@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Production
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env*.local
+.env.production
+.env.prod
+
+# Spring Boot sensitive configs
+apps/api/src/main/resources/application-prod.yml
+apps/api/src/main/resources/application-production.yml
+apps/api/src/main/resources/application-local.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Turbo
+.turbo/
+
+# Vercel
+.vercel
+
+# Spring Boot
+apps/api/target/
+apps/api/.gradle/
+apps/api/build/
+apps/api/out/
+*.jar
+*.war
+*.class
+
+# MongoDB
+data/
+
+# Docker
+docker/nginx/ssl/*.pem
+docker/nginx/ssl/*.key
+
+# Uploads
+uploads/
+
+# Claude
+.claude/

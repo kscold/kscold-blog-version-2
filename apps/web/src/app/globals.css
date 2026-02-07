@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-pretendard: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui,
+      Roboto, sans-serif;
+    --font-playfair: 'Playfair Display', Georgia, serif;
+    --font-jetbrains: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  }
+
+  * {
+    @apply border-primary-200 dark:border-primary-800;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-white dark:bg-black text-primary-900 dark:text-primary-50;
+    @apply font-sans antialiased;
+    @apply transition-colors duration-300;
+  }
+
+  /* 선택 영역 스타일 */
+  ::selection {
+    @apply bg-accent-light/30 text-primary-900;
+  }
+
+  /* 스크롤바 스타일 (Webkit) */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-primary-100 dark:bg-primary-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-400 dark:bg-primary-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-500 dark:bg-primary-500;
+  }
+}
+
+@layer components {
+  /* Glassmorphism Card */
+  .glass-card {
+    @apply bg-white/70 dark:bg-primary-900/70;
+    @apply backdrop-blur-xl;
+    @apply border border-white/30 dark:border-white/10;
+    @apply shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)];
+    @apply rounded-[20px];
+  }
+
+  /* Anti-Gravity 효과 */
+  .anti-gravity {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .anti-gravity:hover {
+    @apply -translate-y-2;
+    @apply shadow-[0_30px_80px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.8)];
+  }
+
+  /* 컨테이너 */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* 텍스트 그라데이션 */
+  .text-gradient {
+    @apply bg-gradient-to-r from-accent-light to-accent-dark;
+    @apply bg-clip-text text-transparent;
+  }
+}
+
+@layer utilities {
+  /* 텍스트 말줄임 */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* 애니메이션 딜레이 */
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  /* 텍스트 균형 (제목용) */
+  .text-balance {
+    text-wrap: balance;
+  }
+}
