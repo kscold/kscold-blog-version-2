@@ -12,26 +12,41 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          50: '#fafafa',
-          100: '#f5f5f5',
-          200: '#e5e5e5',
-          300: '#d4d4d4',
-          400: '#a3a3a3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#082f49',
+        },
+        background: {
+          dark: '#020410', // Deep Ink Blue (More Blue, Less Gray)
+          light: '#ffffff',
         },
         accent: {
-          light: '#a78bfa',
-          DEFAULT: '#8b5cf6',
-          dark: '#7c3aed',
+          light: '#67e8f9', // Cyan Light
+          DEFAULT: '#06b6d4', // Cyan
+          dark: '#0891b2', // Cyan Dark
+          glow: '#22d3ee', // Cyan Glow
+          blue: '#3b82f6', // Electric Blue
         },
-        secondary: {
-          beige: '#f5f1ed',
-          sand: '#e8e0d5',
-          taupe: '#cabfb1',
+        surface: {
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
+          700: '#334155',
+          800: '#1e293b',
+          900: '#0f172a', // Slate/Navy
+          950: '#020617', // Deep Navy
         },
       },
       fontFamily: {
@@ -62,6 +77,10 @@ const config: Config = {
         'fade-in': 'fadeIn 0.6s ease-out',
         'fade-in-up': 'fadeInUp 0.6s ease-out',
         'scale-in': 'scaleIn 0.4s ease-out',
+        'shimmer': 'shimmer 2.5s linear infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'slide-up': 'slideUp 0.5s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -75,6 +94,18 @@ const config: Config = {
         scaleIn: {
           '0%': { opacity: '0', transform: 'scale(0.9)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
         },
       },
     },

@@ -11,7 +11,7 @@
   }
 
   * {
-    @apply border-primary-200 dark:border-primary-800;
+    @apply border-surface-200 dark:border-surface-800;
   }
 
   html {
@@ -19,52 +19,122 @@
   }
 
   body {
-    @apply bg-white dark:bg-black text-primary-900 dark:text-primary-50;
+    @apply bg-background-light dark:bg-background-dark text-surface-900 dark:text-primary-50;
     @apply font-sans antialiased;
     @apply transition-colors duration-300;
   }
 
-  /* 선택 영역 스타일 */
+  /* 선택 영역 스타일 - Cold Cyan */
   ::selection {
-    @apply bg-accent-light/30 text-primary-900;
+    @apply bg-accent-light/30 text-accent-light;
   }
 
   /* 스크롤바 스타일 (Webkit) */
   ::-webkit-scrollbar {
-    @apply w-2;
+    @apply w-1.5;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-primary-100 dark:bg-primary-900;
+    @apply bg-background-dark;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary-400 dark:bg-primary-600 rounded-full;
+    @apply bg-surface-700 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary-500 dark:bg-primary-500;
+    @apply bg-accent-dark;
   }
 }
 
 @layer components {
-  /* Glassmorphism Card */
+  /* Cold Glassmorphism (Bank Style - More Rounded) */
   .glass-card {
-    @apply bg-white/70 dark:bg-primary-900/70;
+    @apply bg-surface-950/60;
     @apply backdrop-blur-xl;
-    @apply border border-white/30 dark:border-white/10;
-    @apply shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)];
-    @apply rounded-[20px];
+    @apply border border-white/10;
+    @apply shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+    @apply rounded-[16px]; /* Bank Style: More Rounded */
+    @apply transition-all duration-300 ease-out;
   }
 
-  /* Anti-Gravity 효과 */
+  /* 3D Card Effect (From Original Blog) */
+  .card-3d {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .card-3d-inner {
+    transform-style: preserve-3d;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-3d:hover .card-3d-inner {
+    transform: rotateY(5deg) rotateX(5deg);
+  }
+
+  /* Cyan/Blue Glow Text */
+  .text-glow {
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.3);
+  }
+
+  /* Anti-Gravity + Glow Hover (Enhanced) */
   .anti-gravity {
     @apply transition-all duration-300 ease-out;
   }
 
   .anti-gravity:hover {
     @apply -translate-y-2;
-    @apply shadow-[0_30px_80px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.8)];
+    @apply shadow-[0_20px_40px_-10px_rgba(6,182,212,0.4)];
+    transform: translateY(-8px) scale(1.02);
+  }
+
+  /* Bank Style Button */
+  .btn-bank {
+    @apply px-6 py-3;
+    @apply rounded-[10px];
+    @apply font-semibold text-sm uppercase tracking-wide;
+    @apply transition-all duration-300 ease-out;
+    @apply shadow-[0_4px_12px_rgba(0,0,0,0.2)];
+  }
+
+  .btn-bank:hover {
+    @apply shadow-[0_8px_20px_rgba(0,0,0,0.3)];
+    @apply -translate-y-1;
+  }
+
+  .btn-bank-primary {
+    @apply btn-bank;
+    @apply bg-accent text-white;
+  }
+
+  .btn-bank-primary:hover {
+    @apply bg-accent-dark;
+  }
+
+  .btn-bank-secondary {
+    @apply btn-bank;
+    @apply bg-surface-700 text-white;
+  }
+
+  .btn-bank-secondary:hover {
+    @apply bg-surface-600;
+  }
+
+  /* Bank Style Input */
+  .input-bank {
+    @apply px-5 py-3;
+    @apply rounded-[8px];
+    @apply bg-surface-900 border-none;
+    @apply text-primary-100 placeholder-surface-400;
+    @apply shadow-[0_4px_8px_rgba(0,0,0,0.2)];
+    @apply transition-all duration-200 ease-out;
+    @apply outline-none;
+  }
+
+  .input-bank:focus {
+    @apply shadow-[0_4px_12px_rgba(6,182,212,0.3)];
+    @apply ring-2 ring-accent/50;
   }
 
   /* 컨테이너 */
@@ -72,10 +142,31 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* 텍스트 그라데이션 */
+  /* 텍스트 그라데이션 - Cold Blue/Cyan */
   .text-gradient {
-    @apply bg-gradient-to-r from-accent-light to-accent-dark;
+    @apply bg-gradient-to-r from-accent-light to-accent-blue;
     @apply bg-clip-text text-transparent;
+  }
+
+  /* Modal Overlay (Bank Style) */
+  .modal-overlay {
+    @apply fixed inset-0 z-[1300];
+    @apply bg-black/60 backdrop-blur-sm;
+    @apply transition-opacity duration-300;
+  }
+
+  /* Modal Container (Bank Style) */
+  .modal-container {
+    @apply fixed inset-0 z-[1400];
+    @apply flex items-center justify-center p-4;
+  }
+
+  .modal-content {
+    @apply bg-surface-900;
+    @apply rounded-[16px];
+    @apply shadow-[0_20px_60px_rgba(0,0,0,0.5)];
+    @apply border border-white/10;
+    @apply transition-all duration-300 ease-out;
   }
 }
 

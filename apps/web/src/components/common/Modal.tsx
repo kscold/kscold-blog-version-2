@@ -23,36 +23,46 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'md' }: ModalProps
     <AnimatePresence>
       {isOpen && (
         <Fragment>
-          {/* Backdrop */}
+          {/* Backdrop - Bank Style */}
           <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1300]"
+            className="modal-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={onClose}
           />
 
-          {/* Modal */}
-          <div className="fixed inset-0 z-[1400] flex items-center justify-center p-4">
+          {/* Modal Container */}
+          <div className="modal-container">
             <motion.div
               className={`
-                glass-card w-full ${maxWidthClass} p-6
+                modal-content w-full ${maxWidthClass} p-6
                 ${title ? 'space-y-4' : ''}
               `}
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 30,
+                mass: 0.8,
+              }}
               onClick={e => e.stopPropagation()}
             >
               {title && (
-                <div className="flex items-center justify-between border-b border-primary-200 dark:border-primary-700 pb-4">
-                  <h3 className="text-xl font-semibold text-primary-900 dark:text-primary-100">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <h3 className="text-xl font-semibold text-primary-50 tracking-tight">
                     {title}
                   </h3>
                   <button
                     onClick={onClose}
-                    className="text-primary-500 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                    className="
+                      text-surface-400 hover:text-accent-light
+                      transition-colors duration-200
+                      p-1 rounded-lg hover:bg-surface-800
+                    "
                   >
                     <svg
                       className="w-6 h-6"
@@ -68,7 +78,7 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'md' }: ModalProps
                   </button>
                 </div>
               )}
-              <div>{children}</div>
+              <div className="text-primary-100">{children}</div>
             </motion.div>
           </div>
         </Fragment>
