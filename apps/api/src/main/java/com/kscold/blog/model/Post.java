@@ -45,6 +45,11 @@ public class Post {
     private AuthorInfo author;
 
     @Builder.Default
+    private Source source = Source.MANUAL;
+
+    private String originalFilename;
+
+    @Builder.Default
     private Status status = Status.DRAFT;
 
     @Builder.Default
@@ -68,6 +73,10 @@ public class Post {
 
     public enum Status {
         DRAFT, PUBLISHED, ARCHIVED
+    }
+
+    public enum Source {
+        MANUAL, MARKDOWN_IMPORT
     }
 
     @Data

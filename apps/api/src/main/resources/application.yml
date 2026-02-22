@@ -1,0 +1,46 @@
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+  application:
+    name: kscold-blog-api
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/kscold-blog}
+      auto-index-creation: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# JWT 설정
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-change-in-production-must-be-at-least-256-bits}
+  access-token-expiration: 3600000  # 1 hour
+  refresh-token-expiration: 604800000  # 7 days
+
+# CORS 설정
+cors:
+  allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+
+# File Upload
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:./uploads}
+
+# Logging
+logging:
+  level:
+    com.kscold.blog: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    org.springframework.security: DEBUG

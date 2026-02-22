@@ -28,6 +28,8 @@ public class PostResponse {
     private List<TagInfo> tags;
     private AuthorInfo author;
     private Post.Status status;
+    private Post.Source source;
+    private String originalFilename;
     private Boolean featured;
     private Integer views;
     private Integer likes;
@@ -113,6 +115,8 @@ public class PostResponse {
                         .name(post.getAuthor().getName())
                         .build())
                 .status(post.getStatus())
+                .source(post.getSource())
+                .originalFilename(post.getOriginalFilename())
                 .featured(post.getFeatured())
                 .views(post.getViews())
                 .likes(post.getLikes())

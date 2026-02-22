@@ -29,4 +29,6 @@ public interface PostRepository extends MongoRepository<Post, String> {
     Page<Post> searchByText(String searchText, Pageable pageable);
 
     long countByStatus(Post.Status status);
+
+    boolean existsBySlug(String slug);
 }
