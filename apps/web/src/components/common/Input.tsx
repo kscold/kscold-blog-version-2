@@ -16,19 +16,19 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         ? 'input-bank'
         : `
             w-full px-5 py-3 rounded-[8px]
-            bg-surface-900 border-none
-            text-primary-100 placeholder:text-surface-400
-            shadow-[0_4px_8px_rgba(0,0,0,0.2)]
-            focus:outline-none focus:ring-2 focus:ring-accent-DEFAULT/50 focus:shadow-[0_4px_12px_rgba(6,182,212,0.3)]
+            bg-white border border-surface-200
+            text-surface-900 placeholder:text-surface-400
+            shadow-sm
+            focus:outline-none focus:ring-1 focus:ring-surface-900 focus:border-surface-900 focus:shadow-[0_4px_12px_rgba(15,23,42,0.08)]
             transition-all duration-200
             disabled:opacity-50 disabled:cursor-not-allowed
-            ${error ? 'ring-2 ring-red-500/50' : ''}
+            ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
           `;
 
     return (
       <div className="space-y-2">
         {label && (
-          <label className="block text-sm font-medium text-primary-100 tracking-tight">
+          <label className="block text-sm font-medium text-surface-900 tracking-tight">
             {label}
           </label>
         )}

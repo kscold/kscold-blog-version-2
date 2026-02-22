@@ -55,10 +55,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-surface-950 via-background-dark to-surface-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-surface-50 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent-DEFAULT/10 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white via-surface-50 to-surface-100" />
+      <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02]" />
 
       <motion.div
         className="relative z-10 w-full max-w-[440px]"
@@ -74,10 +74,12 @@ export default function LoginPage() {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <Link href="/" className="inline-block group">
-            <h1 className="text-5xl font-serif font-bold text-gradient mb-3 group-hover:scale-105 transition-transform">
-              KSCOLD
+            <h1 className="text-5xl font-sans font-black tracking-tighter mb-3 group-hover:scale-105 transition-transform">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 bg-[size:200%_auto] animate-shimmer">
+                KSCOLD
+              </span>
             </h1>
-            <p className="text-surface-400 text-sm tracking-wide">
+            <p className="text-surface-500 text-sm tracking-wide font-medium">
               Professional Development Blog
             </p>
           </Link>
@@ -91,12 +93,12 @@ export default function LoginPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="bg-surface-900 border border-white/10 rounded-[16px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+            <div className="bg-white/80 backdrop-blur-xl border border-surface-200/60 rounded-[16px] p-8 shadow-[0_8px_32px_-8px_rgba(15,23,42,0.08)]">
               {/* Toggle Switch (Bank Style) */}
               <div className="flex items-center justify-center mb-8">
-                <div className="relative inline-flex bg-surface-800 rounded-[8px] p-1">
+                <div className="relative inline-flex bg-surface-100/80 p-1 rounded-xl">
                   <motion.div
-                    className="absolute h-[calc(100%-8px)] bg-accent-DEFAULT rounded-[6px] transition-all duration-300"
+                    className="absolute h-[calc(100%-8px)] bg-white rounded-lg shadow-sm transition-all duration-300"
                     initial={false}
                     animate={{
                       width: 'calc(50% - 4px)',
@@ -107,7 +109,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setIsLogin(true)}
                     className={`relative z-10 px-6 py-2 text-sm font-semibold transition-colors duration-300 ${
-                      isLogin ? 'text-white' : 'text-surface-400'
+                      isLogin ? 'text-surface-900' : 'text-surface-500'
                     }`}
                   >
                     로그인
@@ -116,7 +118,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setIsLogin(false)}
                     className={`relative z-10 px-6 py-2 text-sm font-semibold transition-colors duration-300 ${
-                      !isLogin ? 'text-white' : 'text-surface-400'
+                      !isLogin ? 'text-surface-900' : 'text-surface-500'
                     }`}
                   >
                     회원가입
@@ -187,7 +189,7 @@ export default function LoginPage() {
               <div className="mt-6 text-center">
                 <Link
                   href="/"
-                  className="text-sm text-surface-400 hover:text-accent-light transition-colors inline-flex items-center gap-2 group"
+                  className="text-sm font-medium text-surface-500 hover:text-surface-900 transition-colors inline-flex items-center gap-2 group"
                 >
                   <svg
                     className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
@@ -211,13 +213,13 @@ export default function LoginPage() {
 
         {/* Dev Notice */}
         <motion.div
-          className="mt-6 p-4 bg-accent-DEFAULT/10 border border-accent-DEFAULT/20 rounded-[12px] backdrop-blur-sm"
+          className="mt-6 p-4 bg-white/60 border border-surface-200/60 rounded-[12px] backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <p className="text-xs text-accent-light text-center">
-            <strong>개발 모드:</strong> 백엔드 서버 확인 (localhost:8080)
+          <p className="text-xs text-surface-500 text-center font-medium tracking-wide">
+            <strong className="text-surface-900">개발 모드:</strong> 백엔드 서버 확인 (localhost:8080)
           </p>
         </motion.div>
       </motion.div>

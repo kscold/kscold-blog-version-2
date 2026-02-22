@@ -9,36 +9,41 @@ export function Footer() {
     social: [
       { label: 'GitHub', href: 'https://github.com/kscold' },
       { label: 'LinkedIn', href: '#' },
-      { label: 'Twitter', href: '#' },
+      { label: 'Email', href: 'mailto:contact@coldcraft.dev' },
     ],
     quick: [
       { label: 'Blog', href: '/blog' },
       { label: 'Portfolio', href: '/portfolio' },
       { label: 'About', href: '/about' },
-      { label: 'Chat', href: '/chat' },
     ],
   };
 
   return (
-    <footer className="relative mt-20 border-t border-accent-blue/10 bg-background-dark/40 backdrop-blur-md">
-      {/* Footer Top Gradient Line */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent-blue/50 to-transparent" />
-      
-      <div className="max-w-7xl mx-auto px-6 py-12 lg:px-8">
+    <footer className="relative mt-20 bg-white border-t border-neutral-200">
+      <div className="max-w-7xl mx-auto px-6 py-16 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-24">
+          {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="inline-block">
-              <span className="text-2xl font-sans font-black tracking-[-0.05em] text-white">
-                KSCOLD
+              <span className="text-2xl font-sans font-black tracking-[-0.05em] text-neutral-900 hover:text-neutral-600 transition-colors">
+                COLDING
               </span>
             </Link>
-            <p className="mt-4 text-sm text-surface-400 font-light leading-relaxed max-w-sm text-balance">
-              Building digital experiences while <span className="text-accent-light">Enjoying</span> the <span className="text-accent-blue">Learning Curve</span>.
+            <p className="mt-1 text-xs font-mono text-neutral-400 tracking-wider uppercase">
+              by KSCOLD
+            </p>
+            <p className="mt-4 text-sm text-neutral-500 font-light leading-relaxed max-w-sm text-balance">
+              Crafting digital products with precision.
+              <br />
+              <span className="text-neutral-700 font-medium">
+                Enjoying the Learning Curve.
+              </span>
             </p>
           </div>
 
+          {/* Navigation */}
           <div>
-            <h4 className="font-mono text-xs font-bold text-accent-light uppercase tracking-[0.2em] mb-6 opacity-70">
+            <h4 className="font-mono text-xs font-bold text-neutral-400 uppercase tracking-[0.2em] mb-6">
               Navigation
             </h4>
             <ul className="space-y-3">
@@ -46,7 +51,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-surface-400 hover:text-white transition-colors hover:translate-x-1 inline-block duration-300"
+                    className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors duration-300"
                   >
                     {link.label}
                   </Link>
@@ -55,8 +60,9 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Connect */}
           <div>
-            <h4 className="font-mono text-xs font-bold text-accent-light uppercase tracking-[0.2em] mb-6 opacity-70">
+            <h4 className="font-mono text-xs font-bold text-neutral-400 uppercase tracking-[0.2em] mb-6">
               Connect
             </h4>
             <ul className="space-y-3">
@@ -66,10 +72,9 @@ export function Footer() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-2 text-sm text-surface-400 hover:text-white transition-colors"
+                    className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors duration-300"
                   >
                     {link.label}
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent-light opacity-0 group-hover:opacity-100 transition-opacity" />
                   </a>
                 </li>
               ))}
@@ -77,15 +82,14 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-surface-600 font-mono tracking-wider">
-            © {currentYear} KSCOLD. All rights reserved.
+        {/* Bottom */}
+        <div className="mt-16 pt-8 border-t border-neutral-100 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-neutral-400 font-mono tracking-wider">
+            &copy; {currentYear} COLDING. All rights reserved.
           </p>
-          <div className="flex gap-6">
-             <div className="w-2 h-2 rounded-full bg-surface-800 animate-pulse" />
-             <div className="w-2 h-2 rounded-full bg-surface-800 animate-pulse animation-delay-200" />
-             <div className="w-2 h-2 rounded-full bg-surface-800 animate-pulse animation-delay-400" />
-          </div>
+          <p className="text-[10px] text-neutral-300 font-mono tracking-widest uppercase">
+            Seoul, South Korea
+          </p>
         </div>
       </div>
     </footer>

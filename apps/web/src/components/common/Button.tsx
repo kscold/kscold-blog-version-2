@@ -23,16 +23,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-semibold transition-all duration-300 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-accent-DEFAULT/50 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+      'inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-surface-900/50 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variantStyles = {
       primary:
-        'bg-accent-DEFAULT text-white hover:bg-accent-dark shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_20px_rgba(6,182,212,0.3)] hover:-translate-y-1',
+        'bg-surface-900 text-white hover:bg-surface-800 shadow-[0_4px_12px_rgba(15,23,42,0.2)] hover:shadow-[0_8px_20px_rgba(15,23,42,0.3)] hover:-translate-y-1',
       secondary:
-        'bg-surface-700 text-white hover:bg-surface-600 shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)] hover:-translate-y-1',
+        'bg-surface-100 text-surface-900 hover:bg-surface-200 shadow-sm hover:shadow-md hover:-translate-y-1',
       ghost:
-        'border border-white/10 hover:bg-surface-800 text-primary-100 hover:border-accent-DEFAULT/50',
-      minimal: 'hover:bg-surface-800 text-primary-100',
+        'border border-surface-200 hover:bg-surface-50 text-surface-600 hover:text-surface-900',
+      minimal: 'hover:bg-surface-50 text-surface-600 hover:text-surface-900',
       bank: 'btn-bank-primary uppercase tracking-wide text-sm',
     };
 

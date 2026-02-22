@@ -32,19 +32,19 @@ export function Header() {
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${
         isScrolled
-          ? 'bg-background-dark/80 backdrop-blur-3xl border-accent-blue/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] h-16'
-          : 'bg-transparent border-transparent h-20'
+          ? 'bg-white/80 backdrop-blur-xl border-surface-200 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]'
+          : 'bg-white/50 backdrop-blur-lg border-transparent'
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
-      <div className="px-6 sm:px-8 lg:px-12 h-full">
+      <div className="px-6 sm:px-8 lg:px-12 h-16">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-4 sm:gap-8">
             <button
               onClick={toggleSidebar}
-              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-white/10 transition-colors text-white"
+              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-surface-100 transition-colors text-surface-900"
               aria-label="Toggle sidebar"
             >
               <svg
@@ -66,8 +66,7 @@ export function Header() {
               href="/"
               className="group relative flex items-center gap-2"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-accent-blue to-accent-light opacity-80 group-hover:opacity-100 transition-opacity blur-[8px] absolute" />
-              <span className="relative text-xl sm:text-2xl font-sans font-bold tracking-tighter text-white z-10 group-hover:text-accent-light transition-colors">
+              <span className="relative text-xl sm:text-2xl font-sans font-black tracking-tighter text-surface-900 z-10 group-hover:text-surface-600 transition-colors">
                 KSCOLD
               </span>
             </Link>
@@ -77,11 +76,11 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative px-4 py-2 text-sm font-medium text-surface-300 hover:text-white transition-colors group overflow-hidden rounded-full"
+                  className="relative px-4 py-2 text-sm font-medium text-surface-500 hover:text-surface-900 transition-colors group overflow-hidden rounded-full"
                 >
                   <span className="relative z-10">{item.label}</span>
-                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent-light to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-surface-100 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-surface-900 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 </Link>
               ))}
             </nav>
@@ -93,14 +92,14 @@ export function Header() {
                 {user.role === 'ADMIN' && (
                   <Link
                     href="/admin"
-                    className="hidden sm:block px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-full transition-colors"
+                    className="hidden sm:block px-4 py-2 text-sm font-medium text-surface-900 hover:bg-surface-100 rounded-full transition-colors"
                   >
                     Admin
                   </Link>
                 )}
                 <button
                   onClick={logout}
-                  className="px-4 py-2 text-sm font-medium text-surface-400 hover:text-white transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-surface-500 hover:text-surface-900 transition-colors"
                 >
                   Logout
                 </button>
@@ -108,7 +107,7 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                className="px-5 py-2 text-xs sm:text-sm font-bold text-background-dark bg-white hover:bg-accent-light transition-colors rounded-full shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_20px_rgba(103,232,249,0.6)]"
+                className="px-5 py-2 text-xs sm:text-sm font-bold text-white bg-surface-900 hover:bg-surface-800 transition-colors rounded-full"
               >
                 LOGIN
               </Link>

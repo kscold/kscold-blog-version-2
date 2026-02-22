@@ -30,9 +30,9 @@ export function PostCard({ post, featured = false }: PostCardProps) {
         href={`/blog/${post.category.slug}/${post.slug}`}
         className="block h-full"
       >
-        <div className="h-full bg-surface-900/40 backdrop-blur-md border border-white/5 rounded-[24px] p-6 transition-all duration-500 group-hover:border-accent-light/30 group-hover:bg-surface-900/60 group-hover:shadow-[0_20px_50px_-12px_rgba(6,182,212,0.25)] relative overflow-hidden">
-          {/* Holographic Sliek Effect */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none z-0" />
+        <div className="h-full bg-white border border-surface-200 rounded-[24px] p-6 transition-all duration-500 group-hover:border-surface-900 group-hover:bg-surface-50 group-hover:shadow-xl relative overflow-hidden">
+          {/* Holographic Slide Effect */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-surface-900/5 to-transparent skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none z-0" />
           
           {post.coverImage && (
             <div
@@ -60,14 +60,14 @@ export function PostCard({ post, featured = false }: PostCardProps) {
             <span className="text-xs font-bold text-accent-light uppercase tracking-widest">
               {post.category.name}
             </span>
-            <span className="text-xs text-surface-600">•</span>
+            <span className="text-xs text-surface-400">•</span>
             <time className="text-xs text-surface-500 font-mono">
               {formattedDate}
             </time>
           </div>
 
           <h3
-            className={`font-sans font-bold text-white mb-3 group-hover:text-accent-light transition-colors ${
+            className={`font-sans font-bold text-surface-900 mb-3 group-hover:text-surface-600 transition-colors ${
               featured ? 'text-3xl' : 'text-xl'
             }`}
           >
@@ -75,7 +75,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
           </h3>
 
           <p
-            className={`text-surface-400 mb-4 line-clamp-${
+            className={`text-surface-600 mb-4 line-clamp-${
               featured ? '4' : '3'
             }`}
           >
@@ -87,7 +87,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
               {post.tags.slice(0, featured ? 5 : 3).map((tag) => (
                 <span
                   key={tag.id}
-                  className="px-2 py-1 text-[10px] font-bold bg-surface-800 text-surface-300 border border-white/5 rounded-lg group-hover:border-accent-light/30 transition-colors uppercase tracking-wider"
+                  className="px-2 py-1 text-[10px] font-bold bg-surface-50 text-surface-600 border border-surface-200 rounded-lg group-hover:border-surface-900 transition-colors uppercase tracking-wider"
                 >
                   #{tag.name}
                 </span>
@@ -95,7 +95,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
             </div>
           )}
 
-          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-white/5">
+          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-surface-100">
             <div className="flex items-center gap-1 text-xs text-surface-500 font-mono">
               <span className="uppercase">Views</span>
               <span>{post.views || 0}</span>

@@ -24,10 +24,10 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
       whileTap={{ scale: 0.95 }}
     >
       {/* Glow Effect */}
-      <div className="absolute inset-0 bg-accent-DEFAULT/30 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-x-0 -bottom-2 h-full bg-surface-900/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
       {/* Button */}
-      <div className="relative w-16 h-16 bg-accent-DEFAULT hover:bg-accent-dark rounded-full shadow-[0_8px_24px_rgba(6,182,212,0.4)] flex items-center justify-center transition-all duration-300">
+      <div className="relative w-16 h-16 bg-surface-900 hover:bg-surface-800 rounded-full shadow-xl shadow-surface-900/10 flex items-center justify-center transition-all duration-300 border border-surface-800">
         {/* Chat Icon */}
         <AnimatePresence mode="wait">
           {!isHovered ? (
@@ -90,14 +90,14 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-surface-800 text-primary-100 text-sm rounded-lg shadow-lg whitespace-nowrap border border-white/10"
+            className="absolute bottom-full right-0 mb-3 px-4 py-2 bg-white text-surface-900 font-bold tracking-wide text-xs rounded-xl shadow-lg whitespace-nowrap border border-surface-200"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.2 }}
           >
             실시간 채팅
-            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-surface-800" />
+            <div className="absolute top-full right-6 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white drop-shadow-sm" />
           </motion.div>
         )}
       </AnimatePresence>
