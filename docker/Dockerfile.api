@@ -1,0 +1,32 @@
+# Multi-stage build for Spring Boot
+
+# Builder stage
+FROM gradle:8.5-jdk21 AS builder
+WORKDIR /app
+
+# Copy Gradle files
+COPY apps/api/build.gradle apps/api/settings.gradle ./
+COPY apps/api/gradle ./gradle
+
+# Download dependencies (cached)
+RUN gradle dependencies --no-daemon || true
+
+# Copy source code
+COPY apps/api/src ./src
+
+# Build the application
+RUN gradle build -x test --no-daemon
+
+# Runner stage
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+
+# Create uploads directory
+RUN mkdir -p /uploads && chmod 755 /uploads
+
+# Copy the built JAR
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
