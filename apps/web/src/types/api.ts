@@ -70,6 +70,8 @@ export interface Post {
     name: string;
   };
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  source?: 'MANUAL' | 'MARKDOWN_IMPORT';
+  originalFilename?: string;
   featured: boolean;
   views: number;
   likes: number;
@@ -115,6 +117,8 @@ export interface PostCreateRequest {
   metaTitle?: string;
   metaDescription?: string;
   keywords?: string[];
+  source?: 'MANUAL' | 'MARKDOWN_IMPORT';
+  originalFilename?: string;
 }
 
 export interface PostUpdateRequest {

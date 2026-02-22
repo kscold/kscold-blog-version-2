@@ -99,9 +99,9 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             onClick={onClose}
           />
 
-          {/* Chat Modal - Bank Style */}
+          {/* Chat Modal - Premium Light */}
           <motion.div
-            className="fixed bottom-24 right-6 z-[1400] w-[400px] h-[600px] bg-surface-900 border border-white/10 rounded-[16px] shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col"
+            className="fixed bottom-24 right-6 z-[1400] w-[400px] h-[600px] bg-white border border-surface-200 rounded-[24px] shadow-2xl overflow-hidden flex flex-col"
             initial={{ opacity: 0, scale: 0.8, y: 100, x: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 100, x: 50 }}
@@ -113,12 +113,12 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="p-4 border-b border-white/10 bg-gradient-to-r from-surface-900 to-surface-800 flex-shrink-0">
+            <div className="p-4 border-b border-surface-200 bg-surface-50 flex-shrink-0">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent-DEFAULT/10 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-surface-900 rounded-full flex items-center justify-center shadow-sm">
                     <svg
-                      className="w-6 h-6 text-accent-light"
+                      className="w-5 h-5 text-white"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -132,15 +132,15 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-primary-50">실시간 채팅</h3>
-                    <p className="text-xs text-surface-400">
+                    <h3 className="text-sm font-bold text-surface-900">실시간 채팅</h3>
+                    <p className="text-xs text-surface-500 font-medium">
                       {isConnected ? '연결됨' : '연결 중...'}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-800 text-surface-400 hover:text-accent-light transition-colors"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-200 text-surface-400 hover:text-surface-900 transition-colors"
                 >
                   <svg
                     className="w-5 h-5"
@@ -159,14 +159,14 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               </div>
 
               {/* Status Bar */}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-surface-800 rounded-[6px] border border-white/10">
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-surface-200 shadow-sm">
                   <div
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      isConnected ? 'bg-accent-light animate-pulse' : 'bg-red-500'
+                    className={`w-2 h-2 rounded-full ${
+                      isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'
                     }`}
                   />
-                  <span className="text-xs text-primary-100">
+                  <span className="text-xs font-bold tracking-wide text-surface-600">
                     {onlineUsers} 명 접속
                   </span>
                 </div>
@@ -174,7 +174,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-surface-950/50">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-surface-50">
               <AnimatePresence initial={false}>
                 {messages.map((message, index) => (
                   <motion.div
@@ -185,34 +185,34 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                     transition={{ duration: 0.3 }}
                     className={
                       message.type === 'SYSTEM'
-                        ? 'text-center'
+                        ? 'text-center my-4'
                         : message.user.name === (user?.displayName || user?.username || '익명')
                         ? 'flex justify-end'
                         : 'flex justify-start'
                     }
                   >
                     {message.type === 'SYSTEM' ? (
-                      <div className="px-3 py-1.5 bg-surface-800/50 border border-white/10 rounded-full text-xs text-surface-400">
+                      <div className="inline-block px-4 py-1.5 bg-surface-200/50 rounded-full text-[11px] font-bold tracking-wider text-surface-500">
                         {message.content}
                       </div>
                     ) : (
-                      <div className="max-w-[80%]">
-                        <div className="text-xs text-surface-400 mb-1">
+                      <div className="max-w-[85%]">
+                        <div className="text-[11px] font-bold text-surface-400 mb-1.5 px-1 tracking-wide">
                           {message.user.name}
                         </div>
                         <div
-                          className={`px-3 py-2 rounded-[10px] shadow-md ${
+                          className={`px-4 py-2.5 rounded-[16px] shadow-sm ${
                             message.user.name ===
                             (user?.displayName || user?.username || '익명')
-                              ? 'bg-accent-DEFAULT text-white rounded-tr-sm'
-                              : 'bg-surface-800 text-primary-100 rounded-tl-sm border border-white/10'
+                              ? 'bg-surface-900 text-white rounded-tr-sm'
+                              : 'bg-white text-surface-700 rounded-tl-sm border border-surface-200'
                           }`}
                         >
-                          <p className="text-sm break-words leading-relaxed">
+                          <p className="text-sm break-words leading-relaxed font-medium">
                             {message.content}
                           </p>
                         </div>
-                        <div className="text-xs text-surface-500 mt-1">
+                        <div className="text-[10px] text-surface-400 mt-1.5 px-1 font-mono tracking-wider">
                           {new Date(message.createdAt).toLocaleTimeString('ko-KR', {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -227,20 +227,20 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-white/10 bg-surface-900 flex-shrink-0">
-              <form onSubmit={handleSendMessage} className="flex gap-2">
+            <div className="p-4 border-t border-surface-200 bg-white flex-shrink-0">
+              <form onSubmit={handleSendMessage} className="flex gap-3">
                 <input
                   type="text"
                   value={inputMessage}
                   onChange={e => setInputMessage(e.target.value)}
                   placeholder={isConnected ? '메시지 입력...' : '연결 중...'}
                   disabled={!isConnected}
-                  className="flex-1 px-3 py-2 rounded-[8px] bg-surface-800 border-none text-primary-100 placeholder:text-surface-400 text-sm focus:outline-none focus:ring-2 focus:ring-accent-DEFAULT/50 disabled:opacity-50"
+                  className="flex-1 px-4 py-3 rounded-xl bg-surface-50 border border-surface-200 text-surface-900 placeholder:text-surface-400 text-sm focus:outline-none focus:border-surface-900 focus:ring-1 focus:ring-surface-900 disabled:opacity-50 transition-all font-medium shadow-inner"
                 />
                 <button
                   type="submit"
                   disabled={!isConnected || !inputMessage.trim()}
-                  className="w-10 h-10 flex items-center justify-center bg-accent-DEFAULT hover:bg-accent-dark rounded-[8px] text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                  className="w-12 h-12 flex items-center justify-center bg-surface-900 hover:bg-surface-800 rounded-xl text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 >
                   <svg
                     className="w-5 h-5"

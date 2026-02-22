@@ -22,14 +22,14 @@ function CategoryTree({ categories, depth = 0 }: { categories: Category[]; depth
               href={`/blog/${category.slug}`}
               className="group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 hover:bg-white/5 hover:shadow-[inset_0_0_20px_rgba(6,182,212,0.1)] relative overflow-hidden"
             >
-              <div className="absolute left-0 w-1 h-0 bg-accent-light group-hover:h-full transition-all duration-300 top-1/2 -translate-y-1/2 rounded-full opacity-0 group-hover:opacity-100" />
-              {category.icon && <span className="text-surface-500 group-hover:text-accent-light transition-colors relative z-10">{category.icon}</span>}
+              <div className="absolute left-0 w-1 h-0 bg-surface-900 group-hover:h-full transition-all duration-300 top-1/2 -translate-y-1/2 rounded-full opacity-0 group-hover:opacity-100" />
+              {category.icon && <span className="text-surface-400 group-hover:text-surface-900 transition-colors relative z-10">{category.icon}</span>}
               <span
-                className="flex-1 text-surface-400 group-hover:text-white transition-colors font-medium tracking-wide relative z-10"
+                className="flex-1 text-surface-600 group-hover:text-surface-900 transition-colors font-medium tracking-wide relative z-10"
               >
                 {category.name}
               </span>
-              <span className="text-[10px] text-surface-600 group-hover:text-accent-dark font-mono relative z-10">{category.postCount}</span>
+              <span className="text-[10px] text-surface-400 group-hover:text-surface-900 font-mono relative z-10">{category.postCount}</span>
             </Link>
             {children.length > 0 && (
               <CategoryTree categories={categories} depth={depth + 1} />
@@ -60,11 +60,10 @@ export function Sidebar() {
       </AnimatePresence>
 
       <motion.aside
-        className={`fixed top-16 left-0 bottom-0 w-64 z-40 overflow-y-auto transition-transform duration-300 ${
+        className={`fixed top-16 left-0 bottom-0 w-56 z-40 overflow-y-auto transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 bg-background-dark/30 backdrop-blur-2xl border-r border-accent-blue/5`}
+        } lg:translate-x-0 bg-white border-r border-surface-200`}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-accent-blue/5 to-transparent pointer-events-none" />
         <div className="p-6 space-y-8 relative">
           {/* Mobile Navigation Links (Visible on all sizes for sidebar access) */}
           <div className="lg:hidden pb-6 border-b border-white/5 space-y-1">
@@ -79,7 +78,7 @@ export function Sidebar() {
                    key={link.href}
                    href={link.href}
                    onClick={() => setSidebarOpen(false)}
-                   className="block px-4 py-2.5 rounded-xl text-sm font-medium text-surface-300 hover:text-white hover:bg-white/5 transition-colors"
+                   className="block px-4 py-2.5 rounded-xl text-sm font-medium text-surface-600 hover:text-surface-900 hover:bg-surface-50 transition-colors"
                 >
                    {link.label}
                 </Link>
@@ -87,7 +86,7 @@ export function Sidebar() {
           </div>
 
           <div>
-            <h2 className="text-xs font-bold text-accent-light mb-4 tracking-[0.2em] uppercase opacity-70">
+            <h2 className="text-xs font-bold text-surface-400 mb-4 tracking-[0.2em] uppercase">
               Categories
             </h2>
             {categories ? (
@@ -98,7 +97,7 @@ export function Sidebar() {
           </div>
 
           <div>
-            <h2 className="text-xs font-bold text-accent-light mb-4 tracking-[0.2em] uppercase opacity-70">
+            <h2 className="text-xs font-bold text-surface-400 mb-4 tracking-[0.2em] uppercase">
               Popular Tags
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -106,9 +105,9 @@ export function Sidebar() {
                 <Link
                   key={tag}
                   href={`/blog/tags/${tag.toLowerCase()}`}
-                  className="group relative px-3 py-1.5 text-xs font-bold text-surface-400 bg-surface-950/50 border border-white/5 rounded-lg overflow-hidden transition-all hover:text-white hover:border-accent-light/30"
+                  className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
                 >
-                  <div className="absolute inset-0 bg-accent-blue/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-surface-50 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <span className="relative z-10">{tag}</span>
                 </Link>
               ))}

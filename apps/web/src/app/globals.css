@@ -19,14 +19,20 @@
   }
 
   body {
-    @apply bg-background-light dark:bg-background-dark text-surface-900 dark:text-primary-50;
+    @apply bg-white text-surface-900;
     @apply font-sans antialiased;
     @apply transition-colors duration-300;
   }
 
-  /* 선택 영역 스타일 - Cold Cyan */
+  @media (hover: hover) and (pointer: fine) {
+    body, a, button, input, textarea, select, [role="button"], .interactive {
+      cursor: none !important;
+    }
+  }
+
+  /* 선택 영역 스타일 - Crisp Dark */
   ::selection {
-    @apply bg-accent-light/30 text-accent-light;
+    @apply bg-surface-900 text-white;
   }
 
   /* 스크롤바 스타일 (Webkit) */
@@ -148,24 +154,24 @@
     @apply bg-clip-text text-transparent;
   }
 
-  /* Modal Overlay (Bank Style) */
+  /* Modal Overlay (Clean Light Style) */
   .modal-overlay {
     @apply fixed inset-0 z-[1300];
-    @apply bg-black/60 backdrop-blur-sm;
+    @apply bg-surface-900/20 backdrop-blur-sm;
     @apply transition-opacity duration-300;
   }
 
-  /* Modal Container (Bank Style) */
+  /* Modal Container */
   .modal-container {
     @apply fixed inset-0 z-[1400];
     @apply flex items-center justify-center p-4;
   }
 
   .modal-content {
-    @apply bg-surface-900;
-    @apply rounded-[16px];
-    @apply shadow-[0_20px_60px_rgba(0,0,0,0.5)];
-    @apply border border-white/10;
+    @apply bg-white;
+    @apply rounded-[24px];
+    @apply shadow-2xl;
+    @apply border border-surface-200;
     @apply transition-all duration-300 ease-out;
   }
 }
