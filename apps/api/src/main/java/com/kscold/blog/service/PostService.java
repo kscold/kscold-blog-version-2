@@ -105,6 +105,8 @@ public class PostService {
                 .tags(tagInfos)
                 .author(authorInfo)
                 .status(request.getStatus())
+                .source(request.getSource() != null ? request.getSource() : Post.Source.MANUAL)
+                .originalFilename(request.getOriginalFilename())
                 .featured(request.getFeatured())
                 .seo(seoInfo)
                 .publishedAt(request.getStatus() == Post.Status.PUBLISHED ? LocalDateTime.now() : null)
@@ -271,6 +273,13 @@ public class PostService {
      */
     public Page<Post> search(String keyword, Pageable pageable) {
         return postRepository.searchByText(keyword, pageable);
+    }
+
+    /**
+     * 슬러그 존재 여부 확인
+     */
+    public boolean existsBySlug(String slug) {
+        return postRepository.existsBySlug(slug);
     }
 
     /**

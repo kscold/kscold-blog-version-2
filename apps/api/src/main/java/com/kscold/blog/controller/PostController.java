@@ -191,4 +191,16 @@ public class PostController {
 
         return ResponseEntity.ok(ApiResponse.successWithMessage("포스트가 삭제되었습니다"));
     }
+
+    /**
+     * 슬러그 존재 여부 확인
+     * GET /api/posts/exists/slug/:slug
+     */
+    @GetMapping("/exists/slug/{slug}")
+    public ResponseEntity<ApiResponse<Boolean>> checkSlugExists(
+            @PathVariable String slug
+    ) {
+        boolean exists = postService.existsBySlug(slug);
+        return ResponseEntity.ok(ApiResponse.success(exists));
+    }
 }

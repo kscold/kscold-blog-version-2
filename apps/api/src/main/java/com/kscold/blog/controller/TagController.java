@@ -110,4 +110,19 @@ public class TagController {
 
         return ResponseEntity.ok(ApiResponse.successWithMessage("태그가 삭제되었습니다"));
     }
+
+    /**
+     * 태그 이름으로 조회 또는 자동 생성 (ADMIN 권한 필요)
+     * POST /api/tags/find-or-create
+     */
+    @PostMapping("/find-or-create")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<TagResponse>> findOrCreateTag(
+            @Valid @RequestBody TagRequest request
+    ) {
+        Tag tag = tagService.findOrCreateByName(request.getName());
+        TagResponse response = TagResponse.from(tag);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 }

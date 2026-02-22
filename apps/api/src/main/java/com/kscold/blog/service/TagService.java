@@ -118,6 +118,28 @@ public class TagService {
     }
 
     /**
+     * 태그명으로 조회하거나, 없으면 자동 생성
+     */
+    @Transactional
+    public Tag findOrCreateByName(String name) {
+        return tagRepository.findByName(name)
+                .orElseGet(() -> {
+                    String slug = generateSlug(name);
+                    // 슬러그 충돌 시 숫자 접미사 추가
+                    String uniqueSlug = slug;
+                    int counter = 1;
+                    while (tagRepository.findBySlug(uniqueSlug).isPresent()) {
+                        uniqueSlug = slug + "-" + counter++;
+                    }
+                    Tag tag = Tag.builder()
+                            .name(name)
+                            .slug(uniqueSlug)
+                            .build();
+                    return tagRepository.save(tag);
+                });
+    }
+
+    /**
      * 슬러그 생성 (이름 → kebab-case)
      */
     private String generateSlug(String name) {

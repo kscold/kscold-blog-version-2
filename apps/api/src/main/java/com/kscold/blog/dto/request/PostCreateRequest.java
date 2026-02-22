@@ -44,4 +44,8 @@ public class PostCreateRequest {
     private String metaDescription;
 
     private List<String> keywords;
+
+    private Post.Source source;
+
+    private String originalFilename;
 }
