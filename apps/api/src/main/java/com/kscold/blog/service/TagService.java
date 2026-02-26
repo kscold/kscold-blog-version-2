@@ -5,6 +5,7 @@ import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.model.Tag;
 import com.kscold.blog.repository.TagRepository;
+import com.kscold.blog.util.SlugUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,7 @@ public class TagService {
         }
 
         // 슬러그 생성 및 중복 체크
-        String slug = request.getSlug() != null ? request.getSlug() : generateSlug(request.getName());
+        String slug = request.getSlug() != null ? request.getSlug() : SlugUtils.generate(request.getName());
         if (tagRepository.findBySlug(slug).isPresent()) {
             throw DuplicateResourceException.slug(slug);
         }
@@ -105,15 +106,22 @@ public class TagService {
     }
 
     /**
-     * 태그의 포스트 카운트 업데이트
-     * PostService에서 포스트 생성/삭제 시 호출
+     * 태그의 postCount 증가
      */
     @Transactional
-    public void updatePostCount(String tagId) {
+    public void incrementPostCount(String tagId) {
         Tag tag = getById(tagId);
-        // 실제 포스트 개수는 PostRepository에서 카운트해야 하지만
-        // 여기서는 간단히 증가/감소만 처리
-        // 실제 구현 시 PostRepository에서 카운트 쿼리 필요
+        tag.setPostCount(tag.getPostCount() + 1);
+        tagRepository.save(tag);
+    }
+
+    /**
+     * 태그의 postCount 감소
+     */
+    @Transactional
+    public void decrementPostCount(String tagId) {
+        Tag tag = getById(tagId);
+        tag.setPostCount(Math.max(0, tag.getPostCount() - 1));
         tagRepository.save(tag);
     }
 
@@ -124,8 +132,7 @@ public class TagService {
     public Tag findOrCreateByName(String name) {
         return tagRepository.findByName(name)
                 .orElseGet(() -> {
-                    String slug = generateSlug(name);
-                    // 슬러그 충돌 시 숫자 접미사 추가
+                    String slug = SlugUtils.generate(name);
                     String uniqueSlug = slug;
                     int counter = 1;
                     while (tagRepository.findBySlug(uniqueSlug).isPresent()) {
@@ -137,15 +144,5 @@ public class TagService {
                             .build();
                     return tagRepository.save(tag);
                 });
-    }
-
-    /**
-     * 슬러그 생성 (이름 → kebab-case)
-     */
-    private String generateSlug(String name) {
-        return name.toLowerCase()
-                .replaceAll("[^a-z0-9가-힣\\s-]", "")
-                .replaceAll("\\s+", "-")
-                .trim();
     }
 }

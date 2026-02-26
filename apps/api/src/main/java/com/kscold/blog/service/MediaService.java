@@ -2,6 +2,8 @@ package com.kscold.blog.service;
 
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
+import com.kscold.blog.model.Media;
+import com.kscold.blog.repository.MediaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +24,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MediaService {
 
+    private final MediaRepository mediaRepository;
+
     @Value("${file.upload-dir:./uploads}")
     private String uploadDir;
 
@@ -36,7 +40,7 @@ public class MediaService {
             "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"
     );
 
-    public String upload(MultipartFile file) {
+    public Media upload(MultipartFile file, String uploaderId, String uploaderName) {
         validateFile(file);
 
         try {
@@ -45,14 +49,29 @@ public class MediaService {
 
             String originalFilename = file.getOriginalFilename();
             String extension = getFileExtension(originalFilename);
-            String filename = UUID.randomUUID().toString() + "." + extension;
+            String savedFilename = UUID.randomUUID().toString() + "." + extension;
 
-            Path targetPath = uploadPath.resolve(filename);
+            Path targetPath = uploadPath.resolve(savedFilename);
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-            log.info("File uploaded successfully: {}", filename);
+            String fileUrl = "/uploads/" + savedFilename;
 
-            return "/uploads/" + filename;
+            Media media = Media.builder()
+                    .originalFilename(originalFilename)
+                    .savedFilename(savedFilename)
+                    .filePath(targetPath.toString())
+                    .fileUrl(fileUrl)
+                    .contentType(file.getContentType())
+                    .fileSize(file.getSize())
+                    .uploader(Media.UploaderInfo.builder()
+                            .id(uploaderId)
+                            .name(uploaderName)
+                            .build())
+                    .build();
+
+            log.info("File uploaded successfully: {}", savedFilename);
+
+            return mediaRepository.save(media);
         } catch (IOException e) {
             log.error("Failed to upload file", e);
             throw new InvalidRequestException(
@@ -62,17 +81,22 @@ public class MediaService {
         }
     }
 
-    public void delete(String filePath) {
+    public void delete(String fileUrl) {
         try {
-            String filename = filePath.replace("/uploads/", "");
+            String filename = fileUrl.replace("/uploads/", "");
             Path path = Paths.get(uploadDir, filename).toAbsolutePath().normalize();
 
             if (Files.exists(path)) {
                 Files.delete(path);
                 log.info("File deleted successfully: {}", filename);
             }
+
+            mediaRepository.findAll().stream()
+                    .filter(m -> fileUrl.equals(m.getFileUrl()))
+                    .findFirst()
+                    .ifPresent(mediaRepository::delete);
         } catch (IOException e) {
-            log.error("Failed to delete file: {}", filePath, e);
+            log.error("Failed to delete file: {}", fileUrl, e);
         }
     }
 

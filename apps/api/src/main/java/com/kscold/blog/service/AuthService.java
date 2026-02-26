@@ -49,19 +49,10 @@ public class AuthService {
         user = userRepository.save(user);
 
         // JWT 토큰 생성
-        String token = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
+        String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId(), user.getRole().name());
 
-        return AuthResponse.builder()
-                .accessToken(token)
-                .tokenType("Bearer")
-                .user(AuthResponse.UserInfo.builder()
-                        .id(user.getId())
-                        .email(user.getEmail())
-                        .username(user.getUsername())
-                        .displayName(user.getProfile().getDisplayName())
-                        .role(user.getRole())
-                        .build())
-                .build();
+        return buildAuthResponse(user, accessToken, refreshToken);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -72,19 +63,34 @@ public class AuthService {
             throw InvalidRequestException.invalidInput("이메일 또는 비밀번호가 올바르지 않습니다");
         }
 
-        String token = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
+        String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId(), user.getRole().name());
 
-        return AuthResponse.builder()
-                .accessToken(token)
-                .tokenType("Bearer")
-                .user(AuthResponse.UserInfo.builder()
-                        .id(user.getId())
-                        .email(user.getEmail())
-                        .username(user.getUsername())
-                        .displayName(user.getProfile() != null ? user.getProfile().getDisplayName() : user.getUsername())
-                        .role(user.getRole())
-                        .build())
-                .build();
+        return buildAuthResponse(user, accessToken, refreshToken);
+    }
+
+    /**
+     * Refresh Token으로 새로운 Access Token 발급
+     */
+    public AuthResponse refresh(String refreshToken) {
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw InvalidRequestException.invalidInput("유효하지 않은 리프레시 토큰입니다");
+        }
+
+        if (!jwtTokenProvider.isRefreshToken(refreshToken)) {
+            throw InvalidRequestException.invalidInput("리프레시 토큰이 아닙니다");
+        }
+
+        String userId = jwtTokenProvider.getUserId(refreshToken);
+        String role = jwtTokenProvider.getRole(refreshToken);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> ResourceNotFoundException.user(userId));
+
+        String newAccessToken = jwtTokenProvider.createToken(user.getId(), role);
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(user.getId(), role);
+
+        return buildAuthResponse(user, newAccessToken, newRefreshToken);
     }
 
     public AuthResponse.UserInfo getMe(String userId) {
@@ -97,6 +103,22 @@ public class AuthService {
                 .username(user.getUsername())
                 .displayName(user.getProfile() != null ? user.getProfile().getDisplayName() : user.getUsername())
                 .role(user.getRole())
+                .build();
+    }
+
+    private AuthResponse buildAuthResponse(User user, String accessToken, String refreshToken) {
+        String displayName = user.getProfile() != null ? user.getProfile().getDisplayName() : user.getUsername();
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .user(AuthResponse.UserInfo.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .username(user.getUsername())
+                        .displayName(displayName)
+                        .role(user.getRole())
+                        .build())
                 .build();
     }
 }
