@@ -10,12 +10,20 @@ import { GraphData, GraphNode } from '@/types/api';
 // It must be dynamically imported by the parent with ssr: false
 
 interface VaultGraphViewProps {
-  graphData: GraphData;
+  graphData: any;
   activeNodeSlug?: string;
   onNodeClick?: (slug: string) => void;
+  onFolderClick?: (folderId: string) => void;
+  folderColorMap?: Record<string, string>;
 }
 
-export function VaultGraphView({ graphData, activeNodeSlug, onNodeClick }: VaultGraphViewProps) {
+export function VaultGraphView({
+  graphData,
+  activeNodeSlug,
+  onNodeClick,
+  onFolderClick,
+  folderColorMap = {},
+}: VaultGraphViewProps) {
   const fgRef = useRef<ForceGraphMethods | undefined>(undefined);
   const router = useRouter();
   const { width, height } = useWindowSize();
@@ -24,15 +32,17 @@ export function VaultGraphView({ graphData, activeNodeSlug, onNodeClick }: Vault
   // Parse strings into objects if needed by force-graph
   const gData = useMemo(() => {
     return {
-      nodes: graphData.nodes.map(n => ({ ...n, val: n.size * 2 })),
-      links: graphData.links.map(l => ({ ...l })),
+      nodes: graphData.nodes.map((n: any) => ({ ...n, val: n.size * 2 })),
+      links: graphData.links.map((l: any) => ({ ...l })),
     };
   }, [graphData]);
 
   // Center on active node on mount or change
   useEffect(() => {
     if (activeNodeSlug && fgRef.current && gData.nodes.length > 0) {
-      const activeNode = gData.nodes.find(n => n.slug === activeNodeSlug) as unknown as NodeObject;
+      const activeNode = gData.nodes.find(
+        (n: any) => n.slug === activeNodeSlug
+      ) as unknown as NodeObject;
       if (activeNode && activeNode.x && activeNode.y) {
         fgRef.current.centerAt(activeNode.x, activeNode.y, 1000);
         fgRef.current.zoom(1.5, 1000);
@@ -69,7 +79,8 @@ export function VaultGraphView({ graphData, activeNodeSlug, onNodeClick }: Vault
         nodeColor={(node: any) => {
           const isActive = activeNodeSlug === node.slug;
           const isHover = hoverNode?.id === node.id;
-          return isActive ? '#64C8FF' : isHover ? '#ffffff' : '#475569'; // accent-light, white, surface-600
+          const categoryColor = folderColorMap[node.folderId] || '#64C8FF';
+          return isActive ? categoryColor : isHover ? '#ffffff' : categoryColor;
         }}
         nodeRelSize={4}
         linkWidth={link =>
@@ -88,7 +99,18 @@ export function VaultGraphView({ graphData, activeNodeSlug, onNodeClick }: Vault
             : 1;
         }}
         linkDirectionalParticleSpeed={0.005}
-        linkDirectionalParticleColor={() => 'rgba(100, 200, 255, 0.8)'}
+        linkDirectionalParticleColor={(link: any) => {
+          // Inherit color from the source node's category
+          const sourceNode = typeof link.source === 'object' ? link.source.folderId : null;
+          // We fallback to checking via finding the node if link.source is just ID
+          const getSourceFolder = () => {
+            if (sourceNode) return sourceNode;
+            const gn = gData.nodes.find((n: any) => n.id === link.source);
+            return gn?.folderId;
+          };
+          const catColor = folderColorMap[getSourceFolder() || ''] || '#64C8FF';
+          return catColor;
+        }}
         onNodeHover={node => setHoverNode((node as GraphNode) || null)}
         onNodeClick={handleNodeClick}
         d3AlphaDecay={0.02}
@@ -101,6 +123,14 @@ export function VaultGraphView({ graphData, activeNodeSlug, onNodeClick }: Vault
           const fontSize = 12 / globalScale;
           const isActive = activeNodeSlug === node.slug;
           const isHover = hoverNode?.id === node.id;
+          const categoryColor = folderColorMap[node.folderId] || '#8b5cf6'; // default to violet if none
+
+          const hexToRgba = (hex: string, alpha: number) => {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+          };
 
           const radius = Math.sqrt(node.val || 1) * 2;
 
@@ -108,20 +138,20 @@ export function VaultGraphView({ graphData, activeNodeSlug, onNodeClick }: Vault
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius + (isActive || isHover ? 4 : 2), 0, 2 * Math.PI, false);
           ctx.fillStyle = isActive
-            ? 'rgba(100, 200, 255, 0.2)'
+            ? hexToRgba(categoryColor, 0.3)
             : isHover
-              ? 'rgba(255, 255, 255, 0.1)'
-              : 'rgba(71, 85, 105, 0.1)';
+              ? 'rgba(255, 255, 255, 0.2)'
+              : hexToRgba(categoryColor, 0.1);
           ctx.fill();
 
           // Inner Core
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-          ctx.fillStyle = isActive ? '#64C8FF' : isHover ? '#ffffff' : '#94a3b8'; // accent-light, white, surface-400
+          ctx.fillStyle = isActive ? categoryColor : isHover ? '#ffffff' : categoryColor;
 
           // SF Shadow Glow
-          ctx.shadowBlur = isActive || isHover ? 15 : 5;
-          ctx.shadowColor = isActive ? '#64C8FF' : '#ffffff';
+          ctx.shadowBlur = isActive || isHover ? 20 : 8;
+          ctx.shadowColor = isActive ? categoryColor : isHover ? '#ffffff' : categoryColor;
           ctx.fill();
 
           // Reset shadow for text

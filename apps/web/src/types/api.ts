@@ -256,6 +256,7 @@ export interface GraphNode {
   name: string;
   slug: string;
   size: number;
+  folderId?: string;
 }
 
 export interface GraphLink {

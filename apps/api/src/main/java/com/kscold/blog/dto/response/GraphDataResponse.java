@@ -22,6 +22,7 @@ public class GraphDataResponse {
         private String name;
         private String slug;
         private Integer size;
+        private String folderId;
     }
 
     @Getter

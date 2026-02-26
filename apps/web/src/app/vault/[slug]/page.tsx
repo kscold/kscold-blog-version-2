@@ -1,11 +1,13 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useVaultNote, useVaultBacklinks, useVaultFolders, useVaultGraph } from '@/hooks/useVault';
 import { VaultFolderTree } from '@/components/vault/VaultFolderTree';
 import { VaultNoteContent } from '@/components/vault/VaultNoteContent';
 import { BacklinkList } from '@/components/vault/BacklinkList';
 import { ClientVaultGraph } from '@/components/vault/ClientVaultGraph';
+import { buildFolderColorMap, getAggregatedGraph } from '@/lib/vault-utils';
 
 export default function VaultNotePage() {
   const params = useParams();
@@ -15,6 +17,19 @@ export default function VaultNotePage() {
   const { data: backlinks } = useVaultBacklinks(note?.id || '');
   const { data: folders, isLoading: isFoldersLoading } = useVaultFolders();
   const { data: graphData } = useVaultGraph();
+
+  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+
+  // Derive filtered graph data and colors
+  const { filteredGraph, colorMap } = useMemo(() => {
+    const fList = folders || [];
+    const cMap = buildFolderColorMap(fList);
+
+    if (!graphData) return { filteredGraph: null, colorMap: cMap };
+
+    const aggregatedGraph = getAggregatedGraph(graphData, fList, activeFolderId);
+    return { filteredGraph: aggregatedGraph, colorMap: cMap };
+  }, [folders, graphData, activeFolderId]);
 
   if (isError) {
     return (
@@ -42,7 +57,11 @@ export default function VaultNotePage() {
                 <div className="h-4 bg-surface-200/50 rounded-full w-1/2" />
               </div>
             ) : (
-              <VaultFolderTree folders={folders || []} />
+              <VaultFolderTree
+                folders={folders || []}
+                activeFolderId={activeFolderId}
+                onFolderSelect={setActiveFolderId}
+              />
             )}
           </div>
         </div>
@@ -83,7 +102,14 @@ export default function VaultNotePage() {
                 </svg>
                 Synapse Map Insight
               </h3>
-              {graphData && <ClientVaultGraph graphData={graphData} activeNodeSlug={note.slug} />}
+              {filteredGraph && (
+                <ClientVaultGraph
+                  graphData={filteredGraph}
+                  activeNodeSlug={note.slug}
+                  folderColorMap={colorMap}
+                  onFolderClick={setActiveFolderId}
+                />
+              )}
             </div>
           </div>
         ) : null}
