@@ -71,7 +71,8 @@ public class VaultNoteService {
     public VaultNote update(String id, VaultNoteUpdateRequest request) {
         VaultNote note = findById(id);
 
-        if (request.getTitle() != null) note.setTitle(request.getTitle());
+        if (request.getTitle() != null)
+            note.setTitle(request.getTitle());
         if (request.getSlug() != null && !request.getSlug().equals(note.getSlug())) {
             if (vaultNoteRepository.existsBySlug(request.getSlug())) {
                 throw DuplicateResourceException.slug(request.getSlug());
@@ -87,7 +88,8 @@ public class VaultNoteService {
             vaultFolderService.incrementNoteCount(request.getFolderId());
             note.setFolderId(request.getFolderId());
         }
-        if (request.getTags() != null) note.setTags(request.getTags());
+        if (request.getTags() != null)
+            note.setTags(request.getTags());
 
         return vaultNoteRepository.save(note);
     }
@@ -155,6 +157,7 @@ public class VaultNoteService {
                         .name(note.getTitle())
                         .slug(note.getSlug())
                         .size(note.getOutgoingLinks().size() + 1)
+                        .folderId(note.getFolderId())
                         .build())
                 .toList();
 
@@ -193,7 +196,8 @@ public class VaultNoteService {
      * [[제목]] 형태에서 제목을 슬러그로 변환 후 노트 ID 조회
      */
     private List<String> parseBacklinks(String content) {
-        if (content == null) return new ArrayList<>();
+        if (content == null)
+            return new ArrayList<>();
 
         List<String> links = new ArrayList<>();
         Matcher matcher = BACKLINK_PATTERN.matcher(content);

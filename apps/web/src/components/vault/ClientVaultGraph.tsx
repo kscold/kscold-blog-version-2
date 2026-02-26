@@ -1,6 +1,15 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { GraphData } from '@/types/api';
+
+interface ClientVaultGraphProps {
+  graphData: any; // Using any for now since getAggregatedGraph returns aggregated nodes
+  activeNodeSlug?: string;
+  onNodeClick?: (slug: string) => void;
+  onFolderClick?: (folderId: string) => void;
+  folderColorMap?: Record<string, string>;
+}
 
 // Dynamically import the ForceGraph component with SSR disabled
 export const ClientVaultGraph = dynamic(
@@ -18,4 +27,4 @@ export const ClientVaultGraph = dynamic(
       </div>
     ),
   }
-);
+) as React.FC<ClientVaultGraphProps>;
