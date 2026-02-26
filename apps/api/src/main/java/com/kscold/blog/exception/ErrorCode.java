@@ -31,6 +31,11 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "E303", "포스트를 찾을 수 없습니다"),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "E304", "카테고리를 찾을 수 없습니다"),
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "E305", "태그를 찾을 수 없습니다"),
+    FEED_NOT_FOUND(HttpStatus.NOT_FOUND, "E306", "피드를 찾을 수 없습니다"),
+    FEED_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "E307", "댓글을 찾을 수 없습니다"),
+    VAULT_NOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "E308", "노트를 찾을 수 없습니다"),
+    VAULT_FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, "E309", "폴더를 찾을 수 없습니다"),
+    VAULT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "E310", "댓글을 찾을 수 없습니다"),
 
     // 409 Conflict
     DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "E401", "이미 존재하는 리소스입니다"),

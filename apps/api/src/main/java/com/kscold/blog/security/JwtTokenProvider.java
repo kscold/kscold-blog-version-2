@@ -25,6 +25,9 @@ public class JwtTokenProvider {
     @Value("${jwt.access-token-expiration}")
     private long validityInMilliseconds;
 
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenValidity;
+
     private SecretKey secretKey;
 
     @PostConstruct
@@ -46,6 +49,34 @@ public class JwtTokenProvider {
                 .expiration(validity)
                 .signWith(secretKey, Jwts.SIG.HS256)
                 .compact();
+    }
+
+    public String createRefreshToken(String userId, String role) {
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + refreshTokenValidity);
+
+        return Jwts.builder()
+                .subject(userId)
+                .claim("role", role)
+                .claim("type", "refresh")
+                .issuedAt(now)
+                .expiration(validity)
+                .signWith(secretKey, Jwts.SIG.HS256)
+                .compact();
+    }
+
+    public boolean isRefreshToken(String token) {
+        try {
+            Object type = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("type");
+            return "refresh".equals(type);
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public boolean validateToken(String token) {

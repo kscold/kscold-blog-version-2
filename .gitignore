@@ -72,3 +72,7 @@ uploads/
 
 # Claude
 .claude/
+CLAUDE.md
+
+# Serena
+.serena/

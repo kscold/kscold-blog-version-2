@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.web
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api
+      - NEXT_PUBLIC_SOCKET_URL=http://localhost:8080
+    volumes:
+      - ../apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - api
+    networks:
+      - blog-network
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - '8080:8080'
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - MONGODB_URI=mongodb://mongo:27017/kscold-blog
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production-must-be-at-least-256-bits}
+      - CORS_ORIGINS=http://localhost:3000
+    volumes:
+      - ../uploads:/uploads
+    depends_on:
+      - mongo
+    networks:
+      - blog-network
+
+  mongo:
+    image: mongo:7.0
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_DATABASE=kscold-blog
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - blog-network
+
+volumes:
+  mongo-data:
+
+networks:
+  blog-network:
+    driver: bridge

@@ -32,8 +32,8 @@ public class CategoryController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getAllCategories() {
-        List<Category> categories = categoryService.getTree();
-        List<CategoryResponse> response = CategoryResponse.from(categories);
+        List<Category> categories = categoryService.getAll();
+        List<CategoryResponse> response = CategoryResponse.buildTree(categories);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -96,17 +96,7 @@ public class CategoryController {
     public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
             @Valid @RequestBody CategoryCreateRequest request
     ) {
-        Category category = Category.builder()
-                .name(request.getName())
-                .slug(request.getSlug())
-                .description(request.getDescription())
-                .parent(request.getParent())
-                .order(request.getOrder())
-                .icon(request.getIcon())
-                .color(request.getColor())
-                .build();
-
-        Category created = categoryService.create(category);
+        Category created = categoryService.create(request);
         CategoryResponse response = CategoryResponse.from(created);
 
         return ResponseEntity
@@ -124,16 +114,7 @@ public class CategoryController {
             @PathVariable String id,
             @Valid @RequestBody CategoryUpdateRequest request
     ) {
-        Category category = Category.builder()
-                .name(request.getName())
-                .slug(request.getSlug())
-                .description(request.getDescription())
-                .order(request.getOrder())
-                .icon(request.getIcon())
-                .color(request.getColor())
-                .build();
-
-        Category updated = categoryService.update(id, category);
+        Category updated = categoryService.update(id, request);
         CategoryResponse response = CategoryResponse.from(updated);
 
         return ResponseEntity.ok(ApiResponse.success(response, "카테고리가 수정되었습니다"));

@@ -12,6 +12,7 @@ import com.kscold.blog.repository.CategoryRepository;
 import com.kscold.blog.repository.PostRepository;
 import com.kscold.blog.repository.TagRepository;
 import com.kscold.blog.repository.UserRepository;
+import com.kscold.blog.util.SlugUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,8 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
+    private final TagService tagService;
+    private final CategoryService categoryService;
 
     /**
      * 포스트 생성
@@ -112,7 +115,15 @@ public class PostService {
                 .publishedAt(request.getStatus() == Post.Status.PUBLISHED ? LocalDateTime.now() : null)
                 .build();
 
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+
+        // postCount 업데이트
+        categoryService.incrementPostCount(categoryInfo.getId());
+        for (Post.TagInfo tagInfo : tagInfos) {
+            tagService.incrementPostCount(tagInfo.getId());
+        }
+
+        return saved;
     }
 
     /**
@@ -120,7 +131,7 @@ public class PostService {
      */
     @Transactional
     public Post update(String id, PostUpdateRequest request) {
-        Post post = getById(id);
+        Post post = findById(id);
 
         // 제목 수정
         if (request.getTitle() != null) {
@@ -209,9 +220,27 @@ public class PostService {
      */
     @Transactional
     public void delete(String id) {
-        Post post = getById(id);
+        Post post = findById(id);
         post.setStatus(Post.Status.ARCHIVED);
         postRepository.save(post);
+
+        // postCount 감소
+        if (post.getCategory() != null) {
+            categoryService.decrementPostCount(post.getCategory().getId());
+        }
+        if (post.getTags() != null) {
+            for (Post.TagInfo tagInfo : post.getTags()) {
+                tagService.decrementPostCount(tagInfo.getId());
+            }
+        }
+    }
+
+    /**
+     * 내부 조회용 (조회수 미증가)
+     */
+    private Post findById(String id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> ResourceNotFoundException.post(id));
     }
 
     /**
@@ -219,10 +248,7 @@ public class PostService {
      */
     @Transactional
     public Post getById(String id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> ResourceNotFoundException.post(id));
-
-        // 조회수 증가
+        Post post = findById(id);
         post.setViews(post.getViews() + 1);
         return postRepository.save(post);
     }
@@ -234,8 +260,6 @@ public class PostService {
     public Post getBySlug(String slug) {
         Post post = postRepository.findBySlug(slug)
                 .orElseThrow(() -> ResourceNotFoundException.postBySlug(slug));
-
-        // 조회수 증가
         post.setViews(post.getViews() + 1);
         return postRepository.save(post);
     }
@@ -283,13 +307,10 @@ public class PostService {
     }
 
     /**
-     * 슬러그 생성 (제목 → kebab-case)
+     * 슬러그 생성 (제목 -> kebab-case)
      */
     private String generateSlug(String title) {
-        return title.toLowerCase()
-                .replaceAll("[^a-z0-9가-힣\\s-]", "")
-                .replaceAll("\\s+", "-")
-                .trim();
+        return SlugUtils.generate(title);
     }
 
     /**

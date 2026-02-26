@@ -49,6 +49,19 @@ public class AuthController {
     }
 
     /**
+     * 토큰 갱신
+     * POST /api/auth/refresh
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<AuthResponse>> refresh(
+            @RequestBody java.util.Map<String, String> request
+    ) {
+        String refreshToken = request.get("refreshToken");
+        AuthResponse response = authService.refresh(refreshToken);
+        return ResponseEntity.ok(ApiResponse.success(response, "토큰이 갱신되었습니다"));
+    }
+
+    /**
      * 현재 사용자 정보 조회
      * GET /api/auth/me
      *

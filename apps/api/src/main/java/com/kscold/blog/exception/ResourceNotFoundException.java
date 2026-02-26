@@ -48,4 +48,39 @@ public class ResourceNotFoundException extends BusinessException {
             String.format("태그를 찾을 수 없습니다 (ID: %s)", tagId)
         );
     }
+
+    public static ResourceNotFoundException feed(String feedId) {
+        return new ResourceNotFoundException(
+            ErrorCode.FEED_NOT_FOUND,
+            String.format("피드를 찾을 수 없습니다 (ID: %s)", feedId)
+        );
+    }
+
+    public static ResourceNotFoundException feedComment(String commentId) {
+        return new ResourceNotFoundException(
+            ErrorCode.FEED_COMMENT_NOT_FOUND,
+            String.format("댓글을 찾을 수 없습니다 (ID: %s)", commentId)
+        );
+    }
+
+    public static ResourceNotFoundException vaultNote(String noteId) {
+        return new ResourceNotFoundException(
+            ErrorCode.VAULT_NOTE_NOT_FOUND,
+            String.format("노트를 찾을 수 없습니다 (ID: %s)", noteId)
+        );
+    }
+
+    public static ResourceNotFoundException vaultFolder(String folderId) {
+        return new ResourceNotFoundException(
+            ErrorCode.VAULT_FOLDER_NOT_FOUND,
+            String.format("폴더를 찾을 수 없습니다 (ID: %s)", folderId)
+        );
+    }
+
+    public static ResourceNotFoundException vaultComment(String commentId) {
+        return new ResourceNotFoundException(
+            ErrorCode.VAULT_COMMENT_NOT_FOUND,
+            String.format("댓글을 찾을 수 없습니다 (ID: %s)", commentId)
+        );
+    }
 }
