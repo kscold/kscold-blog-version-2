@@ -40,9 +40,7 @@ export function usePostsByCategory(categoryId: string, page: number = 0, size: n
   return useQuery({
     queryKey: ['posts', 'category', categoryId, { page, size }],
     queryFn: () =>
-      apiClient.get<PageResponse<Post>>(
-        `/posts/category/${categoryId}?page=${page}&size=${size}`
-      ),
+      apiClient.get<PageResponse<Post>>(`/posts/category/${categoryId}?page=${page}&size=${size}`),
     enabled: !!categoryId,
   });
 }

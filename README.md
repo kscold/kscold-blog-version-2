@@ -5,17 +5,20 @@ COLDING 스튜디오의 개인 기술 블로그. Markdown 기반 포스팅 시�
 ## 기술 스택
 
 ### 프론트엔드
+
 - Next.js 15 (App Router, TypeScript)
 - Tailwind CSS + Framer Motion
 - Zustand (상태 관리) + React Query (서버 상태)
 
 ### 백엔드
+
 - Spring Boot 3.x (Java 21)
 - Spring Data MongoDB + MongoDB Atlas
 - Spring Security + JWT
 - WebSocket (실시간 채팅)
 
 ### 인프라
+
 - Turborepo (모노레포)
 - Docker + Docker Compose
 - Nginx (리버스 프록시)
@@ -104,11 +107,13 @@ kscold-blog-version-2/
 ## API 엔드포인트
 
 ### 인증
+
 - `POST /api/auth/register` - 회원가입
 - `POST /api/auth/login` - 로그인
 - `GET /api/auth/me` - 현재 사용자 조회
 
 ### 포스트
+
 - `GET /api/posts` - 전체 조회 (페이지네이션)
 - `GET /api/posts/featured` - 추천 포스트
 - `GET /api/posts/slug/:slug` - 슬러그로 조회
@@ -118,14 +123,17 @@ kscold-blog-version-2/
 - `DELETE /api/posts/:id` - 삭제 (ADMIN)
 
 ### 카테고리
+
 - `GET /api/categories` - 전체 조회 (트리 구조)
 - `POST /api/categories` - 생성 (ADMIN)
 
 ### 태그
+
 - `GET /api/tags` - 전체 조회
 - `POST /api/tags/find-or-create` - 조회 또는 자동 생성 (ADMIN)
 
 ### 미디어
+
 - `POST /api/media/upload` - 파일 업로드 (ADMIN)
 
 ## 라이선스

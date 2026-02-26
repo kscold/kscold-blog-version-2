@@ -43,17 +43,13 @@ export function ImageUpload({ onUploadSuccess, currentImage }: ImageUploadProps)
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await apiClient.post<{ url: string }>(
-        '/media/upload',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const response = await apiClient.post<{ url: string }>('/media/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-      const url = response.data?.url || response.url;
+      const url = response.url;
       onUploadSuccess(url);
     } catch (err: any) {
       setError(err.response?.data?.message || '업로드에 실패했습니다');
@@ -87,11 +83,7 @@ export function ImageUpload({ onUploadSuccess, currentImage }: ImageUploadProps)
 
       {preview ? (
         <div className="relative group">
-          <img
-            src={preview}
-            alt="Preview"
-            className="w-full h-64 object-cover rounded-lg"
-          />
+          <img src={preview} alt="Preview" className="w-full h-64 object-cover rounded-lg" />
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-3">
             <button
               onClick={handleClick}
@@ -118,9 +110,7 @@ export function ImageUpload({ onUploadSuccess, currentImage }: ImageUploadProps)
           {isUploading ? (
             <>
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                업로드 중...
-              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">업로드 중...</p>
             </>
           ) : (
             <>
@@ -137,12 +127,8 @@ export function ImageUpload({ onUploadSuccess, currentImage }: ImageUploadProps)
                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                 />
               </svg>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                클릭하여 이미지 업로드
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-500">
-                JPG, PNG, GIF (최대 10MB)
-              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">클릭하여 이미지 업로드</p>
+              <p className="text-xs text-gray-500 dark:text-gray-500">JPG, PNG, GIF (최대 10MB)</p>
             </>
           )}
         </button>

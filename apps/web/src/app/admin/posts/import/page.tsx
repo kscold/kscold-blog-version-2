@@ -4,11 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { parseMarkdownFile } from '@/lib/markdown-parser';
 import { useCategories } from '@/hooks/useCategories';
-import {
-  useResolveTag,
-  useCheckSlugExists,
-  useImportPost,
-} from '@/hooks/useImportPosts';
+import { useResolveTag, useCheckSlugExists, useImportPost } from '@/hooks/useImportPosts';
 import { ParsedMarkdownFile, ImportResult, ImportStatus } from '@/types/import';
 import { PostCreateRequest } from '@/types/api';
 
@@ -30,7 +26,7 @@ export default function ImportPage() {
   const handleFiles = useCallback(async (fileList: FileList) => {
     setImportStatus('parsing');
     const mdFiles = Array.from(fileList).filter(
-      (f) => f.name.endsWith('.md') || f.name.endsWith('.markdown')
+      f => f.name.endsWith('.md') || f.name.endsWith('.markdown')
     );
 
     if (mdFiles.length === 0) {
@@ -70,13 +66,11 @@ export default function ImportPage() {
   );
 
   const updateFile = (index: number, updates: Partial<ParsedMarkdownFile>) => {
-    setFiles((prev) =>
-      prev.map((f, i) => (i === index ? { ...f, ...updates } : f))
-    );
+    setFiles(prev => prev.map((f, i) => (i === index ? { ...f, ...updates } : f)));
   };
 
   const removeFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleImportAll = async () => {
@@ -130,8 +124,7 @@ export default function ImportPage() {
         const post = await importPost.mutateAsync(postData);
         results.push({ filename: file.filename, success: true, postId: post.id });
       } catch (error: unknown) {
-        const errMsg =
-          error instanceof Error ? error.message : '알 수 없는 오류';
+        const errMsg = error instanceof Error ? error.message : '알 수 없는 오류';
         results.push({ filename: file.filename, success: false, error: errMsg });
       }
     }
@@ -140,20 +133,16 @@ export default function ImportPage() {
     setImportStatus('done');
   };
 
-  const successCount = importResults.filter((r) => r.success).length;
-  const failCount = importResults.filter((r) => !r.success).length;
+  const successCount = importResults.filter(r => r.success).length;
+  const failCount = importResults.filter(r => !r.success).length;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-surface-900 tracking-tight">
-            Markdown 가져오기
-          </h1>
-          <p className="mt-2 text-surface-500">
-            .md 파일을 업로드하여 블로그 포스트로 변환합니다
-          </p>
+          <h1 className="text-3xl font-bold text-surface-900 tracking-tight">Markdown 가져오기</h1>
+          <p className="mt-2 text-surface-500">.md 파일을 업로드하여 블로그 포스트로 변환합니다</p>
         </div>
         <Link
           href="/admin/posts"
@@ -166,7 +155,7 @@ export default function ImportPage() {
       {/* Drop Zone */}
       {importStatus === 'idle' && (
         <div
-          onDragOver={(e) => {
+          onDragOver={e => {
             e.preventDefault();
             setDragOver(true);
           }}
@@ -226,11 +215,11 @@ export default function ImportPage() {
                 </label>
                 <select
                   value={globalCategoryId}
-                  onChange={(e) => setGlobalCategoryId(e.target.value)}
+                  onChange={e => setGlobalCategoryId(e.target.value)}
                   className="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm bg-white text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900"
                 >
                   <option value="">카테고리 선택</option>
-                  {categories?.map((cat) => (
+                  {categories?.map(cat => (
                     <option key={cat.id} value={cat.id}>
                       {'  '.repeat(cat.depth)}
                       {cat.name}
@@ -239,14 +228,10 @@ export default function ImportPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-surface-600 mb-1">
-                  게시 상태
-                </label>
+                <label className="block text-sm font-medium text-surface-600 mb-1">게시 상태</label>
                 <select
                   value={globalPostStatus}
-                  onChange={(e) =>
-                    setGlobalPostStatus(e.target.value as 'DRAFT' | 'PUBLISHED')
-                  }
+                  onChange={e => setGlobalPostStatus(e.target.value as 'DRAFT' | 'PUBLISHED')}
                   className="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm bg-white text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900"
                 >
                   <option value="DRAFT">DRAFT (임시저장)</option>
@@ -259,9 +244,7 @@ export default function ImportPage() {
           {/* File List */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-surface-900">
-                {files.length}개 파일
-              </h2>
+              <h2 className="text-lg font-bold text-surface-900">{files.length}개 파일</h2>
               <div className="flex gap-2">
                 <button
                   onClick={() => {
@@ -293,9 +276,7 @@ export default function ImportPage() {
                       <input
                         type="text"
                         value={file.title}
-                        onChange={(e) =>
-                          updateFile(index, { title: e.target.value })
-                        }
+                        onChange={e => updateFile(index, { title: e.target.value })}
                         className="text-lg font-bold text-surface-900 bg-transparent border-none outline-none w-full focus:ring-0 p-0"
                         placeholder="제목"
                       />
@@ -330,9 +311,7 @@ export default function ImportPage() {
                     <input
                       type="text"
                       value={file.slug}
-                      onChange={(e) =>
-                        updateFile(index, { slug: e.target.value })
-                      }
+                      onChange={e => updateFile(index, { slug: e.target.value })}
                       className="ml-2 text-sm text-surface-600 font-mono bg-transparent border-none outline-none focus:ring-0 p-0"
                     />
                   </div>
@@ -340,7 +319,7 @@ export default function ImportPage() {
                   {/* Tags */}
                   {file.tags.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1.5">
-                      {file.tags.map((tag) => (
+                      {file.tags.map(tag => (
                         <span
                           key={tag}
                           className="px-2 py-0.5 text-xs font-medium text-surface-600 bg-surface-100 rounded-md"
@@ -352,9 +331,7 @@ export default function ImportPage() {
                   )}
 
                   {/* Excerpt */}
-                  <p className="mt-3 text-sm text-surface-500 line-clamp-2">
-                    {file.excerpt}
-                  </p>
+                  <p className="mt-3 text-sm text-surface-500 line-clamp-2">{file.excerpt}</p>
 
                   {/* Warnings */}
                   {file.parseWarnings.length > 0 && (
@@ -391,37 +368,28 @@ export default function ImportPage() {
       {importStatus === 'done' && (
         <div className="space-y-6">
           <div className="bg-surface-50 border border-surface-200 rounded-xl p-8 text-center">
-            <h2 className="text-2xl font-bold text-surface-900 mb-2">
-              가져오기 완료
-            </h2>
+            <h2 className="text-2xl font-bold text-surface-900 mb-2">가져오기 완료</h2>
             <p className="text-surface-500">
               성공: <span className="text-green-600 font-bold">{successCount}</span>
               {failCount > 0 && (
                 <>
-                  {' / '}실패:{' '}
-                  <span className="text-red-600 font-bold">{failCount}</span>
+                  {' / '}실패: <span className="text-red-600 font-bold">{failCount}</span>
                 </>
               )}
             </p>
           </div>
 
           <div className="space-y-2">
-            {importResults.map((result) => (
+            {importResults.map(result => (
               <div
                 key={result.filename}
                 className={`flex items-center justify-between p-4 rounded-lg border ${
-                  result.success
-                    ? 'bg-green-50 border-green-200'
-                    : 'bg-red-50 border-red-200'
+                  result.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
                 }`}
               >
-                <span className="text-sm font-mono text-surface-700">
-                  {result.filename}
-                </span>
+                <span className="text-sm font-mono text-surface-700">{result.filename}</span>
                 {result.success ? (
-                  <span className="text-sm font-medium text-green-700">
-                    성공
-                  </span>
+                  <span className="text-sm font-medium text-green-700">성공</span>
                 ) : (
                   <span className="text-sm text-red-600">{result.error}</span>
                 )}

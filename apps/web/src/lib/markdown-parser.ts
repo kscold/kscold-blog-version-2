@@ -5,10 +5,7 @@ import { ParsedMarkdownFile } from '@/types/import';
  * .md 파일을 파싱하여 블로그 포스트 데이터로 변환
  * 옵시디언, 노션 내보내기, 일반 markdown 모두 지원
  */
-export function parseMarkdownFile(
-  filename: string,
-  rawContent: string
-): ParsedMarkdownFile {
+export function parseMarkdownFile(filename: string, rawContent: string): ParsedMarkdownFile {
   const warnings: string[] = [];
 
   let frontmatter: Record<string, unknown> = {};
@@ -48,11 +45,7 @@ export function parseMarkdownFile(
   };
 }
 
-function extractTitle(
-  fm: Record<string, unknown>,
-  content: string,
-  filename: string
-): string {
+function extractTitle(fm: Record<string, unknown>, content: string, filename: string): string {
   if (typeof fm.title === 'string' && fm.title.trim()) return fm.title.trim();
   if (typeof fm.Title === 'string' && fm.Title.trim()) return fm.Title.trim();
 
@@ -68,11 +61,7 @@ function extractTitle(
     .trim();
 }
 
-function extractSlug(
-  fm: Record<string, unknown>,
-  filename: string,
-  title: string
-): string {
+function extractSlug(fm: Record<string, unknown>, filename: string, title: string): string {
   if (typeof fm.slug === 'string' && fm.slug.trim()) return fm.slug.trim();
   if (typeof fm.permalink === 'string' && fm.permalink.trim()) {
     return fm.permalink.trim().replace(/^\/|\/$/g, '');
@@ -93,13 +82,13 @@ function extractTags(fm: Record<string, unknown>): string[] {
   if (!raw) return [];
 
   if (Array.isArray(raw)) {
-    return raw.map((t) => String(t).trim()).filter(Boolean);
+    return raw.map(t => String(t).trim()).filter(Boolean);
   }
 
   if (typeof raw === 'string') {
     return raw
       .split(/[,;]/)
-      .map((t) => t.trim())
+      .map(t => t.trim())
       .filter(Boolean);
   }
 
@@ -116,12 +105,8 @@ function extractCategory(fm: Record<string, unknown>): string | null {
   return null;
 }
 
-function extractDate(
-  fm: Record<string, unknown>,
-  filename: string
-): string | null {
-  const raw =
-    fm.date ?? fm.created ?? fm.createdAt ?? fm.Date ?? fm['Date Created'];
+function extractDate(fm: Record<string, unknown>, filename: string): string | null {
+  const raw = fm.date ?? fm.created ?? fm.createdAt ?? fm.Date ?? fm['Date Created'];
   if (raw) {
     if (raw instanceof Date) return raw.toISOString().split('T')[0];
     const str = String(raw).trim();
@@ -141,16 +126,12 @@ function extractDate(
 }
 
 function extractCoverImage(fm: Record<string, unknown>): string | null {
-  const raw =
-    fm.coverImage ?? fm.cover ?? fm.thumbnail ?? fm.image ?? fm.banner;
+  const raw = fm.coverImage ?? fm.cover ?? fm.thumbnail ?? fm.image ?? fm.banner;
   if (typeof raw === 'string' && raw.trim()) return raw.trim();
   return null;
 }
 
-function extractExcerpt(
-  fm: Record<string, unknown>,
-  content: string
-): string {
+function extractExcerpt(fm: Record<string, unknown>, content: string): string {
   const raw = fm.excerpt ?? fm.description ?? fm.summary ?? fm.abstract;
   if (typeof raw === 'string' && raw.trim()) return raw.trim();
 

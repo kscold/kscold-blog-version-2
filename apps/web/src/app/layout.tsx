@@ -57,8 +57,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="antialiased bg-white text-surface-900 min-h-screen relative selection:bg-accent-light/30 selection:text-accent-light">
-        <div className="fixed inset-0 z-[-1] pointer-events-none bg-white">
-        </div>
+        <div className="fixed inset-0 z-[-1] pointer-events-none bg-white"></div>
 
         <Providers>
           <ClientLayout>{children}</ClientLayout>

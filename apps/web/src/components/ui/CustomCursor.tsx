@@ -6,7 +6,7 @@ import { motion, useMotionValue } from 'framer-motion';
 export function CustomCursor() {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
-  
+
   const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 

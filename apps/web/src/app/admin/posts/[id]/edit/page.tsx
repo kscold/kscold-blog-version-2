@@ -28,17 +28,14 @@ export default function EditPostPage() {
   const [coverImage, setCoverImage] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [tags, setTags] = useState('');
-  const [status, setStatus] = useState<'DRAFT' | 'PUBLISHED' | 'ARCHIVED'>(
-    'DRAFT'
-  );
+  const [status, setStatus] = useState<'DRAFT' | 'PUBLISHED' | 'ARCHIVED'>('DRAFT');
   const [featured, setFeatured] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await apiClient.get(`/posts/${postId}`);
-        const post = response.data || response;
+        const post: any = await apiClient.get(`/posts/${postId}`);
 
         setTitle(post.title);
         setSlug(post.slug);
@@ -71,8 +68,8 @@ export default function EditPostPage() {
 
     const tagIds = tags
       .split(',')
-      .map((t) => t.trim())
-      .filter((t) => t);
+      .map(t => t.trim())
+      .filter(t => t);
 
     const postData: PostUpdateRequest = {
       title,
@@ -100,9 +97,7 @@ export default function EditPostPage() {
       <div className="min-h-screen bg-secondary-beige dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">
-            포스트를 불러오는 중...
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">포스트를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -140,7 +135,7 @@ export default function EditPostPage() {
                   <input
                     type="text"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={e => setTitle(e.target.value)}
                     className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                     required
                   />
@@ -154,7 +149,7 @@ export default function EditPostPage() {
                   <input
                     type="text"
                     value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
+                    onChange={e => setSlug(e.target.value)}
                     className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
                 </div>
@@ -174,7 +169,7 @@ export default function EditPostPage() {
                         height="600px"
                         defaultLanguage="markdown"
                         value={content}
-                        onChange={(value) => setContent(value || '')}
+                        onChange={value => setContent(value || '')}
                         theme="vs-dark"
                         options={{
                           minimap: { enabled: false },
@@ -195,7 +190,7 @@ export default function EditPostPage() {
                   </label>
                   <textarea
                     value={excerpt}
-                    onChange={(e) => setExcerpt(e.target.value)}
+                    onChange={e => setExcerpt(e.target.value)}
                     rows={3}
                     className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
@@ -216,13 +211,8 @@ export default function EditPostPage() {
                       </label>
                       <select
                         value={status}
-                        onChange={(e) =>
-                          setStatus(
-                            e.target.value as
-                              | 'DRAFT'
-                              | 'PUBLISHED'
-                              | 'ARCHIVED'
-                          )
+                        onChange={e =>
+                          setStatus(e.target.value as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED')
                         }
                         className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                       >
@@ -237,7 +227,7 @@ export default function EditPostPage() {
                         type="checkbox"
                         id="featured"
                         checked={featured}
-                        onChange={(e) => setFeatured(e.target.checked)}
+                        onChange={e => setFeatured(e.target.checked)}
                         className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label
@@ -257,12 +247,12 @@ export default function EditPostPage() {
                   </h3>
                   <select
                     value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
+                    onChange={e => setCategoryId(e.target.value)}
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                     required
                   >
                     <option value="">카테고리 선택</option>
-                    {categories?.map((cat) => (
+                    {categories?.map(cat => (
                       <option key={cat.id} value={cat.id}>
                         {'  '.repeat(cat.depth)}
                         {cat.icon && `${cat.icon} `}
@@ -274,13 +264,11 @@ export default function EditPostPage() {
 
                 {/* Tags */}
                 <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    태그
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">태그</h3>
                   <input
                     type="text"
                     value={tags}
-                    onChange={(e) => setTags(e.target.value)}
+                    onChange={e => setTags(e.target.value)}
                     placeholder="태그 ID (쉼표로 구분)"
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
@@ -294,7 +282,7 @@ export default function EditPostPage() {
                   <input
                     type="text"
                     value={coverImage}
-                    onChange={(e) => setCoverImage(e.target.value)}
+                    onChange={e => setCoverImage(e.target.value)}
                     placeholder="이미지 URL"
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
@@ -303,7 +291,7 @@ export default function EditPostPage() {
                       src={coverImage}
                       alt="Cover preview"
                       className="mt-4 w-full rounded-lg"
-                      onError={(e) => {
+                      onError={e => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />

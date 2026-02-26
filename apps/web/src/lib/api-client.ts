@@ -26,11 +26,11 @@ class ApiClient {
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      error => Promise.reject(error)
     );
 
     this.client.interceptors.response.use(
-      (response) => response,
+      response => response,
       async (error: AxiosError) => {
         const originalRequest = error.config as InternalAxiosRequestConfig & {
           _retry?: boolean;
@@ -64,26 +64,46 @@ class ApiClient {
     return localStorage.getItem('accessToken');
   }
 
+  private getRefreshToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('refreshToken');
+  }
+
   private setAccessToken(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('accessToken', token);
+      document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+    }
+  }
+
+  private setRefreshToken(token: string): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('refreshToken', token);
     }
   }
 
   private clearTokens(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      document.cookie = 'auth-token=; path=/; max-age=0';
     }
   }
 
   private async refreshToken(): Promise<string | null> {
     try {
-      const response = await axios.post(`${API_URL}/auth/refresh`, {}, {
-        withCredentials: true,
+      const currentRefreshToken = this.getRefreshToken();
+      if (!currentRefreshToken) return null;
+
+      const response = await axios.post(`${API_URL}/auth/refresh`, {
+        refreshToken: currentRefreshToken,
       });
-      const newToken = response.data.data.accessToken;
-      this.setAccessToken(newToken);
-      return newToken;
+      const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+      this.setAccessToken(accessToken);
+      if (newRefreshToken) {
+        this.setRefreshToken(newRefreshToken);
+      }
+      return accessToken;
     } catch (error) {
       console.error('Token refresh failed:', error);
       return null;
@@ -110,8 +130,11 @@ class ApiClient {
     return response.data.data;
   }
 
-  public setToken(token: string): void {
+  public setToken(token: string, refreshToken?: string): void {
     this.setAccessToken(token);
+    if (refreshToken) {
+      this.setRefreshToken(refreshToken);
+    }
   }
 
   public removeToken(): void {

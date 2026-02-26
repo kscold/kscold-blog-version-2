@@ -23,17 +23,17 @@ export function Header() {
 
   const navItems = [
     { label: 'Blog', href: '/blog' },
-    { label: 'Portfolio', href: '/portfolio' },
-    { label: 'About', href: '/about' },
-    { label: 'Chat', href: '/chat' },
+    { label: 'Feed', href: '/feed' },
+    { label: 'Vault', href: '/vault' },
+    { label: 'Info', href: '/info' },
   ];
 
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? 'bg-white/80 backdrop-blur-xl border-surface-200 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]'
-          : 'bg-white/50 backdrop-blur-lg border-transparent'
+          ? 'bg-white/80 backdrop-blur-xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]'
+          : 'bg-white/50 backdrop-blur-lg'
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -47,12 +47,7 @@ export function Header() {
               className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-surface-100 transition-colors text-surface-900"
               aria-label="Toggle sidebar"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -62,17 +57,19 @@ export function Header() {
               </svg>
             </button>
 
-            <Link
-              href="/"
-              className="group relative flex items-center gap-2"
-            >
+            <Link href="/" className="group relative flex items-center gap-3">
+              <img
+                src="/logo.svg"
+                alt="KSCOLD Logo"
+                className="w-8 h-8 group-hover:scale-110 transition-transform duration-500 will-change-transform"
+              />
               <span className="relative text-xl sm:text-2xl font-sans font-black tracking-tighter text-surface-900 z-10 group-hover:text-surface-600 transition-colors">
                 KSCOLD
               </span>
             </Link>
 
             <nav className="hidden lg:flex items-center gap-1">
-              {navItems.map((item) => (
+              {navItems.map(item => (
                 <Link
                   key={item.href}
                   href={item.href}

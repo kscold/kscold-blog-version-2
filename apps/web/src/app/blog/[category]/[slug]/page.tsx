@@ -78,7 +78,7 @@ async function getAllPosts(): Promise<Post[]> {
 export async function generateStaticParams() {
   const posts = await getAllPosts();
 
-  return posts.map((post) => ({
+  return posts.map(post => ({
     category: post.category.slug,
     slug: post.slug,
   }));
@@ -87,9 +87,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const post = await getPost(params.slug);
+  const { slug } = await params;
+  const post = await getPost(slug);
 
   if (!post) {
     return {
@@ -99,7 +100,7 @@ export async function generateMetadata({
 
   const title = post.seo?.metaTitle || post.title;
   const description = post.seo?.metaDescription || post.excerpt;
-  const keywords = post.seo?.keywords || post.tags.map((tag) => tag.name);
+  const keywords = post.seo?.keywords || post.tags.map(tag => tag.name);
 
   return {
     title,
@@ -121,7 +122,7 @@ export async function generateMetadata({
             },
           ]
         : [],
-      tags: post.tags.map((tag) => tag.name),
+      tags: post.tags.map(tag => tag.name),
     },
     twitter: {
       card: 'summary_large_image',
@@ -135,9 +136,10 @@ export async function generateMetadata({
 export default async function PostPage({
   params,
 }: {
-  params: { category: string; slug: string };
+  params: Promise<{ category: string; slug: string }>;
 }) {
-  const post = await getPost(params.slug);
+  const { slug } = await params;
+  const post = await getPost(slug);
 
   if (!post || post.status !== 'PUBLISHED') {
     notFound();

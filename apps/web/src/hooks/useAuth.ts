@@ -19,10 +19,9 @@ export function useAuth() {
   });
 
   const loginMutation = useMutation({
-    mutationFn: (data: LoginRequest) =>
-      apiClient.post<AuthResponse>('/auth/login', data),
-    onSuccess: (data) => {
-      apiClient.setToken(data.accessToken);
+    mutationFn: (data: LoginRequest) => apiClient.post<AuthResponse>('/auth/login', data),
+    onSuccess: data => {
+      apiClient.setToken(data.accessToken, data.refreshToken);
       setToken(data.accessToken);
       setUser(data.user);
       queryClient.invalidateQueries({ queryKey: ['auth'] });
@@ -30,10 +29,9 @@ export function useAuth() {
   });
 
   const registerMutation = useMutation({
-    mutationFn: (data: RegisterRequest) =>
-      apiClient.post<AuthResponse>('/auth/register', data),
-    onSuccess: (data) => {
-      apiClient.setToken(data.accessToken);
+    mutationFn: (data: RegisterRequest) => apiClient.post<AuthResponse>('/auth/register', data),
+    onSuccess: data => {
+      apiClient.setToken(data.accessToken, data.refreshToken);
       setToken(data.accessToken);
       setUser(data.user);
       queryClient.invalidateQueries({ queryKey: ['auth'] });

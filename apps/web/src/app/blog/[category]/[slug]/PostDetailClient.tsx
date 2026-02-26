@@ -95,9 +95,7 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
               {post.category.icon && <span>{post.category.icon}</span>}
               {post.category.name}
             </Link>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {formattedDate}
-            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">{formattedDate}</span>
             {post.featured && (
               <span className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 rounded-full text-xs font-medium">
                 Featured
@@ -119,12 +117,7 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
           <div className="flex items-center justify-between pb-8 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -136,12 +129,7 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
               </div>
 
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -159,12 +147,7 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
               </div>
 
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -186,11 +169,7 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <img
-              src={post.coverImage}
-              alt={post.title}
-              className="w-full h-auto"
-            />
+            <img src={post.coverImage} alt={post.title} className="w-full h-auto" />
           </motion.div>
         )}
 
@@ -212,11 +191,9 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-              Tags
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
+              {post.tags.map(tag => (
                 <Link
                   key={tag.id}
                   href={`/blog/tags/${tag.name.toLowerCase()}`}
@@ -240,12 +217,7 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
             href="/blog"
             className="inline-flex items-center gap-2 px-6 py-3 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-600 dark:hover:border-purple-400 transition-all font-medium"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -258,12 +230,7 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
 
           <div className="flex items-center gap-4">
             <button className="p-3 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-600 dark:hover:border-purple-400 transition-all">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

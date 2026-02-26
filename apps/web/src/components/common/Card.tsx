@@ -1,16 +1,18 @@
 'use client';
 
-import { HTMLAttributes, forwardRef } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { forwardRef } from 'react';
+import { motion } from 'framer-motion';
 
-export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ref'> {
+export interface CardProps {
   variant?: 'default' | 'elevated' | 'glass' | 'bank';
   hover?: boolean;
   children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
 }
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ variant = 'default', hover = false, className = '', children, ...props }, ref) => {
+  ({ variant = 'default', hover = false, className = '', children, onClick }, ref) => {
     const baseStyles = 'rounded-[16px] transition-all duration-300';
 
     const variantStyles = {
@@ -24,20 +26,18 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
 
     const hoverStyles = hover ? 'anti-gravity cursor-pointer' : '';
 
-    const MotionDiv = motion.div as React.ComponentType<HTMLMotionProps<'div'>>;
-
     return (
-      <MotionDiv
+      <motion.div
         ref={ref}
         className={`${baseStyles} ${variantStyles[variant]} ${hoverStyles} ${className}`}
+        onClick={onClick}
         {...(hover && {
           whileHover: { y: -8, scale: 1.02 },
           transition: { type: 'spring', stiffness: 400, damping: 25 },
         })}
-        {...props}
       >
         {children}
-      </MotionDiv>
+      </motion.div>
     );
   }
 );

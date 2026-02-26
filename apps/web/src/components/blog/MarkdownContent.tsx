@@ -11,7 +11,7 @@ interface MarkdownContentProps {
 
 export function MarkdownContent({ content }: MarkdownContentProps) {
   return (
-    <div className="prose prose-lg prose-invert max-w-none prose-headings:font-sans prose-headings:tracking-tight prose-p:text-surface-300 prose-a:text-white prose-a:decoration-1 prose-a:underline-offset-4 hover:prose-a:text-surface-200 prose-code:text-white prose-code:bg-surface-900 prose-code:rounded prose-code:border prose-code:border-surface-800 prose-strong:text-white prose-ul:text-surface-300 prose-ol:text-surface-300 prose-blockquote:border-l-white prose-blockquote:bg-surface-900/50 prose-blockquote:text-surface-300">
+    <div className="prose prose-lg max-w-none prose-headings:font-sans prose-headings:tracking-tight prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-a:decoration-1 prose-a:underline-offset-4 hover:prose-a:text-blue-800 prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:rounded prose-code:border prose-code:border-gray-200 prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-blockquote:border-l-gray-400 prose-blockquote:bg-gray-50 prose-blockquote:text-gray-600">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -58,11 +58,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
                 className="rounded-none w-full border border-surface-800"
                 loading="lazy"
               />
-              {alt && (
-                <p className="text-center text-sm text-surface-500 mt-2 font-mono">
-                  {alt}
-                </p>
-              )}
+              {alt && <p className="text-center text-sm text-surface-500 mt-2 font-mono">{alt}</p>}
             </div>
           ),
         }}

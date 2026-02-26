@@ -142,12 +142,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                   onClick={onClose}
                   className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-200 text-surface-400 hover:text-surface-900 transition-colors"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -187,8 +182,8 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                       message.type === 'SYSTEM'
                         ? 'text-center my-4'
                         : message.user.name === (user?.displayName || user?.username || '익명')
-                        ? 'flex justify-end'
-                        : 'flex justify-start'
+                          ? 'flex justify-end'
+                          : 'flex justify-start'
                     }
                   >
                     {message.type === 'SYSTEM' ? (
@@ -202,8 +197,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                         </div>
                         <div
                           className={`px-4 py-2.5 rounded-[16px] shadow-sm ${
-                            message.user.name ===
-                            (user?.displayName || user?.username || '익명')
+                            message.user.name === (user?.displayName || user?.username || '익명')
                               ? 'bg-surface-900 text-white rounded-tr-sm'
                               : 'bg-white text-surface-700 rounded-tl-sm border border-surface-200'
                           }`}
@@ -242,12 +236,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                   disabled={!isConnected || !inputMessage.trim()}
                   className="w-12 h-12 flex items-center justify-center bg-surface-900 hover:bg-surface-800 rounded-xl text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

@@ -11,11 +11,7 @@ export function Footer() {
       { label: 'LinkedIn', href: '#' },
       { label: 'Email', href: 'mailto:contact@coldcraft.dev' },
     ],
-    quick: [
-      { label: 'Blog', href: '/blog' },
-      { label: 'Portfolio', href: '/portfolio' },
-      { label: 'About', href: '/about' },
-    ],
+    quick: [{ label: 'Blog', href: '/blog' }],
   };
 
   return (
@@ -24,9 +20,14 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-24">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <Link href="/" className="inline-block">
-              <span className="text-2xl font-sans font-black tracking-[-0.05em] text-neutral-900 hover:text-neutral-600 transition-colors">
-                COLDING
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              <img
+                src="/logo.svg"
+                alt="KSCOLD Logo"
+                className="w-7 h-7 group-hover:scale-110 transition-transform duration-500 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 will-change-transform"
+              />
+              <span className="text-2xl font-sans font-black tracking-[-0.05em] text-neutral-900 group-hover:text-neutral-600 transition-colors">
+                KSCOLD
               </span>
             </Link>
             <p className="mt-1 text-xs font-mono text-neutral-400 tracking-wider uppercase">
@@ -35,9 +36,7 @@ export function Footer() {
             <p className="mt-4 text-sm text-neutral-500 font-light leading-relaxed max-w-sm text-balance">
               Crafting digital products with precision.
               <br />
-              <span className="text-neutral-700 font-medium">
-                Enjoying the Learning Curve.
-              </span>
+              <span className="text-neutral-700 font-medium">Enjoying the Learning Curve.</span>
             </p>
           </div>
 
@@ -47,7 +46,7 @@ export function Footer() {
               Navigation
             </h4>
             <ul className="space-y-3">
-              {links.quick.map((link) => (
+              {links.quick.map(link => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -66,7 +65,7 @@ export function Footer() {
               Connect
             </h4>
             <ul className="space-y-3">
-              {links.social.map((link) => (
+              {links.social.map(link => (
                 <li key={link.href}>
                   <a
                     href={link.href}

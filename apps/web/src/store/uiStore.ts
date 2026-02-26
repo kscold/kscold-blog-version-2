@@ -11,12 +11,12 @@ interface UiState {
 
 export const useUiStore = create<UiState>()(
   persist(
-    (set) => ({
+    set => ({
       theme: 'system',
       sidebarOpen: true,
-      setTheme: (theme) => set({ theme }),
-      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-      setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      setTheme: theme => set({ theme }),
+      toggleSidebar: () => set(state => ({ sidebarOpen: !state.sidebarOpen })),
+      setSidebarOpen: open => set({ sidebarOpen: open }),
     }),
     {
       name: 'ui-storage',
