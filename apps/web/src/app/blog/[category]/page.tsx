@@ -14,13 +14,9 @@ export default function CategoryPage() {
   const [page, setPage] = useState(0);
 
   const { data: categories } = useCategories();
-  const category = categories?.find((cat) => cat.slug === categorySlug);
+  const category = categories?.find(cat => cat.slug === categorySlug);
 
-  const { data: postsData, isLoading } = usePostsByCategory(
-    category?.id || '',
-    page,
-    12
-  );
+  const { data: postsData, isLoading } = usePostsByCategory(category?.id || '', page, 12);
 
   const posts = postsData?.content || [];
   const totalPages = postsData?.totalPages || 0;
@@ -33,10 +29,7 @@ export default function CategoryPage() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             카테고리를 찾을 수 없습니다
           </h1>
-          <Link
-            href="/blog"
-            className="text-purple-600 dark:text-purple-400 hover:underline"
-          >
+          <Link href="/blog" className="text-purple-600 dark:text-purple-400 hover:underline">
             블로그로 돌아가기
           </Link>
         </div>
@@ -72,9 +65,7 @@ export default function CategoryPage() {
           transition={{ duration: 0.6 }}
         >
           <div className="flex items-center gap-3 mb-4">
-            {category.icon && (
-              <span className="text-4xl">{category.icon}</span>
-            )}
+            {category.icon && <span className="text-4xl">{category.icon}</span>}
             <h1 className="text-5xl font-serif font-bold text-gray-900 dark:text-white">
               {category.name}
             </h1>
@@ -98,9 +89,7 @@ export default function CategoryPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             {(() => {
-              const subcategories = categories.filter(
-                (cat) => cat.parent === category.id
-              );
+              const subcategories = categories.filter(cat => cat.parent === category.id);
 
               if (subcategories.length === 0) return null;
 
@@ -110,19 +99,15 @@ export default function CategoryPage() {
                     하위 카테고리
                   </h2>
                   <div className="flex flex-wrap gap-2">
-                    {subcategories.map((subcat) => (
+                    {subcategories.map(subcat => (
                       <Link
                         key={subcat.id}
                         href={`/blog/${subcat.slug}`}
                         className="px-4 py-2 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-600 dark:hover:border-purple-400 transition-all text-sm font-medium text-gray-700 dark:text-gray-300"
                       >
-                        {subcat.icon && (
-                          <span className="mr-1">{subcat.icon}</span>
-                        )}
+                        {subcat.icon && <span className="mr-1">{subcat.icon}</span>}
                         {subcat.name}
-                        <span className="ml-2 text-xs text-gray-400">
-                          ({subcat.postCount})
-                        </span>
+                        <span className="ml-2 text-xs text-gray-400">({subcat.postCount})</span>
                       </Link>
                     ))}
                   </div>
@@ -156,7 +141,7 @@ export default function CategoryPage() {
                 },
               }}
             >
-              {posts.map((post) => (
+              {posts.map(post => (
                 <motion.div
                   key={post.id}
                   variants={{
@@ -183,12 +168,7 @@ export default function CategoryPage() {
                   disabled={page === 0}
                   className="px-4 py-2 rounded-lg bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -199,10 +179,7 @@ export default function CategoryPage() {
                 </button>
 
                 {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                  const pageNum = Math.max(
-                    0,
-                    Math.min(page - 2 + i, totalPages - (5 - i))
-                  );
+                  const pageNum = Math.max(0, Math.min(page - 2 + i, totalPages - (5 - i)));
                   if (pageNum < 0 || pageNum >= totalPages) return null;
 
                   return (
@@ -225,12 +202,7 @@ export default function CategoryPage() {
                   disabled={page >= totalPages - 1}
                   className="px-4 py-2 rounded-lg bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

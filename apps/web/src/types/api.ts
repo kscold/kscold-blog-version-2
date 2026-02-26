@@ -16,6 +16,7 @@ export interface User {
 
 export interface AuthResponse {
   accessToken: string;
+  refreshToken: string;
   tokenType: string;
   user: User;
 }
@@ -44,6 +45,7 @@ export interface Category {
   icon?: string;
   color?: string;
   postCount: number;
+  children?: Category[];
   createdAt: string;
   updatedAt: string;
 }
@@ -153,4 +155,135 @@ export interface CategoryUpdateRequest {
   order?: number;
   icon?: string;
   color?: string;
+}
+
+// Feed
+export interface Feed {
+  id: string;
+  content: string;
+  images: string[];
+  author: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  visibility: 'PUBLIC' | 'PRIVATE';
+  linkPreview?: LinkPreview;
+  likesCount: number;
+  commentsCount: number;
+  views: number;
+  isLiked: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LinkPreview {
+  url: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  siteName?: string;
+}
+
+export interface FeedComment {
+  id: string;
+  feedId: string;
+  authorName: string;
+  isAdmin: boolean;
+  content: string;
+  createdAt: string;
+}
+
+export interface FeedCreateRequest {
+  content: string;
+  images?: string[];
+  visibility?: 'PUBLIC' | 'PRIVATE';
+  linkUrl?: string;
+}
+
+export interface FeedUpdateRequest {
+  content?: string;
+  images?: string[];
+  visibility?: 'PUBLIC' | 'PRIVATE';
+  linkUrl?: string;
+}
+
+export interface FeedCommentCreateRequest {
+  authorName: string;
+  authorPassword: string;
+  content: string;
+}
+
+// Vault
+export interface VaultNote {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  folderId: string;
+  author: {
+    id: string;
+    name: string;
+  };
+  outgoingLinks: string[];
+  tags: string[];
+  views: number;
+  commentsCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VaultFolder {
+  id: string;
+  name: string;
+  slug: string;
+  parent?: string;
+  depth: number;
+  order: number;
+  noteCount: number;
+  children?: VaultFolder[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GraphData {
+  nodes: GraphNode[];
+  links: GraphLink[];
+}
+
+export interface GraphNode {
+  id: string;
+  name: string;
+  slug: string;
+  size: number;
+}
+
+export interface GraphLink {
+  source: string;
+  target: string;
+}
+
+export interface VaultNoteCreateRequest {
+  title: string;
+  slug?: string;
+  content: string;
+  folderId: string;
+  tags?: string[];
+}
+
+export interface VaultNoteUpdateRequest {
+  title?: string;
+  slug?: string;
+  content?: string;
+  folderId?: string;
+  tags?: string[];
+}
+
+export interface VaultNoteComment {
+  id: string;
+  noteId: string;
+  authorName: string;
+  isAdmin: boolean;
+  content: string;
+  createdAt: string;
 }

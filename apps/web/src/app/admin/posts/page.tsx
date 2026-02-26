@@ -80,10 +80,7 @@ export default function AdminPostsPage() {
           {isLoading ? (
             <div className="space-y-4">
               {[...Array(10)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-24 bg-white dark:bg-gray-900 rounded-lg animate-pulse"
-                />
+                <div key={i} className="h-24 bg-white dark:bg-gray-900 rounded-lg animate-pulse" />
               ))}
             </div>
           ) : posts.length > 0 ? (
@@ -114,7 +111,7 @@ export default function AdminPostsPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                      {posts.map((post) => (
+                      {posts.map(post => (
                         <tr
                           key={post.id}
                           className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -142,16 +139,12 @@ export default function AdminPostsPage() {
                             )}
                             {post.category.name}
                           </td>
-                          <td className="px-6 py-4">
-                            {getStatusBadge(post.status)}
-                          </td>
+                          <td className="px-6 py-4">{getStatusBadge(post.status)}</td>
                           <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                             {post.views}
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                            {new Date(post.createdAt).toLocaleDateString(
-                              'ko-KR'
-                            )}
+                            {new Date(post.createdAt).toLocaleDateString('ko-KR')}
                           </td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-2">

@@ -53,9 +53,7 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'md' }: ModalProps
             >
               {title && (
                 <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <h3 className="text-xl font-semibold text-primary-50 tracking-tight">
-                    {title}
-                  </h3>
+                  <h3 className="text-xl font-semibold text-primary-50 tracking-tight">{title}</h3>
                   <button
                     onClick={onClose}
                     className="

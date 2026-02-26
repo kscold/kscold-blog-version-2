@@ -2,11 +2,19 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useCategories } from '@/hooks/useCategories';
+import {
+  useCategories,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+} from '@/hooks/useCategories';
 import { Category } from '@/types/api';
 
 export default function AdminCategoriesPage() {
   const { data: categories, isLoading } = useCategories();
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -50,35 +58,60 @@ export default function AdminCategoriesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('카테고리 저장 기능은 백엔드 연동 후 구현됩니다.');
-    setIsModalOpen(false);
+
+    try {
+      const payload = {
+        name: formData.name,
+        slug: formData.slug || undefined,
+        description: formData.description || undefined,
+        parent: formData.parent || undefined,
+        order: formData.order,
+        icon: formData.icon || undefined,
+        color: formData.color || undefined,
+      };
+
+      if (editingCategory) {
+        await updateCategory.mutateAsync({
+          id: editingCategory.id,
+          data: payload,
+        });
+      } else {
+        await createCategory.mutateAsync(payload);
+      }
+      setIsModalOpen(false);
+    } catch (err: any) {
+      alert(err.response?.data?.message || err.message || '저장에 실패했습니다.');
+    }
   };
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`"${name}" 카테고리를 삭제하시겠습니까?`)) {
       return;
     }
-    alert('카테고리 삭제 기능은 백엔드 연동 후 구현됩니다.');
+
+    try {
+      await deleteCategory.mutateAsync(id);
+    } catch (err: any) {
+      alert(err.response?.data?.message || err.message || '삭제에 실패했습니다.');
+    }
   };
 
   const renderCategoryTree = (parentId: string | null = null, depth = 0) => {
     if (!categories) return null;
 
-    const filteredCategories = categories.filter(
-      (cat) => (parentId === null ? !cat.parent : cat.parent === parentId)
+    const filteredCategories = categories.filter(cat =>
+      parentId === null ? !cat.parent : cat.parent === parentId
     );
 
     if (filteredCategories.length === 0) return null;
 
     return (
       <ul className={depth > 0 ? 'ml-8 mt-2' : ''}>
-        {filteredCategories.map((category) => (
+        {filteredCategories.map(category => (
           <li key={category.id} className="mb-2">
             <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-purple-600 dark:hover:border-purple-400 transition-colors">
               <div className="flex items-center gap-3">
-                {category.icon && (
-                  <span className="text-2xl">{category.icon}</span>
-                )}
+                {category.icon && <span className="text-2xl">{category.icon}</span>}
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-900 dark:text-white">
@@ -153,10 +186,7 @@ export default function AdminCategoriesPage() {
           {isLoading ? (
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-24 bg-white dark:bg-gray-900 rounded-lg animate-pulse"
-                />
+                <div key={i} className="h-24 bg-white dark:bg-gray-900 rounded-lg animate-pulse" />
               ))}
             </div>
           ) : categories && categories.length > 0 ? (
@@ -205,9 +235,7 @@ export default function AdminCategoriesPage() {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                     required
                   />
@@ -220,9 +248,7 @@ export default function AdminCategoriesPage() {
                   <input
                     type="text"
                     value={formData.slug}
-                    onChange={(e) =>
-                      setFormData({ ...formData, slug: e.target.value })
-                    }
+                    onChange={e => setFormData({ ...formData, slug: e.target.value })}
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                     required
                   />
@@ -235,9 +261,7 @@ export default function AdminCategoriesPage() {
                   <input
                     type="text"
                     value={formData.icon}
-                    onChange={(e) =>
-                      setFormData({ ...formData, icon: e.target.value })
-                    }
+                    onChange={e => setFormData({ ...formData, icon: e.target.value })}
                     placeholder="📁"
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
@@ -249,15 +273,13 @@ export default function AdminCategoriesPage() {
                   </label>
                   <select
                     value={formData.parent}
-                    onChange={(e) =>
-                      setFormData({ ...formData, parent: e.target.value })
-                    }
+                    onChange={e => setFormData({ ...formData, parent: e.target.value })}
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                   >
                     <option value="">없음 (최상위)</option>
                     {categories
-                      ?.filter((cat) => cat.depth < 4)
-                      .map((cat) => (
+                      ?.filter(cat => cat.depth < 4)
+                      .map(cat => (
                         <option key={cat.id} value={cat.id}>
                           {'  '.repeat(cat.depth)}
                           {cat.icon && `${cat.icon} `}
@@ -274,9 +296,7 @@ export default function AdminCategoriesPage() {
                 </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                 />

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,9 +9,23 @@ import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 
 export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-surface-50 flex items-center justify-center">
+          <p>Loading...</p>
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login, register } = useAuth();
+  const { loginAsync, registerAsync, isLoggingIn, isRegistering } = useAuth();
 
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -21,16 +35,16 @@ export default function LoginPage() {
     displayName: '',
   });
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+  const isLoading = isLoggingIn || isRegistering;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
 
     try {
       if (isLogin) {
-        await login.mutateAsync({
+        await loginAsync({
           email: formData.email,
           password: formData.password,
         });
@@ -38,7 +52,7 @@ export default function LoginPage() {
         const redirect = searchParams.get('redirect') || '/admin';
         router.push(redirect);
       } else {
-        await register.mutateAsync({
+        await registerAsync({
           email: formData.email,
           password: formData.password,
           username: formData.username,
@@ -49,8 +63,6 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || '로그인에 실패했습니다.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -219,7 +231,8 @@ export default function LoginPage() {
           transition={{ duration: 0.6, delay: 0.4 }}
         >
           <p className="text-xs text-surface-500 text-center font-medium tracking-wide">
-            <strong className="text-surface-900">개발 모드:</strong> 백엔드 서버 확인 (localhost:8080)
+            <strong className="text-surface-900">개발 모드:</strong> 백엔드 서버 확인
+            (localhost:8080)
           </p>
         </motion.div>
       </motion.div>

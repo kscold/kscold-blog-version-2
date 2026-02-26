@@ -31,14 +31,14 @@ export default function AdminDashboardPage() {
     },
     {
       name: '발행된 포스트',
-      value: posts.filter((p) => p.status === 'PUBLISHED').length,
+      value: posts.filter(p => p.status === 'PUBLISHED').length,
       icon: '✅',
       link: '/admin/posts',
       color: 'from-green-600 to-emerald-600',
     },
     {
       name: '초안',
-      value: posts.filter((p) => p.status === 'DRAFT').length,
+      value: posts.filter(p => p.status === 'DRAFT').length,
       icon: '📄',
       link: '/admin/posts',
       color: 'from-yellow-600 to-orange-600',
@@ -117,9 +117,7 @@ export default function AdminDashboardPage() {
                   <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {stat.name}
-                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">{stat.name}</div>
                 </Link>
               </motion.div>
             ))}
@@ -150,9 +148,7 @@ export default function AdminDashboardPage() {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                       {action.name}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {action.description}
-                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{action.description}</p>
                   </Link>
                 </motion.div>
               ))}
@@ -176,7 +172,7 @@ export default function AdminDashboardPage() {
             {posts.length > 0 ? (
               <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {posts.slice(0, 5).map((post) => (
+                  {posts.slice(0, 5).map(post => (
                     <Link
                       key={post.id}
                       href={`/admin/posts/${post.id}/edit`}
@@ -202,11 +198,7 @@ export default function AdminDashboardPage() {
                             <span>•</span>
                             <span>조회수 {post.views}</span>
                             <span>•</span>
-                            <span>
-                              {new Date(post.createdAt).toLocaleDateString(
-                                'ko-KR'
-                              )}
-                            </span>
+                            <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
                           </div>
                         </div>
                         <div>
@@ -228,9 +220,7 @@ export default function AdminDashboardPage() {
             ) : (
               <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
                 <div className="text-4xl mb-3">📝</div>
-                <p className="text-gray-600 dark:text-gray-400">
-                  아직 포스트가 없습니다
-                </p>
+                <p className="text-gray-600 dark:text-gray-400">아직 포스트가 없습니다</p>
               </div>
             )}
           </div>

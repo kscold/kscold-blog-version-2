@@ -48,8 +48,8 @@ export default function NewPostPage() {
 
     const tagIds = tags
       .split(',')
-      .map((t) => t.trim())
-      .filter((t) => t);
+      .map(t => t.trim())
+      .filter(t => t);
 
     const postData: PostCreateRequest = {
       title,
@@ -104,7 +104,7 @@ export default function NewPostPage() {
                   <input
                     type="text"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={e => setTitle(e.target.value)}
                     placeholder="포스트 제목을 입력하세요"
                     className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
                     required
@@ -119,7 +119,7 @@ export default function NewPostPage() {
                   <input
                     type="text"
                     value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
+                    onChange={e => setSlug(e.target.value)}
                     placeholder="url-friendly-slug"
                     className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
@@ -140,7 +140,7 @@ export default function NewPostPage() {
                         height="600px"
                         defaultLanguage="markdown"
                         value={content}
-                        onChange={(value) => setContent(value || '')}
+                        onChange={value => setContent(value || '')}
                         theme="vs-dark"
                         options={{
                           minimap: { enabled: false },
@@ -161,7 +161,7 @@ export default function NewPostPage() {
                   </label>
                   <textarea
                     value={excerpt}
-                    onChange={(e) => setExcerpt(e.target.value)}
+                    onChange={e => setExcerpt(e.target.value)}
                     placeholder="포스트 요약을 입력하세요 (비워두면 자동 생성됩니다)"
                     rows={3}
                     className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
@@ -183,9 +183,7 @@ export default function NewPostPage() {
                       </label>
                       <select
                         value={status}
-                        onChange={(e) =>
-                          setStatus(e.target.value as 'DRAFT' | 'PUBLISHED')
-                        }
+                        onChange={e => setStatus(e.target.value as 'DRAFT' | 'PUBLISHED')}
                         className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                       >
                         <option value="DRAFT">초안</option>
@@ -198,7 +196,7 @@ export default function NewPostPage() {
                         type="checkbox"
                         id="featured"
                         checked={featured}
-                        onChange={(e) => setFeatured(e.target.checked)}
+                        onChange={e => setFeatured(e.target.checked)}
                         className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <label
@@ -218,12 +216,12 @@ export default function NewPostPage() {
                   </h3>
                   <select
                     value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
+                    onChange={e => setCategoryId(e.target.value)}
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                     required
                   >
                     <option value="">카테고리 선택</option>
-                    {categories?.map((cat) => (
+                    {categories?.map(cat => (
                       <option key={cat.id} value={cat.id}>
                         {'  '.repeat(cat.depth)}
                         {cat.icon && `${cat.icon} `}
@@ -235,13 +233,11 @@ export default function NewPostPage() {
 
                 {/* Tags */}
                 <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    태그
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">태그</h3>
                   <input
                     type="text"
                     value={tags}
-                    onChange={(e) => setTags(e.target.value)}
+                    onChange={e => setTags(e.target.value)}
                     placeholder="태그 ID (쉼표로 구분)"
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
@@ -258,7 +254,7 @@ export default function NewPostPage() {
                   <input
                     type="text"
                     value={coverImage}
-                    onChange={(e) => setCoverImage(e.target.value)}
+                    onChange={e => setCoverImage(e.target.value)}
                     placeholder="이미지 URL"
                     className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
@@ -267,7 +263,7 @@ export default function NewPostPage() {
                       src={coverImage}
                       alt="Cover preview"
                       className="mt-4 w-full rounded-lg"
-                      onError={(e) => {
+                      onError={e => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
