@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  blog-mongo:
+    container_name: kscold-blog-mongo
+    image: mongo:7.0
+    volumes:
+      - blog-mongo-data:/data/db
+    networks:
+      - kscold-control_default
+    restart: unless-stopped
+
+  blog-web:
+    container_name: kscold-blog-web
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.web
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://kscold.com/api
+      - NEXT_PUBLIC_SOCKET_URL=https://kscold.com
+    depends_on:
+      - blog-api
+    networks:
+      - kscold-control_default
+    restart: unless-stopped
+
+  blog-api:
+    container_name: kscold-blog-api
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MONGODB_URI=mongodb://kscold-blog-mongo:27017/kscold-blog
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_EXPIRATION=3600000
+      - JWT_REFRESH_EXPIRATION=604800000
+      - CORS_ORIGINS=https://kscold.com
+      - FILE_UPLOAD_DIR=/app/uploads
+    volumes:
+      - blog-uploads:/app/uploads
+    depends_on:
+      - blog-mongo
+    networks:
+      - kscold-control_default
+    restart: unless-stopped
+
+networks:
+  kscold-control_default:
+    external: true
+
+volumes:
+  blog-mongo-data:
+    external: true
+  blog-uploads:
+    driver: local

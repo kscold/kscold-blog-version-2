@@ -7,20 +7,29 @@ RUN npm install -g pnpm@8
 # Dependencies stage
 FROM base AS deps
 WORKDIR /app
-COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/web/package.json ./apps/web/
-COPY packages/*/package.json ./packages/
-RUN pnpm install --frozen-lockfile
+# Copy packages if they have package.json (they may be empty placeholders)
+COPY packages/ ./packages/
+RUN pnpm install --frozen-lockfile --filter=@kscold-blog/web...
 
 # Builder stage
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY . .
-RUN pnpm build --filter=@kscold-blog/web
+
+# Build args for env vars baked into the Next.js bundle
+ARG NEXT_PUBLIC_API_URL=https://kscold.com/api
+ARG NEXT_PUBLIC_SOCKET_URL=https://kscold.com
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+
+RUN cd apps/web && pnpm build
 
 # Runner stage
-FROM base AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production

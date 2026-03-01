@@ -43,6 +43,9 @@ apps/api/src/main/resources/application-secret*.yml
 .DS_Store
 Thumbs.db
 
+# TypeScript build cache
+*.tsbuildinfo
+
 # Turbo
 .turbo/
 
