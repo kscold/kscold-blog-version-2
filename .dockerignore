@@ -1,0 +1,14 @@
+node_modules
+.next
+.turbo
+.git
+.gitignore
+*.md
+.env*
+docker/
+apps/api/build/
+apps/api/.gradle/
+apps/api/target/
+uploads/
+.claude/
+.serena/
