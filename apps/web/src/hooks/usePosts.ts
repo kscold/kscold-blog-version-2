@@ -21,6 +21,13 @@ export function usePosts(options: UsePostsOptions = {}) {
   });
 }
 
+export function useAdminPosts(page: number = 0, size: number = 20) {
+  return useQuery({
+    queryKey: ['posts', 'admin', { page, size }],
+    queryFn: () => apiClient.get<PageResponse<Post>>(`/posts/admin?page=${page}&size=${size}`),
+  });
+}
+
 export function usePost(slug: string) {
   return useQuery({
     queryKey: ['posts', slug],

@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { usePosts, useDeletePost } from '@/hooks/usePosts';
+import { useAdminPosts, useDeletePost } from '@/hooks/usePosts';
 
 export default function AdminPostsPage() {
   const [page, setPage] = useState(0);
-  const { data: postsData, isLoading } = usePosts({ page, size: 20 });
+  const { data: postsData, isLoading } = useAdminPosts(page, 20);
   const deletePost = useDeletePost();
 
   const posts = postsData?.content || [];

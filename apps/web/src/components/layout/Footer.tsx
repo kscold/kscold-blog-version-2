@@ -8,10 +8,14 @@ export function Footer() {
   const links = {
     social: [
       { label: 'GitHub', href: 'https://github.com/kscold' },
-      { label: 'LinkedIn', href: '#' },
       { label: 'Email', href: 'mailto:contact@coldcraft.dev' },
     ],
-    quick: [{ label: 'Blog', href: '/blog' }],
+    quick: [
+      { label: 'Blog', href: '/blog' },
+      { label: 'Feed', href: '/feed' },
+      { label: 'Vault', href: '/vault' },
+      { label: 'Info', href: '/info' },
+    ],
   };
 
   return (
