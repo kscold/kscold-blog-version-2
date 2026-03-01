@@ -193,6 +193,22 @@ public class PostController {
     }
 
     /**
+     * 관리자용 전체 포스트 조회 (DRAFT, ARCHIVED 포함)
+     * GET /api/posts/admin?page=0&size=20
+     */
+    @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Page<PostResponse>>> getAdminPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> posts = postService.getAllAdmin(pageable);
+        Page<PostResponse> response = posts.map(PostResponse::from);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
      * 슬러그 존재 여부 확인
      * GET /api/posts/exists/slug/:slug
      */

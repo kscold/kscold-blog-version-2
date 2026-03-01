@@ -272,6 +272,13 @@ public class PostService {
     }
 
     /**
+     * 관리자용 전체 포스트 조회 (모든 상태)
+     */
+    public Page<Post> getAllAdmin(Pageable pageable) {
+        return postRepository.findAll(pageable);
+    }
+
+    /**
      * 추천 포스트 조회
      */
     public List<Post> getFeatured(Pageable pageable) {

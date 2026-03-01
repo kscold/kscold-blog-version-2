@@ -64,14 +64,14 @@ function FolderNode({
         onClick={handleHeaderClick}
         className={`flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer transition-colors group ${
           isFolderActive
-            ? 'bg-accent-light/10 text-accent-light shadow-[inset_0_0_10px_rgba(100,200,255,0.05)] border border-accent-light/20'
-            : 'text-surface-300 hover:text-white hover:bg-white/10'
+            ? 'bg-accent-light/10 text-accent-light shadow-sm border border-accent-light/20'
+            : 'text-surface-600 hover:text-surface-900 hover:bg-surface-50'
         }`}
       >
         <motion.div
           animate={{ rotate: isOpen ? 90 : 0 }}
           onClick={toggleOpenIcon}
-          className={`transition-colors ${isFolderActive ? 'text-accent-light' : 'text-surface-500 group-hover:text-surface-300'}`}
+          className={`transition-colors ${isFolderActive ? 'text-accent-light' : 'text-surface-400 group-hover:text-surface-600'}`}
         >
           <svg
             width="12"
@@ -88,7 +88,7 @@ function FolderNode({
         </motion.div>
 
         <svg
-          className={`w-4 h-4 ${isFolderActive ? 'text-accent-light' : 'text-surface-400 group-hover:text-surface-200'}`}
+          className={`w-4 h-4 ${isFolderActive ? 'text-accent-light' : 'text-surface-400 group-hover:text-surface-600'}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -107,7 +107,7 @@ function FolderNode({
           {folder.name}
         </span>
         {folder.noteCount > 0 && (
-          <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white/10 text-surface-400 group-hover:text-white transition-colors">
+          <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-surface-100 text-surface-500 group-hover:bg-surface-200 group-hover:text-surface-700 transition-colors">
             {folder.noteCount}
           </span>
         )}
@@ -120,7 +120,7 @@ function FolderNode({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden ml-4 pl-3 border-l sm:border-surface-800 border-white/10 mt-1 space-y-1"
+            className="overflow-hidden ml-4 pl-3 border-l border-surface-200 mt-1 space-y-1"
           >
             {folder.children &&
               folder.children.map(child => (
@@ -133,7 +133,7 @@ function FolderNode({
               ))}
 
             {isLoading && (
-              <div className="px-3 py-2 text-xs text-surface-600 animate-pulse">
+              <div className="px-3 py-2 text-xs text-surface-500 animate-pulse">
                 데이터 동기화 중...
               </div>
             )}
@@ -148,12 +148,12 @@ function FolderNode({
                     href={`/vault/${note.slug}`}
                     className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all ${
                       isActive
-                        ? 'bg-accent-light/10 text-accent-light font-bold border border-accent-light/20 shadow-[0_0_15px_rgba(100,200,255,0.1)]'
-                        : 'text-surface-400 hover:text-white hover:bg-white/10'
+                        ? 'bg-accent-light/10 text-accent-light font-bold border border-accent-light/20 shadow-sm'
+                        : 'text-surface-500 hover:text-surface-900 hover:bg-surface-50'
                     }`}
                   >
                     <svg
-                      className={`w-3.5 h-3.5 ${isActive ? 'text-accent-light' : 'text-surface-500'}`}
+                      className={`w-3.5 h-3.5 ${isActive ? 'text-accent-light' : 'text-surface-400'}`}
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

@@ -2,82 +2,81 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { usePosts } from '@/hooks/usePosts';
+import { useAdminPosts } from '@/hooks/usePosts';
 import { useCategories } from '@/hooks/useCategories';
+import { useFeeds } from '@/hooks/useFeeds';
+import { useAllVaultNotes } from '@/hooks/useVault';
 import { useAuthStore } from '@/store/authStore';
 
 export default function AdminDashboardPage() {
   const { user } = useAuthStore();
-  const { data: postsData } = usePosts({ page: 0, size: 5 });
+  const { data: postsData } = useAdminPosts(0, 5);
+  const { data: allPostsData } = useAdminPosts(0, 1);
   const { data: categories } = useCategories();
+  const { data: feedsData } = useFeeds({ page: 0, size: 1 });
+  const { data: vaultData } = useAllVaultNotes(0, 1);
 
   const posts = postsData?.content || [];
-  const totalPosts = postsData?.totalElements || 0;
+  const totalPosts = allPostsData?.totalElements || 0;
+  const totalFeeds = feedsData?.totalElements || 0;
+  const totalVaultNotes = vaultData?.totalElements || 0;
 
   const stats = [
     {
       name: '전체 포스트',
       value: totalPosts,
-      icon: '📝',
       link: '/admin/posts',
       color: 'from-purple-600 to-blue-600',
     },
     {
       name: '카테고리',
       value: categories?.length || 0,
-      icon: '📁',
       link: '/admin/categories',
       color: 'from-blue-600 to-cyan-600',
     },
     {
-      name: '발행된 포스트',
-      value: posts.filter(p => p.status === 'PUBLISHED').length,
-      icon: '✅',
-      link: '/admin/posts',
-      color: 'from-green-600 to-emerald-600',
+      name: '피드',
+      value: totalFeeds,
+      link: '/admin/feed',
+      color: 'from-pink-600 to-rose-600',
     },
     {
-      name: '초안',
-      value: posts.filter(p => p.status === 'DRAFT').length,
-      icon: '📄',
-      link: '/admin/posts',
-      color: 'from-yellow-600 to-orange-600',
+      name: 'Vault 노트',
+      value: totalVaultNotes,
+      link: '/admin/vault',
+      color: 'from-violet-600 to-purple-600',
     },
   ];
 
   const quickActions = [
     {
       name: '새 포스트 작성',
-      description: '새로운 블로그 포스트를 작성합니다',
-      icon: '✏️',
+      description: '블로그 포스트를 작성합니다',
       link: '/admin/posts/new',
       color: 'from-purple-600 to-blue-600',
     },
     {
-      name: '포스트 관리',
-      description: '기존 포스트를 수정하거나 삭제합니다',
-      icon: '📋',
-      link: '/admin/posts',
-      color: 'from-blue-600 to-cyan-600',
+      name: '새 피드 작성',
+      description: '일상 피드를 작성합니다',
+      link: '/admin/feed/new',
+      color: 'from-pink-600 to-rose-600',
+    },
+    {
+      name: '새 노트 작성',
+      description: 'Vault 노트를 작성합니다',
+      link: '/admin/vault/new',
+      color: 'from-violet-600 to-purple-600',
     },
     {
       name: '카테고리 관리',
-      description: '카테고리를 추가, 수정, 삭제합니다',
-      icon: '🗂️',
+      description: '카테고리를 관리합니다',
       link: '/admin/categories',
       color: 'from-cyan-600 to-teal-600',
-    },
-    {
-      name: '블로그 보기',
-      description: '공개된 블로그를 확인합니다',
-      icon: '🌐',
-      link: '/blog',
-      color: 'from-green-600 to-emerald-600',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-secondary-beige dark:bg-gray-950">
+    <div className="min-h-screen bg-surface-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -86,38 +85,27 @@ export default function AdminDashboardPage() {
         >
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-serif font-bold text-gray-900 dark:text-white">
-              관리자 대시보드
+            <h1 className="text-4xl font-sans font-black tracking-tighter text-surface-900">
+              Dashboard
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              안녕하세요, {user?.displayName || user?.username}님
-            </p>
+            <p className="text-surface-500 mt-2">{user?.displayName || user?.username}</p>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.name}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
               >
                 <Link
                   href={stat.link}
-                  className="block p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-all group"
+                  className="block p-5 bg-white border border-surface-200 rounded-2xl hover:border-surface-300 hover:shadow-sm transition-all group"
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div
-                      className={`w-12 h-12 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-2xl group-hover:scale-110 transition-transform`}
-                    >
-                      {stat.icon}
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">{stat.name}</div>
+                  <div className="text-3xl font-black text-surface-900 mb-1">{stat.value}</div>
+                  <div className="text-sm font-medium text-surface-500">{stat.name}</div>
                 </Link>
               </motion.div>
             ))}
@@ -125,30 +113,21 @@ export default function AdminDashboardPage() {
 
           {/* Quick Actions */}
           <div className="mb-8">
-            <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white mb-6">
-              빠른 작업
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <h2 className="text-lg font-bold text-surface-900 mb-4">빠른 작업</h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {quickActions.map((action, index) => (
                 <motion.div
                   key={action.name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
+                  transition={{ duration: 0.4, delay: 0.2 + index * 0.05 }}
                 >
                   <Link
                     href={action.link}
-                    className="block p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-lg transition-all group"
+                    className={`block p-5 bg-gradient-to-br ${action.color} rounded-2xl text-white hover:shadow-lg transition-all group`}
                   >
-                    <div
-                      className={`w-12 h-12 rounded-lg bg-gradient-to-r ${action.color} flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform`}
-                    >
-                      {action.icon}
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      {action.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{action.description}</p>
+                    <h3 className="font-bold mb-1">{action.name}</h3>
+                    <p className="text-sm text-white/70">{action.description}</p>
                   </Link>
                 </motion.div>
               ))}
@@ -157,70 +136,57 @@ export default function AdminDashboardPage() {
 
           {/* Recent Posts */}
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white">
-                최근 포스트
-              </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-surface-900">최근 포스트</h2>
               <Link
                 href="/admin/posts"
-                className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                className="text-sm font-medium text-surface-500 hover:text-surface-900 transition-colors"
               >
-                전체 보기 →
+                전체 보기
               </Link>
             </div>
 
             {posts.length > 0 ? (
-              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {posts.slice(0, 5).map(post => (
+              <div className="bg-white rounded-2xl border border-surface-200 overflow-hidden">
+                <div className="divide-y divide-surface-100">
+                  {posts.map(post => (
                     <Link
                       key={post.id}
                       href={`/admin/posts/${post.id}/edit`}
-                      className="block p-6 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      className="block p-5 hover:bg-surface-50 transition-colors"
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                              {post.title}
-                            </h3>
-                            {post.featured && (
-                              <span className="px-2 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full">
-                                Featured
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                            <span>
-                              {post.category.icon && `${post.category.icon} `}
-                              {post.category.name}
-                            </span>
-                            <span>•</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-surface-900 truncate">{post.title}</h3>
+                          <div className="flex items-center gap-3 mt-1 text-sm text-surface-500">
+                            {post.category && <span>{post.category.name}</span>}
                             <span>조회수 {post.views}</span>
-                            <span>•</span>
                             <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
                           </div>
                         </div>
-                        <div>
-                          <span
-                            className={`px-3 py-1 text-xs font-medium rounded-full ${
-                              post.status === 'PUBLISHED'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                            }`}
-                          >
-                            {post.status === 'PUBLISHED' ? '발행됨' : '초안'}
-                          </span>
-                        </div>
+                        <span
+                          className={`ml-4 px-3 py-1 text-xs font-bold rounded-full ${
+                            post.status === 'PUBLISHED'
+                              ? 'bg-green-100 text-green-700'
+                              : post.status === 'DRAFT'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-surface-100 text-surface-500'
+                          }`}
+                        >
+                          {post.status === 'PUBLISHED'
+                            ? '발행'
+                            : post.status === 'DRAFT'
+                              ? '초안'
+                              : '보관'}
+                        </span>
                       </div>
                     </Link>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
-                <div className="text-4xl mb-3">📝</div>
-                <p className="text-gray-600 dark:text-gray-400">아직 포스트가 없습니다</p>
+              <div className="text-center py-12 bg-white rounded-2xl border border-surface-200">
+                <p className="text-surface-500">아직 포스트가 없습니다</p>
               </div>
             )}
           </div>

@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { useCategories } from '@/hooks/useCategories';
 import { useUiStore } from '@/store/uiStore';
-import { Category } from '@/types/api';
+import { apiClient } from '@/lib/api-client';
+import { Category, Tag } from '@/types/api';
 
 function CategoryTree({ categories, depth = 0 }: { categories: Category[]; depth?: number }) {
   const rootCategories = categories.filter(cat => cat.depth === depth);
@@ -46,6 +48,11 @@ function CategoryTree({ categories, depth = 0 }: { categories: Category[]; depth
 export function Sidebar() {
   const { data: categories } = useCategories();
   const { sidebarOpen, setSidebarOpen } = useUiStore();
+  const { data: tags } = useQuery({
+    queryKey: ['tags'],
+    queryFn: () => apiClient.get<Tag[]>('/tags'),
+    staleTime: 1000 * 60 * 5,
+  });
 
   return (
     <>
@@ -103,16 +110,25 @@ export function Sidebar() {
               Popular Tags
             </h2>
             <div className="flex flex-wrap gap-2">
-              {['React', 'TypeScript', 'Next.js', 'Spring Boot'].map(tag => (
-                <Link
-                  key={tag}
-                  href={`/blog/tags/${tag.toLowerCase()}`}
-                  className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
-                >
-                  <div className="absolute inset-0 bg-surface-50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="relative z-10">{tag}</span>
-                </Link>
-              ))}
+              {tags && tags.length > 0 ? (
+                tags.slice(0, 10).map(tag => (
+                  <Link
+                    key={tag.id}
+                    href={`/blog/tags/${tag.slug}`}
+                    className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
+                  >
+                    <div className="absolute inset-0 bg-surface-50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="relative z-10">{tag.name}</span>
+                    {tag.postCount > 0 && (
+                      <span className="relative z-10 ml-1 text-[10px] text-surface-400">
+                        {tag.postCount}
+                      </span>
+                    )}
+                  </Link>
+                ))
+              ) : (
+                <p className="text-xs text-surface-400">태그가 없습니다</p>
+              )}
             </div>
           </div>
         </div>

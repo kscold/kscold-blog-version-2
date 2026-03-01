@@ -66,8 +66,19 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
   return (
     <div className="space-y-4 pt-12 border-t border-surface-200/50 mt-16">
       <h3 className="text-sm font-bold text-surface-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+          />
         </svg>
         Neural Network Synapse Link Formed
       </h3>
@@ -162,7 +173,9 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
           )}
         </div>
       ) : (
-        <p className="text-xs text-surface-500 text-center py-8 font-mono bg-surface-50 rounded-2xl border border-surface-200/50">No comm links active yet</p>
+        <p className="text-xs text-surface-500 text-center py-8 font-mono bg-surface-50 rounded-2xl border border-surface-200/50">
+          No comm links active yet
+        </p>
       )}
 
       {/* Comment Form */}

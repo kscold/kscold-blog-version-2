@@ -28,7 +28,7 @@ export function ClientLayout({ children }: ClientLayoutProps) {
             !isVaultPage ? 'lg:pl-64' : ''
           }`}
         >
-          <div className="flex-1">{children}</div>
+          <div className="flex-1 flex flex-col">{children}</div>
           {!isVaultPage && <Footer />}
         </main>
       </div>

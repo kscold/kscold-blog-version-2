@@ -148,6 +148,12 @@ export default function AdminVaultPage() {
                               보기
                             </button>
                             <button
+                              onClick={() => router.push(`/admin/vault/${note.id}/edit`)}
+                              className="px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                            >
+                              수정
+                            </button>
+                            <button
                               onClick={() => handleDelete(note)}
                               className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
                             >
