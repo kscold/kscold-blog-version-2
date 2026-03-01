@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { usePosts, usePostsByCategory, useSearchPosts } from '@/hooks/usePosts';
 import { useCategories } from '@/hooks/useCategories';
@@ -9,7 +9,15 @@ import { PostCard } from '@/components/blog/PostCard';
 export default function BlogPage() {
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const { data: categories } = useCategories();
   const { data: allPostsData, isLoading: isLoadingAll } = usePosts({
@@ -25,9 +33,9 @@ export default function BlogPage() {
     12
   );
 
-  const { data: searchResults, isLoading: isSearching } = useSearchPosts(searchQuery, page, 12);
+  const { data: searchResults, isLoading: isSearching } = useSearchPosts(debouncedQuery, page, 12);
 
-  const displayData = searchQuery
+  const displayData = debouncedQuery
     ? searchResults
     : selectedCategory
       ? categoryPostsData
@@ -235,7 +243,7 @@ export default function BlogPage() {
               포스트가 없습니다
             </h2>
             <p className="text-surface-500 font-medium">
-              {searchQuery
+              {debouncedQuery
                 ? '검색 결과가 없습니다. 다른 검색어를 시도해보세요.'
                 : '아직 작성된 포스트가 없습니다.'}
             </p>

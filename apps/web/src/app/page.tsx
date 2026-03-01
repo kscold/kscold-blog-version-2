@@ -109,10 +109,10 @@ export default function HomePage() {
               </span>
             </Link>
             <Link
-              href="/blog"
+              href="/feed"
               className="group flex items-center justify-center w-full sm:w-auto px-10 py-4 text-surface-600 bg-white border border-surface-200 hover:border-surface-900 hover:text-surface-900 transition-all duration-300 rounded-2xl hover:shadow-sm"
             >
-              <span className="font-bold tracking-wide">블로그 보기</span>
+              <span className="font-bold tracking-wide">피드 보기</span>
             </Link>
           </motion.div>
 
@@ -124,13 +124,18 @@ export default function HomePage() {
             whileHover={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
           >
-            {['Github', 'LinkedIn', 'Email'].map(social => (
+            {[
+              { label: 'Github', href: 'https://github.com/kscold' },
+              { label: 'Email', href: 'mailto:contact@coldcraft.dev' },
+            ].map(social => (
               <a
-                key={social}
-                href="#"
+                key={social.label}
+                href={social.href}
+                target={social.href.startsWith('http') ? '_blank' : undefined}
+                rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="text-xs text-surface-500 hover:text-surface-900 transition-all hover:scale-110 uppercase tracking-[0.3em] font-bold relative group"
               >
-                {social}
+                {social.label}
                 <span className="absolute -bottom-2 left-0 w-full h-[1px] bg-surface-900 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
               </a>
             ))}

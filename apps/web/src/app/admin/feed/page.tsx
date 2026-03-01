@@ -131,6 +131,12 @@ export default function AdminFeedPage() {
                           >
                             보기
                           </Link>
+                          <Link
+                            href={`/admin/feed/${feed.id}/edit`}
+                            className="text-xs font-medium text-blue-500 hover:text-blue-700"
+                          >
+                            수정
+                          </Link>
                           <button
                             onClick={() => handleDelete(feed.id)}
                             className="text-xs font-medium text-red-500 hover:text-red-700"
