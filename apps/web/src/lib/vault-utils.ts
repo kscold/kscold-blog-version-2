@@ -78,12 +78,15 @@ export function getAggregatedGraph(
       nodeMapping.set(node.id, subfolder.id);
     }
 
-    if (notesInside.length > 0) {
+    const hasChildren = subfolder.children && subfolder.children.length > 0;
+
+    // Show folder if it has notes inside or has child subfolders
+    if (notesInside.length > 0 || hasChildren) {
       aggregatedNodes.push({
         id: subfolder.id,
         name: subfolder.name,
         slug: '',
-        val: Math.max(10, notesInside.length * 2), // Size for graph rendering
+        val: Math.max(10, notesInside.length * 2 + (hasChildren ? 5 : 0)),
         folderId: subfolder.id,
         isFolder: true,
       });
