@@ -60,6 +60,9 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
       setDeletePassword('');
     } catch (err: any) {
       alert(err.response?.data?.message || err.message || '삭제에 실패했습니다');
+    }
+  };
+
   return (
     <div className="space-y-4 pt-12 border-t border-surface-200/50 mt-16">
       <h3 className="text-sm font-bold text-surface-400 uppercase tracking-widest mb-6 flex items-center gap-2">

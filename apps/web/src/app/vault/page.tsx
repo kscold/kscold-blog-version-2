@@ -57,7 +57,7 @@ export default function VaultIndexPage() {
             <button
               onClick={() => {
                 const parent = folders?.find(f => f.id === activeFolderId)?.parent;
-                setActiveFolderId(parent ? parent.id : null);
+                setActiveFolderId(parent ?? null);
               }}
               className="px-4 py-2 rounded-full bg-surface-900/80 border border-white/10 text-surface-200 hover:text-white text-sm flex items-center gap-2 backdrop-blur-md transition-colors"
             >
