@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FeedComposer } from '@/components/feed/FeedComposer';
+import { FeedComposer } from '@/features/feed/ui/FeedComposer';
 
 export default function NewFeedPage() {
   return (

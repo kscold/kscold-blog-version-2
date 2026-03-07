@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useFeeds } from '@/hooks/useFeeds';
-import { FeedCard } from '@/components/feed/FeedCard';
+import { useFeeds } from '@/entities/feed/api/useFeeds';
+import { FeedCard } from '@/entities/feed/ui/FeedCard';
 
 export default function FeedPage() {
   const [page, setPage] = useState(0);

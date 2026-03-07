@@ -2,16 +2,18 @@
 
 import { useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { useVaultNote, useVaultBacklinks, useVaultFolders, useVaultGraph } from '@/hooks/useVault';
-import { VaultFolderTree } from '@/components/vault/VaultFolderTree';
-import { VaultNoteContent } from '@/components/vault/VaultNoteContent';
-import { BacklinkList } from '@/components/vault/BacklinkList';
-import { ClientVaultGraph } from '@/components/vault/ClientVaultGraph';
-import { buildFolderColorMap, getAggregatedGraph } from '@/lib/vault-utils';
+import { useUiStore } from '@/shared/model/uiStore';
+import { useVaultNote, useVaultBacklinks, useVaultFolders, useVaultGraph } from '@/entities/vault/api/useVault';
+import { VaultFolderTree } from '@/widgets/vault/ui/VaultFolderTree';
+import { VaultNoteContent } from '@/entities/vault/ui/VaultNoteContent';
+import { BacklinkList } from '@/entities/vault/ui/BacklinkList';
+import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
+import { buildFolderColorMap, getLocalGraph } from '@/entities/vault/lib/vault-utils';
 
 export default function VaultNotePage() {
   const params = useParams();
   const slug = params.slug as string;
+  const { theme } = useUiStore();
 
   const { data: note, isLoading: isNoteLoading, isError } = useVaultNote(slug);
   const { data: backlinks } = useVaultBacklinks(note?.id || '');
@@ -21,16 +23,16 @@ export default function VaultNotePage() {
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  // Derive filtered graph data and colors
-  const { filteredGraph, colorMap } = useMemo(() => {
+  // Build local graph centered on the current note (Obsidian-style)
+  const { localGraph, colorMap } = useMemo(() => {
     const fList = folders || [];
     const cMap = buildFolderColorMap(fList);
 
-    if (!graphData) return { filteredGraph: null, colorMap: cMap };
+    if (!graphData || !note) return { localGraph: null, colorMap: cMap };
 
-    const aggregatedGraph = getAggregatedGraph(graphData, fList, activeFolderId);
-    return { filteredGraph: aggregatedGraph, colorMap: cMap };
-  }, [folders, graphData, activeFolderId]);
+    const graph = getLocalGraph(graphData, note, backlinks || []);
+    return { localGraph: graph, colorMap: cMap };
+  }, [folders, graphData, note, backlinks]);
 
   if (isError) {
     return (
@@ -44,18 +46,18 @@ export default function VaultNotePage() {
   }
 
   return (
-    <div className="flex-1 flex h-full w-full max-w-[1600px] mx-auto overflow-hidden">
+    <div className="absolute inset-0 flex overflow-hidden bg-transparent">
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-surface-900/20 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-surface-900/20 backdrop-blur-sm z-[45] lg:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
       {/* Sidebar: Folder Tree */}
       <aside
-        className={`fixed top-[88px] left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-[150%]'} lg:translate-x-0 bg-white/70 backdrop-blur-2xl border border-surface-200/50 rounded-3xl shadow-sm custom-scrollbar`}
+        className={`absolute lg:fixed top-0 lg:top-[88px] left-0 lg:left-4 bottom-0 lg:bottom-4 w-64 lg:w-56 z-50 lg:z-40 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 lg:rounded-3xl shadow-2xl lg:shadow-sm custom-scrollbar h-full lg:h-auto`}
       >
         <div className="p-6 space-y-8 relative">
           <div>
@@ -79,7 +81,7 @@ export default function VaultNotePage() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 relative p-4 sm:p-6 lg:p-12 lg:pl-[260px] overflow-y-auto custom-scrollbar w-full">
+      <main className="flex-1 relative p-4 sm:p-6 lg:p-12 lg:pl-[260px] overflow-y-auto custom-scrollbar w-full h-full">
         {isNoteLoading ? (
           <div className="space-y-8 animate-pulse max-w-4xl mx-auto">
             <div className="h-12 bg-surface-200/50 rounded-2xl w-3/4" />
@@ -92,7 +94,7 @@ export default function VaultNotePage() {
           </div>
         ) : note ? (
           <div className="max-w-4xl mx-auto pb-24">
-            <VaultNoteContent note={note} />
+            <VaultNoteContent note={note} theme={theme} />
             <BacklinkList backlinks={backlinks || []} />
 
             {/* Local Context Graph (Mini Graph View) */}
@@ -113,12 +115,13 @@ export default function VaultNotePage() {
                 </svg>
                 Synapse Map Insight
               </h3>
-              {filteredGraph && (
+              {localGraph && (
                 <ClientVaultGraph
-                  graphData={filteredGraph}
+                  graphData={localGraph}
                   activeNodeSlug={note.slug}
                   folderColorMap={colorMap}
                   onFolderClick={setActiveFolderId}
+                  theme={theme}
                 />
               )}
             </div>
