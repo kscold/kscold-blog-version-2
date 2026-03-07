@@ -1,6 +1,6 @@
 package com.kscold.blog.dto.response;
 
-import com.kscold.blog.model.VaultNote;
+import com.kscold.blog.vault.domain.model.VaultNote;
 import lombok.*;
 
 import java.time.LocalDateTime;

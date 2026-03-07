@@ -1,5 +1,7 @@
 package com.kscold.blog.security;
 
+import com.kscold.blog.exception.BusinessException;
+import com.kscold.blog.exception.ErrorCode;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
@@ -120,7 +122,7 @@ public class JwtTokenProvider {
             String userId = getUserId(token);
             return new UsernamePasswordAuthenticationToken(userId, "", Collections.emptyList());
         } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException("Invalid JWT token");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
     }
 }
