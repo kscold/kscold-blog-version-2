@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { Providers } from '@/components/providers';
-import { ClientLayout } from '@/components/layout/ClientLayout';
+import { Providers } from '@/app/providers/providers';
+import { ClientLayout } from '@/app/providers/ClientLayout';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     default: '김승찬 블로그',
     template: '%s | 김승찬 블로그',
   },
-  description: '도도하고 미술관 같은 개발 블로그',
+  description: '김승찬 일상 개발 블로그',
   keywords: [
     '김승찬',
     'kscold',
@@ -56,8 +56,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className="antialiased bg-white text-surface-900 min-h-screen relative selection:bg-accent-light/30 selection:text-accent-light">
-        <div className="fixed inset-0 z-[-1] pointer-events-none bg-white"></div>
+      <body className="antialiased bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50 min-h-screen relative selection:bg-accent-light/30 selection:text-accent-light transition-colors duration-300">
+        <div className="fixed inset-0 z-[-1] pointer-events-none bg-surface-50 dark:bg-surface-950 transition-colors duration-300"></div>
 
         <Providers>
           <ClientLayout>{children}</ClientLayout>

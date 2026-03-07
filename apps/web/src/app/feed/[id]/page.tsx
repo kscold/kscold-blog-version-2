@@ -3,9 +3,9 @@
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useFeed } from '@/hooks/useFeeds';
-import { FeedCard } from '@/components/feed/FeedCard';
-import { CommentSection } from '@/components/feed/CommentSection';
+import { useFeed } from '@/entities/feed/api/useFeeds';
+import { FeedCard } from '@/entities/feed/ui/FeedCard';
+import { CommentSection } from '@/widgets/feed/ui/CommentSection';
 
 export default function FeedDetailPage() {
   const params = useParams();
