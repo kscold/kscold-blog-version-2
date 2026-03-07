@@ -1,6 +1,6 @@
 package com.kscold.blog.dto.response;
 
-import com.kscold.blog.model.Post;
+import com.kscold.blog.blog.domain.model.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

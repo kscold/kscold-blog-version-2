@@ -16,7 +16,7 @@ spring:
       max-request-size: 10MB
 
 server:
-  port: 8080
+  port: 8081
   error:
     include-message: always
     include-binding-errors: always
@@ -24,14 +24,14 @@ server:
 # JWT 설정
 jwt:
   secret: ${JWT_SECRET:your-secret-key-change-in-production-must-be-at-least-256-bits}
-  access-token-expiration: 3600000  # 1 hour
-  refresh-token-expiration: 604800000  # 7 days
+  access-token-expiration: 3600000 # 1 hour
+  refresh-token-expiration: 604800000 # 7 days
 
 # CORS 설정
 cors:
-  allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
+  allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:3001}
   allowed-methods: GET,POST,PUT,DELETE,OPTIONS
-  allowed-headers: "*"
+  allowed-headers: '*'
   allow-credentials: true
 
 # File Upload
