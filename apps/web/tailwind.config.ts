@@ -6,6 +6,9 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/features/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/widgets/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/shared/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/entities/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   darkMode: 'class',
   theme: {
@@ -107,6 +110,11 @@ const config: Config = {
           '0%': { transform: 'translateY(100%)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
+      },
+      boxShadow: {
+        'gallery': '0 4px 20px -10px rgba(0,0,0,0.05)',
+        'gallery-hover': '0 8px 30px -10px rgba(0,0,0,0.1)',
+        'glow-surface': '0 8px 32px rgba(0,0,0,0.3)',
       },
     },
   },

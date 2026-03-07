@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useAdminFeeds, useDeleteFeed } from '@/hooks/useFeeds';
+import { useAdminFeeds, useDeleteFeed } from '@/entities/feed/api/useFeeds';
 
 export default function AdminFeedPage() {
   const [page, setPage] = useState(0);
