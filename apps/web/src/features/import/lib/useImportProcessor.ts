@@ -5,6 +5,7 @@ import { parseMarkdownFile } from '@/shared/lib/markdown-parser';
 import { useResolveTag, useCheckSlugExists, useImportPost } from '@/features/feed/api/useImportPosts';
 import type { ParsedMarkdownFile, ImportResult, ImportStatus } from '@/types/import';
 import type { PostCreateRequest } from '@/types/blog';
+import { useAlert } from '@/shared/model/alertStore';
 
 interface ImportProgress {
   current: number;
@@ -42,6 +43,7 @@ export function useImportProcessor(): UseImportProcessorReturn {
   const resolveTag = useResolveTag();
   const checkSlug = useCheckSlugExists();
   const importPost = useImportPost();
+  const alert = useAlert();
 
   const handleFiles = useCallback(async (fileList: FileList) => {
     setImportStatus('parsing');
@@ -50,7 +52,7 @@ export function useImportProcessor(): UseImportProcessorReturn {
     );
 
     if (mdFiles.length === 0) {
-      alert('.md 파일만 업로드할 수 있습니다.');
+      alert.warning('.md 파일만 업로드할 수 있습니다.');
       setImportStatus('idle');
       return;
     }
@@ -98,7 +100,7 @@ export function useImportProcessor(): UseImportProcessorReturn {
     globalPostStatus: 'DRAFT' | 'PUBLISHED',
   ) => {
     if (!globalCategoryId) {
-      alert('카테고리를 선택해주세요.');
+      alert.warning('카테고리를 선택해주세요.');
       return;
     }
 

@@ -51,8 +51,9 @@ export function ImageUpload({ onUploadSuccess, currentImage }: ImageUploadProps)
 
       const url = response.url;
       onUploadSuccess(url);
-    } catch (err: any) {
-      setError(err.response?.data?.message || '업로드에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '업로드에 실패했습니다';
+      setError(message);
       setPreview(currentImage || null);
     } finally {
       setIsUploading(false);

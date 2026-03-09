@@ -6,6 +6,7 @@ import {
   useCreateFeedComment,
   useDeleteFeedComment,
 } from '@/entities/feed/api/useFeedComments';
+import { useAlert } from '@/shared/model/alertStore';
 
 interface CommentSectionProps {
   feedId: string;
@@ -16,6 +17,7 @@ export function CommentSection({ feedId }: CommentSectionProps) {
   const { data: commentsData, isLoading } = useFeedComments(feedId, page);
   const createComment = useCreateFeedComment(feedId);
   const deleteComment = useDeleteFeedComment(feedId);
+  const alert = useAlert();
 
   const [authorName, setAuthorName] = useState('');
   const [authorPassword, setAuthorPassword] = useState('');
@@ -33,8 +35,9 @@ export function CommentSection({ feedId }: CommentSectionProps) {
     try {
       await createComment.mutateAsync({ authorName, authorPassword, content });
       setContent('');
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '댓글 작성에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '댓글 작성에 실패했습니다';
+      alert.error(message);
     }
   };
 
@@ -45,8 +48,9 @@ export function CommentSection({ feedId }: CommentSectionProps) {
       await deleteComment.mutateAsync({ commentId, password: deletePassword });
       setDeletingId(null);
       setDeletePassword('');
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '삭제에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '삭제에 실패했습니다';
+      alert.error(message);
     }
   };
 

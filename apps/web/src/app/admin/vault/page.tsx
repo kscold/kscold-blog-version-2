@@ -6,9 +6,11 @@ import { motion } from 'framer-motion';
 import { useAllVaultNotes, useDeleteVaultNote } from '@/entities/vault/api/useVault';
 import { VaultNote } from '@/types/vault';
 import { VaultNoteList } from '@/widgets/admin/ui/VaultNoteList';
+import { useAlert } from '@/shared/model/alertStore';
 
 export default function AdminVaultPage() {
   const router = useRouter();
+  const alert = useAlert();
   const [page, setPage] = useState(0);
   const { data: notesData, isLoading } = useAllVaultNotes(page, 50);
   const deleteNote = useDeleteVaultNote();
@@ -22,8 +24,9 @@ export default function AdminVaultPage() {
 
     try {
       await deleteNote.mutateAsync(note.id);
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '삭제에 실패했습니다.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '삭제에 실패했습니다.';
+      alert.error(message);
     }
   };
 

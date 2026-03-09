@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useAdminPosts, useDeletePost } from '@/entities/post/api/usePosts';
 import { PostsTable } from '@/widgets/admin/ui/PostsTable';
+import { useAlert } from '@/shared/model/alertStore';
 
 export default function AdminPostsPage() {
+  const alert = useAlert();
   const [page, setPage] = useState(0);
   const { data: postsData, isLoading } = useAdminPosts(page, 20);
   const deletePost = useDeletePost();
@@ -21,9 +23,10 @@ export default function AdminPostsPage() {
 
     try {
       await deletePost.mutateAsync(id);
-      alert('포스트가 삭제되었습니다.');
-    } catch (error: any) {
-      alert(`에러: ${error.response?.data?.message || error.message}`);
+      alert.success('포스트가 삭제되었습니다.');
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : '알 수 없는 오류';
+      alert.error(msg);
     }
   };
 
