@@ -2,11 +2,10 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
 import { useCategories } from '@/entities/category/api/useCategories';
+import { useTags } from '@/entities/tag/api/useTags';
 import { useUiStore } from '@/shared/model/uiStore';
-import { apiClient } from '@/shared/api/api-client';
-import { Category, Tag } from '@/types/blog';
+import { Category } from '@/types/blog';
 
 function CategoryTree({ categories, depth = 0 }: { categories: Category[]; depth?: number }) {
   const rootCategories = categories.filter(cat => cat.depth === depth);
@@ -48,11 +47,7 @@ function CategoryTree({ categories, depth = 0 }: { categories: Category[]; depth
 export function Sidebar() {
   const { data: categories } = useCategories();
   const { sidebarOpen, setSidebarOpen } = useUiStore();
-  const { data: tags } = useQuery({
-    queryKey: ['tags'],
-    queryFn: () => apiClient.get<Tag[]>('/tags'),
-    staleTime: 1000 * 60 * 5,
-  });
+  const { data: tags } = useTags();
 
   return (
     <>

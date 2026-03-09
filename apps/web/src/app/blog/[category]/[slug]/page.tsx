@@ -1,43 +1,9 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PostDetailClient } from './PostDetailClient';
+import type { Post } from '@/types/blog';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
-
-interface Post {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string;
-  coverImage?: string;
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-    icon?: string;
-  };
-  tags: {
-    id: string;
-    name: string;
-  }[];
-  author: {
-    id: string;
-    name: string;
-  };
-  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-  featured: boolean;
-  views: number;
-  likes: number;
-  seo?: {
-    metaTitle: string;
-    metaDescription: string;
-    keywords: string[];
-  };
-  publishedAt?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 async function getPost(slug: string): Promise<Post | null> {
   try {

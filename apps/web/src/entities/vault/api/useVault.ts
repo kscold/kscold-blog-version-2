@@ -99,3 +99,11 @@ export function useDeleteVaultNote() {
     },
   });
 }
+
+export function useVaultNoteById(id: string) {
+  return useQuery({
+    queryKey: ['vault', 'notes', 'id', id],
+    queryFn: () => apiClient.get<VaultNote>(`/vault/notes/${id}`),
+    enabled: !!id,
+  });
+}
