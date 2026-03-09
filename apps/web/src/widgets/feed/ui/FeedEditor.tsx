@@ -8,6 +8,7 @@ import { useUpdateFeed, useLinkPreview } from '@/entities/feed/api/useFeeds';
 import { apiClient } from '@/shared/api/api-client';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import FeedActionBar from '@/widgets/feed/ui/FeedActionBar';
+import { useAlert } from '@/shared/model/alertStore';
 
 interface FeedEditorProps {
   feedId: string;
@@ -26,6 +27,7 @@ export default function FeedEditor({
 }: FeedEditorProps) {
   const router = useRouter();
   const updateFeed = useUpdateFeed();
+  const alert = useAlert();
 
   const [content, setContent] = useState(initialContent);
   const [images, setImages] = useState<string[]>(initialImages);
@@ -48,8 +50,9 @@ export default function FeedEditor({
         uploadedUrls.push(result.url);
       }
       setImages([...images, ...uploadedUrls]);
-    } catch (err: any) {
-      alert(err.response?.data?.message || '업로드에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '업로드에 실패했습니다';
+      alert.error(message);
     } finally {
       setIsUploading(false);
     }
@@ -61,7 +64,7 @@ export default function FeedEditor({
 
   const handleSubmit = async () => {
     if (!content.trim() && images.length === 0) {
-      alert('내용 또는 이미지를 입력해주세요');
+      alert.warning('내용 또는 이미지를 입력해주세요');
       return;
     }
     try {
@@ -70,8 +73,9 @@ export default function FeedEditor({
         data: { content, images, visibility, linkUrl: linkUrl || undefined },
       });
       router.push('/admin/feed');
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '피드 수정에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '피드 수정에 실패했습니다';
+      alert.error(message);
     }
   };
 

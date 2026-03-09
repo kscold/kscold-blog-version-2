@@ -1,49 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useUpdatePost } from '@/entities/post/api/usePosts';
+import { useAdminPost, useUpdatePost } from '@/entities/post/api/usePosts';
 import { PostEditor, PostFormData } from '@/features/editor/ui/PostEditor';
-import { apiClient } from '@/shared/api/api-client';
+import { useAlert } from '@/shared/model/alertStore';
 
 export default function EditPostPage() {
   const params = useParams();
   const router = useRouter();
+  const alert = useAlert();
   const postId = params.id as string;
 
+  const { data: post, isLoading } = useAdminPost(postId);
   const updatePost = useUpdatePost();
-  const [initialData, setInitialData] = useState<Partial<PostFormData> | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const post: any = await apiClient.get(`/posts/${postId}`);
-
-        setInitialData({
-          title: post.title,
-          slug: post.slug,
-          content: post.content,
-          excerpt: post.excerpt || '',
-          coverImage: post.coverImage || '',
-          categoryId: post.category.id,
-          tagIds: post.tags?.map((t: any) => t.id) || [],
-          status: post.status,
-          featured: post.featured || false,
-          metaTitle: post.seo?.metaTitle || '',
-          metaDescription: post.seo?.metaDescription || '',
-          keywords: post.seo?.keywords?.join(', ') || '',
-        });
-      } catch {
-        alert('포스트를 불러오는데 실패했습니다.');
-        router.push('/admin/posts');
-      } finally {
-        setIsLoading(false);
+  const initialData: Partial<PostFormData> | null = post
+    ? {
+        title: post.title,
+        slug: post.slug,
+        content: post.content,
+        excerpt: post.excerpt || '',
+        coverImage: post.coverImage || '',
+        categoryId: post.category.id,
+        tagIds: post.tags?.map(t => t.id) || [],
+        status: post.status,
+        featured: post.featured || false,
+        metaTitle: post.seo?.metaTitle || '',
+        metaDescription: post.seo?.metaDescription || '',
+        keywords: post.seo?.keywords?.join(', ') || '',
       }
-    };
-
-    fetchPost();
-  }, [postId, router]);
+    : null;
 
   const handleSubmit = async (data: PostFormData) => {
     const keywords = data.keywords
@@ -69,7 +55,7 @@ export default function EditPostPage() {
       },
     });
 
-    alert('포스트가 수정되었습니다!');
+    alert.success('포스트가 수정되었습니다!');
     router.push('/admin/posts');
   };
 

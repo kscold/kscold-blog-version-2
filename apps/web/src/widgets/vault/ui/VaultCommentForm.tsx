@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
+import { useAlert } from '@/shared/model/alertStore';
 
 interface VaultCommentFormProps {
   createComment: UseMutationResult<any, any, { authorName: string; authorPassword: string; content: string }, any>;
@@ -11,6 +12,7 @@ export function VaultCommentForm({ createComment }: VaultCommentFormProps) {
   const [authorName, setAuthorName] = useState('');
   const [authorPassword, setAuthorPassword] = useState('');
   const [content, setContent] = useState('');
+  const alert = useAlert();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,8 +21,9 @@ export function VaultCommentForm({ createComment }: VaultCommentFormProps) {
     try {
       await createComment.mutateAsync({ authorName, authorPassword, content });
       setContent('');
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '댓글 작성에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '댓글 작성에 실패했습니다';
+      alert.error(message);
     }
   };
 

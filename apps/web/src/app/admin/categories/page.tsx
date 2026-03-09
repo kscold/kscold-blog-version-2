@@ -11,6 +11,7 @@ import {
 import { Category } from '@/types/blog';
 import { CategoryTree } from '@/widgets/admin/ui/CategoryTree';
 import { CategoryModal } from '@/widgets/admin/ui/CategoryModal';
+import { useAlert } from '@/shared/model/alertStore';
 
 const EMPTY_FORM = {
   name: '',
@@ -27,6 +28,7 @@ export default function AdminCategoriesPage() {
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
+  const alert = useAlert();
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM);
@@ -69,8 +71,9 @@ export default function AdminCategoriesPage() {
         await createCategory.mutateAsync(payload);
       }
       setIsModalOpen(false);
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '저장에 실패했습니다.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '저장에 실패했습니다.';
+      alert.error(message);
     }
   };
 
@@ -78,8 +81,9 @@ export default function AdminCategoriesPage() {
     if (!confirm(`"${name}" 카테고리를 삭제하시겠습니까?`)) return;
     try {
       await deleteCategory.mutateAsync(id);
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '삭제에 실패했습니다.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '삭제에 실패했습니다.';
+      alert.error(message);
     }
   };
 

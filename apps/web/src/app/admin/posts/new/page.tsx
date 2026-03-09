@@ -3,9 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { useCreatePost } from '@/entities/post/api/usePosts';
 import { PostEditor, PostFormData } from '@/features/editor/ui/PostEditor';
+import { useAlert } from '@/shared/model/alertStore';
 
 export default function NewPostPage() {
   const router = useRouter();
+  const alert = useAlert();
   const createPost = useCreatePost();
 
   const handleSubmit = async (data: PostFormData) => {
@@ -30,11 +32,11 @@ export default function NewPostPage() {
         keywords: keywords.length > 0 ? keywords : undefined,
       });
 
-      alert('포스트가 생성되었습니다!');
+      alert.success('포스트가 생성되었습니다!');
       router.push('/admin/posts');
-    } catch (err: unknown) {
+    } catch (err) {
       const message = err instanceof Error ? err.message : '포스트 생성에 실패했습니다.';
-      alert(message);
+      alert.error(message);
     }
   };
 

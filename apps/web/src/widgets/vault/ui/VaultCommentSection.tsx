@@ -8,6 +8,7 @@ import {
 } from '@/entities/vault/api/useVaultComments';
 import { VaultCommentItem } from '@/widgets/vault/ui/VaultCommentItem';
 import { VaultCommentForm } from '@/widgets/vault/ui/VaultCommentForm';
+import { useAlert } from '@/shared/model/alertStore';
 
 interface VaultCommentSectionProps {
   noteId: string;
@@ -31,6 +32,7 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
   const { data: commentsData, isLoading } = useVaultComments(noteId, page);
   const createComment = useCreateVaultComment(noteId);
   const deleteComment = useDeleteVaultComment(noteId);
+  const alert = useAlert();
 
   const comments = commentsData?.content || [];
   const totalPages = commentsData?.totalPages || 0;
@@ -38,8 +40,9 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
   const handleDelete = async (commentId: string, password: string) => {
     try {
       await deleteComment.mutateAsync({ commentId, password });
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '삭제에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '삭제에 실패했습니다';
+      alert.error(message);
     }
   };
 

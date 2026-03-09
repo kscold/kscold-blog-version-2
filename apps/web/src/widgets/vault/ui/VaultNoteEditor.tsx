@@ -8,6 +8,7 @@ import { useVaultFolders, useCreateVaultNote, useUpdateVaultNote } from '@/entit
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import { VaultFolder } from '@/types/vault';
 import VaultEditorSidebar from '@/widgets/vault/ui/VaultEditorSidebar';
+import { useAlert } from '@/shared/model/alertStore';
 
 const Editor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
 
@@ -42,6 +43,7 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
   const { data: folders } = useVaultFolders();
   const createNote = useCreateVaultNote();
   const updateNote = useUpdateVaultNote();
+  const alert = useAlert();
 
   const [title, setTitle] = useState(initialData?.title || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
@@ -77,7 +79,7 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !content || !folderId) {
-      alert('제목, 내용, 폴더는 필수입니다.');
+      alert.warning('제목, 내용, 폴더는 필수입니다.');
       return;
     }
 
@@ -93,14 +95,15 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
     try {
       if (mode === 'create') {
         await createNote.mutateAsync(noteData);
-        alert('노트가 생성되었습니다.');
+        alert.success('노트가 생성되었습니다.');
       } else {
         await updateNote.mutateAsync({ id: noteId!, data: noteData });
-        alert('노트가 수정되었습니다.');
+        alert.success('노트가 수정되었습니다.');
       }
       router.push('/admin/vault');
-    } catch (error: any) {
-      alert(`에러: ${error.response?.data?.message || error.message}`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다';
+      alert.error(message);
     }
   };
 
