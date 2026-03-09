@@ -107,3 +107,11 @@ export function useDeletePost() {
     },
   });
 }
+
+export function useAdminPost(id: string) {
+  return useQuery({
+    queryKey: ['posts', 'admin', id],
+    queryFn: () => apiClient.get<Post>(`/posts/${id}`),
+    enabled: !!id,
+  });
+}

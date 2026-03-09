@@ -4,41 +4,7 @@ import { motion } from 'framer-motion';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import { PostHeader } from '@/widgets/post/ui/PostHeader';
 import { PostCommentSection } from '@/widgets/post/ui/PostCommentSection';
-
-interface Post {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string;
-  coverImage?: string;
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-    icon?: string;
-  };
-  tags: {
-    id: string;
-    name: string;
-  }[];
-  author: {
-    id: string;
-    name: string;
-  };
-  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-  featured: boolean;
-  views: number;
-  likes: number;
-  seo?: {
-    metaTitle: string;
-    metaDescription: string;
-    keywords: string[];
-  };
-  publishedAt?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Post } from '@/types/blog';
 
 interface PostDetailClientProps {
   post: Post;

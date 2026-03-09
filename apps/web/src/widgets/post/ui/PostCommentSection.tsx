@@ -4,13 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-interface Tag {
-  id: string;
-  name: string;
-}
+import type { Tag } from '@/types/blog';
+
+type PostTagInfo = Pick<Tag, 'id' | 'name'>;
 
 interface PostCommentSectionProps {
-  tags: Tag[];
+  tags: PostTagInfo[];
 }
 
 export function PostCommentSection({ tags }: PostCommentSectionProps) {
