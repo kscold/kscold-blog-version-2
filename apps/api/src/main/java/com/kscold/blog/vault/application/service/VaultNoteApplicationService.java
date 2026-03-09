@@ -1,12 +1,13 @@
 package com.kscold.blog.vault.application.service;
 
-import com.kscold.blog.dto.response.GraphDataResponse;
+import com.kscold.blog.vault.application.dto.GraphDataResponse;
 import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.util.SlugUtils;
 import com.kscold.blog.vault.application.dto.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.NoteUpdateCommand;
+import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNote;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
@@ -15,10 +16,6 @@ import com.kscold.blog.vault.domain.service.BacklinkParsingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +24,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class VaultNoteApplicationService {
+public class VaultNoteApplicationService implements VaultNoteUseCase {
 
     private final VaultNoteRepository vaultNoteRepository;
     private final VaultNoteCommentRepository vaultNoteCommentRepository;
@@ -35,7 +32,6 @@ public class VaultNoteApplicationService {
     private final VaultFolderApplicationService vaultFolderApplicationService;
     private final UserQueryPort userQueryPort;
     private final BacklinkParsingService backlinkParsingService;
-    private final MongoTemplate mongoTemplate;
 
     @Transactional
     public VaultNote create(NoteCreateCommand command, String userId) {
@@ -157,9 +153,7 @@ public class VaultNoteApplicationService {
      * Projection 쿼리로 필요한 필드만 조회하여 메모리 최적화
      */
     public GraphDataResponse getGraphData() {
-        Query query = new Query();
-        query.fields().include("id", "title", "slug", "outgoingLinks", "folderId");
-        List<VaultNote> allNotes = mongoTemplate.find(query, VaultNote.class);
+        List<VaultNote> allNotes = vaultNoteRepository.findAllForGraph();
 
         List<GraphDataResponse.GraphNode> nodes = allNotes.stream()
                 .map(note -> {
@@ -196,21 +190,13 @@ public class VaultNoteApplicationService {
      * 댓글 수 원자적 증가
      */
     public void incrementCommentCount(String noteId) {
-        mongoTemplate.updateFirst(
-                Query.query(Criteria.where("id").is(noteId)),
-                new Update().inc("commentsCount", 1),
-                VaultNote.class
-        );
+        vaultNoteRepository.incrementCommentCount(noteId);
     }
 
     /**
      * 댓글 수 원자적 감소 (최소 0)
      */
     public void decrementCommentCount(String noteId) {
-        mongoTemplate.updateFirst(
-                Query.query(Criteria.where("id").is(noteId).and("commentsCount").gt(0)),
-                new Update().inc("commentsCount", -1),
-                VaultNote.class
-        );
+        vaultNoteRepository.decrementCommentCount(noteId);
     }
 }
