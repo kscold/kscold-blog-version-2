@@ -6,6 +6,7 @@ import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.dto.AuthResult;
 import com.kscold.blog.identity.application.dto.LoginCommand;
 import com.kscold.blog.identity.application.dto.RegisterCommand;
+import com.kscold.blog.identity.application.port.in.AuthUseCase;
 import com.kscold.blog.identity.application.port.out.TokenProvider;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class AuthApplicationService {
+public class AuthApplicationService implements AuthUseCase {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
