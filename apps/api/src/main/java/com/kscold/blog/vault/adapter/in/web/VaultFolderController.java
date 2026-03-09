@@ -1,10 +1,10 @@
 package com.kscold.blog.vault.adapter.in.web;
 
-import com.kscold.blog.dto.response.ApiResponse;
-import com.kscold.blog.dto.response.VaultFolderResponse;
+import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.vault.adapter.in.web.dto.VaultFolderResponse;
 import com.kscold.blog.vault.application.dto.FolderCreateCommand;
 import com.kscold.blog.vault.application.dto.FolderUpdateCommand;
-import com.kscold.blog.vault.application.service.VaultFolderApplicationService;
+import com.kscold.blog.vault.application.port.in.VaultFolderUseCase;
 import com.kscold.blog.vault.domain.model.VaultFolder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,18 +20,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VaultFolderController {
 
-    private final VaultFolderApplicationService vaultFolderService;
+    private final VaultFolderUseCase vaultFolderUseCase;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<VaultFolderResponse>>> getAllFolders() {
-        List<VaultFolder> folders = vaultFolderService.getAll();
-        List<VaultFolderResponse> response = VaultFolderResponse.buildTree(folders);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        List<VaultFolder> folders = vaultFolderUseCase.getAll();
+        return ResponseEntity.ok(ApiResponse.success(VaultFolderResponse.buildTree(folders)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<VaultFolderResponse>> getFolderById(@PathVariable String id) {
-        VaultFolder folder = vaultFolderService.getById(id);
+        VaultFolder folder = vaultFolderUseCase.getById(id);
         return ResponseEntity.ok(ApiResponse.success(VaultFolderResponse.from(folder)));
     }
 
@@ -40,7 +39,7 @@ public class VaultFolderController {
     public ResponseEntity<ApiResponse<VaultFolderResponse>> createFolder(
             @Valid @RequestBody FolderCreateCommand command
     ) {
-        VaultFolder folder = vaultFolderService.create(command);
+        VaultFolder folder = vaultFolderUseCase.create(command);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(VaultFolderResponse.from(folder), "폴더가 생성되었습니다"));
@@ -52,14 +51,14 @@ public class VaultFolderController {
             @PathVariable String id,
             @Valid @RequestBody FolderUpdateCommand command
     ) {
-        VaultFolder folder = vaultFolderService.update(id, command);
+        VaultFolder folder = vaultFolderUseCase.update(id, command);
         return ResponseEntity.ok(ApiResponse.success(VaultFolderResponse.from(folder), "폴더가 수정되었습니다"));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> deleteFolder(@PathVariable String id) {
-        vaultFolderService.delete(id);
-        return ResponseEntity.ok(ApiResponse.successWithMessage("폴더가 삭제되었습니다"));
+    public ResponseEntity<Void> deleteFolder(@PathVariable String id) {
+        vaultFolderUseCase.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

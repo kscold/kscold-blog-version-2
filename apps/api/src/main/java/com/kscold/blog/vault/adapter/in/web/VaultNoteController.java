@@ -1,11 +1,11 @@
 package com.kscold.blog.vault.adapter.in.web;
 
-import com.kscold.blog.dto.response.ApiResponse;
-import com.kscold.blog.dto.response.GraphDataResponse;
-import com.kscold.blog.dto.response.VaultNoteResponse;
+import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.vault.adapter.in.web.dto.VaultNoteResponse;
+import com.kscold.blog.vault.application.dto.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.NoteUpdateCommand;
-import com.kscold.blog.vault.application.service.VaultNoteApplicationService;
+import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNote;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VaultNoteController {
 
-    private final VaultNoteApplicationService vaultNoteService;
+    private final VaultNoteUseCase vaultNoteUseCase;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<VaultNoteResponse>>> getAllNotes(
@@ -34,20 +34,19 @@ public class VaultNoteController {
             @RequestParam(defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
-        Page<VaultNote> notes = vaultNoteService.getAll(pageable);
-        Page<VaultNoteResponse> response = notes.map(VaultNoteResponse::from);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        Page<VaultNote> notes = vaultNoteUseCase.getAll(pageable);
+        return ResponseEntity.ok(ApiResponse.success(notes.map(VaultNoteResponse::from)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<VaultNoteResponse>> getNoteById(@PathVariable String id) {
-        VaultNote note = vaultNoteService.getById(id);
+        VaultNote note = vaultNoteUseCase.getById(id);
         return ResponseEntity.ok(ApiResponse.success(VaultNoteResponse.from(note)));
     }
 
     @GetMapping("/slug/{slug}")
     public ResponseEntity<ApiResponse<VaultNoteResponse>> getNoteBySlug(@PathVariable String slug) {
-        VaultNote note = vaultNoteService.getBySlugWithView(slug);
+        VaultNote note = vaultNoteUseCase.getBySlugWithView(slug);
         return ResponseEntity.ok(ApiResponse.success(VaultNoteResponse.from(note)));
     }
 
@@ -58,24 +57,20 @@ public class VaultNoteController {
             @RequestParam(defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "title"));
-        Page<VaultNote> notes = vaultNoteService.getByFolder(folderId, pageable);
-        Page<VaultNoteResponse> response = notes.map(VaultNoteResponse::from);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        Page<VaultNote> notes = vaultNoteUseCase.getByFolder(folderId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(notes.map(VaultNoteResponse::from)));
     }
 
     @GetMapping("/{id}/backlinks")
     public ResponseEntity<ApiResponse<List<VaultNoteResponse>>> getBacklinks(@PathVariable String id) {
-        List<VaultNote> backlinks = vaultNoteService.getBackreferences(id);
-        List<VaultNoteResponse> response = backlinks.stream()
-                .map(VaultNoteResponse::from)
-                .toList();
+        List<VaultNote> backlinks = vaultNoteUseCase.getBackreferences(id);
+        List<VaultNoteResponse> response = backlinks.stream().map(VaultNoteResponse::from).toList();
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping("/graph")
     public ResponseEntity<ApiResponse<GraphDataResponse>> getGraphData() {
-        GraphDataResponse graphData = vaultNoteService.getGraphData();
-        return ResponseEntity.ok(ApiResponse.success(graphData));
+        return ResponseEntity.ok(ApiResponse.success(vaultNoteUseCase.getGraphData()));
     }
 
     @GetMapping("/search")
@@ -85,9 +80,8 @@ public class VaultNoteController {
             @RequestParam(defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<VaultNote> notes = vaultNoteService.search(q, pageable);
-        Page<VaultNoteResponse> response = notes.map(VaultNoteResponse::from);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        Page<VaultNote> notes = vaultNoteUseCase.search(q, pageable);
+        return ResponseEntity.ok(ApiResponse.success(notes.map(VaultNoteResponse::from)));
     }
 
     @PostMapping
@@ -96,7 +90,7 @@ public class VaultNoteController {
             @Valid @RequestBody NoteCreateCommand command,
             @AuthenticationPrincipal String userId
     ) {
-        VaultNote note = vaultNoteService.create(command, userId);
+        VaultNote note = vaultNoteUseCase.create(command, userId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(VaultNoteResponse.from(note), "노트가 생성되었습니다"));
@@ -108,14 +102,14 @@ public class VaultNoteController {
             @PathVariable String id,
             @Valid @RequestBody NoteUpdateCommand command
     ) {
-        VaultNote note = vaultNoteService.update(id, command);
+        VaultNote note = vaultNoteUseCase.update(id, command);
         return ResponseEntity.ok(ApiResponse.success(VaultNoteResponse.from(note), "노트가 수정되었습니다"));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> deleteNote(@PathVariable String id) {
-        vaultNoteService.delete(id);
-        return ResponseEntity.ok(ApiResponse.successWithMessage("노트가 삭제되었습니다"));
+    public ResponseEntity<Void> deleteNote(@PathVariable String id) {
+        vaultNoteUseCase.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

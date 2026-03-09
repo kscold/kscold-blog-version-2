@@ -3,6 +3,7 @@ package com.kscold.blog.vault.application.service;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.vault.application.dto.NoteCommentCreateCommand;
+import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class VaultNoteCommentApplicationService {
+public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCase {
 
     private final VaultNoteCommentRepository commentRepository;
     private final VaultNoteApplicationService vaultNoteApplicationService;
