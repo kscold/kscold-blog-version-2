@@ -1,11 +1,12 @@
 package com.kscold.blog.social.application.service;
 
-import com.kscold.blog.dto.response.LinkPreviewResponse;
+import com.kscold.blog.social.domain.dto.LinkPreviewResponse;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.application.port.in.UserQueryPort.UserInfo;
 import com.kscold.blog.social.application.dto.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.FeedUpdateCommand;
+import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
@@ -13,10 +14,6 @@ import com.kscold.blog.social.domain.port.out.LinkScrapingPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +21,12 @@ import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
-public class FeedApplicationService {
+public class FeedApplicationService implements FeedUseCase {
 
     private final FeedRepository feedRepository;
     private final FeedCommentRepository feedCommentRepository;
     private final UserQueryPort userQueryPort;
     private final LinkScrapingPort linkScrapingPort;
-    private final MongoTemplate mongoTemplate;
 
     @Transactional
     public Feed create(FeedCreateCommand command, String userId) {
@@ -123,22 +119,14 @@ public class FeedApplicationService {
      * 댓글 수 원자적 증가
      */
     public void incrementCommentCount(String feedId) {
-        mongoTemplate.updateFirst(
-                Query.query(Criteria.where("id").is(feedId)),
-                new Update().inc("commentsCount", 1),
-                Feed.class
-        );
+        feedRepository.incrementCommentCount(feedId);
     }
 
     /**
      * 댓글 수 원자적 감소 (최소 0)
      */
     public void decrementCommentCount(String feedId) {
-        mongoTemplate.updateFirst(
-                Query.query(Criteria.where("id").is(feedId).and("commentsCount").gt(0)),
-                new Update().inc("commentsCount", -1),
-                Feed.class
-        );
+        feedRepository.decrementCommentCount(feedId);
     }
 
     private Feed findById(String id) {
