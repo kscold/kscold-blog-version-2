@@ -7,6 +7,7 @@ import { usePostAutosave } from '@/features/editor/lib/usePostAutosave';
 import { PostEditorHeader } from '@/features/editor/ui/PostEditorHeader';
 import { PostEditorSidebar } from '@/features/editor/ui/PostEditorSidebar';
 import type { ViewMode } from '@/features/editor/ui/PostEditorHeader';
+import { useAlert } from '@/shared/model/alertStore';
 
 export interface PostFormData {
   title: string;
@@ -56,6 +57,7 @@ export function PostEditor({
   autosaveKey,
 }: PostEditorProps) {
   const { data: categories } = useCategories();
+  const alert = useAlert();
 
   const [form, setForm] = useState<PostFormData>({ ...DEFAULT_FORM, ...initialData });
   const [viewMode, setViewMode] = useState<ViewMode>('editor');
@@ -101,7 +103,7 @@ export function PostEditor({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.content || !form.categoryId) {
-      alert('제목, 내용, 카테고리는 필수입니다.');
+      alert.warning('제목, 내용, 카테고리는 필수입니다.');
       return;
     }
     await onSubmit(form);

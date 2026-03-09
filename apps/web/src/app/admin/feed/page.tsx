@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAdminFeeds, useDeleteFeed } from '@/entities/feed/api/useFeeds';
+import { useAlert } from '@/shared/model/alertStore';
 
 export default function AdminFeedPage() {
+  const alert = useAlert();
   const [page, setPage] = useState(0);
   const { data: feedsData, isLoading } = useAdminFeeds(page, 20);
   const deleteFeed = useDeleteFeed();
@@ -17,8 +19,9 @@ export default function AdminFeedPage() {
     if (!confirm('이 피드를 삭제하시겠습니까?')) return;
     try {
       await deleteFeed.mutateAsync(id);
-    } catch (err: any) {
-      alert(err.response?.data?.message || '삭제에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '삭제에 실패했습니다';
+      alert.error(message);
     }
   };
 

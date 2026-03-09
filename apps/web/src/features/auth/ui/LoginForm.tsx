@@ -50,8 +50,9 @@ export function LoginForm() {
 
         router.push('/admin');
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '로그인에 실패했습니다.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '로그인에 실패했습니다.';
+      setError(message);
     }
   };
 

@@ -7,10 +7,12 @@ import { useCreateFeed, useLinkPreview } from '@/entities/feed/api/useFeeds';
 import { apiClient } from '@/shared/api/api-client';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import { FeedImageUploader } from '@/features/feed/ui/FeedImageUploader';
+import { useAlert } from '@/shared/model/alertStore';
 
 export function FeedComposer() {
   const router = useRouter();
   const createFeed = useCreateFeed();
+  const alert = useAlert();
 
   const [content, setContent] = useState('');
   const [images, setImages] = useState<string[]>([]);
@@ -33,8 +35,9 @@ export function FeedComposer() {
         uploadedUrls.push(result.url);
       }
       setImages([...images, ...uploadedUrls]);
-    } catch (err: any) {
-      alert(err.response?.data?.message || '업로드에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '업로드에 실패했습니다';
+      alert.error(message);
     } finally {
       setIsUploading(false);
     }
@@ -46,7 +49,7 @@ export function FeedComposer() {
 
   const handleSubmit = async () => {
     if (!content.trim() && images.length === 0) {
-      alert('내용 또는 이미지를 입력해주세요');
+      alert.warning('내용 또는 이미지를 입력해주세요');
       return;
     }
 
@@ -58,8 +61,9 @@ export function FeedComposer() {
         linkUrl: linkUrl || undefined,
       });
       router.push('/admin/feed');
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || '피드 생성에 실패했습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '피드 생성에 실패했습니다';
+      alert.error(message);
     }
   };
 
