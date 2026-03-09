@@ -1,8 +1,9 @@
 package com.kscold.blog.vault.adapter.in.web;
 
-import com.kscold.blog.dto.response.ApiResponse;
+import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.vault.application.dto.DeleteNoteCommentCommand;
 import com.kscold.blog.vault.application.dto.NoteCommentCreateCommand;
-import com.kscold.blog.vault.application.service.VaultNoteCommentApplicationService;
+import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,14 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/vault/notes/{noteId}/comments")
 @RequiredArgsConstructor
 public class VaultNoteCommentController {
 
-    private final VaultNoteCommentApplicationService commentService;
+    private final VaultNoteCommentUseCase commentUseCase;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<VaultNoteCommentResponse>>> getComments(
@@ -31,9 +31,8 @@ public class VaultNoteCommentController {
             @RequestParam(defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
-        Page<VaultNoteComment> comments = commentService.getByNoteId(noteId, pageable);
-        Page<VaultNoteCommentResponse> response = comments.map(VaultNoteCommentResponse::from);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        Page<VaultNoteComment> comments = commentUseCase.getByNoteId(noteId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(comments.map(VaultNoteCommentResponse::from)));
     }
 
     @PostMapping
@@ -41,26 +40,22 @@ public class VaultNoteCommentController {
             @PathVariable String noteId,
             @Valid @RequestBody NoteCommentCreateCommand command
     ) {
-        VaultNoteComment comment = commentService.create(noteId, command);
-        VaultNoteCommentResponse response = VaultNoteCommentResponse.from(comment);
+        VaultNoteComment comment = commentUseCase.create(noteId, command);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response, "댓글이 작성되었습니다"));
+                .body(ApiResponse.success(VaultNoteCommentResponse.from(comment), "댓글이 작성되었습니다"));
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ApiResponse<Void>> deleteComment(
+    public ResponseEntity<Void> deleteComment(
             @PathVariable String noteId,
             @PathVariable String commentId,
-            @RequestBody Map<String, String> body
+            @Valid @RequestBody DeleteNoteCommentCommand command
     ) {
-        commentService.delete(noteId, commentId, body.get("password"));
-        return ResponseEntity.ok(ApiResponse.successWithMessage("댓글이 삭제되었습니다"));
+        commentUseCase.delete(noteId, commentId, command.getPassword());
+        return ResponseEntity.noContent().build();
     }
 
-    /**
-     * VaultNoteComment -> Response 변환용 내부 record
-     */
     private record VaultNoteCommentResponse(
             String id,
             String noteId,
