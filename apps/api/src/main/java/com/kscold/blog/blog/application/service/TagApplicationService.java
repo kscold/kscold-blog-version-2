@@ -1,6 +1,7 @@
 package com.kscold.blog.blog.application.service;
 
 import com.kscold.blog.blog.application.dto.TagCommand;
+import com.kscold.blog.blog.application.port.in.TagUseCase;
 import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.exception.DuplicateResourceException;
@@ -8,10 +9,6 @@ import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.util.SlugUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +19,9 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class TagApplicationService {
+public class TagApplicationService implements TagUseCase {
 
     private final TagRepository tagRepository;
-    private final MongoTemplate mongoTemplate;
 
     /**
      * 태그 생성
@@ -110,22 +106,14 @@ public class TagApplicationService {
      * 태그의 postCount 원자적 증가
      */
     public void incrementPostCount(String tagId) {
-        mongoTemplate.updateFirst(
-                Query.query(Criteria.where("id").is(tagId)),
-                new Update().inc("postCount", 1),
-                Tag.class
-        );
+        tagRepository.incrementPostCount(tagId);
     }
 
     /**
      * 태그의 postCount 원자적 감소 (최소 0)
      */
     public void decrementPostCount(String tagId) {
-        mongoTemplate.updateFirst(
-                Query.query(Criteria.where("id").is(tagId).and("postCount").gt(0)),
-                new Update().inc("postCount", -1),
-                Tag.class
-        );
+        tagRepository.decrementPostCount(tagId);
     }
 
     /**

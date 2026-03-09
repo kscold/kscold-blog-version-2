@@ -2,16 +2,13 @@ package com.kscold.blog.blog.application.service;
 
 import com.kscold.blog.blog.application.dto.CategoryCreateCommand;
 import com.kscold.blog.blog.application.dto.CategoryUpdateCommand;
+import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.port.out.CategoryRepository;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.util.SlugUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +17,9 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryApplicationService {
+public class CategoryApplicationService implements CategoryUseCase {
 
     private final CategoryRepository categoryRepository;
-    private final MongoTemplate mongoTemplate;
     private static final int MAX_DEPTH = 4; // 0-4 = 5단계
 
     /**
@@ -163,22 +159,14 @@ public class CategoryApplicationService {
      * 카테고리의 postCount 원자적 증가
      */
     public void incrementPostCount(String categoryId) {
-        mongoTemplate.updateFirst(
-                Query.query(Criteria.where("id").is(categoryId)),
-                new Update().inc("postCount", 1),
-                Category.class
-        );
+        categoryRepository.incrementPostCount(categoryId);
     }
 
     /**
      * 카테고리의 postCount 원자적 감소 (최소 0)
      */
     public void decrementPostCount(String categoryId) {
-        mongoTemplate.updateFirst(
-                Query.query(Criteria.where("id").is(categoryId).and("postCount").gt(0)),
-                new Update().inc("postCount", -1),
-                Category.class
-        );
+        categoryRepository.decrementPostCount(categoryId);
     }
 
     private void updateChildrenAncestors(Category parent) {
