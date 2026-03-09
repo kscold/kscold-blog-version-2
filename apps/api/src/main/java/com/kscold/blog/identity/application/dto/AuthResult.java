@@ -3,10 +3,10 @@ package com.kscold.blog.identity.application.dto;
 import com.kscold.blog.identity.domain.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +16,7 @@ public class AuthResult {
     private String tokenType;
     private UserInfo user;
 
-    @Data
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
