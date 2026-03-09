@@ -2,6 +2,7 @@ package com.kscold.blog.blog.application.service;
 
 import com.kscold.blog.blog.application.dto.PostCreateCommand;
 import com.kscold.blog.blog.application.dto.PostUpdateCommand;
+import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.domain.model.Tag;
@@ -29,7 +30,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class PostApplicationService {
+public class PostApplicationService implements PostUseCase {
 
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
