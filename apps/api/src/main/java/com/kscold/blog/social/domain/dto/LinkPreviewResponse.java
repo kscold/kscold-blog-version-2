@@ -1,4 +1,4 @@
-package com.kscold.blog.dto.response;
+package com.kscold.blog.social.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

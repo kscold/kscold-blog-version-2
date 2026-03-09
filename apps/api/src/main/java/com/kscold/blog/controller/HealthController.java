@@ -1,6 +1,6 @@
 package com.kscold.blog.controller;
 
-import com.kscold.blog.dto.response.ApiResponse;
+import com.kscold.blog.shared.web.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

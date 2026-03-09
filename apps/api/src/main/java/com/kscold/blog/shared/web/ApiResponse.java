@@ -1,4 +1,4 @@
-package com.kscold.blog.dto.response;
+package com.kscold.blog.shared.web;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
