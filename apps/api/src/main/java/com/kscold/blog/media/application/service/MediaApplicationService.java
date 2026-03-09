@@ -2,6 +2,7 @@ package com.kscold.blog.media.application.service;
 
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
+import com.kscold.blog.media.application.port.in.MediaUseCase;
 import com.kscold.blog.media.domain.model.Media;
 import com.kscold.blog.media.domain.port.out.FileStoragePort;
 import com.kscold.blog.media.domain.port.out.MediaRepository;
@@ -17,7 +18,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MediaApplicationService {
+public class MediaApplicationService implements MediaUseCase {
 
     private final MediaRepository mediaRepository;
     private final FileStoragePort fileStoragePort;

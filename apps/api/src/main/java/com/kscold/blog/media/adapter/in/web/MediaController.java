@@ -1,7 +1,7 @@
 package com.kscold.blog.media.adapter.in.web;
 
-import com.kscold.blog.dto.response.ApiResponse;
-import com.kscold.blog.media.application.service.MediaApplicationService;
+import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.media.application.port.in.MediaUseCase;
 import com.kscold.blog.media.domain.model.Media;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MediaController {
 
-    private final MediaApplicationService mediaApplicationService;
+    private final MediaUseCase mediaUseCase;
 
     @PostMapping("/upload")
     @PreAuthorize("hasRole('ADMIN')")
@@ -25,27 +25,18 @@ public class MediaController {
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal String userId
     ) {
-        Media media = mediaApplicationService.upload(file, userId, userId);
-
+        Media media = mediaUseCase.upload(file, userId, userId);
         Map<String, String> response = Map.of(
                 "url", media.getFileUrl(),
                 "id", media.getId()
         );
-
-        return ResponseEntity.ok(
-                ApiResponse.success(response, "파일이 업로드되었습니다")
-        );
+        return ResponseEntity.ok(ApiResponse.success(response, "파일이 업로드되었습니다"));
     }
 
     @DeleteMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> delete(
-            @RequestParam("url") String url
-    ) {
-        mediaApplicationService.delete(url);
-
-        return ResponseEntity.ok(
-                ApiResponse.success(null, "파일이 삭제되었습니다")
-        );
+    public ResponseEntity<Void> delete(@RequestParam("url") String url) {
+        mediaUseCase.delete(url);
+        return ResponseEntity.noContent().build();
     }
 }
