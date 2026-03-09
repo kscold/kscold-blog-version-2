@@ -1,7 +1,7 @@
 package com.kscold.blog.social.adapter.in.web;
 
-import com.kscold.blog.dto.response.ApiResponse;
-import com.kscold.blog.dto.response.LinkPreviewResponse;
+import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.social.domain.dto.LinkPreviewResponse;
 import com.kscold.blog.social.domain.port.out.LinkScrapingPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

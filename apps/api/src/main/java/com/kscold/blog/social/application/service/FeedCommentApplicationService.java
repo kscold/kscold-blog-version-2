@@ -3,6 +3,7 @@ package com.kscold.blog.social.application.service;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.social.application.dto.FeedCommentCreateCommand;
+import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class FeedCommentApplicationService {
+public class FeedCommentApplicationService implements FeedCommentUseCase {
 
     private final FeedCommentRepository feedCommentRepository;
     private final FeedApplicationService feedApplicationService;

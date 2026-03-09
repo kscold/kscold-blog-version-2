@@ -1,9 +1,10 @@
 package com.kscold.blog.social.adapter.in.web;
 
-import com.kscold.blog.dto.response.ApiResponse;
-import com.kscold.blog.dto.response.FeedCommentResponse;
+import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.social.adapter.in.web.dto.FeedCommentResponse;
+import com.kscold.blog.social.application.dto.DeleteCommentCommand;
 import com.kscold.blog.social.application.dto.FeedCommentCreateCommand;
-import com.kscold.blog.social.application.service.FeedCommentApplicationService;
+import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,19 +16,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/feeds/{feedId}/comments")
 @RequiredArgsConstructor
 public class FeedCommentController {
 
-    private final FeedCommentApplicationService feedCommentApplicationService;
+    private final FeedCommentUseCase feedCommentUseCase;
 
-    /**
-     * 댓글 목록 조회
-     * GET /api/feeds/{feedId}/comments?page=0&size=20
-     */
     @GetMapping
     public ResponseEntity<ApiResponse<Page<FeedCommentResponse>>> getComments(
             @PathVariable String feedId,
@@ -35,39 +30,28 @@ public class FeedCommentController {
             @RequestParam(defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
-        Page<FeedComment> comments = feedCommentApplicationService.getByFeedId(feedId, pageable);
-        Page<FeedCommentResponse> response = comments.map(FeedCommentResponse::from);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        Page<FeedComment> comments = feedCommentUseCase.getByFeedId(feedId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(comments.map(FeedCommentResponse::from)));
     }
 
-    /**
-     * 댓글 작성
-     * POST /api/feeds/{feedId}/comments
-     */
     @PostMapping
     public ResponseEntity<ApiResponse<FeedCommentResponse>> createComment(
             @PathVariable String feedId,
             @Valid @RequestBody FeedCommentCreateCommand command
     ) {
-        FeedComment comment = feedCommentApplicationService.create(feedId, command);
-        FeedCommentResponse response = FeedCommentResponse.from(comment);
+        FeedComment comment = feedCommentUseCase.create(feedId, command);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response, "댓글이 작성되었습니다"));
+                .body(ApiResponse.success(FeedCommentResponse.from(comment), "댓글이 작성되었습니다"));
     }
 
-    /**
-     * 댓글 삭제 (비밀번호 확인)
-     * DELETE /api/feeds/{feedId}/comments/{commentId}
-     */
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ApiResponse<Void>> deleteComment(
+    public ResponseEntity<Void> deleteComment(
             @PathVariable String feedId,
             @PathVariable String commentId,
-            @RequestBody Map<String, String> body
+            @Valid @RequestBody DeleteCommentCommand command
     ) {
-        String password = body.get("password");
-        feedCommentApplicationService.delete(feedId, commentId, password);
-        return ResponseEntity.ok(ApiResponse.successWithMessage("댓글이 삭제되었습니다"));
+        feedCommentUseCase.delete(feedId, commentId, command.getPassword());
+        return ResponseEntity.noContent().build();
     }
 }
