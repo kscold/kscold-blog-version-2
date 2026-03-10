@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { parseMarkdownFile } from '@/shared/lib/markdown-parser';
-import { useResolveTag, useCheckSlugExists, useImportPost } from '@/features/feed/api/useImportPosts';
+import { useResolveTag, useCheckSlugExists, useImportPost } from '@/features/import/api/useImportPosts';
 import type { ParsedMarkdownFile, ImportResult, ImportStatus } from '@/types/import';
 import type { PostCreateRequest } from '@/types/blog';
 import { useAlert } from '@/shared/model/alertStore';

@@ -10,6 +10,7 @@ interface FeedActionBarProps {
   onToggleVisibility: () => void;
   onImageUpload: (files: FileList) => void;
   onSubmit: () => void;
+  submitLabel?: string;
 }
 
 export default function FeedActionBar({
@@ -20,6 +21,7 @@ export default function FeedActionBar({
   onToggleVisibility,
   onImageUpload,
   onSubmit,
+  submitLabel = '수정하기',
 }: FeedActionBarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -79,7 +81,7 @@ export default function FeedActionBar({
         disabled={isPending || isSubmitDisabled}
         className="px-6 py-2 bg-surface-900 text-white text-sm font-bold rounded-xl hover:bg-surface-800 disabled:opacity-50 transition-colors"
       >
-        {isPending ? '저장 중...' : '수정하기'}
+        {isPending ? '저장 중...' : submitLabel}
       </button>
     </div>
   );

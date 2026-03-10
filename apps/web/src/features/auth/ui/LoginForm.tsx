@@ -58,7 +58,6 @@ export function LoginForm() {
 
   return (
     <div className="min-h-screen bg-surface-50 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white via-surface-50 to-surface-100" />
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02]" />
 

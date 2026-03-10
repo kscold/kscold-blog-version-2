@@ -5,28 +5,29 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useUpdateFeed, useLinkPreview } from '@/entities/feed/api/useFeeds';
+import { useCreateFeed, useUpdateFeed, useLinkPreview } from '@/entities/feed/api/useFeeds';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
-import { useMediaUpload } from '@/features/media/lib/useMediaUpload';
+import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 import FeedActionBar from '@/widgets/feed/ui/FeedActionBar';
 import { useAlert } from '@/shared/model/alertStore';
 
 interface FeedEditorProps {
-  feedId: string;
-  initialContent: string;
-  initialImages: string[];
-  initialVisibility: 'PUBLIC' | 'PRIVATE';
-  initialLinkUrl: string;
+  feedId?: string;
+  initialContent?: string;
+  initialImages?: string[];
+  initialVisibility?: 'PUBLIC' | 'PRIVATE';
+  initialLinkUrl?: string;
 }
 
 export default function FeedEditor({
   feedId,
-  initialContent,
-  initialImages,
-  initialVisibility,
-  initialLinkUrl,
+  initialContent = '',
+  initialImages = [],
+  initialVisibility = 'PUBLIC',
+  initialLinkUrl = '',
 }: FeedEditorProps) {
   const router = useRouter();
+  const createFeed = useCreateFeed();
   const updateFeed = useUpdateFeed();
   const alert = useAlert();
   const { uploadFiles, isUploading } = useMediaUpload();
@@ -58,16 +59,32 @@ export default function FeedEditor({
       return;
     }
     try {
-      await updateFeed.mutateAsync({
-        id: feedId,
-        data: { content, images, visibility, linkUrl: linkUrl || undefined },
-      });
+      if (feedId) {
+        await updateFeed.mutateAsync({
+          id: feedId,
+          data: { content, images, visibility, linkUrl: linkUrl || undefined },
+        });
+      } else {
+        await createFeed.mutateAsync({
+          content,
+          images,
+          visibility,
+          linkUrl: linkUrl || undefined,
+        });
+      }
       router.push('/admin/feed');
     } catch (err) {
-      const message = err instanceof Error ? err.message : '피드 수정에 실패했습니다';
+      const message =
+        err instanceof Error
+          ? err.message
+          : feedId
+            ? '피드 수정에 실패했습니다'
+            : '피드 생성에 실패했습니다';
       alert.error(message);
     }
   };
+
+  const isPending = feedId ? updateFeed.isPending : createFeed.isPending;
 
   return (
     <div className="min-h-screen bg-surface-50">
@@ -87,7 +104,9 @@ export default function FeedEditor({
             </svg>
             피드 관리로 돌아가기
           </Link>
-          <h1 className="text-3xl font-sans font-black tracking-tighter text-surface-900">피드 수정</h1>
+          <h1 className="text-3xl font-sans font-black tracking-tighter text-surface-900">
+            {feedId ? '피드 수정' : '새 피드 작성'}
+          </h1>
         </motion.div>
 
         <motion.div
@@ -101,13 +120,22 @@ export default function FeedEditor({
               <div className="p-4 border-b border-surface-100">
                 <div className="grid grid-cols-3 gap-2">
                   {images.map((url, i) => (
-                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-surface-100">
+                    <div
+                      key={i}
+                      className="relative aspect-square rounded-lg overflow-hidden bg-surface-100"
+                    >
                       <Image src={url} alt="" fill sizes="33vw" className="object-cover" />
                       <button
                         onClick={() => removeImage(i)}
                         className="absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70"
                       >
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={3}
+                        >
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
@@ -145,11 +173,12 @@ export default function FeedEditor({
             <FeedActionBar
               visibility={visibility}
               isUploading={isUploading}
-              isPending={updateFeed.isPending}
+              isPending={isPending}
               isSubmitDisabled={!content.trim() && images.length === 0}
               onToggleVisibility={() => setVisibility(visibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC')}
               onImageUpload={handleImageUpload}
               onSubmit={handleSubmit}
+              submitLabel={feedId ? '수정하기' : '게시하기'}
             />
           </div>
         </motion.div>

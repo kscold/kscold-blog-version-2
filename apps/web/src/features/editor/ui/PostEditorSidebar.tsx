@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { TagSelector } from '@/features/editor/ui/TagSelector';
-import { ImageUploader } from '@/features/editor/ui/ImageUploader';
+import { ImageUpload } from '@/shared/ui/ImageUpload';
 import type { PostFormData } from '@/features/editor/ui/PostEditor';
 
 interface Category {
@@ -99,9 +99,9 @@ export function PostEditorSidebar({
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
           커버 이미지
         </h3>
-        <ImageUploader
-          value={form.coverImage}
-          onChange={url => onUpdateForm('coverImage', url)}
+        <ImageUpload
+          currentImage={form.coverImage || undefined}
+          onUploadSuccess={(url: string) => onUpdateForm('coverImage', url)}
         />
       </div>
 
