@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { apiClient } from '@/shared/api/api-client';
+import { useMediaUpload } from '@/features/media/lib/useMediaUpload';
 
 interface ImageUploaderProps {
   value: string;
@@ -9,37 +9,18 @@ interface ImageUploaderProps {
 }
 
 export function ImageUploader({ value, onChange }: ImageUploaderProps) {
+  const { uploadFile, isUploading } = useMediaUpload();
   const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const uploadFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setUploadError('이미지 파일만 업로드할 수 있습니다.');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      setUploadError('파일 크기는 10MB 이하여야 합니다.');
-      return;
-    }
-
-    setIsUploading(true);
+  const handleUpload = async (file: File) => {
     setUploadError('');
-
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const result = await apiClient.upload<{ url: string; id: string }>(
-        '/media/upload',
-        formData
-      );
-      onChange(result.url);
-    } catch {
-      setUploadError('업로드에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsUploading(false);
+      const url = await uploadFile(file);
+      onChange(url);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : '업로드에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -47,12 +28,12 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
-    if (file) uploadFile(file);
+    if (file) handleUpload(file);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) uploadFile(file);
+    if (file) handleUpload(file);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 

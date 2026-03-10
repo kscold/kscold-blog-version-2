@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useCreateFeed, useLinkPreview } from '@/entities/feed/api/useFeeds';
-import { apiClient } from '@/shared/api/api-client';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
+import { useMediaUpload } from '@/features/media/lib/useMediaUpload';
 import { FeedImageUploader } from '@/features/feed/ui/FeedImageUploader';
 import { useAlert } from '@/shared/model/alertStore';
 
@@ -13,33 +13,22 @@ export function FeedComposer() {
   const router = useRouter();
   const createFeed = useCreateFeed();
   const alert = useAlert();
+  const { uploadFiles, isUploading } = useMediaUpload();
 
   const [content, setContent] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>('PUBLIC');
   const [linkUrl, setLinkUrl] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
 
   const { data: linkPreview } = useLinkPreview(linkUrl);
 
   const handleImageUpload = async (files: FileList) => {
-    setIsUploading(true);
     try {
-      const uploadedUrls: string[] = [];
-      for (const file of Array.from(files)) {
-        const formData = new FormData();
-        formData.append('file', file);
-        const result = await apiClient.post<{ url: string }>('/media/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        uploadedUrls.push(result.url);
-      }
+      const uploadedUrls = await uploadFiles(files);
       setImages([...images, ...uploadedUrls]);
     } catch (err) {
       const message = err instanceof Error ? err.message : '업로드에 실패했습니다';
       alert.error(message);
-    } finally {
-      setIsUploading(false);
     }
   };
 

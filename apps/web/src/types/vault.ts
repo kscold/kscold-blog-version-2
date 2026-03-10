@@ -39,12 +39,17 @@ export interface GraphNode {
   name: string;
   slug: string;
   size: number;
+  val?: number;
   folderId?: string;
+  isFolder?: boolean;
+  // ForceGraph2D runtime-injected properties
+  x?: number;
+  y?: number;
 }
 
 export interface GraphLink {
-  source: string;
-  target: string;
+  source: string | GraphNode;
+  target: string | GraphNode;
 }
 
 export interface VaultNoteCreateRequest {

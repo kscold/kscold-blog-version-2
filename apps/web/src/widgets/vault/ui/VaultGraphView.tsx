@@ -4,7 +4,7 @@ import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMeasure } from 'react-use';
 import ForceGraph2D, { ForceGraphMethods, NodeObject } from 'react-force-graph-2d';
-import { GraphNode } from '@/types/vault';
+import { GraphNode, GraphData, GraphLink } from '@/types/vault';
 import {
   configureForces,
   renderNode,
@@ -12,7 +12,7 @@ import {
 } from '@/widgets/vault/lib/graphForceConfig';
 
 interface VaultGraphViewProps {
-  graphData: any;
+  graphData: GraphData;
   activeNodeSlug?: string;
   onNodeClick?: (slug: string) => void;
   onFolderClick?: (folderId: string) => void;
@@ -35,11 +35,11 @@ export function VaultGraphView({
 
   const gData = useMemo(() => {
     return {
-      nodes: graphData.nodes.map((n: any) => ({
+      nodes: graphData.nodes.map((n: GraphNode) => ({
         ...n,
         val: n.val ?? (n.size ? n.size * 2 : 4),
       })),
-      links: graphData.links.map((l: any) => ({ ...l })),
+      links: graphData.links.map((l: GraphLink) => ({ ...l })),
     };
   }, [graphData]);
 
@@ -54,7 +54,7 @@ export function VaultGraphView({
   useEffect(() => {
     if (activeNodeSlug && fgRef.current && gData.nodes.length > 0) {
       const activeNode = gData.nodes.find(
-        (n: any) => n.slug === activeNodeSlug
+        (n: GraphNode) => n.slug === activeNodeSlug
       ) as unknown as NodeObject;
       if (activeNode && activeNode.x && activeNode.y) {
         fgRef.current.centerAt(activeNode.x, activeNode.y, 1000);
@@ -64,7 +64,7 @@ export function VaultGraphView({
   }, [activeNodeSlug, gData]);
 
   const handleNodeClick = useCallback((node: NodeObject) => {
-    const gn = node as any;
+    const gn = node as unknown as GraphNode;
     if (gn.isFolder && onFolderClick) {
       onFolderClick(gn.id);
     } else if (gn.slug) {
@@ -76,14 +76,14 @@ export function VaultGraphView({
     }
   }, [onFolderClick, onNodeClick, router]);
 
-  const isLinkHovered = useCallback((link: any): boolean => {
+  const isLinkHovered = useCallback((link: GraphLink): boolean => {
     if (!hoverNode) return false;
     const srcId = typeof link.source === 'object' ? link.source?.id : link.source;
     const tgtId = typeof link.target === 'object' ? link.target?.id : link.target;
     return srcId === hoverNode.id || tgtId === hoverNode.id;
   }, [hoverNode]);
 
-  const nodeCanvasObject = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+  const nodeCanvasObject = useCallback((node: NodeObject, ctx: CanvasRenderingContext2D, globalScale: number) => {
     renderNode(node, ctx, globalScale, {
       activeNodeSlug,
       hoverNodeId: hoverNode?.id,
@@ -92,7 +92,7 @@ export function VaultGraphView({
     });
   }, [activeNodeSlug, hoverNode?.id, folderColorMap, theme]);
 
-  const linkCanvasObject = useCallback((link: any, ctx: CanvasRenderingContext2D) => {
+  const linkCanvasObject = useCallback((link: GraphLink, ctx: CanvasRenderingContext2D) => {
     if (!hoverNode) return;
     const srcId = typeof link.source === 'object' ? link.source?.id : link.source;
     const tgtId = typeof link.target === 'object' ? link.target?.id : link.target;
@@ -123,23 +123,23 @@ export function VaultGraphView({
         width={width > 0 ? width : 100}
         height={height > 0 ? height : 100}
         nodeLabel={() => ''}
-        nodeColor={(node: any) => folderColorMap[node.folderId] || '#64C8FF'}
+        nodeColor={(node: NodeObject) => folderColorMap[(node as unknown as GraphNode).folderId ?? ''] || '#64C8FF'}
         nodeRelSize={4}
-        linkWidth={(link: any) => (isLinkHovered(link) ? 2.5 : 0.8)}
-        linkColor={(link: any) =>
+        linkWidth={(link: GraphLink) => (isLinkHovered(link) ? 2.5 : 0.8)}
+        linkColor={(link: GraphLink) =>
           isLinkHovered(link) ? 'rgba(100, 200, 255, 0.5)' : 'rgba(255, 255, 255, 0.04)'
         }
         linkDirectionalParticles={3}
-        linkDirectionalParticleWidth={(link: any) => (isLinkHovered(link) ? 3 : 1.2)}
+        linkDirectionalParticleWidth={(link: GraphLink) => (isLinkHovered(link) ? 3 : 1.2)}
         linkDirectionalParticleSpeed={0.004}
-        linkDirectionalParticleColor={(link: any) => {
+        linkDirectionalParticleColor={(link: GraphLink) => {
           const sourceNode = typeof link.source === 'object' ? link.source : null;
           const folderId =
             sourceNode?.folderId ||
             gData.nodes.find(
-              (n: any) => n.id === (typeof link.source === 'string' ? link.source : link.source?.id)
+              (n: GraphNode) => n.id === (typeof link.source === 'string' ? link.source : link.source?.id)
             )?.folderId;
-          return folderColorMap[folderId || ''] || '#64C8FF';
+          return folderColorMap[folderId ?? ''] || '#64C8FF';
         }}
         linkCanvasObjectMode={() => 'after'}
         linkCanvasObject={linkCanvasObject}

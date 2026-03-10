@@ -1,39 +1,13 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useAdminFeeds, useDeleteFeed } from '@/entities/feed/api/useFeeds';
-import { useAlert } from '@/shared/model/alertStore';
+import { useAdminFeed } from '@/features/admin/lib/useAdminFeed';
+import { formatDateTime } from '@/shared/lib/format-utils';
+import { Pagination } from '@/shared/ui/Pagination';
 
 export default function AdminFeedPage() {
-  const alert = useAlert();
-  const [page, setPage] = useState(0);
-  const { data: feedsData, isLoading } = useAdminFeeds(page, 20);
-  const deleteFeed = useDeleteFeed();
-
-  const feeds = feedsData?.content || [];
-  const totalPages = feedsData?.totalPages || 0;
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('이 피드를 삭제하시겠습니까?')) return;
-    try {
-      await deleteFeed.mutateAsync(id);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '삭제에 실패했습니다';
-      alert.error(message);
-    }
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const { feeds, totalPages, page, setPage, isLoading, handleDelete } = useAdminFeed();
 
   return (
     <div className="min-h-screen bg-surface-50">
@@ -124,7 +98,7 @@ export default function AdminFeedPage() {
                         {feed.commentsCount}
                       </td>
                       <td className="text-center px-4 py-4 text-xs text-surface-400">
-                        {formatDate(feed.createdAt)}
+                        {formatDateTime(feed.createdAt)}
                       </td>
                       <td className="text-right px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
@@ -166,27 +140,9 @@ export default function AdminFeedPage() {
             </div>
           )}
 
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-4 mt-6">
-              <button
-                onClick={() => setPage(Math.max(0, page - 1))}
-                disabled={page === 0}
-                className="px-4 py-2 text-sm font-medium bg-white border border-surface-200 rounded-lg disabled:opacity-30"
-              >
-                이전
-              </button>
-              <span className="flex items-center text-sm text-surface-500">
-                {page + 1}/{totalPages}
-              </span>
-              <button
-                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-                disabled={page >= totalPages - 1}
-                className="px-4 py-2 text-sm font-medium bg-white border border-surface-200 rounded-lg disabled:opacity-30"
-              >
-                다음
-              </button>
-            </div>
-          )}
+          <div className="mt-6">
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+          </div>
         </motion.div>
       </div>
     </div>

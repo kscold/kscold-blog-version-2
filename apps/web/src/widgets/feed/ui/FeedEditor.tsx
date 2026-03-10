@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useUpdateFeed, useLinkPreview } from '@/entities/feed/api/useFeeds';
-import { apiClient } from '@/shared/api/api-client';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
+import { useMediaUpload } from '@/features/media/lib/useMediaUpload';
 import FeedActionBar from '@/widgets/feed/ui/FeedActionBar';
 import { useAlert } from '@/shared/model/alertStore';
 
@@ -28,33 +28,22 @@ export default function FeedEditor({
   const router = useRouter();
   const updateFeed = useUpdateFeed();
   const alert = useAlert();
+  const { uploadFiles, isUploading } = useMediaUpload();
 
   const [content, setContent] = useState(initialContent);
   const [images, setImages] = useState<string[]>(initialImages);
   const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>(initialVisibility);
   const [linkUrl, setLinkUrl] = useState(initialLinkUrl);
-  const [isUploading, setIsUploading] = useState(false);
 
   const { data: linkPreview } = useLinkPreview(linkUrl);
 
   const handleImageUpload = async (files: FileList) => {
-    setIsUploading(true);
     try {
-      const uploadedUrls: string[] = [];
-      for (const file of Array.from(files)) {
-        const formData = new FormData();
-        formData.append('file', file);
-        const result = await apiClient.post<{ url: string }>('/media/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        uploadedUrls.push(result.url);
-      }
+      const uploadedUrls = await uploadFiles(files);
       setImages([...images, ...uploadedUrls]);
     } catch (err) {
       const message = err instanceof Error ? err.message : '업로드에 실패했습니다';
       alert.error(message);
-    } finally {
-      setIsUploading(false);
     }
   };
 

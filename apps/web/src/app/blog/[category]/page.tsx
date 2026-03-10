@@ -8,6 +8,7 @@ import { usePostsByCategory } from '@/entities/post/api/usePosts';
 import { PostCard } from '@/entities/post/ui/PostCard';
 import Link from 'next/link';
 import { CategoryHeader } from '@/widgets/blog/ui/CategoryHeader';
+import { Pagination } from '@/shared/ui/Pagination';
 
 export default function CategoryPage() {
   const params = useParams();
@@ -83,53 +84,7 @@ export default function CategoryPage() {
             </motion.div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <motion.div
-                className="flex justify-center items-center gap-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <button
-                  onClick={() => setPage(Math.max(0, page - 1))}
-                  disabled={page === 0}
-                  className="px-4 py-2 rounded-lg bg-white border border-surface-200 text-surface-600 disabled:opacity-50 disabled:cursor-not-allowed hover:border-surface-900 transition-all"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-
-                {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                  const pageNum = Math.max(0, Math.min(page - 2 + i, totalPages - (5 - i)));
-                  if (pageNum < 0 || pageNum >= totalPages) return null;
-
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => setPage(pageNum)}
-                      className={`px-4 py-2 rounded-lg transition-all ${
-                        page === pageNum
-                          ? 'bg-surface-900 text-white'
-                          : 'bg-white border border-surface-200 text-surface-600 hover:border-surface-900'
-                      }`}
-                    >
-                      {pageNum + 1}
-                    </button>
-                  );
-                })}
-
-                <button
-                  onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-                  disabled={page >= totalPages - 1}
-                  className="px-4 py-2 rounded-lg bg-white border border-surface-200 text-surface-600 disabled:opacity-50 disabled:cursor-not-allowed hover:border-surface-900 transition-all"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </motion.div>
-            )}
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </>
         ) : (
           <div className="text-center py-20">
