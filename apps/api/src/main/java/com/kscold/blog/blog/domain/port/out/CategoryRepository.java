@@ -14,6 +14,8 @@ public interface CategoryRepository {
     List<Category> findByParentIsNull();
     List<Category> findByParentOrderByOrderAsc(String parentId);
     List<Category> findByParent(String parentId);
+    List<Category> findByAncestorId(String ancestorId);
+    List<Category> findByDepth(Integer depth);
     void incrementPostCount(String categoryId);
     void decrementPostCount(String categoryId);
 }

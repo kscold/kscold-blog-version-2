@@ -3,6 +3,7 @@ package com.kscold.blog.vault.adapter.in.web;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.vault.application.dto.DeleteNoteCommentCommand;
 import com.kscold.blog.vault.application.dto.NoteCommentCreateCommand;
+import com.kscold.blog.vault.adapter.in.web.dto.VaultNoteCommentResponse;
 import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import jakarta.validation.Valid;
@@ -15,8 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -56,21 +55,5 @@ public class VaultNoteCommentController {
     ) {
         commentUseCase.delete(noteId, commentId, command.getPassword());
         return ResponseEntity.noContent().build();
-    }
-
-    private record VaultNoteCommentResponse(
-            String id,
-            String noteId,
-            String authorName,
-            Boolean isAdmin,
-            String content,
-            LocalDateTime createdAt
-    ) {
-        static VaultNoteCommentResponse from(VaultNoteComment c) {
-            return new VaultNoteCommentResponse(
-                    c.getId(), c.getNoteId(), c.getAuthorName(),
-                    c.getUserId() != null, c.getContent(), c.getCreatedAt()
-            );
-        }
     }
 }
