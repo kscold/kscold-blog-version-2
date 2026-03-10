@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/entities/user/model/authStore';
 import { useUiStore } from '@/shared/model/uiStore';
@@ -58,10 +59,12 @@ export function Header() {
             </button>
 
             <Link href="/" className="group relative flex items-center gap-3">
-              <img
+              <Image
                 src="/logo.svg"
                 alt="KSCOLD Logo"
-                className="w-8 h-8 group-hover:scale-110 transition-transform duration-500 will-change-transform"
+                width={32}
+                height={32}
+                className="group-hover:scale-110 transition-transform duration-500 will-change-transform"
               />
               <span className="relative text-xl sm:text-2xl font-sans font-black tracking-tighter text-surface-900 z-10 group-hover:text-surface-600 transition-colors">
                 KSCOLD

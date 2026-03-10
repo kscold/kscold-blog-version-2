@@ -63,6 +63,7 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
           },
           img: ({ src, alt }) => (
             <div className="my-8">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={src}
                 alt={alt || ''}

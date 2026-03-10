@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 interface PostHeaderProps {
@@ -143,7 +144,7 @@ export function PostHeader({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <img src={coverImage} alt={title} className="w-full h-auto" />
+          <Image src={coverImage} alt={title} width={1200} height={630} className="w-full h-auto" />
         </motion.div>
       )}
     </>

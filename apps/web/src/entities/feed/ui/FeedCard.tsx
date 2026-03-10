@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Feed } from '@/types/social';
 import { useToggleLike } from '@/entities/feed/api/useFeeds';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';
@@ -53,9 +54,9 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3">
-        <div className="w-9 h-9 bg-surface-200 rounded-full flex items-center justify-center overflow-hidden">
+        <div className="relative w-9 h-9 bg-surface-200 rounded-full flex items-center justify-center overflow-hidden">
           {feed.author.avatar ? (
-            <img src={feed.author.avatar} alt="" className="w-full h-full object-cover" />
+            <Image src={feed.author.avatar} alt="" fill sizes="36px" className="object-cover" />
           ) : (
             <span className="text-sm font-bold text-surface-600">
               {feed.author.name.charAt(0).toUpperCase()}
