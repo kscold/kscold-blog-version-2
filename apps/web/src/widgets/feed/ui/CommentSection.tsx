@@ -7,6 +7,8 @@ import {
   useDeleteFeedComment,
 } from '@/entities/feed/api/useFeedComments';
 import { useAlert } from '@/shared/model/alertStore';
+import { formatRelativeTime } from '@/shared/lib/format-utils';
+import { Pagination } from '@/shared/ui/Pagination';
 
 interface CommentSectionProps {
   feedId: string;
@@ -54,18 +56,6 @@ export function CommentSection({ feedId }: CommentSectionProps) {
     }
   };
 
-  const formatTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const diff = Date.now() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return '방금';
-    if (minutes < 60) return `${minutes}분 전`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}시간 전`;
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `${days}일 전`;
-    return date.toLocaleDateString('ko-KR');
-  };
 
   return (
     <div className="space-y-4">
@@ -88,7 +78,7 @@ export function CommentSection({ feedId }: CommentSectionProps) {
                       ADMIN
                     </span>
                   )}
-                  <span className="text-xs text-surface-400">{formatTime(comment.createdAt)}</span>
+                  <span className="text-xs text-surface-400">{formatRelativeTime(comment.createdAt)}</span>
                 </div>
                 <p className="text-sm text-surface-700 mt-0.5">{comment.content}</p>
               </div>
@@ -130,27 +120,9 @@ export function CommentSection({ feedId }: CommentSectionProps) {
             </div>
           ))}
 
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-2 pt-2">
-              <button
-                onClick={() => setPage(Math.max(0, page - 1))}
-                disabled={page === 0}
-                className="text-xs text-surface-500 disabled:opacity-30"
-              >
-                이전
-              </button>
-              <span className="text-xs text-surface-400">
-                {page + 1}/{totalPages}
-              </span>
-              <button
-                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-                disabled={page >= totalPages - 1}
-                className="text-xs text-surface-500 disabled:opacity-30"
-              >
-                다음
-              </button>
-            </div>
-          )}
+          <div className="pt-2">
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+          </div>
         </div>
       ) : (
         <p className="text-sm text-surface-400 text-center py-4">아직 댓글이 없습니다</p>
