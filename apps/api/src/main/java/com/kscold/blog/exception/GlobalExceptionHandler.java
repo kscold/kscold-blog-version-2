@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
  * 모든 컨트롤러에서 발생하는 예외를 일관된 형식으로 변환하여 응답
  */
 @Slf4j
+@SuppressWarnings("null")
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -123,11 +124,12 @@ public class GlobalExceptionHandler {
     ) {
         log.warn("MethodArgumentTypeMismatchException: {}", e.getMessage());
 
+        Class<?> requiredType = e.getRequiredType();
         String errorMessage = String.format(
             "파라미터 '%s'의 값 '%s'는 타입 '%s'로 변환할 수 없습니다",
             e.getName(),
             e.getValue(),
-            e.getRequiredType() != null ? e.getRequiredType().getSimpleName() : "unknown"
+            requiredType != null ? requiredType.getSimpleName() : "unknown"
         );
 
         ApiResponse<Void> response = ApiResponse.error(
