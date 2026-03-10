@@ -72,13 +72,15 @@ export function PostEditor({
   const { lastSavedText, restoredFromAutosave, tryRestoreAutosave, clearAutosave } =
     usePostAutosave({ autosaveKey, mode, form });
 
+  const serializedInitialData = JSON.stringify(initialData);
+
   // 초기 데이터 변경 시 폼 업데이트 (edit 모드)
   useEffect(() => {
     if (initialData && Object.keys(initialData).length > 0) {
       setForm({ ...DEFAULT_FORM, ...initialData });
       setSlugEdited(true);
     }
-  }, [JSON.stringify(initialData)]);
+  }, [serializedInitialData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 자동 슬러그 생성
   useEffect(() => {
@@ -98,7 +100,7 @@ export function PostEditor({
       setForm(savedForm);
       setSlugEdited(true);
     });
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

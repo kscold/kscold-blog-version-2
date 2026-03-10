@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -25,10 +26,12 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <img
+              <Image
                 src="/logo.svg"
                 alt="KSCOLD Logo"
-                className="w-7 h-7 group-hover:scale-110 transition-transform duration-500 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 will-change-transform"
+                width={28}
+                height={28}
+                className="group-hover:scale-110 transition-transform duration-500 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 will-change-transform"
               />
               <span className="text-2xl font-sans font-black tracking-[-0.05em] text-surface-900 group-hover:text-surface-600 transition-colors">
                 KSCOLD

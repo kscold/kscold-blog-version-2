@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { LinkPreview } from '@/types/social';
 
 interface LinkPreviewCardProps {
@@ -20,11 +21,12 @@ export function LinkPreviewCard({ preview }: LinkPreviewCardProps) {
     >
       {preview.image && (
         <div className="relative h-40 overflow-hidden bg-surface-100">
-          <img
+          <Image
             src={preview.image}
             alt={preview.title || ''}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </div>
       )}

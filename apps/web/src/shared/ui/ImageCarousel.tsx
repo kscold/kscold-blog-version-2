@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+
+const MotionImage = motion(Image);
 
 interface ImageCarouselProps {
   images: string[];
@@ -16,7 +19,7 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
   if (images.length === 1) {
     return (
       <div className="relative aspect-square overflow-hidden bg-surface-100">
-        <img src={images[0]} alt="" className="w-full h-full object-cover" loading="lazy" />
+        <Image src={images[0]} alt="" fill sizes="100vw" className="object-cover" />
       </div>
     );
   }
@@ -43,18 +46,19 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
   return (
     <div className="relative aspect-square overflow-hidden bg-surface-100 group">
       <AnimatePresence initial={false} custom={direction} mode="popLayout">
-        <motion.img
+        <MotionImage
           key={currentIndex}
           src={images[currentIndex]}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover"
+          fill
+          sizes="100vw"
+          className="object-cover"
           custom={direction}
           variants={variants}
           initial="enter"
           animate="center"
           exit="exit"
           transition={{ duration: 0.3, ease: 'easeInOut' }}
-          loading="lazy"
         />
       </AnimatePresence>
 

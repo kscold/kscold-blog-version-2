@@ -41,6 +41,7 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
     <div className="space-y-3">
       {value ? (
         <div className="relative group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
             alt="커버 이미지 미리보기"
