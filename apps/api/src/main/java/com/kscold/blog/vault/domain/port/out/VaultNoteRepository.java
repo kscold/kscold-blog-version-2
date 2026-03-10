@@ -14,6 +14,7 @@ public interface VaultNoteRepository {
     VaultNote save(VaultNote note);
     void delete(VaultNote note);
     Page<VaultNote> findAll(Pageable pageable);
+    List<VaultNote> findAll();
     Page<VaultNote> findByFolderId(String folderId, Pageable pageable);
     Page<VaultNote> searchByText(String query, Pageable pageable);
     List<VaultNote> findByOutgoingLinksContaining(String noteId);

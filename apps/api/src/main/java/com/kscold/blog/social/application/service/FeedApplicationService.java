@@ -1,6 +1,6 @@
 package com.kscold.blog.social.application.service;
 
-import com.kscold.blog.social.domain.dto.LinkPreviewResponse;
+import com.kscold.blog.social.application.dto.LinkPreviewResponse;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.application.port.in.UserQueryPort.UserInfo;
