@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useMediaUpload } from '@/features/media/lib/useMediaUpload';
+import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 
 interface ImageUploadProps {
   onUploadSuccess: (url: string) => void;

@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
@@ -110,22 +110,22 @@ class ApiClient {
     }
   }
 
-  public async get<T>(url: string, config?: any): Promise<T> {
+  public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.get<{ data: T }>(url, config);
     return response.data.data;
   }
 
-  public async post<T>(url: string, data?: any, config?: any): Promise<T> {
+  public async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.post<{ data: T }>(url, data, config);
     return response.data.data;
   }
 
-  public async put<T>(url: string, data?: any, config?: any): Promise<T> {
+  public async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.put<{ data: T }>(url, data, config);
     return response.data.data;
   }
 
-  public async delete<T>(url: string, config?: any): Promise<T> {
+  public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.delete<{ data: T }>(url, config);
     return response.data.data;
   }

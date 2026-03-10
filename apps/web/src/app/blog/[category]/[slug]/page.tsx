@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { PostDetailClient } from './PostDetailClient';
+import { PostDetail } from '@/widgets/post/ui/PostDetail';
 import type { Post } from '@/types/blog';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
@@ -111,7 +111,7 @@ export default async function PostPage({
     notFound();
   }
 
-  return <PostDetailClient post={post} />;
+  return <PostDetail post={post} />;
 }
 
 export const revalidate = 3600;
