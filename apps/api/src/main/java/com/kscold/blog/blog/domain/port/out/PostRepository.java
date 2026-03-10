@@ -18,4 +18,5 @@ public interface PostRepository {
     Page<Post> findByCategoryIdAndPublished(String categoryId, Pageable pageable);
     Page<Post> findByTagIdAndPublished(String tagId, Pageable pageable);
     Page<Post> searchByText(String keyword, Pageable pageable);
+    long countByStatus(Post.Status status);
 }

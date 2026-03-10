@@ -12,7 +12,7 @@ public interface TagRepository {
     Tag save(Tag tag);
     void delete(Tag tag);
     List<Tag> findAll();
-    List<Tag> findAllById(List<String> ids);
+    List<Tag> findAllById(Iterable<String> ids);
     void incrementPostCount(String tagId);
     void decrementPostCount(String tagId);
 }
