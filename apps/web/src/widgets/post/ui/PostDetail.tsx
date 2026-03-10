@@ -6,11 +6,11 @@ import { PostHeader } from '@/widgets/post/ui/PostHeader';
 import { PostCommentSection } from '@/widgets/post/ui/PostCommentSection';
 import type { Post } from '@/types/blog';
 
-interface PostDetailClientProps {
+interface PostDetailProps {
   post: Post;
 }
 
-export function PostDetailClient({ post }: PostDetailClientProps) {
+export function PostDetail({ post }: PostDetailProps) {
   const formattedDate = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString('ko-KR', {
         year: 'numeric',
@@ -34,7 +34,6 @@ export function PostDetailClient({ post }: PostDetailClientProps) {
           formattedDate={formattedDate}
         />
 
-        {/* Content */}
         <motion.div
           className="mb-12"
           initial={{ opacity: 0, y: 20 }}

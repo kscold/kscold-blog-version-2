@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { CategoryTree } from '@/widgets/admin/ui/CategoryTree';
 import { CategoryModal } from '@/widgets/admin/ui/CategoryModal';
-import { useAdminCategories } from '@/features/admin/lib/useAdminCategories';
+import { useAdminCategories } from '@/widgets/admin/api/useAdminCategories';
 
 export default function AdminCategoriesPage() {
   const {
