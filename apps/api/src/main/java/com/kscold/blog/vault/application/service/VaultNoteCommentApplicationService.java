@@ -7,12 +7,14 @@ import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCase {

@@ -15,6 +15,7 @@ import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.application.port.in.UserQueryPort.UserInfo;
 import com.kscold.blog.util.SlugUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,7 @@ import java.util.List;
 /**
  * 포스트 비즈니스 로직 애플리케이션 서비스
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostApplicationService implements PostUseCase {

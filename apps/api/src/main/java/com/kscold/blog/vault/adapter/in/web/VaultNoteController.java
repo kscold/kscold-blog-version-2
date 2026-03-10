@@ -9,6 +9,7 @@ import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNote;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/vault/notes")
 @RequiredArgsConstructor

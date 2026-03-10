@@ -8,6 +8,7 @@ import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.util.SlugUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
 /**
  * 태그 비즈니스 로직 애플리케이션 서비스
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TagApplicationService implements TagUseCase {
