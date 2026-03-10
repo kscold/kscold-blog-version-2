@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useFeeds } from '@/entities/feed/api/useFeeds';
 import { FeedCard } from '@/entities/feed/ui/FeedCard';
+import { Pagination } from '@/shared/ui/Pagination';
 
 export default function FeedPage() {
   const [page, setPage] = useState(0);
@@ -72,27 +73,9 @@ export default function FeedPage() {
             </motion.div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-4 mt-8">
-                <button
-                  onClick={() => setPage(Math.max(0, page - 1))}
-                  disabled={page === 0}
-                  className="px-4 py-2 text-sm font-bold bg-white border border-surface-200 rounded-xl text-surface-700 disabled:opacity-30 hover:border-surface-400 transition-all"
-                >
-                  이전
-                </button>
-                <span className="text-sm text-surface-500 font-medium">
-                  {page + 1} / {totalPages}
-                </span>
-                <button
-                  onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-                  disabled={page >= totalPages - 1}
-                  className="px-4 py-2 text-sm font-bold bg-white border border-surface-200 rounded-xl text-surface-700 disabled:opacity-30 hover:border-surface-400 transition-all"
-                >
-                  다음
-                </button>
-              </div>
-            )}
+            <div className="mt-8">
+              <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+            </div>
           </>
         ) : (
           <div className="text-center py-20">

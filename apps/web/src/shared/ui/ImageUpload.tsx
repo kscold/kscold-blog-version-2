@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { apiClient } from '@/shared/api/api-client';
+import { useMediaUpload } from '@/features/media/lib/useMediaUpload';
 
 interface ImageUploadProps {
   onUploadSuccess: (url: string) => void;
@@ -10,7 +10,7 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ onUploadSuccess, currentImage }: ImageUploadProps) {
-  const [isUploading, setIsUploading] = useState(false);
+  const { uploadFile, isUploading } = useMediaUpload();
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -21,42 +21,19 @@ export function ImageUpload({ onUploadSuccess, currentImage }: ImageUploadProps)
 
     setError(null);
 
-    if (!file.type.startsWith('image/')) {
-      setError('이미지 파일만 업로드 가능합니다');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      setError('파일 크기는 10MB 이하여야 합니다');
-      return;
-    }
-
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
 
-    setIsUploading(true);
-
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await apiClient.post<{ url: string }>('/media/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      const url = response.url;
+      const url = await uploadFile(file);
       onUploadSuccess(url);
     } catch (err) {
       const message = err instanceof Error ? err.message : '업로드에 실패했습니다';
       setError(message);
       setPreview(currentImage || null);
-    } finally {
-      setIsUploading(false);
     }
   };
 

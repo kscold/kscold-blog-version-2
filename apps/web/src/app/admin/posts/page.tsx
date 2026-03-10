@@ -1,34 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useAdminPosts, useDeletePost } from '@/entities/post/api/usePosts';
 import { PostsTable } from '@/widgets/admin/ui/PostsTable';
-import { useAlert } from '@/shared/model/alertStore';
+import { useAdminPosts } from '@/features/admin/lib/useAdminPosts';
 
 export default function AdminPostsPage() {
-  const alert = useAlert();
-  const [page, setPage] = useState(0);
-  const { data: postsData, isLoading } = useAdminPosts(page, 20);
-  const deletePost = useDeletePost();
-
-  const posts = postsData?.content || [];
-  const totalPages = postsData?.totalPages || 0;
-
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`"${title}" 포스트를 삭제하시겠습니까?`)) {
-      return;
-    }
-
-    try {
-      await deletePost.mutateAsync(id);
-      alert.success('포스트가 삭제되었습니다.');
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : '알 수 없는 오류';
-      alert.error(msg);
-    }
-  };
+  const { posts, totalPages, page, setPage, isLoading, handleDelete } = useAdminPosts();
 
   return (
     <div className="min-h-screen bg-secondary-beige dark:bg-gray-950">
