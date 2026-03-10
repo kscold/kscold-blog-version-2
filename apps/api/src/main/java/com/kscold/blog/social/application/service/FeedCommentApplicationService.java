@@ -7,12 +7,14 @@ import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FeedCommentApplicationService implements FeedCommentUseCase {

@@ -39,6 +39,34 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * DuplicateResourceException 처리
+     * 리소스 중복 시 HTTP 409 Conflict 응답
+     */
+    @ExceptionHandler(DuplicateResourceException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleDuplicateResource(DuplicateResourceException e) {
+        log.warn("DuplicateResourceException: {}", e.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(
+            e.getErrorCode().getCode(),
+            e.getMessage()
+        );
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * InvalidRequestException 처리
+     * 잘못된 요청 시 HTTP 400 Bad Request 응답
+     */
+    @ExceptionHandler(InvalidRequestException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleInvalidRequest(InvalidRequestException e) {
+        log.warn("InvalidRequestException: {}", e.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(
+            e.getErrorCode().getCode(),
+            e.getMessage()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Validation 예외 처리 (@Valid 실패)
      * DTO 필드 검증 실패 시 발생
      */
