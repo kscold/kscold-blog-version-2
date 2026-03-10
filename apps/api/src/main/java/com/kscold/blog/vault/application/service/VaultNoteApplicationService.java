@@ -14,6 +14,7 @@ import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
 import com.kscold.blog.vault.domain.service.BacklinkParsingService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VaultNoteApplicationService implements VaultNoteUseCase {

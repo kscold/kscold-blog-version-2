@@ -8,6 +8,7 @@ import com.kscold.blog.blog.adapter.in.web.dto.PostResponse;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import java.util.List;
 /**
  * 포스트 관련 REST API 컨트롤러
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
