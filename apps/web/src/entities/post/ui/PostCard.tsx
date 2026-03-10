@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Post } from '@/types/blog';
 
@@ -36,10 +37,12 @@ export function PostCard({ post, featured = false }: PostCardProps) {
                 featured ? 'h-64' : 'h-48'
               }`}
             >
-              <img
+              <Image
                 src={post.coverImage}
                 alt={post.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               {post.featured && (
                 <div className="absolute top-4 right-4 px-3 py-1.5 text-[10px] font-bold bg-white/90 backdrop-blur-md text-surface-900 rounded-full uppercase tracking-widest shadow-sm">

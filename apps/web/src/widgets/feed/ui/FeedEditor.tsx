@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useUpdateFeed, useLinkPreview } from '@/entities/feed/api/useFeeds';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import { useMediaUpload } from '@/features/media/lib/useMediaUpload';
@@ -101,7 +102,7 @@ export default function FeedEditor({
                 <div className="grid grid-cols-3 gap-2">
                   {images.map((url, i) => (
                     <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-surface-100">
-                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <Image src={url} alt="" fill sizes="33vw" className="object-cover" />
                       <button
                         onClick={() => removeImage(i)}
                         className="absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70"

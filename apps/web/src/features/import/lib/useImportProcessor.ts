@@ -65,7 +65,7 @@ export function useImportProcessor(): UseImportProcessorReturn {
 
     setFiles(parsed);
     setImportStatus('previewing');
-  }, []);
+  }, [alert]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {

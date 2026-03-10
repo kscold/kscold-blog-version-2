@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { useMediaUpload } from '@/features/media/lib/useMediaUpload';
 
 interface ImageUploadProps {
@@ -60,8 +61,8 @@ export function ImageUpload({ onUploadSuccess, currentImage }: ImageUploadProps)
       />
 
       {preview ? (
-        <div className="relative group">
-          <img src={preview} alt="Preview" className="w-full h-64 object-cover rounded-lg" />
+        <div className="relative group h-64 overflow-hidden rounded-lg">
+          <Image src={preview} alt="Preview" fill sizes="100vw" className="object-cover" />
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-3">
             <button
               onClick={handleClick}

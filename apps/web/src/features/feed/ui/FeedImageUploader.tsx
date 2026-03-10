@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Image from 'next/image';
 
 interface FeedImageUploaderProps {
   images: string[];
@@ -23,7 +24,7 @@ export function FeedImageUploader({ images, isUploading, onUpload, onRemove }: F
                 key={i}
                 className="relative aspect-square rounded-lg overflow-hidden bg-surface-100"
               >
-                <img src={url} alt="" className="w-full h-full object-cover" />
+                <Image src={url} alt="" fill sizes="33vw" className="object-cover" />
                 <button
                   onClick={() => onRemove(i)}
                   className="absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70"
