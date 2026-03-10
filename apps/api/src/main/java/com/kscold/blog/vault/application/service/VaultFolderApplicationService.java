@@ -9,12 +9,14 @@ import com.kscold.blog.vault.application.port.in.VaultFolderUseCase;
 import com.kscold.blog.vault.domain.model.VaultFolder;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VaultFolderApplicationService implements VaultFolderUseCase {
