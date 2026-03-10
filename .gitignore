@@ -9,8 +9,7 @@ coverage/
 
 # Next.js
 .next/
-out/
-build/
+.next/out/
 dist/
 
 # Production
@@ -57,7 +56,6 @@ apps/api/target/
 apps/api/.gradle/
 apps/api/build/
 apps/api/bin/
-apps/api/out/
 *.jar
 *.war
 *.class
