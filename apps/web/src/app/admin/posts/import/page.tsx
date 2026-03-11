@@ -33,7 +33,7 @@ export default function ImportPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
-      {/* Header */}
+      {/* 헤더 */}
       <div className="flex items-center justify-between mb-10">
         <div>
           <h1 className="text-3xl font-bold text-surface-900 tracking-tight">Markdown 가져오기</h1>
@@ -47,7 +47,7 @@ export default function ImportPage() {
         </Link>
       </div>
 
-      {/* Drop Zone */}
+      {/* 드롭 영역 */}
       {importStatus === 'idle' && (
         <div
           onDragOver={e => {
@@ -95,7 +95,7 @@ export default function ImportPage() {
         </div>
       )}
 
-      {/* Preview */}
+      {/* 미리보기 */}
       {importStatus === 'previewing' && files.length > 0 && (
         <ImportFileList
           files={files}
@@ -111,7 +111,7 @@ export default function ImportPage() {
         />
       )}
 
-      {/* Importing Progress */}
+      {/* 가져오기 진행 중 */}
       {importStatus === 'importing' && (
         <div className="text-center py-20">
           <div className="w-16 h-16 border-4 border-surface-200 border-t-surface-900 rounded-full animate-spin mx-auto" />
@@ -127,7 +127,7 @@ export default function ImportPage() {
         </div>
       )}
 
-      {/* Results */}
+      {/* 결과 */}
       {importStatus === 'done' && (
         <div className="space-y-6">
           <div className="bg-surface-50 border border-surface-200 rounded-xl p-8 text-center">
