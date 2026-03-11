@@ -33,7 +33,7 @@ public class Post {
     private String slug;
 
     @TextIndexed
-    private String content; // Markdown
+    private String content; // 마크다운 본문
 
     private String excerpt; // 발췌문 (200자)
 

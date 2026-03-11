@@ -4,9 +4,9 @@ import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.vault.application.dto.NoteCommentCreateCommand;
 import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
-import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
+import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCase {
 
     private final VaultNoteCommentRepository commentRepository;
-    private final VaultNoteUseCase vaultNoteUseCase;
+    private final VaultNoteRepository vaultNoteRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -34,7 +34,7 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
                 .build();
 
         VaultNoteComment saved = commentRepository.save(comment);
-        vaultNoteUseCase.incrementCommentCount(noteId);
+        vaultNoteRepository.incrementCommentCount(noteId);
         return saved;
     }
 
@@ -52,6 +52,6 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
         }
 
         commentRepository.delete(comment);
-        vaultNoteUseCase.decrementCommentCount(noteId);
+        vaultNoteRepository.decrementCommentCount(noteId);
     }
 }
