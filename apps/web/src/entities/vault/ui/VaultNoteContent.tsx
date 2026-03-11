@@ -7,10 +7,10 @@ interface VaultNoteContentProps {
 }
 
 export function VaultNoteContent({ note, theme = 'light' }: VaultNoteContentProps) {
-  // Pre-process Obsidian style backlinks [[Page Title]] to markdown links [Page Title](/vault/page-title)
+  // 옵시디언 스타일 백링크 [[제목]] → 마크다운 링크 변환
   const processContent = (rawContent: string) => {
     return rawContent.replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
-      // Basic slugification matching the backend SlugUtils (lowercase, replace spaces with hyphens)
+      // 백엔드 SlugUtils 기준 슬러그 변환 (소문자, 공백→하이픈)
       const slug = title
         .toLowerCase()
         .trim()
@@ -31,7 +31,7 @@ export function VaultNoteContent({ note, theme = 'light' }: VaultNoteContentProp
         })
       : '';
 
-  // Calculate actual theme matching Tailwind's dark mode resolution
+  // Tailwind 다크모드 기준으로 실제 테마 계산
   const isDark = theme === 'dark' || (theme === 'system' && typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
   const actualTheme = isDark ? 'dark' : 'light';
 

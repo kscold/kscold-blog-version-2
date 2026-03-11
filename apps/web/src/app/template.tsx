@@ -9,7 +9,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       transition={{
         duration: 1,
-        ease: [0.76, 0, 0.24, 1], // Premium aesthetic ease curve
+        ease: [0.76, 0, 0.24, 1], // 고급 이징 커브 (애니메이션용)
       }}
     >
       {children}

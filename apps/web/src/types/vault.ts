@@ -42,7 +42,7 @@ export interface GraphNode {
   val?: number;
   folderId?: string;
   isFolder?: boolean;
-  // ForceGraph2D runtime-injected properties
+  // ForceGraph2D 런타임에 주입되는 속성
   x?: number;
   y?: number;
 }

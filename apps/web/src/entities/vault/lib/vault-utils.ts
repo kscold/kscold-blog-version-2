@@ -1,22 +1,22 @@
 import { VaultFolder, VaultNote, GraphData, GraphNode, GraphLink } from '@/types/vault';
 
 const CATEGORY_COLORS = [
-  '#64C8FF', // Deep Sky Blue
-  '#A855F7', // Purple
-  '#F43F5E', // Rose
-  '#10B981', // Emerald
-  '#F59E0B', // Amber
-  '#3B82F6', // Blue
+  '#64C8FF', // 하늘색
+  '#A855F7', // 보라색
+  '#F43F5E', // 로즈
+  '#10B981', // 에메랄드
+  '#F59E0B', // 황색
+  '#3B82F6', // 파란색
 ];
 
-// Flat map of folder IDs to their assigned root color
+// 폴더 ID → 루트 색상 매핑 테이블
 export function buildFolderColorMap(folders: VaultFolder[]): Record<string, string> {
   const map: Record<string, string> = {};
 
-  // Find roots
+  // 루트 폴더 탐색
   const roots = folders.filter(f => !f.parent);
 
-  // Assign a color to each root, then recursively assign it to all children
+  // 루트에 색상 할당 후 자식 폴더에 재귀적으로 동일 색상 적용
   roots.forEach((root, idx) => {
     const color = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
 
@@ -33,7 +33,7 @@ export function buildFolderColorMap(folders: VaultFolder[]): Record<string, stri
   return map;
 }
 
-// Get all descendants for a folder ID
+// 특정 폴더의 모든 하위 폴더 ID 반환
 export function getSubfolderIds(folders: VaultFolder[], targetId: string): string[] {
   let ids: string[] = [];
 
@@ -63,21 +63,21 @@ export function getLocalGraph(
 ): { nodes: GraphNode[]; links: GraphLink[] } {
   if (!rawGraph || !currentNote) return { nodes: [], links: [] };
 
-  // Collect IDs of all connected notes
+  // 연결된 모든 노트 ID 수집
   const connectedIds = new Set<string>();
   connectedIds.add(currentNote.id);
 
-  // Outgoing links (note IDs this note links to)
+  // 아웃고잉 링크 (현재 노트가 참조하는 노트 ID)
   for (const linkId of currentNote.outgoingLinks || []) {
     connectedIds.add(linkId);
   }
 
-  // Backlinks (notes that link TO this note)
+  // 백링크 (현재 노트를 참조하는 노트)
   for (const bl of backlinks || []) {
     connectedIds.add(bl.id);
   }
 
-  // Filter nodes
+  // 연결된 노드만 필터링
   const localNodes = rawGraph.nodes
     .filter(n => connectedIds.has(n.id))
     .map(n => ({
@@ -87,7 +87,7 @@ export function getLocalGraph(
       isCenter: n.id === currentNote.id,
     }));
 
-  // Filter links: both source and target must be in the local set
+  // 링크 필터링: source·target 모두 로컬 집합에 포함된 경우만
   const localLinks = rawGraph.links.filter(l => {
     const srcId = typeof l.source === 'object' ? (l.source as GraphNode).id : l.source;
     const tgtId = typeof l.target === 'object' ? (l.target as GraphNode).id : l.target;
@@ -112,7 +112,7 @@ export function getAggregatedGraph(
   const nodeMapping = new Map<string, string>();
   const aggregatedNodes: GraphNode[] = [];
 
-  // Map subfolders
+  // 하위 폴더 매핑
   for (const subfolder of directSubfolders) {
     const descendantIds = getSubfolderIds(folders, subfolder.id);
     const notesInside = rawGraph.nodes.filter(
@@ -125,7 +125,7 @@ export function getAggregatedGraph(
 
     const hasChildren = subfolder.children && subfolder.children.length > 0;
 
-    // Show folder if it has notes inside or has child subfolders
+    // 노트가 있거나 자식 서브폴더가 있을 때만 폴더 노드 표시
     if (notesInside.length > 0 || hasChildren) {
       aggregatedNodes.push({
         id: subfolder.id,
@@ -139,7 +139,7 @@ export function getAggregatedGraph(
     }
   }
 
-  // Map direct notes
+  // 직접 소속 노트 매핑
   for (const node of rawGraph.nodes) {
     if ((node.folderId || null) === activeFolderId) {
       nodeMapping.set(node.id, node.id);
@@ -151,7 +151,7 @@ export function getAggregatedGraph(
     }
   }
 
-  // Aggregate links
+  // 링크 집계
   const aggregatedLinks: GraphLink[] = [];
   const linkSet = new Set<string>();
 

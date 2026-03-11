@@ -46,7 +46,7 @@ function FolderNode({
   const handleHeaderClick = () => {
     if (!isOpen) setIsOpen(true);
     if (onFolderSelect) {
-      // Toggle selection off if already selected
+      // 이미 선택된 항목 클릭 시 선택 해제
       onFolderSelect(isFolderActive ? null : folder.id);
     } else {
       setIsOpen(!isOpen);
