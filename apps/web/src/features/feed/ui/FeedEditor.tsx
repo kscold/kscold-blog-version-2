@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { useCreateFeed, useUpdateFeed, useLinkPreview } from '@/entities/feed/api/useFeeds';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';
-import FeedActionBar from '@/widgets/feed/ui/FeedActionBar';
+import FeedActionBar from '@/features/feed/ui/FeedActionBar';
 import { useAlert } from '@/shared/model/alertStore';
 
 interface FeedEditorProps {

@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useFeed } from '@/entities/feed/api/useFeeds';
-import FeedEditor from '@/widgets/feed/ui/FeedEditor';
+import FeedEditor from '@/features/feed/ui/FeedEditor';
 
 export default function EditFeedPage() {
   const { id } = useParams<{ id: string }>();

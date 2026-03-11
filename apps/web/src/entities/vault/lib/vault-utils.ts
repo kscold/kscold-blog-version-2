@@ -1,4 +1,4 @@
-import { VaultFolder, VaultNote, GraphData } from '@/types/vault';
+import { VaultFolder, VaultNote, GraphData, GraphNode, GraphLink } from '@/types/vault';
 
 const CATEGORY_COLORS = [
   '#64C8FF', // Deep Sky Blue
@@ -60,7 +60,7 @@ export function getLocalGraph(
   rawGraph: GraphData,
   currentNote: VaultNote,
   backlinks: VaultNote[]
-): { nodes: any[]; links: any[] } {
+): { nodes: GraphNode[]; links: GraphLink[] } {
   if (!rawGraph || !currentNote) return { nodes: [], links: [] };
 
   // Collect IDs of all connected notes
@@ -89,8 +89,8 @@ export function getLocalGraph(
 
   // Filter links: both source and target must be in the local set
   const localLinks = rawGraph.links.filter(l => {
-    const srcId = typeof l.source === 'object' ? (l.source as any).id : l.source;
-    const tgtId = typeof l.target === 'object' ? (l.target as any).id : l.target;
+    const srcId = typeof l.source === 'object' ? (l.source as GraphNode).id : l.source;
+    const tgtId = typeof l.target === 'object' ? (l.target as GraphNode).id : l.target;
     return connectedIds.has(srcId) && connectedIds.has(tgtId);
   });
 
@@ -98,10 +98,10 @@ export function getLocalGraph(
 }
 
 export function getAggregatedGraph(
-  rawGraph: { nodes: any[]; links: any[] },
+  rawGraph: GraphData,
   folders: VaultFolder[],
   activeFolderId: string | null
-) {
+): { nodes: GraphNode[]; links: GraphLink[] } {
   if (!rawGraph) return { nodes: [], links: [] };
 
   const directSubfolders =
@@ -110,7 +110,7 @@ export function getAggregatedGraph(
       : folders.find(f => f.id === activeFolderId)?.children || [];
 
   const nodeMapping = new Map<string, string>();
-  const aggregatedNodes: any[] = [];
+  const aggregatedNodes: GraphNode[] = [];
 
   // Map subfolders
   for (const subfolder of directSubfolders) {
@@ -131,6 +131,7 @@ export function getAggregatedGraph(
         id: subfolder.id,
         name: subfolder.name,
         slug: '',
+        size: 0,
         val: Math.max(10, notesInside.length * 2 + (hasChildren ? 5 : 0)),
         folderId: subfolder.id,
         isFolder: true,
@@ -151,7 +152,7 @@ export function getAggregatedGraph(
   }
 
   // Aggregate links
-  const aggregatedLinks: any[] = [];
+  const aggregatedLinks: GraphLink[] = [];
   const linkSet = new Set<string>();
 
   for (const link of rawGraph.links) {
