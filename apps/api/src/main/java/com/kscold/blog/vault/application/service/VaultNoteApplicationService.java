@@ -13,7 +13,6 @@ import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
 import com.kscold.blog.vault.domain.service.BacklinkParsingService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +24,6 @@ import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class VaultNoteApplicationService implements VaultNoteUseCase {
 
     private final VaultNoteRepository vaultNoteRepository;
@@ -34,6 +32,20 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     private final VaultFolderApplicationService vaultFolderApplicationService;
     private final UserQueryPort userQueryPort;
     private final BacklinkParsingService backlinkParsingService;
+
+    public VaultNoteApplicationService(
+            VaultNoteRepository vaultNoteRepository,
+            VaultNoteCommentRepository vaultNoteCommentRepository,
+            VaultFolderRepository vaultFolderRepository,
+            VaultFolderApplicationService vaultFolderApplicationService,
+            UserQueryPort userQueryPort) {
+        this.vaultNoteRepository = vaultNoteRepository;
+        this.vaultNoteCommentRepository = vaultNoteCommentRepository;
+        this.vaultFolderRepository = vaultFolderRepository;
+        this.vaultFolderApplicationService = vaultFolderApplicationService;
+        this.userQueryPort = userQueryPort;
+        this.backlinkParsingService = new BacklinkParsingService(vaultNoteRepository);
+    }
 
     @Transactional
     public VaultNote create(NoteCreateCommand command, String userId) {
