@@ -1,5 +1,16 @@
-import { forceCollide } from 'd3-force';
-import { ForceGraphMethods } from 'react-force-graph-2d';
+import { forceCollide, SimulationNodeDatum } from 'd3-force';
+import { ForceGraphMethods, NodeObject } from 'react-force-graph-2d';
+import { GraphNode } from '@/types/vault';
+
+interface NodeRuntime extends NodeObject {
+  name?: string;
+  slug?: string;
+  size?: number;
+  val?: number;
+  folderId?: string;
+  isFolder?: boolean;
+  isCenter?: boolean;
+}
 
 interface ConfigureForcesOptions {
   fg: ForceGraphMethods;
@@ -20,7 +31,8 @@ export function configureForces({ fg, nodeCount }: ConfigureForcesOptions): void
   fg.d3Force(
     'collision',
     forceCollide()
-      .radius((node: any) => {
+      .radius((datum: SimulationNodeDatum) => {
+        const node = datum as NodeRuntime;
         const r = node.isFolder ? Math.sqrt(node.val || 10) * 3 : Math.sqrt(node.val || 1) * 2;
         return r + 15;
       })
@@ -44,7 +56,7 @@ interface RenderNodeOptions {
  * 노드 원, 테두리, 라벨 텍스트를 Canvas API로 렌더링한다.
  */
 export function renderNode(
-  node: any,
+  node: NodeRuntime,
   ctx: CanvasRenderingContext2D,
   globalScale: number,
   options: RenderNodeOptions
@@ -57,7 +69,7 @@ export function renderNode(
     const isActive = activeNodeSlug === node.slug;
     const isHover = hoverNodeId === node.id;
     const isFolder = !!node.isFolder;
-    const baseColor = folderColorMap[node.folderId] || '#8b5cf6';
+    const baseColor = folderColorMap[node.folderId ?? ''] || '#8b5cf6';
     const isDark =
       theme === 'dark' ||
       (theme === 'system' &&
@@ -73,7 +85,7 @@ export function renderNode(
 
     // -- Node circle --
     ctx.beginPath();
-    ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+    ctx.arc(node.x!, node.y!, radius, 0, Math.PI * 2);
 
     if (isFolder) {
       ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
@@ -117,7 +129,7 @@ interface LabelOptions {
 }
 
 function renderLabel(
-  node: any,
+  node: NodeRuntime,
   ctx: CanvasRenderingContext2D,
   globalScale: number,
   opts: LabelOptions
@@ -139,9 +151,9 @@ function renderLabel(
   const textH = clampedSize;
   const padX = 6 / globalScale;
   const padY = 3 / globalScale;
-  const textY = node.y + radius + (8 + textH * 0.5) / globalScale;
+  const textY = node.y! + radius + (8 + textH * 0.5) / globalScale;
 
-  const pillX = node.x - textW / 2 - padX;
+  const pillX = node.x! - textW / 2 - padX;
   const pillY2 = textY - textH / 2 - padY;
   const pillW = textW + padX * 2;
   const pillH = textH + padY * 2;
@@ -176,12 +188,12 @@ function renderLabel(
   } else {
     ctx.fillStyle = focused ? '#0f172a' : isFolder ? '#1e293b' : '#334155';
   }
-  ctx.fillText(displayLabel, node.x, textY);
+  ctx.fillText(displayLabel, node.x!, textY);
 }
 
 /** ForceGraph2D의 nodePointerAreaPaint 콜백 - 클릭/호버 판정용 히트 영역 렌더링 */
 export function renderNodeHitArea(
-  node: any,
+  node: NodeRuntime,
   color: string,
   ctx: CanvasRenderingContext2D,
   globalScale: number
@@ -193,6 +205,6 @@ export function renderNodeHitArea(
   const hitR = r + 12 / globalScale;
   ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.arc(node.x, node.y, hitR, 0, Math.PI * 2);
+  ctx.arc(node.x!, node.y!, hitR, 0, Math.PI * 2);
   ctx.fill();
 }

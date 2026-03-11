@@ -1,35 +1,24 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useUiStore } from '@/shared/model/uiStore';
-import { useVaultNote, useVaultBacklinks, useVaultFolders, useVaultGraph } from '@/entities/vault/api/useVault';
+import { useVaultNoteData } from '@/features/vault/lib/useVaultNote';
 import { VaultFolderTree } from '@/widgets/vault/ui/VaultFolderTree';
 import { VaultNoteContent } from '@/entities/vault/ui/VaultNoteContent';
 import { BacklinkList } from '@/entities/vault/ui/BacklinkList';
 import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
-import { buildFolderColorMap, getLocalGraph } from '@/entities/vault/lib/vault-utils';
 
 export function VaultNoteLayout() {
   const params = useParams();
   const slug = params.slug as string;
   const { theme } = useUiStore();
 
-  const { data: note, isLoading: isNoteLoading, isError } = useVaultNote(slug);
-  const { data: backlinks } = useVaultBacklinks(note?.id || '');
-  const { data: folders, isLoading: isFoldersLoading } = useVaultFolders();
-  const { data: graphData } = useVaultGraph();
+  const { note, backlinks, folders, isNoteLoading, isFoldersLoading, isError, localGraph, colorMap } =
+    useVaultNoteData(slug);
 
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
-  const { localGraph, colorMap } = useMemo(() => {
-    const fList = folders || [];
-    const cMap = buildFolderColorMap(fList);
-    if (!graphData || !note) return { localGraph: null, colorMap: cMap };
-    const graph = getLocalGraph(graphData, note, backlinks || []);
-    return { localGraph: graph, colorMap: cMap };
-  }, [folders, graphData, note, backlinks]);
 
   if (isError) {
     return (
@@ -66,7 +55,7 @@ export function VaultNoteLayout() {
               </div>
             ) : (
               <VaultFolderTree
-                folders={folders || []}
+                folders={folders}
                 activeFolderId={activeFolderId}
                 onFolderSelect={setActiveFolderId}
               />
@@ -89,7 +78,7 @@ export function VaultNoteLayout() {
         ) : note ? (
           <div className="max-w-4xl mx-auto pb-24">
             <VaultNoteContent note={note} theme={theme} />
-            <BacklinkList backlinks={backlinks || []} />
+            <BacklinkList backlinks={backlinks} />
 
             <div className="mt-16 pt-8 border-t border-surface-200/50 h-[400px]">
               <h3 className="text-sm font-bold text-surface-400 uppercase tracking-widest mb-6 flex items-center gap-2">
