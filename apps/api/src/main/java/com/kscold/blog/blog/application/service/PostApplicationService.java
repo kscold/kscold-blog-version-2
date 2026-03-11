@@ -2,7 +2,9 @@ package com.kscold.blog.blog.application.service;
 
 import com.kscold.blog.blog.application.dto.PostCreateCommand;
 import com.kscold.blog.blog.application.dto.PostUpdateCommand;
+import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
+import com.kscold.blog.blog.application.port.in.TagUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.domain.model.Tag;
@@ -38,8 +40,8 @@ public class PostApplicationService implements PostUseCase {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final UserQueryPort userQueryPort;
-    private final TagApplicationService tagApplicationService;
-    private final CategoryApplicationService categoryApplicationService;
+    private final TagUseCase tagUseCase;
+    private final CategoryUseCase categoryUseCase;
 
     /**
      * 포스트 생성
@@ -125,9 +127,9 @@ public class PostApplicationService implements PostUseCase {
         }
 
         // postCount 업데이트
-        categoryApplicationService.incrementPostCount(categoryInfo.getId());
+        categoryUseCase.incrementPostCount(categoryInfo.getId());
         for (Post.TagInfo tagInfo : tagInfos) {
-            tagApplicationService.incrementPostCount(tagInfo.getId());
+            tagUseCase.incrementPostCount(tagInfo.getId());
         }
 
         return saved;
@@ -234,11 +236,11 @@ public class PostApplicationService implements PostUseCase {
 
         // postCount 감소
         if (post.getCategory() != null) {
-            categoryApplicationService.decrementPostCount(post.getCategory().getId());
+            categoryUseCase.decrementPostCount(post.getCategory().getId());
         }
         if (post.getTags() != null) {
             for (Post.TagInfo tagInfo : post.getTags()) {
-                tagApplicationService.decrementPostCount(tagInfo.getId());
+                tagUseCase.decrementPostCount(tagInfo.getId());
             }
         }
     }
