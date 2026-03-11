@@ -7,6 +7,7 @@ import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.util.SlugUtils;
 import com.kscold.blog.vault.application.dto.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.NoteUpdateCommand;
+import com.kscold.blog.vault.application.port.in.VaultFolderUseCase;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNote;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
@@ -29,7 +30,7 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     private final VaultNoteRepository vaultNoteRepository;
     private final VaultNoteCommentRepository vaultNoteCommentRepository;
     private final VaultFolderRepository vaultFolderRepository;
-    private final VaultFolderApplicationService vaultFolderApplicationService;
+    private final VaultFolderUseCase vaultFolderUseCase;
     private final UserQueryPort userQueryPort;
     private final BacklinkParsingService backlinkParsingService;
 
@@ -37,12 +38,12 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
             VaultNoteRepository vaultNoteRepository,
             VaultNoteCommentRepository vaultNoteCommentRepository,
             VaultFolderRepository vaultFolderRepository,
-            VaultFolderApplicationService vaultFolderApplicationService,
+            VaultFolderUseCase vaultFolderUseCase,
             UserQueryPort userQueryPort) {
         this.vaultNoteRepository = vaultNoteRepository;
         this.vaultNoteCommentRepository = vaultNoteCommentRepository;
         this.vaultFolderRepository = vaultFolderRepository;
-        this.vaultFolderApplicationService = vaultFolderApplicationService;
+        this.vaultFolderUseCase = vaultFolderUseCase;
         this.userQueryPort = userQueryPort;
         this.backlinkParsingService = new BacklinkParsingService(vaultNoteRepository);
     }
@@ -78,7 +79,7 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
                 .build();
 
         VaultNote saved = vaultNoteRepository.save(note);
-        vaultFolderApplicationService.incrementNoteCount(command.getFolderId());
+        vaultFolderUseCase.incrementNoteCount(command.getFolderId());
         return saved;
     }
 
@@ -100,8 +101,8 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
             note.setOutgoingLinks(backlinkParsingService.parseBacklinks(command.getContent()));
         }
         if (command.getFolderId() != null && !command.getFolderId().equals(note.getFolderId())) {
-            vaultFolderApplicationService.decrementNoteCount(note.getFolderId());
-            vaultFolderApplicationService.incrementNoteCount(command.getFolderId());
+            vaultFolderUseCase.decrementNoteCount(note.getFolderId());
+            vaultFolderUseCase.incrementNoteCount(command.getFolderId());
             note.setFolderId(command.getFolderId());
         }
         if (command.getTags() != null) {
@@ -115,7 +116,7 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     public void delete(String id) {
         VaultNote note = findById(id);
         vaultNoteCommentRepository.deleteAllByNoteId(id);
-        vaultFolderApplicationService.decrementNoteCount(note.getFolderId());
+        vaultFolderUseCase.decrementNoteCount(note.getFolderId());
         vaultNoteRepository.delete(note);
     }
 
