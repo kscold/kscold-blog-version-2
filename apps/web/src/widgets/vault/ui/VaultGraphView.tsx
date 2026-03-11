@@ -43,14 +43,14 @@ export function VaultGraphView({
     };
   }, [graphData]);
 
-  // Configure force simulation
+  // 포스 시뮬레이션 설정
   useEffect(() => {
     const fg = fgRef.current;
     if (!fg) return;
     configureForces({ fg, nodeCount: gData.nodes.length });
   }, [gData]);
 
-  // Center on active node
+  // 활성 노드로 중앙 이동
   useEffect(() => {
     if (activeNodeSlug && fgRef.current && gData.nodes.length > 0) {
       const activeNode = gData.nodes.find(

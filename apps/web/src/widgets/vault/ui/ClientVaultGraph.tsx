@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { GraphData } from '@/types/vault';
 
 interface ClientVaultGraphProps {
-  graphData: any; // Using any for now since getAggregatedGraph returns aggregated nodes
+  graphData: any; // 집계된 노드 타입이 불명확하여 any 사용
   activeNodeSlug?: string;
   onNodeClick?: (slug: string) => void;
   onFolderClick?: (folderId: string) => void;
@@ -12,7 +12,7 @@ interface ClientVaultGraphProps {
   theme?: 'light' | 'dark' | 'system';
 }
 
-// Dynamically import the ForceGraph component with SSR disabled
+// SSR 비활성화하여 동적 import
 export const ClientVaultGraph = dynamic(
   () => import('./VaultGraphView').then(mod => mod.VaultGraphView),
   {
