@@ -1,27 +1,18 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useUiStore } from '@/shared/model/uiStore';
 import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
 import { VaultFolderTree } from '@/widgets/vault/ui/VaultFolderTree';
-import { useVaultFolders, useVaultGraph } from '@/entities/vault/api/useVault';
-import { buildFolderColorMap, getAggregatedGraph } from '@/entities/vault/lib/vault-utils';
+import { useVaultGraphData } from '@/features/vault/lib/useVaultGraph';
 
 export function VaultGraphLayout() {
   const { theme } = useUiStore();
-  const { data: folders, isLoading: isFoldersLoading } = useVaultFolders();
-  const { data: graphData, isLoading: isGraphLoading } = useVaultGraph();
-
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const { filteredGraph, colorMap } = useMemo(() => {
-    const fList = folders || [];
-    const cMap = buildFolderColorMap(fList);
-    if (!graphData) return { filteredGraph: null, colorMap: cMap };
-    const aggregatedGraph = getAggregatedGraph(graphData, fList, activeFolderId);
-    return { filteredGraph: aggregatedGraph, colorMap: cMap };
-  }, [folders, graphData, activeFolderId]);
+  const { folders, isFoldersLoading, isGraphLoading, filteredGraph, colorMap } =
+    useVaultGraphData(activeFolderId);
 
   return (
     <div className="absolute inset-0 flex overflow-hidden bg-transparent">
@@ -48,7 +39,7 @@ export function VaultGraphLayout() {
               </div>
             ) : (
               <VaultFolderTree
-                folders={folders || []}
+                folders={folders}
                 activeFolderId={activeFolderId}
                 onFolderSelect={setActiveFolderId}
               />
@@ -62,7 +53,7 @@ export function VaultGraphLayout() {
           <div className="absolute top-4 left-4 lg:left-[276px] z-10">
             <button
               onClick={() => {
-                const parent = folders?.find(f => f.id === activeFolderId)?.parent;
+                const parent = folders.find(f => f.id === activeFolderId)?.parent;
                 setActiveFolderId(parent ?? null);
               }}
               className="px-4 py-2 rounded-full bg-surface-50/80 dark:bg-surface-900/80 border border-surface-200 dark:border-surface-800 text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 backdrop-blur-xl shadow-sm transition-all hover:scale-105"
