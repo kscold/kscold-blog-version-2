@@ -40,31 +40,31 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+                        // 공개 엔드포인트
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
-                        // Feed public endpoints
+                        // 피드 공개 엔드포인트
                         .requestMatchers(HttpMethod.GET, "/api/feeds/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/feeds/*/like").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/feeds/*/comments").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/feeds/*/comments").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/feeds/*/comments/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/link-preview").permitAll()
-                        // Vault public endpoints
+                        // Vault 공개 엔드포인트
                         .requestMatchers(HttpMethod.GET, "/api/vault/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/vault/notes/*/comments").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/vault/notes/*/comments/*").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
                         .requestMatchers("/api/health").permitAll()
-                        // Static resources
+                        // 정적 리소스
                         .requestMatchers("/uploads/**").permitAll()
-                        // WebSocket
+                        // 웹소켓
                         .requestMatchers("/ws/**", "/socket.io/**").permitAll()
-                        // Admin endpoints
+                        // 관리자 엔드포인트
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        // All other requests need authentication
+                        // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

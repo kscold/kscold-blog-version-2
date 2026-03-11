@@ -4,9 +4,9 @@ import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.social.application.dto.FeedCommentCreateCommand;
 import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
-import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
+import com.kscold.blog.social.domain.port.out.FeedRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FeedCommentApplicationService implements FeedCommentUseCase {
 
     private final FeedCommentRepository feedCommentRepository;
-    private final FeedUseCase feedUseCase;
+    private final FeedRepository feedRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -34,7 +34,7 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
                 .build();
 
         FeedComment saved = feedCommentRepository.save(comment);
-        feedUseCase.incrementCommentCount(feedId);
+        feedRepository.incrementCommentCount(feedId);
         return saved;
     }
 
@@ -52,6 +52,6 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
         }
 
         feedCommentRepository.delete(comment);
-        feedUseCase.decrementCommentCount(feedId);
+        feedRepository.decrementCommentCount(feedId);
     }
 }
