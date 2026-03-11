@@ -11,7 +11,7 @@ export default function HomePage() {
 
       <FeaturedPostsSection />
 
-      {/* About Section */}
+      {/* 소개 섹션 */}
       <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white border-t border-surface-200">
         <div className="max-w-5xl mx-auto">
           <div className="bg-surface-50 border border-surface-200 rounded-[2rem] p-12 text-center relative overflow-hidden group">

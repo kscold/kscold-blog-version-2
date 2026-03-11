@@ -23,12 +23,12 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
     >
-      {/* Glow Effect */}
+      {/* 글로우 효과 */}
       <div className="absolute inset-x-0 -bottom-2 h-full bg-surface-900/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      {/* Button */}
+      {/* 버튼 */}
       <div className="relative w-16 h-16 bg-surface-900 hover:bg-surface-800 rounded-full shadow-xl shadow-surface-900/10 flex items-center justify-center transition-all duration-300 border border-surface-800">
-        {/* Chat Icon */}
+        {/* 채팅 아이콘 */}
         <AnimatePresence mode="wait">
           {!isHovered ? (
             <motion.svg
@@ -71,7 +71,7 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
           )}
         </AnimatePresence>
 
-        {/* Unread Badge */}
+        {/* 안 읽은 메시지 배지 */}
         {unreadCount > 0 && (
           <motion.div
             className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg"
@@ -86,7 +86,7 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
         )}
       </div>
 
-      {/* Tooltip */}
+      {/* 툴팁 */}
       <AnimatePresence>
         {isHovered && (
           <motion.div
