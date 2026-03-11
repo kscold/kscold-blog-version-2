@@ -41,7 +41,7 @@ export default function AdminTagsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Header */}
+          {/* 헤더 */}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-serif font-bold text-gray-900 dark:text-white">
@@ -59,7 +59,7 @@ export default function AdminTagsPage() {
             </Link>
           </div>
 
-          {/* New Tag Form */}
+          {/* 새 태그 폼 */}
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-6">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">새 태그 추가</h2>
             <form onSubmit={handleCreate} className="flex gap-2">
@@ -80,7 +80,7 @@ export default function AdminTagsPage() {
             </form>
           </div>
 
-          {/* Tag List */}
+          {/* 태그 목록 */}
           <TagManagementTable
             tags={tags}
             isLoading={isLoading}

@@ -67,7 +67,7 @@ export function LoginForm() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
       >
-        {/* Logo */}
+        {/* 로고 */}
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: -20 }}
@@ -86,7 +86,7 @@ export function LoginForm() {
           </Link>
         </motion.div>
 
-        {/* 3D Card Container */}
+        {/* 3D 카드 컨테이너 */}
         <div className="card-3d">
           <motion.div
             className="card-3d-inner"
@@ -97,7 +97,7 @@ export function LoginForm() {
             <div className="bg-white/80 backdrop-blur-xl border border-surface-200/60 rounded-[16px] p-8 shadow-[0_8px_32px_-8px_rgba(15,23,42,0.08)]">
               <AuthToggle isLogin={isLogin} onToggle={setIsLogin} />
 
-              {/* Error Message */}
+              {/* 오류 메시지 */}
               {error && (
                 <motion.div
                   className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-[8px]"
@@ -108,7 +108,7 @@ export function LoginForm() {
                 </motion.div>
               )}
 
-              {/* Form */}
+              {/* 폼 */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
                   type="email"
@@ -156,7 +156,7 @@ export function LoginForm() {
                 </Button>
               </form>
 
-              {/* Back to Home */}
+              {/* 홈 이동 링크 */}
               <div className="mt-6 text-center">
                 <Link
                   href="/"
@@ -182,7 +182,7 @@ export function LoginForm() {
           </motion.div>
         </div>
 
-        {/* Dev Notice */}
+        {/* 개발 모드 안내 */}
         <motion.div
           className="mt-6 p-4 bg-white/60 border border-surface-200/60 rounded-[12px] backdrop-blur-sm"
           initial={{ opacity: 0 }}

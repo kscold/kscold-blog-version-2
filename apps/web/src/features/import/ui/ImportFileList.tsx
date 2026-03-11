@@ -35,7 +35,7 @@ export function ImportFileList({
 }: ImportFileListProps) {
   return (
     <div className="space-y-8">
-      {/* Global Settings */}
+      {/* 전역 설정 */}
       <div className="bg-surface-50 border border-surface-200 rounded-xl p-6">
         <h2 className="text-sm font-bold text-surface-700 uppercase tracking-wider mb-4">
           전역 설정
@@ -73,7 +73,7 @@ export function ImportFileList({
         </div>
       </div>
 
-      {/* File List */}
+      {/* 파일 목록 */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-surface-900">{files.length}개 파일</h2>
@@ -129,7 +129,7 @@ export function ImportFileList({
                 </button>
               </div>
 
-              {/* Slug */}
+              {/* 슬러그 */}
               <div className="mt-3">
                 <label className="text-xs text-surface-400">slug:</label>
                 <input
@@ -140,7 +140,7 @@ export function ImportFileList({
                 />
               </div>
 
-              {/* Tags */}
+              {/* 태그 목록 */}
               {file.tags.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {file.tags.map(tag => (
@@ -154,7 +154,7 @@ export function ImportFileList({
                 </div>
               )}
 
-              {/* Excerpt */}
+              {/* 발췌문 */}
               <p className="mt-3 text-sm text-surface-500 line-clamp-2">{file.excerpt}</p>
 
               {/* Warnings */}

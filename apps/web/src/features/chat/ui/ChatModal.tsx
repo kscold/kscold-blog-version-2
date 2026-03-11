@@ -48,7 +48,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             onClick={e => e.stopPropagation()}
           >
-            {/* Header */}
+            {/* 헤더 */}
             <div className="p-4 border-b border-surface-200 bg-surface-50 flex-shrink-0">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
@@ -90,7 +90,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
 
             <ChatMessageList messages={messages} currentUsername={username} />
 
-            {/* Input */}
+            {/* 입력창 */}
             <div className="p-4 border-t border-surface-200 bg-white flex-shrink-0">
               <form onSubmit={handleSendMessage} className="flex gap-3">
                 <input

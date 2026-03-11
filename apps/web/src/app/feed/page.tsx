@@ -7,7 +7,7 @@ export default function FeedPage() {
   return (
     <div className="min-h-screen bg-surface-50">
       <div className="max-w-xl mx-auto px-4 py-8">
-        {/* Header */}
+        {/* 헤더 */}
         <motion.div
           className="mb-8 text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -20,7 +20,7 @@ export default function FeedPage() {
           <p className="text-sm text-surface-500 font-medium">일상, 개발, 그리고 생각의 조각들</p>
         </motion.div>
 
-        {/* Feed Timeline */}
+        {/* 피드 타임라인 */}
         <FeedList />
       </div>
     </div>
