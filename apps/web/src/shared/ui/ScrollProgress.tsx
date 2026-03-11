@@ -5,7 +5,7 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 export function ScrollProgress() {
   const { scrollYProgress } = useScroll();
 
-  // Smooth out the progress bar movement
+  // 스크롤 진행률 바 부드럽게 처리
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,

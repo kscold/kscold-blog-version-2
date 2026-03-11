@@ -83,7 +83,7 @@ export function renderNode(
     const focused = isActive || isHover;
     ctx.save();
 
-    // -- Node circle --
+    // -- 노드 원 --
     ctx.beginPath();
     ctx.arc(node.x!, node.y!, radius, 0, Math.PI * 2);
 
@@ -95,7 +95,7 @@ export function renderNode(
     ctx.globalAlpha = focused ? 1 : 0.85;
     ctx.fill();
 
-    // -- Node border --
+    // -- 노드 테두리 --
     if (focused || isFolder) {
       ctx.lineWidth = focused ? 2.5 / globalScale : 1 / globalScale;
       ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.9)' : 'rgba(15,23,42,0.9)';
@@ -104,7 +104,7 @@ export function renderNode(
 
     ctx.restore();
 
-    // -- Label --
+    // -- 라벨 --
     const showLabel = isFolder || focused || globalScale > 0.8;
     if (showLabel) {
       renderLabel(node, ctx, globalScale, {
@@ -116,7 +116,7 @@ export function renderNode(
       });
     }
   } catch {
-    /* suppress Canvas API errors during warmup */
+    /* Canvas API 워밍업 중 에러 억제 */
   }
 }
 
