@@ -1,18 +1,7 @@
 'use client';
 
-import { Suspense } from 'react';
-import { LoginForm } from '@/features/auth/ui/LoginForm';
+import { LoginContainer } from '@/widgets/auth/ui/LoginContainer';
 
 export default function LoginPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-surface-50 flex items-center justify-center">
-          <p>Loading...</p>
-        </div>
-      }
-    >
-      <LoginForm />
-    </Suspense>
-  );
+  return <LoginContainer />;
 }

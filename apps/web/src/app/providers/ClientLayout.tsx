@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { Header } from '@/widgets/header/ui/Header';
 import { Footer } from '@/widgets/footer/ui/Footer';
 import { Sidebar } from '@/widgets/sidebar/ui/Sidebar';
-import FloatingChat from '@/features/chat/ui/FloatingChat';
+import { FloatingChatWidget } from '@/widgets/chat/ui/FloatingChatWidget';
 import { AlertToast } from '@/shared/ui/AlertToast';
 import { CustomCursor } from '@/shared/ui/CustomCursor';
 import { ScrollProgress } from '@/shared/ui/ScrollProgress';
@@ -39,7 +39,7 @@ export function ClientLayout({ children }: ClientLayoutProps) {
           )}
         </main>
       </div>
-      <FloatingChat />
+      <FloatingChatWidget />
       <AlertToast />
       <CustomCursor />
     </div>
