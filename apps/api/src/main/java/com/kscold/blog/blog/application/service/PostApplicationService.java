@@ -2,9 +2,7 @@ package com.kscold.blog.blog.application.service;
 
 import com.kscold.blog.blog.application.dto.PostCreateCommand;
 import com.kscold.blog.blog.application.dto.PostUpdateCommand;
-import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
-import com.kscold.blog.blog.application.port.in.TagUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.domain.model.Tag;
@@ -40,8 +38,6 @@ public class PostApplicationService implements PostUseCase {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final UserQueryPort userQueryPort;
-    private final TagUseCase tagUseCase;
-    private final CategoryUseCase categoryUseCase;
 
     /**
      * 포스트 생성
@@ -127,9 +123,9 @@ public class PostApplicationService implements PostUseCase {
         }
 
         // postCount 업데이트
-        categoryUseCase.incrementPostCount(categoryInfo.getId());
+        categoryRepository.incrementPostCount(categoryInfo.getId());
         for (Post.TagInfo tagInfo : tagInfos) {
-            tagUseCase.incrementPostCount(tagInfo.getId());
+            tagRepository.incrementPostCount(tagInfo.getId());
         }
 
         return saved;
@@ -236,11 +232,11 @@ public class PostApplicationService implements PostUseCase {
 
         // postCount 감소
         if (post.getCategory() != null) {
-            categoryUseCase.decrementPostCount(post.getCategory().getId());
+            categoryRepository.decrementPostCount(post.getCategory().getId());
         }
         if (post.getTags() != null) {
             for (Post.TagInfo tagInfo : post.getTags()) {
-                tagUseCase.decrementPostCount(tagInfo.getId());
+                tagRepository.decrementPostCount(tagInfo.getId());
             }
         }
     }
