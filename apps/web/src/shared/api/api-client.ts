@@ -126,14 +126,15 @@ class ApiClient {
   }
 
   public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    const response = await this.client.delete<{ data: T }>(url, config);
-    return response.data.data;
+    const response = await this.client.delete(url, config);
+    if (response.status === 204 || !response.data) {
+      return undefined as T;
+    }
+    return (response.data as { data: T }).data;
   }
 
   public async upload<T>(url: string, formData: FormData): Promise<T> {
-    const response = await this.client.post<{ data: T }>(url, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const response = await this.client.post<{ data: T }>(url, formData);
     return response.data.data;
   }
 
