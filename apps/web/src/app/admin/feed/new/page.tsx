@@ -1,7 +1,7 @@
 'use client';
 
-import FeedEditor from '@/features/feed/ui/FeedEditor';
+import { FeedCreateEditor } from '@/widgets/admin/ui/FeedCreateEditor';
 
 export default function NewFeedPage() {
-  return <FeedEditor />;
+  return <FeedCreateEditor />;
 }

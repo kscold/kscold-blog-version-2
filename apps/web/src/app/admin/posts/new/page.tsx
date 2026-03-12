@@ -1,17 +1,7 @@
 'use client';
 
-import { PostEditor } from '@/features/editor/ui/PostEditor';
-import { usePostCreate } from '@/features/editor/lib/usePostCreate';
+import { PostCreateEditor } from '@/widgets/admin/ui/PostCreateEditor';
 
 export default function NewPostPage() {
-  const { handleSubmit, isSubmitting } = usePostCreate();
-
-  return (
-    <PostEditor
-      mode="create"
-      onSubmit={handleSubmit}
-      isSubmitting={isSubmitting}
-      autosaveKey="autosave-new-post"
-    />
-  );
+  return <PostCreateEditor />;
 }
