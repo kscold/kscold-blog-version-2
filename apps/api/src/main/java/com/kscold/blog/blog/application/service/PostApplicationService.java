@@ -41,63 +41,16 @@ public class PostApplicationService implements PostUseCase {
 
     /**
      * 포스트 생성
-     * - 슬러그 자동 생성 (제목 기반)
-     * - 카테고리 및 태그 검증
-     * - excerpt 자동 생성 (없는 경우)
-     * - PUBLISHED 상태면 publishedAt 설정
      */
     @Transactional
     public Post create(PostCreateCommand command, String userId) {
-        // 슬러그 생성
         String slug = command.getSlug() != null ? command.getSlug() : generateSlug(command.getTitle());
+        Post.CategoryInfo categoryInfo = resolveCategory(command.getCategoryId());
+        List<Post.TagInfo> tagInfos = resolveTags(command.getTagIds());
+        Post.AuthorInfo authorInfo = resolveAuthor(userId);
+        String excerpt = resolveExcerpt(command.getExcerpt(), command.getContent());
+        Post.SeoInfo seoInfo = buildSeoInfo(command, excerpt);
 
-        // 카테고리 검증 및 정보 추출
-        Category category = categoryRepository.findById(command.getCategoryId())
-                .orElseThrow(() -> ResourceNotFoundException.category(command.getCategoryId()));
-
-        Post.CategoryInfo categoryInfo = Post.CategoryInfo.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .slug(category.getSlug())
-                .build();
-
-        // 태그 검증 및 정보 추출 (배치 조회)
-        List<Post.TagInfo> tagInfos = new ArrayList<>();
-        if (command.getTagIds() != null && !command.getTagIds().isEmpty()) {
-            List<Tag> tags = tagRepository.findAllById(command.getTagIds());
-            if (tags.size() != command.getTagIds().size()) {
-                throw ResourceNotFoundException.tag("일부 태그를 찾을 수 없습니다");
-            }
-            for (Tag tag : tags) {
-                tagInfos.add(Post.TagInfo.builder()
-                        .id(tag.getId())
-                        .name(tag.getName())
-                        .build());
-            }
-        }
-
-        // 작성자 정보 추출 (UserQueryPort 사용)
-        UserInfo userInfo = userQueryPort.getUserById(userId);
-
-        Post.AuthorInfo authorInfo = Post.AuthorInfo.builder()
-                .id(userInfo.id())
-                .name(userInfo.displayName())
-                .build();
-
-        // excerpt 자동 생성 (없는 경우 content의 앞 200자)
-        String excerpt = command.getExcerpt();
-        if (excerpt == null || excerpt.isBlank()) {
-            excerpt = generateExcerpt(command.getContent());
-        }
-
-        // SEO 정보 생성
-        Post.SeoInfo seoInfo = Post.SeoInfo.builder()
-                .metaTitle(command.getMetaTitle() != null ? command.getMetaTitle() : command.getTitle())
-                .metaDescription(command.getMetaDescription() != null ? command.getMetaDescription() : excerpt)
-                .keywords(command.getKeywords())
-                .build();
-
-        // Post 생성
         Post post = Post.builder()
                 .title(command.getTitle())
                 .slug(slug)
@@ -115,19 +68,8 @@ public class PostApplicationService implements PostUseCase {
                 .publishedAt(command.getStatus() == Post.Status.PUBLISHED ? LocalDateTime.now() : null)
                 .build();
 
-        Post saved;
-        try {
-            saved = postRepository.save(post);
-        } catch (DuplicateKeyException e) {
-            throw DuplicateResourceException.slug(slug);
-        }
-
-        // postCount 업데이트
-        categoryRepository.incrementPostCount(categoryInfo.getId());
-        for (Post.TagInfo tagInfo : tagInfos) {
-            tagRepository.incrementPostCount(tagInfo.getId());
-        }
-
+        Post saved = saveWithSlugCheck(post, slug);
+        incrementPostCounts(categoryInfo, tagInfos);
         return saved;
     }
 
@@ -138,12 +80,12 @@ public class PostApplicationService implements PostUseCase {
     public Post update(String id, PostUpdateCommand command) {
         Post post = findById(id);
 
-        // 제목 수정
-        if (command.getTitle() != null) {
-            post.setTitle(command.getTitle());
-        }
+        if (command.getTitle() != null) post.setTitle(command.getTitle());
+        if (command.getContent() != null) post.setContent(command.getContent());
+        if (command.getExcerpt() != null) post.setExcerpt(command.getExcerpt());
+        if (command.getCoverImage() != null) post.setCoverImage(command.getCoverImage());
+        if (command.getFeatured() != null) post.setFeatured(command.getFeatured());
 
-        // 슬러그 수정 (중복 체크)
         if (command.getSlug() != null && !command.getSlug().equals(post.getSlug())) {
             if (postRepository.findBySlug(command.getSlug()).isPresent()) {
                 throw DuplicateResourceException.slug(command.getSlug());
@@ -151,71 +93,18 @@ public class PostApplicationService implements PostUseCase {
             post.setSlug(command.getSlug());
         }
 
-        // 내용 수정
-        if (command.getContent() != null) {
-            post.setContent(command.getContent());
-        }
-
-        // excerpt 수정
-        if (command.getExcerpt() != null) {
-            post.setExcerpt(command.getExcerpt());
-        }
-
-        // 커버 이미지 수정
-        if (command.getCoverImage() != null) {
-            post.setCoverImage(command.getCoverImage());
-        }
-
-        // 카테고리 수정
         if (command.getCategoryId() != null) {
-            Category category = categoryRepository.findById(command.getCategoryId())
-                    .orElseThrow(() -> ResourceNotFoundException.category(command.getCategoryId()));
-
-            post.setCategory(Post.CategoryInfo.builder()
-                    .id(category.getId())
-                    .name(category.getName())
-                    .slug(category.getSlug())
-                    .build());
+            post.setCategory(resolveCategory(command.getCategoryId()));
         }
 
-        // 태그 수정 (배치 조회)
         if (command.getTagIds() != null) {
-            List<Post.TagInfo> tagInfos = new ArrayList<>();
-            if (!command.getTagIds().isEmpty()) {
-                List<Tag> tags = tagRepository.findAllById(command.getTagIds());
-                for (Tag tag : tags) {
-                    tagInfos.add(Post.TagInfo.builder()
-                            .id(tag.getId())
-                            .name(tag.getName())
-                            .build());
-                }
-            }
-            post.setTags(tagInfos);
+            post.setTags(resolveTags(command.getTagIds()));
         }
 
-        // 상태 수정 (PUBLISHED로 변경 시 publishedAt 설정)
-        if (command.getStatus() != null) {
-            Post.Status oldStatus = post.getStatus();
-            post.setStatus(command.getStatus());
+        updatePostStatus(post, command.getStatus());
 
-            if (oldStatus != Post.Status.PUBLISHED && command.getStatus() == Post.Status.PUBLISHED) {
-                post.setPublishedAt(LocalDateTime.now());
-            }
-        }
-
-        // featured 수정
-        if (command.getFeatured() != null) {
-            post.setFeatured(command.getFeatured());
-        }
-
-        // SEO 정보 수정
         if (command.getMetaTitle() != null || command.getMetaDescription() != null || command.getKeywords() != null) {
-            Post.SeoInfo currentSeo = post.getSeo() != null ? post.getSeo() : new Post.SeoInfo();
-            post.setSeo(Post.SeoInfo.builder()
-                    .metaTitle(command.getMetaTitle() != null ? command.getMetaTitle() : currentSeo.getMetaTitle())
-                    .metaDescription(command.getMetaDescription() != null ? command.getMetaDescription() : currentSeo.getMetaDescription())
-                    .keywords(command.getKeywords() != null ? command.getKeywords() : currentSeo.getKeywords())
-                    .build());
+            post.setSeo(mergeSeoInfo(command, post.getSeo()));
         }
 
         return postRepository.save(post);
@@ -230,7 +119,6 @@ public class PostApplicationService implements PostUseCase {
         post.setStatus(Post.Status.ARCHIVED);
         postRepository.save(post);
 
-        // postCount 감소
         if (post.getCategory() != null) {
             categoryRepository.decrementPostCount(post.getCategory().getId());
         }
@@ -319,26 +207,89 @@ public class PostApplicationService implements PostUseCase {
         return postRepository.existsBySlug(slug);
     }
 
-    /**
-     * 슬러그 생성 (제목 -> kebab-case)
-     */
-    private String generateSlug(String title) {
-        return SlugUtils.generate(title);
+    // ── 헬퍼 메서드 ──────────────────────────────────────────────────────────
+
+    private Post.CategoryInfo resolveCategory(String categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> ResourceNotFoundException.category(categoryId));
+        return Post.CategoryInfo.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .slug(category.getSlug())
+                .build();
     }
 
-    /**
-     * excerpt 자동 생성 (content의 앞 200자)
-     */
-    private String generateExcerpt(String content) {
-        if (content == null || content.isBlank()) {
-            return "";
-        }
+    private List<Post.TagInfo> resolveTags(List<String> tagIds) {
+        List<Post.TagInfo> tagInfos = new ArrayList<>();
+        if (tagIds == null || tagIds.isEmpty()) return tagInfos;
 
+        List<Tag> tags = tagRepository.findAllById(tagIds);
+        if (tags.size() != tagIds.size()) {
+            throw ResourceNotFoundException.tag("일부 태그를 찾을 수 없습니다");
+        }
+        for (Tag tag : tags) {
+            tagInfos.add(Post.TagInfo.builder().id(tag.getId()).name(tag.getName()).build());
+        }
+        return tagInfos;
+    }
+
+    private Post.AuthorInfo resolveAuthor(String userId) {
+        UserInfo userInfo = userQueryPort.getUserById(userId);
+        return Post.AuthorInfo.builder()
+                .id(userInfo.id())
+                .name(userInfo.displayName())
+                .build();
+    }
+
+    private String resolveExcerpt(String excerpt, String content) {
+        if (excerpt != null && !excerpt.isBlank()) return excerpt;
+        if (content == null || content.isBlank()) return "";
         String plainText = content.replaceAll("[#*`\\[\\]()>-]", "").trim();
-        if (plainText.length() <= 200) {
-            return plainText;
-        }
+        return plainText.length() <= 200 ? plainText : plainText.substring(0, 200) + "...";
+    }
 
-        return plainText.substring(0, 200) + "...";
+    private Post.SeoInfo buildSeoInfo(PostCreateCommand cmd, String excerpt) {
+        return Post.SeoInfo.builder()
+                .metaTitle(cmd.getMetaTitle() != null ? cmd.getMetaTitle() : cmd.getTitle())
+                .metaDescription(cmd.getMetaDescription() != null ? cmd.getMetaDescription() : excerpt)
+                .keywords(cmd.getKeywords())
+                .build();
+    }
+
+    private Post saveWithSlugCheck(Post post, String slug) {
+        try {
+            return postRepository.save(post);
+        } catch (DuplicateKeyException e) {
+            throw DuplicateResourceException.slug(slug);
+        }
+    }
+
+    private void incrementPostCounts(Post.CategoryInfo cat, List<Post.TagInfo> tags) {
+        categoryRepository.incrementPostCount(cat.getId());
+        for (Post.TagInfo tagInfo : tags) {
+            tagRepository.incrementPostCount(tagInfo.getId());
+        }
+    }
+
+    private Post.SeoInfo mergeSeoInfo(PostUpdateCommand cmd, Post.SeoInfo current) {
+        Post.SeoInfo base = current != null ? current : new Post.SeoInfo();
+        return Post.SeoInfo.builder()
+                .metaTitle(cmd.getMetaTitle() != null ? cmd.getMetaTitle() : base.getMetaTitle())
+                .metaDescription(cmd.getMetaDescription() != null ? cmd.getMetaDescription() : base.getMetaDescription())
+                .keywords(cmd.getKeywords() != null ? cmd.getKeywords() : base.getKeywords())
+                .build();
+    }
+
+    private void updatePostStatus(Post post, Post.Status newStatus) {
+        if (newStatus == null) return;
+        Post.Status oldStatus = post.getStatus();
+        post.setStatus(newStatus);
+        if (oldStatus != Post.Status.PUBLISHED && newStatus == Post.Status.PUBLISHED) {
+            post.setPublishedAt(LocalDateTime.now());
+        }
+    }
+
+    private String generateSlug(String title) {
+        return SlugUtils.generate(title);
     }
 }
