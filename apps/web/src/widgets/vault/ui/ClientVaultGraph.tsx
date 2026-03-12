@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { GraphData } from '@/types/vault';
 
 interface ClientVaultGraphProps {
-  graphData: any; // 집계된 노드 타입이 불명확하여 any 사용
+  graphData: GraphData;
   activeNodeSlug?: string;
   onNodeClick?: (slug: string) => void;
   onFolderClick?: (folderId: string) => void;
