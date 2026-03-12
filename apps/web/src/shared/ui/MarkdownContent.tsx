@@ -26,40 +26,70 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
             const { className, children, ...rest } = props;
             const match = /language-(\w+)/.exec(className || '');
             const language = match ? match[1] : '';
-            const isBlock = Boolean(language);
+            // trailing \n 포함 여부로 블록/인라인 구분 (react-markdown v8 기준)
+            const isBlock = String(children).endsWith('\n') || String(children).includes('\n');
+            const codeText = String(children).replace(/\n$/, '');
 
-            return isBlock ? (
+            if (!isBlock) {
+              return (
+                <code
+                  className={`px-1.5 py-0.5 rounded-md text-sm font-mono ${
+                    isDark
+                      ? 'bg-surface-800/80 text-surface-200'
+                      : 'bg-surface-100 text-surface-800'
+                  }`}
+                  {...rest}
+                >
+                  {children}
+                </code>
+              );
+            }
+
+            // 언어 있는 블록 코드 → SyntaxHighlighter
+            if (language) {
+              return (
+                <div className="relative group my-6">
+                  <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(codeText);
+                      }}
+                      className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider bg-surface-800 text-surface-100 border border-surface-700 hover:bg-surface-700 hover:text-white rounded-md transition-colors"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <SyntaxHighlighter
+                    style={vscDarkPlus}
+                    language={language}
+                    PreTag="div"
+                    className="rounded-xl !bg-[#0f111a] !border !border-surface-200 dark:!border-surface-800 !my-0 !p-5 shadow-sm"
+                  >
+                    {codeText}
+                  </SyntaxHighlighter>
+                </div>
+              );
+            }
+
+            // 언어 없는 블록 코드 → 일반 pre 블록
+            return (
               <div className="relative group my-6">
                 <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(String(children).replace(/\n$/, ''));
+                      navigator.clipboard.writeText(codeText);
                     }}
                     className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider bg-surface-800 text-surface-100 border border-surface-700 hover:bg-surface-700 hover:text-white rounded-md transition-colors"
                   >
                     Copy
                   </button>
                 </div>
-                <SyntaxHighlighter
-                  style={vscDarkPlus}
-                  language={language}
-                  PreTag="div"
-                  className="rounded-xl !bg-[#0f111a] !border !border-surface-200 dark:!border-surface-800 !my-0 !p-5 shadow-sm"
-                >
-                  {String(children).replace(/\n$/, '')}
-                </SyntaxHighlighter>
+                <pre className="rounded-xl bg-[#0f111a] border border-surface-200 dark:border-surface-800 p-5 shadow-sm overflow-x-auto my-0">
+                  <code className="text-surface-200 text-sm font-mono whitespace-pre">
+                    {codeText}
+                  </code>
+                </pre>
               </div>
-            ) : (
-              <code
-                className={`px-1.5 py-0.5 rounded-md text-sm font-mono ${
-                  isDark
-                    ? 'bg-surface-800/80 text-surface-200'
-                    : 'bg-surface-100 text-surface-800'
-                }`}
-                {...rest}
-              >
-                {children}
-              </code>
             );
           },
           img: ({ src, alt }) => (
