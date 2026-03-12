@@ -2,7 +2,6 @@ package com.kscold.blog.vault.domain.service;
 
 import com.kscold.blog.util.SlugUtils;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
-import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +12,13 @@ import java.util.regex.Pattern;
  * 마크다운 컨텐츠에서 [[백링크]]를 파싱하여 참조 대상 노트 ID 목록을 추출하는 도메인 서비스
  * 순수 Java 객체 — Spring 빈 등록 금지
  */
-@RequiredArgsConstructor
 public class BacklinkParsingService {
 
     private final VaultNoteRepository vaultNoteRepository;
+
+    public BacklinkParsingService(VaultNoteRepository vaultNoteRepository) {
+        this.vaultNoteRepository = vaultNoteRepository;
+    }
 
     private static final Pattern BACKLINK_PATTERN = Pattern.compile("\\[\\[([^\\]]+)\\]\\]");
 
