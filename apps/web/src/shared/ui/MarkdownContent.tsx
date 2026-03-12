@@ -22,11 +22,13 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          code({ node, inline, className, children, ...props }: any) {
+          code(props) {
+            const { className, children, ...rest } = props;
             const match = /language-(\w+)/.exec(className || '');
             const language = match ? match[1] : '';
+            const isBlock = Boolean(language);
 
-            return !inline && language ? (
+            return isBlock ? (
               <div className="relative group my-6">
                 <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   <button
@@ -43,7 +45,6 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
                   language={language}
                   PreTag="div"
                   className="rounded-xl !bg-[#0f111a] !border !border-surface-200 dark:!border-surface-800 !my-0 !p-5 shadow-sm"
-                  {...props}
                 >
                   {String(children).replace(/\n$/, '')}
                 </SyntaxHighlighter>
@@ -55,7 +56,7 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
                     ? 'bg-surface-800/80 text-surface-200'
                     : 'bg-surface-100 text-surface-800'
                 }`}
-                {...props}
+                {...rest}
               >
                 {children}
               </code>

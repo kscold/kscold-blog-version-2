@@ -1,19 +1,14 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useVaultNoteById } from '@/entities/vault/api/useVault';
+import { useParams } from 'next/navigation';
 import VaultNoteEditor from '@/widgets/vault/ui/VaultNoteEditor';
+import { useVaultNoteEdit } from '@/features/vault/lib/useVaultNoteEdit';
 
 export default function EditVaultNotePage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
+  const { initialData, isLoading, isError } = useVaultNoteEdit(id);
 
-  const { data: note, isLoading, isError } = useVaultNoteById(id);
-
-  if (isError) {
-    router.push('/admin/vault');
-    return null;
-  }
+  if (isError) return null;
 
   if (isLoading) {
     return (
@@ -23,15 +18,7 @@ export default function EditVaultNotePage() {
     );
   }
 
-  if (!note) return null;
-
-  const initialData = {
-    title: note.title,
-    slug: note.slug,
-    content: note.content,
-    folderId: note.folderId,
-    tags: note.tags?.join(', ') || '',
-  };
+  if (!initialData) return null;
 
   return <VaultNoteEditor mode="edit" noteId={id} initialData={initialData} />;
 }
