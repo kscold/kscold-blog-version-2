@@ -1,12 +1,12 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useFeed } from '@/entities/feed/api/useFeeds';
 import FeedEditor from '@/features/feed/ui/FeedEditor';
+import { useFeedEdit } from '@/features/feed/lib/useFeedEdit';
 
 export default function EditFeedPage() {
   const { id } = useParams<{ id: string }>();
-  const { data: feed, isLoading } = useFeed(id);
+  const { initialData, isLoading, notFound } = useFeedEdit(id);
 
   if (isLoading) {
     return (
@@ -16,7 +16,7 @@ export default function EditFeedPage() {
     );
   }
 
-  if (!feed) {
+  if (notFound || !initialData) {
     return (
       <div className="min-h-screen bg-surface-50 flex items-center justify-center">
         <p className="text-surface-500">피드를 찾을 수 없습니다.</p>
@@ -27,10 +27,10 @@ export default function EditFeedPage() {
   return (
     <FeedEditor
       feedId={id}
-      initialContent={feed.content || ''}
-      initialImages={feed.images || []}
-      initialVisibility={feed.visibility || 'PUBLIC'}
-      initialLinkUrl={feed.linkPreview?.url || ''}
+      initialContent={initialData.content}
+      initialImages={initialData.images}
+      initialVisibility={initialData.visibility}
+      initialLinkUrl={initialData.linkUrl}
     />
   );
 }

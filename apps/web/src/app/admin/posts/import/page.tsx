@@ -2,15 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useCategories } from '@/entities/category/api/useCategories';
 import { useImportProcessor } from '@/features/import/lib/useImportProcessor';
 import { ImportFileList } from '@/features/import/ui/ImportFileList';
 
 export default function ImportPage() {
   const [globalCategoryId, setGlobalCategoryId] = useState('');
   const [globalPostStatus, setGlobalPostStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
-
-  const { data: categories } = useCategories();
 
   const {
     files,
@@ -99,7 +96,6 @@ export default function ImportPage() {
       {importStatus === 'previewing' && files.length > 0 && (
         <ImportFileList
           files={files}
-          categories={categories}
           globalCategoryId={globalCategoryId}
           globalPostStatus={globalPostStatus}
           onGlobalCategoryChange={setGlobalCategoryId}

@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
+import { VaultNoteComment } from '@/types/vault';
 import { useAlert } from '@/shared/model/alertStore';
 
 interface VaultCommentFormProps {
-  createComment: UseMutationResult<any, any, { authorName: string; authorPassword: string; content: string }, any>;
+  createComment: UseMutationResult<VaultNoteComment, Error, { authorName: string; authorPassword: string; content: string }, unknown>;
 }
 
 export function VaultCommentForm({ createComment }: VaultCommentFormProps) {

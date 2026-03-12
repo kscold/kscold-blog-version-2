@@ -1,16 +1,10 @@
 'use client';
 
+import { useCategories } from '@/entities/category/api/useCategories';
 import type { ParsedMarkdownFile } from '@/types/import';
-
-interface Category {
-  id: string;
-  name: string;
-  depth: number;
-}
 
 interface ImportFileListProps {
   files: ParsedMarkdownFile[];
-  categories: Category[] | undefined;
   globalCategoryId: string;
   globalPostStatus: 'DRAFT' | 'PUBLISHED';
   onGlobalCategoryChange: (value: string) => void;
@@ -23,7 +17,6 @@ interface ImportFileListProps {
 
 export function ImportFileList({
   files,
-  categories,
   globalCategoryId,
   globalPostStatus,
   onGlobalCategoryChange,
@@ -33,6 +26,8 @@ export function ImportFileList({
   onImportAll,
   onReset,
 }: ImportFileListProps) {
+  const { data: categories } = useCategories();
+
   return (
     <div className="space-y-8">
       {/* 전역 설정 */}
