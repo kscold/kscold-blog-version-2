@@ -7,10 +7,43 @@ interface VaultNoteContentProps {
 }
 
 export function VaultNoteContent({ note, theme = 'light' }: VaultNoteContentProps) {
-  // 옵시디언 스타일 백링크 [[제목]] → 마크다운 링크 변환
+  // 옵시디언 마크다운 문법 → 표준 마크다운 변환
   const processContent = (rawContent: string) => {
-    return rawContent.replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
-      // 백엔드 SlugUtils 기준 슬러그 변환 (소문자, 공백→하이픈)
+    let content = rawContent;
+
+    // YAML frontmatter 제거 (노트가 직접 삽입된 경우 대비)
+    content = content.replace(/^---[\s\S]*?---\n?/, '');
+
+    // 옵시디언 callout: > [!NOTE] 제목 → > **참고**: 제목
+    const calloutTypeMap: Record<string, string> = {
+      NOTE: '참고', TIP: '팁', INFO: '정보', IMPORTANT: '중요',
+      WARNING: '주의', CAUTION: '주의', DANGER: '위험', BUG: '버그',
+      EXAMPLE: '예시', QUOTE: '인용', SUMMARY: '요약', ABSTRACT: '요약',
+    };
+    content = content.replace(/^> \[!(\w+)\]\+?\s*(.*?)$/gm, (_, type, title) => {
+      const label = calloutTypeMap[type.toUpperCase()] ?? type;
+      return title.trim() ? `> **[${label}]** ${title.trim()}` : `> **[${label}]**`;
+    });
+
+    // ==highlight== → **highlight** (볼드로 대체)
+    content = content.replace(/==([^=\n]+)==/g, '**$1**');
+
+    // ![[이미지.ext]] → 이미지 마크다운으로 변환
+    content = content.replace(
+      /!\[\[([^\]]+\.(png|jpg|jpeg|gif|webp|svg))\]\]/gi,
+      (_, filename) => `![${filename}](${filename})`,
+    );
+
+    // ![[비이미지 embed]] → 제거
+    content = content.replace(/!\[\[([^\]]+)\]\]/g, '');
+
+    // [[link|display]] → [**display**]
+    content = content.replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, (_, _link, display) => {
+      return `[**${display}**]`;
+    });
+
+    // [[link]] → [**link**](/vault/slug)
+    content = content.replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
       const slug = title
         .toLowerCase()
         .trim()
@@ -18,6 +51,8 @@ export function VaultNoteContent({ note, theme = 'light' }: VaultNoteContentProp
         .replace(/[^\w\u3131-\uD79D-]/g, '');
       return `[**${title}**](/vault/${slug})`;
     });
+
+    return content;
   };
 
   const parsedContent = processContent(note.content);
