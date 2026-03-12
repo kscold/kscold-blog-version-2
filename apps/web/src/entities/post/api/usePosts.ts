@@ -17,7 +17,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     queryKey: ['posts', { page, size, sortBy, sortDirection }],
     queryFn: () =>
       apiClient.get<PageResponse<Post>>(
-        `/posts?page=${page}&size=${size}&sort=${sortBy},${sortDirection}`
+        `/posts?page=${page}&size=${size}&sortBy=${sortBy}&sortDirection=${sortDirection}`
       ),
   });
 }
