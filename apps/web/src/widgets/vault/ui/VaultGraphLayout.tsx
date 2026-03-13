@@ -11,7 +11,7 @@ export function VaultGraphLayout() {
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const { folders, isFoldersLoading, isGraphLoading, filteredGraph, colorMap } =
+  const { folders, isFoldersLoading, isGraphLoading, isGraphError, graphError, filteredGraph, colorMap } =
     useVaultGraphData(activeFolderId);
 
   return (
@@ -66,7 +66,7 @@ export function VaultGraphLayout() {
           </div>
         )}
 
-        {isGraphLoading ? (
+        {(isGraphLoading || isFoldersLoading) ? (
           <div className="w-full h-full flex items-center justify-center relative overflow-hidden bg-surface-50/50 dark:bg-surface-950/50 backdrop-blur-md">
             <div className="w-8 h-8 border-2 border-surface-300 dark:border-surface-700 border-t-surface-900 dark:border-t-white rounded-full animate-spin" />
           </div>
