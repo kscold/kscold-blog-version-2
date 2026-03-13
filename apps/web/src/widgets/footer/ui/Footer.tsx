@@ -41,9 +41,9 @@ export function Footer() {
               by KSCOLD
             </p>
             <p className="mt-4 text-sm text-surface-500 font-light leading-relaxed max-w-sm text-balance">
-              Crafting digital products with precision.
+              지식을 기록하고, 기록을 연결하고,
               <br />
-              <span className="text-surface-700 font-medium">Enjoying the Learning Curve.</span>
+              <span className="text-surface-700 font-medium">연결을 공유합니다.</span>
             </p>
           </div>
 
