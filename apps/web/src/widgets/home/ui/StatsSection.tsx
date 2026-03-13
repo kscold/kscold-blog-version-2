@@ -100,11 +100,17 @@ export function StatsSection() {
                 {stat.label}
               </p>
               <div className="flex items-end gap-1 my-2">
-                <span className="text-4xl font-black tabular-nums text-surface-900">
-                  {stat.value !== null && stat.value > 0 ? stat.value.toLocaleString() : '—'}
-                </span>
-                {stat.suffix && (
-                  <span className="text-lg font-bold text-surface-400 mb-1">{stat.suffix}</span>
+                {stat.value !== null && stat.value > 0 ? (
+                  <>
+                    <span className="text-4xl font-black tabular-nums text-surface-900">
+                      {stat.value.toLocaleString()}
+                    </span>
+                    {stat.suffix && (
+                      <span className="text-lg font-bold text-surface-400 mb-1">{stat.suffix}</span>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-4xl font-black tabular-nums text-surface-300">—</span>
                 )}
               </div>
               <p className="text-xs text-surface-400">{stat.description}</p>
