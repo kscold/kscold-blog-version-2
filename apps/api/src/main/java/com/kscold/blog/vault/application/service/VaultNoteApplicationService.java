@@ -198,6 +198,25 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     }
 
     /**
+     * 전체 노트의 outgoingLinks 재인덱싱 (일괄 임포트 후 백링크 복원용)
+     */
+    @Transactional
+    public int reindexAllLinks() {
+        List<VaultNote> allNotes = vaultNoteRepository.findAll();
+        int updated = 0;
+        for (VaultNote note : allNotes) {
+            List<String> links = backlinkParsingService.parseBacklinks(note.getContent());
+            if (!links.equals(note.getOutgoingLinks())) {
+                note.setOutgoingLinks(links);
+                vaultNoteRepository.save(note);
+                updated++;
+            }
+        }
+        log.info("reindexAllLinks 완료: {}건 업데이트", updated);
+        return updated;
+    }
+
+    /**
      * 댓글 수 원자적 증가
      */
     public void incrementCommentCount(String noteId) {

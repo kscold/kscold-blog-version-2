@@ -34,4 +34,6 @@ public interface VaultNoteUseCase {
     void incrementCommentCount(String noteId);
 
     void decrementCommentCount(String noteId);
+
+    int reindexAllLinks();
 }
