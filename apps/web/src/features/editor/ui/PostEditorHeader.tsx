@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import type { OnMount } from '@monaco-editor/react';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import { MarkdownToolbar } from '@/features/editor/ui/MarkdownToolbar';
-import type { PostFormData } from '@/features/editor/ui/PostEditor';
+import type { PostFormData } from '@/features/editor/model/types';
 
 const Editor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
 
