@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { TagSelector } from '@/features/editor/ui/TagSelector';
 import { ImageUpload } from '@/shared/ui/ImageUpload';
-import type { PostFormData } from '@/features/editor/ui/PostEditor';
+import type { PostFormData } from '@/features/editor/model/types';
 
 interface Category {
   id: string;
