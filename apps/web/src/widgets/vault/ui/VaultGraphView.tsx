@@ -93,24 +93,68 @@ export function VaultGraphView({
   }, [activeNodeSlug, hoverNode?.id, folderColorMap, theme]);
 
   const linkCanvasObject = useCallback((link: GraphLink, ctx: CanvasRenderingContext2D) => {
-    if (!hoverNode) return;
-    const srcId = typeof link.source === 'object' ? link.source?.id : link.source;
-    const tgtId = typeof link.target === 'object' ? link.target?.id : link.target;
-    if (srcId !== hoverNode.id && tgtId !== hoverNode.id) return;
     const src = link.source;
     const tgt = link.target;
     if (typeof src !== 'object' || typeof tgt !== 'object') return;
     if (src.x == null || src.y == null || tgt.x == null || tgt.y == null) return;
     if (!isFinite(src.x) || !isFinite(src.y) || !isFinite(tgt.x) || !isFinite(tgt.y)) return;
+
+    const srcNode = src as GraphNode;
+    const tgtNode = tgt as GraphNode;
+    const isHovered = hoverNode && (srcNode.id === hoverNode.id || tgtNode.id === hoverNode.id);
+
+    const srcColor = folderColorMap[srcNode.folderId ?? ''] || '#64C8FF';
+    const tgtColor = folderColorMap[tgtNode.folderId ?? ''] || srcColor;
+
+    // 곡선 제어점 계산 (시냅스 곡선 효과)
+    const dx = tgt.x - src.x;
+    const dy = tgt.y - src.y;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    const curve = len * 0.18;
+    const cx = (src.x + tgt.x) / 2 - (dy / len) * curve;
+    const cy = (src.y + tgt.y) / 2 + (dx / len) * curve;
+
     ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(src.x, src.y);
-    ctx.lineTo(tgt.x, tgt.y);
-    ctx.strokeStyle = 'rgba(100, 200, 255, 0.12)';
-    ctx.lineWidth = 6;
-    ctx.stroke();
+
+    if (isHovered) {
+      // 외부 글로우
+      ctx.beginPath();
+      ctx.moveTo(src.x, src.y);
+      ctx.quadraticCurveTo(cx, cy, tgt.x, tgt.y);
+      ctx.strokeStyle = srcColor + '40';
+      ctx.lineWidth = 10;
+      ctx.shadowColor = srcColor;
+      ctx.shadowBlur = 20;
+      ctx.stroke();
+
+      // 그라디언트 메인 라인
+      const grad = ctx.createLinearGradient(src.x, src.y, tgt.x, tgt.y);
+      grad.addColorStop(0, srcColor + 'ee');
+      grad.addColorStop(1, tgtColor + 'ee');
+      ctx.beginPath();
+      ctx.moveTo(src.x, src.y);
+      ctx.quadraticCurveTo(cx, cy, tgt.x, tgt.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = srcColor;
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+    } else {
+      // 기본: 희미한 곡선 + 그라디언트
+      const grad = ctx.createLinearGradient(src.x, src.y, tgt.x, tgt.y);
+      grad.addColorStop(0, srcColor + '55');
+      grad.addColorStop(0.5, srcColor + '33');
+      grad.addColorStop(1, tgtColor + '55');
+      ctx.beginPath();
+      ctx.moveTo(src.x, src.y);
+      ctx.quadraticCurveTo(cx, cy, tgt.x, tgt.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
     ctx.restore();
-  }, [hoverNode]);
+  }, [hoverNode, folderColorMap]);
 
   return (
     <div
@@ -125,13 +169,11 @@ export function VaultGraphView({
         nodeLabel={() => ''}
         nodeColor={(node: NodeObject) => folderColorMap[(node as unknown as GraphNode).folderId ?? ''] || '#64C8FF'}
         nodeRelSize={4}
-        linkWidth={(link: GraphLink) => (isLinkHovered(link) ? 2.5 : 0.8)}
-        linkColor={(link: GraphLink) =>
-          isLinkHovered(link) ? 'rgba(100, 200, 255, 0.5)' : 'rgba(255, 255, 255, 0.04)'
-        }
-        linkDirectionalParticles={3}
-        linkDirectionalParticleWidth={(link: GraphLink) => (isLinkHovered(link) ? 3 : 1.2)}
-        linkDirectionalParticleSpeed={0.004}
+        linkWidth={() => 0}
+        linkColor={() => 'transparent'}
+        linkDirectionalParticles={(link: GraphLink) => (isLinkHovered(link) ? 8 : 4)}
+        linkDirectionalParticleWidth={(link: GraphLink) => (isLinkHovered(link) ? 4 : 2.5)}
+        linkDirectionalParticleSpeed={0.006}
         linkDirectionalParticleColor={(link: GraphLink) => {
           const sourceNode = typeof link.source === 'object' ? link.source : null;
           const folderId =
@@ -141,13 +183,18 @@ export function VaultGraphView({
             )?.folderId;
           return folderColorMap[folderId ?? ''] || '#64C8FF';
         }}
-        linkCanvasObjectMode={() => 'after'}
+        linkCanvasObjectMode={() => 'replace'}
         linkCanvasObject={linkCanvasObject}
         onNodeClick={handleNodeClick}
-        d3AlphaDecay={0.01}
-        d3VelocityDecay={0.2}
-        warmupTicks={200}
-        cooldownTicks={300}
+        d3AlphaDecay={0.003}
+        d3VelocityDecay={0.35}
+        warmupTicks={80}
+        cooldownTicks={Infinity}
+        onEngineStop={() => {
+          setTimeout(() => {
+            fgRef.current?.d3ReheatSimulation();
+          }, 3000);
+        }}
         nodeCanvasObject={nodeCanvasObject}
         nodePointerAreaPaint={renderNodeHitArea}
         onNodeHover={node => {
