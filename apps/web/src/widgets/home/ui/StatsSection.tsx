@@ -14,13 +14,13 @@ interface GitHubStats {
   weeks: { contributionDays: { date: string; contributionCount: number }[] }[];
 }
 
-// 기여 수 → 색상 강도 (라이트 테마 기준)
+// 기여 수 → 모노톤 그레이 강도
 function getColor(count: number): string {
-  if (count === 0) return '#ebedf0';
-  if (count <= 3) return '#9be9a8';
-  if (count <= 6) return '#40c463';
-  if (count <= 9) return '#30a14e';
-  return '#216e39';
+  if (count === 0) return '#e5e7eb';
+  if (count <= 3) return '#9ca3af';
+  if (count <= 6) return '#6b7280';
+  if (count <= 9) return '#374151';
+  return '#111827';
 }
 
 export function StatsSection() {
@@ -43,33 +43,9 @@ export function StatsSection() {
   const recentWeeks = github?.weeks?.slice(-26) ?? [];
 
   const stats = [
-    {
-      label: 'Vault Notes',
-      value: noteCount,
-      suffix: '개',
-      description: '지식 노드',
-      color: 'from-violet-500/10 to-purple-500/5',
-      border: 'border-violet-200',
-      text: 'text-violet-700',
-    },
-    {
-      label: 'Blog Posts',
-      value: postCount,
-      suffix: '편',
-      description: '발행된 글',
-      color: 'from-blue-500/10 to-cyan-500/5',
-      border: 'border-blue-200',
-      text: 'text-blue-700',
-    },
-    {
-      label: 'Contributions',
-      value: commitCount,
-      suffix: '',
-      description: `${new Date().getFullYear()}년 기여`,
-      color: 'from-emerald-500/10 to-green-500/5',
-      border: 'border-emerald-200',
-      text: 'text-emerald-700',
-    },
+    { label: 'Vault Notes', value: noteCount, suffix: '개', description: '지식 노드' },
+    { label: 'Blog Posts',  value: postCount,  suffix: '편', description: '발행된 글' },
+    { label: 'Contributions', value: commitCount, suffix: '', description: `${new Date().getFullYear()}년 기여` },
   ];
 
   return (
@@ -97,7 +73,7 @@ export function StatsSection() {
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              className={`relative rounded-2xl border ${stat.border} bg-gradient-to-br ${stat.color} p-6 overflow-hidden`}
+              className="rounded-2xl border border-surface-200 bg-surface-50 p-6"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -107,14 +83,14 @@ export function StatsSection() {
                 {stat.label}
               </p>
               <div className="flex items-end gap-1 my-2">
-                <span className={`text-4xl font-black tabular-nums ${stat.text}`}>
+                <span className="text-4xl font-black tabular-nums text-surface-900">
                   {stat.value !== null ? stat.value.toLocaleString() : '—'}
                 </span>
                 {stat.suffix && (
                   <span className="text-lg font-bold text-surface-400 mb-1">{stat.suffix}</span>
                 )}
               </div>
-              <p className="text-xs text-surface-500">{stat.description}</p>
+              <p className="text-xs text-surface-400">{stat.description}</p>
             </motion.div>
           ))}
         </div>
@@ -147,7 +123,7 @@ export function StatsSection() {
               <div className="flex gap-[3px] min-w-max">
                 {recentWeeks.map((week, wi) => (
                   <div key={wi} className="flex flex-col gap-[3px]">
-                    {week.contributionDays.map((day) => (
+                    {week.contributionDays.map(day => (
                       <div
                         key={day.date}
                         className="w-3 h-3 rounded-sm cursor-default transition-transform hover:scale-125"
@@ -164,11 +140,7 @@ export function StatsSection() {
             <div className="flex items-center gap-1.5 mt-3 justify-end">
               <span className="text-[10px] text-surface-400">Less</span>
               {[0, 3, 6, 9, 12].map(v => (
-                <div
-                  key={v}
-                  className="w-2.5 h-2.5 rounded-sm"
-                  style={{ backgroundColor: getColor(v) }}
-                />
+                <div key={v} className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: getColor(v) }} />
               ))}
               <span className="text-[10px] text-surface-400">More</span>
             </div>
