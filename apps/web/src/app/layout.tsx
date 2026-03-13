@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     default: '김승찬 블로그',
     template: '%s | 김승찬 블로그',
   },
-  description: '김승찬 일상 개발 블로그',
+  description: '배운 것을 기록하고, 기록을 연결합니다. 개발 공부와 일상을 쌓아가는 공간.',
   keywords: [
     '김승찬',
     'kscold',
@@ -26,15 +26,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: 'https://blog.kscold.com',
+    url: 'https://kscold.com',
     title: '김승찬 블로그',
-    description: '도도하고 미술관 같은 개발 블로그',
+    description: '배운 것을 기록하고, 기록을 연결합니다. 개발 공부와 일상을 쌓아가는 공간.',
     siteName: '김승찬 블로그',
   },
   twitter: {
     card: 'summary_large_image',
     title: '김승찬 블로그',
-    description: '도도하고 미술관 같은 개발 블로그',
+    description: '배운 것을 기록하고, 기록을 연결합니다. 개발 공부와 일상을 쌓아가는 공간.',
   },
   robots: {
     index: true,
