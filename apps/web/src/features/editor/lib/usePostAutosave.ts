@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { PostFormData } from '@/features/editor/ui/PostEditor';
+import type { PostFormData } from '@/features/editor/model/types';
 
 interface UsePostAutosaveOptions {
   autosaveKey: string;

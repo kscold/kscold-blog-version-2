@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { useAdminPost, useUpdatePost } from '@/entities/post/api/usePosts';
 import { useAlert } from '@/shared/model/alertStore';
-import type { PostFormData } from '@/features/editor/ui/PostEditor';
+import type { PostFormData } from '@/features/editor/model/types';
 
 export function usePostEdit(postId: string) {
   const router = useRouter();

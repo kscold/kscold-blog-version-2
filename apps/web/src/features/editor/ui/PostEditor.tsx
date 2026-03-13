@@ -8,21 +8,9 @@ import { PostEditorHeader } from '@/features/editor/ui/PostEditorHeader';
 import { PostEditorSidebar } from '@/features/editor/ui/PostEditorSidebar';
 import type { ViewMode } from '@/features/editor/ui/PostEditorHeader';
 import { useAlert } from '@/shared/model/alertStore';
+import type { PostFormData } from '@/features/editor/model/types';
 
-export interface PostFormData {
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string;
-  coverImage: string;
-  categoryId: string;
-  tagIds: string[];
-  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-  featured: boolean;
-  metaTitle: string;
-  metaDescription: string;
-  keywords: string;
-}
+export type { PostFormData };
 
 interface PostEditorProps {
   mode: 'create' | 'edit';
