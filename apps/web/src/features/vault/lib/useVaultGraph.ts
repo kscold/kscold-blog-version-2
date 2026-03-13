@@ -4,7 +4,7 @@ import { buildFolderColorMap, getAggregatedGraph } from '@/entities/vault/lib/va
 
 export function useVaultGraphData(activeFolderId: string | null) {
   const { data: folders, isLoading: isFoldersLoading } = useVaultFolders();
-  const { data: graphData, isLoading: isGraphLoading } = useVaultGraphQuery();
+  const { data: graphData, isLoading: isGraphLoading, isError: isGraphError, error: graphError } = useVaultGraphQuery();
 
   const { filteredGraph, colorMap } = useMemo(() => {
     const fList = folders || [];
@@ -18,6 +18,8 @@ export function useVaultGraphData(activeFolderId: string | null) {
     folders: folders || [],
     isFoldersLoading,
     isGraphLoading,
+    isGraphError,
+    graphError,
     filteredGraph,
     colorMap,
   };

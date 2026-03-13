@@ -33,6 +33,18 @@ export function buildFolderColorMap(folders: VaultFolder[]): Record<string, stri
   return map;
 }
 
+// 중첩 트리에서 ID로 폴더 찾기
+export function findFolderById(folders: VaultFolder[], id: string): VaultFolder | null {
+  for (const f of folders) {
+    if (f.id === id) return f;
+    if (f.children) {
+      const found = findFolderById(f.children, id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
 // 특정 폴더의 모든 하위 폴더 ID 반환
 export function getSubfolderIds(folders: VaultFolder[], targetId: string): string[] {
   let ids: string[] = [];
@@ -104,78 +116,125 @@ export function getAggregatedGraph(
 ): { nodes: GraphNode[]; links: GraphLink[] } {
   if (!rawGraph) return { nodes: [], links: [] };
 
-  const directSubfolders =
-    activeFolderId === null
-      ? folders.filter(f => !f.parent)
-      : folders.find(f => f.id === activeFolderId)?.children || [];
-
-  const nodeMapping = new Map<string, string>();
   const aggregatedNodes: GraphNode[] = [];
+  const aggregatedLinks: GraphLink[] = [];
 
-  // 하위 폴더 매핑
-  for (const subfolder of directSubfolders) {
-    const descendantIds = getSubfolderIds(folders, subfolder.id);
-    const notesInside = rawGraph.nodes.filter(
-      n => n.folderId && descendantIds.includes(n.folderId)
-    );
+  if (activeFolderId === null) {
+    // ── 루트 뷰: 루트 폴더 + 바로 아래 자식 폴더까지 2레벨 표시 ──
+    const rootFolders = folders.filter(f => !f.parent);
 
-    for (const node of notesInside) {
-      nodeMapping.set(node.id, subfolder.id);
-    }
+    for (const root of rootFolders) {
+      const rootDescendantIds = getSubfolderIds(folders, root.id);
+      const notesInRoot = rawGraph.nodes.filter(
+        n => n.folderId && rootDescendantIds.includes(n.folderId)
+      );
+      if (notesInRoot.length === 0 && !(root.children && root.children.length > 0)) continue;
 
-    const hasChildren = subfolder.children && subfolder.children.length > 0;
-
-    // 노트가 있거나 자식 서브폴더가 있을 때만 폴더 노드 표시
-    if (notesInside.length > 0 || hasChildren) {
       aggregatedNodes.push({
-        id: subfolder.id,
-        name: subfolder.name,
+        id: root.id,
+        name: root.name,
         slug: '',
         size: 0,
-        val: Math.max(10, notesInside.length * 2 + (hasChildren ? 5 : 0)),
-        folderId: subfolder.id,
+        val: Math.min(50, Math.max(12, Math.log(notesInRoot.length + 1) * 8 + 5)),
+        folderId: root.id,
         isFolder: true,
       });
-    }
-  }
 
-  // 직접 소속 노트 매핑
-  for (const node of rawGraph.nodes) {
-    if ((node.folderId || null) === activeFolderId) {
-      nodeMapping.set(node.id, node.id);
-      aggregatedNodes.push({
-        ...node,
-        val: node.size || 1,
-        isFolder: false,
-      });
-    }
-  }
+      // 직속 자식 폴더도 노드로 추가 + 루트→자식 링크 생성
+      for (const child of root.children || []) {
+        const childDescendantIds = getSubfolderIds(folders, child.id);
+        const notesInChild = rawGraph.nodes.filter(
+          n => n.folderId && childDescendantIds.includes(n.folderId)
+        );
+        if (notesInChild.length === 0 && !(child.children && child.children.length > 0)) continue;
 
-  // 링크 집계
-  const aggregatedLinks: GraphLink[] = [];
-  const linkSet = new Set<string>();
-
-  for (const link of rawGraph.links) {
-    const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-    const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-
-    const aggSource = nodeMapping.get(sourceId);
-    const aggTarget = nodeMapping.get(targetId);
-
-    if (aggSource && aggTarget && aggSource !== aggTarget) {
-      const linkKey = `${aggSource}->${aggTarget}`;
-      if (!linkSet.has(linkKey)) {
-        linkSet.add(linkKey);
-        aggregatedLinks.push({
-          source: aggSource,
-          target: aggTarget,
+        aggregatedNodes.push({
+          id: child.id,
+          name: child.name,
+          slug: '',
+          size: 0,
+          val: Math.min(35, Math.max(8, Math.log(notesInChild.length + 1) * 6 + 3)),
+          folderId: root.id, // 부모 색상 상속
+          isFolder: true,
         });
+
+        aggregatedLinks.push({ source: root.id, target: child.id });
       }
     }
+
+    return { nodes: aggregatedNodes, links: aggregatedLinks };
   }
 
-  return {
-    nodes: aggregatedNodes,
-    links: aggregatedLinks,
-  };
+  // ── 폴더 뷰: 허브 + 자식 폴더 + 직접 노트 (Obsidian 스타일) ──────
+  const currentFolder = findFolderById(folders, activeFolderId);
+  const directChildren = currentFolder?.children || [];
+
+  // 현재 폴더를 중앙 허브로 추가
+  if (currentFolder) {
+    const allDescendantIds = getSubfolderIds(folders, activeFolderId);
+    const totalNotes = rawGraph.nodes.filter(
+      n => n.folderId && allDescendantIds.includes(n.folderId)
+    ).length;
+    aggregatedNodes.push({
+      id: activeFolderId,
+      name: currentFolder.name,
+      slug: '',
+      size: 0,
+      val: Math.min(50, Math.max(20, Math.log(totalNotes + 1) * 7 + 5)),
+      folderId: activeFolderId,
+      isFolder: true,
+    });
+  }
+
+  const addedNodeIds = new Set<string>([activeFolderId]);
+
+  // 직속 자식 폴더 → 허브에 연결
+  for (const child of directChildren) {
+    const childDescIds = getSubfolderIds(folders, child.id);
+    const notesInChild = rawGraph.nodes.filter(
+      n => n.folderId && childDescIds.includes(n.folderId)
+    );
+    if (notesInChild.length === 0 && !(child.children && child.children.length > 0)) continue;
+
+    aggregatedNodes.push({
+      id: child.id,
+      name: child.name,
+      slug: '',
+      size: 0,
+      val: Math.min(30, Math.max(10, Math.log(notesInChild.length + 1) * 5 + 3)),
+      folderId: activeFolderId,
+      isFolder: true,
+    });
+    addedNodeIds.add(child.id);
+    aggregatedLinks.push({ source: activeFolderId, target: child.id });
+
+    // 자식 폴더의 노트들 → 자식 폴더에 연결 (최대 30개 per subfolder, 성능)
+    const sample = notesInChild.slice(0, 30);
+    for (const note of sample) {
+      aggregatedNodes.push({ ...note, val: Math.max(4, (note.size || 1) + 3), isFolder: false });
+      addedNodeIds.add(note.id);
+      aggregatedLinks.push({ source: child.id, target: note.id });
+    }
+  }
+
+  // 현재 폴더에 직접 소속된 노트 → 허브에 연결
+  const directNotes = rawGraph.nodes.filter(n => n.folderId === activeFolderId);
+  for (const note of directNotes.slice(0, 50)) {
+    if (!addedNodeIds.has(note.id)) {
+      aggregatedNodes.push({ ...note, val: Math.max(4, (note.size || 1) + 3), isFolder: false });
+      addedNodeIds.add(note.id);
+      aggregatedLinks.push({ source: activeFolderId, target: note.id });
+    }
+  }
+
+  // note→note 실제 링크 추가 (API에 있을 경우)
+  for (const link of rawGraph.links) {
+    const srcId = typeof link.source === 'object' ? link.source.id : link.source;
+    const tgtId = typeof link.target === 'object' ? link.target.id : link.target;
+    if (addedNodeIds.has(srcId) && addedNodeIds.has(tgtId)) {
+      aggregatedLinks.push({ source: srcId, target: tgtId });
+    }
+  }
+
+  return { nodes: aggregatedNodes, links: aggregatedLinks };
 }
