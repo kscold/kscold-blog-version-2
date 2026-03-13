@@ -114,4 +114,11 @@ public class VaultNoteController {
         vaultNoteUseCase.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/reindex-links")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<String>> reindexLinks() {
+        int updated = vaultNoteUseCase.reindexAllLinks();
+        return ResponseEntity.ok(ApiResponse.success(updated + "건의 노트 링크가 재인덱싱되었습니다"));
+    }
 }
