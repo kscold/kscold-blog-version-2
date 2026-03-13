@@ -6,12 +6,15 @@ import { motion } from 'framer-motion';
 import { useVaultGraph } from '@/entities/vault/api/useVault';
 import { usePosts } from '@/entities/post/api/usePosts';
 
+interface ContributionDay {
+  date: string;
+  contributionCount: number;
+}
+
 interface GitHubStats {
-  totalContributions: number;
-  totalCommits: number;
-  totalPRs: number;
-  repos: number;
-  weeks: { contributionDays: { date: string; contributionCount: number }[] }[];
+  total: number;
+  // 날짜별 배열 (jogruber API: contributions[])
+  days: ContributionDay[];
 }
 
 // 기여 수 → 모노톤 그레이 강도
@@ -23,29 +26,43 @@ function getColor(count: number): string {
   return '#111827';
 }
 
+// 일(day) 배열을 7행 × N열 주(week) 2D 배열로 변환
+function groupByWeek(days: ContributionDay[]): ContributionDay[][] {
+  const weeks: ContributionDay[][] = [];
+  for (let i = 0; i < days.length; i += 7) {
+    weeks.push(days.slice(i, i + 7));
+  }
+  return weeks;
+}
+
 export function StatsSection() {
   const [github, setGithub] = useState<GitHubStats | null>(null);
   const { data: graphData } = useVaultGraph();
   const { data: postsData } = usePosts({ page: 0, size: 1 });
 
   useEffect(() => {
-    fetch('/api/github/stats')
+    const year = new Date().getFullYear();
+    fetch(`https://github-contributions-api.jogruber.de/v4/kscold?y=${year}`)
       .then(r => r.json())
-      .then(setGithub)
+      .then(d => setGithub({
+        total: d.total?.[year] ?? 0,
+        days: d.contributions ?? [],
+      }))
       .catch(() => {});
   }, []);
 
   const noteCount = graphData?.nodes?.length ?? null;
   const postCount = postsData?.totalElements ?? null;
-  const commitCount = github?.totalContributions ?? null;
+  const commitCount = github?.total ?? null;
 
   // 최근 26주만 표시
-  const recentWeeks = github?.weeks?.slice(-26) ?? [];
+  const allWeeks = groupByWeek(github?.days ?? []);
+  const recentWeeks = allWeeks.slice(-26);
 
   const stats = [
-    { label: 'Vault Notes', value: noteCount, suffix: '개', description: '지식 노드' },
-    { label: 'Blog Posts',  value: postCount,  suffix: '편', description: '발행된 글' },
-    { label: 'Contributions', value: commitCount, suffix: '', description: `${new Date().getFullYear()}년 기여` },
+    { label: 'Vault Notes',   value: noteCount,   suffix: '개', description: '지식 노드' },
+    { label: 'Blog Posts',    value: postCount,    suffix: '편', description: '발행된 글' },
+    { label: 'Contributions', value: commitCount,  suffix: '',   description: `${new Date().getFullYear()}년 기여` },
   ];
 
   return (
@@ -84,7 +101,7 @@ export function StatsSection() {
               </p>
               <div className="flex items-end gap-1 my-2">
                 <span className="text-4xl font-black tabular-nums text-surface-900">
-                  {stat.value !== null ? stat.value.toLocaleString() : '—'}
+                  {stat.value !== null && stat.value > 0 ? stat.value.toLocaleString() : '—'}
                 </span>
                 {stat.suffix && (
                   <span className="text-lg font-bold text-surface-400 mb-1">{stat.suffix}</span>
@@ -123,7 +140,7 @@ export function StatsSection() {
               <div className="flex gap-[3px] min-w-max">
                 {recentWeeks.map((week, wi) => (
                   <div key={wi} className="flex flex-col gap-[3px]">
-                    {week.contributionDays.map(day => (
+                    {week.map(day => (
                       <div
                         key={day.date}
                         className="w-3 h-3 rounded-sm cursor-default transition-transform hover:scale-125"
