@@ -9,9 +9,9 @@ import { VaultNoteContent } from '@/entities/vault/ui/VaultNoteContent';
 import { BacklinkList } from '@/entities/vault/ui/BacklinkList';
 import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
 
-const MIN_SIDEBAR_WIDTH = 160;
-const MAX_SIDEBAR_WIDTH = 480;
-const DEFAULT_SIDEBAR_WIDTH = 224;
+const MIN_SIDEBAR_WIDTH = 200;
+const MAX_SIDEBAR_WIDTH = 560;
+const DEFAULT_SIDEBAR_WIDTH = 320;
 
 export function VaultNoteLayout() {
   const params = useParams();
@@ -80,7 +80,7 @@ export function VaultNoteLayout() {
   }
 
   return (
-    <div className="absolute inset-0 flex overflow-hidden bg-transparent">
+    <div className="absolute inset-0 flex overflow-hidden bg-transparent lg:p-4 lg:gap-4">
       {isMobileOpen && (
         <div
           className="fixed inset-0 bg-surface-900/20 backdrop-blur-sm z-[45] lg:hidden"
@@ -89,10 +89,10 @@ export function VaultNoteLayout() {
       )}
 
       <aside
-        className={`absolute lg:fixed top-0 lg:top-16 left-0 lg:left-4 bottom-0 lg:bottom-4 w-64 z-50 lg:z-40 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 lg:rounded-3xl shadow-2xl lg:shadow-sm custom-scrollbar h-full lg:h-[calc(100dvh-5rem)]`}
+        className={`fixed lg:relative top-0 lg:top-0 left-0 z-50 lg:z-10 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 lg:rounded-3xl shadow-2xl lg:shadow-sm custom-scrollbar w-80 h-full shrink-0 flex flex-col`}
         style={isDesktop ? { width: `${sidebarWidth}px` } : undefined}
       >
-        <div className="p-6 space-y-8 relative">
+        <div className="p-6 flex-1 space-y-8 relative">
           <div>
             <h2 className="text-[10px] font-black text-surface-400 mb-6 tracking-[0.25em] uppercase">
               Core Database
@@ -118,10 +118,7 @@ export function VaultNoteLayout() {
         />
       </aside>
 
-      <main
-        className="flex-1 relative p-4 sm:p-6 lg:p-12 overflow-y-auto custom-scrollbar w-full h-full"
-        style={isDesktop ? { paddingLeft: `${sidebarWidth + 36}px` } : undefined}
-      >
+      <main className="flex-1 relative p-4 sm:p-6 lg:p-12 overflow-y-auto custom-scrollbar w-full h-full min-w-0 lg:rounded-3xl bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-0 lg:border border-surface-200/50 dark:border-surface-800/50">
         {isNoteLoading ? (
           <div className="space-y-8 animate-pulse max-w-4xl mx-auto">
             <div className="h-12 bg-surface-200/50 rounded-2xl w-3/4" />

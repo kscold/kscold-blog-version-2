@@ -62,15 +62,20 @@ export function CustomCursor() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block will-change-transform"
+      className="fixed top-0 left-0 w-[80px] h-[80px] rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
       style={{
         x: cursorX,
         y: cursorY,
         translateX: '-50%',
         translateY: '-50%',
+        // Force hardware acceleration and anti-aliasing
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
+        WebkitTransform: 'translateZ(0)',
+        outline: '1px solid transparent',
       }}
       animate={{
-        scale: isHovering ? 2.5 : 1,
+        scale: isHovering ? 1 : 0.4,
         backgroundColor: isHovering ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.4)',
       }}
       transition={{
