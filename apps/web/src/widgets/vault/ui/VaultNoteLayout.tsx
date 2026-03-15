@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useUiStore } from '@/shared/model/uiStore';
 import { useVaultNoteData } from '@/features/vault/lib/useVaultNote';
@@ -8,6 +8,10 @@ import { VaultFolderTree } from '@/widgets/vault/ui/VaultFolderTree';
 import { VaultNoteContent } from '@/entities/vault/ui/VaultNoteContent';
 import { BacklinkList } from '@/entities/vault/ui/BacklinkList';
 import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
+
+const MIN_SIDEBAR_WIDTH = 160;
+const MAX_SIDEBAR_WIDTH = 480;
+const DEFAULT_SIDEBAR_WIDTH = 224;
 
 export function VaultNoteLayout() {
   const params = useParams();
@@ -19,6 +23,50 @@ export function VaultNoteLayout() {
 
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  const isResizingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(DEFAULT_SIDEBAR_WIDTH);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isResizingRef.current) return;
+      const delta = e.clientX - startXRef.current;
+      const newWidth = Math.min(MAX_SIDEBAR_WIDTH, Math.max(MIN_SIDEBAR_WIDTH, startWidthRef.current + delta));
+      setSidebarWidth(newWidth);
+    };
+
+    const onMouseUp = () => {
+      isResizingRef.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    isResizingRef.current = true;
+    startXRef.current = e.clientX;
+    startWidthRef.current = sidebarWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
 
   if (isError) {
     return (
@@ -41,7 +89,8 @@ export function VaultNoteLayout() {
       )}
 
       <aside
-        className={`absolute lg:fixed top-0 lg:top-16 left-0 lg:left-4 bottom-0 lg:bottom-4 w-64 lg:w-56 z-50 lg:z-40 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 lg:rounded-3xl shadow-2xl lg:shadow-sm custom-scrollbar h-full lg:h-auto`}
+        className={`absolute lg:fixed top-0 lg:top-16 left-0 lg:left-4 bottom-0 lg:bottom-4 w-64 z-50 lg:z-40 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 lg:rounded-3xl shadow-2xl lg:shadow-sm custom-scrollbar h-full lg:h-[calc(100dvh-5rem)]`}
+        style={isDesktop ? { width: `${sidebarWidth}px` } : undefined}
       >
         <div className="p-6 space-y-8 relative">
           <div>
@@ -62,9 +111,17 @@ export function VaultNoteLayout() {
             )}
           </div>
         </div>
+
+        <div
+          className="hidden lg:block absolute top-0 right-0 w-1.5 h-full cursor-col-resize hover:bg-surface-300/50 dark:hover:bg-surface-600/50 transition-colors rounded-r-3xl"
+          onMouseDown={handleResizeStart}
+        />
       </aside>
 
-      <main className="flex-1 relative p-4 sm:p-6 lg:p-12 lg:pl-[260px] overflow-y-auto custom-scrollbar w-full h-full">
+      <main
+        className="flex-1 relative p-4 sm:p-6 lg:p-12 overflow-y-auto custom-scrollbar w-full h-full"
+        style={isDesktop ? { paddingLeft: `${sidebarWidth + 36}px` } : undefined}
+      >
         {isNoteLoading ? (
           <div className="space-y-8 animate-pulse max-w-4xl mx-auto">
             <div className="h-12 bg-surface-200/50 rounded-2xl w-3/4" />
