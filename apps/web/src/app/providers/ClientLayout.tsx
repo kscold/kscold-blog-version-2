@@ -15,14 +15,13 @@ interface ClientLayoutProps {
 
 export function ClientLayout({ children }: ClientLayoutProps) {
   const pathname = usePathname();
-  const isHomePage = pathname === '/';
   const isVaultPage = pathname.startsWith('/vault');
 
   return (
     <div className={`flex flex-col relative z-0 ${isVaultPage ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'}`}>
       <ScrollProgress />
       <Header />
-      <div className={`flex flex-1 pt-16 w-full ${isVaultPage ? 'h-[calc(100dvh-4rem)] overflow-hidden' : ''}`}>
+      <div className={`flex flex-1 w-full ${isVaultPage ? 'mt-16 h-[calc(100dvh-4rem)] overflow-hidden' : 'pt-16'}`}>
         {!isVaultPage && <Sidebar />}
         <main
           className={`flex-1 flex flex-col w-full relative ${
