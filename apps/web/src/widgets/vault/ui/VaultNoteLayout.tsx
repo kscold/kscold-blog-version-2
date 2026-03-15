@@ -41,7 +41,7 @@ export function VaultNoteLayout() {
       )}
 
       <aside
-        className={`absolute lg:fixed top-0 lg:top-[88px] left-0 lg:left-4 bottom-0 lg:bottom-4 w-64 lg:w-56 z-50 lg:z-40 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 lg:rounded-3xl shadow-2xl lg:shadow-sm custom-scrollbar h-full lg:h-auto`}
+        className={`absolute lg:fixed top-0 lg:top-16 left-0 lg:left-4 bottom-0 lg:bottom-4 w-64 lg:w-56 z-50 lg:z-40 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 lg:rounded-3xl shadow-2xl lg:shadow-sm custom-scrollbar h-full lg:h-auto`}
       >
         <div className="p-6 space-y-8 relative">
           <div>
