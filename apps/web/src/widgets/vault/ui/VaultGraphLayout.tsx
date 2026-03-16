@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useUiStore } from '@/shared/model/uiStore';
 import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
 import { VaultFolderTree } from '@/widgets/vault/ui/VaultFolderTree';
@@ -12,7 +13,9 @@ const DEFAULT_SIDEBAR_WIDTH = 320;
 
 export function VaultGraphLayout() {
   const { theme } = useUiStore();
-  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const initialFolder = searchParams.get('folder');
+  const [activeFolderId, setActiveFolderId] = useState<string | null>(initialFolder);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isDesktop, setIsDesktop] = useState(false);

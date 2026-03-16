@@ -88,7 +88,7 @@ function FolderNode({
         </motion.div>
 
         <svg
-          className={`w-4 h-4 ${isFolderActive ? 'text-surface-900 dark:text-surface-100' : 'text-surface-400 group-hover:text-surface-600 dark:group-hover:text-surface-200'}`}
+          className={`w-4 h-4 shrink-0 ${isFolderActive ? 'text-surface-900 dark:text-surface-100' : 'text-surface-400 group-hover:text-surface-600 dark:group-hover:text-surface-200'}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -155,7 +155,7 @@ function FolderNode({
                     }`}
                   >
                     <svg
-                      className={`w-3.5 h-3.5 transition-colors duration-300 ${isActive ? 'text-surface-900 dark:text-surface-100' : 'text-surface-400 group-hover:text-surface-600 dark:group-hover:text-surface-200'}`}
+                      className={`w-3.5 h-3.5 shrink-0 transition-colors duration-300 ${isActive ? 'text-surface-900 dark:text-surface-100' : 'text-surface-400 group-hover:text-surface-600 dark:group-hover:text-surface-200'}`}
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

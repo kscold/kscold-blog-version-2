@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useUiStore } from '@/shared/model/uiStore';
 import { useVaultNoteData } from '@/features/vault/lib/useVaultNote';
 import { VaultFolderTree } from '@/widgets/vault/ui/VaultFolderTree';
@@ -15,14 +15,24 @@ const DEFAULT_SIDEBAR_WIDTH = 320;
 
 export function VaultNoteLayout() {
   const params = useParams();
+  const router = useRouter();
   const slug = params.slug as string;
   const { theme } = useUiStore();
 
-  const { note, backlinks, folders, isNoteLoading, isFoldersLoading, isError, localGraph, colorMap } =
+  const { note, backlinks, folders, isNoteLoading, isFoldersLoading, isError, localGraph, colorMap, titleSlugMap } =
     useVaultNoteData(slug);
 
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // 폴더 클릭 시 그래프 페이지로 이동
+  const handleFolderSelect = (folderId: string | null) => {
+    if (folderId) {
+      router.push(`/vault?folder=${folderId}`);
+    } else {
+      router.push('/vault');
+    }
+  };
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -106,7 +116,7 @@ export function VaultNoteLayout() {
               <VaultFolderTree
                 folders={folders}
                 activeFolderId={activeFolderId}
-                onFolderSelect={setActiveFolderId}
+                onFolderSelect={handleFolderSelect}
               />
             )}
           </div>
@@ -119,6 +129,23 @@ export function VaultNoteLayout() {
       </aside>
 
       <main className="flex-1 relative p-4 sm:p-6 lg:p-12 overflow-y-auto custom-scrollbar w-full h-full min-w-0 lg:rounded-3xl bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-0 lg:border border-surface-200/50 dark:border-surface-800/50">
+        <div className="mb-6">
+          <button
+            onClick={() => {
+              if (note?.folderId) {
+                router.push(`/vault?folder=${note.folderId}`);
+              } else {
+                router.push('/vault');
+              }
+            }}
+            className="px-4 py-2 rounded-full bg-surface-50/80 dark:bg-surface-900/80 border border-surface-200 dark:border-surface-800 text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 backdrop-blur-xl shadow-sm transition-all hover:scale-105"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>상위 폴더로</span>
+          </button>
+        </div>
         {isNoteLoading ? (
           <div className="space-y-8 animate-pulse max-w-4xl mx-auto">
             <div className="h-12 bg-surface-200/50 rounded-2xl w-3/4" />
@@ -131,7 +158,7 @@ export function VaultNoteLayout() {
           </div>
         ) : note ? (
           <div className="max-w-4xl mx-auto pb-24">
-            <VaultNoteContent note={note} theme={theme} />
+            <VaultNoteContent note={note} theme={theme} titleSlugMap={titleSlugMap} />
             <BacklinkList backlinks={backlinks} />
 
             <div className="mt-16 pt-8 border-t border-surface-200/50 h-[400px]">

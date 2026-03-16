@@ -4,9 +4,10 @@ import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 interface VaultNoteContentProps {
   note: VaultNote;
   theme?: 'light' | 'dark' | 'system';
+  titleSlugMap?: Record<string, string>;
 }
 
-export function VaultNoteContent({ note, theme = 'light' }: VaultNoteContentProps) {
+export function VaultNoteContent({ note, theme = 'light', titleSlugMap = {} }: VaultNoteContentProps) {
   // 옵시디언 마크다운 문법 → 표준 마크다운 변환
   const processContent = (rawContent: string) => {
     let content = rawContent;
@@ -37,19 +38,16 @@ export function VaultNoteContent({ note, theme = 'light' }: VaultNoteContentProp
     // ![[비이미지 embed]] → 제거
     content = content.replace(/!\[\[([^\]]+)\]\]/g, '');
 
-    // [[link|display]] → [**display**]
-    content = content.replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, (_, _link, display) => {
-      return `[**${display}**]`;
+    // [[link|display]] → [**display**](/vault/slug)
+    content = content.replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, (_, link, display) => {
+      const slug = titleSlugMap[link.trim()];
+      return slug ? `[**${display}**](/vault/${slug})` : `**${display}**`;
     });
 
     // [[link]] → [**link**](/vault/slug)
     content = content.replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
-      const slug = title
-        .toLowerCase()
-        .trim()
-        .replace(/[\s_]+/g, '-')
-        .replace(/[^\w\u3131-\uD79D-]/g, '');
-      return `[**${title}**](/vault/${slug})`;
+      const slug = titleSlugMap[title.trim()];
+      return slug ? `[**${title}**](/vault/${slug})` : `**${title}**`;
     });
 
     return content;
