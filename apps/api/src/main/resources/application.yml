@@ -34,9 +34,17 @@ cors:
   allowed-headers: '*'
   allow-credentials: true
 
-# File Upload
+# File Upload (legacy - unused when MinIO is configured)
 file:
   upload-dir: ${FILE_UPLOAD_DIR:./uploads}
+
+# MinIO S3 Object Storage
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket: ${MINIO_BUCKET:blog}
+  public-url: ${MINIO_PUBLIC_URL:https://bucket.kscold.com}
 
 # Logging
 logging:
