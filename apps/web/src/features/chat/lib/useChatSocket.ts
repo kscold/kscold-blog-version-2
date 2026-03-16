@@ -7,6 +7,7 @@ export interface Message {
     name: string;
   };
   content: string;
+  fromAdmin: boolean;
   type: 'TEXT' | 'SYSTEM';
   createdAt: string;
 }
@@ -51,6 +52,7 @@ export function useChatSocket({ isOpen, username }: UseChatSocketOptions) {
             id: string;
             username: string;
             content: string;
+            fromAdmin?: boolean;
             timestamp: string;
           }>).map(msg => toMessage(msg));
           setMessages(historyMessages);
@@ -62,6 +64,7 @@ export function useChatSocket({ isOpen, username }: UseChatSocketOptions) {
             id: string;
             username: string;
             content: string;
+            fromAdmin?: boolean;
             timestamp: string;
           });
           setMessages(prev => [...prev, msg]);
@@ -124,6 +127,7 @@ function toMessage(data: {
   id: string;
   username: string;
   content: string;
+  fromAdmin?: boolean;
   timestamp: string;
 }): Message {
   const isSystem = data.type === 'system';
@@ -134,6 +138,7 @@ function toMessage(data: {
       name: isSystem ? 'SYSTEM' : (data.username || '익명'),
     },
     content: data.content || '',
+    fromAdmin: Boolean(data.fromAdmin),
     type: isSystem ? 'SYSTEM' : 'TEXT',
     createdAt: data.timestamp || new Date().toISOString(),
   };
