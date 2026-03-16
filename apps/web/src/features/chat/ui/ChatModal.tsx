@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import { useAuthStore } from '@/entities/user/model/authStore';
 import { useChatSocket } from '@/features/chat/lib/useChatSocket';
 import ChatMessageList from '@/features/chat/ui/ChatMessageList';
@@ -15,14 +16,15 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
   const { user } = useAuthStore();
   const [inputMessage, setInputMessage] = useState('');
 
-  const username = user?.displayName || user?.username || '익명';
-  const { messages, isConnected, onlineUsers, sendMessage } = useChatSocket({
-    isOpen,
+  const username = user?.displayName || user?.username || '';
+  const { messages, isConnected, sendMessage } = useChatSocket({
+    isOpen: isOpen && !!user,
     username,
   });
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!inputMessage.trim()) return;
     sendMessage(inputMessage);
     setInputMessage('');
   };
@@ -31,6 +33,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
     <AnimatePresence>
       {isOpen && (
         <>
+          {/* 오버레이 */}
           <motion.div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1300]"
             initial={{ opacity: 0 }}
@@ -40,17 +43,20 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             onClick={onClose}
           />
 
+          {/* 모달: 모바일 전체화면 / 데스크탑 우하단 고정 */}
           <motion.div
-            className="fixed bottom-24 right-6 z-[1400] w-[400px] h-[600px] bg-white border border-surface-200 rounded-[24px] shadow-2xl overflow-hidden flex flex-col"
-            initial={{ opacity: 0, scale: 0.8, y: 100, x: 50 }}
-            animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 100, x: 50 }}
+            className="fixed z-[1400] bg-white border border-surface-200 shadow-2xl overflow-hidden flex flex-col
+                       inset-x-0 bottom-0 rounded-t-[24px] h-[85dvh]
+                       sm:inset-auto sm:bottom-24 sm:right-6 sm:w-[400px] sm:h-[600px] sm:rounded-[24px]"
+            initial={{ opacity: 0, y: 80 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 80 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             onClick={e => e.stopPropagation()}
           >
             {/* 헤더 */}
             <div className="p-4 border-b border-surface-200 bg-surface-50 flex-shrink-0">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-surface-900 rounded-full flex items-center justify-center shadow-sm">
                     <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,10 +69,15 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-surface-900">실시간 채팅</h3>
-                    <p className="text-xs text-surface-500 font-medium">
-                      {isConnected ? '연결됨' : '연결 중...'}
-                    </p>
+                    <h3 className="text-sm font-bold text-surface-900">블로그 주인과 대화</h3>
+                    {user && (
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <div className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-surface-300'}`} />
+                        <span className="text-xs text-surface-500 font-medium">
+                          {isConnected ? '연결됨' : '연결 중...'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <button
@@ -78,45 +89,60 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                   </svg>
                 </button>
               </div>
-              <div className="flex items-center gap-2 mt-2">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-surface-200 shadow-sm">
-                  <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                  <span className="text-xs font-bold tracking-wide text-surface-600">
-                    {onlineUsers} 명 접속
-                  </span>
-                </div>
-              </div>
             </div>
 
-            <ChatMessageList messages={messages} currentUsername={username} />
-
-            {/* 입력창 */}
-            <div className="p-4 border-t border-surface-200 bg-white flex-shrink-0">
-              <form onSubmit={handleSendMessage} className="flex gap-3">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={e => setInputMessage(e.target.value)}
-                  placeholder={isConnected ? '메시지 입력...' : '연결 중...'}
-                  disabled={!isConnected}
-                  className="flex-1 px-4 py-3 rounded-xl bg-surface-50 border border-surface-200 text-surface-900 placeholder:text-surface-400 text-sm focus:outline-none focus:border-surface-900 focus:ring-1 focus:ring-surface-900 disabled:opacity-50 transition-all font-medium shadow-inner"
-                />
-                <button
-                  type="submit"
-                  disabled={!isConnected || !inputMessage.trim()}
-                  className="w-12 h-12 flex items-center justify-center bg-surface-900 hover:bg-surface-800 rounded-xl text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:-translate-y-0.5"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                    />
+            {/* 본문 */}
+            {!user ? (
+              /* 로그인 게이트 */
+              <div className="flex-1 flex flex-col items-center justify-center gap-4 p-6 bg-surface-50">
+                <div className="w-14 h-14 bg-surface-100 rounded-full flex items-center justify-center">
+                  <svg className="w-7 h-7 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                </button>
-              </form>
-            </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-bold text-surface-900">로그인이 필요합니다</p>
+                  <p className="text-xs text-surface-400 mt-1">채팅을 이용하려면 먼저 로그인해 주세요.</p>
+                </div>
+                <Link
+                  href="/login"
+                  onClick={onClose}
+                  className="px-5 py-2.5 bg-surface-900 text-white text-sm font-semibold rounded-xl hover:bg-surface-800 transition-colors"
+                >
+                  로그인하러 가기
+                </Link>
+              </div>
+            ) : (
+              <>
+                <ChatMessageList messages={messages} currentUsername={username} />
+
+                {/* 입력창 */}
+                <div className="p-4 border-t border-surface-200 bg-white flex-shrink-0">
+                  <form onSubmit={handleSendMessage} className="flex gap-2.5">
+                    <input
+                      type="text"
+                      value={inputMessage}
+                      onChange={e => setInputMessage(e.target.value)}
+                      placeholder={isConnected ? '메시지를 입력하세요...' : '연결 중...'}
+                      disabled={!isConnected}
+                      autoComplete="off"
+                      className="flex-1 px-4 py-3 rounded-xl bg-surface-50 border border-surface-200 text-surface-900 placeholder:text-surface-400 text-sm focus:outline-none focus:border-surface-900 focus:ring-1 focus:ring-surface-900 disabled:opacity-50 transition-all font-medium"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!isConnected || !inputMessage.trim()}
+                      className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-surface-900 hover:bg-surface-800 rounded-xl text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </>
+            )}
           </motion.div>
         </>
       )}

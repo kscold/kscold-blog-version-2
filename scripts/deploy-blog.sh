@@ -9,7 +9,7 @@ echo "[1/5] git pull..."
 git -C $SRC pull origin main
 
 echo "[2/5] 백엔드 빌드..."
-cd $SRC/apps/api && gradle build -x test -q
+cd $SRC/apps/api && ./gradlew build -x test -q
 cp $SRC/apps/api/build/libs/blog-api-2.0.0.jar $BACKEND_DEST
 
 echo "[3/5] 프론트엔드 빌드..."

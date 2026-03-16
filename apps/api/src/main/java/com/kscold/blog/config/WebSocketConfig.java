@@ -1,5 +1,6 @@
 package com.kscold.blog.config;
 
+import com.kscold.blog.chat.adapter.in.ws.ChatHandshakeInterceptor;
 import com.kscold.blog.chat.adapter.in.ws.ChatWebSocketHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +14,12 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final ChatWebSocketHandler chatWebSocketHandler;
+    private final ChatHandshakeInterceptor chatHandshakeInterceptor;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(chatWebSocketHandler, "/ws/chat")
+                .addInterceptors(chatHandshakeInterceptor)
                 .setAllowedOrigins("*");
     }
 }
