@@ -182,18 +182,6 @@ export function LoginForm() {
           </motion.div>
         </div>
 
-        {/* 개발 모드 안내 */}
-        <motion.div
-          className="mt-6 p-4 bg-white/60 border border-surface-200/60 rounded-[12px] backdrop-blur-sm"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <p className="text-xs text-surface-500 text-center font-medium tracking-wide">
-            <strong className="text-surface-900">개발 모드:</strong> 백엔드 서버 확인
-            (localhost:8080)
-          </p>
-        </motion.div>
       </motion.div>
     </div>
   );
