@@ -1,22 +1,17 @@
 'use client';
 
-import { useRef } from 'react';
 import dynamic from 'next/dynamic';
-import type { OnMount } from '@monaco-editor/react';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
-import { MarkdownToolbar } from '@/features/editor/ui/MarkdownToolbar';
 import type { PostFormData } from '@/features/editor/model/types';
 
-const Editor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
+const TiptapEditor = dynamic(() => import('@/features/editor/ui/TiptapEditor'), { ssr: false });
 
-export type ViewMode = 'editor' | 'split' | 'preview';
-type IStandaloneCodeEditor = Parameters<OnMount>[0];
+export type ViewMode = 'editor' | 'preview';
 
 interface PostEditorHeaderProps {
   mode: 'create' | 'edit';
   form: PostFormData;
   viewMode: ViewMode;
-  slugEdited: boolean;
   restoredFromAutosave: boolean;
   onViewModeChange: (mode: ViewMode) => void;
   onTitleChange: (value: string) => void;
@@ -24,7 +19,7 @@ interface PostEditorHeaderProps {
   onSlugEdited: () => void;
   onContentChange: (value: string) => void;
   onExcerptChange: (value: string) => void;
-  editorRef: React.MutableRefObject<IStandaloneCodeEditor | null>;
+  editorKey: string;
 }
 
 export function PostEditorHeader({
@@ -38,10 +33,8 @@ export function PostEditorHeader({
   onSlugEdited,
   onContentChange,
   onExcerptChange,
-  editorRef,
+  editorKey,
 }: PostEditorHeaderProps) {
-  const editorHeight = viewMode === 'split' ? '550px' : '600px';
-
   return (
     <>
       {/* 헤더 */}
@@ -50,7 +43,7 @@ export function PostEditorHeader({
           {mode === 'create' ? '새 포스트 작성' : '포스트 수정'}
         </h1>
         <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-          {(['editor', 'split', 'preview'] as ViewMode[]).map(vm => (
+          {(['editor', 'preview'] as ViewMode[]).map(vm => (
             <button
               key={vm}
               type="button"
@@ -61,7 +54,7 @@ export function PostEditorHeader({
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              {vm === 'editor' ? '에디터' : vm === 'split' ? '분할' : '프리뷰'}
+              {vm === 'editor' ? '에디터' : '프리뷰'}
             </button>
           ))}
         </div>
@@ -98,70 +91,19 @@ export function PostEditorHeader({
         />
       </div>
 
-      {/* 에디터 영역 */}
-      <div>
-        {viewMode !== 'preview' && (
-          <MarkdownToolbar editorRef={editorRef} />
-        )}
-
-        {viewMode === 'editor' && (
-          <div className="border border-gray-300 dark:border-gray-700 rounded-b-lg overflow-hidden">
-            <Editor
-              height={editorHeight}
-              defaultLanguage="markdown"
-              value={form.content}
-              onChange={value => onContentChange(value || '')}
-              theme="vs-dark"
-              onMount={editor => {
-                editorRef.current = editor;
-              }}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: 'on',
-                wordWrap: 'on',
-                scrollBeyondLastLine: false,
-              }}
-            />
-          </div>
-        )}
-
-        {viewMode === 'split' && (
-          <div className="grid grid-cols-2 gap-0 border border-gray-300 dark:border-gray-700 rounded-b-lg overflow-hidden">
-            <div className="border-r border-gray-300 dark:border-gray-700">
-              <Editor
-                height={editorHeight}
-                defaultLanguage="markdown"
-                value={form.content}
-                onChange={value => onContentChange(value || '')}
-                theme="vs-dark"
-                onMount={editor => {
-                  editorRef.current = editor;
-                }}
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: 13,
-                  lineNumbers: 'on',
-                  wordWrap: 'on',
-                  scrollBeyondLastLine: false,
-                }}
-              />
-            </div>
-            <div
-              className="bg-white dark:bg-gray-900 p-4 overflow-y-auto"
-              style={{ height: editorHeight }}
-            >
-              <MarkdownContent content={form.content} />
-            </div>
-          </div>
-        )}
-
-        {viewMode === 'preview' && (
-          <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-6 min-h-[600px] overflow-auto">
-            <MarkdownContent content={form.content} />
-          </div>
-        )}
-      </div>
+      {/* 에디터 / 프리뷰 */}
+      {viewMode === 'editor' ? (
+        <TiptapEditor
+          key={editorKey}
+          defaultContent={form.content}
+          onChange={onContentChange}
+          minHeight="520px"
+        />
+      ) : (
+        <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-6 min-h-[520px] overflow-auto">
+          <MarkdownContent content={form.content} />
+        </div>
+      )}
 
       {/* 요약 */}
       <div>
