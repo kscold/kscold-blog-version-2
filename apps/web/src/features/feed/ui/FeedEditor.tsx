@@ -145,11 +145,31 @@ export default function FeedEditor({
               </div>
             )}
 
-            <div className="p-4">
+            <div
+              className="p-4"
+              onDragOver={e => { e.preventDefault(); e.stopPropagation(); }}
+              onDrop={async e => {
+                e.preventDefault();
+                const files = e.dataTransfer?.files;
+                if (files && files.length > 0) await handleImageUpload(files);
+              }}
+            >
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                placeholder="오늘 하루는 어땠나요?"
+                onPaste={async e => {
+                  const files = e.clipboardData?.files;
+                  if (files && files.length > 0) {
+                    const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+                    if (imageFiles.length > 0) {
+                      e.preventDefault();
+                      const fileList = new DataTransfer();
+                      imageFiles.forEach(f => fileList.items.add(f));
+                      await handleImageUpload(fileList.files);
+                    }
+                  }
+                }}
+                placeholder="오늘 하루는 어땠나요? 이미지를 붙여넣거나 드래그해서 업로드할 수 있어요."
                 rows={4}
                 className="w-full resize-none text-sm text-surface-900 placeholder-surface-400 focus:outline-none"
               />
