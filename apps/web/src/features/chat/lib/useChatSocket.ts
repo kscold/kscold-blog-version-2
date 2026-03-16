@@ -24,12 +24,16 @@ export function useChatSocket({ isOpen, username }: UseChatSocketOptions) {
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connect = useCallback(() => {
-    const WS_URL =
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token) return;
+
+    const base =
       process.env.NEXT_PUBLIC_WS_URL ||
       (typeof window !== 'undefined' && window.location.protocol === 'https:'
         ? `wss://${window.location.host}/ws/chat`
         : 'ws://localhost:8081/ws/chat');
 
+    const WS_URL = `${base}?token=${encodeURIComponent(token)}`;
     const ws = new WebSocket(WS_URL);
     wsRef.current = ws;
 
