@@ -3,7 +3,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 interface MarkdownContentProps {
   content: string;
@@ -54,16 +54,24 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
                       onClick={() => {
                         navigator.clipboard.writeText(codeText);
                       }}
-                      className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider bg-surface-800 text-surface-100 border border-surface-700 hover:bg-surface-700 hover:text-white rounded-md transition-colors"
+                      className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-md transition-colors ${
+                        isDark
+                          ? 'bg-surface-800 text-surface-100 border border-surface-700 hover:bg-surface-700 hover:text-white'
+                          : 'bg-surface-100 text-surface-600 border border-surface-200 hover:bg-surface-200 hover:text-surface-900'
+                      }`}
                     >
                       Copy
                     </button>
                   </div>
                   <SyntaxHighlighter
-                    style={vscDarkPlus}
+                    style={isDark ? vscDarkPlus : oneLight}
                     language={language}
                     PreTag="div"
-                    className="rounded-xl !bg-[#0f111a] !border !border-surface-200 dark:!border-surface-800 !my-0 !p-5 shadow-sm"
+                    className={`rounded-xl !my-0 !p-5 shadow-sm !border ${
+                      isDark
+                        ? '!bg-[#0f111a] !border-surface-800'
+                        : '!bg-surface-50 !border-surface-200'
+                    }`}
                   >
                     {codeText}
                   </SyntaxHighlighter>
@@ -79,13 +87,21 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
                     onClick={() => {
                       navigator.clipboard.writeText(codeText);
                     }}
-                    className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider bg-surface-800 text-surface-100 border border-surface-700 hover:bg-surface-700 hover:text-white rounded-md transition-colors"
+                    className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-md transition-colors ${
+                      isDark
+                        ? 'bg-surface-800 text-surface-100 border border-surface-700 hover:bg-surface-700 hover:text-white'
+                        : 'bg-surface-100 text-surface-600 border border-surface-200 hover:bg-surface-200 hover:text-surface-900'
+                    }`}
                   >
                     Copy
                   </button>
                 </div>
-                <pre className="rounded-xl bg-[#0f111a] border border-surface-200 dark:border-surface-800 p-5 shadow-sm overflow-x-auto my-0">
-                  <code className="text-surface-200 text-sm font-mono whitespace-pre">
+                <pre className={`rounded-xl border p-5 shadow-sm overflow-x-auto my-0 ${
+                  isDark
+                    ? 'bg-[#0f111a] border-surface-800'
+                    : 'bg-surface-50 border-surface-200'
+                }`}>
+                  <code className={`text-sm font-mono whitespace-pre ${isDark ? 'text-surface-200' : 'text-surface-800'}`}>
                     {codeText}
                   </code>
                 </pre>
