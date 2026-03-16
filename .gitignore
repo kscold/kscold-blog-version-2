@@ -57,6 +57,7 @@ apps/api/.gradle/
 apps/api/build/
 apps/api/bin/
 *.jar
+!apps/api/gradle/wrapper/gradle-wrapper.jar
 *.war
 *.class
 *.bak
