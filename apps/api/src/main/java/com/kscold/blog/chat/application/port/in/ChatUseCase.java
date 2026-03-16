@@ -8,9 +8,12 @@ import java.util.List;
 
 public interface ChatUseCase {
 
-    ChatMessage saveMessage(String sessionId, String username, String content, ChatMessage.MessageType type);
+    ChatMessage saveMessage(String sessionId, String username, String content,
+                            ChatMessage.MessageType type, String roomId, boolean fromAdmin);
 
-    List<ChatMessage> getRecentMessages(int limit);
+    List<ChatMessage> getRecentMessagesByRoom(String roomId, int limit);
 
-    Page<ChatMessage> getMessagesByPage(Pageable pageable);
+    Page<ChatMessage> getMessagesByRoom(String roomId, Pageable pageable);
+
+    Page<ChatMessage> getAllMessages(Pageable pageable);
 }

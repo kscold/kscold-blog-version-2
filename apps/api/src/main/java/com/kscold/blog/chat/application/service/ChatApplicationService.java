@@ -20,26 +20,32 @@ public class ChatApplicationService implements ChatUseCase {
     private final ChatMessageRepository chatMessageRepository;
 
     @Override
-    public ChatMessage saveMessage(String sessionId, String username, String content, ChatMessage.MessageType type) {
+    public ChatMessage saveMessage(String sessionId, String username, String content,
+                                   ChatMessage.MessageType type, String roomId, boolean fromAdmin) {
         ChatMessage message = ChatMessage.builder()
                 .sessionId(sessionId)
+                .roomId(roomId)
                 .username(username)
                 .content(content)
                 .type(type)
+                .fromAdmin(fromAdmin)
                 .timestamp(LocalDateTime.now())
                 .build();
-        ChatMessage saved = chatMessageRepository.save(message);
-        log.debug("Saved chat message: {} from {}", saved.getId(), username);
-        return saved;
+        return chatMessageRepository.save(message);
     }
 
     @Override
-    public List<ChatMessage> getRecentMessages(int limit) {
-        return chatMessageRepository.findRecentMessages(limit);
+    public List<ChatMessage> getRecentMessagesByRoom(String roomId, int limit) {
+        return chatMessageRepository.findRecentByRoomId(roomId, limit);
     }
 
     @Override
-    public Page<ChatMessage> getMessagesByPage(Pageable pageable) {
+    public Page<ChatMessage> getMessagesByRoom(String roomId, Pageable pageable) {
+        return chatMessageRepository.findByRoomId(roomId, pageable);
+    }
+
+    @Override
+    public Page<ChatMessage> getAllMessages(Pageable pageable) {
         return chatMessageRepository.findAll(pageable);
     }
 }
