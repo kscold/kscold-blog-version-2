@@ -31,12 +31,7 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
         }
 
         String token = servletRequest.getServletRequest().getParameter("token");
-        if (token == null || token.isBlank()) {
-            log.warn("WebSocket 연결 거부: 토큰 없음");
-            return false;
-        }
-
-        if (!jwtTokenProvider.validateToken(token)) {
+        if (token == null || token.isBlank() || !jwtTokenProvider.validateToken(token)) {
             log.warn("WebSocket 연결 거부: 유효하지 않은 토큰");
             return false;
         }
@@ -48,8 +43,9 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
             return false;
         }
 
-        attributes.put("username", user.getDisplayName());
         attributes.put("userId", userId);
+        attributes.put("username", user.getDisplayName());
+        attributes.put("isAdmin", user.getRole() == User.Role.ADMIN);
         return true;
     }
 

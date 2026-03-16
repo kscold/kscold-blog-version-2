@@ -10,7 +10,9 @@ public interface ChatMessageRepository {
 
     ChatMessage save(ChatMessage message);
 
-    List<ChatMessage> findRecentMessages(int limit);
+    List<ChatMessage> findRecentByRoomId(String roomId, int limit);
+
+    Page<ChatMessage> findByRoomId(String roomId, Pageable pageable);
 
     Page<ChatMessage> findAll(Pageable pageable);
 }

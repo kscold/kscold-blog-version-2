@@ -25,13 +25,17 @@ public class ChatMessageRepositoryAdapter implements ChatMessageRepository {
     }
 
     @Override
-    public List<ChatMessage> findRecentMessages(int limit) {
-        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "timestamp"));
-        List<ChatMessage> messages = mongoChatMessageRepository.findByOrderByTimestampDesc(pageable);
-        // 최신순 → 오래된순으로 뒤집어서 반환 (채팅 히스토리용)
+    public List<ChatMessage> findRecentByRoomId(String roomId, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        List<ChatMessage> messages = mongoChatMessageRepository.findTopByRoomId(roomId, pageable);
         List<ChatMessage> reversed = new ArrayList<>(messages);
         Collections.reverse(reversed);
         return reversed;
+    }
+
+    @Override
+    public Page<ChatMessage> findByRoomId(String roomId, Pageable pageable) {
+        return mongoChatMessageRepository.findByRoomId(roomId, pageable);
     }
 
     @Override
