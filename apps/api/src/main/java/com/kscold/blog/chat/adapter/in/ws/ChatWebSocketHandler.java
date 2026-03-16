@@ -130,8 +130,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private void sendRoomList(WebSocketSession session) {
         List<Map<String, Object>> rooms = sessions.values().stream()
                 .filter(i -> !i.isAdmin())
-                .map(i -> (Map<String, Object>) new LinkedHashMap<>(
-                        Map.of("userId", i.userId(), "username", i.username(), "online", true)))
+                .map(i -> {
+                    Map<String, Object> room = new LinkedHashMap<>();
+                    room.put("userId", i.userId());
+                    room.put("username", i.username());
+                    room.put("online", true);
+                    return room;
+                })
                 .distinct()
                 .toList();
         sendToSession(session, Map.of("type", "room_list", "rooms", rooms));
