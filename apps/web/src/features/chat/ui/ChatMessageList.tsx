@@ -6,7 +6,7 @@ import { Message } from '@/features/chat/lib/useChatSocket';
 
 interface ChatMessageListProps {
   messages: Message[];
-  currentUsername: string;
+  currentUsername?: string;
 }
 
 export default function ChatMessageList({ messages, currentUsername }: ChatMessageListProps) {
@@ -29,7 +29,7 @@ export default function ChatMessageList({ messages, currentUsername }: ChatMessa
             className={
               message.type === 'SYSTEM'
                 ? 'text-center my-4'
-                : message.user.name === currentUsername
+                : !message.fromAdmin
                   ? 'flex justify-end'
                   : 'flex justify-start'
             }
@@ -45,7 +45,7 @@ export default function ChatMessageList({ messages, currentUsername }: ChatMessa
                 </div>
                 <div
                   className={`px-4 py-2.5 rounded-[16px] shadow-sm ${
-                    message.user.name === currentUsername
+                    !message.fromAdmin
                       ? 'bg-surface-900 text-white rounded-tr-sm'
                       : 'bg-white text-surface-700 rounded-tl-sm border border-surface-200'
                   }`}
