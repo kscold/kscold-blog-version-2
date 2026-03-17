@@ -8,7 +8,7 @@ import { usePosts } from '@/entities/post/api/usePosts';
 
 interface ContributionDay {
   date: string;
-  contributionCount: number;
+  count: number;
 }
 
 interface GitHubStats {
@@ -150,8 +150,8 @@ export function StatsSection() {
                       <div
                         key={day.date}
                         className="w-3 h-3 rounded-sm cursor-default transition-transform hover:scale-125"
-                        style={{ backgroundColor: getColor(day.contributionCount) }}
-                        title={`${day.date}: ${day.contributionCount}개`}
+                        style={{ backgroundColor: getColor(day.count) }}
+                        title={`${day.date}: ${day.count}개`}
                       />
                     ))}
                   </div>
