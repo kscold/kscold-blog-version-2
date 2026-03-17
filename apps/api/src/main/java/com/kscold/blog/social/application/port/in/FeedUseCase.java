@@ -25,4 +25,6 @@ public interface FeedUseCase {
     void incrementCommentCount(String feedId);
 
     void decrementCommentCount(String feedId);
+
+    void validateOwnership(String feedId, String userId);
 }

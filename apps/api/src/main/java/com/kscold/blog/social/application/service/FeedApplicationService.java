@@ -11,10 +11,14 @@ import com.kscold.blog.social.domain.model.Feed;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
 import com.kscold.blog.social.domain.port.out.LinkScrapingPort;
+import com.kscold.blog.exception.BusinessException;
+import com.kscold.blog.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -129,6 +133,22 @@ public class FeedApplicationService implements FeedUseCase {
      */
     public void decrementCommentCount(String feedId) {
         feedRepository.decrementCommentCount(feedId);
+    }
+
+    /**
+     * 피드 소유권 검증: 본인 또는 ADMIN만 수정/삭제 가능
+     */
+    public void validateOwnership(String feedId, String userId) {
+        Feed feed = findById(feedId);
+        if (feed.getAuthor().getId().equals(userId)) {
+            return;
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
     }
 
     private Feed findById(String id) {
