@@ -1,6 +1,6 @@
 package com.kscold.blog.config;
 
-import com.kscold.blog.security.JwtAuthenticationFilter;
+import com.kscold.blog.identity.adapter.in.web.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,7 +1,6 @@
 package com.kscold.blog.identity.adapter.out.security;
 
 import com.kscold.blog.identity.application.port.out.TokenProvider;
-import com.kscold.blog.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

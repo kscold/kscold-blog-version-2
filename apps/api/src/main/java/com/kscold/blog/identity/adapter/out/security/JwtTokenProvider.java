@@ -1,4 +1,4 @@
-package com.kscold.blog.security;
+package com.kscold.blog.identity.adapter.out.security;
 
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;

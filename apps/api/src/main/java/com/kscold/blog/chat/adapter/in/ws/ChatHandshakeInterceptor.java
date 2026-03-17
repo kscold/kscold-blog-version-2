@@ -2,7 +2,7 @@ package com.kscold.blog.chat.adapter.in.ws;
 
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import com.kscold.blog.security.JwtTokenProvider;
+import com.kscold.blog.identity.adapter.out.security.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
