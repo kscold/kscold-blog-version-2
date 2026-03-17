@@ -1,5 +1,6 @@
-package com.kscold.blog.security;
+package com.kscold.blog.identity.adapter.in.web;
 
+import com.kscold.blog.identity.adapter.out.security.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
