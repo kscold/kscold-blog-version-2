@@ -79,9 +79,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             broadcastToUserSessions(info.userId(), msg);
             broadcastToAdmins(msg);
         } else {
-            // 어드민 → toUserId 지정 방문자에게 전송
+            // 어드민 → toUserId 지정 방문자에게 전송 (자기 자신에게는 불가)
             String toUserId = payload.get("toUserId");
             if (toUserId == null || toUserId.isBlank()) return;
+            if (toUserId.equals(info.userId())) return;
 
             ChatMessage saved = chatUseCase.saveMessage(
                     sessionId, info.username(), content.trim(),
