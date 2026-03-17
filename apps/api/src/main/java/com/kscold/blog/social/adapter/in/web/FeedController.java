@@ -62,7 +62,6 @@ public class FeedController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<FeedResponse>> createFeed(
             @Valid @RequestBody FeedCreateCommand command,
             @AuthenticationPrincipal String userId
@@ -74,18 +73,22 @@ public class FeedController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<FeedResponse>> updateFeed(
             @PathVariable String id,
-            @Valid @RequestBody FeedUpdateCommand command
+            @Valid @RequestBody FeedUpdateCommand command,
+            @AuthenticationPrincipal String userId
     ) {
+        feedUseCase.validateOwnership(id, userId);
         Feed feed = feedUseCase.update(id, command);
         return ResponseEntity.ok(ApiResponse.success(FeedResponse.from(feed), "피드가 수정되었습니다"));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteFeed(@PathVariable String id) {
+    public ResponseEntity<Void> deleteFeed(
+            @PathVariable String id,
+            @AuthenticationPrincipal String userId
+    ) {
+        feedUseCase.validateOwnership(id, userId);
         feedUseCase.delete(id);
         return ResponseEntity.noContent().build();
     }
