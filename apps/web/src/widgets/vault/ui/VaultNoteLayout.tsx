@@ -129,7 +129,7 @@ export function VaultNoteLayout() {
       </aside>
 
       <main className="flex-1 relative p-4 sm:p-6 lg:p-12 overflow-y-auto custom-scrollbar w-full h-full min-w-0 lg:rounded-3xl bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-0 lg:border border-surface-200/50 dark:border-surface-800/50">
-        <div className="mb-6">
+        <div className="sticky top-0 z-10 -mx-4 sm:-mx-6 lg:-mx-12 -mt-4 sm:-mt-6 lg:-mt-12 px-4 lg:px-4 py-4 mb-2">
           <button
             onClick={() => {
               if (note?.folderId) {
