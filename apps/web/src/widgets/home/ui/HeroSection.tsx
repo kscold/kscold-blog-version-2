@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center">
       <motion.div
         className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-12 text-center my-16"
         initial={{ opacity: 0 }}
@@ -24,14 +24,14 @@ export function HeroSection() {
           </span>
         </motion.div>
 
-        <div className="relative inline-block group w-full">
+        <div className="relative group w-full flex justify-center">
           <motion.h1
-            className="text-[14vw] md:text-[10vw] lg:text-[8rem] xl:text-[9.5rem] font-sans font-black tracking-tighter leading-none select-none relative z-10 w-full overflow-hidden"
+            className="text-[14vw] md:text-[10vw] lg:text-[8rem] xl:text-[9.5rem] font-sans font-black tracking-tighter leading-none select-none relative z-10 text-surface-900"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.3, ease: [0.76, 0, 0.24, 1] }}
           >
-            <span className="bg-clip-text text-transparent bg-[size:200%_auto] animate-shimmer bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 drop-shadow-sm">
+            <span className="bg-clip-text text-transparent bg-[size:200%_auto] animate-shimmer bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em]">
               KSCOLD
             </span>
           </motion.h1>

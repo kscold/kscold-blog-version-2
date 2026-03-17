@@ -9,20 +9,20 @@ import { usePosts } from '@/entities/post/api/usePosts';
 interface ContributionDay {
   date: string;
   count: number;
+  level: number;
 }
 
 interface GitHubStats {
   total: number;
-  // 날짜별 배열 (jogruber API: contributions[])
   days: ContributionDay[];
 }
 
-// 기여 수 → 모노톤 그레이 강도
-function getColor(count: number): string {
-  if (count === 0) return '#e5e7eb';
-  if (count <= 3) return '#9ca3af';
-  if (count <= 6) return '#6b7280';
-  if (count <= 9) return '#374151';
+// level(0~4) → 모노톤 그레이 강도
+function getColor(level: number): string {
+  if (level === 0) return '#e5e7eb';
+  if (level === 1) return '#9ca3af';
+  if (level === 2) return '#6b7280';
+  if (level === 3) return '#374151';
   return '#111827';
 }
 
@@ -150,7 +150,7 @@ export function StatsSection() {
                       <div
                         key={day.date}
                         className="w-3 h-3 rounded-sm cursor-default transition-transform hover:scale-125"
-                        style={{ backgroundColor: getColor(day.count) }}
+                        style={{ backgroundColor: getColor(day.level) }}
                         title={`${day.date}: ${day.count}개`}
                       />
                     ))}
@@ -162,7 +162,7 @@ export function StatsSection() {
             {/* 범례 */}
             <div className="flex items-center gap-1.5 mt-3 justify-end">
               <span className="text-[10px] text-surface-400">Less</span>
-              {[0, 3, 6, 9, 12].map(v => (
+              {[0, 1, 2, 3, 4].map(v => (
                 <div key={v} className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: getColor(v) }} />
               ))}
               <span className="text-[10px] text-surface-400">More</span>
