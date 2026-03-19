@@ -46,6 +46,11 @@ minio:
   bucket: ${MINIO_BUCKET:blog}
   public-url: ${MINIO_PUBLIC_URL:https://bucket.kscold.com}
 
+# Team private docs
+team:
+  private:
+    password: ${TEAM_PRIVATE_PASSWORD:changeme}
+
 # Logging
 logging:
   level:
