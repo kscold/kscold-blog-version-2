@@ -17,13 +17,13 @@ interface GitHubStats {
   days: ContributionDay[];
 }
 
-// level(0~4) → 모노톤 그레이 강도
+// level(0~4) → GitHub 스타일 green 강도
 function getColor(level: number): string {
-  if (level === 0) return '#e5e7eb';
-  if (level === 1) return '#9ca3af';
-  if (level === 2) return '#6b7280';
-  if (level === 3) return '#374151';
-  return '#111827';
+  if (level === 0) return '#ebedf0';
+  if (level === 1) return '#9be9a8';
+  if (level === 2) return '#40c463';
+  if (level === 3) return '#30a14e';
+  return '#216e39';
 }
 
 // 일(day) 배열을 7행 × N열 주(week) 2D 배열로 변환
