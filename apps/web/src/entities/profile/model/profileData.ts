@@ -8,25 +8,37 @@ export const PROFILE = {
   ],
   contacts: {
     github: 'https://github.com/kscold',
-    email: 'contact@coldcraft.dev',
+    email: 'developerkscold@gmail.com',
   },
 };
 
 export const SKILL_CATEGORIES = [
   {
-    label: 'Backend',
-    skills: ['Java', 'Spring Boot', 'Node.js', 'JPA/Hibernate'],
+    label: 'Language',
+    skills: ['Java', 'TypeScript', 'JavaScript', 'Python', 'HTML', 'CSS'],
   },
   {
-    label: 'Frontend',
-    skills: ['TypeScript', 'React', 'Next.js', 'Tailwind CSS'],
+    label: 'Backend Framework',
+    skills: ['Spring Boot', 'NestJS', 'Express'],
+  },
+  {
+    label: 'Backend ORM',
+    skills: ['JPA/Hibernate', 'TypeORM', 'Mongoose'],
+  },
+  {
+    label: 'Frontend Framework',
+    skills: ['React', 'Next.js', 'Vue.js'],
+  },
+  {
+    label: 'Frontend CSS',
+    skills: ['Tailwind CSS', 'SCSS', 'Styled-Components'],
   },
   {
     label: 'Database',
-    skills: ['MongoDB', 'PostgreSQL', 'Redis'],
+    skills: ['MariaDB', 'PostgreSQL', 'MongoDB', 'Redis'],
   },
   {
     label: 'DevOps',
-    skills: ['Docker', 'AWS', 'Nginx', 'Git'],
+    skills: ['AWS', 'GCP', 'Docker', 'Git'],
   },
 ];
