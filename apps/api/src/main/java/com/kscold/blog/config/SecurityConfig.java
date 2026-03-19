@@ -58,6 +58,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/vault/notes/*/comments/*").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
                         .requestMatchers("/api/health").permitAll()
+                        // 팀 내부 문서 (자체 비밀번호 검증)
+                        .requestMatchers(HttpMethod.POST, "/api/team/private").permitAll()
                         // 정적 리소스
                         .requestMatchers("/uploads/**").permitAll()
                         // 웹소켓
