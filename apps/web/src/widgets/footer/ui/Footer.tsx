@@ -38,7 +38,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-1 text-xs font-mono text-surface-400 tracking-wider uppercase">
-              by KSCOLD
+              by Colding
             </p>
             <p className="mt-4 text-sm text-surface-500 font-light leading-relaxed max-w-sm text-balance">
               지식을 기록하고, 기록을 연결하고,
@@ -88,13 +88,29 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Business Info */}
+        <div className="mt-12 pt-8 border-t border-surface-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px] text-surface-400 leading-relaxed">
+            <div className="space-y-1">
+              <p><span className="text-surface-500 font-medium">상호</span> 콜딩(Colding)</p>
+              <p><span className="text-surface-500 font-medium">대표</span> 김승찬</p>
+              <p><span className="text-surface-500 font-medium">사업자등록번호</span> 457-49-00942</p>
+            </div>
+            <div className="space-y-1">
+              <p><span className="text-surface-500 font-medium">주소</span> 경기도 김포시 김포한강9로75번길 66, 5층 (구래동, 국제프라자)</p>
+              <p><span className="text-surface-500 font-medium">개발자</span> <a href="mailto:developerkscold@gmail.com" className="hover:text-surface-600 transition-colors">developerkscold@gmail.com</a></p>
+              <p><span className="text-surface-500 font-medium">사업자</span> <a href="mailto:coldingcontact@gmail.com" className="hover:text-surface-600 transition-colors">coldingcontact@gmail.com</a></p>
+            </div>
+          </div>
+        </div>
+
         {/* Bottom */}
-        <div className="mt-16 pt-8 border-t border-surface-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="mt-8 pt-6 border-t border-surface-100 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-surface-400 font-mono tracking-wider">
-            &copy; {currentYear} COLDING. All rights reserved.
+            &copy; {currentYear} Colding. All rights reserved.
           </p>
           <p className="text-[10px] text-surface-300 font-mono tracking-widest uppercase">
-            Seoul, South Korea
+            Gimpo, South Korea
           </p>
         </div>
       </div>
