@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useAdminFeed } from '@/widgets/admin/api/useAdminFeed';
+import { useAdminFeed } from '../api/useAdminFeed';
 import { formatDateTime } from '@/shared/lib/format-utils';
 import { Pagination } from '@/shared/ui/Pagination';
 

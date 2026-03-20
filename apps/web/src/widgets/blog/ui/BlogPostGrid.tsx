@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { PostCard } from '@/entities/post/ui/PostCard';
 import { Pagination } from '@/shared/ui/Pagination';
-import { CategoryFilter } from '@/widgets/blog/ui/CategoryFilter';
+import { CategoryFilter } from './CategoryFilter';
 import { Post, Category } from '@/types/blog';
 
 interface BlogPostGridProps {

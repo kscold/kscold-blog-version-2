@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useUiStore } from '@/shared/model/uiStore';
-import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
-import { VaultFolderTree } from '@/widgets/vault/ui/VaultFolderTree';
+import { ClientVaultGraph } from './ClientVaultGraph';
+import { VaultFolderTree } from './VaultFolderTree';
 import { useVaultGraphData } from '@/features/vault/lib/useVaultGraph';
 
 const MIN_SIDEBAR_WIDTH = 200;
