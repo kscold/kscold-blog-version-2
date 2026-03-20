@@ -2,7 +2,7 @@ package com.kscold.blog.chat.adapter.in.ws;
 
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import com.kscold.blog.identity.adapter.out.security.JwtTokenProvider;
+import com.kscold.blog.identity.application.port.out.TokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ChatHandshakeInterceptor implements HandshakeInterceptor {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
 
     @Override
@@ -31,12 +31,12 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
         }
 
         String token = servletRequest.getServletRequest().getParameter("token");
-        if (token == null || token.isBlank() || !jwtTokenProvider.validateToken(token)) {
+        if (token == null || token.isBlank() || !tokenProvider.validateToken(token)) {
             log.warn("WebSocket 연결 거부: 유효하지 않은 토큰");
             return false;
         }
 
-        String userId = jwtTokenProvider.getUserId(token);
+        String userId = tokenProvider.getUserId(token);
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             log.warn("WebSocket 연결 거부: 존재하지 않는 사용자 ({})", userId);
