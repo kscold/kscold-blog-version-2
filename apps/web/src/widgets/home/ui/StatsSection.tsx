@@ -42,12 +42,19 @@ export function StatsSection() {
 
   useEffect(() => {
     const year = new Date().getFullYear();
-    fetch(`https://github-contributions-api.jogruber.de/v4/kscold?y=${year}`)
-      .then(r => r.json())
-      .then(d => setGithub({
-        total: d.total?.[year] ?? 0,
-        days: d.contributions ?? [],
-      }))
+    const api = 'https://github-contributions-api.jogruber.de/v4/kscold';
+    Promise.all([
+      fetch(`${api}?y=${year}`).then(r => r.json()),
+      fetch(`${api}?y=${year - 1}`).then(r => r.json()),
+    ])
+      .then(([curr, prev]) => {
+        const allDays = [...(prev.contributions ?? []), ...(curr.contributions ?? [])];
+        const today = new Date().toISOString().split('T')[0];
+        const pastDays = allDays.filter((d: ContributionDay) => d.date <= today);
+        const last365 = pastDays.slice(-365);
+        const total = last365.reduce((sum: number, d: ContributionDay) => sum + d.count, 0);
+        setGithub({ total, days: last365 });
+      })
       .catch(() => {});
   }, []);
 
@@ -55,7 +62,7 @@ export function StatsSection() {
   const postCount = postsData?.totalElements ?? null;
   const commitCount = github?.total ?? null;
 
-  // 최근 26주만 표시
+  // 최근 26주만 표시 (과거 데이터만, 미래 제외)
   const allWeeks = groupByWeek(github?.days ?? []);
   const recentWeeks = allWeeks.slice(-26);
 
