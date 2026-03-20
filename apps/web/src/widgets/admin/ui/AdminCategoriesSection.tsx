@@ -1,9 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { CategoryTree } from '@/widgets/admin/ui/CategoryTree';
-import { CategoryModal } from '@/widgets/admin/ui/CategoryModal';
-import { useAdminCategories } from '@/widgets/admin/api/useAdminCategories';
+import { CategoryTree } from './CategoryTree';
+import { CategoryModal } from './CategoryModal';
+import { useAdminCategories } from '../api/useAdminCategories';
 
 export function AdminCategoriesSection() {
   const {
