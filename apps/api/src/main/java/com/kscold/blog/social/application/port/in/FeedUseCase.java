@@ -26,5 +26,5 @@ public interface FeedUseCase {
 
     void decrementCommentCount(String feedId);
 
-    void validateOwnership(String feedId, String userId);
+    void validateOwnership(String feedId, String userId, boolean isAdmin);
 }

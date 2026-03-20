@@ -2,12 +2,16 @@ package com.kscold.blog.shared.web;
 
 import com.kscold.blog.shared.domain.model.TeamPrivateDoc;
 import com.kscold.blog.shared.domain.repository.TeamPrivateDocRepository;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 
 @RestController
 @RequestMapping("/api/team")
@@ -23,8 +27,10 @@ public class TeamPrivateController {
      * 비밀번호 검증 후 팀 민감 정보 반환 (공개 API)
      */
     @PostMapping("/private")
-    public ResponseEntity<ApiResponse<TeamPrivateDoc>> getPrivateDocs(@RequestBody PasswordRequest request) {
-        if (!privatePassword.equals(request.getPassword())) {
+    public ResponseEntity<ApiResponse<TeamPrivateDoc>> getPrivateDocs(@Valid @RequestBody PasswordRequest request) {
+        if (!MessageDigest.isEqual(
+                privatePassword.getBytes(StandardCharsets.UTF_8),
+                (request.getPassword() != null ? request.getPassword() : "").getBytes(StandardCharsets.UTF_8))) {
             return ResponseEntity.status(403).body(ApiResponse.error("FORBIDDEN", "비밀번호가 틀렸습니다"));
         }
 
@@ -55,7 +61,7 @@ public class TeamPrivateController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<TeamPrivateDoc>> upsertPrivateDoc(
             @PathVariable String teamId,
-            @RequestBody TeamPrivateDoc doc
+            @Valid @RequestBody TeamPrivateDoc doc
     ) {
         TeamPrivateDoc existing = repository.findByTeamId(teamId).orElse(null);
         if (existing != null) {
