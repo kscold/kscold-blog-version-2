@@ -2,8 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
-import { PostHeader } from '@/widgets/post/ui/PostHeader';
-import { PostCommentSection } from '@/widgets/post/ui/PostCommentSection';
+import { PostHeader } from './PostHeader';
+import { PostCommentSection } from './PostCommentSection';
 import type { Post } from '@/types/blog';
 
 interface PostDetailProps {

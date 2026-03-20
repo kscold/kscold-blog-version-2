@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { usePostsByCategory } from '@/entities/post/api/usePosts';
 import { PostCard } from '@/entities/post/ui/PostCard';
-import { CategoryHeader } from '@/widgets/blog/ui/CategoryHeader';
+import { CategoryHeader } from './CategoryHeader';
 import { Pagination } from '@/shared/ui/Pagination';
 
 interface CategoryPostContainerProps {

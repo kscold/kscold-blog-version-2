@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { usePosts, usePostsByCategory, useSearchPosts } from '@/entities/post/api/usePosts';
 import { useCategories } from '@/entities/category/api/useCategories';
-import BlogPostGrid from '@/widgets/blog/ui/BlogPostGrid';
+import BlogPostGrid from './BlogPostGrid';
 
 export function BlogContainer() {
   const [page, setPage] = useState(0);

@@ -6,8 +6,8 @@ import {
   useCreateVaultComment,
   useDeleteVaultComment,
 } from '@/entities/vault/api/useVaultComments';
-import { VaultCommentItem } from '@/widgets/vault/ui/VaultCommentItem';
-import { VaultCommentForm } from '@/widgets/vault/ui/VaultCommentForm';
+import { VaultCommentItem } from './VaultCommentItem';
+import { VaultCommentForm } from './VaultCommentForm';
 import { useAlert } from '@/shared/model/alertStore';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
 

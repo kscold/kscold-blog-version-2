@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useFeed } from '@/entities/feed/api/useFeeds';
 import { FeedCard } from '@/entities/feed/ui/FeedCard';
-import { CommentSection } from '@/widgets/feed/ui/CommentSection';
+import { CommentSection } from './CommentSection';
 
 export function FeedDetail() {
   const params = useParams();

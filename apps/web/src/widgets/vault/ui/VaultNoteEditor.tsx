@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useVaultFolders, useCreateVaultNote, useUpdateVaultNote } from '@/entities/vault/api/useVault';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import { VaultFolder } from '@/types/vault';
-import VaultEditorSidebar from '@/widgets/vault/ui/VaultEditorSidebar';
+import VaultEditorSidebar from './VaultEditorSidebar';
 import { useAlert } from '@/shared/model/alertStore';
 
 const Editor = dynamic(() => import('@monaco-editor/react'), { ssr: false });

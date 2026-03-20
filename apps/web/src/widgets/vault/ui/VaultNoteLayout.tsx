@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useUiStore } from '@/shared/model/uiStore';
 import { useVaultNoteData } from '@/features/vault/lib/useVaultNote';
-import { VaultFolderTree } from '@/widgets/vault/ui/VaultFolderTree';
+import { VaultFolderTree } from './VaultFolderTree';
 import { VaultNoteContent } from '@/entities/vault/ui/VaultNoteContent';
 import { BacklinkList } from '@/entities/vault/ui/BacklinkList';
-import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
+import { ClientVaultGraph } from './ClientVaultGraph';
 
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 560;

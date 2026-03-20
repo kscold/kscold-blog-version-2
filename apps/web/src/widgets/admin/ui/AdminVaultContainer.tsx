@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAllVaultNotes, useDeleteVaultNote } from '@/entities/vault/api/useVault';
 import { VaultNote } from '@/types/vault';
-import { VaultNoteList } from '@/widgets/admin/ui/VaultNoteList';
+import { VaultNoteList } from './VaultNoteList';
 import { useAlert } from '@/shared/model/alertStore';
 
 export function AdminVaultContainer() {

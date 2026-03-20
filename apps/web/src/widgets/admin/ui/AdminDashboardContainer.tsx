@@ -6,7 +6,7 @@ import { useFeeds } from '@/entities/feed/api/useFeeds';
 import { useAllVaultNotes } from '@/entities/vault/api/useVault';
 import { useAuthStore } from '@/entities/user/model/authStore';
 import { useTags } from '@/entities/tag/api/useTags';
-import { DashboardStats } from '@/widgets/admin/ui/DashboardStats';
+import { DashboardStats } from './DashboardStats';
 
 export function AdminDashboardContainer() {
   const { user } = useAuthStore();

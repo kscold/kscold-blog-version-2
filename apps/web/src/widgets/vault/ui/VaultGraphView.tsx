@@ -9,7 +9,7 @@ import {
   configureForces,
   renderNode,
   renderNodeHitArea,
-} from '@/widgets/vault/lib/graphForceConfig';
+} from '../lib/graphForceConfig';
 
 interface VaultGraphViewProps {
   graphData: GraphData;
