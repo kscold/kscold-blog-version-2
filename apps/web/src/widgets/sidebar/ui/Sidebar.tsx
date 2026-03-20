@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // motion used for overlay only
 import { useCategories } from '@/entities/category/api/useCategories';
 import { useTags } from '@/entities/tag/api/useTags';
 import { useUiStore } from '@/shared/model/uiStore';
 import { Category } from '@/types/blog';
 
-function CategoryTree({ categories, depth = 0 }: { categories: Category[]; depth?: number }) {
+function CategoryTree({ categories, depth = 0, onNavigate }: { categories: Category[]; depth?: number; onNavigate?: () => void }) {
   const rootCategories = categories.filter(cat => cat.depth === depth);
 
   return (
@@ -21,6 +21,7 @@ function CategoryTree({ categories, depth = 0 }: { categories: Category[]; depth
           <li key={category.id}>
             <Link
               href={`/blog/${category.slug}`}
+              onClick={onNavigate}
               className="group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 hover:bg-white/5 hover:shadow-[inset_0_0_20px_rgba(6,182,212,0.1)] relative overflow-hidden"
             >
               <div className="absolute left-0 w-1 h-0 bg-surface-900 group-hover:h-full transition-all duration-300 top-1/2 -translate-y-1/2 rounded-full opacity-0 group-hover:opacity-100" />
@@ -36,7 +37,7 @@ function CategoryTree({ categories, depth = 0 }: { categories: Category[]; depth
                 {category.postCount}
               </span>
             </Link>
-            {children.length > 0 && <CategoryTree categories={categories} depth={depth + 1} />}
+            {children.length > 0 && <CategoryTree categories={categories} depth={depth + 1} onNavigate={onNavigate} />}
           </li>
         );
       })}
@@ -48,6 +49,7 @@ export function Sidebar() {
   const { data: categories } = useCategories();
   const { sidebarOpen, setSidebarOpen } = useUiStore();
   const { data: tags } = useTags();
+  const closeSidebar = () => setSidebarOpen(false);
 
   return (
     <>
@@ -63,8 +65,8 @@ export function Sidebar() {
         )}
       </AnimatePresence>
 
-      <motion.aside
-        className={`fixed top-[88px] left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ${
+      <aside
+        className={`fixed top-[88px] left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ease-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-[150%]'
         } lg:translate-x-0 bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm`}
       >
@@ -94,7 +96,7 @@ export function Sidebar() {
               Categories
             </h2>
             {categories ? (
-              <CategoryTree categories={categories} />
+              <CategoryTree categories={categories} onNavigate={closeSidebar} />
             ) : (
               <div className="text-sm text-surface-500">Loading...</div>
             )}
@@ -110,6 +112,7 @@ export function Sidebar() {
                   <Link
                     key={tag.id}
                     href={`/blog/tags/${tag.slug}`}
+                    onClick={closeSidebar}
                     className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
                   >
                     <div className="absolute inset-0 bg-surface-50 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -127,7 +130,7 @@ export function Sidebar() {
             </div>
           </div>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 }
