@@ -21,8 +21,9 @@ public class LinkScrapingAdapter implements LinkScrapingPort {
 
     @Override
     public LinkPreviewResponse scrape(String url) {
+        validateUrl(url);
+
         try {
-            validateUrl(url);
             Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (compatible; KscoldBot/1.0)")
                     .timeout(TIMEOUT_MS)

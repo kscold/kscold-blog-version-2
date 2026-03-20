@@ -1,6 +1,7 @@
 package com.kscold.blog.social.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.social.adapter.in.web.dto.FeedResponse;
 import com.kscold.blog.social.application.dto.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.FeedUpdateCommand;
@@ -17,7 +18,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class FeedController {
 
     private final FeedUseCase feedUseCase;
+    private final ClientIdentifierResolver clientIdentifierResolver;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<FeedResponse>>> getPublicFeeds(
@@ -36,7 +40,7 @@ public class FeedController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Feed> feeds = feedUseCase.getPublicFeeds(pageable);
-        String identifier = getClientIdentifier(request);
+        String identifier = clientIdentifierResolver.resolve(request);
         return ResponseEntity.ok(ApiResponse.success(feeds.map(feed -> FeedResponse.from(feed, identifier))));
     }
 
@@ -57,7 +61,7 @@ public class FeedController {
             HttpServletRequest request
     ) {
         Feed feed = feedUseCase.getById(id);
-        String identifier = getClientIdentifier(request);
+        String identifier = clientIdentifierResolver.resolve(request);
         return ResponseEntity.ok(ApiResponse.success(FeedResponse.from(feed, identifier)));
     }
 
@@ -78,7 +82,7 @@ public class FeedController {
             @Valid @RequestBody FeedUpdateCommand command,
             @AuthenticationPrincipal String userId
     ) {
-        feedUseCase.validateOwnership(id, userId);
+        feedUseCase.validateOwnership(id, userId, hasAdminRole());
         Feed feed = feedUseCase.update(id, command);
         return ResponseEntity.ok(ApiResponse.success(FeedResponse.from(feed), "피드가 수정되었습니다"));
     }
@@ -88,9 +92,15 @@ public class FeedController {
             @PathVariable String id,
             @AuthenticationPrincipal String userId
     ) {
-        feedUseCase.validateOwnership(id, userId);
+        feedUseCase.validateOwnership(id, userId, hasAdminRole());
         feedUseCase.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private boolean hasAdminRole() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     @PostMapping("/{id}/like")
@@ -98,16 +108,9 @@ public class FeedController {
             @PathVariable String id,
             HttpServletRequest request
     ) {
-        String identifier = getClientIdentifier(request);
+        String identifier = clientIdentifierResolver.resolve(request);
         Feed feed = feedUseCase.toggleLike(id, identifier);
         return ResponseEntity.ok(ApiResponse.success(FeedResponse.from(feed, identifier)));
     }
 
-    private String getClientIdentifier(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
-    }
 }
