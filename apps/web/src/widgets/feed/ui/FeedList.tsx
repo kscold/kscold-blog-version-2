@@ -5,9 +5,11 @@ import { motion } from 'framer-motion';
 import { useFeeds } from '@/entities/feed/api/useFeeds';
 import { FeedCard } from '@/entities/feed/ui/FeedCard';
 import { FeedComposer } from '@/features/feed/ui/FeedComposer';
+import { useAuth } from '@/features/auth/api/useAuth';
 import { Pagination } from '@/shared/ui/Pagination';
 
 export function FeedList() {
+  const { currentUser } = useAuth();
   const [page, setPage] = useState(0);
 
   const { data: feedsData, isLoading } = useFeeds({ page, size: 12 });
@@ -18,7 +20,7 @@ export function FeedList() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <FeedComposer />
+        <FeedComposer currentUser={currentUser ?? null} />
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
@@ -38,7 +40,7 @@ export function FeedList() {
   if (feeds.length === 0) {
     return (
       <div>
-        <FeedComposer />
+        <FeedComposer currentUser={currentUser ?? null} />
         <div className="text-center py-20">
           <h2 className="text-xl font-black tracking-tight text-surface-900 mb-2">
             아직 피드가 없습니다
@@ -51,7 +53,7 @@ export function FeedList() {
 
   return (
     <>
-      <FeedComposer />
+      <FeedComposer currentUser={currentUser ?? null} />
 
       <motion.div
         className="space-y-6"

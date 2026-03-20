@@ -4,13 +4,16 @@ import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCreateFeed, useLinkPreview } from '@/entities/feed/api/useFeeds';
-import { useAuth } from '@/features/auth/api/useAuth';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import { useAlert } from '@/shared/model/alertStore';
+import type { User } from '@/types/user';
 
-export function FeedComposer() {
-  const { currentUser, isAuthenticated } = useAuth();
+interface FeedComposerProps {
+  currentUser: User | null;
+}
+
+export function FeedComposer({ currentUser }: FeedComposerProps) {
   const createFeed = useCreateFeed();
   const alert = useAlert();
   const { uploadFiles, isUploading } = useMediaUpload();
@@ -23,7 +26,7 @@ export function FeedComposer() {
 
   const { data: linkPreview } = useLinkPreview(linkUrl);
 
-  if (!isAuthenticated || !currentUser) return null;
+  if (!currentUser) return null;
 
   const handleImageUpload = async (files: FileList) => {
     try {
