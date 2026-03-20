@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
@@ -34,6 +35,7 @@ public class MediaApplicationService implements MediaUseCase {
             "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"
     );
 
+    @Transactional
     public Media upload(MultipartFile file, String uploaderId, String uploaderName) {
         validateFile(file);
 
@@ -57,6 +59,7 @@ public class MediaApplicationService implements MediaUseCase {
         return mediaRepository.save(media);
     }
 
+    @Transactional
     public void delete(String fileUrl) {
         fileStoragePort.delete(fileUrl);
 
