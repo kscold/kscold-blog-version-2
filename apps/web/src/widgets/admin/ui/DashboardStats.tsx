@@ -8,14 +8,12 @@ interface StatItem {
   name: string;
   value: number;
   link: string;
-  color: string;
 }
 
 interface QuickAction {
   name: string;
   description: string;
   link: string;
-  color: string;
 }
 
 interface DashboardStatsProps {
@@ -50,7 +48,7 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
       {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-lg font-bold text-surface-900 mb-4">빠른 작업</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {quickActions.map((action, index) => (
             <motion.div
               key={action.name}
@@ -60,10 +58,10 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
             >
               <Link
                 href={action.link}
-                className={`block p-5 bg-gradient-to-br ${action.color} rounded-2xl text-white hover:shadow-lg transition-all group`}
+                className="block p-4 bg-surface-900 rounded-xl text-white hover:bg-surface-800 transition-colors group"
               >
-                <h3 className="font-bold mb-1">{action.name}</h3>
-                <p className="text-sm text-white/70">{action.description}</p>
+                <h3 className="font-bold text-sm mb-0.5">{action.name}</h3>
+                <p className="text-xs text-surface-400">{action.description}</p>
               </Link>
             </motion.div>
           ))}
