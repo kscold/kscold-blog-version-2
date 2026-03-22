@@ -203,8 +203,8 @@ export function useChatAdmin() {
   }, []);
 
   useEffect(() => {
-    loadRooms();
-    connect();
+    // REST로 방 목록 먼저 로드 후 WebSocket 연결
+    loadRooms().then(() => connect());
     return () => {
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
       if (wsRef.current) {
