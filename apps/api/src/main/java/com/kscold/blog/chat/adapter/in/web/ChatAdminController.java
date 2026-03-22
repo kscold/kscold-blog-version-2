@@ -29,6 +29,24 @@ public class ChatAdminController {
         return ResponseEntity.ok(ApiResponse.success(chatUseCase.getAllRooms()));
     }
 
+    // 어드민이 특정 방문자에게 메시지 전송 (오프라인 포함)
+    @PostMapping("/rooms/{roomId}/messages")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<ChatMessage>> sendMessage(
+            @PathVariable String roomId,
+            @RequestBody java.util.Map<String, String> body
+    ) {
+        String content = body.get("content");
+        String username = body.getOrDefault("username", "관리자");
+        if (content == null || content.isBlank()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("메시지 내용이 필요합니다"));
+        }
+        ChatMessage saved = chatUseCase.saveMessage(
+                "admin-rest", username, content.trim(),
+                ChatMessage.MessageType.TEXT, roomId, true);
+        return ResponseEntity.ok(ApiResponse.success(saved));
+    }
+
     // 특정 방의 메시지 (어드민 대화창)
     @GetMapping("/rooms/{roomId}/messages")
     @PreAuthorize("hasRole('ADMIN')")
