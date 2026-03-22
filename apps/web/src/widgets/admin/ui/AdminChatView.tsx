@@ -59,9 +59,9 @@ export default function AdminChatView() {
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-surface-900 truncate">{room.username}</p>
-                  {room.messages.length > 0 && (
+                  {(room.lastMessage || room.messages.length > 0) && (
                     <p className="text-xs text-surface-400 truncate">
-                      {room.messages[room.messages.length - 1].content}
+                      {room.lastMessage || room.messages[room.messages.length - 1]?.content}
                     </p>
                   )}
                 </div>
