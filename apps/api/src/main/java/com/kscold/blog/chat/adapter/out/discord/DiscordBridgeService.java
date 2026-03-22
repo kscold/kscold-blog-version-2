@@ -58,7 +58,7 @@ public class DiscordBridgeService {
                         username,
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM/dd HH:mm")));
 
-                thread = channel.createThreadChannel(threadName, true)
+                thread = channel.createThreadChannel(threadName, false)
                         .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
                         .complete();
 
@@ -112,6 +112,31 @@ public class DiscordBridgeService {
         // WebSocket으로 방문자에게 전달 (ChatWebSocketHandler에서 처리)
         if (blogMessageCallback != null) {
             blogMessageCallback.onAdminMessage(roomId, adminName, content);
+        }
+    }
+
+    /**
+     * 웹 어드민 답장 → 디스코드 스레드에 로깅
+     */
+    public void sendAdminReplyToDiscord(String roomId, String adminName, String content) {
+        if (jda == null || channelId.isBlank()) return;
+
+        String threadId = roomToThread.get(roomId);
+        if (threadId == null) return;
+
+        try {
+            ThreadChannel thread = jda.getThreadChannelById(threadId);
+            if (thread != null && !thread.isArchived()) {
+                thread.sendMessageEmbeds(new EmbedBuilder()
+                        .setAuthor("✉️ " + adminName + " (웹)", null, null)
+                        .setDescription(content)
+                        .setColor(new Color(34, 197, 94))
+                        .setTimestamp(java.time.Instant.now())
+                        .build()
+                ).queue();
+            }
+        } catch (Exception e) {
+            log.error("Discord 어드민 답장 로깅 실패: {}", e.getMessage());
         }
     }
 
