@@ -24,19 +24,20 @@ export function AdminDashboardContainer() {
   const totalTags = tagsData?.length || 0;
 
   const stats = [
-    { name: '전체 포스트', value: totalPosts, link: '/admin/posts', color: 'from-purple-600 to-blue-600' },
-    { name: '카테고리', value: categories?.length || 0, link: '/admin/categories', color: 'from-blue-600 to-cyan-600' },
-    { name: '피드', value: totalFeeds, link: '/admin/feed', color: 'from-pink-600 to-rose-600' },
-    { name: 'Vault 노트', value: totalVaultNotes, link: '/admin/vault', color: 'from-violet-600 to-purple-600' },
-    { name: '태그', value: totalTags, link: '/admin/tags', color: 'from-emerald-600 to-green-600' },
+    { name: '전체 포스트', value: totalPosts, link: '/admin/posts' },
+    { name: '카테고리', value: categories?.length || 0, link: '/admin/categories' },
+    { name: '피드', value: totalFeeds, link: '/admin/feed' },
+    { name: 'Vault 노트', value: totalVaultNotes, link: '/admin/vault' },
+    { name: '태그', value: totalTags, link: '/admin/tags' },
   ];
 
   const quickActions = [
-    { name: '새 포스트 작성', description: '블로그 포스트를 작성합니다', link: '/admin/posts/new', color: 'from-purple-600 to-blue-600' },
-    { name: '새 피드 작성', description: '일상 피드를 작성합니다', link: '/admin/feed/new', color: 'from-pink-600 to-rose-600' },
-    { name: '새 노트 작성', description: 'Vault 노트를 작성합니다', link: '/admin/vault/new', color: 'from-violet-600 to-purple-600' },
-    { name: '카테고리 관리', description: '카테고리를 관리합니다', link: '/admin/categories', color: 'from-cyan-600 to-teal-600' },
-    { name: '태그 관리', description: '태그를 생성하고 관리합니다', link: '/admin/tags', color: 'from-emerald-600 to-green-600' },
+    { name: '새 포스트 작성', description: '블로그 포스트를 작성합니다', link: '/admin/posts/new' },
+    { name: '새 피드 작성', description: '일상 피드를 작성합니다', link: '/admin/feed/new' },
+    { name: '새 노트 작성', description: 'Vault 노트를 작성합니다', link: '/admin/vault/new' },
+    { name: '채팅 관리', description: '방문자 실시간 채팅을 관리합니다', link: '/admin/chat' },
+    { name: '카테고리 관리', description: '카테고리를 관리합니다', link: '/admin/categories' },
+    { name: '태그 관리', description: '태그를 생성하고 관리합니다', link: '/admin/tags' },
   ];
 
   return (
