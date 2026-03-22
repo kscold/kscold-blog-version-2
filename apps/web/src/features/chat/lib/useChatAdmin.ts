@@ -29,6 +29,8 @@ export function useChatAdmin() {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const selectedRoomIdRef = useRef<string | null>(null);
+  const roomsRef = useRef(rooms);
+  roomsRef.current = rooms;
 
   // REST: 과거 채팅 방 목록 불러오기
   const loadRooms = useCallback(async () => {
@@ -111,12 +113,13 @@ export function useChatAdmin() {
         const data = JSON.parse(event.data as string);
 
         if (data.type === 'room_list') {
-          // 온라인 상태만 업데이트 (기존 방 목록 유지)
+          // 온라인 상태만 업데이트 (REST로 로드한 기존 방 목록 보존)
           const onlineIds = new Set(
             (data.rooms as Array<{ userId: string }>).map(r => r.userId)
           );
-          setRooms(prev => {
-            const next = new Map(prev);
+          setRooms(() => {
+            // roomsRef.current로 최신 상태 참조 (React 비동기 state 문제 우회)
+            const next = new Map(roomsRef.current);
             next.forEach((room, id) => {
               next.set(id, { ...room, online: onlineIds.has(id) });
             });
