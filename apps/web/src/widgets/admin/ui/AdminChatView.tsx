@@ -44,7 +44,7 @@ export default function AdminChatView() {
         </div>
         <div className="flex-1 overflow-y-auto">
           {roomList.length === 0 ? (
-            <p className="p-4 text-xs text-surface-400 text-center">접속 중인 방문자 없음</p>
+            <p className="p-4 text-xs text-surface-400 text-center">채팅 기록이 없습니다</p>
           ) : (
             roomList.map(room => (
               <button
