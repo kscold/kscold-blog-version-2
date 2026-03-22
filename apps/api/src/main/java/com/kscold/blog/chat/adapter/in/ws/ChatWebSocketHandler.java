@@ -2,7 +2,9 @@ package com.kscold.blog.chat.adapter.in.ws;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
+import com.kscold.blog.chat.adapter.out.discord.DiscordBridgeService;
 import com.kscold.blog.chat.domain.model.ChatMessage;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,6 +26,25 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private final ChatUseCase chatUseCase;
     private final ObjectMapper objectMapper;
+    private final DiscordBridgeService discordBridge;
+
+    @PostConstruct
+    void init() {
+        // 디스코드에서 관리자 답장 → 블로그 방문자에게 WebSocket 전달
+        discordBridge.setBlogMessageCallback((roomId, adminName, content) -> {
+            Map<String, Object> msg = new LinkedHashMap<>();
+            msg.put("type", "message");
+            msg.put("id", String.valueOf(System.currentTimeMillis()));
+            msg.put("roomId", roomId);
+            msg.put("username", adminName);
+            msg.put("content", content);
+            msg.put("fromAdmin", true);
+            msg.put("timestamp", LocalDateTime.now().toString());
+
+            broadcastToUserSessions(roomId, msg);
+            broadcastToAdmins(msg);
+        });
+    }
 
     // sessionId → 세션 정보
     private record SessionInfo(WebSocketSession session, String userId, String username, boolean isAdmin) {}
@@ -54,6 +75,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
             // 어드민에게 새 방문자 알림
             broadcastToAdmins(Map.of("type", "room_joined", "userId", userId, "username", username));
+
+            // 디스코드에 입장 알림
+            discordBridge.sendSystemToDiscord(userId, username + "님이 입장했습니다");
         }
     }
 
@@ -78,6 +102,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             Map<String, Object> msg = toMessageMap(saved);
             broadcastToUserSessions(info.userId(), msg);
             broadcastToAdmins(msg);
+
+            // 디스코드로 전달
+            discordBridge.sendToDiscord(info.userId(), info.username(), content.trim());
         } else {
             // 어드민 → toUserId 지정 방문자에게 전송 (자기 자신에게는 불가)
             String toUserId = payload.get("toUserId");
@@ -105,6 +132,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             chatUseCase.saveMessage(session.getId(), "SYSTEM", info.username() + "님이 퇴장했습니다",
                     ChatMessage.MessageType.SYSTEM, info.userId(), false);
             broadcastToAdmins(Map.of("type", "room_left", "userId", info.userId(), "username", info.username()));
+
+            // 디스코드에 퇴장 알림
+            discordBridge.sendSystemToDiscord(info.userId(), info.username() + "님이 퇴장했습니다");
         }
     }
 

@@ -51,6 +51,12 @@ team:
   private:
     password: ${TEAM_PRIVATE_PASSWORD:changeme}
 
+# Discord Bot (채팅 브릿지)
+discord:
+  token: ${DISCORD_BOT_TOKEN:}
+  guild-id: ${DISCORD_GUILD_ID:1409051974397198368}
+  channel-id: ${DISCORD_CHANNEL_ID:1409051975026217044}
+
 # Logging
 logging:
   level:

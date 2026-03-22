@@ -37,6 +37,9 @@ dependencies {
     // Jsoup (HTML 파싱 / OG 메타데이터 스크래핑)
     implementation 'org.jsoup:jsoup:1.17.2'
 
+    // Discord JDA (채팅 브릿지)
+    implementation 'net.dv8tion:JDA:5.0.0-beta.24'
+
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
