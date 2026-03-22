@@ -215,9 +215,43 @@ export function useChatAdmin() {
     };
   }, [connect, loadRooms]);
 
-  const sendMessage = useCallback((content: string, toUserId: string) => {
-    if (!content.trim() || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
-    wsRef.current.send(JSON.stringify({ type: 'message', content: content.trim(), toUserId }));
+  const sendMessage = useCallback(async (content: string, toUserId: string) => {
+    if (!content.trim()) return;
+
+    // WebSocket이 열려있으면 실시간 전송
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: 'message', content: content.trim(), toUserId }));
+    } else {
+      // 오프라인이거나 WS 끊겼을 때 REST API로 저장
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+      try {
+        await fetch(`${API_BASE}/api/admin/chat/rooms/${toUserId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ content: content.trim(), username: '관리자' }),
+        });
+      } catch { /* ignore */ }
+    }
+
+    // 로컬 메시지 목록에 즉시 반영
+    const msg: AdminMessage = {
+      id: String(Date.now()),
+      username: '관리자',
+      content: content.trim(),
+      fromAdmin: true,
+      type: 'message',
+      timestamp: new Date().toISOString(),
+      roomId: toUserId,
+    };
+    setRooms(prev => {
+      const next = new Map(prev);
+      const room = next.get(toUserId);
+      if (room) {
+        next.set(toUserId, { ...room, messages: [...room.messages, msg], lastMessage: msg.content, lastTimestamp: msg.timestamp });
+      }
+      return next;
+    });
   }, []);
 
   const selectRoom = useCallback((userId: string) => {

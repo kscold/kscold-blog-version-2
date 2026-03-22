@@ -146,13 +146,12 @@ export default function AdminChatView() {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={selectedRoom.online ? '메시지 입력...' : '오프라인 방문자에게는 보낼 수 없습니다'}
-                disabled={!selectedRoom.online}
-                className="flex-1 px-3 py-2 text-sm rounded-lg border border-surface-200 focus:outline-none focus:ring-2 focus:ring-surface-300 disabled:bg-surface-50 disabled:text-surface-400"
+                placeholder="메시지 입력..."
+                className="flex-1 px-3 py-2 text-sm rounded-lg border border-surface-200 focus:outline-none focus:ring-2 focus:ring-surface-300"
               />
               <button
                 onClick={handleSend}
-                disabled={!input.trim() || !selectedRoom.online}
+                disabled={!input.trim()}
                 className="px-4 py-2 bg-surface-900 text-white text-sm rounded-lg hover:bg-surface-800 disabled:opacity-40 transition-colors"
               >
                 전송
