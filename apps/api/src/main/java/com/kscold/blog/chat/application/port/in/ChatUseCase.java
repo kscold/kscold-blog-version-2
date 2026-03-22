@@ -16,4 +16,6 @@ public interface ChatUseCase {
     Page<ChatMessage> getMessagesByRoom(String roomId, Pageable pageable);
 
     Page<ChatMessage> getAllMessages(Pageable pageable);
+
+    List<com.kscold.blog.chat.domain.port.out.ChatMessageRepository.ChatRoomSummary> getAllRooms();
 }
