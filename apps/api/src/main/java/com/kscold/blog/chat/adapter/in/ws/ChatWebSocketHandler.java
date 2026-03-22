@@ -118,6 +118,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             Map<String, Object> msg = toMessageMap(saved);
             broadcastToUserSessions(toUserId, msg);
             broadcastToAdmins(msg);
+
+            // 웹 어드민 답장도 디스코드에 로깅
+            discordBridge.sendAdminReplyToDiscord(toUserId, info.username(), content.trim());
         }
     }
 
