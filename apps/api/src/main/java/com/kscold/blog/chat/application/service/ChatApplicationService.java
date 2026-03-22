@@ -50,4 +50,9 @@ public class ChatApplicationService implements ChatUseCase {
     public Page<ChatMessage> getAllMessages(Pageable pageable) {
         return chatMessageRepository.findAll(pageable);
     }
+
+    @Override
+    public List<ChatMessageRepository.ChatRoomSummary> getAllRooms() {
+        return chatMessageRepository.findAllRooms();
+    }
 }
