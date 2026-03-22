@@ -15,4 +15,8 @@ public interface ChatMessageRepository {
     Page<ChatMessage> findByRoomId(String roomId, Pageable pageable);
 
     Page<ChatMessage> findAll(Pageable pageable);
+
+    List<ChatRoomSummary> findAllRooms();
+
+    record ChatRoomSummary(String roomId, String username, String lastMessage, String lastTimestamp, long messageCount) {}
 }
