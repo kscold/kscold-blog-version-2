@@ -36,6 +36,13 @@ export const metadata: Metadata = {
     title: '김승찬 블로그',
     description: '배운 것을 기록하고, 기록을 연결합니다. 개발 공부와 일상을 쌓아가는 공간.',
   },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '48x48' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
+  },
   robots: {
     index: true,
     follow: true,
