@@ -1,5 +1,6 @@
 package com.kscold.blog.chat.application.port.in;
 
+import com.kscold.blog.chat.application.dto.ChatRoomSummaryDto;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,5 +18,5 @@ public interface ChatUseCase {
 
     Page<ChatMessage> getAllMessages(Pageable pageable);
 
-    List<com.kscold.blog.chat.domain.port.out.ChatMessageRepository.ChatRoomSummary> getAllRooms();
+    List<ChatRoomSummaryDto> getAllRooms();
 }
