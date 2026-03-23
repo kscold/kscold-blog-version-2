@@ -1,10 +1,10 @@
 package com.kscold.blog.chat.application.service;
 
+import com.kscold.blog.chat.application.dto.ChatRoomSummaryDto;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatApplicationService implements ChatUseCase {
@@ -52,7 +51,11 @@ public class ChatApplicationService implements ChatUseCase {
     }
 
     @Override
-    public List<ChatMessageRepository.ChatRoomSummary> getAllRooms() {
-        return chatMessageRepository.findAllRooms();
+    public List<ChatRoomSummaryDto> getAllRooms() {
+        return chatMessageRepository.findAllRooms().stream()
+                .map(s -> new ChatRoomSummaryDto(
+                        s.roomId(), s.username(), s.lastMessage(),
+                        s.lastTimestamp(), s.messageCount()))
+                .toList();
     }
 }
