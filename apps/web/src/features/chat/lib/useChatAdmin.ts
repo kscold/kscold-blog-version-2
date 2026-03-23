@@ -1,273 +1,163 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { AdminMessage, AdminRoom } from '@/entities/chat';
+import { fetchChatRooms, fetchRoomMessages, sendRestMessage } from '@/entities/chat';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+type Rooms = Map<string, AdminRoom>;
 
-export interface AdminMessage {
-  id: string;
-  username: string;
-  content: string;
-  fromAdmin: boolean;
-  type: 'message' | 'system';
-  timestamp: string;
-  roomId: string;
-}
-
-export interface AdminRoom {
-  userId: string;
-  username: string;
-  online: boolean;
-  messages: AdminMessage[];
-  unreadCount: number;
-  lastMessage?: string;
-  lastTimestamp?: string;
+// Map 업데이트 헬퍼
+function updateRoom(prev: Rooms, id: string, patch: Partial<AdminRoom>): Rooms {
+  const next = new Map(prev);
+  const room = next.get(id);
+  if (room) next.set(id, { ...room, ...patch });
+  return next;
 }
 
 export function useChatAdmin() {
-  const [rooms, setRooms] = useState<Map<string, AdminRoom>>(new Map());
+  const [rooms, setRooms] = useState<Rooms>(new Map());
   const [isConnected, setIsConnected] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const selectedRoomIdRef = useRef<string | null>(null);
+  const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const selectedRef = useRef<string | null>(null);
   const roomsRef = useRef(rooms);
   roomsRef.current = rooms;
 
-  // REST: 과거 채팅 방 목록 불러오기
+  // REST: 과거 채팅 방 목록
   const loadRooms = useCallback(async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
     try {
-      const res = await fetch(`${API_BASE}/api/admin/chat/rooms`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return;
-      const json = await res.json();
-      const data = json.data as Array<{
-        roomId: string; username: string; lastMessage: string;
-        lastTimestamp: string; messageCount: number;
-      }>;
+      const data = await fetchChatRooms();
       setRooms(prev => {
         const next = new Map(prev);
         data.forEach(r => {
           const existing = next.get(r.roomId);
           next.set(r.roomId, {
-            userId: r.roomId,
-            username: existing?.username || r.username,
-            online: existing?.online ?? false,
-            messages: existing?.messages ?? [],
+            userId: r.roomId, username: existing?.username || r.username,
+            online: existing?.online ?? false, messages: existing?.messages ?? [],
             unreadCount: existing?.unreadCount ?? 0,
-            lastMessage: r.lastMessage,
-            lastTimestamp: r.lastTimestamp,
+            lastMessage: r.lastMessage, lastTimestamp: r.lastTimestamp,
           });
         });
         return next;
       });
-    } catch { /* ignore */ }
+    } catch { /* 무시 */ }
   }, []);
 
-  // REST: 방 선택 시 메시지 히스토리 불러오기
-  const loadRoomMessages = useCallback(async (roomId: string) => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
+  // REST: 방 메시지 히스토리
+  const loadMessages = useCallback(async (roomId: string) => {
     try {
-      const res = await fetch(`${API_BASE}/api/admin/chat/rooms/${roomId}/messages?size=100`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return;
-      const json = await res.json();
-      const messages: AdminMessage[] = (json.data?.content || []).map((m: Record<string, unknown>) => ({
-        id: (m.id as string) || String(Date.now()),
-        username: (m.username as string) || '',
-        content: (m.content as string) || '',
-        fromAdmin: Boolean(m.fromAdmin),
-        type: m.type === 'SYSTEM' ? 'system' as const : 'message' as const,
-        timestamp: (m.timestamp as string) || '',
-        roomId: (m.roomId as string) || roomId,
-      }));
-      setRooms(prev => {
-        const next = new Map(prev);
-        const room = next.get(roomId);
-        if (room) next.set(roomId, { ...room, messages });
-        return next;
-      });
-    } catch { /* ignore */ }
+      const messages = await fetchRoomMessages(roomId);
+      setRooms(prev => updateRoom(prev, roomId, { messages }));
+    } catch { /* 무시 */ }
   }, []);
 
+  // WebSocket 메시지 핸들러
+  const handleWsMessage = useCallback((event: MessageEvent) => {
+    try {
+      const data = JSON.parse(event.data as string);
+      if (data.type === 'room_list') {
+        const onlineIds = new Set((data.rooms as Array<{ userId: string }>).map(r => r.userId));
+        setRooms(() => {
+          const next = new Map(roomsRef.current);
+          next.forEach((room, id) => next.set(id, { ...room, online: onlineIds.has(id) }));
+          (data.rooms as Array<{ userId: string; username: string }>).forEach(r => {
+            if (!next.has(r.userId))
+              next.set(r.userId, { userId: r.userId, username: r.username, online: true, messages: [], unreadCount: 0 });
+          });
+          return next;
+        });
+      } else if (data.type === 'room_joined') {
+        setRooms(prev => {
+          const next = new Map(prev);
+          const existing = next.get(data.userId);
+          next.set(data.userId, {
+            userId: data.userId, username: data.username || existing?.username || '', online: true,
+            messages: existing?.messages ?? [], unreadCount: existing?.unreadCount ?? 0,
+            lastMessage: existing?.lastMessage, lastTimestamp: existing?.lastTimestamp,
+          });
+          return next;
+        });
+      } else if (data.type === 'room_left') {
+        setRooms(prev => updateRoom(prev, data.userId, { online: false }));
+      } else if (data.type === 'message' || data.type === 'system') {
+        const msg: AdminMessage = {
+          id: data.id || String(Date.now()), username: data.username || '',
+          content: data.content || '', fromAdmin: Boolean(data.fromAdmin),
+          type: data.type, timestamp: data.timestamp || new Date().toISOString(),
+          roomId: data.roomId || '',
+        };
+        if (!msg.roomId) return;
+        setRooms(prev => {
+          const next = new Map(prev);
+          const room = next.get(msg.roomId);
+          const isSelected = selectedRef.current === msg.roomId;
+          if (room) {
+            next.set(msg.roomId, { ...room, messages: [...room.messages, msg],
+              lastMessage: msg.content, lastTimestamp: msg.timestamp,
+              unreadCount: isSelected ? 0 : room.unreadCount + 1 });
+          } else {
+            next.set(msg.roomId, { userId: msg.roomId, username: msg.username, online: true,
+              messages: [msg], lastMessage: msg.content, lastTimestamp: msg.timestamp, unreadCount: 1 });
+          }
+          return next;
+        });
+      }
+    } catch { /* 무시 */ }
+  }, []);
+
+  // WebSocket 연결
   const connect = useCallback(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     if (!token) return;
-
-    const base =
-      process.env.NEXT_PUBLIC_WS_URL ||
+    const base = process.env.NEXT_PUBLIC_WS_URL ||
       (typeof window !== 'undefined' && window.location.protocol === 'https:'
-        ? `wss://${window.location.host}/ws/chat`
-        : 'ws://localhost:8081/ws/chat');
+        ? `wss://${window.location.host}/ws/chat` : 'ws://localhost:8081/ws/chat');
 
     const ws = new WebSocket(`${base}?token=${encodeURIComponent(token)}`);
     wsRef.current = ws;
-
     ws.onopen = () => setIsConnected(true);
-
-    ws.onmessage = event => {
-      try {
-        const data = JSON.parse(event.data as string);
-
-        if (data.type === 'room_list') {
-          // 온라인 상태만 업데이트 (REST로 로드한 기존 방 목록 보존)
-          const onlineIds = new Set(
-            (data.rooms as Array<{ userId: string }>).map(r => r.userId)
-          );
-          setRooms(() => {
-            // roomsRef.current로 최신 상태 참조 (React 비동기 state 문제 우회)
-            const next = new Map(roomsRef.current);
-            next.forEach((room, id) => {
-              next.set(id, { ...room, online: onlineIds.has(id) });
-            });
-            (data.rooms as Array<{ userId: string; username: string }>).forEach(r => {
-              if (!next.has(r.userId)) {
-                next.set(r.userId, {
-                  userId: r.userId, username: r.username, online: true,
-                  messages: [], unreadCount: 0,
-                });
-              }
-            });
-            return next;
-          });
-        } else if (data.type === 'room_joined') {
-          setRooms(prev => {
-            const next = new Map(prev);
-            const existing = next.get(data.userId as string);
-            next.set(data.userId as string, {
-              userId: data.userId as string,
-              username: (data.username as string) || existing?.username || '',
-              online: true,
-              messages: existing?.messages ?? [],
-              unreadCount: existing?.unreadCount ?? 0,
-              lastMessage: existing?.lastMessage,
-              lastTimestamp: existing?.lastTimestamp,
-            });
-            return next;
-          });
-        } else if (data.type === 'room_left') {
-          setRooms(prev => {
-            const next = new Map(prev);
-            const room = next.get(data.userId as string);
-            if (room) next.set(data.userId as string, { ...room, online: false });
-            return next;
-          });
-        } else if (data.type === 'message' || data.type === 'system') {
-          const msg: AdminMessage = {
-            id: (data.id as string) || String(Date.now()),
-            username: (data.username as string) || '',
-            content: (data.content as string) || '',
-            fromAdmin: Boolean(data.fromAdmin),
-            type: data.type as 'message' | 'system',
-            timestamp: (data.timestamp as string) || new Date().toISOString(),
-            roomId: (data.roomId as string) || '',
-          };
-          if (!msg.roomId) return;
-
-          setRooms(prev => {
-            const next = new Map(prev);
-            const room = next.get(msg.roomId);
-            const isSelected = selectedRoomIdRef.current === msg.roomId;
-            if (room) {
-              next.set(msg.roomId, {
-                ...room,
-                messages: [...room.messages, msg],
-                lastMessage: msg.content,
-                lastTimestamp: msg.timestamp,
-                unreadCount: isSelected ? 0 : room.unreadCount + 1,
-              });
-            } else {
-              next.set(msg.roomId, {
-                userId: msg.roomId, username: msg.username, online: true,
-                messages: [msg], lastMessage: msg.content,
-                lastTimestamp: msg.timestamp, unreadCount: 1,
-              });
-            }
-            return next;
-          });
-        }
-      } catch {
-        // ignore parse errors
-      }
-    };
-
+    ws.onmessage = handleWsMessage;
     ws.onclose = () => {
       setIsConnected(false);
       wsRef.current = null;
-      reconnectTimerRef.current = setTimeout(() => {
-        if (wsRef.current === null) connect();
-      }, 3000);
+      reconnectRef.current = setTimeout(() => { if (!wsRef.current) connect(); }, 3000);
     };
-
     ws.onerror = () => ws.close();
-  }, []);
+  }, [handleWsMessage]);
 
   useEffect(() => {
-    // REST로 방 목록 먼저 로드 후 WebSocket 연결
     loadRooms().then(() => connect());
     return () => {
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
-      if (wsRef.current) {
-        wsRef.current.onclose = null;
-        wsRef.current.close();
-        wsRef.current = null;
-      }
+      if (reconnectRef.current) clearTimeout(reconnectRef.current);
+      if (wsRef.current) { wsRef.current.onclose = null; wsRef.current.close(); wsRef.current = null; }
     };
   }, [connect, loadRooms]);
 
   const sendMessage = useCallback(async (content: string, toUserId: string) => {
     if (!content.trim()) return;
-
-    // WebSocket이 열려있으면 실시간 전송
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: 'message', content: content.trim(), toUserId }));
     } else {
-      // 오프라인이거나 WS 끊겼을 때 REST API로 저장
-      const token = localStorage.getItem('accessToken');
-      if (!token) return;
       try {
-        await fetch(`${API_BASE}/api/admin/chat/rooms/${toUserId}/messages`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ content: content.trim(), username: '관리자' }),
+        await sendRestMessage(toUserId, content.trim());
+        const msg: AdminMessage = {
+          id: String(Date.now()), username: '관리자', content: content.trim(),
+          fromAdmin: true, type: 'message', timestamp: new Date().toISOString(), roomId: toUserId,
+        };
+        setRooms(prev => {
+          const room = prev.get(toUserId);
+          if (!room) return prev;
+          return updateRoom(prev, toUserId, { messages: [...room.messages, msg], lastMessage: msg.content });
         });
-      } catch { /* ignore */ }
+      } catch { /* 무시 */ }
     }
-
-    // 로컬 메시지 목록에 즉시 반영
-    const msg: AdminMessage = {
-      id: String(Date.now()),
-      username: '관리자',
-      content: content.trim(),
-      fromAdmin: true,
-      type: 'message',
-      timestamp: new Date().toISOString(),
-      roomId: toUserId,
-    };
-    setRooms(prev => {
-      const next = new Map(prev);
-      const room = next.get(toUserId);
-      if (room) {
-        next.set(toUserId, { ...room, messages: [...room.messages, msg], lastMessage: msg.content, lastTimestamp: msg.timestamp });
-      }
-      return next;
-    });
   }, []);
 
   const selectRoom = useCallback((userId: string) => {
-    selectedRoomIdRef.current = userId;
+    selectedRef.current = userId;
     setSelectedRoomId(userId);
-    setRooms(prev => {
-      const next = new Map(prev);
-      const room = next.get(userId);
-      if (room) next.set(userId, { ...room, unreadCount: 0 });
-      return next;
-    });
-    loadRoomMessages(userId);
-  }, [loadRoomMessages]);
+    setRooms(prev => updateRoom(prev, userId, { unreadCount: 0 }));
+    loadMessages(userId);
+  }, [loadMessages]);
 
   return { rooms, isConnected, selectedRoomId, selectRoom, sendMessage };
 }
