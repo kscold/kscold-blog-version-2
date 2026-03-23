@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.awt.Color;
@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class DiscordBridgeService {
 
+    @Nullable
     private final JDA jda;
     private final ChatUseCase chatUseCase;
 
@@ -30,8 +31,7 @@ public class DiscordBridgeService {
     private final ConcurrentHashMap<String, String> roomToThread = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, String> threadToRoom = new ConcurrentHashMap<>();
 
-    @Autowired
-    public DiscordBridgeService(@Autowired(required = false) JDA jda, ChatUseCase chatUseCase) {
+    public DiscordBridgeService(@Nullable JDA jda, ChatUseCase chatUseCase) {
         this.jda = jda;
         this.chatUseCase = chatUseCase;
     }
