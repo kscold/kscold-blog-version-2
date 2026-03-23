@@ -6,6 +6,8 @@ import { useFeeds } from '@/entities/feed/api/useFeeds';
 import { useAllVaultNotes } from '@/entities/vault/api/useVault';
 import { useAuthStore } from '@/entities/user/model/authStore';
 import { useTags } from '@/entities/tag/api/useTags';
+import { fetchChatRooms } from '@/entities/chat/api/chatAdminApi';
+import { useQuery } from '@tanstack/react-query';
 import { DashboardStats } from './DashboardStats';
 
 export function AdminDashboardContainer() {
@@ -16,12 +18,19 @@ export function AdminDashboardContainer() {
   const { data: feedsData } = useFeeds({ page: 0, size: 1 });
   const { data: vaultData } = useAllVaultNotes(0, 1);
   const { data: tagsData } = useTags();
+  const { data: chatRooms } = useQuery({
+    queryKey: ['admin', 'chat', 'rooms'],
+    queryFn: fetchChatRooms,
+    refetchInterval: 30000,
+  });
 
   const posts = postsData?.content || [];
   const totalPosts = allPostsData?.totalElements || 0;
   const totalFeeds = feedsData?.totalElements || 0;
   const totalVaultNotes = vaultData?.totalElements || 0;
   const totalTags = tagsData?.length || 0;
+  const totalChatRooms = chatRooms?.length || 0;
+  const totalMessages = chatRooms?.reduce((sum, r) => sum + r.messageCount, 0) || 0;
 
   const stats = [
     { name: '전체 포스트', value: totalPosts, link: '/admin/posts' },
@@ -29,6 +38,8 @@ export function AdminDashboardContainer() {
     { name: '피드', value: totalFeeds, link: '/admin/feed' },
     { name: 'Vault 노트', value: totalVaultNotes, link: '/admin/vault' },
     { name: '태그', value: totalTags, link: '/admin/tags' },
+    { name: '채팅 방', value: totalChatRooms, link: '/admin/chat' },
+    { name: '총 메시지', value: totalMessages, link: '/admin/chat' },
   ];
 
   const quickActions = [
