@@ -2,30 +2,13 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { apiClient } from '@/shared/api/api-client';
-import type { PrivateDocs } from '@/entities/profile/model/teamData';
+import { useTeamPrivate } from '../lib/useTeamPrivate';
 
 export function PrivateDocsSection({ teamId }: { teamId: string }) {
-  const [showPrivate, setShowPrivate] = useState(false);
-  const [privateDocs, setPrivateDocs] = useState<PrivateDocs | null>(null);
+  const { docs: privateDocs, unlocked: showPrivate, loading, error: pwError, unlock } = useTeamPrivate(teamId);
   const [password, setPassword] = useState('');
-  const [pwError, setPwError] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const handleUnlock = async () => {
-    if (!password.trim() || loading) return;
-    setLoading(true);
-    setPwError(false);
-    try {
-      const res = await apiClient.post<PrivateDocs>('/team/private', { password, teamId });
-      setPrivateDocs(res);
-      setShowPrivate(true);
-    } catch {
-      setPwError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleUnlock = () => unlock(password);
 
   return (
     <motion.div
@@ -50,7 +33,7 @@ export function PrivateDocsSection({ teamId }: { teamId: string }) {
               <input
                 type="password"
                 value={password}
-                onChange={e => { setPassword(e.target.value); setPwError(false); }}
+                onChange={e => setPassword(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleUnlock()}
                 placeholder="비밀번호"
                 className={`flex-1 px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-surface-300 ${pwError ? 'border-red-400 bg-red-50' : 'border-surface-200'}`}
