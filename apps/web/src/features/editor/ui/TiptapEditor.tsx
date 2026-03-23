@@ -9,13 +9,9 @@ import Placeholder from '@tiptap/extension-placeholder';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Markdown } from 'tiptap-markdown';
 import { createLowlight, common } from 'lowlight';
-import { apiClient } from '@/shared/api/api-client';
+import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 
 const lowlight = createLowlight(common);
-
-interface UploadResponse {
-  url: string;
-}
 
 interface TiptapEditorProps {
   defaultContent?: string;
@@ -30,18 +26,15 @@ export default function TiptapEditor({
   placeholder = '글을 작성하세요... 이미지를 붙여넣거나 드래그해서 업로드할 수 있어요.',
   minHeight = '500px',
 }: TiptapEditorProps) {
+  const { uploadFile } = useMediaUpload();
+
   const uploadImage = useCallback(async (file: File): Promise<string | null> => {
-    if (!file.type.startsWith('image/')) return null;
-    if (file.size > 10 * 1024 * 1024) return null;
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const result = await apiClient.upload<UploadResponse>('/media/upload', formData);
-      return result.url;
+      return await uploadFile(file);
     } catch {
       return null;
     }
-  }, []);
+  }, [uploadFile]);
 
   const editor = useEditor({
     extensions: [
