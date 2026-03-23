@@ -9,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -50,8 +51,13 @@ public class LinkScrapingAdapter implements LinkScrapingPort {
                     .image(image)
                     .siteName(siteName)
                     .build();
+        } catch (IOException e) {
+            log.warn("링크 스크래핑 실패 (네트워크): {} - {}", url, e.getMessage());
+            return LinkPreviewResponse.builder()
+                    .url(url)
+                    .build();
         } catch (Exception e) {
-            log.warn("Failed to scrape URL: {} - {}", url, e.getMessage());
+            log.error("링크 스크래핑 실패 (예상치 못한 오류): {} - {}", url, e.getMessage());
             return LinkPreviewResponse.builder()
                     .url(url)
                     .build();
