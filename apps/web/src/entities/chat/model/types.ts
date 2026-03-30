@@ -25,3 +25,15 @@ export interface ChatRoomSummary {
   lastTimestamp: string;
   messageCount: number;
 }
+
+export interface VisitorChatMessage {
+  id: string;
+  user: {
+    id: string | null;
+    name: string;
+  };
+  content: string;
+  fromAdmin: boolean;
+  type: 'TEXT' | 'SYSTEM';
+  createdAt: string;
+}

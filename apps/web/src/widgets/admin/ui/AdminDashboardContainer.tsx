@@ -49,6 +49,7 @@ export function AdminDashboardContainer() {
     { name: '채팅 관리', description: '방문자 실시간 채팅을 관리합니다', link: '/admin/chat' },
     { name: '카테고리 관리', description: '카테고리를 관리합니다', link: '/admin/categories' },
     { name: '태그 관리', description: '태그를 생성하고 관리합니다', link: '/admin/tags' },
+    { name: '열람 요청 관리', description: '글 열람 권한 요청을 승인/거절합니다', link: '/admin/access-requests' },
   ];
 
   return (

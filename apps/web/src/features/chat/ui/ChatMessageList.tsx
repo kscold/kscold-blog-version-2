@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Message } from '@/features/chat/lib/useChatSocket';
+import type { VisitorChatMessage } from '@/entities/chat';
 
 interface ChatMessageListProps {
-  messages: Message[];
+  messages: VisitorChatMessage[];
   currentUsername?: string;
 }
 
