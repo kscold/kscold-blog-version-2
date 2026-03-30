@@ -9,6 +9,7 @@ export interface Category {
   order: number;
   icon?: string;
   color?: string;
+  restricted?: boolean;
   postCount: number;
   children?: Category[];
   createdAt: string;
@@ -40,6 +41,7 @@ export interface Post {
   source?: 'MANUAL' | 'MARKDOWN_IMPORT';
   originalFilename?: string;
   featured: boolean;
+  restricted?: boolean;
   views: number;
   likes: number;
   seo?: {
