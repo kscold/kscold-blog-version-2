@@ -2,8 +2,8 @@ package com.kscold.blog.chat.adapter.in.ws;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
-import com.kscold.blog.chat.adapter.out.discord.DiscordBridgeService;
 import com.kscold.blog.chat.domain.model.ChatMessage;
+import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ChatWebSocketHandler extends TextWebSocketHandler {
+public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBroadcastPort {
 
     private final ChatUseCase chatUseCase;
     private final ObjectMapper objectMapper;
-    private final DiscordBridgeService discordBridge;
+    private final com.kscold.blog.chat.adapter.out.discord.DiscordBridgeService discordBridge;
 
     @PostConstruct
     void init() {
@@ -199,7 +199,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         return map;
     }
 
-    public void publishSavedMessage(ChatMessage message) {
+    @Override
+    public void broadcast(ChatMessage message) {
         Map<String, Object> payload = toMessageMap(message);
         broadcastToAdmins(payload);
         if (message.getRoomId() != null) {
