@@ -132,8 +132,8 @@ export function GitHubHeatmap({ username }: Props) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-2">
-        <div className="flex sm:hidden gap-1">
+      <div className="flex flex-col gap-2 mt-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex sm:hidden gap-1 flex-wrap">
           {availableYears.map(y => (
             <button key={y} onClick={() => setYear(y)}
               className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
@@ -141,7 +141,7 @@ export function GitHubHeatmap({ username }: Props) {
               }`}>{y}</button>
           ))}
         </div>
-        <div className="flex items-center gap-1.5 ml-auto">
+        <div className="flex items-center gap-1.5 sm:ml-auto">
           <span className="text-[10px] text-surface-400">Less</span>
           {COLORS.map((c, i) => (
             <div key={i} className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: c }} />
