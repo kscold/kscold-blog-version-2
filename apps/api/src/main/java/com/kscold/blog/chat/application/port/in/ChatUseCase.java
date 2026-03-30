@@ -12,6 +12,10 @@ public interface ChatUseCase {
     ChatMessage saveMessage(String sessionId, String username, String content,
                             ChatMessage.MessageType type, String roomId, boolean fromAdmin);
 
+    /** 저장 + WebSocket 브로드캐스트 + 외부 알림 (REST 전송용) */
+    ChatMessage saveAndBroadcast(String sessionId, String username, String content,
+                                 ChatMessage.MessageType type, String roomId, boolean fromAdmin);
+
     List<ChatMessage> getRecentMessagesByRoom(String roomId, int limit);
 
     Page<ChatMessage> getMessagesByRoom(String roomId, Pageable pageable);
