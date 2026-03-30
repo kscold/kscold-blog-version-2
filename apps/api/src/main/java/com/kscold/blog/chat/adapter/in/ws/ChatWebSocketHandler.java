@@ -198,4 +198,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         map.put("timestamp", msg.getTimestamp() != null ? msg.getTimestamp().toString() : LocalDateTime.now().toString());
         return map;
     }
+
+    public void publishSavedMessage(ChatMessage message) {
+        Map<String, Object> payload = toMessageMap(message);
+        broadcastToAdmins(payload);
+        if (message.getRoomId() != null) {
+            broadcastToUserSessions(message.getRoomId(), payload);
+        }
+    }
 }

@@ -1,0 +1,50 @@
+package com.kscold.blog.chat.adapter.in.web;
+
+import com.kscold.blog.chat.adapter.in.ws.ChatWebSocketHandler;
+import com.kscold.blog.chat.adapter.out.discord.DiscordBridgeService;
+import com.kscold.blog.chat.application.dto.SendUserMessageCommand;
+import com.kscold.blog.chat.application.port.in.ChatUseCase;
+import com.kscold.blog.chat.domain.model.ChatMessage;
+import com.kscold.blog.identity.domain.model.User;
+import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.shared.web.ApiResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/chat")
+@RequiredArgsConstructor
+public class ChatController {
+
+    private final ChatUseCase chatUseCase;
+    private final UserRepository userRepository;
+    private final ChatWebSocketHandler chatWebSocketHandler;
+    private final DiscordBridgeService discordBridgeService;
+
+    @GetMapping("/messages")
+    public ResponseEntity<ApiResponse<List<ChatMessage>>> getMyMessages(
+            @AuthenticationPrincipal String userId,
+            @RequestParam(defaultValue = "50") int limit
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(chatUseCase.getRecentMessagesByRoom(userId, limit)));
+    }
+
+    @PostMapping("/messages")
+    public ResponseEntity<ApiResponse<ChatMessage>> sendMessage(
+            @AuthenticationPrincipal String userId,
+            @RequestBody @Valid SendUserMessageCommand command
+    ) {
+        User user = userRepository.findById(userId).orElseThrow();
+        ChatMessage saved = chatUseCase.saveMessage(
+                "user-rest", user.getDisplayName(), command.content().trim(),
+                ChatMessage.MessageType.TEXT, userId, false);
+        chatWebSocketHandler.publishSavedMessage(saved);
+        discordBridgeService.sendToDiscord(userId, user.getDisplayName(), command.content().trim());
+        return ResponseEntity.ok(ApiResponse.success(saved));
+    }
+}
