@@ -31,6 +31,7 @@ public class PostResponse {
     private Post.Source source;
     private String originalFilename;
     private Boolean featured;
+    private Boolean restricted;
     private Integer views;
     private Integer likes;
     private SeoInfo seo;
@@ -128,6 +129,34 @@ public class PostResponse {
                 .publishedAt(post.getPublishedAt())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
+                .build();
+    }
+
+    /**
+     * restricted 포스트 — 본문 제거, excerpt만 반환
+     */
+    public static PostResponse restricted(Post post) {
+        PostResponse resp = from(post);
+        return PostResponse.builder()
+                .id(resp.getId())
+                .title(resp.getTitle())
+                .slug(resp.getSlug())
+                .content(null)
+                .excerpt(resp.getExcerpt())
+                .coverImage(resp.getCoverImage())
+                .category(resp.getCategory())
+                .tags(resp.getTags())
+                .author(resp.getAuthor())
+                .status(resp.getStatus())
+                .source(resp.getSource())
+                .featured(resp.getFeatured())
+                .restricted(true)
+                .views(resp.getViews())
+                .likes(resp.getLikes())
+                .seo(resp.getSeo())
+                .publishedAt(resp.getPublishedAt())
+                .createdAt(resp.getCreatedAt())
+                .updatedAt(resp.getUpdatedAt())
                 .build();
     }
 

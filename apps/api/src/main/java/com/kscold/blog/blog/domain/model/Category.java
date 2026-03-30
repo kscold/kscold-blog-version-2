@@ -48,6 +48,9 @@ public class Category {
     private String color; // hex 색상 코드
 
     @Builder.Default
+    private Boolean restricted = false; // true면 승인된 유저만 글 열람 가능
+
+    @Builder.Default
     private Integer postCount = 0; // 비정규화된 포스트 수
 
     @CreatedDate

@@ -2,7 +2,10 @@ package com.kscold.blog.blog.adapter.in.web;
 
 import com.kscold.blog.blog.application.dto.PostCreateCommand;
 import com.kscold.blog.blog.application.dto.PostUpdateCommand;
+import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
+import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
+import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.adapter.in.web.dto.PostResponse;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -31,6 +34,8 @@ import java.util.List;
 public class PostController {
 
     private final PostUseCase postUseCase;
+    private final AccessRequestUseCase accessRequestUseCase;
+    private final CategoryUseCase categoryUseCase;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<PostResponse>>> getAllPosts(
@@ -55,15 +60,21 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PostResponse>> getPostById(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<PostResponse>> getPostById(
+            @PathVariable String id,
+            @AuthenticationPrincipal String userId
+    ) {
         Post post = postUseCase.getById(id);
-        return ResponseEntity.ok(ApiResponse.success(PostResponse.from(post)));
+        return ResponseEntity.ok(ApiResponse.success(applyRestriction(post, userId)));
     }
 
     @GetMapping("/slug/{slug}")
-    public ResponseEntity<ApiResponse<PostResponse>> getPostBySlug(@PathVariable String slug) {
+    public ResponseEntity<ApiResponse<PostResponse>> getPostBySlug(
+            @PathVariable String slug,
+            @AuthenticationPrincipal String userId
+    ) {
         Post post = postUseCase.getBySlug(slug);
-        return ResponseEntity.ok(ApiResponse.success(PostResponse.from(post)));
+        return ResponseEntity.ok(ApiResponse.success(applyRestriction(post, userId)));
     }
 
     @GetMapping("/category/{categoryId}")
@@ -143,5 +154,18 @@ public class PostController {
     public ResponseEntity<ApiResponse<Boolean>> checkSlugExists(@PathVariable String slug) {
         boolean exists = postUseCase.existsBySlug(slug);
         return ResponseEntity.ok(ApiResponse.success(exists));
+    }
+
+    private PostResponse applyRestriction(Post post, String userId) {
+        if (post.getCategory() == null) return PostResponse.from(post);
+        try {
+            Category category = categoryUseCase.getById(post.getCategory().getId());
+            if (Boolean.TRUE.equals(category.getRestricted())
+                    && !accessRequestUseCase.hasAccess(userId, category.getId())) {
+                return PostResponse.restricted(post);
+            }
+        } catch (Exception ignored) {
+        }
+        return PostResponse.from(post);
     }
 }

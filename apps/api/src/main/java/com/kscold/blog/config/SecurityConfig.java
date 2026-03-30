@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/github/**").permitAll()
                         // 피드 공개 엔드포인트
                         .requestMatchers(HttpMethod.GET, "/api/feeds/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/feeds/*/like").permitAll()
@@ -64,6 +65,8 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         // 웹소켓
                         .requestMatchers("/ws/**", "/socket.io/**").permitAll()
+                        // 접근 요청 확인 (비로그인도 가능하게 - 필터에서 null userId 처리)
+                        .requestMatchers(HttpMethod.GET, "/api/access-requests/check/**").permitAll()
                         // 관리자 엔드포인트
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 그 외 모든 요청은 인증 필요
