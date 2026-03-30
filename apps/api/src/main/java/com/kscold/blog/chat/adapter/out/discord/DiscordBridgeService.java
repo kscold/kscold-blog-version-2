@@ -2,6 +2,7 @@ package com.kscold.blog.chat.adapter.out.discord;
 
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
+import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -18,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
-public class DiscordBridgeService {
+public class DiscordBridgeService implements ChatNotificationPort {
 
     @Nullable
     private final JDA jda;
@@ -137,6 +138,15 @@ public class DiscordBridgeService {
             }
         } catch (Exception e) {
             log.error("Discord 어드민 답장 로깅 실패: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void notifyMessage(String roomId, String username, String content, boolean fromAdmin) {
+        if (fromAdmin) {
+            sendAdminReplyToDiscord(roomId, username, content);
+        } else {
+            sendToDiscord(roomId, username, content);
         }
     }
 

@@ -3,7 +3,9 @@ package com.kscold.blog.chat.application.service;
 import com.kscold.blog.chat.application.dto.ChatRoomSummaryDto;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
+import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
+import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,8 @@ import java.util.List;
 public class ChatApplicationService implements ChatUseCase {
 
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatBroadcastPort broadcastPort;
+    private final ChatNotificationPort notificationPort;
 
     @Override
     @Transactional
@@ -33,6 +37,16 @@ public class ChatApplicationService implements ChatUseCase {
                 .timestamp(LocalDateTime.now())
                 .build();
         return chatMessageRepository.save(message);
+    }
+
+    @Override
+    @Transactional
+    public ChatMessage saveAndBroadcast(String sessionId, String username, String content,
+                                        ChatMessage.MessageType type, String roomId, boolean fromAdmin) {
+        ChatMessage saved = saveMessage(sessionId, username, content, type, roomId, fromAdmin);
+        broadcastPort.broadcast(saved);
+        notificationPort.notifyMessage(roomId, username, content, fromAdmin);
+        return saved;
     }
 
     @Override
