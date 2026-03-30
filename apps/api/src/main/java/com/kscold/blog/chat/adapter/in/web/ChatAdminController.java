@@ -3,8 +3,6 @@ package com.kscold.blog.chat.adapter.in.web;
 import com.kscold.blog.chat.application.dto.ChatRoomSummaryDto;
 import com.kscold.blog.chat.application.dto.SendAdminMessageCommand;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
-import com.kscold.blog.chat.adapter.in.ws.ChatWebSocketHandler;
-import com.kscold.blog.chat.adapter.out.discord.DiscordBridgeService;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.validation.Valid;
@@ -26,8 +24,6 @@ import java.util.List;
 public class ChatAdminController {
 
     private final ChatUseCase chatUseCase;
-    private final ChatWebSocketHandler chatWebSocketHandler;
-    private final DiscordBridgeService discordBridgeService;
 
     @GetMapping("/rooms")
     public ResponseEntity<ApiResponse<List<ChatRoomSummaryDto>>> getRooms() {
@@ -39,11 +35,9 @@ public class ChatAdminController {
             @PathVariable String roomId,
             @RequestBody @Valid SendAdminMessageCommand command
     ) {
-        ChatMessage saved = chatUseCase.saveMessage(
+        ChatMessage saved = chatUseCase.saveAndBroadcast(
                 "admin-rest", command.resolvedUsername(), command.content().trim(),
                 ChatMessage.MessageType.TEXT, roomId, true);
-        chatWebSocketHandler.publishSavedMessage(saved);
-        discordBridgeService.sendAdminReplyToDiscord(roomId, command.resolvedUsername(), command.content().trim());
         return ResponseEntity.ok(ApiResponse.success(saved));
     }
 
