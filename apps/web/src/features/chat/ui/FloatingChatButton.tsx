@@ -16,7 +16,8 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="fixed bottom-6 right-6 z-[1200] group"
+      className="fixed right-4 z-[1200] group sm:right-6"
+      style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -27,13 +28,13 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
       <div className="absolute inset-x-0 -bottom-2 h-full bg-surface-900/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
       {/* 버튼 */}
-      <div className="relative w-16 h-16 bg-surface-900 hover:bg-surface-800 rounded-full shadow-xl shadow-surface-900/10 flex items-center justify-center transition-all duration-300 border border-surface-800">
+      <div className="relative flex h-14 w-14 items-center justify-center rounded-full border border-surface-800 bg-surface-900 shadow-xl shadow-surface-900/10 transition-all duration-300 hover:bg-surface-800 sm:h-16 sm:w-16">
         {/* 채팅 아이콘 */}
         <AnimatePresence mode="wait">
           {!isHovered ? (
             <motion.svg
               key="chat"
-              className="w-8 h-8 text-white"
+            className="h-7 w-7 text-white sm:h-8 sm:w-8"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -52,7 +53,7 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
           ) : (
             <motion.svg
               key="message"
-              className="w-8 h-8 text-white"
+              className="h-7 w-7 text-white sm:h-8 sm:w-8"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -90,7 +91,7 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            className="absolute bottom-full right-0 mb-3 px-4 py-2 bg-white text-surface-900 font-bold tracking-wide text-xs rounded-xl shadow-lg whitespace-nowrap border border-surface-200"
+            className="absolute bottom-full right-0 mb-3 hidden whitespace-nowrap rounded-xl border border-surface-200 bg-white px-4 py-2 text-xs font-bold tracking-wide text-surface-900 shadow-lg sm:block"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
