@@ -4,6 +4,8 @@ import com.kscold.blog.shared.web.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -138,6 +140,34 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 인증 실패 예외 처리 (401)
+     * JWT 토큰 없음, 만료 등 인증 관련 예외
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleAuthentication(AuthenticationException e) {
+        log.warn("AuthenticationException: {}", e.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(
+            ErrorCode.UNAUTHORIZED.getCode(),
+            "인증이 필요합니다. 다시 로그인해주세요."
+        );
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * 접근 권한 없음 예외 처리 (403)
+     * @PreAuthorize 등 권한 검사 실패 시 발생
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException e) {
+        log.warn("AccessDeniedException: {}", e.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(
+            ErrorCode.FORBIDDEN.getCode(),
+            "접근 권한이 없습니다."
+        );
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
     /**
