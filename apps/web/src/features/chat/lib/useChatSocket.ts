@@ -1,145 +1,78 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-
-export interface Message {
-  id: string;
-  user: {
-    id: string | null;
-    name: string;
-  };
-  content: string;
-  fromAdmin: boolean;
-  type: 'TEXT' | 'SYSTEM';
-  createdAt: string;
-}
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import type { RawChatPayload } from '@/entities/chat/lib/messageMappers';
+import { toVisitorMessage } from '@/entities/chat/lib/messageMappers';
+import { fetchMyChatMessages, sendVisitorMessage, type VisitorChatMessage } from '@/entities/chat';
+import { resolveChatWsUrl } from '@/shared/lib/runtime-url';
 
 interface UseChatSocketOptions {
   isOpen: boolean;
   username: string;
 }
 
-export function useChatSocket({ isOpen, username }: UseChatSocketOptions) {
-  const [messages, setMessages] = useState<Message[]>([]);
+export function useChatSocket({ isOpen, username: _username }: UseChatSocketOptions) {
+  const [messages, setMessages] = useState<VisitorChatMessage[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const [onlineUsers, setOnlineUsers] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connect = useCallback(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     if (!token) return;
-
-    const base =
-      process.env.NEXT_PUBLIC_WS_URL ||
-      (typeof window !== 'undefined' && window.location.protocol === 'https:'
-        ? `wss://${window.location.host}/ws/chat`
-        : 'ws://localhost:8081/ws/chat');
-
-    const WS_URL = `${base}?token=${encodeURIComponent(token)}`;
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(`${resolveChatWsUrl()}?token=${encodeURIComponent(token)}`);
     wsRef.current = ws;
-
-    ws.onopen = () => {
-      setIsConnected(true);
-    };
-
-    ws.onmessage = event => {
-      try {
-        const data = JSON.parse(event.data as string);
-
-        if (data.type === 'history') {
-          const historyMessages: Message[] = (data.messages as Array<{
-            type: string;
-            id: string;
-            username: string;
-            content: string;
-            fromAdmin?: boolean;
-            timestamp: string;
-          }>).map(msg => toMessage(msg));
-          setMessages(historyMessages);
-        } else if (data.type === 'user_count') {
-          setOnlineUsers(data.count as number);
-        } else if (data.type === 'message' || data.type === 'system') {
-          const msg = toMessage(data as {
-            type: string;
-            id: string;
-            username: string;
-            content: string;
-            fromAdmin?: boolean;
-            timestamp: string;
-          });
-          setMessages(prev => [...prev, msg]);
-        }
-      } catch {
-        // ignore parse errors
-      }
-    };
-
+    ws.onopen = () => setIsConnected(true);
+    ws.onmessage = event => handleSocketMessage(event, setMessages);
     ws.onclose = () => {
       setIsConnected(false);
       wsRef.current = null;
-      // 3초 후 재연결 시도
-      reconnectTimerRef.current = setTimeout(() => {
-        if (wsRef.current === null) {
-          connect();
-        }
-      }, 3000);
+      reconnectRef.current = setTimeout(() => !wsRef.current && connect(), 3000);
     };
-
-    ws.onerror = () => {
-      ws.close();
-    };
+    ws.onerror = () => ws.close();
   }, []);
 
   useEffect(() => {
     if (!isOpen) return;
-
+    fetchMyChatMessages().then(setMessages).catch(() => {});
     connect();
-
     return () => {
-      if (reconnectTimerRef.current) {
-        clearTimeout(reconnectTimerRef.current);
-        reconnectTimerRef.current = null;
-      }
+      if (reconnectRef.current) clearTimeout(reconnectRef.current);
       if (wsRef.current) {
-        wsRef.current.onclose = null; // 재연결 방지
+        wsRef.current.onclose = null;
         wsRef.current.close();
         wsRef.current = null;
       }
       setMessages([]);
       setIsConnected(false);
-      setOnlineUsers(0);
     };
-  }, [isOpen, connect]);
+  }, [connect, isOpen]);
 
-  const sendMessage = useCallback(
-    (content: string) => {
-      if (!content.trim() || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+  const sendMessage = useCallback(async (content: string) => {
+    if (!content.trim()) return;
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: 'message', content: content.trim() }));
-    },
-    []
-  );
+      return;
+    }
+    const saved = await sendVisitorMessage(content.trim());
+    setMessages(prev => [...prev, saved]);
+  }, []);
 
-  return { messages, isConnected, onlineUsers, sendMessage };
+  return { messages, isConnected, sendMessage };
 }
 
-function toMessage(data: {
-  type: string;
-  id: string;
-  username: string;
-  content: string;
-  fromAdmin?: boolean;
-  timestamp: string;
-}): Message {
-  const isSystem = data.type === 'system';
-  return {
-    id: data.id || String(Date.now()),
-    user: {
-      id: null,
-      name: isSystem ? 'SYSTEM' : (data.username || '익명'),
-    },
-    content: data.content || '',
-    fromAdmin: Boolean(data.fromAdmin),
-    type: isSystem ? 'SYSTEM' : 'TEXT',
-    createdAt: data.timestamp || new Date().toISOString(),
-  };
+function handleSocketMessage(
+  event: MessageEvent,
+  setMessages: Dispatch<SetStateAction<VisitorChatMessage[]>>
+) {
+  try {
+    const data = JSON.parse(event.data as string) as RawChatPayload & { messages?: RawChatPayload[] };
+    if (data.type === 'history') {
+      setMessages((data.messages || []).map(toVisitorMessage));
+      return;
+    }
+    if (data.type === 'message' || data.type === 'system') {
+      setMessages(prev => [...prev, toVisitorMessage(data)]);
+    }
+  } catch {
+    // noop
+  }
 }

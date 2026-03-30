@@ -1,13 +1,14 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+import { resolveApiBaseUrl } from '@/shared/lib/runtime-url';
 
 class ApiClient {
   private client: AxiosInstance;
+  private readonly apiUrl: string;
 
   constructor() {
+    this.apiUrl = resolveApiBaseUrl();
     this.client = axios.create({
-      baseURL: API_URL,
+      baseURL: this.apiUrl,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -95,7 +96,7 @@ class ApiClient {
       const currentRefreshToken = this.getRefreshToken();
       if (!currentRefreshToken) return null;
 
-      const response = await axios.post(`${API_URL}/auth/refresh`, {
+      const response = await axios.post(`${this.apiUrl}/auth/refresh`, {
         refreshToken: currentRefreshToken,
       });
       const { accessToken, refreshToken: newRefreshToken } = response.data.data;
