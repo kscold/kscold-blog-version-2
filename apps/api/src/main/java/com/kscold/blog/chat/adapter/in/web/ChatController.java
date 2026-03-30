@@ -1,10 +1,10 @@
 package com.kscold.blog.chat.adapter.in.web;
 
-import com.kscold.blog.chat.adapter.in.ws.ChatWebSocketHandler;
 import com.kscold.blog.chat.adapter.out.discord.DiscordBridgeService;
 import com.kscold.blog.chat.application.dto.SendUserMessageCommand;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
+import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -23,7 +23,7 @@ public class ChatController {
 
     private final ChatUseCase chatUseCase;
     private final UserRepository userRepository;
-    private final ChatWebSocketHandler chatWebSocketHandler;
+    private final ChatBroadcastPort chatBroadcastPort;
     private final DiscordBridgeService discordBridgeService;
 
     @GetMapping("/messages")
@@ -43,7 +43,7 @@ public class ChatController {
         ChatMessage saved = chatUseCase.saveMessage(
                 "user-rest", user.getDisplayName(), command.content().trim(),
                 ChatMessage.MessageType.TEXT, userId, false);
-        chatWebSocketHandler.publishSavedMessage(saved);
+        chatBroadcastPort.broadcast(saved);
         discordBridgeService.sendToDiscord(userId, user.getDisplayName(), command.content().trim());
         return ResponseEntity.ok(ApiResponse.success(saved));
     }
