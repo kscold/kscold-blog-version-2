@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import { PostHeader } from './PostHeader';
 import { PostCommentSection } from './PostCommentSection';
+import { RestrictedOverlay } from './RestrictedOverlay';
 import type { Post } from '@/types/blog';
 
 interface PostDetailProps {
@@ -18,6 +19,8 @@ export function PostDetail({ post }: PostDetailProps) {
         day: 'numeric',
       })
     : '';
+
+  const isRestricted = post.restricted && !post.content;
 
   return (
     <div className="min-h-screen bg-surface-50">
@@ -34,16 +37,26 @@ export function PostDetail({ post }: PostDetailProps) {
           formattedDate={formattedDate}
         />
 
-        <motion.div
-          className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
-          <MarkdownContent content={post.content} />
-        </motion.div>
+        {isRestricted ? (
+          <RestrictedOverlay
+            categoryId={post.category?.id}
+            categoryName={post.category?.name}
+            excerpt={post.excerpt}
+          />
+        ) : (
+          <>
+            <motion.div
+              className="mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <MarkdownContent content={post.content} />
+            </motion.div>
 
-        <PostCommentSection tags={post.tags} />
+            <PostCommentSection tags={post.tags} />
+          </>
+        )}
       </article>
     </div>
   );
