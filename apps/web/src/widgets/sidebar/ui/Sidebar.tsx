@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion'; // motion used for overlay only
+import { usePathname } from 'next/navigation';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { useTags } from '@/entities/tag/api/useTags';
 import { useUiStore } from '@/shared/model/uiStore';
@@ -50,6 +51,8 @@ export function Sidebar() {
   const { sidebarOpen, setSidebarOpen } = useUiStore();
   const { data: tags } = useTags();
   const closeSidebar = () => setSidebarOpen(false);
+  const pathname = usePathname();
+  const isVaultPage = pathname.startsWith('/vault');
 
   return (
     <>
@@ -68,7 +71,7 @@ export function Sidebar() {
       <aside
         className={`fixed top-[88px] left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ease-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-[150%]'
-        } lg:translate-x-0 bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm`}
+        } ${isVaultPage ? '' : 'lg:translate-x-0'} bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm`}
       >
         <div className="p-6 space-y-8 relative">
           {/* Mobile Navigation Links (Visible on all sizes for sidebar access) */}

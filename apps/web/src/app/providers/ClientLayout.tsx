@@ -22,7 +22,7 @@ export function ClientLayout({ children }: ClientLayoutProps) {
       <ScrollProgress />
       <Header />
       <div className={`flex flex-1 w-full ${isVaultPage ? 'mt-16 h-[calc(100dvh-4rem)] overflow-hidden' : 'pt-16'}`}>
-        {!isVaultPage && <Sidebar />}
+        <Sidebar />
         <main
           className={`flex-1 flex flex-col w-full relative ${
             !isVaultPage ? 'lg:pl-64 min-h-[calc(100vh-4rem)]' : 'h-full'
