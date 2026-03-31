@@ -1,5 +1,7 @@
 package com.kscold.blog.chat.adapter.out.discord;
 
+import com.kscold.blog.chat.application.port.in.ChatUseCase;
+import com.kscold.blog.chat.domain.model.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -14,19 +16,16 @@ import org.springframework.stereotype.Component;
 public class DiscordMessageListener extends ListenerAdapter {
 
     private final DiscordBridgeService discordBridgeService;
+    private final ChatUseCase chatUseCase;
 
     @Value("${discord.channel-id:}")
     private String supportChannelId;
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        // 봇 자신의 메시지 무시
         if (event.getAuthor().isBot()) return;
-
-        // 스레드 메시지만 처리
         if (!event.isFromType(ChannelType.GUILD_PUBLIC_THREAD)) return;
 
-        // support 채널의 스레드인지 확인
         String parentId = event.getChannel().asThreadChannel().getParentChannel().getId();
         if (!parentId.equals(supportChannelId)) return;
 
@@ -36,7 +35,28 @@ public class DiscordMessageListener extends ListenerAdapter {
 
         if (content.isBlank()) return;
 
+        String roomId = discordBridgeService.getRoomIdByThread(threadId);
+        if (roomId == null) {
+            log.warn("Discord → Blog: 스레드 매핑 없음 ({})", threadId);
+            return;
+        }
+
         log.info("Discord → Blog: {} in thread {}: {}", adminName, threadId, content);
-        discordBridgeService.sendToBlog(threadId, adminName, content);
+
+        // MongoDB에 저장
+        chatUseCase.saveMessage(
+                "discord-" + threadId,
+                adminName,
+                content,
+                ChatMessage.MessageType.TEXT,
+                roomId,
+                true
+        );
+
+        // WebSocket으로 방문자에게 전달
+        DiscordBridgeService.BlogMessageCallback callback = discordBridgeService.getBlogMessageCallback();
+        if (callback != null) {
+            callback.onAdminMessage(roomId, adminName, content);
+        }
     }
 }

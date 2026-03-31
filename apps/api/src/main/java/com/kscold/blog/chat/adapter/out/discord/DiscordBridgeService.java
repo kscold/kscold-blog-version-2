@@ -1,6 +1,5 @@
 package com.kscold.blog.chat.adapter.out.discord;
 
-import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,6 @@ public class DiscordBridgeService implements ChatNotificationPort {
 
     @Nullable
     private final JDA jda;
-    private final ChatUseCase chatUseCase;
 
     @Value("${discord.channel-id:}")
     private String channelId;
@@ -32,9 +30,8 @@ public class DiscordBridgeService implements ChatNotificationPort {
     private final ConcurrentHashMap<String, String> roomToThread = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, String> threadToRoom = new ConcurrentHashMap<>();
 
-    public DiscordBridgeService(@Nullable JDA jda, ChatUseCase chatUseCase) {
+    public DiscordBridgeService(@Nullable JDA jda) {
         this.jda = jda;
-        this.chatUseCase = chatUseCase;
     }
 
     /**
@@ -54,7 +51,6 @@ public class DiscordBridgeService implements ChatNotificationPort {
             ThreadChannel thread = threadId != null ? jda.getThreadChannelById(threadId) : null;
 
             if (thread == null || thread.isArchived()) {
-                // 새 스레드 생성
                 String threadName = String.format("💬 %s (%s)",
                         username,
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM/dd HH:mm")));
@@ -66,7 +62,6 @@ public class DiscordBridgeService implements ChatNotificationPort {
                 roomToThread.put(roomId, thread.getId());
                 threadToRoom.put(thread.getId(), roomId);
 
-                // 스레드 시작 안내 메시지
                 thread.sendMessageEmbeds(new EmbedBuilder()
                         .setTitle("새 채팅 시작")
                         .setDescription("**" + username + "** 님이 블로그에서 채팅을 시작했습니다.\n이 스레드에서 답장하면 방문자에게 전달됩니다.")
@@ -75,7 +70,6 @@ public class DiscordBridgeService implements ChatNotificationPort {
                 ).queue();
             }
 
-            // 방문자 메시지 전송
             thread.sendMessageEmbeds(new EmbedBuilder()
                     .setAuthor(username, null, null)
                     .setDescription(content)
@@ -86,33 +80,6 @@ public class DiscordBridgeService implements ChatNotificationPort {
 
         } catch (Exception e) {
             log.error("Discord 메시지 전송 실패: {}", e.getMessage());
-        }
-    }
-
-    /**
-     * 디스코드 스레드 답장 → 블로그 방문자에게 전달
-     * DiscordMessageListener에서 호출
-     */
-    public void sendToBlog(String threadId, String adminName, String content) {
-        String roomId = threadToRoom.get(threadId);
-        if (roomId == null) {
-            log.warn("스레드 매핑을 찾을 수 없음: {}", threadId);
-            return;
-        }
-
-        // MongoDB에 저장
-        chatUseCase.saveMessage(
-                "discord-" + threadId,
-                adminName,
-                content,
-                ChatMessage.MessageType.TEXT,
-                roomId,
-                true
-        );
-
-        // WebSocket으로 방문자에게 전달 (ChatWebSocketHandler에서 처리)
-        if (blogMessageCallback != null) {
-            blogMessageCallback.onAdminMessage(roomId, adminName, content);
         }
     }
 
@@ -170,7 +137,7 @@ public class DiscordBridgeService implements ChatNotificationPort {
     }
 
     /**
-     * 스레드 ID → roomId 매핑 확인
+     * 스레드 ID → roomId 매핑 확인 (DiscordMessageListener에서 사용)
      */
     public String getRoomIdByThread(String threadId) {
         return threadToRoom.get(threadId);
@@ -185,5 +152,9 @@ public class DiscordBridgeService implements ChatNotificationPort {
 
     public void setBlogMessageCallback(BlogMessageCallback callback) {
         this.blogMessageCallback = callback;
+    }
+
+    public BlogMessageCallback getBlogMessageCallback() {
+        return blogMessageCallback;
     }
 }

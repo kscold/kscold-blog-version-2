@@ -1,7 +1,6 @@
 package com.kscold.blog.chat.adapter.in.ws;
 
-import com.kscold.blog.identity.domain.model.User;
-import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.application.port.out.TokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ import java.util.Map;
 public class ChatHandshakeInterceptor implements HandshakeInterceptor {
 
     private final TokenProvider tokenProvider;
-    private final UserRepository userRepository;
+    private final UserQueryPort userQueryPort;
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
@@ -31,21 +30,23 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
         }
 
         String token = servletRequest.getServletRequest().getParameter("token");
-        if (token == null || token.isBlank() || !tokenProvider.validateToken(token)) {
+        if (token == null || token.isBlank() || !tokenProvider.validateAccessToken(token)) {
             log.warn("WebSocket 연결 거부: 유효하지 않은 토큰");
             return false;
         }
 
-        String userId = tokenProvider.getUserId(token);
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
+        String userId = tokenProvider.getUserIdFromAccessToken(token);
+        UserQueryPort.UserInfo user;
+        try {
+            user = userQueryPort.getUserById(userId);
+        } catch (Exception e) {
             log.warn("WebSocket 연결 거부: 존재하지 않는 사용자 ({})", userId);
             return false;
         }
 
         attributes.put("userId", userId);
-        attributes.put("username", user.getDisplayName());
-        attributes.put("isAdmin", user.getRole() == User.Role.ADMIN);
+        attributes.put("username", user.displayName());
+        attributes.put("isAdmin", user.isAdmin());
         return true;
     }
 
