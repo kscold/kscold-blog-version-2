@@ -7,8 +7,7 @@ import com.kscold.blog.blog.domain.port.out.AccessRequestRepository;
 import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
-import com.kscold.blog.identity.domain.model.User;
-import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +19,10 @@ public class AccessRequestService implements AccessRequestUseCase {
 
     private final AccessRequestRepository accessRequestRepository;
     private final CategoryUseCase categoryUseCase;
-    private final UserRepository userRepository;
+    private final UserQueryPort userQueryPort;
 
     @Override
     public AccessRequest requestAccess(String userId, String categoryId, String message) {
-        // 이미 요청 존재 확인
         var existing = accessRequestRepository.findByUserIdAndCategoryId(userId, categoryId);
         if (existing.isPresent()) {
             AccessRequest req = existing.get();
@@ -34,19 +32,17 @@ public class AccessRequestService implements AccessRequestUseCase {
             if (req.getStatus() == AccessRequest.Status.PENDING) {
                 throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "이미 대기 중인 요청이 있습니다");
             }
-            // REJECTED → 재요청 허용
             req.setStatus(AccessRequest.Status.PENDING);
             req.setMessage(message);
             return accessRequestRepository.save(req);
         }
 
         Category category = categoryUseCase.getById(categoryId);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "사용자를 찾을 수 없습니다"));
+        UserQueryPort.UserInfo user = userQueryPort.getUserById(userId);
 
         AccessRequest request = AccessRequest.builder()
                 .userId(userId)
-                .username(user.getDisplayName())
+                .username(user.displayName())
                 .categoryId(categoryId)
                 .categoryName(category.getName())
                 .message(message)
@@ -58,9 +54,12 @@ public class AccessRequestService implements AccessRequestUseCase {
     @Override
     public boolean hasAccess(String userId, String categoryId) {
         if (userId == null) return false;
-        // ADMIN은 항상 접근 가능
-        var user = userRepository.findById(userId);
-        if (user.isPresent() && user.get().getRole() == User.Role.ADMIN) return true;
+
+        try {
+            if (userQueryPort.getUserById(userId).isAdmin()) return true;
+        } catch (Exception ignored) {
+            return false;
+        }
 
         return accessRequestRepository.findByUserIdAndCategoryId(userId, categoryId)
                 .map(r -> r.getStatus() == AccessRequest.Status.APPROVED)
