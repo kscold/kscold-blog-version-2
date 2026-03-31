@@ -11,6 +11,7 @@ public interface UserQueryPort {
     record UserInfo(
             String id,
             String displayName,
-            String avatar
+            String avatar,
+            boolean isAdmin
     ) {}
 }
