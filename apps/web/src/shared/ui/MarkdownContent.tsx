@@ -18,7 +18,7 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
     : 'prose prose-lg max-w-none prose-headings:font-sans prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-surface-900 text-surface-700 prose-p:leading-relaxed prose-a:text-surface-900 prose-a:decoration-surface-300 prose-a:underline-offset-4 hover:prose-a:decoration-surface-900 prose-code:text-surface-800 prose-code:bg-surface-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-strong:text-surface-900 prose-ul:text-surface-700 prose-ol:text-surface-700 prose-blockquote:border-l-surface-300 prose-blockquote:bg-surface-50 prose-blockquote:text-surface-600 prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-hr:border-surface-200';
 
   return (
-    <div className={proseClasses}>
+    <div className={`${proseClasses} min-w-0`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -63,18 +63,28 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
                       Copy
                     </button>
                   </div>
-                  <SyntaxHighlighter
-                    style={isDark ? vscDarkPlus : oneLight}
-                    language={language}
-                    PreTag="div"
-                    className={`rounded-xl !my-0 !p-5 shadow-sm !border ${
+                  <div
+                    className={`overflow-x-auto rounded-xl border shadow-sm ${
                       isDark
-                        ? '!bg-[#0f111a] !border-surface-800'
-                        : '!bg-surface-50 !border-surface-200'
+                        ? 'bg-[#0f111a] border-surface-800'
+                        : 'bg-surface-50 border-surface-200'
                     }`}
                   >
-                    {codeText}
-                  </SyntaxHighlighter>
+                    <SyntaxHighlighter
+                      style={isDark ? vscDarkPlus : oneLight}
+                      language={language}
+                      PreTag="div"
+                      className="!my-0 !border-0 !bg-transparent"
+                      customStyle={{
+                        margin: 0,
+                        padding: '1.25rem',
+                        minWidth: 'max-content',
+                        background: 'transparent',
+                      }}
+                    >
+                      {codeText}
+                    </SyntaxHighlighter>
+                  </div>
                 </div>
               );
             }
@@ -119,6 +129,33 @@ export function MarkdownContent({ content, theme = 'light' }: MarkdownContentPro
               />
               {alt && <p className="text-center text-sm text-surface-500 mt-2 font-mono">{alt}</p>}
             </div>
+          ),
+          table: ({ children }) => (
+            <div className="my-8 overflow-x-auto">
+              <table className="min-w-full border-collapse text-sm">{children}</table>
+            </div>
+          ),
+          th: ({ children }) => (
+            <th
+              className={`border px-4 py-2 text-left font-semibold whitespace-nowrap ${
+                isDark
+                  ? 'border-surface-700 bg-surface-900 text-surface-100'
+                  : 'border-surface-200 bg-surface-50 text-surface-900'
+              }`}
+            >
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td
+              className={`border px-4 py-2 align-top ${
+                isDark
+                  ? 'border-surface-800 text-surface-300'
+                  : 'border-surface-200 text-surface-700'
+              }`}
+            >
+              {children}
+            </td>
           ),
         }}
       >

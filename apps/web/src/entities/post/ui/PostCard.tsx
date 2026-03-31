@@ -72,7 +72,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
           </h3>
 
           <p
-            className={`text-surface-500 text-sm leading-relaxed font-medium mb-6 line-clamp-${
+            className={`mb-6 text-sm font-medium leading-relaxed text-surface-500 break-words [overflow-wrap:anywhere] line-clamp-${
               featured ? '4' : '3'
             }`}
           >

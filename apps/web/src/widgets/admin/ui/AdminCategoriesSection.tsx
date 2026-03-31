@@ -28,9 +28,9 @@ export function AdminCategoriesSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-between mb-8">
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-4xl font-serif font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-white">
                 카테고리 관리
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -39,7 +39,7 @@ export function AdminCategoriesSection() {
             </div>
             <button
               onClick={openCreateModal}
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+              className="w-full rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 text-sm font-medium text-white transition-all hover:shadow-lg sm:w-auto"
             >
               새 카테고리 추가
             </button>

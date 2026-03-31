@@ -40,7 +40,7 @@ export function TagManagementContainer() {
       {/* 새 태그 폼 */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-6">
         <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">새 태그 추가</h2>
-        <form onSubmit={handleCreate} className="flex gap-2">
+        <form onSubmit={handleCreate} className="flex flex-col gap-2 sm:flex-row">
           <input
             type="text"
             value={newTagName}
@@ -51,7 +51,7 @@ export function TagManagementContainer() {
           <button
             type="submit"
             disabled={createTag.isPending || !newTagName.trim()}
-            className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full rounded-lg bg-purple-600 px-4 py-2 text-sm text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {createTag.isPending ? '추가 중...' : '추가'}
           </button>

@@ -88,18 +88,18 @@ export function Header() {
 
           <div className="flex items-center gap-4">
             {user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 {user.role === 'ADMIN' && (
                   <Link
                     href="/admin"
-                    className="hidden sm:block px-4 py-2 text-sm font-medium text-surface-900 hover:bg-surface-100 rounded-full transition-colors"
+                    className="inline-flex items-center rounded-full border border-surface-200 px-3 py-1.5 text-xs font-semibold text-surface-900 hover:bg-surface-100 transition-colors sm:px-4 sm:py-2 sm:text-sm"
                   >
                     Admin
                   </Link>
                 )}
                 <button
                   onClick={logout}
-                  className="px-4 py-2 text-sm font-medium text-surface-500 hover:text-surface-900 transition-colors"
+                  className="px-2 py-1.5 text-xs font-medium text-surface-500 hover:text-surface-900 transition-colors sm:px-4 sm:py-2 sm:text-sm"
                 >
                   Logout
                 </button>
