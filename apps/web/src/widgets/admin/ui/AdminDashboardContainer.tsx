@@ -55,7 +55,7 @@ export function AdminDashboardContainer() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-4xl font-sans font-black tracking-tighter text-surface-900">
+        <h1 className="text-3xl sm:text-4xl font-sans font-black tracking-tighter text-surface-900">
           Dashboard
         </h1>
         <p className="text-surface-500 mt-2">{user?.displayName || user?.username}</p>

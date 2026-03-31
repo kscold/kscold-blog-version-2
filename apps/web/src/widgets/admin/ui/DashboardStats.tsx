@@ -26,7 +26,7 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
   return (
     <>
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
         {stats.map((stat, index) => (
           <motion.div
             key={stat.name}
@@ -36,10 +36,10 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
           >
             <Link
               href={stat.link}
-              className="block p-5 bg-white border border-surface-200 rounded-2xl hover:border-surface-300 hover:shadow-sm transition-all group"
+              className="block p-4 bg-white border border-surface-200 rounded-2xl hover:border-surface-300 hover:shadow-sm transition-all group"
             >
-              <div className="text-3xl font-black text-surface-900 mb-1">{stat.value}</div>
-              <div className="text-sm font-medium text-surface-500">{stat.name}</div>
+              <div className="text-2xl sm:text-3xl font-black text-surface-900 mb-1">{stat.value}</div>
+              <div className="text-xs sm:text-sm font-medium text-surface-500">{stat.name}</div>
             </Link>
           </motion.div>
         ))}
@@ -48,7 +48,7 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
       {/* Quick Actions */}
       <div className="mb-8">
         <h2 className="text-lg font-bold text-surface-900 mb-4">빠른 작업</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {quickActions.map((action, index) => (
             <motion.div
               key={action.name}
@@ -58,10 +58,15 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
             >
               <Link
                 href={action.link}
-                className="block p-4 bg-surface-900 rounded-xl text-white hover:bg-surface-800 transition-colors group"
+                className="flex items-center gap-3 p-4 bg-surface-900 rounded-xl text-white hover:bg-surface-800 transition-colors group"
               >
-                <h3 className="font-bold text-sm mb-0.5">{action.name}</h3>
-                <p className="text-xs text-surface-400">{action.description}</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-sm truncate">{action.name}</h3>
+                  <p className="text-xs text-surface-400 truncate">{action.description}</p>
+                </div>
+                <svg className="w-4 h-4 text-surface-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </Link>
             </motion.div>
           ))}
@@ -87,19 +92,19 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
                 <Link
                   key={post.id}
                   href={`/admin/posts/${post.id}/edit`}
-                  className="block p-5 hover:bg-surface-50 transition-colors"
+                  className="block p-4 hover:bg-surface-50 transition-colors"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-surface-900 truncate">{post.title}</h3>
-                      <div className="flex items-center gap-3 mt-1 text-sm text-surface-500">
+                      <h3 className="font-bold text-surface-900 truncate text-sm">{post.title}</h3>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs text-surface-500">
                         {post.category && <span>{post.category.name}</span>}
-                        <span>조회수 {post.views}</span>
+                        <span>조회 {post.views}</span>
                         <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
                       </div>
                     </div>
                     <span
-                      className={`ml-4 px-3 py-1 text-xs font-bold rounded-full ${
+                      className={`shrink-0 px-2 py-1 text-xs font-bold rounded-full ${
                         post.status === 'PUBLISHED'
                           ? 'bg-green-100 text-green-700'
                           : post.status === 'DRAFT'
@@ -107,11 +112,7 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
                             : 'bg-surface-100 text-surface-500'
                       }`}
                     >
-                      {post.status === 'PUBLISHED'
-                        ? '발행'
-                        : post.status === 'DRAFT'
-                          ? '초안'
-                          : '보관'}
+                      {post.status === 'PUBLISHED' ? '발행' : post.status === 'DRAFT' ? '초안' : '보관'}
                     </span>
                   </div>
                 </Link>

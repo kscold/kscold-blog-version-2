@@ -86,7 +86,9 @@ export function PostHeader({
         </h1>
 
         {/* Excerpt */}
-        <p className="text-lg text-surface-500 leading-relaxed mb-8">{excerpt}</p>
+        <p className="mb-8 text-lg leading-relaxed text-surface-500 break-words [overflow-wrap:anywhere]">
+          {excerpt}
+        </p>
 
         {/* Meta */}
         <div className="flex items-center justify-between pb-8 border-b border-surface-200">
