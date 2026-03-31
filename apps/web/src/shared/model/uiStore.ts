@@ -13,13 +13,19 @@ export const useUiStore = create<UiState>()(
   persist(
     set => ({
       theme: 'system',
-      sidebarOpen: true,
+      sidebarOpen: false,
       setTheme: theme => set({ theme }),
       toggleSidebar: () => set(state => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarOpen: open => set({ sidebarOpen: open }),
     }),
     {
       name: 'ui-storage',
+      partialize: state => ({ theme: state.theme }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as Partial<UiState>),
+        sidebarOpen: false,
+      }),
     }
   )
 );

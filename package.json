@@ -2,9 +2,9 @@
   "name": "kscold-blog-v2",
   "version": "2.0.0",
   "private": true,
-  "description": "김승찬의 도도하고 미술관 같은 블로그 - 모노레포",
+  "description": "Colding / 김승찬(kscold)의 개인 기술 블로그 모노레포",
   "author": "김승찬 (kscold)",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE.md",
   "workspaces": [
     "apps/*",
     "packages/*"

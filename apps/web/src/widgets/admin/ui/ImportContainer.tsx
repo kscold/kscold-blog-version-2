@@ -29,16 +29,16 @@ export function ImportContainer() {
   } = useImportProcessor();
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-10">
+      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-surface-900 tracking-tight">Markdown 가져오기</h1>
           <p className="mt-2 text-surface-500">.md 파일을 업로드하여 블로그 포스트로 변환합니다</p>
         </div>
         <Link
           href="/admin/posts"
-          className="px-4 py-2 text-sm text-surface-600 border border-surface-200 rounded-lg hover:bg-surface-50 transition-colors"
+          className="w-full rounded-lg border border-surface-200 px-4 py-2 text-center text-sm text-surface-600 transition-colors hover:bg-surface-50 sm:w-auto"
         >
           돌아가기
         </Link>
@@ -54,7 +54,7 @@ export function ImportContainer() {
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-2xl p-16 text-center cursor-pointer transition-all ${
+          className={`cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center transition-all sm:p-16 ${
             dragOver
               ? 'border-surface-900 bg-surface-50'
               : 'border-surface-300 hover:border-surface-400'
@@ -142,30 +142,30 @@ export function ImportContainer() {
             {importResults.map(result => (
               <div
                 key={result.filename}
-                className={`flex items-center justify-between p-4 rounded-lg border ${
+                className={`flex flex-col gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between ${
                   result.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
                 }`}
               >
-                <span className="text-sm font-mono text-surface-700">{result.filename}</span>
+                <span className="break-all text-sm font-mono text-surface-700">{result.filename}</span>
                 {result.success ? (
-                  <span className="text-sm font-medium text-green-700">성공</span>
+                  <span className="text-sm font-medium text-green-700 sm:text-right">성공</span>
                 ) : (
-                  <span className="text-sm text-red-600">{result.error}</span>
+                  <span className="break-words text-sm text-red-600 sm:text-right">{result.error}</span>
                 )}
               </div>
             ))}
           </div>
 
-          <div className="flex gap-3 justify-center pt-4">
+          <div className="flex flex-col justify-center gap-3 pt-4 sm:flex-row">
             <button
               onClick={resetAll}
-              className="px-6 py-2 text-sm border border-surface-200 rounded-lg hover:bg-surface-50 transition-colors"
+              className="rounded-lg border border-surface-200 px-6 py-2 text-sm transition-colors hover:bg-surface-50"
             >
               더 가져오기
             </button>
             <Link
               href="/admin/posts"
-              className="px-6 py-2 text-sm font-bold text-white bg-surface-900 rounded-lg hover:bg-surface-800 transition-colors"
+              className="rounded-lg bg-surface-900 px-6 py-2 text-center text-sm font-bold text-white transition-colors hover:bg-surface-800"
             >
               포스트 목록 보기
             </Link>

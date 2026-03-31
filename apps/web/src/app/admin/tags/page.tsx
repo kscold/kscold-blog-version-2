@@ -14,15 +14,15 @@ export default function AdminTagsPage() {
           transition={{ duration: 0.5 }}
         >
           {/* 헤더 */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-serif font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-white">
                 태그 관리
               </h1>
             </div>
             <Link
               href="/admin"
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="text-sm text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
             >
               대시보드로 돌아가기
             </Link>

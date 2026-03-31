@@ -32,8 +32,8 @@ export function RestrictedOverlay({ categoryId, categoryName, excerpt }: Restric
       {/* 블러된 미리보기 */}
       {excerpt && (
         <div className="select-none pointer-events-none" aria-hidden>
-          <div className="prose prose-lg max-w-none text-surface-700 blur-sm opacity-50">
-            <p>{excerpt}</p>
+          <div className="prose prose-lg max-w-none text-surface-700 blur-sm opacity-50 break-words [overflow-wrap:anywhere]">
+            <p className="break-words [overflow-wrap:anywhere]">{excerpt}</p>
             <p className="text-surface-400">
               이 글의 나머지 내용은 열람 권한이 필요합니다. 아래에서 접근을 요청할 수 있습니다.
               이 글의 나머지 내용은 열람 권한이 필요합니다. 아래에서 접근을 요청할 수 있습니다.

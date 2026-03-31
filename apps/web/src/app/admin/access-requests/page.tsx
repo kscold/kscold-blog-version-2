@@ -37,9 +37,9 @@ export default function AccessRequestsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-surface-900">열람 요청 관리</h1>
-        <span className="rounded-full bg-surface-100 px-3 py-1 text-sm font-medium text-surface-600">
+        <span className="inline-flex w-fit rounded-full bg-surface-100 px-3 py-1 text-sm font-medium text-surface-600">
           {requests.length}건 대기
         </span>
       </div>
@@ -55,7 +55,7 @@ export default function AccessRequestsPage() {
           {requests.map(req => (
             <div
               key={req.id}
-              className="flex items-center gap-4 rounded-xl border border-surface-200 bg-white px-5 py-4"
+              className="flex flex-col gap-4 rounded-xl border border-surface-200 bg-white px-5 py-4 sm:flex-row sm:items-center"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-surface-900">{req.username}</p>
@@ -63,10 +63,10 @@ export default function AccessRequestsPage() {
                   {req.categoryName} · {new Date(req.createdAt).toLocaleDateString('ko-KR')}
                 </p>
                 {req.message && (
-                  <p className="text-xs text-surface-500 mt-1 truncate">&quot;{req.message}&quot;</p>
+                  <p className="mt-1 break-words text-xs text-surface-500">&quot;{req.message}&quot;</p>
                 )}
               </div>
-              <div className="flex gap-2 shrink-0">
+              <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex">
                 <button
                   onClick={() => handle(req.id, 'approve')}
                   className="rounded-lg bg-green-600 px-4 py-2 text-xs font-semibold text-white hover:bg-green-700 transition-colors"

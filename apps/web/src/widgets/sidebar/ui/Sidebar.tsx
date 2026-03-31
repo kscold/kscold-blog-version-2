@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'; // motion used for over
 import { usePathname } from 'next/navigation';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { useTags } from '@/entities/tag/api/useTags';
+import { useAuthStore } from '@/entities/user/model/authStore';
 import { useUiStore } from '@/shared/model/uiStore';
 import { Category } from '@/types/blog';
 
@@ -50,9 +51,20 @@ export function Sidebar() {
   const { data: categories } = useCategories();
   const { sidebarOpen, setSidebarOpen } = useUiStore();
   const { data: tags } = useTags();
+  const { user } = useAuthStore();
   const closeSidebar = () => setSidebarOpen(false);
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
+  const mobileSidebarState = sidebarOpen ? 'block translate-x-4' : 'hidden';
+  const desktopSidebarState = isVaultPage ? 'lg:hidden' : 'lg:block lg:translate-x-0';
+  const mobileLinks = [
+    ...(user?.role === 'ADMIN' ? [{ label: 'Admin', href: '/admin', highlighted: true }] : []),
+    { label: 'Home', href: '/' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Feed', href: '/feed' },
+    { label: 'Vault', href: '/vault' },
+    { label: 'Info', href: '/info' },
+  ];
 
   return (
     <>
@@ -69,25 +81,21 @@ export function Sidebar() {
       </AnimatePresence>
 
       <aside
-        className={`fixed top-[88px] left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ease-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-[150%]'
-        } ${isVaultPage ? '' : 'lg:translate-x-0'} bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm`}
+        className={`fixed top-[88px] left-0 lg:left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ease-out ${mobileSidebarState} ${desktopSidebarState} bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm`}
       >
         <div className="p-6 space-y-8 relative">
           {/* Mobile Navigation Links (Visible on all sizes for sidebar access) */}
           <div className="lg:hidden pb-6 border-b border-surface-200/50 space-y-1 mt-2">
-            {[
-              { label: 'Home', href: '/' },
-              { label: 'Blog', href: '/blog' },
-              { label: 'Feed', href: '/feed' },
-              { label: 'Vault', href: '/vault' },
-              { label: 'Info', href: '/info' },
-            ].map(link => (
+            {mobileLinks.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setSidebarOpen(false)}
-                className="block px-4 py-2.5 rounded-xl text-sm font-medium text-surface-600 hover:text-surface-900 hover:bg-surface-50 transition-colors"
+                className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  link.highlighted
+                    ? 'bg-surface-900 text-white hover:bg-surface-800'
+                    : 'text-surface-600 hover:text-surface-900 hover:bg-surface-50'
+                }`}
               >
                 {link.label}
               </Link>
