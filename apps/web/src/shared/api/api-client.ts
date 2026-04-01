@@ -1,9 +1,11 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
+import { useAuthStore } from '@/entities/user/model/authStore';
 import { resolveApiBaseUrl } from '@/shared/lib/runtime-url';
 
 class ApiClient {
   private client: AxiosInstance;
   private readonly apiUrl: string;
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor() {
     this.apiUrl = resolveApiBaseUrl();
@@ -36,23 +38,24 @@ class ApiClient {
         const originalRequest = error.config as InternalAxiosRequestConfig & {
           _retry?: boolean;
         };
+        const status = error.response?.status;
+        const requestPath = this.extractPath(originalRequest?.url);
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (originalRequest && status === 401 && !originalRequest._retry && this.shouldAttemptRefresh(requestPath)) {
           originalRequest._retry = true;
 
-          try {
-            const newToken = await this.refreshToken();
-            if (newToken && originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${newToken}`;
-              return this.client(originalRequest);
-            }
-          } catch (refreshError) {
-            this.clearTokens();
-            if (typeof window !== 'undefined') {
-              window.location.href = '/login';
-            }
-            return Promise.reject(refreshError);
+          const newToken = await this.refreshAccessToken();
+          if (newToken && originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            return this.client(originalRequest);
           }
+
+          this.forceLogout();
+          return Promise.reject(error);
+        }
+
+        if (this.shouldForceLogout(status, requestPath)) {
+          this.forceLogout();
         }
 
         return Promise.reject(error);
@@ -73,7 +76,10 @@ class ApiClient {
   private setAccessToken(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('accessToken', token);
-      document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+      useAuthStore.getState().setToken(token);
+
+      const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60}; SameSite=Lax${secure}`;
     }
   }
 
@@ -87,11 +93,13 @@ class ApiClient {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('auth-storage');
+      useAuthStore.getState().clearAuth();
       document.cookie = 'auth-token=; path=/; max-age=0';
     }
   }
 
-  private async refreshToken(): Promise<string | null> {
+  private async doRefreshToken(): Promise<string | null> {
     try {
       const currentRefreshToken = this.getRefreshToken();
       if (!currentRefreshToken) return null;
@@ -108,6 +116,60 @@ class ApiClient {
     } catch (error) {
       console.error('Token refresh failed:', error);
       return null;
+    }
+  }
+
+  private async refreshAccessToken(): Promise<string | null> {
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.refreshPromise = this.doRefreshToken().finally(() => {
+      this.refreshPromise = null;
+    });
+
+    return this.refreshPromise;
+  }
+
+  private extractPath(url?: string): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      try {
+        return new URL(url).pathname;
+      } catch {
+        return url;
+      }
+    }
+    const normalized = url.startsWith('/') ? url : `/${url}`;
+    return normalized.split('?')[0].split('#')[0];
+  }
+
+  private shouldAttemptRefresh(path: string): boolean {
+    return !['/auth/login', '/auth/register', '/auth/refresh'].includes(path);
+  }
+
+  private shouldForceLogout(status: number | undefined, path: string): boolean {
+    if (status === 401) {
+      return path === '/auth/refresh' || path === '/auth/me';
+    }
+
+    if (status === 403) {
+      return this.isAdminProtectedPath(path) || path === '/auth/me';
+    }
+
+    return false;
+  }
+
+  private isAdminProtectedPath(path: string): boolean {
+    return path.startsWith('/admin') || path.includes('/admin/') || path.endsWith('/admin');
+  }
+
+  private forceLogout(): void {
+    this.clearTokens();
+
+    if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+      const redirect = `${window.location.pathname}${window.location.search}`;
+      window.location.replace(`/login?redirect=${encodeURIComponent(redirect)}`);
     }
   }
 
@@ -152,6 +214,14 @@ class ApiClient {
 
   public getToken(): string | null {
     return this.getAccessToken();
+  }
+
+  public hasRefreshToken(): boolean {
+    return !!this.getRefreshToken();
+  }
+
+  public async restoreSession(): Promise<string | null> {
+    return this.refreshAccessToken();
   }
 }
 

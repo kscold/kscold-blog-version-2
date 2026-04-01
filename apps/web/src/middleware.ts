@@ -1,15 +1,47 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+function decodeBase64Url(value: string): Uint8Array {
+  const normalized = value
+    .replace(/-/g, '+')
+    .replace(/_/g, '/')
+    .padEnd(value.length + ((4 - (value.length % 4)) % 4), '=');
+  const binary = atob(normalized);
+  return Uint8Array.from(binary, char => char.charCodeAt(0));
+}
+
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
-    const payload = JSON.parse(atob(parts[1]));
+    const payload = JSON.parse(new TextDecoder().decode(decodeBase64Url(parts[1])));
     return payload;
   } catch {
     return null;
   }
+}
+
+function decodeJwtHeader(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    return JSON.parse(new TextDecoder().decode(decodeBase64Url(parts[0])));
+  } catch {
+    return null;
+  }
+}
+
+function isExpired(payload: Record<string, unknown>): boolean {
+  if (typeof payload.exp !== 'number') return true;
+  return payload.exp * 1000 <= Date.now();
+}
+
+function clearAuthCookie(response: NextResponse) {
+  response.cookies.set('auth-token', '', {
+    path: '/',
+    maxAge: 0,
+  });
+  return response;
 }
 
 export function middleware(request: NextRequest) {
@@ -28,15 +60,39 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // JWT에서 role 디코딩하여 ADMIN 권한 확인
     const payload = decodeJwtPayload(jwtToken);
-    if (!payload || payload.role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/', request.url));
+    const header = decodeJwtHeader(jwtToken);
+    const isValidAdminToken =
+      !!payload &&
+      !!header &&
+      header.alg === 'HS256' &&
+      !isExpired(payload) &&
+      payload.type === 'access' &&
+      payload.role === 'ADMIN';
+
+    if (!isValidAdminToken) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
+      return clearAuthCookie(NextResponse.redirect(loginUrl));
     }
   }
 
   if (isLoginPage && token) {
-    return NextResponse.redirect(new URL('/admin', request.url));
+    const payload = decodeJwtPayload(token);
+    const header = decodeJwtHeader(token);
+    const isValidToken =
+      !!payload &&
+      !!header &&
+      header.alg === 'HS256' &&
+      !isExpired(payload) &&
+      payload.type === 'access';
+
+    if (!isValidToken) {
+      return clearAuthCookie(NextResponse.next());
+    }
+
+    const target = payload.role === 'ADMIN' ? '/admin' : '/';
+    return NextResponse.redirect(new URL(target, request.url));
   }
 
   return NextResponse.next();

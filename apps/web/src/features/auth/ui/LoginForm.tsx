@@ -1,20 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/features/auth/api/useAuth';
+import { useAuthStore } from '@/entities/user/model/authStore';
+import { apiClient } from '@/shared/api/api-client';
 import Link from 'next/link';
 import Input from '@/shared/ui/Input';
 import Button from '@/shared/ui/Button';
 import { AuthToggle } from '@/features/auth/ui/AuthToggle';
+import type { User } from '@/types/user';
+import { siteConfig } from '@/shared/config/site';
+
+function resolveSafeRedirect(requestedPath: string, role: User['role']) {
+  const fallback = role === 'ADMIN' ? '/admin' : '/';
+  if (!requestedPath.startsWith('/') || requestedPath.startsWith('//')) return fallback;
+  if (requestedPath.startsWith('/admin') && role !== 'ADMIN') return '/';
+  return requestedPath;
+}
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { loginAsync, registerAsync, isLoggingIn, isRegistering } = useAuth();
+  const { loginAsync, registerAsync, isLoggingIn, isRegistering, currentUser, isLoading: isAuthLoading } = useAuth();
+  const { setUser, setToken } = useAuthStore();
 
   const [isLogin, setIsLogin] = useState(true);
+  const [isRestoringSession, setIsRestoringSession] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -23,7 +36,46 @@ export function LoginForm() {
   });
   const [error, setError] = useState('');
 
-  const isLoading = isLoggingIn || isRegistering;
+  const isLoading = isLoggingIn || isRegistering || isRestoringSession;
+  const redirect = useMemo(() => searchParams.get('redirect') || '/admin', [searchParams]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    router.replace(resolveSafeRedirect(redirect, currentUser.role));
+  }, [currentUser, redirect, router]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const restoreSession = async () => {
+      if (apiClient.getToken() || !apiClient.hasRefreshToken()) return;
+
+      setIsRestoringSession(true);
+      try {
+        const accessToken = await apiClient.restoreSession();
+        if (!accessToken || cancelled) return;
+
+        const user = await apiClient.get<User>('/auth/me');
+        if (cancelled) return;
+
+        setToken(accessToken);
+        setUser(user);
+        router.replace(resolveSafeRedirect(redirect, user.role));
+      } catch {
+        // noop
+      } finally {
+        if (!cancelled) setIsRestoringSession(false);
+      }
+    };
+
+    if (!isAuthLoading) {
+      void restoreSession();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthLoading, redirect, router, setToken, setUser]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,24 +83,21 @@ export function LoginForm() {
 
     try {
       if (isLogin) {
-        await loginAsync({
+        const result = await loginAsync({
           email: formData.email,
           password: formData.password,
         });
 
-        const redirect = searchParams.get('redirect') || '/admin';
-        // Open Redirect 방어: 상대 경로만 허용, 프로토콜 상대 URL(//) 차단
-        const safeRedirect = redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/admin';
-        router.push(safeRedirect);
+        router.push(resolveSafeRedirect(redirect, result.user.role));
       } else {
-        await registerAsync({
+        const result = await registerAsync({
           email: formData.email,
           password: formData.password,
           username: formData.username,
           displayName: formData.displayName || formData.username,
         });
 
-        router.push('/admin');
+        router.push(resolveSafeRedirect(redirect, result.user.role));
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : '로그인에 실패했습니다.';
@@ -77,11 +126,11 @@ export function LoginForm() {
           <Link href="/" className="inline-block group">
             <h1 className="text-5xl font-sans font-black tracking-tighter mb-3 group-hover:scale-105 transition-transform">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 bg-[size:200%_auto] animate-shimmer">
-                KSCOLD
+                {siteConfig.brand.name}
               </span>
             </h1>
             <p className="text-surface-500 text-sm tracking-wide font-medium">
-              Professional Development Blog
+              {siteConfig.brand.subtitle}
             </p>
           </Link>
         </motion.div>
