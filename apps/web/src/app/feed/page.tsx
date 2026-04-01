@@ -1,28 +1,31 @@
-'use client';
+import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
+import { JsonLd } from '@/shared/ui/JsonLd';
+import { FeedPageClient } from './FeedPageClient';
 
-import { motion } from 'framer-motion';
-import { FeedList } from '@/widgets/feed/ui/FeedList';
+export const metadata = buildPageMetadata({
+  title: '피드',
+  description: '일상, 개발, 그리고 생각의 조각들을 짧은 글과 링크로 남기는 피드입니다.',
+  path: '/feed',
+  keywords: ['개발 피드', '일상 메모', '링크 로그', '김승찬'],
+});
+
+const feedJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  '@id': `${SITE_URL}/feed#collection`,
+  url: `${SITE_URL}/feed`,
+  name: '피드',
+  description: '일상, 개발, 그리고 생각의 조각들을 짧은 글과 링크로 남기는 피드입니다.',
+  isPartOf: {
+    '@id': `${SITE_URL}/#website`,
+  },
+};
 
 export default function FeedPage() {
   return (
-    <div className="min-h-screen bg-surface-50">
-      <div className="max-w-xl mx-auto px-4 py-8">
-        {/* 헤더 */}
-        <motion.div
-          className="mb-8 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-4xl font-sans font-black tracking-tighter text-surface-900 mb-2">
-            Feed
-          </h1>
-          <p className="text-sm text-surface-500 font-medium">일상, 개발, 그리고 생각의 조각들</p>
-        </motion.div>
-
-        {/* 피드 타임라인 */}
-        <FeedList />
-      </div>
-    </div>
+    <>
+      <JsonLd id="feed-page" data={feedJsonLd} />
+      <FeedPageClient />
+    </>
   );
 }
