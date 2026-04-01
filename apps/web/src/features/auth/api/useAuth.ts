@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
 import { AuthResponse, LoginRequest, RegisterRequest, User } from '@/types/user';
@@ -17,6 +18,12 @@ export function useAuth() {
     enabled: !!apiClient.getToken(),
     retry: false,
   });
+
+  useEffect(() => {
+    if (currentUser) {
+      setUser(currentUser);
+    }
+  }, [currentUser, setUser]);
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginRequest) => apiClient.post<AuthResponse>('/auth/login', data),
