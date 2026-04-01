@@ -10,5 +10,9 @@ export function useLogout() {
     apiClient.removeToken();
     clearAuth();
     queryClient.clear();
+
+    if (typeof window !== 'undefined') {
+      window.location.replace('/login');
+    }
   };
 }
