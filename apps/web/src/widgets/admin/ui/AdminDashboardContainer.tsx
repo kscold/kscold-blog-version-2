@@ -9,6 +9,7 @@ import { useTags } from '@/entities/tag/api/useTags';
 import { fetchChatRooms } from '@/entities/chat/api/chatAdminApi';
 import { useQuery } from '@tanstack/react-query';
 import { DashboardStats } from './DashboardStats';
+import { AdminUserStatsSection } from './AdminUserStatsSection';
 
 export function AdminDashboardContainer() {
   const { user } = useAuthStore();
@@ -66,6 +67,12 @@ export function AdminDashboardContainer() {
         quickActions={quickActions}
         recentPosts={posts}
       />
+
+      {/* 사용자 통계 */}
+      <div className="mt-10">
+        <h2 className="text-lg font-bold text-surface-900 mb-4">가입자 현황</h2>
+        <AdminUserStatsSection />
+      </div>
     </>
   );
 }
