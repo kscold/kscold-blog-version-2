@@ -1,17 +1,26 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Providers } from '@/app/providers/providers';
 import { ClientLayout } from '@/app/providers/ClientLayout';
+import { PROFILE } from '@/entities/profile/model/profileData';
+import { BUSINESS_INFO } from '@/entities/profile/model/teamData';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, toOgImage } from '@/shared/lib/seo';
+import { JsonLd } from '@/shared/ui/JsonLd';
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: '김승찬 블로그',
-    template: '%s | 김승찬 블로그',
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
-  description: '배운 것을 기록하고, 기록을 연결합니다. 개발 공부와 일상을 쌓아가는 공간.',
+  applicationName: SITE_NAME,
+  description: SITE_DESCRIPTION,
   keywords: [
     '김승찬',
     'kscold',
+    '콜딩',
+    'Colding',
     '프론트엔드',
     '백엔드',
     '개발자',
@@ -23,18 +32,27 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: '김승찬', url: 'https://github.com/kscold' }],
   creator: '김승찬',
+  publisher: '콜딩(Colding)',
+  category: 'technology',
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: 'https://kscold.com',
-    title: '김승찬 블로그',
-    description: '배운 것을 기록하고, 기록을 연결합니다. 개발 공부와 일상을 쌓아가는 공간.',
-    siteName: '김승찬 블로그',
+    url: SITE_URL,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    siteName: SITE_NAME,
+    images: [
+      {
+        url: toOgImage(),
+        alt: SITE_NAME,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: '김승찬 블로그',
-    description: '배운 것을 기록하고, 기록을 연결합니다. 개발 공부와 일상을 쌓아가는 공간.',
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [toOgImage()],
   },
   icons: {
     icon: [
@@ -57,6 +75,53 @@ export const metadata: Metadata = {
 };
 
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+const gaId = process.env.NEXT_PUBLIC_GA_ID;
+const siteJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE_NAME,
+      inLanguage: 'ko-KR',
+      description: SITE_DESCRIPTION,
+      publisher: {
+        '@id': `${SITE_URL}/#organization`,
+      },
+    },
+    {
+      '@type': 'Person',
+      '@id': `${SITE_URL}/#person`,
+      name: PROFILE.name,
+      alternateName: PROFILE.handle,
+      url: SITE_URL,
+      description: PROFILE.bio.join(' '),
+      image: 'https://avatars.githubusercontent.com/u/66587554?v=4',
+      jobTitle: PROFILE.title,
+      sameAs: [PROFILE.contacts.github],
+      worksFor: {
+        '@id': `${SITE_URL}/#organization`,
+      },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: BUSINESS_INFO.companyName,
+      url: SITE_URL,
+      founder: PROFILE.name,
+      email: BUSINESS_INFO.email,
+      taxID: BUSINESS_INFO.registrationNumber,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '김포한강9로75번길 66, 5층 (구래동, 국제프라자)',
+        addressLocality: '김포시',
+        addressRegion: '경기도',
+        addressCountry: 'KR',
+      },
+    },
+  ],
+};
 
 export default function RootLayout({
   children,
@@ -66,16 +131,23 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
+        <JsonLd id="site-graph" data={siteJsonLd} />
         {gtmId && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          <Script id="google-tag-manager" strategy="beforeInteractive">{`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${gtmId}');`,
-            }}
-          />
+})(window,document,'script','dataLayer','${gtmId}');`}</Script>
+        )}
+        {gaId && (
+          <>
+            <Script
+              id="google-analytics-src"
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+            />
+            <Script id="google-analytics" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}');`}</Script>
+          </>
         )}
       </head>
       <body className="antialiased bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50 min-h-screen relative selection:bg-accent-light/30 selection:text-accent-light transition-colors duration-300">
