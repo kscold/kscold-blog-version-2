@@ -75,7 +75,9 @@ public class JwtTokenProvider {
     public boolean validateAccessToken(String token) {
         try {
             Claims claims = parseClaims(token, accessSecretKey);
-            return "access".equals(claims.get("type"));
+            Object type = claims.get("type");
+            // 기존 토큰(type claim 없음)도 액세스로 허용, 리프레시만 거부
+            return !"refresh".equals(type);
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
