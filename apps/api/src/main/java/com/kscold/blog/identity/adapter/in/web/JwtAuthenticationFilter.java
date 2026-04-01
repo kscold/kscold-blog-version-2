@@ -31,9 +31,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String token = resolveToken(request);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            String userId = jwtTokenProvider.getUserId(token);
-            String role = jwtTokenProvider.getRole(token);
+        if (token != null && jwtTokenProvider.validateAccessToken(token)) {
+            String userId = jwtTokenProvider.getUserIdFromAccessToken(token);
+            String role = jwtTokenProvider.getRoleFromAccessToken(token);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
