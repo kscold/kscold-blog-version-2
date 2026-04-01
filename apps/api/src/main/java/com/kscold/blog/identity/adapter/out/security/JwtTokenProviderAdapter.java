@@ -16,7 +16,7 @@ public class JwtTokenProviderAdapter implements TokenProvider {
 
     @Override
     public String createAccessToken(String userId, String role) {
-        return jwtTokenProvider.createToken(userId, role);
+        return jwtTokenProvider.createAccessToken(userId, role);
     }
 
     @Override
@@ -25,22 +25,27 @@ public class JwtTokenProviderAdapter implements TokenProvider {
     }
 
     @Override
-    public boolean validateToken(String token) {
-        return jwtTokenProvider.validateToken(token);
+    public boolean validateAccessToken(String token) {
+        return jwtTokenProvider.validateAccessToken(token);
     }
 
     @Override
-    public boolean isRefreshToken(String token) {
-        return jwtTokenProvider.isRefreshToken(token);
+    public boolean validateRefreshToken(String token) {
+        return jwtTokenProvider.validateRefreshToken(token);
     }
 
     @Override
-    public String getUserId(String token) {
-        return jwtTokenProvider.getUserId(token);
+    public String getUserIdFromAccessToken(String token) {
+        return jwtTokenProvider.getUserIdFromAccessToken(token);
     }
 
     @Override
-    public String getRole(String token) {
-        return jwtTokenProvider.getRole(token);
+    public String getUserIdFromRefreshToken(String token) {
+        return jwtTokenProvider.getUserIdFromRefreshToken(token);
+    }
+
+    @Override
+    public String getRoleFromAccessToken(String token) {
+        return jwtTokenProvider.getRoleFromAccessToken(token);
     }
 }
