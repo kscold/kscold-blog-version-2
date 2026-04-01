@@ -13,10 +13,10 @@ const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 560;
 const DEFAULT_SIDEBAR_WIDTH = 320;
 
-export function VaultNoteLayout() {
+export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
   const params = useParams();
   const router = useRouter();
-  const slug = params.slug as string;
+  const slug = initialSlug || (params.slug as string);
   const { theme } = useUiStore();
 
   const { note, backlinks, folders, isNoteLoading, isFoldersLoading, isError, localGraph, colorMap, titleSlugMap } =

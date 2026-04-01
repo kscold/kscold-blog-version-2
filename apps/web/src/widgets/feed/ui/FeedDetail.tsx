@@ -7,9 +7,9 @@ import { useFeed } from '@/entities/feed/api/useFeeds';
 import { FeedCard } from '@/entities/feed/ui/FeedCard';
 import { CommentSection } from './CommentSection';
 
-export function FeedDetail() {
+export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {
   const params = useParams();
-  const feedId = params.id as string;
+  const feedId = initialFeedId || (params.id as string);
   const { data: feed, isLoading } = useFeed(feedId);
 
   if (isLoading) {
