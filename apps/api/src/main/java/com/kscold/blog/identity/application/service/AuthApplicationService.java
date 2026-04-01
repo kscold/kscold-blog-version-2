@@ -69,21 +69,17 @@ public class AuthApplicationService implements AuthUseCase {
     }
 
     public AuthResult refresh(String refreshToken) {
-        if (!tokenProvider.validateToken(refreshToken)) {
+        if (!tokenProvider.validateRefreshToken(refreshToken)) {
             throw InvalidRequestException.invalidInput("유효하지 않은 리프레시 토큰입니다");
         }
-        if (!tokenProvider.isRefreshToken(refreshToken)) {
-            throw InvalidRequestException.invalidInput("리프레시 토큰이 아닙니다");
-        }
 
-        String userId = tokenProvider.getUserId(refreshToken);
-        String role = tokenProvider.getRole(refreshToken);
+        String userId = tokenProvider.getUserIdFromRefreshToken(refreshToken);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
-        String newAccessToken = tokenProvider.createAccessToken(user.getId(), role);
-        String newRefreshToken = tokenProvider.createRefreshToken(user.getId(), role);
+        String newAccessToken = tokenProvider.createAccessToken(user.getId(), user.getRole().name());
+        String newRefreshToken = tokenProvider.createRefreshToken(user.getId(), user.getRole().name());
 
         return buildAuthResult(user, newAccessToken, newRefreshToken);
     }

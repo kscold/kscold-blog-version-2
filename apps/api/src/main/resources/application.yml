@@ -24,6 +24,7 @@ server:
 # JWT 설정
 jwt:
   secret: ${JWT_SECRET:your-secret-key-change-in-production-must-be-at-least-256-bits}
+  refresh-secret: ${JWT_REFRESH_SECRET:${JWT_SECRET:your-secret-key-change-in-production-must-be-at-least-256-bits}}
   access-token-expiration: 3600000 # 1 hour
   refresh-token-expiration: 604800000 # 7 days
 
