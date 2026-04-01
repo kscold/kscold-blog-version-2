@@ -5,6 +5,8 @@ import com.kscold.blog.identity.domain.port.out.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -51,5 +53,20 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public long count() {
         return mongoUserRepository.count();
+    }
+
+    @Override
+    public List<User> findAllOrderByCreatedAtDesc() {
+        return mongoUserRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    @Override
+    public long countByCreatedAtAfter(LocalDateTime after) {
+        return mongoUserRepository.countByCreatedAtAfter(after);
+    }
+
+    @Override
+    public List<User> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime after) {
+        return mongoUserRepository.findByCreatedAtAfterOrderByCreatedAtDesc(after);
     }
 }
