@@ -29,10 +29,7 @@ export function useCreateVaultComment(noteId: string) {
 export function useDeleteVaultComment(noteId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ commentId, password }: { commentId: string; password: string }) =>
-      apiClient.delete<void>(`/vault/notes/${noteId}/comments/${commentId}`, {
-        data: { password },
-      }),
+    mutationFn: (commentId: string) => apiClient.delete<void>(`/vault/notes/${noteId}/comments/${commentId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vault-comments', noteId] });
       queryClient.invalidateQueries({ queryKey: ['vault'] });

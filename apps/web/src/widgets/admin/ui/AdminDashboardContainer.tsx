@@ -51,6 +51,12 @@ export function AdminDashboardContainer() {
     { name: '카테고리 관리', description: '카테고리를 관리합니다', link: '/admin/categories' },
     { name: '태그 관리', description: '태그를 생성하고 관리합니다', link: '/admin/tags' },
     { name: '열람 요청 관리', description: '글 열람 권한 요청을 승인/거절합니다', link: '/admin/access-requests' },
+    {
+      name: 'QA / E2E',
+      description: '시나리오 링크와 Cypress 실행 명령을 확인합니다',
+      link: '/admin/testing',
+      dataCy: 'admin-qa-link',
+    },
   ];
 
   return (

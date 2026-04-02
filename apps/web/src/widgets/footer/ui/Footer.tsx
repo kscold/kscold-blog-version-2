@@ -15,6 +15,7 @@ export function Footer() {
       { label: 'Blog', href: '/blog' },
       { label: 'Feed', href: '/feed' },
       { label: 'Vault', href: '/vault' },
+      { label: 'Guestbook', href: '/guestbook' },
       { label: 'Info', href: '/info' },
     ],
   };

@@ -26,6 +26,7 @@ export function Header() {
     { label: 'Blog', href: '/blog' },
     { label: 'Feed', href: '/feed' },
     { label: 'Vault', href: '/vault' },
+    { label: 'Guestbook', href: '/guestbook' },
     { label: 'Info', href: '/info' },
   ];
 
@@ -76,6 +77,7 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  data-cy={`nav-link-${item.label.toLowerCase()}`}
                   className="relative px-4 py-2 text-sm font-medium text-surface-500 hover:text-surface-900 transition-colors group overflow-hidden rounded-full"
                 >
                   <span className="relative z-10">{item.label}</span>

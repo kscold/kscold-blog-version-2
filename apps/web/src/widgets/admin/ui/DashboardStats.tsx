@@ -14,6 +14,7 @@ interface QuickAction {
   name: string;
   description: string;
   link: string;
+  dataCy?: string;
 }
 
 interface DashboardStatsProps {
@@ -58,6 +59,7 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
             >
               <Link
                 href={action.link}
+                data-cy={action.dataCy}
                 className="flex items-center gap-3 p-4 bg-surface-900 rounded-xl text-white hover:bg-surface-800 transition-colors group"
               >
                 <div className="flex-1 min-w-0">

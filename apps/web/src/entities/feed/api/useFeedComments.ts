@@ -31,10 +31,7 @@ export function useDeleteFeedComment(feedId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ commentId, password }: { commentId: string; password: string }) =>
-      apiClient.delete<void>(`/feeds/${feedId}/comments/${commentId}`, {
-        data: { password },
-      }),
+    mutationFn: (commentId: string) => apiClient.delete<void>(`/feeds/${feedId}/comments/${commentId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feed-comments', feedId] });
       queryClient.invalidateQueries({ queryKey: ['feeds'] });
