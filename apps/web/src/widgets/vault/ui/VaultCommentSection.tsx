@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '@/features/auth/api/useAuth';
 import {
   useVaultComments,
   useCreateVaultComment,
@@ -20,14 +21,15 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
   const { data: commentsData, isLoading } = useVaultComments(noteId, page);
   const createComment = useCreateVaultComment(noteId);
   const deleteComment = useDeleteVaultComment(noteId);
+  const { currentUser, isAuthenticated } = useAuth();
   const alert = useAlert();
 
   const comments = commentsData?.content || [];
   const totalPages = commentsData?.totalPages || 0;
 
-  const handleDelete = async (commentId: string, password: string) => {
+  const handleDelete = async (commentId: string) => {
     try {
-      await deleteComment.mutateAsync({ commentId, password });
+      await deleteComment.mutateAsync(commentId);
     } catch (err) {
       const message = err instanceof Error ? err.message : '삭제에 실패했습니다';
       alert.error(message);
@@ -101,7 +103,11 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
       )}
 
       {/* Comment Form */}
-      <VaultCommentForm createComment={createComment} />
+      <VaultCommentForm
+        currentUser={currentUser ?? null}
+        isAuthenticated={isAuthenticated}
+        createComment={createComment}
+      />
     </div>
   );
 }
