@@ -1,14 +1,13 @@
-package com.kscold.blog.social.domain.model;
+package com.kscold.blog.guestbook.domain.model;
 
 import com.kscold.blog.identity.domain.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -18,18 +17,13 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "feed_comments")
-public class FeedComment {
+@Document(collection = "guestbook_entries")
+public class GuestbookEntry {
 
     @Id
     private String id;
 
-    @Indexed
-    private String feedId;
-
     private String authorName;
-
-    private String authorPassword;
 
     private String userId;
 
