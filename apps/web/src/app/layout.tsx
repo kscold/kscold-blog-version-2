@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
+import { cookies } from 'next/headers';
 import { Providers } from '@/app/providers/providers';
 import { ClientLayout } from '@/app/providers/ClientLayout';
 import { PROFILE } from '@/entities/profile/model/profileData';
 import { BUSINESS_INFO } from '@/entities/profile/model/teamData';
+import { resolveInitialViewer } from '@/shared/lib/initialViewer';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, toOgImage } from '@/shared/lib/seo';
+import { AnalyticsScripts } from '@/shared/ui/AnalyticsScripts';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import './globals.css';
 
@@ -123,34 +125,20 @@ const siteJsonLd = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const initialViewer = resolveInitialViewer(cookieStore.get('auth-token')?.value);
+
   return (
     <html lang="ko" suppressHydrationWarning>
-      <head>
-        {gtmId && (
-          <Script id="google-tag-manager" strategy="beforeInteractive">{`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${gtmId}');`}</Script>
-        )}
-        {gaId && (
-          <>
-            <Script
-              id="google-analytics-src"
-              strategy="afterInteractive"
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-            />
-            <Script id="google-analytics" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}');`}</Script>
-          </>
-        )}
-      </head>
+      <head />
       <body className="antialiased bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50 min-h-screen relative selection:bg-accent-light/30 selection:text-accent-light transition-colors duration-300">
         <JsonLd id="site-graph" data={siteJsonLd} />
+        <AnalyticsScripts gtmId={gtmId} gaId={gaId} />
         {gtmId && (
           <noscript>
             <iframe
@@ -165,7 +153,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <div className="fixed inset-0 z-[-1] pointer-events-none bg-surface-50 dark:bg-surface-950 transition-colors duration-300"></div>
 
         <Providers>
-          <ClientLayout>{children}</ClientLayout>
+          <ClientLayout initialViewer={initialViewer}>{children}</ClientLayout>
         </Providers>
       </body>
     </html>

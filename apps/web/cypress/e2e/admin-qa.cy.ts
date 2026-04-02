@@ -45,7 +45,27 @@ function createAdminAccessToken() {
 
 function seedAdminSession() {
   const accessToken = createAdminAccessToken();
+  const persistedAuth = JSON.stringify({
+    state: {
+      user: {
+        id: 'admin-1',
+        email: 'developerkscold@gmail.com',
+        username: 'kscold',
+        displayName: '김승찬',
+        role: 'ADMIN',
+      },
+      token: accessToken,
+    },
+    version: 0,
+  });
+
+  cy.visit('/login');
   cy.setCookie('auth-token', accessToken);
+  cy.window().then(win => {
+    win.localStorage.setItem('accessToken', accessToken);
+    win.localStorage.setItem('refreshToken', 'fake-refresh-token');
+    win.localStorage.setItem('auth-storage', persistedAuth);
+  });
 
   return accessToken;
 }
@@ -132,30 +152,9 @@ describe('어드민 QA 진입 시나리오', () => {
   });
 
   it('시나리오: 관리자는 대시보드 빠른 작업에서 QA / E2E 페이지로 이동할 수 있다', () => {
-    const accessToken = seedAdminSession();
+    seedAdminSession();
 
-    cy.visit('/admin', {
-      onBeforeLoad(win) {
-        win.localStorage.setItem('accessToken', accessToken);
-        win.localStorage.setItem('refreshToken', 'fake-refresh-token');
-        win.localStorage.setItem(
-          'auth-storage',
-          JSON.stringify({
-            state: {
-              user: {
-                id: 'admin-1',
-                email: 'developerkscold@gmail.com',
-                username: 'kscold',
-                displayName: '김승찬',
-                role: 'ADMIN',
-              },
-              token: accessToken,
-            },
-            version: 0,
-          })
-        );
-      },
-    });
+    cy.visit('/admin');
 
     cy.wait(['@categories', '@tags', '@adminPosts', '@adminPostsMeta', '@feeds', '@vaultNotes', '@chatRooms']);
     cy.get('[data-cy="admin-qa-link"]').should('have.attr', 'href', '/admin/testing').click();
@@ -164,29 +163,9 @@ describe('어드민 QA 진입 시나리오', () => {
   });
 
   it('시나리오: 관리자는 QA / E2E 페이지에서 주요 시나리오 링크와 실행 명령을 확인할 수 있다', () => {
-    const accessToken = seedAdminSession();
+    seedAdminSession();
 
-    cy.visit('/admin/testing', {
-      onBeforeLoad(win) {
-        win.localStorage.setItem('accessToken', accessToken);
-        win.localStorage.setItem(
-          'auth-storage',
-          JSON.stringify({
-            state: {
-              user: {
-                id: 'admin-1',
-                email: 'developerkscold@gmail.com',
-                username: 'kscold',
-                displayName: '김승찬',
-                role: 'ADMIN',
-              },
-              token: accessToken,
-            },
-            version: 0,
-          })
-        );
-      },
-    });
+    cy.visit('/admin/testing');
 
     cy.wait(['@categories', '@tags']);
     cy.get('[data-cy="admin-qa-scenario-home"]').should('have.attr', 'href', '/');

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuthStore } from '@/entities/user/model/authStore';
 import apiClient from '@/shared/api/api-client';
 import Link from 'next/link';
+import { useViewer } from '@/shared/model/useViewer';
 
 interface RestrictedOverlayProps {
   categoryId?: string;
@@ -12,7 +12,7 @@ interface RestrictedOverlayProps {
 }
 
 export function RestrictedOverlay({ categoryId, categoryName, excerpt }: RestrictedOverlayProps) {
-  const { user } = useAuthStore();
+  const { isAuthenticated } = useViewer();
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
@@ -57,7 +57,7 @@ export function RestrictedOverlay({ categoryId, categoryName, excerpt }: Restric
           {categoryName ? `"${categoryName}" 카테고리의 글은` : '이 글은'} 승인된 사용자만 읽을 수 있습니다.
         </p>
 
-        {!user ? (
+        {!isAuthenticated ? (
           <div className="mt-6">
             <Link
               href="/login"
