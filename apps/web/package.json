@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "dev:e2e": "NEXT_PUBLIC_GTM_ID= NEXT_PUBLIC_GA_ID= next dev -p 3101",
+    "dev:e2e": "./scripts/run-e2e-dev.sh",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
