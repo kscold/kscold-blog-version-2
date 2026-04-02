@@ -57,7 +57,8 @@ export function HeroSection() {
             개발자
           </span>
           ,<br />
-          문제를 서비스로 풀어내는{' '}
+          문제를 서비스로 풀어내는
+          <br />
           <span className="text-surface-900 font-semibold relative after:absolute after:bottom-1 after:left-0 after:w-full after:h-2 after:bg-blue-100 after:-z-10 px-1">
             프로덕트 엔지니어 김승찬
           </span>

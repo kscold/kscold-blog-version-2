@@ -2,7 +2,8 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/entities/user/model/authStore';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -18,6 +19,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         },
       })
   );
+
+  useEffect(() => {
+    void useAuthStore.persist.rehydrate();
+  }, []);
 
   return (
     <ErrorBoundary>

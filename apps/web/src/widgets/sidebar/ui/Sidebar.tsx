@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'; // motion used for over
 import { usePathname } from 'next/navigation';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { useTags } from '@/entities/tag/api/useTags';
-import { useAuthStore } from '@/entities/user/model/authStore';
 import { useUiStore } from '@/shared/model/uiStore';
+import { useViewer } from '@/shared/model/useViewer';
 import { Category } from '@/types/blog';
 
 function CategoryTree({ categories, depth = 0, onNavigate }: { categories: Category[]; depth?: number; onNavigate?: () => void }) {
@@ -51,14 +51,14 @@ export function Sidebar() {
   const { data: categories } = useCategories();
   const { sidebarOpen, setSidebarOpen } = useUiStore();
   const { data: tags } = useTags();
-  const { user } = useAuthStore();
+  const { role } = useViewer();
   const closeSidebar = () => setSidebarOpen(false);
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
   const mobileSidebarState = sidebarOpen ? 'block translate-x-4' : 'hidden';
   const desktopSidebarState = isVaultPage ? 'lg:hidden' : 'lg:block lg:translate-x-0';
   const mobileLinks = [
-    ...(user?.role === 'ADMIN' ? [{ label: 'Admin', href: '/admin', highlighted: true }] : []),
+    ...(role === 'ADMIN' ? [{ label: 'Admin', href: '/admin', highlighted: true }] : []),
     { label: 'Home', href: '/' },
     { label: 'Blog', href: '/blog' },
     { label: 'Feed', href: '/feed' },
@@ -91,6 +91,7 @@ export function Sidebar() {
               <Link
                 key={link.href}
                 href={link.href}
+                data-cy={`sidebar-link-${link.label.toLowerCase()}`}
                 onClick={() => setSidebarOpen(false)}
                 className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   link.highlighted

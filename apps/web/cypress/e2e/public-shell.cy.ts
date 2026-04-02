@@ -42,7 +42,8 @@ describe('공개 페이지 핵심 시나리오', () => {
 
     cy.get('[data-cy="hero-tagline"]')
       .should('contain.text', '러닝커브를 즐기는 개발자')
-      .and('contain.text', '문제를 서비스로 풀어내는 프로덕트 엔지니어 김승찬입니다.');
+      .and('contain.text', '문제를 서비스로 풀어내는')
+      .and('contain.text', '프로덕트 엔지니어 김승찬입니다.');
 
     cy.get('[data-cy="hero-primary-cta"]').should('have.attr', 'href', '/blog');
     cy.get('[data-cy="hero-secondary-cta"]').should('have.attr', 'href', '/feed');

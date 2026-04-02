@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { useAuthStore } from '@/entities/user/model/authStore';
 import { useUiStore } from '@/shared/model/uiStore';
 import { useLogout } from '@/entities/user/model/useLogout';
 import { useState, useEffect } from 'react';
+import { useViewer } from '@/shared/model/useViewer';
 
 export function Header() {
-  const { user } = useAuthStore();
+  const { user, isAuthenticated, role } = useViewer();
   const { toggleSidebar } = useUiStore();
   const logout = useLogout();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -41,11 +41,12 @@ export function Header() {
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
-      <div className="px-6 sm:px-8 lg:px-12 h-16">
+      <div className="px-4 sm:px-8 lg:px-12 h-16">
         <div className="flex items-center justify-between h-full">
-          <div className="flex items-center gap-4 sm:gap-8">
+          <div className="flex items-center gap-3 sm:gap-8 min-w-0">
             <button
               onClick={toggleSidebar}
+              data-cy="sidebar-toggle"
               className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-surface-100 transition-colors text-surface-900"
               aria-label="Toggle sidebar"
             >
@@ -59,7 +60,7 @@ export function Header() {
               </svg>
             </button>
 
-            <Link href="/" className="group relative flex items-center gap-3">
+            <Link href="/" className="group relative flex items-center gap-2 sm:gap-3 min-w-0">
               <Image
                 src="/logo.svg"
                 alt="KSCOLD Logo"
@@ -67,7 +68,7 @@ export function Header() {
                 height={32}
                 className="group-hover:scale-110 transition-transform duration-500 will-change-transform"
               />
-              <span className="relative text-xl sm:text-2xl font-sans font-black tracking-tighter text-surface-900 z-10 group-hover:text-surface-600 transition-colors">
+              <span className="relative text-lg sm:text-2xl font-sans font-black tracking-tighter text-surface-900 z-10 group-hover:text-surface-600 transition-colors truncate">
                 KSCOLD
               </span>
             </Link>
@@ -88,20 +89,21 @@ export function Header() {
             </nav>
           </div>
 
-          <div className="flex items-center gap-4">
-            {user ? (
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            {isAuthenticated ? (
               <div className="flex items-center gap-2 sm:gap-4">
-                {user.role === 'ADMIN' && (
+                {role === 'ADMIN' && (
                   <Link
                     href="/admin"
-                    className="inline-flex items-center rounded-full border border-surface-200 px-3 py-1.5 text-xs font-semibold text-surface-900 hover:bg-surface-100 transition-colors sm:px-4 sm:py-2 sm:text-sm"
+                    data-cy="admin-header-link"
+                    className="hidden sm:inline-flex items-center rounded-full border border-surface-200 px-3 py-1.5 text-xs font-semibold text-surface-900 hover:bg-surface-100 transition-colors sm:px-4 sm:py-2 sm:text-sm"
                   >
                     Admin
                   </Link>
                 )}
                 <button
                   onClick={logout}
-                  className="px-2 py-1.5 text-xs font-medium text-surface-500 hover:text-surface-900 transition-colors sm:px-4 sm:py-2 sm:text-sm"
+                  className="px-1.5 py-1.5 text-[11px] font-medium text-surface-500 hover:text-surface-900 transition-colors sm:px-4 sm:py-2 sm:text-sm"
                 >
                   Logout
                 </button>
