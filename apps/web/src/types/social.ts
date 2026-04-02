@@ -30,6 +30,7 @@ export interface FeedComment {
   feedId: string;
   authorName: string;
   isAdmin: boolean;
+  canDelete: boolean;
   content: string;
   createdAt: string;
 }
@@ -49,7 +50,5 @@ export interface FeedUpdateRequest {
 }
 
 export interface FeedCommentCreateRequest {
-  authorName: string;
-  authorPassword: string;
   content: string;
 }

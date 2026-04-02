@@ -73,12 +73,11 @@ export interface VaultNoteComment {
   noteId: string;
   authorName: string;
   isAdmin: boolean;
+  canDelete: boolean;
   content: string;
   createdAt: string;
 }
 
 export interface VaultNoteCommentCreateRequest {
-  authorName: string;
-  authorPassword: string;
   content: string;
 }

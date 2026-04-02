@@ -46,6 +46,7 @@ export function HeroSection() {
         />
 
         <motion.p
+          data-cy="hero-tagline"
           className="mt-6 text-lg sm:text-2xl text-surface-500 font-light max-w-2xl mx-auto leading-relaxed text-balance tracking-tight"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -56,9 +57,9 @@ export function HeroSection() {
             개발자
           </span>
           ,<br />
-          사용자 경험을 완성하는{' '}
+          문제를 서비스로 풀어내는{' '}
           <span className="text-surface-900 font-semibold relative after:absolute after:bottom-1 after:left-0 after:w-full after:h-2 after:bg-blue-100 after:-z-10 px-1">
-            프로덕트 엔지니어
+            프로덕트 엔지니어 김승찬
           </span>
           입니다.
         </motion.p>
@@ -78,6 +79,7 @@ export function HeroSection() {
         >
           <Link
             href="/blog"
+            data-cy="hero-primary-cta"
             className="group relative flex items-center justify-center w-full sm:w-auto px-10 py-4 bg-surface-900 text-white font-bold rounded-2xl overflow-hidden transition-all duration-300 shadow-[0_8px_20px_-8px_rgba(15,23,42,0.6)] hover:shadow-[0_12px_30px_-10px_rgba(15,23,42,0.8)] hover:-translate-y-1"
           >
             <div className="absolute inset-0 bg-surface-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -101,6 +103,7 @@ export function HeroSection() {
           </Link>
           <Link
             href="/feed"
+            data-cy="hero-secondary-cta"
             className="group flex items-center justify-center w-full sm:w-auto px-10 py-4 text-surface-600 bg-white border border-surface-200 hover:border-surface-900 hover:text-surface-900 transition-all duration-300 rounded-2xl hover:shadow-sm"
           >
             <span className="font-bold tracking-wide">피드 보기</span>
