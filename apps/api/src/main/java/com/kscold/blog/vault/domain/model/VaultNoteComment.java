@@ -1,5 +1,6 @@
 package com.kscold.blog.vault.domain.model;
 
+import com.kscold.blog.identity.domain.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +32,8 @@ public class VaultNoteComment {
     private String authorPassword;
 
     private String userId;
+
+    private User.Role authorRole;
 
     private String content;
 

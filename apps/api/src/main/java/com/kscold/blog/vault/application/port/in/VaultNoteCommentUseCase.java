@@ -7,9 +7,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface VaultNoteCommentUseCase {
 
-    VaultNoteComment create(String noteId, NoteCommentCreateCommand command);
+    VaultNoteComment create(String noteId, NoteCommentCreateCommand command, String userId);
 
-    Page<VaultNoteComment> getByNoteId(String noteId, Pageable pageable);
+    Page<VaultNoteComment> getByNoteId(String noteId, Pageable pageable, String currentUserId);
 
-    void delete(String noteId, String commentId, String password);
+    void delete(String noteId, String commentId, String currentUserId);
 }

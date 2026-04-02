@@ -83,4 +83,11 @@ public class ResourceNotFoundException extends BusinessException {
             String.format("댓글을 찾을 수 없습니다 (ID: %s)", commentId)
         );
     }
+
+    public static ResourceNotFoundException guestbookEntry(String entryId) {
+        return new ResourceNotFoundException(
+            ErrorCode.GUESTBOOK_ENTRY_NOT_FOUND,
+            String.format("방명록을 찾을 수 없습니다 (ID: %s)", entryId)
+        );
+    }
 }
