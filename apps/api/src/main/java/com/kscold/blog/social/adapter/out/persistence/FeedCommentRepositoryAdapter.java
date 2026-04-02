@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("null")
@@ -22,6 +23,11 @@ public class FeedCommentRepositoryAdapter implements FeedCommentRepository {
     }
 
     @Override
+    public List<FeedComment> saveAll(List<FeedComment> comments) {
+        return mongoFeedCommentRepository.saveAll(comments);
+    }
+
+    @Override
     public Optional<FeedComment> findById(String id) {
         return mongoFeedCommentRepository.findById(id);
     }
@@ -29,6 +35,11 @@ public class FeedCommentRepositoryAdapter implements FeedCommentRepository {
     @Override
     public Page<FeedComment> findByFeedId(String feedId, Pageable pageable) {
         return mongoFeedCommentRepository.findByFeedId(feedId, pageable);
+    }
+
+    @Override
+    public List<FeedComment> findAnonymousByFeedIdAndAuthorNames(String feedId, List<String> authorNames) {
+        return mongoFeedCommentRepository.findByFeedIdAndUserIdIsNullAndAuthorNameIn(feedId, authorNames);
     }
 
     @Override

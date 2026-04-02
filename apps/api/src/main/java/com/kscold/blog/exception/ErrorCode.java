@@ -36,6 +36,7 @@ public enum ErrorCode {
     VAULT_NOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "E308", "노트를 찾을 수 없습니다"),
     VAULT_FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, "E309", "폴더를 찾을 수 없습니다"),
     VAULT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "E310", "댓글을 찾을 수 없습니다"),
+    GUESTBOOK_ENTRY_NOT_FOUND(HttpStatus.NOT_FOUND, "E311", "방명록을 찾을 수 없습니다"),
 
     // 409 충돌
     DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "E401", "이미 존재하는 리소스입니다"),
