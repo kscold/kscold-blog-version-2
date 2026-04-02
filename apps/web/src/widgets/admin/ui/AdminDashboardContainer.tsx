@@ -4,15 +4,15 @@ import { useAdminPosts } from '@/entities/post/api/usePosts';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { useFeeds } from '@/entities/feed/api/useFeeds';
 import { useAllVaultNotes } from '@/entities/vault/api/useVault';
-import { useAuthStore } from '@/entities/user/model/authStore';
 import { useTags } from '@/entities/tag/api/useTags';
 import { fetchChatRooms } from '@/entities/chat/api/chatAdminApi';
 import { useQuery } from '@tanstack/react-query';
+import { useViewer } from '@/shared/model/useViewer';
 import { DashboardStats } from './DashboardStats';
 import { AdminUserStatsSection } from './AdminUserStatsSection';
 
 export function AdminDashboardContainer() {
-  const { user } = useAuthStore();
+  const { user, role } = useViewer();
   const { data: postsData } = useAdminPosts(0, 5);
   const { data: allPostsData } = useAdminPosts(0, 1);
   const { data: categories } = useCategories();
@@ -32,6 +32,10 @@ export function AdminDashboardContainer() {
   const totalTags = tagsData?.length || 0;
   const totalChatRooms = chatRooms?.length || 0;
   const totalMessages = chatRooms?.reduce((sum, r) => sum + r.messageCount, 0) || 0;
+  const viewerName =
+    user?.displayName ||
+    user?.username ||
+    (role === 'ADMIN' ? '관리자' : role === 'USER' ? '회원' : '');
 
   const stats = [
     { name: '전체 포스트', value: totalPosts, link: '/admin/posts' },
@@ -65,7 +69,7 @@ export function AdminDashboardContainer() {
         <h1 className="text-3xl sm:text-4xl font-sans font-black tracking-tighter text-surface-900">
           Dashboard
         </h1>
-        <p className="text-surface-500 mt-2">{user?.displayName || user?.username}</p>
+        <p className="text-surface-500 mt-2">{viewerName}</p>
       </div>
 
       <DashboardStats

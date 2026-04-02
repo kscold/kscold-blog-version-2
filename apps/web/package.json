@@ -12,7 +12,7 @@
     "cy:open": "unset ELECTRON_RUN_AS_NODE && cypress open",
     "cy:run": "unset ELECTRON_RUN_AS_NODE && cypress run",
     "cy:run:e2e": "unset ELECTRON_RUN_AS_NODE && cypress run --config baseUrl=http://127.0.0.1:3101",
-    "test:e2e": "start-server-and-test dev:e2e http://127.0.0.1:3101 cy:run:e2e"
+    "test:e2e": "start-server-and-test './scripts/run-e2e-dev.sh' http://127.0.0.1:3101 'unset ELECTRON_RUN_AS_NODE && cypress run --config baseUrl=http://127.0.0.1:3101'"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
