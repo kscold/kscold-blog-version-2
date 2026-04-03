@@ -1,6 +1,13 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
-import { useAuthStore } from '@/entities/user/model/authStore';
 import { resolveApiBaseUrl } from '@/shared/lib/runtime-url';
+import {
+  clearStoredAuth,
+  getAccessToken,
+  getRefreshToken,
+  hasRefreshToken,
+  storeAccessToken,
+  storeRefreshToken,
+} from '@/shared/lib/authTokenStorage';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -64,39 +71,23 @@ class ApiClient {
   }
 
   private getAccessToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('accessToken');
+    return getAccessToken();
   }
 
   private getRefreshToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('refreshToken');
+    return getRefreshToken();
   }
 
   private setAccessToken(token: string): void {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('accessToken', token);
-      useAuthStore.getState().setToken(token);
-
-      const secure = window.location.protocol === 'https:' ? '; Secure' : '';
-      document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60}; SameSite=Lax${secure}`;
-    }
+    storeAccessToken(token);
   }
 
   private setRefreshToken(token: string): void {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('refreshToken', token);
-    }
+    storeRefreshToken(token);
   }
 
   private clearTokens(): void {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('auth-storage');
-      useAuthStore.getState().clearAuth();
-      document.cookie = 'auth-token=; path=/; max-age=0';
-    }
+    clearStoredAuth();
   }
 
   private async doRefreshToken(): Promise<string | null> {
@@ -217,7 +208,7 @@ class ApiClient {
   }
 
   public hasRefreshToken(): boolean {
-    return !!this.getRefreshToken();
+    return hasRefreshToken();
   }
 
   public async restoreSession(): Promise<string | null> {
