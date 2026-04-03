@@ -1,21 +1,22 @@
 import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
+import { getAccessToken } from '@/shared/lib/authTokenStorage';
 import { AuthResponse, LoginRequest, RegisterRequest, User } from '@/types/user';
 import { useAuthStore } from '@/entities/user/model/authStore';
 
 export function useAuth() {
   const queryClient = useQueryClient();
-  const { setUser, setToken, clearAuth } = useAuthStore();
+  const { setUser } = useAuthStore();
 
   const { data: currentUser, isLoading } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: async () => {
-      const token = apiClient.getToken();
+      const token = getAccessToken();
       if (!token) return null;
       return apiClient.get<User>('/auth/me');
     },
-    enabled: !!apiClient.getToken(),
+    enabled: !!getAccessToken(),
     retry: false,
   });
 
@@ -29,7 +30,6 @@ export function useAuth() {
     mutationFn: (data: LoginRequest) => apiClient.post<AuthResponse>('/auth/login', data),
     onSuccess: data => {
       apiClient.setToken(data.accessToken, data.refreshToken);
-      setToken(data.accessToken);
       setUser(data.user);
       queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
@@ -39,7 +39,6 @@ export function useAuth() {
     mutationFn: (data: RegisterRequest) => apiClient.post<AuthResponse>('/auth/register', data),
     onSuccess: data => {
       apiClient.setToken(data.accessToken, data.refreshToken);
-      setToken(data.accessToken);
       setUser(data.user);
       queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
@@ -47,8 +46,6 @@ export function useAuth() {
 
   const logout = () => {
     apiClient.removeToken();
-    clearAuth();
-    queryClient.clear();
   };
 
   return {

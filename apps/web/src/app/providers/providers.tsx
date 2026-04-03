@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/entities/user/model/authStore';
+import { subscribeAuthSessionBridge } from '@/shared/model/authSessionBridge';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -22,7 +23,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     void useAuthStore.persist.rehydrate();
-  }, []);
+
+    const unsubscribe = subscribeAuthSessionBridge({
+      onTokenChange: token => {
+        if (token) {
+          useAuthStore.getState().setToken(token);
+        }
+      },
+      onSessionCleared: () => {
+        useAuthStore.getState().clearAuth();
+        queryClient.clear();
+      },
+    });
+
+    return unsubscribe;
+  }, [queryClient]);
 
   return (
     <ErrorBoundary>

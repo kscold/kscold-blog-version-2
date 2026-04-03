@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateA
 import type { RawChatPayload } from '@/entities/chat/lib/messageMappers';
 import { toVisitorMessage } from '@/entities/chat/lib/messageMappers';
 import { fetchMyChatMessages, sendVisitorMessage, type VisitorChatMessage } from '@/entities/chat';
+import { getAccessToken } from '@/shared/lib/authTokenStorage';
 import { resolveChatWsUrl } from '@/shared/lib/runtime-url';
 
 interface UseChatSocketOptions {
@@ -16,7 +17,7 @@ export function useChatSocket({ isOpen, username: _username }: UseChatSocketOpti
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connect = useCallback(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    const token = getAccessToken();
     if (!token) return;
     const ws = new WebSocket(`${resolveChatWsUrl()}?token=${encodeURIComponent(token)}`);
     wsRef.current = ws;
