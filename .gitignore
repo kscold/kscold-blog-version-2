@@ -6,6 +6,8 @@ node_modules/
 # Testing
 coverage/
 .nyc_output
+apps/web/cypress/screenshots/
+apps/web/cypress/videos/
 
 # Next.js
 .next/
