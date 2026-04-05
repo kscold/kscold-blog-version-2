@@ -6,10 +6,12 @@ import { useFeeds } from '@/entities/feed/api/useFeeds';
 import { FeedCard } from '@/entities/feed/ui/FeedCard';
 import { FeedComposer } from '@/features/feed/ui/FeedComposer';
 import { useAuth } from '@/features/auth/api/useAuth';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 
 export function FeedList() {
   const { currentUser } = useAuth();
+  const { allowRichEffects } = usePerformanceMode();
   const [page, setPage] = useState(0);
 
   const { data: feedsData, isLoading } = useFeeds({ page, size: 12 });
@@ -24,12 +26,14 @@ export function FeedList() {
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="bg-white border border-surface-200 rounded-2xl overflow-hidden animate-pulse"
+            className="overflow-hidden rounded-2xl border border-surface-200 bg-white animate-pulse"
           >
-            <div className="aspect-square bg-surface-100" />
-            <div className="p-4 space-y-2">
-              <div className="h-4 bg-surface-100 rounded w-3/4" />
-              <div className="h-4 bg-surface-100 rounded w-1/2" />
+            <div className="h-16 border-b border-surface-100 bg-surface-50" />
+            <div className="aspect-[16/10] bg-surface-100" />
+            <div className="space-y-3 p-5">
+              <div className="h-4 w-2/3 rounded bg-surface-100" />
+              <div className="h-4 w-full rounded bg-surface-100" />
+              <div className="h-4 w-3/4 rounded bg-surface-100" />
             </div>
           </div>
         ))}
@@ -57,22 +61,22 @@ export function FeedList() {
 
       <motion.div
         className="space-y-6"
-        initial="hidden"
-        animate="visible"
-        variants={{
+        initial={allowRichEffects ? 'hidden' : false}
+        animate={allowRichEffects ? 'visible' : undefined}
+        variants={allowRichEffects ? {
           visible: {
             transition: { staggerChildren: 0.1 },
           },
-        }}
+        } : undefined}
       >
         {feeds.map(feed => (
           <motion.div
             key={feed.id}
-            variants={{
+            variants={allowRichEffects ? {
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 },
-            }}
-            transition={{ duration: 0.4 }}
+            } : undefined}
+            transition={allowRichEffects ? { duration: 0.4 } : undefined}
           >
             <FeedCard feed={feed} />
           </motion.div>
