@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMeasure } from 'react-use';
 import ForceGraph2D, { ForceGraphMethods, NodeObject } from 'react-force-graph-2d';
 import { GraphNode, GraphData, GraphLink } from '@/types/vault';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import {
   configureForces,
   renderNode,
@@ -32,6 +33,8 @@ export function VaultGraphView({
   const router = useRouter();
   const [containerRef, { width, height }] = useMeasure<HTMLDivElement>();
   const [hoverNode, setHoverNode] = useState<GraphNode | null>(null);
+  const { reduceMotion, isTouchDevice } = usePerformanceMode();
+  const reducedGraphEffects = reduceMotion || isTouchDevice;
 
   const gData = useMemo(() => {
     return {
@@ -47,8 +50,8 @@ export function VaultGraphView({
   useEffect(() => {
     const fg = fgRef.current;
     if (!fg) return;
-    configureForces({ fg, nodeCount: gData.nodes.length });
-  }, [gData]);
+    configureForces({ fg, nodeCount: gData.nodes.length, reducedEffects: reducedGraphEffects });
+  }, [gData, reducedGraphEffects]);
 
   // 활성 노드로 중앙 이동
   useEffect(() => {
@@ -57,11 +60,12 @@ export function VaultGraphView({
         (n: GraphNode) => n.slug === activeNodeSlug
       ) as unknown as NodeObject;
       if (activeNode && activeNode.x && activeNode.y) {
-        fgRef.current.centerAt(activeNode.x, activeNode.y, 1000);
-        fgRef.current.zoom(1.5, 1000);
+        const duration = reducedGraphEffects ? 0 : 1000;
+        fgRef.current.centerAt(activeNode.x, activeNode.y, duration);
+        fgRef.current.zoom(1.5, duration);
       }
     }
-  }, [activeNodeSlug, gData]);
+  }, [activeNodeSlug, gData, reducedGraphEffects]);
 
   const handleNodeClick = useCallback((node: NodeObject) => {
     const gn = node as unknown as GraphNode;
@@ -89,8 +93,9 @@ export function VaultGraphView({
       hoverNodeId: hoverNode?.id,
       folderColorMap,
       theme,
+      reducedEffects: reducedGraphEffects,
     });
-  }, [activeNodeSlug, hoverNode?.id, folderColorMap, theme]);
+  }, [activeNodeSlug, hoverNode?.id, folderColorMap, theme, reducedGraphEffects]);
 
   const linkCanvasObject = useCallback((link: GraphLink, ctx: CanvasRenderingContext2D) => {
     const src = link.source;
@@ -105,6 +110,18 @@ export function VaultGraphView({
 
     const srcColor = folderColorMap[srcNode.folderId ?? ''] || '#64C8FF';
     const tgtColor = folderColorMap[tgtNode.folderId ?? ''] || srcColor;
+
+    if (reducedGraphEffects) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(src.x, src.y);
+      ctx.lineTo(tgt.x, tgt.y);
+      ctx.strokeStyle = isHovered ? srcColor + 'aa' : srcColor + '44';
+      ctx.lineWidth = isHovered ? 1.6 : 0.9;
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
 
     // 곡선 제어점 계산 (시냅스 곡선 효과)
     const dx = tgt.x - src.x;
@@ -154,7 +171,7 @@ export function VaultGraphView({
     }
 
     ctx.restore();
-  }, [hoverNode, folderColorMap]);
+  }, [hoverNode, folderColorMap, reducedGraphEffects]);
 
   return (
     <div
@@ -171,9 +188,9 @@ export function VaultGraphView({
         nodeRelSize={4}
         linkWidth={() => 0}
         linkColor={() => 'transparent'}
-        linkDirectionalParticles={(link: GraphLink) => (isLinkHovered(link) ? 8 : 4)}
-        linkDirectionalParticleWidth={(link: GraphLink) => (isLinkHovered(link) ? 4 : 2.5)}
-        linkDirectionalParticleSpeed={0.006}
+        linkDirectionalParticles={(link: GraphLink) => (reducedGraphEffects ? 0 : isLinkHovered(link) ? 8 : 4)}
+        linkDirectionalParticleWidth={(link: GraphLink) => (reducedGraphEffects ? 0 : isLinkHovered(link) ? 4 : 2.5)}
+        linkDirectionalParticleSpeed={reducedGraphEffects ? 0 : 0.006}
         linkDirectionalParticleColor={(link: GraphLink) => {
           const sourceNode = typeof link.source === 'object' ? link.source : null;
           const folderId =
@@ -186,15 +203,10 @@ export function VaultGraphView({
         linkCanvasObjectMode={() => 'replace'}
         linkCanvasObject={linkCanvasObject}
         onNodeClick={handleNodeClick}
-        d3AlphaDecay={0.003}
-        d3VelocityDecay={0.35}
-        warmupTicks={80}
-        cooldownTicks={Infinity}
-        onEngineStop={() => {
-          setTimeout(() => {
-            fgRef.current?.d3ReheatSimulation();
-          }, 3000);
-        }}
+        d3AlphaDecay={reducedGraphEffects ? 0.05 : 0.015}
+        d3VelocityDecay={reducedGraphEffects ? 0.48 : 0.35}
+        warmupTicks={reducedGraphEffects ? 36 : 80}
+        cooldownTicks={reducedGraphEffects ? 90 : 180}
         nodeCanvasObject={nodeCanvasObject}
         nodePointerAreaPaint={renderNodeHitArea}
         onNodeHover={node => {

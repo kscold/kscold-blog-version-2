@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useFeaturedPosts } from '@/entities/post/api/usePosts';
 import { PostCard } from '@/entities/post/ui/PostCard';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function FeaturedPostsSection() {
+  const { allowRichEffects } = usePerformanceMode();
   const { data: featuredPosts, isLoading } = useFeaturedPosts(6);
 
   return (
@@ -13,10 +15,10 @@ export function FeaturedPostsSection() {
       <div className="max-w-7xl mx-auto">
         <motion.div
           className="flex items-end justify-between mb-20 border-b border-white/10 pb-8"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          initial={allowRichEffects ? { opacity: 0, y: 20 } : false}
+          whileInView={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
+          viewport={allowRichEffects ? { once: true } : undefined}
+          transition={allowRichEffects ? { duration: 0.6 } : undefined}
         >
           <div>
             <h2 className="text-4xl sm:text-5xl font-sans font-bold text-surface-900 mb-2 tracking-tight">
@@ -44,25 +46,25 @@ export function FeaturedPostsSection() {
         ) : featuredPosts && featuredPosts.length > 0 ? (
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={{
+            initial={allowRichEffects ? 'hidden' : false}
+            whileInView={allowRichEffects ? 'visible' : undefined}
+            viewport={allowRichEffects ? { once: true } : undefined}
+            variants={allowRichEffects ? {
               visible: {
                 transition: {
                   staggerChildren: 0.1,
                 },
               },
-            }}
+            } : undefined}
           >
             {featuredPosts.map((post, index) => (
               <motion.div
                 key={post.id}
-                variants={{
+                variants={allowRichEffects ? {
                   hidden: { opacity: 0, y: 20 },
                   visible: { opacity: 1, y: 0 },
-                }}
-                transition={{ duration: 0.5 }}
+                } : undefined}
+                transition={allowRichEffects ? { duration: 0.5 } : undefined}
               >
                 <PostCard post={post} featured={index === 0} />
               </motion.div>
