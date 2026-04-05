@@ -5,12 +5,14 @@ import { useAlert } from '@/shared/model/alertStore';
 import type { QaSession, QaSessionResponse } from './adminTesting';
 
 type QaSessionStatus = QaSession['status'] | 'idle';
+type QaAction = 'start' | 'stop' | 'delete';
 
 export function useAdminQaSession() {
   const alerts = useAlert();
   const [session, setSession] = useState<QaSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRunningAction, setIsRunningAction] = useState(false);
+  const [activeAction, setActiveAction] = useState<QaAction | null>(null);
   const [runnerMessage, setRunnerMessage] = useState<string | null>(null);
   const latestStatusRef = useRef<QaSessionStatus>('idle');
 
@@ -64,22 +66,39 @@ export function useAdminQaSession() {
     };
   }, []);
 
-  async function runAction(action: 'start' | 'stop') {
+  async function runAction(action: QaAction) {
+    if (action === 'delete' && session?.id) {
+      const confirmed = window.confirm('현재 실행 결과와 저장된 스크린샷을 삭제할까요?');
+      if (!confirmed) return;
+    }
+
     setIsRunningAction(true);
+    setActiveAction(action);
 
     try {
-      const response = await fetch(
-        action === 'start' ? '/admin/testing/session' : '/admin/testing/session/stop',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: action === 'start' ? JSON.stringify({ suiteId: 'admin_smoke' }) : undefined,
-          cache: 'no-store',
-          credentials: 'same-origin',
-        }
-      );
+      const endpoint =
+        action === 'start'
+          ? '/admin/testing/session'
+          : action === 'stop'
+            ? '/admin/testing/session/stop'
+            : '/admin/testing/session/delete';
+
+      const body =
+        action === 'start'
+          ? { suiteId: 'admin_smoke' }
+          : action === 'delete'
+            ? { sessionId: session?.id }
+            : undefined;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+        cache: 'no-store',
+        credentials: 'same-origin',
+      });
 
       const data: QaSessionResponse = await response
         .json()
@@ -92,8 +111,10 @@ export function useAdminQaSession() {
       if (response.ok) {
         if (action === 'start') {
           alerts.success('QA 세션을 시작했습니다.');
-        } else {
+        } else if (action === 'stop') {
           alerts.info(data.stopped ? '실행 중인 QA 세션을 중지했습니다.' : '중지할 세션이 없었습니다.');
+        } else {
+          alerts.success(data.deleted ? '저장된 QA 스크린샷을 삭제했습니다.' : '삭제할 실행 결과가 없었습니다.');
         }
       } else {
         alerts.error(data.message || 'QA 세션 요청에 실패했습니다.');
@@ -103,6 +124,7 @@ export function useAdminQaSession() {
       alerts.error('QA 러너에 연결하지 못했습니다.');
     } finally {
       setIsRunningAction(false);
+      setActiveAction(null);
     }
   }
 
@@ -110,6 +132,7 @@ export function useAdminQaSession() {
     session,
     isLoading,
     isRunningAction,
+    activeAction,
     runnerMessage,
     currentStatus: (session?.status || 'idle') as QaSessionStatus,
     latestScreenshot: session?.latestScreenshotUrl || null,

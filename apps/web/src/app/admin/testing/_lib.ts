@@ -1,6 +1,5 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { resolveInitialViewer } from '@/shared/lib/initialViewer';
+import { denyUnlessAdmin } from '@/shared/lib/server/adminGuard';
 
 const QA_RUNNER_CANDIDATES = [
   process.env.BLOG_QA_RUNNER_URL,
@@ -10,14 +9,7 @@ const QA_RUNNER_CANDIDATES = [
 const QA_ROUTE_PREFIX = '/admin/testing';
 
 export async function ensureAdmin() {
-  const cookieStore = await cookies();
-  const viewer = resolveInitialViewer(cookieStore.get('auth-token')?.value);
-
-  if (viewer.role !== 'ADMIN') {
-    return NextResponse.json({ message: 'Admin only' }, { status: 403 });
-  }
-
-  return null;
+  return denyUnlessAdmin();
 }
 
 export function toProxiedArtifactUrl(url: string | null) {
@@ -44,12 +36,13 @@ interface SessionPayload {
   };
 }
 
-export function normalizeSessionPayload(payload: SessionPayload): SessionPayload {
+export function normalizeSessionPayload<T extends SessionPayload & Record<string, unknown>>(payload: T): T {
   if (!payload.session) {
     return payload;
   }
 
   return {
+    ...payload,
     session: {
       ...payload.session,
       screenshots: payload.session.screenshots.map(screenshot => ({

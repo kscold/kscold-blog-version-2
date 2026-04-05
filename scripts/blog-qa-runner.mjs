@@ -7,6 +7,8 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
@@ -366,6 +368,73 @@ async function uploadSessionArtifacts(session) {
   session.logs.push(`[${nowIso()}] MinIO upload completed`);
 }
 
+async function removeLocalSessionArtifacts(sessionId) {
+  await fs.rm(path.join(ARTIFACT_ROOT, sessionId), {
+    recursive: true,
+    force: true,
+  });
+}
+
+async function removeRemoteSessionArtifacts(sessionId) {
+  if (!minioClient) return;
+
+  let continuationToken = undefined;
+
+  do {
+    const response = await minioClient.send(
+      new ListObjectsV2Command({
+        Bucket: MINIO_BUCKET,
+        Prefix: `${buildArtifactKey(sessionId)}/`,
+        ContinuationToken: continuationToken,
+      })
+    );
+
+    const objects = (response.Contents || [])
+      .map(item => item.Key)
+      .filter(key => Boolean(key))
+      .map(Key => ({ Key }));
+
+    if (objects.length) {
+      await minioClient.send(
+        new DeleteObjectsCommand({
+          Bucket: MINIO_BUCKET,
+          Delete: {
+            Objects: objects,
+            Quiet: true,
+          },
+        })
+      );
+    }
+
+    continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined;
+  } while (continuationToken);
+}
+
+async function clearLatestSessionManifest(sessionId) {
+  const latestManifest = await readLatestSessionManifestLocal();
+  if (latestManifest?.id === sessionId) {
+    await fs.rm(LATEST_SESSION_MANIFEST, { force: true });
+  }
+}
+
+async function deleteSessionArtifacts(sessionId) {
+  if (!sessionId) {
+    throw new Error('Missing session id');
+  }
+
+  if (currentSession?.id === sessionId && currentSession.status === 'running') {
+    throw new Error('실행 중인 QA 세션은 먼저 중지해야 합니다.');
+  }
+
+  await removeLocalSessionArtifacts(sessionId);
+  await removeRemoteSessionArtifacts(sessionId);
+  await clearLatestSessionManifest(sessionId);
+
+  if (currentSession?.id === sessionId) {
+    currentSession = null;
+  }
+}
+
 async function serializeSession() {
   const manifest = currentSession
     ? await buildSessionManifest(currentSession)
@@ -567,6 +636,24 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'POST' && url.pathname === '/session/stop') {
     const stopped = await stopSession();
     writeJson(res, 200, { stopped, ...(await serializeSession()) });
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/session/delete') {
+    try {
+      const body = await readBody(req);
+      await deleteSessionArtifacts(body.sessionId);
+      writeJson(res, 200, {
+        deleted: true,
+        ...(await serializeSession()),
+      });
+    } catch (error) {
+      writeJson(res, 409, {
+        deleted: false,
+        message: error instanceof Error ? error.message : 'Failed to delete session artifacts',
+        ...(await serializeSession()),
+      });
+    }
     return;
   }
 
