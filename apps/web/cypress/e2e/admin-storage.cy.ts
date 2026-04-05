@@ -172,7 +172,7 @@ describe('어드민 스토리지 시나리오', () => {
     cy.get('[data-cy="admin-storage-page"]').should('contain.text', 'Storage');
   });
 
-  it('시나리오: 관리자는 폴더 탐색과 파일 업로드/삭제 흐름을 확인할 수 있다', () => {
+  it('시나리오: 관리자는 폴더 탐색과 폴더 생성, 파일 삭제 흐름을 확인할 수 있다', () => {
     seedAdminSession();
 
     const tinyPng = Cypress.Buffer.from(
@@ -228,14 +228,17 @@ describe('어드민 스토리지 시나리오', () => {
       body: tinyPng,
     }).as('storageObjectPreview');
 
-    cy.intercept('POST', '**/api/admin/storage/files*', req => {
+    cy.intercept('POST', '**/api/admin/storage/folders', req => {
       req.reply({
         statusCode: 200,
         body: success({
           bucket: 'blog',
           currentPrefix: '',
           parentPrefix: null,
-          folders: [{ name: 'images', key: 'images/' }],
+          folders: [
+            { name: 'images', key: 'images/' },
+            { name: 'banners', key: 'banners/' },
+          ],
           objects: [
             {
               name: 'hero.png',
@@ -245,18 +248,10 @@ describe('어드민 스토리지 시나리오', () => {
               isImage: true,
               publicUrl: 'https://bucket.kscold.com/blog/hero.png',
             },
-            {
-              name: 'new-banner.png',
-              key: 'new-banner.png',
-              size: 1024,
-              lastModified: '2026-04-03T03:00:00.000Z',
-              isImage: true,
-              publicUrl: 'https://bucket.kscold.com/blog/new-banner.png',
-            },
           ],
         }),
       });
-    }).as('storageUpload');
+    }).as('storageCreateFolder');
 
     cy.intercept('DELETE', '**/api/admin/storage?prefix=*&key=*', {
       statusCode: 200,
@@ -282,16 +277,10 @@ describe('어드민 스토리지 시나리오', () => {
     cy.wait('@storageRoot');
     cy.wait('@storageObjectPreview');
 
-    cy.get('[data-cy="admin-storage-upload-input"]').selectFile(
-      {
-        contents: Cypress.Buffer.from('banner'),
-        fileName: 'new-banner.png',
-        mimeType: 'image/png',
-      },
-      { force: true }
-    );
-    cy.wait('@storageUpload');
-    cy.contains('new-banner.png').should('exist');
+    cy.get('[data-cy="admin-storage-folder-input"]').type('banners');
+    cy.get('[data-cy="admin-storage-folder-submit"]').click();
+    cy.wait('@storageCreateFolder');
+    cy.contains('banners').should('exist');
 
     cy.window().then(win => {
       cy.stub(win, 'confirm').returns(true);

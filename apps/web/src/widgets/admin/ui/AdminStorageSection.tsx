@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, DragEvent, FormEvent, useState } from 'react';
 import Image from 'next/image';
 import Button from '@/shared/ui/Button';
 import Input from '@/shared/ui/Input';
@@ -51,9 +51,26 @@ export function AdminStorageSection() {
     setSelectedFilesLabel('선택된 파일이 없습니다.');
   }
 
+  async function handleFileDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+
+    const files = Array.from(event.dataTransfer.files || []);
+    if (!files.length) {
+      setSelectedFilesLabel('선택된 파일이 없습니다.');
+      return;
+    }
+
+    setSelectedFilesLabel(files.map(file => file.name).join(', '));
+    await uploadFiles(files);
+    setSelectedFilesLabel('선택된 파일이 없습니다.');
+  }
+
   const breadcrumbs = storageBreadcrumbs(currentPrefix);
   const objectCount = listing?.objects.length || 0;
   const folderCount = listing?.folders.length || 0;
+  const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
+    void handleFilesChange(event);
+  };
 
   return (
     <div data-cy="admin-storage-page" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -290,22 +307,32 @@ export function AdminStorageSection() {
             <p className="mt-2 text-sm text-surface-500">
               현재 경로에 이미지나 정적 파일을 바로 올릴 수 있습니다.
             </p>
-            <label
-              htmlFor="admin-storage-upload"
-              className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-surface-200 bg-surface-50 px-5 py-8 text-center"
+            <div
+              className="mt-4 rounded-2xl border border-dashed border-surface-200 bg-surface-50 px-5 py-5 text-center"
+              onDragOver={event => event.preventDefault()}
+              onDrop={event => void handleFileDrop(event)}
+              data-cy="admin-storage-dropzone"
             >
               <span className="text-sm font-semibold text-surface-900">파일 선택</span>
-              <span className="mt-2 text-xs text-surface-500 break-all">{selectedFilesLabel}</span>
-            </label>
-            <input
-              id="admin-storage-upload"
-              type="file"
-              multiple
-              className="sr-only"
-              onChange={event => void handleFilesChange(event)}
-              disabled={isMutating}
-              data-cy="admin-storage-upload-input"
-            />
+              <span
+                className="mt-2 block text-xs text-surface-500 break-all"
+                data-cy="admin-storage-selected-files"
+              >
+                {selectedFilesLabel}
+              </span>
+              <input
+                id="admin-storage-upload"
+                type="file"
+                multiple
+                className="mt-4 block w-full cursor-pointer rounded-xl border border-surface-200 bg-white px-3 py-2 text-sm text-surface-600 file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-surface-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-surface-700"
+                onChange={handleFileSelection}
+                disabled={isMutating}
+                data-cy="admin-storage-upload-input"
+              />
+              <div className="mt-3 text-xs text-surface-400">
+                파일을 이 영역으로 바로 끌어와도 업로드할 수 있습니다.
+              </div>
+            </div>
             <div className="mt-3 text-xs text-surface-400">
               업로드는 현재 경로 `{currentPrefix || '/'}`에 바로 반영됩니다.
             </div>

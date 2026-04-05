@@ -188,7 +188,11 @@ class ApiClient {
   }
 
   public async upload<T>(url: string, formData: FormData): Promise<T> {
-    const response = await this.client.post<{ data: T }>(url, formData);
+    const response = await this.client.post<{ data: T }>(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data.data;
   }
 

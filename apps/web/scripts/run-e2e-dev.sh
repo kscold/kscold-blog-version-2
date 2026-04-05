@@ -25,4 +25,9 @@ cp "$APP_DIR/next-env.d.ts" "$TMP_DIR/next-env.d.ts"
 
 cd "$APP_DIR"
 
-NEXT_DIST_DIR=.next-e2e NEXT_PUBLIC_GTM_ID= NEXT_PUBLIC_GA_ID= pnpm exec next dev -p 3101
+NEXT_DIST_DIR=.next-e2e \
+NEXT_PUBLIC_API_URL= \
+NEXT_PUBLIC_WS_URL= \
+NEXT_PUBLIC_GTM_ID= \
+NEXT_PUBLIC_GA_ID= \
+pnpm exec next dev -p 3101
