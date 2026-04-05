@@ -2,6 +2,7 @@
 
 import { useUserStats, type RecentUser } from '@/entities/user/api/useUserStats';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 function SparkBar({ value, max }: { value: number; max: number }) {
   const pct = max === 0 ? 0 : Math.round((value / max) * 100);
@@ -25,7 +26,16 @@ function UserAvatar({ user }: { user: RecentUser }) {
   const color = colors[user.username.charCodeAt(0) % colors.length];
 
   if (user.avatar) {
-    return <img src={user.avatar} alt={initials} className="w-8 h-8 rounded-full object-cover shrink-0" />;
+    return (
+      <Image
+        src={user.avatar}
+        alt={user.displayName || user.username}
+        width={32}
+        height={32}
+        sizes="32px"
+        className="w-8 h-8 rounded-full object-cover shrink-0"
+      />
+    );
   }
   return (
     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${color}`}>
