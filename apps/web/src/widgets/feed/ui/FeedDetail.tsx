@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useFeed } from '@/entities/feed/api/useFeeds';
+import { FeedDetailPageSkeleton } from '@/shared/ui/RouteSkeletons';
 import { FeedCard } from '@/entities/feed/ui/FeedCard';
 import { CommentSection } from './CommentSection';
 
@@ -13,11 +14,7 @@ export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {
   const { data: feed, isLoading } = useFeed(feedId);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-surface-300 border-t-surface-900 rounded-full animate-spin" />
-      </div>
-    );
+    return <FeedDetailPageSkeleton />;
   }
 
   if (!feed) {

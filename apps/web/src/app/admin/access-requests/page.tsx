@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import apiClient from '@/shared/api/api-client';
+import { Skeleton } from '@/shared/ui/Skeleton';
 
 interface AccessRequest {
   id: string;
@@ -45,7 +46,24 @@ export default function AccessRequestsPage() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-surface-400">로딩 중...</p>
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex flex-col gap-4 rounded-xl border border-surface-200 bg-white px-5 py-4 sm:flex-row sm:items-center"
+            >
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-4 w-28 rounded-md" />
+                <Skeleton className="h-3 w-44 rounded-md" />
+                <Skeleton className="h-3 w-64 rounded-md" />
+              </div>
+              <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex">
+                <Skeleton className="h-10 w-20 rounded-lg" />
+                <Skeleton className="h-10 w-20 rounded-lg" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : requests.length === 0 ? (
         <div className="rounded-xl border border-surface-200 bg-white p-12 text-center">
           <p className="text-sm text-surface-400">대기 중인 요청이 없습니다</p>
