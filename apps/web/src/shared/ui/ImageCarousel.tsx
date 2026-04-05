@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
-const MotionImage = motion(Image);
+const MotionImage = motion.create(Image);
 
 interface ImageCarouselProps {
   images: string[];
