@@ -7,6 +7,8 @@ import { useCategories } from '@/entities/category/api/useCategories';
 import { useTags } from '@/entities/tag/api/useTags';
 import { useUiStore } from '@/shared/model/uiStore';
 import { useViewer } from '@/shared/model/useViewer';
+import { Skeleton } from '@/shared/ui/Skeleton';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Category } from '@/types/blog';
 
 function CategoryTree({ categories, depth = 0, onNavigate }: { categories: Category[]; depth?: number; onNavigate?: () => void }) {
@@ -52,6 +54,7 @@ export function Sidebar() {
   const { sidebarOpen, setSidebarOpen } = useUiStore();
   const { data: tags } = useTags();
   const { role } = useViewer();
+  const { isTouchDevice } = usePerformanceMode();
   const closeSidebar = () => setSidebarOpen(false);
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
@@ -72,7 +75,7 @@ export function Sidebar() {
       <AnimatePresence>
         {sidebarOpen && (
           <motion.div
-            className="fixed inset-0 bg-surface-900/10 backdrop-blur-sm z-40 lg:hidden"
+            className={`fixed inset-0 z-40 lg:hidden ${isTouchDevice ? 'bg-surface-900/20' : 'bg-surface-900/10 backdrop-blur-sm'}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -82,7 +85,7 @@ export function Sidebar() {
       </AnimatePresence>
 
       <aside
-        className={`fixed top-[88px] left-0 lg:left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ease-out ${mobileSidebarState} ${desktopSidebarState} bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm`}
+        className={`fixed top-[88px] left-0 lg:left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ease-out ${mobileSidebarState} ${desktopSidebarState} ${isTouchDevice ? 'bg-white border border-surface-200 rounded-2xl shadow-md' : 'bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm'}`}
       >
         <div className="p-6 space-y-8 relative">
           {/* Mobile Navigation Links (Visible on all sizes for sidebar access) */}
@@ -111,7 +114,11 @@ export function Sidebar() {
             {categories ? (
               <CategoryTree categories={categories} onNavigate={closeSidebar} />
             ) : (
-              <div className="text-sm text-surface-500">Loading...</div>
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-4/5 rounded-md" />
+                <Skeleton className="h-4 w-3/5 rounded-md" />
+                <Skeleton className="h-4 w-2/3 rounded-md" />
+              </div>
             )}
           </div>
 
@@ -120,7 +127,8 @@ export function Sidebar() {
               Popular Tags
             </h2>
             <div className="flex flex-wrap gap-2">
-              {tags && tags.length > 0 ? (
+              {tags ? (
+                tags.length > 0 ? (
                 tags.slice(0, 10).map(tag => (
                   <Link
                     key={tag.id}
@@ -139,6 +147,13 @@ export function Sidebar() {
                 ))
               ) : (
                 <p className="text-xs text-surface-400">태그가 없습니다</p>
+                )
+              ) : (
+                <>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <Skeleton key={index} className="h-8 w-16 rounded-lg" />
+                  ))}
+                </>
               )}
             </div>
           </div>

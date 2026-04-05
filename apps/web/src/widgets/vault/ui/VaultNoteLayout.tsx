@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useUiStore } from '@/shared/model/uiStore';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { useVaultNoteData } from '@/features/vault/lib/useVaultNote';
 import { VaultFolderTree } from './VaultFolderTree';
 import { VaultNoteContent } from '@/entities/vault/ui/VaultNoteContent';
@@ -18,6 +19,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
   const router = useRouter();
   const slug = initialSlug || (params.slug as string);
   const { theme } = useUiStore();
+  const { isTouchDevice } = usePerformanceMode();
 
   const { note, backlinks, folders, isNoteLoading, isFoldersLoading, isError, localGraph, colorMap, titleSlugMap } =
     useVaultNoteData(slug);
@@ -93,13 +95,13 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
     <div className="absolute inset-0 flex overflow-hidden bg-transparent lg:p-4 lg:gap-4">
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-surface-900/20 backdrop-blur-sm z-[45] lg:hidden"
+          className={`fixed inset-0 z-[45] lg:hidden ${isTouchDevice ? 'bg-surface-900/25' : 'bg-surface-900/20 backdrop-blur-sm'}`}
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
       <aside
-        className={`fixed lg:relative top-0 lg:top-0 left-0 z-50 lg:z-10 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 lg:rounded-3xl shadow-2xl lg:shadow-sm custom-scrollbar w-80 h-full shrink-0 flex flex-col`}
+        className={`fixed lg:relative top-0 lg:top-0 left-0 z-50 lg:z-10 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${isTouchDevice ? 'bg-white dark:bg-surface-900 border-r border-surface-200 dark:border-surface-800 shadow-xl' : 'bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 shadow-2xl lg:shadow-sm'} lg:rounded-3xl custom-scrollbar w-80 h-full shrink-0 flex flex-col`}
         style={isDesktop ? { width: `${sidebarWidth}px` } : undefined}
       >
         <div className="p-6 flex-1 space-y-8 relative">
@@ -128,7 +130,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
         />
       </aside>
 
-      <main className="flex-1 relative p-4 sm:p-6 lg:p-12 overflow-y-auto custom-scrollbar w-full h-full min-w-0 lg:rounded-3xl bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-0 lg:border border-surface-200/50 dark:border-surface-800/50">
+      <main className={`flex-1 relative p-4 sm:p-6 lg:p-12 overflow-y-auto custom-scrollbar w-full h-full min-w-0 lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 lg:shadow-sm border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-surface-200/50 dark:border-surface-800/50'}`}>
         <div className="mb-8">
           <button
             onClick={() => {
@@ -138,7 +140,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
                 router.push('/vault');
               }
             }}
-            className="px-4 py-2 rounded-full bg-surface-50/80 dark:bg-surface-900/80 border border-surface-200 dark:border-surface-800 text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 backdrop-blur-xl shadow-sm transition-all hover:scale-105"
+            className={`px-4 py-2 rounded-full border text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 shadow-sm transition-all ${isTouchDevice ? 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-800' : 'bg-surface-50/80 dark:bg-surface-900/80 border-surface-200 dark:border-surface-800 backdrop-blur-xl hover:scale-105'}`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />

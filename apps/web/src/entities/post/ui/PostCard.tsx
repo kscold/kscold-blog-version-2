@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Post } from '@/types/blog';
 
 interface PostCardProps {
@@ -11,6 +12,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, featured = false }: PostCardProps) {
+  const { allowRichEffects, supportsHover, reduceMotion, isTouchDevice } = usePerformanceMode();
   const formattedDate = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString('ko-KR', {
         year: 'numeric',
@@ -22,14 +24,16 @@ export function PostCard({ post, featured = false }: PostCardProps) {
   return (
     <motion.article
       className={`group relative ${featured ? 'col-span-2 row-span-2' : ''}`}
-      whileHover={{ y: -6, scale: 1.01 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      whileHover={supportsHover && allowRichEffects ? { y: -6, scale: 1.01 } : undefined}
+      whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+      transition={allowRichEffects ? { type: 'spring', stiffness: 400, damping: 25 } : undefined}
     >
       <Link href={`/blog/${post.category.slug}/${post.slug}`} className="block h-full">
-        <div className="h-full bg-white border border-surface-200 rounded-[24px] p-6 transition-all duration-500 group-hover:border-surface-300 group-hover:bg-surface-50 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
+        <div className={`h-full bg-white border border-surface-200 rounded-[24px] p-6 transition-all duration-500 relative overflow-hidden ${supportsHover ? 'group-hover:border-surface-300 group-hover:bg-surface-50 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]' : ''}`}>
           {/* Holographic Slide Effect */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none z-10 mix-blend-overlay" />
+          {supportsHover && allowRichEffects && (
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none z-10 mix-blend-overlay" />
+          )}
 
           {post.coverImage && (
             <div
@@ -42,10 +46,10 @@ export function PostCard({ post, featured = false }: PostCardProps) {
                 alt={post.title}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                className={`object-cover transition-transform duration-500 ${supportsHover ? 'group-hover:scale-110' : ''}`}
               />
               {post.featured && (
-                <div className="absolute top-4 right-4 px-3 py-1.5 text-[10px] font-bold bg-white/90 backdrop-blur-md text-surface-900 rounded-full uppercase tracking-widest shadow-sm">
+                <div className={`absolute top-4 right-4 px-3 py-1.5 text-[10px] font-bold text-surface-900 rounded-full uppercase tracking-widest shadow-sm ${isTouchDevice ? 'bg-white' : 'bg-white/90 backdrop-blur-md'}`}>
                   Featured
                 </div>
               )}

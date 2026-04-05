@@ -1,8 +1,10 @@
 'use client';
 
 import { motion, useScroll, useSpring } from 'framer-motion';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function ScrollProgress() {
+  const { reduceMotion, isTouchDevice } = usePerformanceMode();
   const { scrollYProgress } = useScroll();
 
   // 스크롤 진행률 바 부드럽게 처리
@@ -11,6 +13,10 @@ export function ScrollProgress() {
     damping: 30,
     restDelta: 0.001,
   });
+
+  if (reduceMotion || isTouchDevice) {
+    return null;
+  }
 
   return (
     <motion.div

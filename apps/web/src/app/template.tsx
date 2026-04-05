@@ -1,8 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export default function Template({ children }: { children: React.ReactNode }) {
+  const { allowRichEffects } = usePerformanceMode();
+
+  if (!allowRichEffects) {
+    return <div className="h-full">{children}</div>;
+  }
+
   return (
     <motion.div
       className="h-full"

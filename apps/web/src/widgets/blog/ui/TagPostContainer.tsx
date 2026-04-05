@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useTags } from '@/entities/tag/api/useTags';
 import { usePostsByTag } from '@/entities/post/api/usePosts';
 import { PostCard } from '@/entities/post/ui/PostCard';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 
 interface TagPostContainerProps {
@@ -14,6 +15,7 @@ interface TagPostContainerProps {
 
 export function TagPostContainer({ tagSlug }: TagPostContainerProps) {
   const [page, setPage] = useState(0);
+  const { allowRichEffects } = usePerformanceMode();
 
   const { data: tags = [] } = useTags();
   const tag = tags.find(
@@ -46,9 +48,9 @@ export function TagPostContainer({ tagSlug }: TagPostContainerProps) {
         {/* 브레드크럼 */}
         <motion.nav
           className="mb-8 flex items-center gap-2 text-sm text-surface-500"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          initial={allowRichEffects ? { opacity: 0, y: -10 } : false}
+          animate={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
+          transition={allowRichEffects ? { duration: 0.4 } : undefined}
         >
           <Link href="/blog" className="hover:text-surface-900 transition-colors">
             Blog
@@ -60,9 +62,9 @@ export function TagPostContainer({ tagSlug }: TagPostContainerProps) {
         {/* 헤더 */}
         <motion.div
           className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          initial={allowRichEffects ? { opacity: 0, y: 20 } : false}
+          animate={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
+          transition={allowRichEffects ? { duration: 0.6 } : undefined}
         >
           <h1 className="text-5xl font-sans font-black tracking-tight text-surface-900 mb-2">
             #{tag?.name || tagSlug}
@@ -86,20 +88,20 @@ export function TagPostContainer({ tagSlug }: TagPostContainerProps) {
           <>
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
-              initial="hidden"
-              animate="visible"
-              variants={{
+              initial={allowRichEffects ? 'hidden' : false}
+              animate={allowRichEffects ? 'visible' : undefined}
+              variants={allowRichEffects ? {
                 visible: { transition: { staggerChildren: 0.1 } },
-              }}
+              } : undefined}
             >
               {posts.map(post => (
                 <motion.div
                   key={post.id}
-                  variants={{
+                  variants={allowRichEffects ? {
                     hidden: { opacity: 0, y: 20 },
                     visible: { opacity: 1, y: 0 },
-                  }}
-                  transition={{ duration: 0.5 }}
+                  } : undefined}
+                  transition={allowRichEffects ? { duration: 0.5 } : undefined}
                 >
                   <PostCard post={post} />
                 </motion.div>

@@ -15,18 +15,23 @@ interface NodeRuntime extends NodeObject {
 interface ConfigureForcesOptions {
   fg: ForceGraphMethods;
   nodeCount: number;
+  reducedEffects?: boolean;
 }
 
-export function configureForces({ fg, nodeCount }: ConfigureForcesOptions): void {
+export function configureForces({ fg, nodeCount, reducedEffects = false }: ConfigureForcesOptions): void {
   // Obsidian처럼: 노드 수에 따라 동적 조절
   const isSparse = nodeCount <= 10;
   const isMedium = nodeCount <= 50;
 
   // 척력: 적은 노드일수록 강하게 밀어서 자연스러운 배치
-  const chargeStrength = isSparse ? -400 : isMedium ? -250 : -150;
+  const chargeStrength = reducedEffects
+    ? (isSparse ? -320 : isMedium ? -200 : -110)
+    : (isSparse ? -400 : isMedium ? -250 : -150);
 
   // 링크 길이: 허브-자식은 짧게, 많을수록 촘촘하게
-  const linkDist = isSparse ? 160 : isMedium ? 90 : 60;
+  const linkDist = reducedEffects
+    ? (isSparse ? 140 : isMedium ? 84 : 54)
+    : (isSparse ? 160 : isMedium ? 90 : 60);
 
   fg.d3Force('charge')?.strength(chargeStrength).distanceMax(600);
   fg.d3Force('link')?.distance(linkDist).strength(isSparse ? 0.3 : 0.5);
@@ -40,14 +45,14 @@ export function configureForces({ fg, nodeCount }: ConfigureForcesOptions): void
         const r = node.isFolder
           ? Math.sqrt(node.val || 10) * 4.5
           : Math.sqrt(node.val || 4) * 3;
-        return r + (isSparse ? 20 : 8);
+        return r + (isSparse ? (reducedEffects ? 16 : 20) : reducedEffects ? 6 : 8);
       })
-      .strength(0.85)
-      .iterations(2)
+      .strength(reducedEffects ? 0.7 : 0.85)
+      .iterations(reducedEffects ? 1 : 2)
   );
 
   // 중심력: 약하게 → 더 퍼져서 자연스러운 느낌
-  fg.d3Force('center')?.strength(isSparse ? 0.05 : 0.02);
+  fg.d3Force('center')?.strength(reducedEffects ? (isSparse ? 0.045 : 0.03) : isSparse ? 0.05 : 0.02);
   fg.d3ReheatSimulation();
 }
 
@@ -56,6 +61,7 @@ interface RenderNodeOptions {
   hoverNodeId?: string;
   folderColorMap: Record<string, string>;
   theme: 'light' | 'dark' | 'system';
+  reducedEffects?: boolean;
 }
 
 export function renderNode(
@@ -67,7 +73,7 @@ export function renderNode(
   if (node.x == null || node.y == null || !isFinite(node.x) || !isFinite(node.y)) return;
 
   try {
-    const { activeNodeSlug, hoverNodeId, folderColorMap, theme } = options;
+    const { activeNodeSlug, hoverNodeId, folderColorMap, theme, reducedEffects = false } = options;
     const isActive = activeNodeSlug === node.slug;
     const isHover = hoverNodeId === node.id;
     const isFolder = !!node.isFolder;
@@ -85,6 +91,38 @@ export function renderNode(
       : Math.sqrt(node.val || 1) * 3;
     const x = node.x!;
     const y = node.y!;
+
+    if (reducedEffects) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = nodeColor;
+      ctx.globalAlpha = focused ? 0.92 : isFolder ? 0.8 : 0.68;
+      ctx.fill();
+
+      if (focused || isFolder) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = focused ? nodeColor + 'cc' : nodeColor + '55';
+        ctx.lineWidth = (focused ? 1 : 0.6) / globalScale;
+        ctx.globalAlpha = focused ? 0.95 : 0.8;
+        ctx.stroke();
+      }
+
+      ctx.restore();
+
+      if (isFolder || focused || globalScale > 1.15) {
+        renderLabel(node, ctx, globalScale, {
+          label: node.name || '',
+          isFolder,
+          focused,
+          isDark,
+          radius,
+          nodeColor,
+        });
+      }
+      return;
+    }
 
     ctx.save();
 

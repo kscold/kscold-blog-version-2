@@ -7,18 +7,22 @@ import { useUiStore } from '@/shared/model/uiStore';
 import { useLogout } from '@/entities/user/model/useLogout';
 import { useState, useEffect } from 'react';
 import { useViewer } from '@/shared/model/useViewer';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function Header() {
   const { user, isAuthenticated, role } = useViewer();
   const { toggleSidebar } = useUiStore();
   const logout = useLogout();
   const [isScrolled, setIsScrolled] = useState(false);
+  const { allowRichEffects, isTouchDevice } = usePerformanceMode();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const next = window.scrollY > 20;
+      setIsScrolled(prev => (prev === next ? prev : next));
     };
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -30,16 +34,26 @@ export function Header() {
     { label: 'Info', href: '/info' },
   ];
 
+  const headerMotionProps = allowRichEffects
+    ? {
+        initial: { y: -100 },
+        animate: { y: 0 },
+        transition: { type: 'spring', stiffness: 300, damping: 30 },
+      }
+    : {};
+
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? 'bg-white/80 backdrop-blur-xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]'
-          : 'bg-white/50 backdrop-blur-lg'
+        isTouchDevice
+          ? isScrolled
+            ? 'bg-white/95 shadow-sm border-b border-surface-100'
+            : 'bg-white/92 border-b border-surface-100/80'
+          : isScrolled
+            ? 'bg-white/80 backdrop-blur-xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]'
+            : 'bg-white/50 backdrop-blur-lg'
       }`}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      {...headerMotionProps}
     >
       <div className="px-4 sm:px-8 lg:px-12 h-16">
         <div className="flex items-center justify-between h-full">

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { PostCard } from '@/entities/post/ui/PostCard';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 import { CategoryFilter } from './CategoryFilter';
 import { Post, Category } from '@/types/blog';
@@ -29,6 +30,8 @@ export default function BlogPostGrid({
   onPageChange,
   onCategoryChange,
 }: BlogPostGridProps) {
+  const { allowRichEffects } = usePerformanceMode();
+
   return (
     <>
       <CategoryFilter
@@ -51,20 +54,20 @@ export default function BlogPostGrid({
         <>
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
-            initial="hidden"
-            animate="visible"
-            variants={{
+            initial={allowRichEffects ? 'hidden' : false}
+            animate={allowRichEffects ? 'visible' : undefined}
+            variants={allowRichEffects ? {
               visible: { transition: { staggerChildren: 0.1 } },
-            }}
+            } : undefined}
           >
             {posts.map(post => (
               <motion.div
                 key={post.id}
-                variants={{
+                variants={allowRichEffects ? {
                   hidden: { opacity: 0, y: 20 },
                   visible: { opacity: 1, y: 0 },
-                }}
-                transition={{ duration: 0.5 }}
+                } : undefined}
+                transition={allowRichEffects ? { duration: 0.5 } : undefined}
               >
                 <PostCard post={post} />
               </motion.div>
