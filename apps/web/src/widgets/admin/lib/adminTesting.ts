@@ -83,6 +83,7 @@ export interface QaSessionResponse {
   session: QaSession | null;
   message?: string;
   stopped?: boolean;
+  deleted?: boolean;
 }
 
 export function formatSessionId(value: string | null) {

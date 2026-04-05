@@ -10,6 +10,7 @@ export function AdminTestingSection() {
     session,
     isLoading,
     isRunningAction,
+    activeAction,
     runnerMessage,
     currentStatus,
     latestScreenshot,
@@ -34,6 +35,7 @@ export function AdminTestingSection() {
         session={session}
         isLoading={isLoading}
         isRunningAction={isRunningAction}
+        activeAction={activeAction}
         runnerMessage={runnerMessage}
         currentStatus={currentStatus}
         onAction={runAction}
