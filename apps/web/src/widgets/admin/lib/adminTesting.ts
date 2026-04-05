@@ -36,6 +36,12 @@ export const scenarioLinks = [
     dataCy: 'admin-qa-scenario-admin-chat',
   },
   {
+    title: '스토리지 관리',
+    description: 'MinIO blog 버킷 탐색과 파일 관리 흐름을 확인합니다.',
+    href: '/admin/storage',
+    dataCy: 'admin-qa-scenario-admin-storage',
+  },
+  {
     title: '포스트 관리',
     description: '모바일 카드 레이아웃과 관리 액션을 확인합니다.',
     href: '/admin/posts',
