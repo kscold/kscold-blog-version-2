@@ -6,15 +6,17 @@ interface AdminTestingRunPanelProps {
   session: QaSession | null;
   isLoading: boolean;
   isRunningAction: boolean;
+  activeAction: 'start' | 'stop' | 'delete' | null;
   runnerMessage: string | null;
   currentStatus: QaSession['status'] | 'idle';
-  onAction: (action: 'start' | 'stop') => Promise<void>;
+  onAction: (action: 'start' | 'stop' | 'delete') => Promise<void>;
 }
 
 export function AdminTestingRunPanel({
   session,
   isLoading,
   isRunningAction,
+  activeAction,
   runnerMessage,
   currentStatus,
   onAction,
@@ -41,7 +43,7 @@ export function AdminTestingRunPanel({
             <Button
               type="button"
               size="sm"
-              isLoading={isRunningAction && currentStatus !== 'running'}
+              isLoading={isRunningAction && activeAction === 'start'}
               disabled={isLoading || isRunningAction || currentStatus === 'running'}
               onClick={() => void onAction('start')}
               data-cy="admin-qa-run-button"
@@ -52,15 +54,27 @@ export function AdminTestingRunPanel({
               type="button"
               size="sm"
               variant="ghost"
-              isLoading={isRunningAction && currentStatus === 'running'}
+              isLoading={isRunningAction && activeAction === 'stop'}
               disabled={isLoading || isRunningAction || currentStatus !== 'running'}
               onClick={() => void onAction('stop')}
               data-cy="admin-qa-stop-button"
-            >
-              실행 중지
-            </Button>
+              >
+                실행 중지
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                isLoading={isRunningAction && activeAction === 'delete'}
+                disabled={isLoading || isRunningAction || !session || currentStatus === 'running'}
+                onClick={() => void onAction('delete')}
+                data-cy="admin-qa-delete-button"
+              >
+                결과 삭제
+              </Button>
+            </div>
           </div>
-        </div>
 
         <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="rounded-xl border border-surface-100 bg-surface-50 px-4 py-3">
@@ -89,6 +103,10 @@ export function AdminTestingRunPanel({
             </div>
             <div className="mt-1 text-xs text-surface-500">exit code {session?.exitCode ?? '-'}</div>
           </div>
+        </div>
+
+        <div className="mt-4 rounded-xl border border-surface-100 bg-surface-50 px-4 py-3 text-sm text-surface-500">
+          실행 결과와 스크린샷은 MinIO에 보관되며, 필요하면 여기서 현재 세션 결과를 바로 삭제할 수 있습니다.
         </div>
 
         {runnerMessage ? (
