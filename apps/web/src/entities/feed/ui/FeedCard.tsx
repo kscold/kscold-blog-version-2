@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Feed } from '@/types/social';
 import { useToggleLike } from '@/entities/feed/api/useFeeds';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 
@@ -15,6 +16,7 @@ interface FeedCardProps {
 }
 
 export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
+  const { allowRichEffects, reduceMotion } = usePerformanceMode();
   const toggleLike = useToggleLike();
   const [isLiked, setIsLiked] = useState(feed.isLiked);
   const [likesCount, setLikesCount] = useState(feed.likesCount);
@@ -48,9 +50,9 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
   return (
     <motion.article
       className="bg-white border border-surface-200 rounded-2xl overflow-hidden"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      initial={allowRichEffects ? { opacity: 0, y: 20 } : false}
+      animate={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
+      transition={allowRichEffects ? { duration: 0.4 } : undefined}
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3">
@@ -87,8 +89,8 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
               fill={isLiked ? 'currentColor' : 'none'}
               stroke="currentColor"
               strokeWidth={2}
-              whileTap={{ scale: 1.3 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+              whileTap={reduceMotion ? undefined : { scale: 1.18 }}
+              transition={reduceMotion ? undefined : { type: 'spring', stiffness: 500, damping: 15 }}
             >
               <path
                 strokeLinecap="round"

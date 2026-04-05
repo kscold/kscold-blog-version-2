@@ -5,10 +5,12 @@ import { motion } from 'framer-motion';
 import { useVaultGraph } from '@/entities/vault/api/useVault';
 import { usePosts } from '@/entities/post/api/usePosts';
 import { useGitHubOverview } from '@/entities/github';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { GitHubHeatmap } from './GitHubHeatmap';
 import { StatsGrid } from './StatsGrid';
 
 export function StatsSection() {
+  const { allowRichEffects, isTouchDevice } = usePerformanceMode();
   const { data: github } = useGitHubOverview('kscold');
   const { data: graphData } = useVaultGraph();
   const { data: postsData } = usePosts({ page: 0, size: 1 });
@@ -30,10 +32,10 @@ export function StatsSection() {
       <div className="max-w-5xl mx-auto space-y-12">
         <motion.div
           className="text-center"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          initial={allowRichEffects ? { opacity: 0, y: 16 } : false}
+          whileInView={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
+          viewport={allowRichEffects ? { once: true } : undefined}
+          transition={allowRichEffects ? { duration: 0.6 } : undefined}
         >
           <p className="text-xs font-bold tracking-[0.25em] text-surface-400 uppercase mb-3">By the Numbers</p>
           <p className="text-surface-500 text-base leading-relaxed">지식을 기록하고, 기록을 연결하고, 연결을 공유합니다.</p>
@@ -45,12 +47,12 @@ export function StatsSection() {
 
         <motion.div
           className="text-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          initial={allowRichEffects ? { opacity: 0 } : false}
+          whileInView={allowRichEffects ? { opacity: 1 } : undefined}
+          viewport={allowRichEffects ? { once: true } : undefined}
+          transition={allowRichEffects ? { duration: 0.6, delay: 0.4 } : undefined}
         >
-          <Link href="/vault" className="inline-flex items-center gap-2 px-8 py-3 bg-surface-900 hover:bg-surface-800 text-white rounded-xl transition-colors font-bold shadow-lg text-sm">
+          <Link href="/vault" className={`inline-flex items-center gap-2 px-8 py-3 bg-surface-900 hover:bg-surface-800 text-white rounded-xl transition-colors font-bold text-sm ${isTouchDevice ? 'shadow-sm' : 'shadow-lg'}`}>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>

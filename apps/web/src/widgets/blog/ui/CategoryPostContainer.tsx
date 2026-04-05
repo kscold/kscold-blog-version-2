@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { usePostsByCategory } from '@/entities/post/api/usePosts';
 import { PostCard } from '@/entities/post/ui/PostCard';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { CategoryHeader } from './CategoryHeader';
 import { Pagination } from '@/shared/ui/Pagination';
 
@@ -15,6 +16,7 @@ interface CategoryPostContainerProps {
 
 export function CategoryPostContainer({ categorySlug }: CategoryPostContainerProps) {
   const [page, setPage] = useState(0);
+  const { allowRichEffects } = usePerformanceMode();
 
   const { data: categories } = useCategories();
   const category = categories?.find(cat => cat.slug === categorySlug);
@@ -60,24 +62,24 @@ export function CategoryPostContainer({ categorySlug }: CategoryPostContainerPro
           <>
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
-              initial="hidden"
-              animate="visible"
-              variants={{
+              initial={allowRichEffects ? 'hidden' : false}
+              animate={allowRichEffects ? 'visible' : undefined}
+              variants={allowRichEffects ? {
                 visible: {
                   transition: {
                     staggerChildren: 0.1,
                   },
                 },
-              }}
+              } : undefined}
             >
               {posts.map(post => (
                 <motion.div
                   key={post.id}
-                  variants={{
+                  variants={allowRichEffects ? {
                     hidden: { opacity: 0, y: 20 },
                     visible: { opacity: 1, y: 0 },
-                  }}
-                  transition={{ duration: 0.5 }}
+                  } : undefined}
+                  transition={allowRichEffects ? { duration: 0.5 } : undefined}
                 >
                   <PostCard post={post} />
                 </motion.div>
