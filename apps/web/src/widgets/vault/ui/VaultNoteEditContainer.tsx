@@ -2,6 +2,7 @@
 
 import VaultNoteEditor from './VaultNoteEditor';
 import { useVaultNoteEdit } from '@/features/vault/lib/useVaultNoteEdit';
+import { AdminEditorSkeleton } from '@/shared/ui/RouteSkeletons';
 
 interface VaultNoteEditContainerProps {
   noteId: string;
@@ -13,11 +14,7 @@ export function VaultNoteEditContainer({ noteId }: VaultNoteEditContainerProps) 
   if (isError) return null;
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-secondary-beige dark:bg-gray-950 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gray-300 border-t-purple-600 rounded-full animate-spin" />
-      </div>
-    );
+    return <AdminEditorSkeleton />;
   }
 
   if (!initialData) return null;

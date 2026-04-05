@@ -2,6 +2,7 @@
 
 import FeedEditor from '@/features/feed/ui/FeedEditor';
 import { useFeedEdit } from '@/features/feed/lib/useFeedEdit';
+import { AdminEditorSkeleton } from '@/shared/ui/RouteSkeletons';
 
 interface FeedEditEditorProps {
   feedId: string;
@@ -11,11 +12,7 @@ export function FeedEditEditor({ feedId }: FeedEditEditorProps) {
   const { initialData, isLoading, notFound } = useFeedEdit(feedId);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-surface-300 border-t-surface-900 rounded-full animate-spin" />
-      </div>
-    );
+    return <AdminEditorSkeleton />;
   }
 
   if (notFound || !initialData) {
