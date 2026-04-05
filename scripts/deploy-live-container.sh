@@ -64,15 +64,6 @@ has_java_21() {
   java -version 2>&1 | head -1 | grep -Eq 'version "21|openjdk 21'
 }
 
-resolve_pnpm_runtime_version() {
-  if ! command -v node >/dev/null 2>&1; then
-    echo "8.15.4"
-    return
-  fi
-
-  node -e "const pkg=require('${REPO_ROOT}/package.json'); process.stdout.write((pkg.packageManager || 'pnpm@8.15.4').split('@')[1]);"
-}
-
 wait_for_container_http() {
   local url="$1"
   local label="$2"
@@ -87,8 +78,6 @@ wait_for_container_http() {
     sleep 2
   done
 }
-
-PNPM_RUNTIME_VERSION=$(resolve_pnpm_runtime_version)
 
 echo "[0/6] 배포 준비"
 echo "  - repo: ${REPO_ROOT}"
@@ -135,10 +124,12 @@ if [[ "${RUN_FRONTEND}" -eq 1 ]]; then
   FRONTEND_TARBALL="/tmp/kscold-blog-frontend-runtime-${TIMESTAMP}.tgz"
 
   mkdir -p "${FRONTEND_STAGE}"
-  cp -R "${REPO_ROOT}/apps/web/.next" "${FRONTEND_STAGE}/.next"
+  cp -R "${REPO_ROOT}/apps/web/.next/standalone/node_modules" "${FRONTEND_STAGE}/node_modules"
+  mkdir -p "${FRONTEND_STAGE}/apps"
+  cp -R "${REPO_ROOT}/apps/web/.next/standalone/apps/web" "${FRONTEND_STAGE}/apps/web"
   cp -R "${REPO_ROOT}/apps/web/public" "${FRONTEND_STAGE}/public"
-  cp "${REPO_ROOT}/apps/web/.next/standalone/apps/web/server.js" "${FRONTEND_STAGE}/server.js"
-  cp "${REPO_ROOT}/apps/web/package.json" "${FRONTEND_STAGE}/package.json"
+  cp -R "${REPO_ROOT}/apps/web/.next/static" "${FRONTEND_STAGE}/apps/web/.next/static"
+  cp "${REPO_ROOT}/apps/web/.next/standalone/package.json" "${FRONTEND_STAGE}/package.json"
   cp "${REPO_ROOT}/pnpm-lock.yaml" "${FRONTEND_STAGE}/pnpm-lock.yaml"
 
   tar -czf "${FRONTEND_TARBALL}" -C "${FRONTEND_STAGE}" .
@@ -146,13 +137,14 @@ if [[ "${RUN_FRONTEND}" -eq 1 ]]; then
 
   echo "[4/6] 프런트엔드 백업 및 반영"
   docker exec "${CONTAINER_NAME}" sh -lc \
-    "mkdir -p ${BACKUP_DIR} && tar -czf ${BACKUP_DIR}/apps-web.tar.gz -C /app/frontend/apps/web .next public server.js package.json pnpm-lock.yaml 2>/dev/null || true"
+    "mkdir -p ${BACKUP_DIR} && tar -czf ${BACKUP_DIR}/frontend-runtime.tar.gz -C /app/frontend apps node_modules package.json pnpm-lock.yaml 2>/dev/null || true"
   docker cp "${FRONTEND_TARBALL}" "${CONTAINER_NAME}:/tmp/kscold-blog-frontend-runtime.tgz"
   docker exec "${CONTAINER_NAME}" sh -lc '
-    cd /app/frontend/apps/web &&
-    rm -rf .next public &&
-    tar -xzf /tmp/kscold-blog-frontend-runtime.tgz -C /app/frontend/apps/web &&
-    CI=1 npx -y pnpm@'"${PNPM_RUNTIME_VERSION}"' install --force --prod --frozen-lockfile --ignore-scripts &&
+    cd /app/frontend &&
+    rm -rf apps/web node_modules package.json pnpm-lock.yaml &&
+    tar -xzf /tmp/kscold-blog-frontend-runtime.tgz -C /app/frontend &&
+    rm -rf /app/frontend/apps/web/public &&
+    cp -R /app/frontend/public /app/frontend/apps/web/public &&
     pm2 restart kscold-blog-frontend >/dev/null &&
     pm2 save >/dev/null
   '
