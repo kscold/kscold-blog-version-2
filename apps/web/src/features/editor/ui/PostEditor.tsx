@@ -96,10 +96,10 @@ export function PostEditor({
 
   return (
     <div className="min-h-screen bg-surface-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-4">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px] xl:gap-8">
+            <div className="space-y-4">
               <PostEditorHeader
                 mode={mode}
                 form={form}
@@ -111,6 +111,7 @@ export function PostEditor({
                 onSlugEdited={() => setSlugEdited(true)}
                 onContentChange={value => updateForm('content', value)}
                 onExcerptChange={value => updateForm('excerpt', value)}
+                onCoverImageChange={value => updateForm('coverImage', value)}
                 editorKey={editorKey}
               />
             </div>

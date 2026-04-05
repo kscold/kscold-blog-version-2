@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { TagSelector } from '@/features/editor/ui/TagSelector';
-import { ImageUpload } from '@/shared/ui/ImageUpload';
 import type { PostFormData } from '@/features/editor/model/types';
 
 interface Category {
@@ -32,94 +31,118 @@ export function PostEditorSidebar({
 }: PostEditorSidebarProps) {
   const router = useRouter();
   const [showSeo, setShowSeo] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   return (
-    <div className="space-y-4">
-      {/* 발행 설정 */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-          발행 설정
+    <aside data-cy="post-editor-sidebar" className="space-y-4 xl:sticky xl:top-24 xl:self-start">
+      <div className="rounded-[28px] border border-surface-200 bg-white p-5 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-surface-400">
+          Publish
+        </p>
+        <h3 className="mt-3 text-xl font-black tracking-tight text-surface-900">
+          문서 설정
         </h3>
-        <div className="space-y-3">
-          <select
-            value={form.status}
-            onChange={e => onUpdateForm('status', e.target.value as PostFormData['status'])}
-            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
-          >
-            <option value="DRAFT">초안</option>
-            <option value="PUBLISHED">발행</option>
-            {mode === 'edit' && <option value="ARCHIVED">보관</option>}
-          </select>
+        <p className="mt-2 text-sm leading-relaxed text-surface-500">
+          발행 상태와 카테고리, 태그를 먼저 잡아두면 문서 정리가 훨씬 편합니다.
+        </p>
 
-          <label className="flex items-center gap-2 cursor-pointer">
+        <div className="mt-5 space-y-5">
+          <div>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
+              상태
+            </label>
+            <select
+              value={form.status}
+              onChange={e => onUpdateForm('status', e.target.value as PostFormData['status'])}
+              data-cy="post-editor-status"
+              className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
+            >
+              <option value="DRAFT">초안</option>
+              <option value="PUBLISHED">발행</option>
+              {mode === 'edit' && <option value="ARCHIVED">보관</option>}
+            </select>
+          </div>
+
+          <label className="flex items-center justify-between gap-4 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-4">
+            <div>
+              <p className="text-sm font-semibold text-surface-900">추천 포스트</p>
+              <p className="mt-1 text-sm text-surface-500">
+                메인 추천 영역에 노출할 수 있습니다.
+              </p>
+            </div>
             <input
               type="checkbox"
               checked={form.featured}
               onChange={e => onUpdateForm('featured', e.target.checked)}
-              className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
+              className="h-4 w-4 rounded border-surface-300 text-surface-900 focus:ring-surface-900"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300">추천 포스트로 표시</span>
           </label>
+
+          <div>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
+              카테고리
+            </label>
+            <select
+              value={form.categoryId}
+              onChange={e => onUpdateForm('categoryId', e.target.value)}
+              data-cy="post-editor-category"
+              className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
+              required
+            >
+              <option value="">카테고리 선택</option>
+              {isHydrated && categories?.map(cat => (
+                <option key={cat.id} value={cat.id}>
+                  {'  '.repeat(cat.depth)}
+                  {cat.icon && `${cat.icon} `}
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
+              태그
+            </label>
+            {isHydrated ? (
+              <TagSelector
+                selectedTagIds={form.tagIds}
+                onChange={tagIds => onUpdateForm('tagIds', tagIds)}
+              />
+            ) : (
+              <div className="h-[42px] rounded-2xl border border-surface-200 bg-surface-50" />
+            )}
+          </div>
         </div>
       </div>
 
-      {/* 카테고리 */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-          카테고리 <span className="text-red-500">*</span>
-        </h3>
-        <select
-          value={form.categoryId}
-          onChange={e => onUpdateForm('categoryId', e.target.value)}
-          className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-600"
-          required
-        >
-          <option value="">카테고리 선택</option>
-          {categories?.map(cat => (
-            <option key={cat.id} value={cat.id}>
-              {'  '.repeat(cat.depth)}
-              {cat.icon && `${cat.icon} `}
-              {cat.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* 태그 */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">태그</h3>
-        <TagSelector
-          selectedTagIds={form.tagIds}
-          onChange={tagIds => onUpdateForm('tagIds', tagIds)}
-        />
-      </div>
-
-      {/* 커버 이미지 */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-          커버 이미지
-        </h3>
-        <ImageUpload
-          currentImage={form.coverImage || undefined}
-          onUploadSuccess={(url: string) => onUpdateForm('coverImage', url)}
-        />
-      </div>
-
-      {/* SEO 설정 */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-4">
+      <div className="rounded-[28px] border border-surface-200 bg-white p-5 shadow-sm">
         <button
           type="button"
           onClick={() => setShowSeo(prev => !prev)}
-          className="w-full flex items-center justify-between text-sm font-semibold text-gray-900 dark:text-white"
+          className="flex w-full items-center justify-between gap-3 text-left"
         >
-          <span>SEO 설정</span>
-          <span className="text-gray-400">{showSeo ? '▲' : '▼'}</span>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-surface-400">
+              SEO
+            </p>
+            <h3 className="mt-2 text-lg font-black tracking-tight text-surface-900">
+              검색 미리보기 설정
+            </h3>
+          </div>
+          <span className="text-sm font-semibold text-surface-400">
+            {showSeo ? '접기' : '열기'}
+          </span>
         </button>
 
         {showSeo && (
-          <div className="mt-3 space-y-3">
+          <div className="mt-5 space-y-4">
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
                 메타 제목
               </label>
               <input
@@ -127,11 +150,11 @@ export function PostEditorSidebar({
                 value={form.metaTitle}
                 onChange={e => onUpdateForm('metaTitle', e.target.value)}
                 placeholder="검색 결과에 표시될 제목"
-                className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
                 메타 설명
               </label>
               <textarea
@@ -139,54 +162,66 @@ export function PostEditorSidebar({
                 onChange={e => onUpdateForm('metaDescription', e.target.value)}
                 placeholder="검색 결과에 표시될 설명 (150자 권장)"
                 rows={3}
-                className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
               />
-              <p className="text-xs text-gray-400 mt-1">{form.metaDescription.length}/160</p>
+              <p className="mt-2 text-xs text-surface-400">{form.metaDescription.length}/160</p>
             </div>
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                키워드 (쉼표로 구분)
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
+                키워드
               </label>
               <input
                 type="text"
                 value={form.keywords}
                 onChange={e => onUpdateForm('keywords', e.target.value)}
                 placeholder="React, TypeScript, 프론트엔드"
-                className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
               />
             </div>
           </div>
         )}
       </div>
 
-      {/* 자동저장 상태 + 버튼 */}
-      <div className="space-y-2">
+      <div className="rounded-[28px] border border-surface-200 bg-surface-900 p-5 text-white shadow-[0_20px_50px_rgba(15,23,42,0.14)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">
+          Ready
+        </p>
+        <h3 className="mt-3 text-xl font-black tracking-tight">
+          문서 상태를 저장합니다
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-white/70">
+          작성 중인 초안은 자동 저장되고, 여기서 발행 상태와 함께 최종 저장할 수 있습니다.
+        </p>
+
         {lastSavedText && (
-          <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
+          <p className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
             {lastSavedText}
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full px-6 py-3 bg-surface-900 text-white rounded-lg font-medium hover:bg-surface-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting
-            ? '저장 중...'
-            : mode === 'create'
-              ? '포스트 저장'
-              : '변경사항 저장'}
-        </button>
+        <div className="mt-5 space-y-3">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            data-cy="post-editor-submit"
+            className="w-full rounded-full bg-white px-6 py-3 font-semibold text-surface-900 transition-colors hover:bg-surface-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isSubmitting
+              ? '저장 중...'
+              : mode === 'create'
+                ? '포스트 저장'
+                : '변경사항 저장'}
+          </button>
 
-        <button
-          type="button"
-          onClick={() => router.push('/admin/posts')}
-          className="w-full px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-        >
-          취소
-        </button>
+          <button
+            type="button"
+            onClick={() => router.push('/admin/posts')}
+            className="w-full rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white transition-colors hover:bg-white/10"
+          >
+            목록으로 돌아가기
+          </button>
+        </div>
       </div>
-    </div>
+    </aside>
   );
 }
