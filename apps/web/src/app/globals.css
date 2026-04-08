@@ -179,6 +179,69 @@
     @apply border border-surface-200;
     @apply transition-all duration-300 ease-out;
   }
+
+  .tiptap-editor-surface pre {
+    @apply overflow-x-auto rounded-2xl bg-surface-950 px-5 py-4 text-sm text-surface-100;
+  }
+
+  .tiptap-editor-surface pre code {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  .tiptap-editor-surface .hljs-comment,
+  .tiptap-editor-surface .hljs-quote {
+    color: #7c8597;
+  }
+
+  .tiptap-editor-surface .hljs-keyword,
+  .tiptap-editor-surface .hljs-selector-tag,
+  .tiptap-editor-surface .hljs-literal,
+  .tiptap-editor-surface .hljs-section,
+  .tiptap-editor-surface .hljs-link {
+    color: #c084fc;
+  }
+
+  .tiptap-editor-surface .hljs-string,
+  .tiptap-editor-surface .hljs-title,
+  .tiptap-editor-surface .hljs-name,
+  .tiptap-editor-surface .hljs-type,
+  .tiptap-editor-surface .hljs-attribute,
+  .tiptap-editor-surface .hljs-symbol,
+  .tiptap-editor-surface .hljs-bullet,
+  .tiptap-editor-surface .hljs-addition {
+    color: #86efac;
+  }
+
+  .tiptap-editor-surface .hljs-number,
+  .tiptap-editor-surface .hljs-variable,
+  .tiptap-editor-surface .hljs-template-variable {
+    color: #fda4af;
+  }
+
+  .tiptap-editor-surface .hljs-built_in,
+  .tiptap-editor-surface .hljs-class .hljs-title {
+    color: #7dd3fc;
+  }
+
+  .tiptap-editor-surface .hljs-emphasis {
+    font-style: italic;
+  }
+
+  .tiptap-editor-surface .hljs-strong {
+    font-weight: 700;
+  }
+
+  .mermaid-diagram svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-width: 640px;
+    margin: 0 auto;
+  }
+
+  .mermaid-diagram-wrapper {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 @layer utilities {
