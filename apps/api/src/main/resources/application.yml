@@ -7,7 +7,7 @@ spring:
 
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/kscold-blog}
+      uri: ${MONGODB_URI:}
       auto-index-creation: true
 
   servlet:
@@ -23,8 +23,8 @@ server:
 
 # JWT 설정
 jwt:
-  secret: ${JWT_SECRET:your-secret-key-change-in-production-must-be-at-least-256-bits}
-  refresh-secret: ${JWT_REFRESH_SECRET:${JWT_SECRET:your-secret-key-change-in-production-must-be-at-least-256-bits}}
+  secret: ${JWT_SECRET:}
+  refresh-secret: ${JWT_REFRESH_SECRET:${JWT_SECRET:}}
   access-token-expiration: 3600000 # 1 hour
   refresh-token-expiration: 604800000 # 7 days
 
@@ -42,21 +42,21 @@ file:
 # MinIO S3 Object Storage
 minio:
   endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
-  access-key: ${MINIO_ACCESS_KEY:minioadmin}
-  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  access-key: ${MINIO_ACCESS_KEY:}
+  secret-key: ${MINIO_SECRET_KEY:}
   bucket: ${MINIO_BUCKET:blog}
   public-url: ${MINIO_PUBLIC_URL:https://bucket.kscold.com}
 
 # Team private docs
 team:
   private:
-    password: ${TEAM_PRIVATE_PASSWORD:changeme}
+    password: ${TEAM_PRIVATE_PASSWORD:}
 
 # Discord Bot (채팅 브릿지)
 discord:
   token: ${DISCORD_BOT_TOKEN:}
-  guild-id: ${DISCORD_GUILD_ID:1409051974397198368}
-  channel-id: ${DISCORD_CHANNEL_ID:1409051975026217044}
+  guild-id: ${DISCORD_GUILD_ID:}
+  channel-id: ${DISCORD_CHANNEL_ID:}
 
 # Logging
 logging:
