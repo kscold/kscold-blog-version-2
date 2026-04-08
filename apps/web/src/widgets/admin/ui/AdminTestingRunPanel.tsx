@@ -22,10 +22,10 @@ export function AdminTestingRunPanel({
   onAction,
 }: AdminTestingRunPanelProps) {
   return (
-    <section className="mb-10 grid grid-cols-1 xl:grid-cols-[1.2fr_1fr] gap-4">
+    <section className="mb-10 grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_1fr]">
       <div className="rounded-2xl border border-surface-200 bg-white p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
+          <div className="max-w-2xl space-y-2">
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-surface-900">실행 패널</h2>
               <span
@@ -34,12 +34,12 @@ export function AdminTestingRunPanel({
                 {statusLabel(currentStatus)}
               </span>
             </div>
-            <p className="mt-2 text-sm text-surface-500 leading-relaxed">
+            <p className="text-sm leading-6 text-surface-500">
               어드민 UI 테스트 실행을 시작하면 최신 스크린샷과 로그가 자동으로 갱신됩니다.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
             <Button
               type="button"
               size="sm"
@@ -58,30 +58,30 @@ export function AdminTestingRunPanel({
               disabled={isLoading || isRunningAction || currentStatus !== 'running'}
               onClick={() => void onAction('stop')}
               data-cy="admin-qa-stop-button"
-              >
-                실행 중지
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                isLoading={isRunningAction && activeAction === 'delete'}
-                disabled={isLoading || isRunningAction || !session || currentStatus === 'running'}
-                onClick={() => void onAction('delete')}
-                data-cy="admin-qa-delete-button"
-              >
-                결과 삭제
-              </Button>
-            </div>
+            >
+              실행 중지
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+              isLoading={isRunningAction && activeAction === 'delete'}
+              disabled={isLoading || isRunningAction || !session || currentStatus === 'running'}
+              onClick={() => void onAction('delete')}
+              data-cy="admin-qa-delete-button"
+            >
+              결과 삭제
+            </Button>
           </div>
+        </div>
 
-        <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-surface-100 bg-surface-50 px-4 py-3">
             <div className="text-xs font-semibold uppercase tracking-wide text-surface-400">
               최근 실행
             </div>
-            <div className="mt-2 text-sm font-semibold text-surface-900">
+            <div className="mt-2 text-sm font-semibold leading-6 text-surface-900 [overflow-wrap:anywhere]">
               {session?.suiteLabel || '어드민 UI 테스트 실행'}
             </div>
             <div className="mt-1 text-xs text-surface-500">{formatSessionId(session?.id || null)}</div>
@@ -105,7 +105,7 @@ export function AdminTestingRunPanel({
           </div>
         </div>
 
-        <div className="mt-4 rounded-xl border border-surface-100 bg-surface-50 px-4 py-3 text-sm text-surface-500">
+        <div className="mt-4 rounded-xl border border-surface-100 bg-surface-50 px-4 py-3 text-sm leading-6 text-surface-500">
           실행 결과와 스크린샷은 MinIO에 보관되며, 필요하면 여기서 현재 세션 결과를 바로 삭제할 수 있습니다.
         </div>
 
@@ -118,7 +118,7 @@ export function AdminTestingRunPanel({
 
       <div className="rounded-2xl border border-surface-200 bg-white p-5">
         <h2 className="text-lg font-bold text-surface-900">실행 개요</h2>
-        <ul className="mt-3 space-y-2 text-sm text-surface-500 leading-relaxed">
+        <ul className="mt-3 space-y-2 text-sm leading-6 text-surface-500">
           <li>실행은 호스트 QA 러너가 맡고, 어드민에서는 세션 상태만 제어합니다.</li>
           <li>현재는 라이브 `kscold.com` 기준 어드민 UI 테스트 실행 흐름을 제공합니다.</li>
           <li>실패가 나면 로그와 마지막 스크린샷부터 먼저 보면 원인 파악이 빠릅니다.</li>

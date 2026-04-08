@@ -7,7 +7,7 @@ import { useAllVaultNotes } from '@/entities/vault/api/useVault';
 import { useTags } from '@/entities/tag/api/useTags';
 import { fetchChatRooms } from '@/entities/chat/api/chatAdminApi';
 import { useQuery } from '@tanstack/react-query';
-import { useViewer } from '@/shared/model/useViewer';
+import { useViewer } from '@/entities/user/model/useViewer';
 import { DashboardStats } from './DashboardStats';
 import { AdminUserStatsSection } from './AdminUserStatsSection';
 
@@ -66,11 +66,13 @@ export function AdminDashboardContainer() {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-sans font-black tracking-tighter text-surface-900">
+      <div className="mb-10 space-y-3">
+        <h1 className="text-3xl font-sans font-black tracking-tighter text-surface-900 sm:text-4xl">
           Dashboard
         </h1>
-        <p className="text-surface-500 mt-2">{viewerName}</p>
+        <p className="text-sm leading-6 text-surface-500 sm:text-base">
+          {viewerName}
+        </p>
       </div>
 
       <DashboardStats
@@ -79,9 +81,13 @@ export function AdminDashboardContainer() {
         recentPosts={posts}
       />
 
-      {/* 사용자 통계 */}
-      <div className="mt-10">
-        <h2 className="text-lg font-bold text-surface-900 mb-4">가입자 현황</h2>
+      <div className="mt-12 space-y-4">
+        <div className="space-y-1">
+          <h2 className="text-lg font-bold text-surface-900">가입자 현황</h2>
+          <p className="text-sm leading-6 text-surface-500">
+            최근 가입 흐름과 신규 사용자 목록을 한눈에 확인할 수 있습니다.
+          </p>
+        </div>
         <AdminUserStatsSection />
       </div>
     </>
