@@ -15,7 +15,7 @@ export function AdminTestingArtifactsPanel({
 }: AdminTestingArtifactsPanelProps) {
   return (
     <>
-      <section className="mb-10 grid grid-cols-1 xl:grid-cols-[1.2fr_1fr] gap-4">
+      <section className="mb-10 grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_1fr]">
         <div className="rounded-2xl border border-surface-200 bg-white p-5">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-surface-900">실행 로그</h2>
@@ -63,7 +63,7 @@ export function AdminTestingArtifactsPanel({
               href={latestScreenshot}
               target="_blank"
               rel="noreferrer"
-              className="mt-3 inline-flex text-sm font-semibold text-surface-700 hover:text-surface-900"
+              className="mt-3 inline-flex text-sm font-semibold text-surface-700 transition-colors hover:text-surface-900"
             >
               원본 이미지 열기
             </a>
@@ -72,13 +72,13 @@ export function AdminTestingArtifactsPanel({
       </section>
 
       <section className="mb-10">
-        <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="text-lg font-bold text-surface-900">스크린샷 타임라인</h2>
           <span className="text-xs font-medium text-surface-400">
             {hasSession ? '세션 아티팩트' : '세션 시작 전'}
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {session?.screenshots.length ? (
             session.screenshots.map(item => (
               <a
@@ -99,7 +99,7 @@ export function AdminTestingArtifactsPanel({
                   />
                 </div>
                 <div className="px-4 py-3">
-                  <div className="text-sm font-semibold text-surface-900 break-all">
+                  <div className="text-sm font-semibold leading-6 text-surface-900 [overflow-wrap:anywhere]">
                     {formatScreenshotLabel(item.name)}
                   </div>
                   <div className="mt-1 text-xs text-surface-400">새 탭에서 원본 보기</div>

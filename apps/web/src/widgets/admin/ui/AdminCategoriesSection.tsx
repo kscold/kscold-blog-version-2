@@ -28,13 +28,13 @@ export function AdminCategoriesSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-white">
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-serif font-bold text-gray-900 dark:text-white sm:text-4xl">
                 카테고리 관리
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
-                최대 5단계까지 계층 구조를 만들 수 있습니다
+              <p className="max-w-2xl text-sm leading-6 text-gray-600 dark:text-gray-400">
+                최대 5단계까지 계층 구조를 만들고, 제한 카테고리 운영에 필요한 흐름도 이 화면에서 함께 관리할 수 있습니다.
               </p>
             </div>
             <button
