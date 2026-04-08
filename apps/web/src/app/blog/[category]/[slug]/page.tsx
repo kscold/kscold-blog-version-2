@@ -2,12 +2,11 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { PostDetail } from '@/widgets/post/ui/PostDetail';
 import type { Post } from '@/types/blog';
-import type { PageResponse } from '@/types/api';
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
-  fetchPublicApi,
+  fetchViewerApi,
   toMetaDescription,
   toOgImage,
   uniqueKeywords,
@@ -15,23 +14,7 @@ import {
 import { JsonLd } from '@/shared/ui/JsonLd';
 
 async function getPost(slug: string) {
-  return fetchPublicApi<Post>(`/posts/slug/${slug}`);
-}
-
-async function getAllPosts() {
-  const page = await fetchPublicApi<PageResponse<Post>>('/posts?size=1000');
-  return page?.content || [];
-}
-
-export async function generateStaticParams() {
-  const posts = await getAllPosts();
-
-  return posts
-    .filter(post => post.status === 'PUBLISHED')
-    .map(post => ({
-      category: post.category.slug,
-      slug: post.slug,
-    }));
+  return fetchViewerApi<Post>(`/posts/slug/${slug}`);
 }
 
 export async function generateMetadata({
@@ -131,4 +114,4 @@ export default async function PostPage({
   );
 }
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';

@@ -3,24 +3,32 @@
 import { useState } from 'react';
 import apiClient from '@/shared/api/api-client';
 import Link from 'next/link';
-import { useViewer } from '@/shared/model/useViewer';
+import { useViewer } from '@/entities/user/model/useViewer';
 
 interface RestrictedOverlayProps {
+  postId?: string;
+  postTitle?: string;
   categoryId?: string;
   categoryName?: string;
   excerpt?: string;
 }
 
-export function RestrictedOverlay({ categoryId, categoryName, excerpt }: RestrictedOverlayProps) {
+export function RestrictedOverlay({
+  postId,
+  postTitle,
+  categoryId,
+  categoryName,
+  excerpt,
+}: RestrictedOverlayProps) {
   const { isAuthenticated } = useViewer();
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
   const handleRequest = async () => {
-    if (!categoryId) return;
+    if (!postId) return;
     setStatus('loading');
     try {
-      await apiClient.post('/access-requests', { categoryId, message: message || null });
+      await apiClient.post('/access-requests', { postId, message: message || null });
       setStatus('sent');
     } catch {
       setStatus('error');
@@ -54,7 +62,10 @@ export function RestrictedOverlay({ categoryId, categoryName, excerpt }: Restric
 
         <h3 className="text-lg font-bold text-surface-900">열람 권한이 필요한 글입니다</h3>
         <p className="mt-2 text-sm text-surface-500">
-          {categoryName ? `"${categoryName}" 카테고리의 글은` : '이 글은'} 승인된 사용자만 읽을 수 있습니다.
+          {categoryName ? `"${categoryName}" 카테고리의 제한 글은` : '이 글은'} 승인된 사용자만 읽을 수 있습니다.
+        </p>
+        <p className="mt-1 text-sm text-surface-400">
+          {postTitle ? `"${postTitle}"에 대한` : '이 글에 대한'} 열람 요청을 남기면 관리자가 글 단위 또는 카테고리 단위로 승인할 수 있습니다.
         </p>
 
         {!isAuthenticated ? (
@@ -68,7 +79,7 @@ export function RestrictedOverlay({ categoryId, categoryName, excerpt }: Restric
           </div>
         ) : status === 'sent' ? (
           <div className="mt-6 rounded-xl bg-green-50 px-6 py-4 text-sm font-medium text-green-700">
-            접근 요청이 등록되었습니다. 관리자 승인 후 열람할 수 있습니다.
+            열람 요청이 등록되었습니다. 관리자가 범위를 승인하면 바로 읽을 수 있습니다.
           </div>
         ) : (
           <div className="mt-6 space-y-3">
