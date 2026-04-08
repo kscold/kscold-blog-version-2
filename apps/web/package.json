@@ -7,7 +7,7 @@
     "dev:e2e": "./scripts/run-e2e-dev.sh",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "type-check": "next typegen && tsc --noEmit",
     "cy:open": "unset ELECTRON_RUN_AS_NODE && cypress open",
     "cy:run": "unset ELECTRON_RUN_AS_NODE && cypress run",
