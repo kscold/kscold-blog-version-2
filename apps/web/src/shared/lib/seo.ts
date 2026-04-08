@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://kscold.com/api';
 
@@ -40,6 +41,40 @@ export async function fetchPublicApi<T>(path: string, revalidate = 3600): Promis
     return (payload?.data ?? payload) as T;
   } catch (error) {
     console.error(`Failed to fetch public API: ${requestUrl}`, error);
+    return null;
+  }
+}
+
+export async function fetchViewerApi<T>(path: string, revalidate = 3600): Promise<T | null> {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const requestUrl = `${API_BASE_URL}${normalizedPath}`;
+
+  try {
+    const cookieStore = await cookies();
+    const authToken = cookieStore.get('auth-token')?.value;
+
+    const response = await fetch(
+      requestUrl,
+      authToken
+        ? {
+            headers: {
+              Cookie: `auth-token=${authToken}`,
+            },
+            cache: 'no-store',
+          }
+        : {
+            next: { revalidate },
+          }
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = await response.json();
+    return (payload?.data ?? payload) as T;
+  } catch (error) {
+    console.error(`Failed to fetch viewer API: ${requestUrl}`, error);
     return null;
   }
 }
