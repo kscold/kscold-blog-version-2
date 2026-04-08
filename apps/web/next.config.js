@@ -3,6 +3,7 @@ const nextConfig = {
   output: 'standalone',
   distDir: process.env.NEXT_DIST_DIR || '.next',
   reactStrictMode: true,
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
 
   // 이미지 최적화
   images: {
