@@ -132,4 +132,55 @@ describe('포스트 에디터 반응형 시나리오', () => {
       expectNoHorizontalOverflow(viewport.width);
     });
   });
+
+  it('시나리오: 작성기는 코드 블록 언어를 지정하면 미리보기에서 올바르게 인식한다', () => {
+    cy.viewport(1440, 900);
+    cy.visit('/admin/posts/new');
+    cy.wait(['@categories', '@tags']);
+
+    cy.window().then(win => {
+      cy.stub(win, 'prompt').returns('ts');
+    });
+
+    cy.get('.ProseMirror', { timeout: 20000 })
+      .click()
+      .type('const total = 42;{enter}console.log(total);', {
+        parseSpecialCharSequences: false,
+      });
+
+    cy.contains('button', '코드').click();
+    cy.contains('button', '언어').click();
+    cy.contains('button', 'TS').should('be.visible');
+
+    cy.get('[data-cy="post-editor-view-preview"]').click();
+    cy.get('[data-code-language="ts"]', { timeout: 10000 })
+      .should('be.visible')
+      .and('contain.text', 'TypeScript');
+    cy.contains('const total = 42;').should('be.visible');
+  });
+
+  it('시나리오: 작성기는 mermaid 코드 블록을 다이어그램으로 미리보기한다', () => {
+    cy.viewport(1440, 900);
+    cy.visit('/admin/posts/new');
+    cy.wait(['@categories', '@tags']);
+
+    cy.window().then(win => {
+      cy.stub(win, 'prompt').returns('mermaid');
+    });
+
+    cy.get('.ProseMirror', { timeout: 20000 })
+      .click()
+      .type('graph TD; A[Login] --> B[Approved]; B --> C[Read Post]', {
+        parseSpecialCharSequences: false,
+      });
+
+    cy.contains('button', '코드').click();
+    cy.contains('button', '언어').click();
+    cy.contains('button', 'MERMAID').should('be.visible');
+
+    cy.get('[data-cy="post-editor-view-preview"]').click();
+    cy.get('[data-code-language="mermaid"]', { timeout: 10000 }).should('be.visible');
+    cy.get('[data-mermaid-status="rendered"]', { timeout: 20000 }).should('be.visible');
+    cy.get('.mermaid-diagram svg', { timeout: 20000 }).should('be.visible');
+  });
 });
