@@ -8,6 +8,13 @@ import {
   storeAccessToken,
   storeRefreshToken,
 } from '@/shared/lib/authTokenStorage';
+import {
+  extractRequestPath,
+  forceLogout,
+  shouldAttemptRefresh,
+  shouldForceLogout,
+} from '@/shared/api/apiClientPolicies';
+import { performTokenRefresh } from '@/shared/api/apiClientRefresh';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -30,7 +37,7 @@ class ApiClient {
   private setupInterceptors() {
     this.client.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        const token = this.getAccessToken();
+        const token = getAccessToken();
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -46,9 +53,9 @@ class ApiClient {
           _retry?: boolean;
         };
         const status = error.response?.status;
-        const requestPath = this.extractPath(originalRequest?.url);
+        const requestPath = extractRequestPath(originalRequest?.url);
 
-        if (originalRequest && status === 401 && !originalRequest._retry && this.shouldAttemptRefresh(requestPath)) {
+        if (originalRequest && status === 401 && !originalRequest._retry && shouldAttemptRefresh(requestPath)) {
           originalRequest._retry = true;
 
           const newToken = await this.refreshAccessToken();
@@ -57,12 +64,14 @@ class ApiClient {
             return this.client(originalRequest);
           }
 
-          this.forceLogout();
+          this.clearTokens();
+          forceLogout();
           return Promise.reject(error);
         }
 
-        if (this.shouldForceLogout(status, requestPath)) {
-          this.forceLogout();
+        if (shouldForceLogout(status, requestPath)) {
+          this.clearTokens();
+          forceLogout();
         }
 
         return Promise.reject(error);
@@ -70,44 +79,8 @@ class ApiClient {
     );
   }
 
-  private getAccessToken(): string | null {
-    return getAccessToken();
-  }
-
-  private getRefreshToken(): string | null {
-    return getRefreshToken();
-  }
-
-  private setAccessToken(token: string): void {
-    storeAccessToken(token);
-  }
-
-  private setRefreshToken(token: string): void {
-    storeRefreshToken(token);
-  }
-
   private clearTokens(): void {
     clearStoredAuth();
-  }
-
-  private async doRefreshToken(): Promise<string | null> {
-    try {
-      const currentRefreshToken = this.getRefreshToken();
-      if (!currentRefreshToken) return null;
-
-      const response = await axios.post(`${this.apiUrl}/auth/refresh`, {
-        refreshToken: currentRefreshToken,
-      });
-      const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-      this.setAccessToken(accessToken);
-      if (newRefreshToken) {
-        this.setRefreshToken(newRefreshToken);
-      }
-      return accessToken;
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      return null;
-    }
   }
 
   private async refreshAccessToken(): Promise<string | null> {
@@ -115,53 +88,16 @@ class ApiClient {
       return this.refreshPromise;
     }
 
-    this.refreshPromise = this.doRefreshToken().finally(() => {
+    const currentRefreshToken = getRefreshToken();
+    if (!currentRefreshToken) {
+      return null;
+    }
+
+    this.refreshPromise = performTokenRefresh(this.apiUrl, currentRefreshToken).finally(() => {
       this.refreshPromise = null;
     });
 
     return this.refreshPromise;
-  }
-
-  private extractPath(url?: string): string {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      try {
-        return new URL(url).pathname;
-      } catch {
-        return url;
-      }
-    }
-    const normalized = url.startsWith('/') ? url : `/${url}`;
-    return normalized.split('?')[0].split('#')[0];
-  }
-
-  private shouldAttemptRefresh(path: string): boolean {
-    return !['/auth/login', '/auth/register', '/auth/refresh'].includes(path);
-  }
-
-  private shouldForceLogout(status: number | undefined, path: string): boolean {
-    if (status === 401) {
-      return path === '/auth/refresh' || path === '/auth/me';
-    }
-
-    if (status === 403) {
-      return this.isAdminProtectedPath(path) || path === '/auth/me';
-    }
-
-    return false;
-  }
-
-  private isAdminProtectedPath(path: string): boolean {
-    return path.startsWith('/admin') || path.includes('/admin/') || path.endsWith('/admin');
-  }
-
-  private forceLogout(): void {
-    this.clearTokens();
-
-    if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-      const redirect = `${window.location.pathname}${window.location.search}`;
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirect)}`);
-    }
   }
 
   public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
@@ -197,9 +133,9 @@ class ApiClient {
   }
 
   public setToken(token: string, refreshToken?: string): void {
-    this.setAccessToken(token);
+    storeAccessToken(token);
     if (refreshToken) {
-      this.setRefreshToken(refreshToken);
+      storeRefreshToken(refreshToken);
     }
   }
 
@@ -208,7 +144,7 @@ class ApiClient {
   }
 
   public getToken(): string | null {
-    return this.getAccessToken();
+    return getAccessToken();
   }
 
   public hasRefreshToken(): boolean {
