@@ -1,112 +1,17 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/features/auth/api/useAuth';
-import { useAuthStore } from '@/entities/user/model/authStore';
-import { apiClient } from '@/shared/api/api-client';
 import Link from 'next/link';
 import Input from '@/shared/ui/Input';
 import Button from '@/shared/ui/Button';
 import { AuthToggle } from '@/features/auth/ui/AuthToggle';
-import type { User } from '@/types/user';
-
-
-function resolveSafeRedirect(requestedPath: string, role: User['role']) {
-  const fallback = role === 'ADMIN' ? '/admin' : '/';
-  if (!requestedPath.startsWith('/') || requestedPath.startsWith('//')) return fallback;
-  if (requestedPath.startsWith('/admin') && role !== 'ADMIN') return '/';
-  return requestedPath;
-}
+import { useLoginForm } from '@/features/auth/model/useLoginForm';
 
 export function LoginForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { loginAsync, registerAsync, isLoggingIn, isRegistering, currentUser, isLoading: isAuthLoading } = useAuth();
-  const { setUser, setToken } = useAuthStore();
-
-  const [isLogin, setIsLogin] = useState(true);
-  const [isRestoringSession, setIsRestoringSession] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    username: '',
-    displayName: '',
-  });
-  const [error, setError] = useState('');
-
-  const isLoading = isLoggingIn || isRegistering || isRestoringSession;
-  const redirect = useMemo(() => searchParams.get('redirect') || '/admin', [searchParams]);
-
-  useEffect(() => {
-    if (!currentUser) return;
-    router.replace(resolveSafeRedirect(redirect, currentUser.role));
-  }, [currentUser, redirect, router]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const restoreSession = async () => {
-      if (apiClient.getToken() || !apiClient.hasRefreshToken()) return;
-
-      setIsRestoringSession(true);
-      try {
-        const accessToken = await apiClient.restoreSession();
-        if (!accessToken || cancelled) return;
-
-        const user = await apiClient.get<User>('/auth/me');
-        if (cancelled) return;
-
-        setToken(accessToken);
-        setUser(user);
-        router.replace(resolveSafeRedirect(redirect, user.role));
-      } catch {
-        // noop
-      } finally {
-        if (!cancelled) setIsRestoringSession(false);
-      }
-    };
-
-    if (!isAuthLoading) {
-      void restoreSession();
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthLoading, redirect, router, setToken, setUser]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    try {
-      if (isLogin) {
-        const result = await loginAsync({
-          email: formData.email,
-          password: formData.password,
-        });
-
-        router.push(resolveSafeRedirect(redirect, result.user.role));
-      } else {
-        const result = await registerAsync({
-          email: formData.email,
-          password: formData.password,
-          username: formData.username,
-          displayName: formData.displayName || formData.username,
-        });
-
-        router.push(resolveSafeRedirect(redirect, result.user.role));
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '로그인에 실패했습니다.';
-      setError(message);
-    }
-  };
+  const { error, formData, handleSubmit, isLoading, isLogin, setIsLogin, updateField } = useLoginForm();
 
   return (
-    <div className="min-h-screen bg-surface-50 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="relative flex min-h-screen items-start justify-center overflow-hidden bg-surface-50 px-4 pb-10 pt-24 sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white via-surface-50 to-surface-100" />
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02]" />
 
@@ -118,7 +23,7 @@ export function LoginForm() {
       >
         {/* 로고 */}
         <motion.div
-          className="text-center mb-12"
+          className="mb-8 text-center sm:mb-12"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
@@ -139,11 +44,11 @@ export function LoginForm() {
         <div className="card-3d">
           <motion.div
             className="card-3d-inner"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <div className="bg-white/80 backdrop-blur-xl border border-surface-200/60 rounded-[16px] p-8 shadow-[0_8px_32px_-8px_rgba(15,23,42,0.08)]">
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+            <div className="rounded-[16px] border border-surface-200/60 bg-white/80 p-6 shadow-[0_8px_32px_-8px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-8">
               <AuthToggle isLogin={isLogin} onToggle={setIsLogin} />
 
               {/* 오류 메시지 */}
@@ -163,7 +68,7 @@ export function LoginForm() {
                   type="email"
                   placeholder="your@email.com"
                   value={formData.email}
-                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  onChange={e => updateField('email', e.target.value)}
                   required
                 />
 
@@ -173,7 +78,7 @@ export function LoginForm() {
                       type="text"
                       placeholder="사용자명"
                       value={formData.username}
-                      onChange={e => setFormData({ ...formData, username: e.target.value })}
+                      onChange={e => updateField('username', e.target.value)}
                       required
                     />
 
@@ -181,7 +86,7 @@ export function LoginForm() {
                       type="text"
                       placeholder="표시 이름 (선택)"
                       value={formData.displayName}
-                      onChange={e => setFormData({ ...formData, displayName: e.target.value })}
+                      onChange={e => updateField('displayName', e.target.value)}
                     />
                   </>
                 )}
@@ -190,7 +95,7 @@ export function LoginForm() {
                   type="password"
                   placeholder="••••••••"
                   value={formData.password}
-                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                  onChange={e => updateField('password', e.target.value)}
                   required
                 />
 
@@ -230,7 +135,6 @@ export function LoginForm() {
             </div>
           </motion.div>
         </div>
-
       </motion.div>
     </div>
   );
