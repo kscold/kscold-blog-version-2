@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { useTags } from '@/entities/tag/api/useTags';
 import { useUiStore } from '@/shared/model/uiStore';
-import { useViewer } from '@/shared/model/useViewer';
+import { useViewer } from '@/entities/user/model/useViewer';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Category } from '@/types/blog';

@@ -16,20 +16,25 @@ export function AdminPostsSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-white">
-              포스트 관리
-            </h1>
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-serif font-bold text-gray-900 dark:text-white sm:text-4xl">
+                포스트 관리
+              </h1>
+              <p className="max-w-2xl text-sm leading-6 text-gray-600 dark:text-gray-400">
+                발행 상태와 작성 흐름을 한곳에서 살펴보고, 새 글 작성이나 Markdown 가져오기를 바로 이어갈 수 있습니다.
+              </p>
+            </div>
             <div className="flex gap-2 sm:gap-3">
               <Link
                 href="/admin/posts/import"
-                className="flex-1 sm:flex-none text-center px-3 sm:px-6 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-center text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 sm:flex-none sm:px-6 sm:py-3"
               >
                 MD 가져오기
               </Link>
               <Link
                 href="/admin/posts/new"
-                className="flex-1 sm:flex-none text-center px-3 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:shadow-lg transition-all"
+                className="flex-1 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-3 py-2.5 text-center text-sm font-medium text-white transition-all hover:shadow-lg sm:flex-none sm:px-6 sm:py-3"
               >
                 새 포스트
               </Link>

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { useUiStore } from '@/shared/model/uiStore';
 import { useLogout } from '@/entities/user/model/useLogout';
 import { useState, useEffect } from 'react';
-import { useViewer } from '@/shared/model/useViewer';
+import { useViewer } from '@/entities/user/model/useViewer';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function Header() {
