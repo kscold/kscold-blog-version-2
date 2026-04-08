@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuthStore } from '@/entities/user/model/authStore';
 import { useInitialViewer } from '@/shared/model/ViewerProvider';
+import { useAuthStore } from './authStore';
 
 export function useViewer() {
   const { user } = useAuthStore();

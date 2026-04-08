@@ -1,7 +1,7 @@
 'use client';
 
 import FloatingChat from '@/features/chat/ui/FloatingChat';
-import { useViewer } from '@/shared/model/useViewer';
+import { useViewer } from '@/entities/user/model/useViewer';
 
 export function FloatingChatWidget() {
   const { role } = useViewer();
