@@ -6,15 +6,17 @@ import java.util.List;
 
 public interface AccessRequestUseCase {
 
-    AccessRequest requestAccess(String userId, String categoryId, String message);
+    AccessRequest requestAccess(String userId, String postId, String message);
 
     boolean hasAccess(String userId, String categoryId);
+
+    boolean hasAccess(String userId, String postId, String categoryId);
 
     List<AccessRequest> getPendingRequests();
 
     List<AccessRequest> getMyRequests(String userId);
 
-    AccessRequest approve(String requestId);
+    AccessRequest approve(String requestId, AccessRequest.GrantScope grantScope);
 
     AccessRequest reject(String requestId);
 }
