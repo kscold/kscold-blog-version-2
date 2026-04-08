@@ -6,6 +6,7 @@ import { useMeasure } from 'react-use';
 import ForceGraph2D, { ForceGraphMethods, NodeObject } from 'react-force-graph-2d';
 import { GraphNode, GraphData, GraphLink } from '@/types/vault';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
+import { renderGraphLink, resolveLinkParticleColor } from '../lib/graphLinkRenderer';
 import {
   configureForces,
   renderNode,
@@ -98,79 +99,11 @@ export function VaultGraphView({
   }, [activeNodeSlug, hoverNode?.id, folderColorMap, theme, reducedGraphEffects]);
 
   const linkCanvasObject = useCallback((link: GraphLink, ctx: CanvasRenderingContext2D) => {
-    const src = link.source;
-    const tgt = link.target;
-    if (typeof src !== 'object' || typeof tgt !== 'object') return;
-    if (src.x == null || src.y == null || tgt.x == null || tgt.y == null) return;
-    if (!isFinite(src.x) || !isFinite(src.y) || !isFinite(tgt.x) || !isFinite(tgt.y)) return;
-
-    const srcNode = src as GraphNode;
-    const tgtNode = tgt as GraphNode;
-    const isHovered = hoverNode && (srcNode.id === hoverNode.id || tgtNode.id === hoverNode.id);
-
-    const srcColor = folderColorMap[srcNode.folderId ?? ''] || '#64C8FF';
-    const tgtColor = folderColorMap[tgtNode.folderId ?? ''] || srcColor;
-
-    if (reducedGraphEffects) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(src.x, src.y);
-      ctx.lineTo(tgt.x, tgt.y);
-      ctx.strokeStyle = isHovered ? srcColor + 'aa' : srcColor + '44';
-      ctx.lineWidth = isHovered ? 1.6 : 0.9;
-      ctx.stroke();
-      ctx.restore();
-      return;
-    }
-
-    // 곡선 제어점 계산 (시냅스 곡선 효과)
-    const dx = tgt.x - src.x;
-    const dy = tgt.y - src.y;
-    const len = Math.sqrt(dx * dx + dy * dy) || 1;
-    const curve = len * 0.18;
-    const cx = (src.x + tgt.x) / 2 - (dy / len) * curve;
-    const cy = (src.y + tgt.y) / 2 + (dx / len) * curve;
-
-    ctx.save();
-
-    if (isHovered) {
-      // 외부 글로우
-      ctx.beginPath();
-      ctx.moveTo(src.x, src.y);
-      ctx.quadraticCurveTo(cx, cy, tgt.x, tgt.y);
-      ctx.strokeStyle = srcColor + '40';
-      ctx.lineWidth = 10;
-      ctx.shadowColor = srcColor;
-      ctx.shadowBlur = 20;
-      ctx.stroke();
-
-      // 그라디언트 메인 라인
-      const grad = ctx.createLinearGradient(src.x, src.y, tgt.x, tgt.y);
-      grad.addColorStop(0, srcColor + 'ee');
-      grad.addColorStop(1, tgtColor + 'ee');
-      ctx.beginPath();
-      ctx.moveTo(src.x, src.y);
-      ctx.quadraticCurveTo(cx, cy, tgt.x, tgt.y);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 2;
-      ctx.shadowColor = srcColor;
-      ctx.shadowBlur = 8;
-      ctx.stroke();
-    } else {
-      // 기본: 희미한 곡선 + 그라디언트
-      const grad = ctx.createLinearGradient(src.x, src.y, tgt.x, tgt.y);
-      grad.addColorStop(0, srcColor + '55');
-      grad.addColorStop(0.5, srcColor + '33');
-      grad.addColorStop(1, tgtColor + '55');
-      ctx.beginPath();
-      ctx.moveTo(src.x, src.y);
-      ctx.quadraticCurveTo(cx, cy, tgt.x, tgt.y);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-
-    ctx.restore();
+    renderGraphLink(link, ctx, {
+      hoverNode,
+      folderColorMap,
+      reducedEffects: reducedGraphEffects,
+    });
   }, [hoverNode, folderColorMap, reducedGraphEffects]);
 
   return (
@@ -191,15 +124,9 @@ export function VaultGraphView({
         linkDirectionalParticles={(link: GraphLink) => (reducedGraphEffects ? 0 : isLinkHovered(link) ? 8 : 4)}
         linkDirectionalParticleWidth={(link: GraphLink) => (reducedGraphEffects ? 0 : isLinkHovered(link) ? 4 : 2.5)}
         linkDirectionalParticleSpeed={reducedGraphEffects ? 0 : 0.006}
-        linkDirectionalParticleColor={(link: GraphLink) => {
-          const sourceNode = typeof link.source === 'object' ? link.source : null;
-          const folderId =
-            sourceNode?.folderId ||
-            gData.nodes.find(
-              (n: GraphNode) => n.id === (typeof link.source === 'string' ? link.source : link.source?.id)
-            )?.folderId;
-          return folderColorMap[folderId ?? ''] || '#64C8FF';
-        }}
+        linkDirectionalParticleColor={(link: GraphLink) =>
+          resolveLinkParticleColor(link, gData.nodes, folderColorMap)
+        }
         linkCanvasObjectMode={() => 'replace'}
         linkCanvasObject={linkCanvasObject}
         onNodeClick={handleNodeClick}
