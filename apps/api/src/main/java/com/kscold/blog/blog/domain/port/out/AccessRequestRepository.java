@@ -8,11 +8,13 @@ import java.util.Optional;
 
 public interface AccessRequestRepository extends MongoRepository<AccessRequest, String> {
 
-    Optional<AccessRequest> findByUserIdAndCategoryId(String userId, String categoryId);
+    Optional<AccessRequest> findByUserIdAndPostId(String userId, String postId);
 
-    List<AccessRequest> findByStatus(AccessRequest.Status status);
+    List<AccessRequest> findAllByUserIdAndCategoryId(String userId, String categoryId);
 
-    List<AccessRequest> findByUserId(String userId);
+    List<AccessRequest> findByStatusOrderByCreatedAtDesc(AccessRequest.Status status);
+
+    List<AccessRequest> findByUserIdOrderByCreatedAtDesc(String userId);
 
     List<AccessRequest> findByUserIdAndStatus(String userId, AccessRequest.Status status);
 }
