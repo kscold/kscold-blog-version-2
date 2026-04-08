@@ -161,7 +161,7 @@ public class PostController {
         try {
             Category category = categoryUseCase.getById(post.getCategory().getId());
             if (Boolean.TRUE.equals(category.getRestricted())
-                    && !accessRequestUseCase.hasAccess(userId, category.getId())) {
+                    && !accessRequestUseCase.hasAccess(userId, post.getId(), category.getId())) {
                 return PostResponse.restricted(post);
             }
         } catch (Exception ignored) {

@@ -24,7 +24,7 @@ public class AccessRequestController {
             @AuthenticationPrincipal String userId,
             @RequestBody AccessRequestBody body
     ) {
-        AccessRequest request = accessRequestUseCase.requestAccess(userId, body.categoryId(), body.message());
+        AccessRequest request = accessRequestUseCase.requestAccess(userId, body.postId(), body.message());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(request, "접근 요청이 등록되었습니다"));
     }
@@ -41,9 +41,13 @@ public class AccessRequestController {
     @GetMapping("/api/access-requests/check/{categoryId}")
     public ResponseEntity<ApiResponse<Boolean>> checkAccess(
             @AuthenticationPrincipal String userId,
-            @PathVariable String categoryId
+            @PathVariable String categoryId,
+            @RequestParam(required = false) String postId
     ) {
-        return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.hasAccess(userId, categoryId)));
+        boolean hasAccess = postId != null
+                ? accessRequestUseCase.hasAccess(userId, postId, categoryId)
+                : accessRequestUseCase.hasAccess(userId, categoryId);
+        return ResponseEntity.ok(ApiResponse.success(hasAccess));
     }
 
     // 어드민: 대기 중인 요청 목록
@@ -56,8 +60,12 @@ public class AccessRequestController {
     // 어드민: 승인
     @PutMapping("/api/admin/access-requests/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<AccessRequest>> approve(@PathVariable String id) {
-        return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.approve(id), "승인되었습니다"));
+    public ResponseEntity<ApiResponse<AccessRequest>> approve(
+            @PathVariable String id,
+            @RequestBody(required = false) ApproveAccessRequestBody body
+    ) {
+        AccessRequest.GrantScope grantScope = body != null ? body.grantScope() : null;
+        return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.approve(id, grantScope), "승인되었습니다"));
     }
 
     // 어드민: 거절
@@ -67,5 +75,7 @@ public class AccessRequestController {
         return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.reject(id), "거절되었습니다"));
     }
 
-    record AccessRequestBody(String categoryId, String message) {}
+    record AccessRequestBody(String postId, String message) {}
+
+    record ApproveAccessRequestBody(AccessRequest.GrantScope grantScope) {}
 }
