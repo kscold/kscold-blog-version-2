@@ -64,6 +64,7 @@ public class PostApplicationService implements PostUseCase {
                 .source(command.getSource() != null ? command.getSource() : Post.Source.MANUAL)
                 .originalFilename(command.getOriginalFilename())
                 .featured(command.getFeatured())
+                .publicOverride(command.getPublicOverride())
                 .seo(seoInfo)
                 .publishedAt(command.getStatus() == Post.Status.PUBLISHED ? LocalDateTime.now() : null)
                 .build();
@@ -85,6 +86,7 @@ public class PostApplicationService implements PostUseCase {
         if (command.getExcerpt() != null) post.setExcerpt(command.getExcerpt());
         if (command.getCoverImage() != null) post.setCoverImage(command.getCoverImage());
         if (command.getFeatured() != null) post.setFeatured(command.getFeatured());
+        if (command.getPublicOverride() != null) post.setPublicOverride(command.getPublicOverride());
 
         if (command.getSlug() != null && !command.getSlug().equals(post.getSlug())) {
             if (postRepository.findBySlug(command.getSlug()).isPresent()) {
