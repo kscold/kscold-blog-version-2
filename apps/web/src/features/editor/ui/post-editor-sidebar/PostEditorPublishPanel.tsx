@@ -15,6 +15,9 @@ export function PostEditorPublishPanel({
   mode,
   onUpdateForm,
 }: PostEditorPublishPanelProps) {
+  const selectedCategory = categories?.find(category => category.id === form.categoryId);
+  const isRestrictedCategory = Boolean(selectedCategory?.restricted);
+
   return (
     <div className="rounded-[28px] border border-surface-200 bg-white p-5 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-surface-400">
@@ -59,6 +62,22 @@ export function PostEditorPublishPanel({
           />
         </label>
 
+        <label className="flex items-center justify-between gap-4 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-4">
+          <div>
+            <p className="text-sm font-semibold text-surface-900">완전 공개</p>
+            <p className="mt-1 text-sm text-surface-500">
+              제한 카테고리 안에 있어도 이 글만은 열람 요청 없이 바로 공개합니다.
+            </p>
+          </div>
+          <input
+            type="checkbox"
+            checked={form.publicOverride}
+            onChange={event => onUpdateForm('publicOverride', event.target.checked)}
+            data-cy="post-editor-public-override"
+            className="h-4 w-4 rounded border-surface-300 text-surface-900 focus:ring-surface-900"
+          />
+        </label>
+
         <div>
           <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
             카테고리
@@ -79,7 +98,16 @@ export function PostEditorPublishPanel({
                   {category.name}
                 </option>
               ))}
-          </select>
+            </select>
+          {selectedCategory && (
+            <p className="mt-2 text-xs leading-5 text-surface-500">
+              {isRestrictedCategory
+                ? form.publicOverride
+                  ? '현재 제한 카테고리지만, 이 글은 완전 공개로 우선 적용됩니다.'
+                  : '현재 제한 카테고리라서 기본적으로 열람 요청이 필요합니다.'
+                : '현재 공개 카테고리라서 누구나 바로 볼 수 있습니다.'}
+            </p>
+          )}
         </div>
 
         <div>

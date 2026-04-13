@@ -10,6 +10,7 @@ import {
   promptCodeBlockLanguage,
   promptImageUpload,
   promptLinkUrl,
+  promptVideoUrl,
   readMarkdown,
 } from '@/features/editor/lib/tiptapEditor';
 import {
@@ -73,6 +74,7 @@ export default function TiptapEditor({
 
   const actions = {
     addLink: () => promptLinkUrl(editor),
+    addVideo: () => promptVideoUrl(editor),
     addImage: () => void promptImageUpload(editor, uploadImage),
     setCodeBlockLanguage: () => promptCodeBlockLanguage(editor),
     setText: () => editor.chain().focus().setParagraph().run(),
