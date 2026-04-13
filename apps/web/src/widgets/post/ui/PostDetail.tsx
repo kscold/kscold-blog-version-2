@@ -77,6 +77,7 @@ export function PostDetail({ post }: PostDetailProps) {
 
   const isRestricted = Boolean(resolvedPost.restricted && !resolvedPost.content);
   const isCheckingRestrictedAccess = isRestricted && isAuthenticated && isResolvingAccess;
+  const headerExcerpt = isRestricted ? resolvedPost.excerpt : undefined;
   const accessStatusMessage = useMemo(() => {
     if (role === 'ADMIN') {
       return '관리자 권한으로 열람 가능 여부를 확인하고 있습니다.';
@@ -90,7 +91,7 @@ export function PostDetail({ post }: PostDetailProps) {
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <PostHeader
           title={resolvedPost.title}
-          excerpt={resolvedPost.excerpt}
+          excerpt={headerExcerpt}
           coverImage={resolvedPost.coverImage}
           category={resolvedPost.category}
           author={resolvedPost.author}

@@ -88,6 +88,27 @@ export function promptLinkUrl(editor: Editor | null) {
   editor.chain().focus().setLink({ href: url }).run();
 }
 
+export function promptVideoUrl(editor: Editor | null) {
+  if (!editor) return;
+
+  const url = window.prompt('비디오 URL을 입력하세요 (YouTube, Vimeo, Loom 지원)');
+  if (!url) return;
+
+  editor
+    .chain()
+    .focus()
+    .insertContent([
+      {
+        type: 'paragraph',
+        content: [{ type: 'text', text: url }],
+      },
+      {
+        type: 'paragraph',
+      },
+    ])
+    .run();
+}
+
 export function promptCodeBlockLanguage(editor: Editor | null) {
   if (!editor) return;
 

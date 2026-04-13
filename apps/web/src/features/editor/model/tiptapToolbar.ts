@@ -10,6 +10,7 @@ export type ToolbarButtonConfig = {
 
 interface ToolbarActions {
   addLink: () => void;
+  addVideo: () => void;
   addImage: () => void;
   setCodeBlockLanguage: () => void;
   setText: () => void;
@@ -58,6 +59,11 @@ export function buildPrimaryToolbarButtons(
       title: '링크 삽입',
       active: editor.isActive('link'),
       onClick: actions.addLink,
+    },
+    {
+      label: '비디오',
+      title: '비디오 임베드',
+      onClick: actions.addVideo,
     },
     {
       label: '이미지',

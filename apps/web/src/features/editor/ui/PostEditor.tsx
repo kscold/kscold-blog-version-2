@@ -29,6 +29,7 @@ const DEFAULT_FORM: PostFormData = {
   tagIds: [],
   status: 'DRAFT',
   featured: false,
+  publicOverride: false,
   metaTitle: '',
   metaDescription: '',
   keywords: '',
