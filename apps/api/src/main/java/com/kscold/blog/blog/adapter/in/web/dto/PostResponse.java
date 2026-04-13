@@ -31,6 +31,7 @@ public class PostResponse {
     private Post.Source source;
     private String originalFilename;
     private Boolean featured;
+    private Boolean publicOverride;
     private Boolean restricted;
     private Integer views;
     private Integer likes;
@@ -119,6 +120,7 @@ public class PostResponse {
                 .source(post.getSource())
                 .originalFilename(post.getOriginalFilename())
                 .featured(post.getFeatured())
+                .publicOverride(post.getPublicOverride())
                 .views(post.getViews())
                 .likes(post.getLikes())
                 .seo(post.getSeo() != null ? SeoInfo.builder()
@@ -150,6 +152,7 @@ public class PostResponse {
                 .status(resp.getStatus())
                 .source(resp.getSource())
                 .featured(resp.getFeatured())
+                .publicOverride(resp.getPublicOverride())
                 .restricted(true)
                 .views(resp.getViews())
                 .likes(resp.getLikes())

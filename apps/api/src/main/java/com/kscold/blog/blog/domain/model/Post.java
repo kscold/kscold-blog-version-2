@@ -58,6 +58,9 @@ public class Post {
     private Boolean featured = false;
 
     @Builder.Default
+    private Boolean publicOverride = false;
+
+    @Builder.Default
     private Integer views = 0;
 
     @Builder.Default

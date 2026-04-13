@@ -158,6 +158,9 @@ public class PostController {
 
     private PostResponse applyRestriction(Post post, String userId) {
         if (post.getCategory() == null) return PostResponse.from(post);
+        if (Boolean.TRUE.equals(post.getPublicOverride())) {
+            return PostResponse.from(post);
+        }
         try {
             Category category = categoryUseCase.getById(post.getCategory().getId());
             if (Boolean.TRUE.equals(category.getRestricted())
