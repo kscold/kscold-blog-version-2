@@ -1,8 +1,44 @@
+import React from 'react';
 import type { Components } from 'react-markdown';
+import { getVideoEmbedConfig } from '@/shared/lib/videoEmbed';
+import { VideoEmbed } from '@/shared/ui/VideoEmbed';
 import { MarkdownCodeBlock } from './markdownCodeBlock';
+
+function extractStandaloneLink(children: React.ReactNode) {
+  const childArray = React.Children.toArray(children);
+  if (childArray.length !== 1) return null;
+
+  const onlyChild = childArray[0];
+  if (typeof onlyChild === 'string') {
+    const value = onlyChild.trim();
+    return value.startsWith('http://') || value.startsWith('https://') ? value : null;
+  }
+
+  if (!React.isValidElement<{ href?: string }>(onlyChild)) return null;
+
+  const href = onlyChild.props.href?.trim();
+  if (!href) return null;
+
+  return href.startsWith('http://') || href.startsWith('https://') ? href : null;
+}
 
 export function createMarkdownComponents(isDark: boolean): Components {
   return {
+    p: ({ children }) => {
+      const standaloneLink = extractStandaloneLink(children);
+
+      if (standaloneLink && getVideoEmbedConfig(standaloneLink)) {
+        return <VideoEmbed url={standaloneLink} />;
+      }
+
+      return <p>{children}</p>;
+    },
+    a: ({ href, children }) => (
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        {children}
+      </a>
+    ),
+    strong: ({ children }) => <strong className="markdown-strong">{children}</strong>,
     code(props) {
       const { className, children } = props;
       return <MarkdownCodeBlock className={className} isDark={isDark}>{children}</MarkdownCodeBlock>;

@@ -25,6 +25,7 @@ export function usePostCreate() {
         tagIds: data.tagIds.length > 0 ? data.tagIds : undefined,
         status: data.status === 'ARCHIVED' ? 'DRAFT' : data.status,
         featured: data.featured,
+        publicOverride: data.publicOverride,
         metaTitle: data.metaTitle || undefined,
         metaDescription: data.metaDescription || undefined,
         keywords: keywords.length > 0 ? keywords : undefined,

@@ -5,6 +5,7 @@ export interface PostEditorCategoryOption {
   name: string;
   depth: number;
   icon?: string;
+  restricted?: boolean;
 }
 
 export interface PostEditorSidebarProps {

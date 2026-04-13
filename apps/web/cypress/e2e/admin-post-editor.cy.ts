@@ -75,6 +75,7 @@ function stubEditorApis() {
         slug: 'dev-story',
         depth: 0,
         icon: '✦',
+        restricted: true,
       },
       {
         id: 'cat-2',
@@ -82,6 +83,7 @@ function stubEditorApis() {
         slug: 'frontend',
         depth: 1,
         parent: 'cat-1',
+        restricted: false,
       },
     ]),
   }).as('categories');
@@ -127,10 +129,22 @@ describe('포스트 에디터 반응형 시나리오', () => {
       cy.get('[data-cy="post-editor-title"]').type('노션형 작성기 테스트');
       cy.get('[data-cy="post-editor-sidebar"]').scrollIntoView();
       cy.get('[data-cy="post-editor-category"]').should('be.visible');
+      cy.get('[data-cy="post-editor-public-override"]').should('be.visible');
       cy.get('[data-cy="post-editor-submit"]').scrollIntoView().should('exist');
 
       expectNoHorizontalOverflow(viewport.width);
     });
+  });
+
+  it('시나리오: 제한 카테고리에서도 완전 공개 토글로 요청 없이 바로 공개할 수 있다', () => {
+    cy.viewport(1440, 900);
+    cy.visit('/admin/posts/new');
+    cy.wait(['@categories', '@tags']);
+
+    cy.get('[data-cy="post-editor-category"]').select('cat-1');
+    cy.contains('현재 제한 카테고리라서 기본적으로 열람 요청이 필요합니다.').should('be.visible');
+    cy.get('[data-cy="post-editor-public-override"]').check({ force: true });
+    cy.contains('현재 제한 카테고리지만, 이 글은 완전 공개로 우선 적용됩니다.').should('be.visible');
   });
 
   it('시나리오: 작성기는 코드 블록 언어를 지정하면 미리보기에서 올바르게 인식한다', () => {
@@ -182,5 +196,19 @@ describe('포스트 에디터 반응형 시나리오', () => {
     cy.get('[data-code-language="mermaid"]', { timeout: 10000 }).should('be.visible');
     cy.get('[data-mermaid-status="rendered"]', { timeout: 20000 }).should('be.visible');
     cy.get('.mermaid-diagram svg', { timeout: 20000 }).should('be.visible');
+  });
+
+  it('시나리오: 작성기는 비디오 링크를 노션처럼 임베드 미리보기한다', () => {
+    cy.viewport(1440, 900);
+    cy.visit('/admin/posts/new');
+    cy.wait(['@categories', '@tags']);
+
+    cy.window().then(win => {
+      cy.stub(win, 'prompt').returns('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    });
+
+    cy.contains('button', '비디오').click();
+    cy.get('[data-cy="post-editor-view-preview"]').click();
+    cy.get('iframe[data-video-provider="youtube"]', { timeout: 10000 }).should('be.visible');
   });
 });

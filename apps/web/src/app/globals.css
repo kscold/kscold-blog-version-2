@@ -242,6 +242,42 @@
   .mermaid-diagram-wrapper {
     -webkit-overflow-scrolling: touch;
   }
+
+  .markdown-prose {
+    text-wrap: pretty;
+  }
+
+  .markdown-prose p,
+  .markdown-prose li,
+  .markdown-prose blockquote {
+    letter-spacing: -0.012em;
+    line-height: 1.92;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  .markdown-prose h1,
+  .markdown-prose h2,
+  .markdown-prose h3,
+  .markdown-prose h4 {
+    letter-spacing: -0.03em;
+    line-height: 1.25;
+    word-break: keep-all;
+  }
+
+  .markdown-prose .markdown-strong {
+    font-weight: 760;
+    letter-spacing: -0.018em;
+    color: inherit;
+  }
+
+  .markdown-prose h1 > .markdown-strong,
+  .markdown-prose h2 > .markdown-strong,
+  .markdown-prose h3 > .markdown-strong,
+  .markdown-prose h4 > .markdown-strong {
+    font-weight: inherit;
+    letter-spacing: inherit;
+  }
 }
 
 @layer utilities {

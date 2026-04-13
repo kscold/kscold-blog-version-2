@@ -8,6 +8,7 @@ export interface PostFormData {
   tagIds: string[];
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   featured: boolean;
+  publicOverride: boolean;
   metaTitle: string;
   metaDescription: string;
   keywords: string;

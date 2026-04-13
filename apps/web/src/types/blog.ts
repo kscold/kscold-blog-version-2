@@ -41,6 +41,7 @@ export interface Post {
   source?: 'MANUAL' | 'MARKDOWN_IMPORT';
   originalFilename?: string;
   featured: boolean;
+  publicOverride?: boolean;
   restricted?: boolean;
   views: number;
   likes: number;
@@ -72,6 +73,7 @@ export interface PostCreateRequest {
   tagIds?: string[];
   status?: 'DRAFT' | 'PUBLISHED';
   featured?: boolean;
+  publicOverride?: boolean;
   metaTitle?: string;
   metaDescription?: string;
   keywords?: string[];
@@ -89,6 +91,7 @@ export interface PostUpdateRequest {
   tagIds?: string[];
   status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   featured?: boolean;
+  publicOverride?: boolean;
   metaTitle?: string;
   metaDescription?: string;
   keywords?: string[];
