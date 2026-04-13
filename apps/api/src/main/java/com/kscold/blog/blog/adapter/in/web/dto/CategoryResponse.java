@@ -32,6 +32,7 @@ public class CategoryResponse {
     private Integer order;
     private String icon;
     private String color;
+    private Boolean restricted;
     private Integer postCount;
     @Builder.Default
     private List<CategoryResponse> children = new ArrayList<>();
@@ -53,6 +54,7 @@ public class CategoryResponse {
                 .order(category.getOrder())
                 .icon(category.getIcon())
                 .color(category.getColor())
+                .restricted(category.getRestricted())
                 .postCount(category.getPostCount())
                 .children(new ArrayList<>())
                 .createdAt(category.getCreatedAt())

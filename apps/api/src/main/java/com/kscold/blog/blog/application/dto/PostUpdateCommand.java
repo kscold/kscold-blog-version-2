@@ -35,6 +35,8 @@ public class PostUpdateCommand {
 
     private Boolean featured;
 
+    private Boolean publicOverride;
+
     private String metaTitle;
 
     private String metaDescription;

@@ -39,6 +39,8 @@ public class PostCreateCommand {
 
     private Boolean featured = false;
 
+    private Boolean publicOverride = false;
+
     private String metaTitle;
 
     private String metaDescription;
