@@ -45,7 +45,7 @@ export function AdminNightCalendar({ slots }: AdminNightCalendarProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
         {slots.map((slot) => (
           <article
             key={slot.id}
