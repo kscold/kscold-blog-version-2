@@ -30,6 +30,7 @@ public class ChatController {
             @AuthenticationPrincipal String userId,
             @RequestParam(defaultValue = "50") int limit
     ) {
+        chatUseCase.markAdminMessagesRead(userId);
         return ResponseEntity.ok(ApiResponse.success(chatUseCase.getRecentMessagesByRoom(userId, limit)));
     }
 

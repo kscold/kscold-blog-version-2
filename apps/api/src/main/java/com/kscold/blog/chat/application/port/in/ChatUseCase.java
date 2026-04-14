@@ -1,10 +1,12 @@
 package com.kscold.blog.chat.application.port.in;
 
 import com.kscold.blog.chat.application.dto.ChatRoomSummaryDto;
+import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ChatUseCase {
@@ -23,4 +25,10 @@ public interface ChatUseCase {
     Page<ChatMessage> getAllMessages(Pageable pageable);
 
     List<ChatRoomSummaryDto> getAllRooms();
+
+    void markAdminMessagesRead(String roomId);
+
+    List<ChatMessageRepository.PendingAdminReminder> getPendingAdminReminders(LocalDateTime unreadBefore);
+
+    void markReminderSent(String roomId, LocalDateTime unreadBefore);
 }

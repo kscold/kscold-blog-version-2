@@ -77,6 +77,12 @@ account-recovery:
   from-name: ${MAIL_FROM_NAME:KSCOLD}
   password-reset-expiry-minutes: ${PASSWORD_RESET_EXPIRY_MINUTES:30}
 
+chat:
+  reminder:
+    enabled: ${CHAT_REMINDER_ENABLED:true}
+    fixed-delay-ms: ${CHAT_REMINDER_FIXED_DELAY_MS:300000}
+    unread-threshold-minutes: ${CHAT_REMINDER_THRESHOLD_MINUTES:30}
+
 # Logging
 logging:
   level:

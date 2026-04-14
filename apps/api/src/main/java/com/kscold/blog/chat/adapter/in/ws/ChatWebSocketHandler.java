@@ -43,6 +43,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
 
             broadcastToUserSessions(roomId, msg);
             broadcastToAdmins(msg);
+            if (hasActiveUserSession(roomId)) {
+                chatUseCase.markAdminMessagesRead(roomId);
+            }
         });
     }
 
@@ -64,6 +67,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
             // 어드민: 현재 접속 중인 방문자 목록 전송
             sendRoomList(session);
         } else {
+            chatUseCase.markAdminMessagesRead(userId);
             // 방문자: 자신의 방 히스토리 전송
             List<ChatMessage> history = chatUseCase.getRecentMessagesByRoom(userId, 50);
             List<Map<String, Object>> historyList = history.stream().map(this::toMessageMap).toList();
@@ -118,6 +122,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
             Map<String, Object> msg = toMessageMap(saved);
             broadcastToUserSessions(toUserId, msg);
             broadcastToAdmins(msg);
+            if (hasActiveUserSession(toUserId)) {
+                chatUseCase.markAdminMessagesRead(toUserId);
+            }
 
             // 웹 어드민 답장도 디스코드에 로깅
             discordBridge.sendAdminReplyToDiscord(toUserId, info.username(), content.trim());
@@ -159,6 +166,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         sessions.values().stream()
                 .filter(i -> !i.isAdmin() && userId.equals(i.userId()))
                 .forEach(i -> sendToSession(i.session(), payload));
+    }
+
+    private boolean hasActiveUserSession(String userId) {
+        return sessions.values().stream()
+                .anyMatch(i -> !i.isAdmin() && userId.equals(i.userId()) && i.session().isOpen());
     }
 
     private void sendRoomList(WebSocketSession session) {
