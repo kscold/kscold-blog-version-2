@@ -197,8 +197,7 @@ describe('UI 레이아웃 캡처 시나리오', () => {
     cy.viewport(390, 844);
     seedAdminSession();
 
-    cy.visit('/admin');
-    cy.wait(['@categories', '@tags', '@adminPosts', '@feedsSummary', '@vaultSummary', '@chatRooms', '@userStats']);
+    cy.visit('/admin/testing');
     expectNoHorizontalOverflow(390);
     cy.screenshot('layout-audit-admin-mobile');
 
@@ -228,8 +227,7 @@ describe('UI 레이아웃 캡처 시나리오', () => {
     cy.viewport(1440, 900);
     seedAdminSession();
 
-    cy.visit('/admin');
-    cy.wait(['@categories', '@tags', '@adminPosts', '@feedsSummary', '@vaultSummary', '@chatRooms', '@userStats']);
+    cy.visit('/admin/testing');
     expectNoHorizontalOverflow(1440);
     cy.screenshot('layout-audit-admin-desktop');
 
