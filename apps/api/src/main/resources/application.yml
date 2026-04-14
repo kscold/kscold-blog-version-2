@@ -83,6 +83,10 @@ chat:
     fixed-delay-ms: ${CHAT_REMINDER_FIXED_DELAY_MS:300000}
     unread-threshold-minutes: ${CHAT_REMINDER_THRESHOLD_MINUTES:30}
 
+admin-night:
+  admin-email: ${ADMIN_NIGHT_ADMIN_EMAIL:developerkscold@gmail.com}
+  admin-name: ${ADMIN_NIGHT_ADMIN_NAME:김승찬}
+
 # Logging
 logging:
   level:
