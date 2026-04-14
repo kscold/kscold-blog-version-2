@@ -21,13 +21,13 @@ export function AdminNightPromoSection() {
             Admin Night
           </p>
           <h2 className="text-3xl font-black tracking-tight text-surface-900">
-            술 대신 각자 할 일을 들고 모이는
+            퇴근 후, 각자 할 일을 끝내는
             <br />
             조용한 작업의 밤
           </h2>
           <p className="max-w-2xl text-sm leading-7 text-surface-500 sm:text-base">
-            퇴근 후나 주말에 카페나 집에서 각자 밀린 일을 끝내는 느슨한 작업 문화입니다. 참가 의사는 마치 PR처럼 먼저
-            보내고, 승인되면 merge 혹은 meet해서 실제 카공으로 이어지는 컨셉으로 열어두고 있습니다.
+            메일 답장, 블로그 초안, 작은 버그 수정처럼 미뤄둔 개인 잡무를 조용히 끝내는 각할모 공간입니다. 같은
+            시간대에 몰입한다는 감각만으로도 미뤄둔 일을 훨씬 쉽게 시작할 수 있습니다.
           </p>
         </div>
 
@@ -37,9 +37,9 @@ export function AdminNightPromoSection() {
               Tonight Flow
             </p>
             <p className="text-lg font-black leading-7">
-              메일 한 통, 초안 한 개, 작은 버그 하나.
+              신청 PR을 보내고 승인되면
               <br />
-              오늘 밤 끝낼 일만 들고 오면 충분합니다.
+              merge / meet 흐름으로 실제 만남이 이어집니다.
             </p>
           </div>
 
@@ -51,7 +51,7 @@ export function AdminNightPromoSection() {
               Admin Night 보러 가기
             </Link>
             <Link
-              href="/admin-night?chat=open"
+              href="/admin-night#admin-night-request"
               className="inline-flex items-center justify-center rounded-2xl border border-white/15 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10"
             >
               참가 의사 보내기
