@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Post } from '@/types/blog';
 
@@ -21,9 +22,10 @@ interface DashboardStatsProps {
   stats: StatItem[];
   quickActions: QuickAction[];
   recentPosts: Post[];
+  adminNightBoard?: ReactNode;
 }
 
-export function DashboardStats({ stats, quickActions, recentPosts }: DashboardStatsProps) {
+export function DashboardStats({ stats, quickActions, recentPosts, adminNightBoard }: DashboardStatsProps) {
   return (
     <>
       <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -79,6 +81,8 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
           ))}
         </div>
       </div>
+
+      {adminNightBoard}
 
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3">
