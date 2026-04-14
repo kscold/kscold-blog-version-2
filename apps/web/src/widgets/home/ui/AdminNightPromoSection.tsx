@@ -26,8 +26,8 @@ export function AdminNightPromoSection() {
             조용한 작업의 밤
           </h2>
           <p className="max-w-2xl text-sm leading-7 text-surface-500 sm:text-base">
-            퇴근 후나 주말에 카페나 집에서 각자 밀린 일을 끝내고, 가능하면 기록이나 PR까지 남기는 느슨한 작업 문화입니다.
-            블로그 안에서는 이 흐름을 소개하고, 바로 이어갈 수 있는 링크도 함께 열어둡니다.
+            퇴근 후나 주말에 카페나 집에서 각자 밀린 일을 끝내는 느슨한 작업 문화입니다. 참가 의사는 마치 PR처럼 먼저
+            보내고, 승인되면 merge 혹은 meet해서 실제 카공으로 이어지는 컨셉으로 열어두고 있습니다.
           </p>
         </div>
 
@@ -51,10 +51,10 @@ export function AdminNightPromoSection() {
               Admin Night 보러 가기
             </Link>
             <Link
-              href="/guestbook"
+              href="/admin-night?chat=open"
               className="inline-flex items-center justify-center rounded-2xl border border-white/15 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10"
             >
-              같이 붙고 싶다면 한 줄 남기기
+              참가 의사 보내기
             </Link>
           </div>
         </div>
