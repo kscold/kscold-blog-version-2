@@ -3,6 +3,8 @@ package com.kscold.blog.identity.application.service;
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.identity.adapter.out.mail.RecoveryEmailComposer;
 import com.kscold.blog.identity.adapter.out.mail.RecoveryMailProperties;
+import com.kscold.blog.identity.application.dto.AuthResult;
+import com.kscold.blog.identity.application.dto.RegisterCommand;
 import com.kscold.blog.identity.application.dto.PasswordResetTokenStatus;
 import com.kscold.blog.identity.application.port.out.RecoveryMailMessage;
 import com.kscold.blog.identity.application.port.out.RecoveryMailSender;
@@ -32,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,6 +64,42 @@ class AuthApplicationServiceTest {
 
     @InjectMocks
     private AuthApplicationService authApplicationService;
+
+    @Test
+    @DisplayName("시나리오: 회원가입이 완료되면 폼 흐름을 깨지 않고 환영 메일을 보낸다")
+    void registerSendsWelcomeMailWithoutBlockingSignup() {
+        RegisterCommand command = new RegisterCommand(
+                "hello@example.com",
+                "hello",
+                "password-123",
+                "헬로"
+        );
+        RecoveryMailMessage welcomeMail = new RecoveryMailMessage(
+                command.getEmail(),
+                "[KSCOLD] 가입을 환영합니다",
+                "plain",
+                "<html></html>"
+        );
+
+        when(userRepository.existsByEmail(command.getEmail())).thenReturn(false);
+        when(userRepository.existsByUsername(command.getUsername())).thenReturn(false);
+        when(userRepository.count()).thenReturn(1L);
+        when(passwordEncoder.encode(command.getPassword())).thenReturn("encoded-password");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            user.setId("user-1");
+            return user;
+        });
+        when(tokenProvider.createAccessToken("user-1", "USER")).thenReturn("access-token");
+        when(tokenProvider.createRefreshToken("user-1", "USER")).thenReturn("refresh-token");
+        when(recoveryMailSender.isAvailable()).thenReturn(true);
+        when(recoveryEmailComposer.buildWelcome(any(User.class))).thenReturn(welcomeMail);
+
+        AuthResult result = authApplicationService.register(command);
+
+        assertThat(result.getUser().getEmail()).isEqualTo(command.getEmail());
+        verify(recoveryMailSender).send(welcomeMail);
+    }
 
     @Test
     @DisplayName("시나리오: 아이디 찾기는 가입한 이메일이 있으면 안내 메일을 보낸다")
@@ -154,6 +193,35 @@ class AuthApplicationServiceTest {
         assertThatThrownBy(() -> authApplicationService.sendUsernameReminder("kscold@example.com"))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("SMTP 설정");
+    }
+
+    @Test
+    @DisplayName("시나리오: SMTP가 없어도 회원가입 자체는 완료된다")
+    void registerCompletesWithoutMailSender() {
+        RegisterCommand command = new RegisterCommand(
+                "hello@example.com",
+                "hello",
+                "password-123",
+                "헬로"
+        );
+
+        when(userRepository.existsByEmail(command.getEmail())).thenReturn(false);
+        when(userRepository.existsByUsername(command.getUsername())).thenReturn(false);
+        when(userRepository.count()).thenReturn(1L);
+        when(passwordEncoder.encode(command.getPassword())).thenReturn("encoded-password");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            user.setId("user-1");
+            return user;
+        });
+        when(tokenProvider.createAccessToken("user-1", "USER")).thenReturn("access-token");
+        when(tokenProvider.createRefreshToken("user-1", "USER")).thenReturn("refresh-token");
+        when(recoveryMailSender.isAvailable()).thenReturn(false);
+
+        AuthResult result = authApplicationService.register(command);
+
+        assertThat(result.getUser().getUsername()).isEqualTo(command.getUsername());
+        verify(recoveryMailSender, never()).send(any());
     }
 
     @Test
