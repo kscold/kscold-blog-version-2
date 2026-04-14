@@ -27,7 +27,8 @@ function LinkCard() {
           </p>
           <p>
             오래 이야기하지 않아도 괜찮고, 같은 시간대에 각자 할 일을 한다는 감각만으로도 시작이 쉬워집니다.
-            가능하면 마지막엔 기록이나 PR까지 남기는 걸 목표로 합니다.
+            여기서 말하는 PR은 코드 PR이라기보다 참가 의사를 보내는 비유에 가깝고, 제가 승인하면 merge 혹은 meet해서
+            실제 카공으로 이어지는 흐름을 상상하고 있습니다.
           </p>
         </div>
       </section>
@@ -99,7 +100,7 @@ export function AdminNightPage() {
 
   return (
     <main className="min-h-screen px-4 pb-20 pt-28 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl space-y-8">
+      <div className="mx-auto max-w-[1440px] space-y-8">
         <section className="overflow-hidden rounded-[32px] border border-surface-200 bg-white shadow-sm">
           <div className="border-b border-surface-200 bg-[radial-gradient(circle_at_top_left,_rgba(15,23,42,0.08),_transparent_46%),linear-gradient(180deg,_rgba(248,250,252,0.96),_rgba(255,255,255,1))] px-5 py-8 sm:px-8 sm:py-10">
             <div className="max-w-4xl space-y-4">
@@ -111,11 +112,17 @@ export function AdminNightPage() {
                 <br />
                 각자 할 일을 끝내는 밤
               </h1>
-              <p className="max-w-3xl text-base leading-8 text-surface-500 sm:text-lg">
-                {PROFILE.name}이 퇴근 후나 주말에 열어두는 느슨한 작업 문화입니다. 메일 답장, 문서 정리,
-                블로그 초안, 작은 버그, 사이드 프로젝트처럼 혼자 미루던 일을 조용히 끝내고, 가능하면 기록이나 PR까지
-                남기는 흐름을 권합니다.
-              </p>
+              <div className="max-w-3xl space-y-3 text-base leading-8 text-surface-500 sm:text-lg">
+                <p>
+                  Admin Night는 {PROFILE.name}과 같이 퇴근 후나 주말에 붙어서, 메일 답장, 블로그 초안, 작은 버그,
+                  문서 정리처럼 미뤄둔 일을 조용히 끝내는 문화 페이지입니다.
+                </p>
+                <p>
+                  오래 이야기하지 않아도 괜찮고, 같은 시간대에 각자 할 일을 한다는 감각만으로도 시작이 쉬워집니다.
+                  내가 말하는 PR은 코드 PR이라기보다 참가 신청의 비유이고, 제가 승인하면 merge 혹은 meet해서 실제
+                  카공으로 이어지는 흐름입니다.
+                </p>
+              </div>
               <div className="flex flex-wrap gap-2 pt-1">
                 {ADMIN_NIGHT_TAGS.map((tag) => (
                   <span
@@ -128,27 +135,25 @@ export function AdminNightPage() {
               </div>
               <div className="flex flex-col gap-3 pt-3 sm:flex-row">
                 <Link
-                  href="https://github.com/kscold/kscold-blog-version-2"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/admin-night?chat=open"
                   data-cy="admin-night-hero-primary"
                   className="inline-flex items-center justify-center rounded-2xl bg-surface-900 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-surface-800"
                 >
-                  블로그 레포 보러 가기
+                  Admin Night 신청 보내기
                 </Link>
                 <Link
-                  href="/feed"
+                  href="/guestbook"
                   data-cy="admin-night-hero-secondary"
                   className="inline-flex items-center justify-center rounded-2xl border border-surface-200 bg-white px-6 py-3 text-sm font-bold text-surface-900 transition-colors hover:bg-surface-50"
                 >
-                  지금 작업 흐름 피드에 남기기
+                  방명록에 한 줄 남기기
                 </Link>
               </div>
             </div>
           </div>
         </section>
 
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.95fr)]">
+        <div className="grid gap-4 2xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.9fr)]">
           <AdminNightCalendar slots={slots} />
           <LinkCard />
         </div>
