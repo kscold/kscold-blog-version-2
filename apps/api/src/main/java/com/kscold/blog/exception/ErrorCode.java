@@ -16,6 +16,7 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "E001", "잘못된 입력값입니다"),
     INVALID_TYPE_VALUE(HttpStatus.BAD_REQUEST, "E002", "잘못된 타입입니다"),
     MISSING_INPUT_VALUE(HttpStatus.BAD_REQUEST, "E003", "필수 입력값이 누락되었습니다"),
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "E004", "지원하지 않는 요청 방식입니다"),
 
     // 401 인증 필요
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "E101", "인증이 필요합니다"),
