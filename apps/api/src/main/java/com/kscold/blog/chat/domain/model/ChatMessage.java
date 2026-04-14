@@ -37,6 +37,10 @@ public class ChatMessage {
 
     private LocalDateTime timestamp;
 
+    private LocalDateTime visitorReadAt;
+
+    private LocalDateTime reminderSentAt;
+
     public enum MessageType {
         TEXT, SYSTEM
     }

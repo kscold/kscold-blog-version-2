@@ -103,6 +103,103 @@ public class RecoveryEmailComposer {
         );
     }
 
+    public RecoveryMailMessage buildWelcome(User user) {
+        String loginUrl = recoveryMailProperties.resolvePublicUrl("/login");
+        String subject = "[KSCOLD] 가입을 환영합니다";
+        String preview = user.getDisplayName() + "님의 가입이 완료되었습니다.";
+        String summary = "김승찬의 블로그에서 일상과 기술, 작업 기록을 지금부터 편하게 둘러보세요.";
+        String body = """
+                가입이 정상적으로 완료되었습니다.
+                이제 블로그 글, 피드, Vault 노트, 방명록, 채팅 기능을 현재 계정으로 바로 이용하실 수 있습니다.
+                """;
+        String details = """
+                <tr>
+                  <td style="padding:0 32px 24px;">
+                    <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E2E8F0; border-radius:20px; background-color:#F8FAFC;">
+                      <tr>
+                        <td style="padding:20px 22px;">
+                          <p style="margin:0 0 8px; font-size:12px; line-height:18px; letter-spacing:0.18em; color:#94A3B8; font-weight:700;">WELCOME</p>
+                          <p style="margin:0 0 8px; font-size:14px; line-height:24px; color:#475569;">가입 계정</p>
+                          <p style="margin:0; font-size:22px; line-height:30px; font-weight:800; color:#0F172A;">%s</p>
+                          <p style="margin:6px 0 0; font-size:14px; line-height:22px; color:#64748B;">아이디 %s 로 바로 로그인할 수 있습니다.</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                """.formatted(escapeHtml(user.getEmail()), escapeHtml(user.getUsername()));
+
+        String plainText = """
+                %s님, 가입을 환영합니다.
+
+                가입한 이메일: %s
+                아이디: %s
+
+                로그인:
+                %s
+                """.formatted(user.getDisplayName(), user.getEmail(), user.getUsername(), loginUrl);
+
+        return new RecoveryMailMessage(
+                user.getEmail(),
+                subject,
+                plainText,
+                buildTemplate(preview, "가입을 환영합니다", summary, body, details, loginUrl, "로그인 바로가기")
+        );
+    }
+
+    public RecoveryMailMessage buildUnreadChatReminder(
+            User user,
+            String adminName,
+            String latestContent,
+            long unreadCount,
+            String actionUrl
+    ) {
+        String subject = "[KSCOLD] 새 답장이 도착했습니다";
+        String preview = "관리자가 남긴 답장이 아직 확인되지 않았습니다.";
+        String summary = "채팅에 새 답장이 있어요. 아래에서 바로 확인할 수 있습니다.";
+        String body = """
+                관리자가 남긴 새 답장이 아직 읽히지 않아 한 번 더 알려드립니다.
+                답장이 쌓이기 전에 아래 버튼으로 들어와 이어서 확인해 주세요.
+                """;
+        String details = """
+                <tr>
+                  <td style="padding:0 32px 24px;">
+                    <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E2E8F0; border-radius:20px; background-color:#F8FAFC;">
+                      <tr>
+                        <td style="padding:20px 22px;">
+                          <p style="margin:0 0 8px; font-size:12px; line-height:18px; letter-spacing:0.18em; color:#94A3B8; font-weight:700;">CHAT UPDATE</p>
+                          <p style="margin:0 0 8px; font-size:14px; line-height:24px; color:#475569;">최근 답장</p>
+                          <p style="margin:0 0 12px; font-size:20px; line-height:30px; font-weight:800; color:#0F172A;">%s님의 새 답장 %d건</p>
+                          <p style="margin:0; font-size:14px; line-height:24px; color:#64748B;">%s</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                """.formatted(
+                escapeHtml(adminName),
+                unreadCount,
+                truncateForMail(latestContent, 140)
+        );
+
+        String plainText = """
+                %s님, 관리자가 남긴 새 답장 %d건이 아직 확인되지 않았습니다.
+
+                최근 답장:
+                %s
+
+                채팅 열기:
+                %s
+                """.formatted(user.getDisplayName(), unreadCount, latestContent, actionUrl);
+
+        return new RecoveryMailMessage(
+                user.getEmail(),
+                subject,
+                plainText,
+                buildTemplate(preview, "새 답장을 확인해 주세요", summary, body, details, actionUrl, "채팅 확인하기")
+        );
+    }
+
     private String buildTemplate(
             String previewText,
             String title,
@@ -225,5 +322,13 @@ public class RecoveryEmailComposer {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    private String truncateForMail(String value, int maxLength) {
+        String escaped = escapeHtml(value);
+        if (escaped.length() <= maxLength) {
+            return escaped;
+        }
+        return escaped.substring(0, maxLength - 1) + "…";
     }
 }

@@ -44,6 +44,7 @@ public class ChatApplicationService implements ChatUseCase {
                 .type(type)
                 .fromAdmin(fromAdmin)
                 .timestamp(LocalDateTime.now())
+                .visitorReadAt(fromAdmin ? null : LocalDateTime.now())
                 .build();
         return chatMessageRepository.save(message);
     }
@@ -80,5 +81,22 @@ public class ChatApplicationService implements ChatUseCase {
                         s.roomId(), s.username(), s.lastMessage(),
                         s.lastTimestamp(), s.messageCount()))
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void markAdminMessagesRead(String roomId) {
+        chatMessageRepository.markAdminMessagesRead(roomId, LocalDateTime.now());
+    }
+
+    @Override
+    public List<ChatMessageRepository.PendingAdminReminder> getPendingAdminReminders(LocalDateTime unreadBefore) {
+        return chatMessageRepository.findPendingAdminReminders(unreadBefore);
+    }
+
+    @Override
+    @Transactional
+    public void markReminderSent(String roomId, LocalDateTime unreadBefore) {
+        chatMessageRepository.markReminderSent(roomId, unreadBefore, LocalDateTime.now());
     }
 }

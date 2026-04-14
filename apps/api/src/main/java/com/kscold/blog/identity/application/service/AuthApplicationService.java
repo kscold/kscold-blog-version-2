@@ -66,6 +66,7 @@ public class AuthApplicationService implements AuthUseCase {
                 .build();
 
         user = userRepository.save(user);
+        sendWelcomeMailSafely(user);
 
         String accessToken = tokenProvider.createAccessToken(user.getId(), user.getRole().name());
         String refreshToken = tokenProvider.createRefreshToken(user.getId(), user.getRole().name());
@@ -207,6 +208,18 @@ public class AuthApplicationService implements AuthUseCase {
                     ErrorCode.INTERNAL_SERVER_ERROR,
                     "이메일 발송 설정이 아직 준비되지 않았습니다. SMTP 설정을 확인해주세요."
             );
+        }
+    }
+
+    private void sendWelcomeMailSafely(User user) {
+        if (!recoveryMailSender.isAvailable()) {
+            return;
+        }
+
+        try {
+            recoveryMailSender.send(recoveryEmailComposer.buildWelcome(user));
+        } catch (Exception exception) {
+            log.warn("Welcome email delivery skipped for {}", user.getEmail(), exception);
         }
     }
 
