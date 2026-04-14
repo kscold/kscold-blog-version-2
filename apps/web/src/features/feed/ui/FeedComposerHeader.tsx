@@ -17,10 +17,10 @@ export function FeedComposerHeader({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-surface-400">
-                Share a Note
+                SHARE A NOTE
               </p>
-              <h2 className="mt-2 text-2xl font-black tracking-tight text-surface-900 sm:text-3xl">
-                {currentUser.displayName}님, 지금의 흐름을 남겨보세요
+              <h2 className="mt-2 max-w-[18ch] text-balance text-2xl font-black tracking-tight text-surface-900 sm:max-w-[22ch] sm:text-3xl">
+                {currentUser.displayName}님, 지금 하고 있는 흐름을 남겨보세요
               </h2>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -32,8 +32,8 @@ export function FeedComposerHeader({
               </span>
             </div>
           </div>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-surface-500">
-            짧은 문장, 작업 캡처, 참고 링크를 한 흐름으로 남길 수 있는 피드 작성 공간을 제공합니다.
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-surface-500 [overflow-wrap:anywhere]">
+            짧은 메모, 작업 캡처, 참고 링크를 한 흐름으로 묶어두는 기록 공간입니다.
           </p>
         </div>
       </div>

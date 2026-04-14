@@ -157,6 +157,15 @@ describe('공개 피드 작성기 시나리오', () => {
       cy.wait(['@authMe', '@feeds']);
 
       cy.get('[data-cy="feed-composer"]').should('be.visible');
+      cy.contains('지금 흐름 남기기').should('be.visible');
+      cy.contains('이미지 바로 첨부').should('be.visible');
+      cy.contains('링크 함께 정리').should('be.visible');
+      cy.get('[data-cy="feed-composer-link-input"]').should('not.exist');
+      cy.contains('링크와 이미지 더하기').should('be.visible').click();
+      cy.get('[data-cy="feed-composer-link-input"]').should('be.visible');
+      cy.contains('링크와 이미지 패널 닫기').should('be.visible').click();
+      cy.get('[data-cy="feed-composer-link-input"]').should('not.exist');
+
       cy.get('[data-cy="feed-composer-content"]').should('be.visible').type('공개 피드 작성기 시나리오를 점검합니다.');
       cy.get('[data-cy="feed-composer-link-input"]').should('be.visible').type('https://kscold.com/info/team');
       cy.wait('@linkPreview');

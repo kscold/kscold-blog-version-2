@@ -58,7 +58,7 @@ export function FeedComposerActions({
           data-cy="feed-composer-toggle"
           className="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-white px-4 py-2 text-sm font-semibold text-surface-500 transition-colors hover:text-surface-900"
         >
-          {shouldShowExpanded ? '보조 패널 접기' : '링크와 이미지 패널 열기'}
+          {shouldShowExpanded ? '링크와 이미지 패널 닫기' : '링크와 이미지 더하기'}
         </button>
 
         {hasDraft ? (
