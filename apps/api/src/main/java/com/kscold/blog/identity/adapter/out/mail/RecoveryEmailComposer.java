@@ -190,7 +190,7 @@ public class RecoveryEmailComposer {
                             </tr>
                             <tr>
                               <td style="padding:18px 12px 0; text-align:center;">
-                                <p style="margin:0; font-size:12px; line-height:20px; color:#94A3B8;">KSCOLD BLOG · Colding에서 제품을 만들고 운영하는 김승찬의 개인 기술 블로그</p>
+                                <p style="margin:0; font-size:12px; line-height:20px; color:#94A3B8;">KSCOLD BLOG · 김승찬의 블로그, 일상과 기술 그리고 작업 기록을 전합니다.</p>
                               </td>
                             </tr>
                           </table>
