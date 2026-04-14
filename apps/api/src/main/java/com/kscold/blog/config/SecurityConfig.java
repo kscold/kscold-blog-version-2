@@ -65,7 +65,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/guestbook/**").permitAll()
                         // Vault 공개 엔드포인트
                         .requestMatchers(HttpMethod.GET, "/api/vault/**").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/refresh",
+                                "/api/auth/recover-username",
+                                "/api/auth/request-password-reset",
+                                "/api/auth/reset-password",
+                                "/api/auth/password-reset/validate"
+                        ).permitAll()
                         .requestMatchers("/api/health").permitAll()
                         // 팀 내부 문서 (자체 비밀번호 검증)
                         .requestMatchers(HttpMethod.POST, "/api/team/private").permitAll()
