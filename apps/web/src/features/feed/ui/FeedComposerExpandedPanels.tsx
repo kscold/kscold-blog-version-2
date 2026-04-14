@@ -45,8 +45,8 @@ export function FeedComposerExpandedPanels({
                 className="rounded-[24px] border border-dashed border-surface-200 bg-white px-5 py-8 text-center"
               >
                 <p className="text-base font-semibold text-surface-900">아직 첨부된 이미지가 없습니다</p>
-                <p className="mt-2 text-sm leading-relaxed text-surface-500">
-                  아래 버튼으로 이미지를 추가하거나, 본문에 붙여넣어서 바로 업로드할 수 있습니다.
+                <p className="mt-2 text-sm leading-6 text-surface-500">
+                  아래 버튼으로 이미지를 고르거나, 본문에 붙여넣어서 바로 올릴 수 있습니다.
                 </p>
               </div>
             )}
@@ -58,8 +58,8 @@ export function FeedComposerExpandedPanels({
           >
             <div className="mb-3">
               <p className="text-sm font-semibold text-surface-900">링크 미리보기</p>
-              <p className="mt-1 text-sm text-surface-500">
-                참고 자료나 공유하고 싶은 페이지가 있다면 링크와 함께 남겨 주세요.
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-surface-500">
+                참고 자료나 함께 보고 싶은 페이지가 있다면 링크를 붙여 주세요.
               </p>
             </div>
             <input
@@ -69,7 +69,7 @@ export function FeedComposerExpandedPanels({
                 onLinkUrlChange(event.target.value);
                 onExpand();
               }}
-              placeholder="https://example.com"
+              placeholder="링크를 붙여 넣으면 미리보기가 바로 준비됩니다."
               data-cy="feed-composer-link-input"
               className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
             />
