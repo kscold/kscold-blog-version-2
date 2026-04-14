@@ -47,24 +47,24 @@ const SLOT_TEMPLATES = [
 
 export const ADMIN_NIGHT_STEPS: AdminNightStep[] = [
   {
-    id: 'one-task',
-    title: '끝낼 일 하나만 들고 오기',
-    description: '밀린 메일, 문서 정리, 블로그 초안, 작은 버그 하나처럼 오늘 마감할 일을 고릅니다.',
+    id: 'pick-task',
+    title: '끝낼 일과 가능한 시간대 정하기',
+    description: '밀린 메일, 문서 정리, 블로그 초안, 작은 버그처럼 오늘 같이 붙어 끝내고 싶은 일을 먼저 고릅니다.',
   },
   {
-    id: 'quiet-focus',
-    title: '잠깐 이야기한 뒤 각자 몰입하기',
-    description: '술 약속 대신 카페나 집에서 각자 작업하고, 같은 시간대에 붙어 있다는 감각만 유지합니다.',
+    id: 'request-pr',
+    title: '참가 의사를 PR처럼 보내기',
+    description: '어드민 나이트에 붙고 싶다는 메시지를 먼저 보내고, 같이 보고 싶은 작업 맥락을 짧게 남깁니다.',
   },
   {
-    id: 'ship-something',
-    title: '끝나면 기록이나 링크 남기기',
-    description: '정리한 결과는 피드, 방명록, 이슈 링크처럼 흔적이 남는 방식으로 마무리합니다.',
+    id: 'merge-meet',
+    title: '승인되면 Merge / Meet',
+    description: '김승찬이 확인하고 승인하면 실제로 같은 시간대에 붙어서 카공하거나 흐름을 맞춰 작업합니다.',
   },
   {
-    id: 'send-pr',
-    title: '가능하면 PR까지 보내기',
-    description: '혼자 미루던 작업이라도 작은 수정부터 공개 저장소나 문서 제안으로 이어가는 걸 권합니다.',
+    id: 'leave-trace',
+    title: '끝나면 흔적 남기기',
+    description: '작업이 끝나면 피드, 방명록, 링크 메모처럼 기록을 남기고, 가능하면 코드 PR도 자연스럽게 이어갑니다.',
   },
 ];
 
@@ -72,29 +72,35 @@ export const ADMIN_NIGHT_TAGS = [
   'Body Doubling',
   '각할모',
   '퇴근 후 카공',
-  'Weekend Reset',
-  'PR Friendly',
+  '신청 PR',
+  'Merge / Meet',
 ];
 
 export const ADMIN_NIGHT_LINKS: AdminNightLink[] = [
   {
-    id: 'github',
-    label: '블로그 레포 보기',
-    detail: '작업 아이디어가 있다면 저장소를 보고 이슈나 PR 흐름을 바로 확인합니다.',
-    href: 'https://github.com/kscold/kscold-blog-version-2',
-    external: true,
-  },
-  {
-    id: 'feed',
-    label: '피드에 지금 흐름 남기기',
-    detail: '오늘 밤 하고 있는 일이나 참고 링크를 짧게 남겨두면 다음 작업이 쉬워집니다.',
-    href: '/feed',
+    id: 'request',
+    label: 'Admin Night 신청 보내기',
+    detail: '참가 의사를 마치 PR처럼 먼저 보내고, 같이 붙고 싶은 작업을 한 줄 남깁니다.',
+    href: '/admin-night?chat=open',
   },
   {
     id: 'guestbook',
-    label: '방명록으로 합류 의사 남기기',
-    detail: '이번 주 같이 붙고 싶은 작업이나 관심 주제를 방명록에 남겨도 좋습니다.',
+    label: '방명록에 합류 의사 남기기',
+    detail: '이번 주 같이 붙고 싶은 시간대나 주제를 남기면 흐름을 잡기 좋습니다.',
     href: '/guestbook',
+  },
+  {
+    id: 'feed',
+    label: '피드에서 오늘 작업 흐름 보기',
+    detail: '지금 하고 있는 일이나 참고 링크를 짧게 남겨두고, 끝나면 결과도 바로 이어서 기록합니다.',
+    href: '/feed',
+  },
+  {
+    id: 'github',
+    label: '블로그 레포 흐름 보기',
+    detail: '실제 코드 작업이 붙는 날에는 저장소 흐름과 PR 맥락도 여기서 확인할 수 있습니다.',
+    href: 'https://github.com/kscold/kscold-blog-version-2',
+    external: true,
   },
 ];
 
