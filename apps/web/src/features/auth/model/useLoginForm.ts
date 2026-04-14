@@ -32,6 +32,39 @@ function resolveSafeRedirect(requestedPath: string, role: User['role']) {
   return requestedPath;
 }
 
+function validateRegistrationForm(formData: LoginFormData) {
+  const email = formData.email.trim();
+  const username = formData.username.trim();
+  const displayName = formData.displayName.trim();
+  const password = formData.password;
+
+  if (!email) {
+    return '이메일을 입력해주세요.';
+  }
+
+  if (!username) {
+    return '사용자명을 입력해주세요.';
+  }
+
+  if (username.length < 3 || username.length > 20) {
+    return '사용자명은 3-20자여야 합니다.';
+  }
+
+  if (displayName && displayName.length > 30) {
+    return '표시 이름은 30자 이내로 입력해주세요.';
+  }
+
+  if (!password) {
+    return '비밀번호를 입력해주세요.';
+  }
+
+  if (password.length < 8) {
+    return '비밀번호는 최소 8자 이상이어야 합니다.';
+  }
+
+  return null;
+}
+
 export function useLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,6 +129,9 @@ export function useLoginForm() {
   }, [isAuthLoading, redirect, router, setToken, setUser]);
 
   const updateField = <K extends keyof LoginFormData>(key: K, value: LoginFormData[K]) => {
+    if (error) {
+      setError('');
+    }
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
@@ -106,7 +142,7 @@ export function useLoginForm() {
     try {
       if (isLogin) {
         const result = await loginAsync({
-          email: formData.email,
+          email: formData.email.trim(),
           password: formData.password,
         });
 
@@ -114,11 +150,17 @@ export function useLoginForm() {
         return;
       }
 
+      const validationError = validateRegistrationForm(formData);
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+
       const result = await registerAsync({
-        email: formData.email,
+        email: formData.email.trim(),
         password: formData.password,
-        username: formData.username,
-        displayName: formData.displayName || formData.username,
+        username: formData.username.trim(),
+        displayName: formData.displayName.trim() || formData.username.trim(),
       });
 
       router.push(resolveSafeRedirect(redirect, result.user.role));

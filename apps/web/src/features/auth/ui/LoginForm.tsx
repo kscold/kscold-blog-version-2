@@ -58,7 +58,7 @@ export function LoginForm() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <p className="text-sm text-red-400 text-center">{error}</p>
+                  <p data-cy="auth-form-error" className="text-sm text-red-400 text-center">{error}</p>
                 </motion.div>
               )}
 
@@ -69,6 +69,8 @@ export function LoginForm() {
                   placeholder="your@email.com"
                   value={formData.email}
                   onChange={e => updateField('email', e.target.value)}
+                  autoComplete="email"
+                  data-cy={isLogin ? 'login-email-input' : 'register-email-input'}
                   required
                 />
 
@@ -79,6 +81,11 @@ export function LoginForm() {
                       placeholder="사용자명"
                       value={formData.username}
                       onChange={e => updateField('username', e.target.value)}
+                      helperText="사용자명은 3-20자까지 사용할 수 있어요."
+                      autoComplete="username"
+                      data-cy="register-username-input"
+                      minLength={3}
+                      maxLength={20}
                       required
                     />
 
@@ -87,15 +94,23 @@ export function LoginForm() {
                       placeholder="표시 이름 (선택)"
                       value={formData.displayName}
                       onChange={e => updateField('displayName', e.target.value)}
+                      helperText="비워두면 사용자명이 그대로 표시됩니다."
+                      autoComplete="nickname"
+                      data-cy="register-display-name-input"
+                      maxLength={30}
                     />
                   </>
                 )}
 
                 <Input
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={isLogin ? '••••••••' : '8자 이상 비밀번호'}
                   value={formData.password}
                   onChange={e => updateField('password', e.target.value)}
+                  helperText={!isLogin ? '비밀번호는 최소 8자 이상이어야 합니다.' : undefined}
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
+                  data-cy={isLogin ? 'login-password-input' : 'register-password-input'}
+                  minLength={isLogin ? undefined : 8}
                   required
                 />
 
@@ -124,6 +139,7 @@ export function LoginForm() {
                   size="lg"
                   isLoading={isLoading}
                   className="w-full mt-6"
+                  data-cy={isLogin ? 'login-submit' : 'register-submit'}
                 >
                   {isLogin ? '로그인' : '회원가입'}
                 </Button>
