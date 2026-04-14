@@ -65,6 +65,7 @@ export function Sidebar() {
     { label: 'Home', href: '/' },
     { label: 'Blog', href: '/blog' },
     { label: 'Feed', href: '/feed' },
+    { label: 'Admin Night', href: '/admin-night' },
     { label: 'Vault', href: '/vault' },
     { label: 'Guestbook', href: '/guestbook' },
     { label: 'Info', href: '/info' },
@@ -94,7 +95,7 @@ export function Sidebar() {
               <Link
                 key={link.href}
                 href={link.href}
-                data-cy={`sidebar-link-${link.label.toLowerCase()}`}
+                data-cy={`sidebar-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                 onClick={() => setSidebarOpen(false)}
                 className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   link.highlighted

@@ -10,7 +10,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useViewer } from '@/entities/user/model/useViewer';
 import { DashboardStats } from './DashboardStats';
 import { AdminUserStatsSection } from './AdminUserStatsSection';
-import { AdminNightSection } from './AdminNightSection';
 
 export function AdminDashboardContainer() {
   const { user, role } = useViewer();
@@ -80,14 +79,6 @@ export function AdminDashboardContainer() {
         stats={stats}
         quickActions={quickActions}
         recentPosts={posts}
-        adminNightBoard={
-          <AdminNightSection
-            viewerName={viewerName}
-            recentPosts={posts}
-            totalChatRooms={totalChatRooms}
-            totalMessages={totalMessages}
-          />
-        }
       />
 
       <div className="mt-12 space-y-4">
