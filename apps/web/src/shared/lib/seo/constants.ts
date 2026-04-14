@@ -3,7 +3,7 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://kscold.c
 export const SITE_URL = 'https://kscold.com';
 export const SITE_NAME = '김승찬 블로그';
 export const SITE_DESCRIPTION =
-  '콜딩(Colding)에서 제품을 만들고 운영하는 김승찬의 개인 기술 블로그. 개발 기록, 실험, 피드, Vault 노트를 연결합니다.';
+  '김승찬의 블로그. 일상과 기술, 작업 기록과 실험을 차곡히 남깁니다.';
 export const DEFAULT_OG_IMAGE = '/apple-touch-icon.png';
 
 export type OpenGraphType =
