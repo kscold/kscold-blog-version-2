@@ -283,6 +283,49 @@
     font-weight: inherit;
     letter-spacing: inherit;
   }
+
+  .admin-night-range-slider {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    width: 100%;
+    appearance: none;
+    background: transparent;
+    pointer-events: auto;
+  }
+
+  .admin-night-range-slider::-webkit-slider-runnable-track {
+    height: 0;
+    background: transparent;
+  }
+
+  .admin-night-range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 22px;
+    width: 22px;
+    border-radius: 9999px;
+    background: #ffffff;
+    border: 2px solid #0f172a;
+    box-shadow: 0 10px 24px -10px rgba(15, 23, 42, 0.35);
+    cursor: pointer;
+    margin-top: -11px;
+  }
+
+  .admin-night-range-slider::-moz-range-track {
+    height: 0;
+    background: transparent;
+  }
+
+  .admin-night-range-slider::-moz-range-thumb {
+    height: 22px;
+    width: 22px;
+    border-radius: 9999px;
+    background: #ffffff;
+    border: 2px solid #0f172a;
+    box-shadow: 0 10px 24px -10px rgba(15, 23, 42, 0.35);
+    cursor: pointer;
+  }
 }
 
 @layer utilities {
