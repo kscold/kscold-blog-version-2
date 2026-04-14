@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { motion, useMotionValue } from 'framer-motion';
 
+const ACTIVE_CURSOR_CLASS = 'custom-cursor-active';
+
 export function CustomCursor() {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
@@ -11,17 +13,22 @@ export function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(pointer: fine)');
-    if (!mediaQuery.matches) return;
-
-    setIsVisible(true);
+    const html = document.documentElement;
+    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)');
+    const shouldUseCustomCursor = () => mediaQuery.matches;
 
     const updatePosition = (e: MouseEvent) => {
+      if (!shouldUseCustomCursor()) return;
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
     };
 
     const updateHoverState = (e: MouseEvent) => {
+      if (!shouldUseCustomCursor()) {
+        setIsHovering(false);
+        return;
+      }
+
       const target = e.target as HTMLElement;
       if (
         target.closest('a') ||
@@ -42,19 +49,37 @@ export function CustomCursor() {
     };
 
     const handleMouseEnter = () => {
-      setIsVisible(true);
+      setIsVisible(shouldUseCustomCursor());
     };
+
+    const syncCursorMode = () => {
+      const isEnabled = shouldUseCustomCursor();
+
+      html.classList.toggle(ACTIVE_CURSOR_CLASS, isEnabled);
+      setIsVisible(isEnabled);
+
+      if (!isEnabled) {
+        setIsHovering(false);
+        cursorX.set(-100);
+        cursorY.set(-100);
+      }
+    };
+
+    syncCursorMode();
 
     window.addEventListener('mousemove', updatePosition);
     window.addEventListener('mouseover', updateHoverState);
-    document.documentElement.addEventListener('mouseleave', handleMouseLeave);
-    document.documentElement.addEventListener('mouseenter', handleMouseEnter);
+    html.addEventListener('mouseleave', handleMouseLeave);
+    html.addEventListener('mouseenter', handleMouseEnter);
+    mediaQuery.addEventListener('change', syncCursorMode);
 
     return () => {
+      html.classList.remove(ACTIVE_CURSOR_CLASS);
       window.removeEventListener('mousemove', updatePosition);
       window.removeEventListener('mouseover', updateHoverState);
-      document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
-      document.documentElement.removeEventListener('mouseenter', handleMouseEnter);
+      html.removeEventListener('mouseleave', handleMouseLeave);
+      html.removeEventListener('mouseenter', handleMouseEnter);
+      mediaQuery.removeEventListener('change', syncCursorMode);
     };
   }, [cursorX, cursorY]);
 
@@ -62,7 +87,7 @@ export function CustomCursor() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 w-[80px] h-[80px] rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
+      className="fixed top-0 left-0 z-[9999] h-[80px] w-[80px] rounded-full pointer-events-none mix-blend-difference"
       style={{
         x: cursorX,
         y: cursorY,
