@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
@@ -140,6 +141,24 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 지원하지 않는 HTTP 메서드 예외 처리 (405)
+     * 브라우저나 잘못된 호출이 POST 전용 엔드포인트를 GET으로 두드릴 때 내부 오류처럼 보이지 않게 처리
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupported(
+        HttpRequestMethodNotSupportedException e
+    ) {
+        log.warn("HttpRequestMethodNotSupportedException: {}", e.getMessage());
+
+        ApiResponse<Void> response = ApiResponse.error(
+            ErrorCode.METHOD_NOT_ALLOWED.getCode(),
+            "지원하지 않는 요청 방식입니다."
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     /**
