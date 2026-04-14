@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { HeroSection } from '@/widgets/home/ui/HeroSection';
 import { FeaturedPostsSection } from '@/widgets/home/ui/FeaturedPostsSection';
+import { AdminNightPromoSection } from '@/widgets/home/ui/AdminNightPromoSection';
 import { StatsSection } from '@/widgets/home/ui/StatsSection';
 import { PROFILE } from '@/entities/profile/model/profileData';
 import { SITE_NAME, SITE_URL } from '@/shared/lib/seo';
@@ -47,6 +48,8 @@ export default function HomePage() {
         <HeroSection />
 
         <FeaturedPostsSection />
+
+        <AdminNightPromoSection />
 
         <StatsSection />
       </main>
