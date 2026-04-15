@@ -50,6 +50,9 @@ export function AdminNightPage() {
   const { data: myRequests = [] } = useMyAdminNightRequests(isAuthenticated);
   const createRequestMutation = useCreateAdminNightRequest();
   const resubmitRequestMutation = useResubmitAdminNightRequest();
+  const canSubmitRequest = requesterName.trim().length > 0
+    && taskTitle.trim().length > 0
+    && selectedDate.length > 0;
 
   useEffect(() => {
     if (!hasPrefilledRequesterName.current && !requesterName.trim() && user?.displayName) {
@@ -64,8 +67,12 @@ export function AdminNightPage() {
       setStatusMessage('실제 만남과 일정 안내에 사용할 실명을 먼저 적어주세요.');
       return;
     }
+    if (!taskTitle.trim()) {
+      setStatusMessage('오늘 끝내고 싶은 일을 한 줄로 적어주세요.');
+      return;
+    }
     if (!selectedSlot) {
-      setStatusMessage('같이 붙고 싶은 시간을 먼저 골라주세요.');
+      setStatusMessage('만날 시간을 먼저 골라주세요.');
       return;
     }
 
@@ -236,6 +243,7 @@ export function AdminNightPage() {
               endMinutes={timeRange.endMinutes}
               dateOptions={upcomingSlots}
               isSubmitting={createRequestMutation.isPending || resubmitRequestMutation.isPending}
+              canSubmit={canSubmitRequest}
               statusMessage={statusMessage}
               requests={myRequests}
               onRequesterNameChange={setRequesterName}
