@@ -131,7 +131,7 @@ describe('Admin Night 신청 시나리오', () => {
       expect(req.body.taskTitle).to.contain('작은 버그 수정');
       expect(req.body.requesterName).to.eq('류태호');
       expect(req.body.participationMode).to.eq('OFFLINE');
-      expect(req.body.preferredSlot.timeLabel).to.eq('20:00 - 22:00');
+      expect(req.body.preferredSlot.timeLabel).to.eq('19:00 - 22:00');
       myRequests = [
         {
           id: 'request-2',
@@ -159,9 +159,8 @@ describe('Admin Night 신청 시나리오', () => {
     cy.get('[data-cy="admin-night-request-name"]').clear().type('류태호');
     cy.get('[data-cy="admin-night-request-title"]').type('작은 버그 수정과 블로그 초안 정리');
     cy.get('[data-cy="admin-night-mode-offline"]').click();
-    setRangeValue('[data-cy="admin-night-range-start"]', '1200');
     setRangeValue('[data-cy="admin-night-range-end"]', '1320');
-    cy.get('[data-cy="admin-night-range-summary"]').should('contain.text', '20:00 - 22:00');
+    cy.get('[data-cy="admin-night-range-summary"]').should('contain.text', '19:00 - 22:00');
     cy.get('[data-cy="admin-night-request-message"]').type('퇴근 후 몰입해서 문서와 작은 버그를 같이 정리하고 싶어요.');
     cy.get('[data-cy="admin-night-request-submit"]').click();
     cy.wait('@createRequest');
@@ -215,7 +214,7 @@ describe('Admin Night 신청 시나리오', () => {
       expect(req.body.requesterName).to.eq('류태호');
       expect(req.body.participationMode).to.eq('OFFLINE');
       expect(req.body.taskTitle).to.contain('실명과 일정');
-      expect(req.body.preferredSlot.timeLabel).to.eq('20:10 - 22:10');
+      expect(req.body.preferredSlot.timeLabel).to.eq('19:00 - 22:00');
       myRequests = [
         {
           id: 'request-2',
@@ -245,9 +244,8 @@ describe('Admin Night 신청 시나리오', () => {
     cy.get('[data-cy="admin-night-resubmit-start-request-2"]').click();
     cy.get('[data-cy="admin-night-request-title"]').clear().type('실명과 일정 맥락을 보완한 신청');
     cy.get('[data-cy="admin-night-mode-offline"]').click();
-    setRangeValue('[data-cy="admin-night-range-start"]', '1210');
-    setRangeValue('[data-cy="admin-night-range-end"]', '1330');
-    cy.get('[data-cy="admin-night-range-summary"]').should('contain.text', '20:10 - 22:10');
+    setRangeValue('[data-cy="admin-night-range-end"]', '1320');
+    cy.get('[data-cy="admin-night-range-summary"]').should('contain.text', '19:00 - 22:00');
     cy.get('[data-cy="admin-night-request-message"]')
       .clear()
       .type('오프라인으로 만나서 블로그 초안과 밀린 메일을 같이 끝내고 싶어요.');
