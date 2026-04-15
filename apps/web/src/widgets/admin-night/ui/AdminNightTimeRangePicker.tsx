@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import {
   ADMIN_NIGHT_REQUEST_END_MINUTES,
@@ -22,32 +23,17 @@ export function AdminNightTimeRangePicker({
   endMinutes,
   onChange,
 }: AdminNightTimeRangePickerProps) {
+  const [isDragging, setIsDragging] = useState(false);
   const totalWindow = ADMIN_NIGHT_REQUEST_END_MINUTES - ADMIN_NIGHT_REQUEST_START_MINUTES;
-  const startPercent = ((startMinutes - ADMIN_NIGHT_REQUEST_START_MINUTES) / totalWindow) * 100;
   const endPercent = ((endMinutes - ADMIN_NIGHT_REQUEST_START_MINUTES) / totalWindow) * 100;
-
-  const handleStartChange = (value: number) => {
-    onChange(
-      clampAdminNightTimeRange({
-        startMinutes: value,
-        endMinutes,
-      })
-    );
-  };
 
   const handleEndChange = (value: number) => {
     onChange(
       clampAdminNightTimeRange({
-        startMinutes,
+        startMinutes: ADMIN_NIGHT_REQUEST_START_MINUTES,
         endMinutes: value,
       })
     );
-  };
-
-  const handleStartInput = (
-    event: ChangeEvent<HTMLInputElement> | FormEvent<HTMLInputElement>
-  ) => {
-    handleStartChange(Number(event.currentTarget.value));
   };
 
   const handleEndInput = (
@@ -60,9 +46,9 @@ export function AdminNightTimeRangePicker({
     <div className="rounded-[24px] border border-surface-200 bg-surface-50 p-4 sm:p-5">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
-          <p className="text-sm font-bold text-surface-900">같이 붙고 싶은 시간</p>
+          <p className="text-sm font-bold text-surface-900">만날 시간</p>
           <p className="text-xs leading-6 text-surface-500">
-            19:00부터 23:00 사이를 드래그해서 정해 주세요. 최소 30분 이상 선택할 수 있습니다.
+            19:00부터 시작해 언제까지 만날지 드래그해서 정해 주세요. 최소 1시간 이상 선택할 수 있습니다.
           </p>
         </div>
         <span
@@ -79,33 +65,25 @@ export function AdminNightTimeRangePicker({
           <div
             className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-surface-900"
             style={{
-              left: `${startPercent}%`,
-              width: `${endPercent - startPercent}%`,
+              left: '0%',
+              width: `${endPercent}%`,
             }}
           />
 
           <input
             type="range"
             min={ADMIN_NIGHT_REQUEST_START_MINUTES}
-            max={ADMIN_NIGHT_REQUEST_END_MINUTES - ADMIN_NIGHT_REQUEST_MIN_DURATION}
-            step={ADMIN_NIGHT_REQUEST_STEP_MINUTES}
-            value={startMinutes}
-            data-cy="admin-night-range-start"
-            onInput={handleStartInput}
-            onChange={handleStartInput}
-            className="admin-night-range-slider"
-          />
-
-          <input
-            type="range"
-            min={ADMIN_NIGHT_REQUEST_START_MINUTES + ADMIN_NIGHT_REQUEST_MIN_DURATION}
             max={ADMIN_NIGHT_REQUEST_END_MINUTES}
             step={ADMIN_NIGHT_REQUEST_STEP_MINUTES}
             value={endMinutes}
             data-cy="admin-night-range-end"
             onInput={handleEndInput}
             onChange={handleEndInput}
-            className="admin-night-range-slider"
+            onPointerDown={() => setIsDragging(true)}
+            onPointerUp={() => setIsDragging(false)}
+            onPointerCancel={() => setIsDragging(false)}
+            onBlur={() => setIsDragging(false)}
+            className={`admin-night-range-slider ${isDragging ? 'is-dragging' : ''}`}
           />
         </div>
 
@@ -120,6 +98,10 @@ export function AdminNightTimeRangePicker({
             <span key={minutes}>{formatAdminNightTime(minutes)}</span>
           ))}
         </div>
+
+        <p className="mt-3 text-xs leading-6 text-surface-400">
+          시작 시간은 19:00으로 고정되고, 슬라이더로 만나는 종료 시간을 고릅니다.
+        </p>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import type { AdminNightSlot } from '@/widgets/admin-night/lib/adminNight';
 export const ADMIN_NIGHT_REQUEST_START_MINUTES = 19 * 60;
 export const ADMIN_NIGHT_REQUEST_END_MINUTES = 23 * 60;
 export const ADMIN_NIGHT_REQUEST_STEP_MINUTES = 10;
-export const ADMIN_NIGHT_REQUEST_MIN_DURATION = 30;
+export const ADMIN_NIGHT_REQUEST_MIN_DURATION = 60;
 
 export interface AdminNightTimeRange {
   startMinutes: number;
@@ -32,27 +32,18 @@ export function formatAdminNightTimeRange(startMinutes: number, endMinutes: numb
 }
 
 export function clampAdminNightTimeRange(range: AdminNightTimeRange): AdminNightTimeRange {
-  const clampedStart = roundToStep(clampToRequestWindow(range.startMinutes));
+  const fixedStart = ADMIN_NIGHT_REQUEST_START_MINUTES;
   const clampedEnd = roundToStep(clampToRequestWindow(range.endMinutes));
 
-  if (clampedEnd - clampedStart < ADMIN_NIGHT_REQUEST_MIN_DURATION) {
-    const safeEnd = Math.min(
-      ADMIN_NIGHT_REQUEST_END_MINUTES,
-      clampedStart + ADMIN_NIGHT_REQUEST_MIN_DURATION
-    );
-    const safeStart = Math.max(
-      ADMIN_NIGHT_REQUEST_START_MINUTES,
-      Math.min(clampedStart, safeEnd - ADMIN_NIGHT_REQUEST_MIN_DURATION)
-    );
-
+  if (clampedEnd - fixedStart < ADMIN_NIGHT_REQUEST_MIN_DURATION) {
     return {
-      startMinutes: safeStart,
-      endMinutes: safeEnd,
+      startMinutes: fixedStart,
+      endMinutes: fixedStart + ADMIN_NIGHT_REQUEST_MIN_DURATION,
     };
   }
 
   return {
-    startMinutes: clampedStart,
+    startMinutes: fixedStart,
     endMinutes: clampedEnd,
   };
 }
@@ -61,8 +52,8 @@ export function parseAdminNightTimeRange(timeLabel: string | null | undefined, f
   const matched = timeLabel?.match(/(\d{2}):(\d{2})\s*-\s*(\d{2}):(\d{2})/);
   if (!matched) {
     return fallback ?? {
-      startMinutes: 20 * 60 + 30,
-      endMinutes: 22 * 60,
+      startMinutes: ADMIN_NIGHT_REQUEST_START_MINUTES,
+      endMinutes: 21 * 60,
     };
   }
 

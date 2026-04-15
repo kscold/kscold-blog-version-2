@@ -22,6 +22,7 @@ interface AdminNightRequestPanelProps {
   endMinutes: number;
   dateOptions: AdminNightSlot[];
   isSubmitting: boolean;
+  canSubmit: boolean;
   statusMessage: string | null;
   requests: AdminNightRequest[];
   onRequesterNameChange: (value: string) => void;
@@ -47,6 +48,7 @@ export function AdminNightRequestPanel({
   endMinutes,
   dateOptions,
   isSubmitting,
+  canSubmit,
   statusMessage,
   requests,
   onRequesterNameChange,
@@ -67,7 +69,7 @@ export function AdminNightRequestPanel({
             {activeEditingRequestId ? 'Resubmit PR' : 'Participation PR'}
           </p>
           <h2 className="text-2xl font-black tracking-tight text-surface-900">
-            {activeEditingRequestId ? '추가 정보를 반영해 다시 보내 주세요' : '같이 붙고 싶은 일과 시간을 남겨 주세요'}
+            {activeEditingRequestId ? '추가 정보를 반영해 다시 보내 주세요' : '만나고 싶은 일과 시간을 남겨 주세요'}
           </h2>
           <p className="text-sm leading-7 text-surface-500 sm:text-[15px]">
             {activeEditingRequestId
@@ -88,6 +90,7 @@ export function AdminNightRequestPanel({
                   data-cy="admin-night-request-name"
                   value={requesterName}
                   onChange={event => onRequesterNameChange(event.target.value)}
+                  required
                   placeholder="실제 만남과 일정 안내에 사용할 이름을 적어 주세요."
                   className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
                 />
@@ -102,6 +105,7 @@ export function AdminNightRequestPanel({
                   data-cy="admin-night-request-title"
                   value={taskTitle}
                   onChange={event => onTaskTitleChange(event.target.value)}
+                  required
                   placeholder="메일 답장, 블로그 초안, 작은 버그 수정처럼 오늘 끝낼 일을 한 줄로 적어 주세요."
                   className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
                 />
@@ -130,7 +134,7 @@ export function AdminNightRequestPanel({
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm font-bold text-surface-900">같이 붙고 싶은 날짜</p>
+                <p className="text-sm font-bold text-surface-900">만날 날짜</p>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {dateOptions.map(slot => (
                     <button
@@ -178,7 +182,7 @@ export function AdminNightRequestPanel({
                   type="button"
                   data-cy="admin-night-request-submit"
                   onClick={onSubmit}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !canSubmit}
                   className="inline-flex items-center justify-center rounded-2xl bg-surface-900 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-surface-800 disabled:cursor-not-allowed disabled:bg-surface-300"
                 >
                   {isSubmitting
@@ -205,6 +209,11 @@ export function AdminNightRequestPanel({
                   방명록에 한 줄 남기기
                 </Link>
               </div>
+              {!canSubmit && (
+                <p className="text-xs leading-6 text-surface-400">
+                  실명과 오늘 끝낼 일을 적어야 신청을 보낼 수 있습니다.
+                </p>
+              )}
             </>
           ) : (
             <div className="rounded-[24px] border border-surface-200 bg-surface-50 p-5">

@@ -27,7 +27,7 @@ export const ADMIN_NIGHT_PARTICIPATION_OPTIONS: {
   {
     value: 'ONLINE',
     label: '온라인',
-    description: 'Google Meet, Discord, 화면 공유처럼 온라인으로 붙을 수 있어요.',
+    description: 'Google Meet, Discord, 화면 공유처럼 온라인으로 만날 수 있어요.',
   },
   {
     value: 'OFFLINE',
@@ -55,7 +55,7 @@ const WEEKDAY_SLOT_CONFIG: Record<number, { focus: string; timeLabel: string; de
   2: {
     focus: 'Body Doubling',
     timeLabel: '21:00 - 22:40',
-    description: '각자 할 일을 켜 두고, 같은 시간대에 조용히 붙어 있는 만남의 시간입니다.',
+    description: '각자 할 일을 켜 두고, 같은 시간대에 조용히 만나는 시간입니다.',
   },
   3: {
     focus: 'PR Window',
@@ -70,7 +70,7 @@ const WEEKDAY_SLOT_CONFIG: Record<number, { focus: string; timeLabel: string; de
   5: {
     focus: 'Body Doubling',
     timeLabel: '21:00 - 22:40',
-    description: '각자 할 일을 켜 두고, 같은 시간대에 조용히 붙어 있는 만남의 시간입니다.',
+    description: '각자 할 일을 켜 두고, 같은 시간대에 조용히 만나는 시간입니다.',
   },
   6: {
     focus: 'Weekend Reset',
