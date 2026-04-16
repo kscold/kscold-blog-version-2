@@ -1,28 +1,22 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
 import { resolveApiBaseUrl } from '@/shared/lib/runtime-url';
 import {
-  clearStoredAuth,
-  getAccessToken,
-  getRefreshToken,
-  hasRefreshToken,
-  storeAccessToken,
-  storeRefreshToken,
-} from '@/shared/lib/authTokenStorage';
-import {
   extractRequestPath,
   forceLogout,
   shouldAttemptRefresh,
   shouldForceLogout,
 } from '@/shared/api/apiClientPolicies';
-import { performTokenRefresh } from '@/shared/api/apiClientRefresh';
+import { toApiClientError } from '@/shared/api/apiClientError';
+import { ApiClientSession } from '@/shared/api/apiClientSession';
 
 class ApiClient {
   private client: AxiosInstance;
   private readonly apiUrl: string;
-  private refreshPromise: Promise<string | null> | null = null;
+  private readonly session: ApiClientSession;
 
   constructor() {
     this.apiUrl = resolveApiBaseUrl();
+    this.session = new ApiClientSession(this.apiUrl);
     this.client = axios.create({
       baseURL: this.apiUrl,
       headers: {
@@ -34,36 +28,10 @@ class ApiClient {
     this.setupInterceptors();
   }
 
-  private toAppError(error: unknown): Error {
-    if (!axios.isAxiosError(error)) {
-      return error instanceof Error ? error : new Error('요청을 처리하는 중 오류가 발생했습니다.');
-    }
-
-    const payload = error.response?.data as { message?: string; errorCode?: string } | undefined;
-    const message =
-      payload?.message
-      || (error.response?.status === 405 ? '지원하지 않는 요청 방식입니다.' : undefined)
-      || error.message
-      || '요청을 처리하는 중 오류가 발생했습니다.';
-
-    const normalizedError = new Error(message) as Error & {
-      status?: number;
-      errorCode?: string;
-      cause?: unknown;
-    };
-
-    normalizedError.name = 'ApiClientError';
-    normalizedError.status = error.response?.status;
-    normalizedError.errorCode = payload?.errorCode;
-    normalizedError.cause = error;
-
-    return normalizedError;
-  }
-
   private setupInterceptors() {
     this.client.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        const token = getAccessToken();
+        const token = this.session.getAccessToken();
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -84,46 +52,25 @@ class ApiClient {
         if (originalRequest && status === 401 && !originalRequest._retry && shouldAttemptRefresh(requestPath)) {
           originalRequest._retry = true;
 
-          const newToken = await this.refreshAccessToken();
+          const newToken = await this.session.refreshAccessToken();
           if (newToken && originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
             return this.client(originalRequest);
           }
 
-          this.clearTokens();
+          this.session.clearTokens();
           forceLogout();
-          return Promise.reject(this.toAppError(error));
+          return Promise.reject(toApiClientError(error));
         }
 
         if (shouldForceLogout(status, requestPath)) {
-          this.clearTokens();
+          this.session.clearTokens();
           forceLogout();
         }
 
-        return Promise.reject(this.toAppError(error));
+        return Promise.reject(toApiClientError(error));
       }
     );
-  }
-
-  private clearTokens(): void {
-    clearStoredAuth();
-  }
-
-  private async refreshAccessToken(): Promise<string | null> {
-    if (this.refreshPromise) {
-      return this.refreshPromise;
-    }
-
-    const currentRefreshToken = getRefreshToken();
-    if (!currentRefreshToken) {
-      return null;
-    }
-
-    this.refreshPromise = performTokenRefresh(this.apiUrl, currentRefreshToken).finally(() => {
-      this.refreshPromise = null;
-    });
-
-    return this.refreshPromise;
   }
 
   public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
@@ -159,26 +106,27 @@ class ApiClient {
   }
 
   public setToken(token: string, refreshToken?: string): void {
-    storeAccessToken(token);
-    if (refreshToken) {
-      storeRefreshToken(refreshToken);
-    }
+    this.session.setTokens(token, refreshToken);
+    this.session.applyAccessToken(this.client);
   }
 
   public removeToken(): void {
-    this.clearTokens();
+    this.session.clearTokens();
+    this.session.applyAccessToken(this.client);
   }
 
   public getToken(): string | null {
-    return getAccessToken();
+    return this.session.getAccessToken();
   }
 
   public hasRefreshToken(): boolean {
-    return hasRefreshToken();
+    return this.session.hasRefreshToken();
   }
 
   public async restoreSession(): Promise<string | null> {
-    return this.refreshAccessToken();
+    const accessToken = await this.session.restoreSession();
+    this.session.applyAccessToken(this.client);
+    return accessToken;
   }
 }
 
