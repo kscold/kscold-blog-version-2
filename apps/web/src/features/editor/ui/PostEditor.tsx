@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { usePostAutosave } from '@/features/editor/lib/usePostAutosave';
 import { PostEditorHeader } from '@/features/editor/ui/PostEditorHeader';
@@ -49,6 +49,7 @@ export function PostEditor({
   const [viewMode, setViewMode] = useState<ViewMode>('editor');
   const [slugEdited, setSlugEdited] = useState(false);
   const [editorKey, setEditorKey] = useState('initial');
+  const appliedInitialDataRef = useRef<string | null>(null);
 
   const updateForm = useCallback(<K extends keyof PostFormData>(key: K, value: PostFormData[K]) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -57,14 +58,20 @@ export function PostEditor({
   const { lastSavedText, restoredFromAutosave, tryRestoreAutosave, clearAutosave } =
     usePostAutosave({ autosaveKey, mode, form });
 
-  const serializedInitialData = JSON.stringify(initialData);
+  const serializedInitialData = useMemo(() => JSON.stringify(initialData), [initialData]);
 
   useEffect(() => {
-    if (initialData && Object.keys(initialData).length > 0) {
-      setForm({ ...DEFAULT_FORM, ...initialData });
-      setSlugEdited(true);
+    if (!initialData || Object.keys(initialData).length === 0) {
+      return;
     }
-  }, [serializedInitialData]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (appliedInitialDataRef.current === serializedInitialData) {
+      return;
+    }
+
+    setForm({ ...DEFAULT_FORM, ...initialData });
+    setSlugEdited(true);
+    appliedInitialDataRef.current = serializedInitialData;
+  }, [initialData, serializedInitialData]);
 
   useEffect(() => {
     if (!slugEdited && form.title) {
@@ -81,9 +88,9 @@ export function PostEditor({
     tryRestoreAutosave(savedForm => {
       setForm(savedForm);
       setSlugEdited(true);
-      setEditorKey('restored-' + Date.now()); // Tiptap 재마운트로 내용 반영
+      setEditorKey('restored-' + Date.now()); // Tiptap을 다시 마운트해 복구 내용을 즉시 반영
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tryRestoreAutosave]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
