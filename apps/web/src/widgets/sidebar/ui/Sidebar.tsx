@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion'; // motion used for overlay only
+import { motion, AnimatePresence } from 'framer-motion'; // overlay 애니메이션에만 사용
 import { usePathname } from 'next/navigation';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { useTags } from '@/entities/tag/api/useTags';
@@ -89,7 +89,7 @@ export function Sidebar() {
         className={`fixed top-[88px] left-0 lg:left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ease-out ${mobileSidebarState} ${desktopSidebarState} ${isTouchDevice ? 'bg-white border border-surface-200 rounded-2xl shadow-md' : 'bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm'}`}
       >
         <div className="p-6 space-y-8 relative">
-          {/* Mobile Navigation Links (Visible on all sizes for sidebar access) */}
+          {/* 모바일 사이드바 바로가기 */}
           <div className="lg:hidden pb-6 border-b border-surface-200/50 space-y-1 mt-2">
             {mobileLinks.map(link => (
               <Link

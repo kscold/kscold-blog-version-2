@@ -54,7 +54,7 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
       animate={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
       transition={allowRichEffects ? { duration: 0.4 } : undefined}
     >
-      {/* Header */}
+      {/* 작성자 정보 */}
       <div className="flex items-center gap-3 px-4 py-3">
         <div className="relative w-9 h-9 bg-surface-200 rounded-full flex items-center justify-center overflow-hidden">
           {feed.author.avatar ? (
@@ -76,10 +76,10 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
         )}
       </div>
 
-      {/* Images */}
+      {/* 첨부 이미지 */}
       {feed.images.length > 0 && <ImageCarousel images={feed.images} />}
 
-      {/* Actions */}
+      {/* 반응 영역 */}
       <div className="px-4 pt-3">
         <div className="flex items-center gap-4">
           <button onClick={handleLike} className="flex items-center gap-1.5 group">
@@ -124,7 +124,7 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
         </div>
       </div>
 
-      {/* Content */}
+      {/* 본문 */}
       <div className="px-4 py-3">
         <p className="text-sm text-surface-800 whitespace-pre-wrap leading-relaxed">
           <span className="font-bold text-surface-900 mr-1.5">{feed.author.name}</span>
@@ -132,14 +132,14 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
         </p>
       </div>
 
-      {/* Link Preview */}
+      {/* 링크 미리보기 */}
       {feed.linkPreview && (
         <div className="px-4 pb-3">
           <LinkPreviewCard preview={feed.linkPreview} />
         </div>
       )}
 
-      {/* Comment CTA */}
+      {/* 댓글 이동 */}
       {showCommentLink && feed.commentsCount > 0 && (
         <div className="px-4 pb-3">
           <Link

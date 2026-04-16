@@ -23,7 +23,7 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'md' }: ModalProps
     <AnimatePresence>
       {isOpen && (
         <Fragment>
-          {/* Backdrop - Bank Style */}
+          {/* 배경 오버레이 */}
           <motion.div
             className="modal-overlay"
             initial={{ opacity: 0 }}
@@ -33,7 +33,7 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'md' }: ModalProps
             onClick={onClose}
           />
 
-          {/* Modal Container */}
+          {/* 모달 컨테이너 */}
           <div className="modal-container">
             <motion.div
               className={`
