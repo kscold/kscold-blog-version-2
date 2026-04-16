@@ -35,7 +35,7 @@ export function PostHeader({
 }: PostHeaderProps) {
   return (
     <>
-      {/* Breadcrumb */}
+      {/* 현재 위치 */}
       <motion.nav
         className="mb-8 flex items-center gap-2 text-sm text-surface-500"
         initial={{ opacity: 0, y: -10 }}
@@ -56,14 +56,14 @@ export function PostHeader({
         <span className="text-surface-400 truncate max-w-[200px]">{title}</span>
       </motion.nav>
 
-      {/* Header */}
+      {/* 포스트 상단 정보 */}
       <motion.header
         className="mb-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        {/* Category & Date */}
+        {/* 카테고리와 발행일 */}
         <div className="flex items-center gap-3 mb-6">
           <Link
             href={`/blog/${category.slug}`}
@@ -80,19 +80,19 @@ export function PostHeader({
           )}
         </div>
 
-        {/* Title */}
+        {/* 제목 */}
         <h1 className="text-4xl sm:text-5xl font-sans font-black tracking-tight text-surface-900 mb-6 leading-[1.1]">
           {title}
         </h1>
 
-        {/* Excerpt */}
+        {/* 요약 */}
         {excerpt?.trim() ? (
           <p className="mb-8 text-lg leading-relaxed text-surface-500 break-words [overflow-wrap:anywhere]">
             {excerpt}
           </p>
         ) : null}
 
-        {/* Meta */}
+        {/* 작성 정보 */}
         <div className="flex items-center justify-between pb-8 border-b border-surface-200">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 text-sm text-surface-500">
@@ -140,7 +140,7 @@ export function PostHeader({
         </div>
       </motion.header>
 
-      {/* Cover Image */}
+      {/* 커버 이미지 */}
       {coverImage && (
         <motion.div
           className="mb-12 rounded-2xl overflow-hidden"
