@@ -180,7 +180,7 @@ export function renderNode(
       });
     }
   } catch {
-    // Canvas warm-up errors can occur briefly while the graph mounts.
+    // 그래프가 처음 붙는 순간에는 캔버스 준비 과정에서 일시 오류가 날 수 있습니다.
   }
 }
 

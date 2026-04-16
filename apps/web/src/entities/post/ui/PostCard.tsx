@@ -30,7 +30,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
     >
       <Link href={`/blog/${post.category.slug}/${post.slug}`} className="block h-full">
         <div className={`h-full bg-white border border-surface-200 rounded-[24px] p-6 transition-all duration-500 relative overflow-hidden ${supportsHover ? 'group-hover:border-surface-300 group-hover:bg-surface-50 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]' : ''}`}>
-          {/* Holographic Slide Effect */}
+          {/* 빛이 스쳐 지나가는 듯한 강조 효과 */}
           {supportsHover && allowRichEffects && (
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none z-10 mix-blend-overlay" />
           )}
