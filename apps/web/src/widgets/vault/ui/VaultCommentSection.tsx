@@ -56,7 +56,7 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
         Neural Network Synapse Link Formed
       </h3>
 
-      {/* Comment List */}
+      {/* 댓글 목록 */}
       {isLoading ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
@@ -102,7 +102,7 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
         </p>
       )}
 
-      {/* Comment Form */}
+      {/* 댓글 입력 폼 */}
       <VaultCommentForm
         currentUser={currentUser ?? null}
         isAuthenticated={isAuthenticated}

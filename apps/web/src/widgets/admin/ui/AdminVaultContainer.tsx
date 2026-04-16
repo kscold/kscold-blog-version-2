@@ -36,7 +36,7 @@ export function AdminVaultContainer() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      {/* Header */}
+      {/* 상단 헤더 */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-white">
@@ -52,7 +52,7 @@ export function AdminVaultContainer() {
         </button>
       </div>
 
-      {/* Table */}
+      {/* 목록 테이블 */}
       {isLoading ? (
         <div className="space-y-3">
           {[...Array(8)].map((_, i) => (
