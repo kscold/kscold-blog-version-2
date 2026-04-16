@@ -149,7 +149,7 @@ export function PostsTable({ posts, totalPages, page, onPageChange, onDelete }: 
         </div>
       </div>
 
-      {/* Pagination */}
+      {/* 페이지 이동 */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-6">
           <button

@@ -35,12 +35,12 @@ export function LoginForm() {
               </span>
             </h1>
             <p className="text-surface-500 text-sm tracking-wide font-medium">
-              Professional Development Blog
+              김승찬의 블로그, 일상과 기술 기록
             </p>
           </Link>
         </motion.div>
 
-        {/* 3D 카드 컨테이너 */}
+        {/* 입체 카드 래퍼 */}
         <div className="card-3d">
           <motion.div
             className="card-3d-inner"
