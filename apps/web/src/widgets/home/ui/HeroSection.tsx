@@ -116,7 +116,7 @@ export function HeroSection() {
           </Link>
         </motion.div>
 
-        {/* Social Links */}
+        {/* 외부 링크 */}
         <motion.div
           className="flex items-center justify-center gap-10 pt-12"
           initial={allowRichEffects ? { opacity: 0 } : false}
