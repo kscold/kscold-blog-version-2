@@ -111,7 +111,7 @@ export function useLoginForm() {
         setUser(user);
         router.replace(resolveSafeRedirect(redirect, user.role));
       } catch {
-        // no-op
+        // 의도적으로 무시
       } finally {
         if (!cancelled) {
           setIsRestoringSession(false);

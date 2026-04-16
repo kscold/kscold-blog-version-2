@@ -12,7 +12,7 @@ interface CategoryHeaderProps {
 export function CategoryHeader({ category, subcategories }: CategoryHeaderProps) {
   return (
     <>
-      {/* Breadcrumb */}
+      {/* 현재 위치 */}
       <motion.nav
         className="mb-8 flex items-center gap-2 text-sm text-surface-500"
         initial={{ opacity: 0, y: -10 }}
@@ -29,7 +29,7 @@ export function CategoryHeader({ category, subcategories }: CategoryHeaderProps)
         <span className="text-surface-900 font-medium">{category.name}</span>
       </motion.nav>
 
-      {/* Header */}
+      {/* 카테고리 헤더 */}
       <motion.div
         className="mb-12"
         initial={{ opacity: 0, y: 20 }}
@@ -52,7 +52,7 @@ export function CategoryHeader({ category, subcategories }: CategoryHeaderProps)
         </div>
       </motion.div>
 
-      {/* Subcategories */}
+      {/* 하위 카테고리 */}
       {subcategories.length > 0 && (
         <motion.div
           className="mb-8"

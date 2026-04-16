@@ -18,7 +18,7 @@ export function useChatAdmin() {
       const data = await fetchChatRooms();
       setRooms(prev => mergeRestRooms(prev, data));
     } catch {
-      // noop
+      // 의도적으로 무시
     }
   }, []);
 
@@ -27,7 +27,7 @@ export function useChatAdmin() {
       const messages = await fetchRoomMessages(roomId);
       setRooms(prev => patchRoom(prev, roomId, { messages }));
     } catch {
-      // noop
+      // 의도적으로 무시
     }
   }, []);
 
@@ -92,7 +92,7 @@ function handleSocketMessage(
     const data = JSON.parse(event.data as string);
     setRooms(prev => applyAdminSocketEvent(prev, data, selectedRoomId));
   } catch {
-    // noop
+    // 의도적으로 무시
   }
 }
 

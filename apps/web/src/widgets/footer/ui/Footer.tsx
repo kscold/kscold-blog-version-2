@@ -25,7 +25,7 @@ export function Footer() {
     <footer className="relative mt-20 bg-white border-t border-surface-200">
       <div className="max-w-7xl mx-auto px-6 py-16 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-24">
-          {/* Brand */}
+          {/* 브랜드 영역 */}
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="inline-flex items-center gap-3 group">
               <Image
@@ -49,7 +49,7 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Navigation */}
+          {/* 네비게이션 */}
           <div>
             <h4 className="font-mono text-xs font-bold text-surface-400 uppercase tracking-[0.2em] mb-6">
               Navigation
@@ -68,7 +68,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Connect */}
+          {/* 연결 정보 */}
           <div>
             <h4 className="font-mono text-xs font-bold text-surface-400 uppercase tracking-[0.2em] mb-6">
               Connect
@@ -90,7 +90,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Business Info */}
+        {/* 사업자 정보 */}
         <div className="mt-12 pt-8 border-t border-surface-100">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px] text-surface-400 leading-relaxed">
             <div className="space-y-1">
@@ -106,7 +106,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom */}
+        {/* 하단 줄 */}
         <div className="mt-8 pt-6 border-t border-surface-100 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-surface-400 font-mono tracking-wider">
             &copy; {currentYear} Colding. All rights reserved.
