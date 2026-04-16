@@ -4,7 +4,6 @@ import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
 import com.kscold.blog.adminnight.application.port.in.AdminNightUseCase;
 import com.kscold.blog.adminnight.application.port.out.AdminNightNotificationPort;
-import com.kscold.blog.adminnight.config.AdminNightProperties;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightRequestRepository;
 import com.kscold.blog.exception.ErrorCode;
@@ -30,27 +29,13 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     private final UserRepository userRepository;
     private final UserQueryPort userQueryPort;
     private final AdminNightNotificationPort adminNightNotificationPort;
+    private final AdminNightRequestDraftService adminNightRequestDraftService;
 
     @Override
     @Transactional
     public AdminNightRequest createRequest(String userId, AdminNightCreateCommand command) {
         User user = requireUser(userId);
-        String requesterName = normalizeText(command.requesterName(), "실명을 입력해주세요.");
-        String taskTitle = normalizeText(command.taskTitle(), "끝낼 일을 적어주세요.");
-        String message = normalizeOptionalText(command.message());
-        AdminNightRequest.ParticipationMode participationMode = requireParticipationMode(command.participationMode());
-        AdminNightRequest.SlotInfo preferredSlot = requireSlot(command.preferredSlot(), "같이 붙고 싶은 시간을 골라주세요.");
-
-        AdminNightRequest request = AdminNightRequest.builder()
-                .userId(user.getId())
-                .requesterName(requesterName)
-                .requesterEmail(user.getEmail())
-                .taskTitle(taskTitle)
-                .message(message)
-                .participationMode(participationMode)
-                .preferredSlot(preferredSlot)
-                .status(AdminNightRequest.Status.PENDING)
-                .build();
+        AdminNightRequest request = adminNightRequestDraftService.createPendingRequest(user.getId(), user.getEmail(), command);
 
         AdminNightRequest saved = adminNightRequestRepository.save(request);
         adminNightNotificationPort.notifyRequestCreated(saved);
@@ -96,18 +81,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
             throw InvalidRequestException.invalidInput("추가 정보 요청된 신청만 보완해서 다시 보낼 수 있습니다.");
         }
 
-        String requesterName = normalizeText(command.requesterName(), "실명을 입력해주세요.");
-        String taskTitle = normalizeText(command.taskTitle(), "끝낼 일을 적어주세요.");
-        String message = normalizeOptionalText(command.message());
-        AdminNightRequest.ParticipationMode participationMode = requireParticipationMode(command.participationMode());
-        AdminNightRequest.SlotInfo preferredSlot = requireSlot(command.preferredSlot(), "같이 붙고 싶은 시간을 골라주세요.");
-
-        request.setRequesterName(requesterName);
-        request.setRequesterEmail(user.getEmail());
-        request.setTaskTitle(taskTitle);
-        request.setMessage(message);
-        request.setParticipationMode(participationMode);
-        request.setPreferredSlot(preferredSlot);
+        adminNightRequestDraftService.applyResubmission(request, user.getEmail(), command);
         request.setScheduledSlot(null);
         request.setReviewNote(null);
         request.setStatus(AdminNightRequest.Status.PENDING);
@@ -130,9 +104,8 @@ public class AdminNightApplicationService implements AdminNightUseCase {
             throw InvalidRequestException.invalidInput("거절된 신청은 다시 승인할 수 없습니다.");
         }
 
-        AdminNightRequest.SlotInfo scheduledSlot = requireSlot(command.scheduledSlot(), "승인할 시간을 지정해주세요.");
         request.setStatus(AdminNightRequest.Status.APPROVED);
-        request.setScheduledSlot(scheduledSlot);
+        request.setScheduledSlot(adminNightRequestDraftService.resolveScheduledSlot(command));
         request.setReviewNote(null);
         request.setDecidedAt(LocalDateTime.now());
         request.setDecidedByUserId(admin.id());
@@ -158,7 +131,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
         request.setStatus(AdminNightRequest.Status.INFO_REQUESTED);
         request.setScheduledSlot(null);
-        request.setReviewNote(normalizeText(reviewNote, "신청자에게 요청할 추가 정보를 적어주세요."));
+        request.setReviewNote(adminNightRequestDraftService.requireReviewNote(reviewNote));
         request.setDecidedAt(LocalDateTime.now());
         request.setDecidedByUserId(admin.id());
         request.setDecidedByName(admin.displayName());
@@ -180,7 +153,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
         request.setStatus(AdminNightRequest.Status.REJECTED);
         request.setScheduledSlot(null);
-        request.setReviewNote(normalizeOptionalText(reviewNote));
+        request.setReviewNote(adminNightRequestDraftService.normalizeOptionalReviewNote(reviewNote));
         request.setDecidedAt(LocalDateTime.now());
         request.setDecidedByUserId(admin.id());
         request.setDecidedByName(admin.displayName());
@@ -220,47 +193,4 @@ public class AdminNightApplicationService implements AdminNightUseCase {
             throw new InvalidRequestException(ErrorCode.FORBIDDEN, "본인 신청만 수정할 수 있습니다.");
         }
     }
-
-    private AdminNightRequest.SlotInfo requireSlot(AdminNightRequest.SlotInfo slot, String message) {
-        if (slot == null) {
-            throw InvalidRequestException.invalidInput(message);
-        }
-
-        if (!StringUtils.hasText(slot.getSlotKey())
-                || slot.getDate() == null
-                || !StringUtils.hasText(slot.getWeekday())
-                || !StringUtils.hasText(slot.getTimeLabel())
-                || !StringUtils.hasText(slot.getFocus())
-                || !StringUtils.hasText(slot.getBadgeLabel())) {
-            throw InvalidRequestException.invalidInput(message);
-        }
-
-        return AdminNightRequest.SlotInfo.builder()
-                .slotKey(slot.getSlotKey().trim())
-                .date(slot.getDate())
-                .weekday(slot.getWeekday().trim())
-                .timeLabel(slot.getTimeLabel().trim())
-                .focus(slot.getFocus().trim())
-                .badgeLabel(slot.getBadgeLabel().trim())
-                .build();
-    }
-
-    private AdminNightRequest.ParticipationMode requireParticipationMode(AdminNightRequest.ParticipationMode participationMode) {
-        if (participationMode == null) {
-            throw InvalidRequestException.invalidInput("온라인/오프라인 진행 방식을 골라주세요.");
-        }
-        return participationMode;
-    }
-
-    private String normalizeText(String value, String message) {
-        if (!StringUtils.hasText(value)) {
-            throw InvalidRequestException.invalidInput(message);
-        }
-        return value.trim();
-    }
-
-    private String normalizeOptionalText(String value) {
-        return StringUtils.hasText(value) ? value.trim() : null;
-    }
-
 }
