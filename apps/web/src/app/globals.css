@@ -35,12 +35,12 @@
     cursor: none !important;
   }
 
-  /* 선택 영역 스타일 - Crisp Dark */
+  /* 선택 영역 스타일 */
   ::selection {
     @apply bg-surface-900 text-white;
   }
 
-  /* 스크롤바 스타일 (Webkit) */
+  /* 스크롤바 스타일 */
   ::-webkit-scrollbar {
     @apply w-1.5;
   }
@@ -59,7 +59,7 @@
 }
 
 @layer components {
-  /* Art Gallery Card (Crisp, High Contrast) */
+  /* 선명한 카드 표면 */
   .gallery-card {
     @apply bg-white dark:bg-surface-950;
     @apply border border-surface-200 dark:border-surface-800;
@@ -68,13 +68,13 @@
     @apply transition-all duration-300 ease-out;
   }
 
-  /* Subtle Border Accent */
+  /* 은은한 보더 강조 */
   .gallery-border {
     @apply border border-surface-200 dark:border-surface-800;
     @apply hover:border-surface-300 dark:hover:border-surface-700 transition-colors duration-300;
   }
 
-  /* 3D Card Effect (From Original Blog) */
+  /* 입체 카드 효과 */
   .card-3d {
     transform-style: preserve-3d;
     perspective: 1000px;
@@ -89,12 +89,12 @@
     transform: rotateY(5deg) rotateX(5deg);
   }
 
-  /* Cyan/Blue Glow Text */
+  /* 청록 계열 글로우 텍스트 */
   .text-glow {
     text-shadow: 0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.3);
   }
 
-  /* Anti-Gravity + Glow Hover (Enhanced) */
+  /* 떠오르는 듯한 호버 효과 */
   .anti-gravity {
     @apply transition-all duration-300 ease-out;
   }
@@ -105,7 +105,7 @@
     transform: translateY(-8px) scale(1.02);
   }
 
-  /* Bank Style Button */
+  /* 묵직한 버튼 스타일 */
   .btn-bank {
     @apply px-6 py-3;
     @apply rounded-[10px];
@@ -137,7 +137,7 @@
     @apply bg-surface-600;
   }
 
-  /* Bank Style Input */
+  /* 묵직한 입력창 스타일 */
   .input-bank {
     @apply px-5 py-3;
     @apply rounded-[8px];
@@ -158,20 +158,20 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* 텍스트 그라데이션 - Cold Blue/Cyan */
+  /* 청록 계열 텍스트 그라데이션 */
   .text-gradient {
     @apply bg-gradient-to-r from-accent-light to-accent-blue;
     @apply bg-clip-text text-transparent;
   }
 
-  /* Modal Overlay (Clean Light Style) */
+  /* 밝은 톤 모달 오버레이 */
   .modal-overlay {
     @apply fixed inset-0 z-[1300];
     @apply bg-surface-900/20 backdrop-blur-sm;
     @apply transition-opacity duration-300;
   }
 
-  /* Modal Container */
+  /* 모달 래퍼 */
   .modal-container {
     @apply fixed inset-0 z-[1400];
     @apply flex items-center justify-center p-4;

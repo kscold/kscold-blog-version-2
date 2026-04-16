@@ -33,7 +33,7 @@ export function useAccessRequests() {
         Object.fromEntries(data.map(request => [request.id, request.postId ? 'POST' : 'CATEGORY']))
       );
     } catch {
-      // no-op
+      // 의도적으로 무시
     }
     setLoading(false);
   }, []);
@@ -54,7 +54,7 @@ export function useAccessRequests() {
         }
         setRequests(prev => prev.filter(item => item.id !== request.id));
       } catch {
-        // no-op
+        // 의도적으로 무시
       }
     },
     [scopeById]

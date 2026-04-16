@@ -74,6 +74,6 @@ function handleSocketMessage(
       setMessages(prev => [...prev, toVisitorMessage(data)]);
     }
   } catch {
-    // noop
+    // 의도적으로 무시
   }
 }

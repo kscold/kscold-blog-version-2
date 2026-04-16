@@ -59,7 +59,7 @@ export function InfoContainer() {
         <SkillsSection />
         <ContactSection />
 
-        {/* Teams 섹션 */}
+        {/* 팀 소개 섹션 */}
         <motion.section
           className="mb-16"
           variants={fadeUp}

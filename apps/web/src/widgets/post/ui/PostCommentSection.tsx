@@ -50,7 +50,7 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
 
   return (
     <>
-      {/* Tags */}
+      {/* 태그 목록 */}
       {tags && tags.length > 0 && (
         <motion.div
           className="mb-12 pt-8 border-t border-surface-200"
@@ -75,7 +75,7 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
         </motion.div>
       )}
 
-      {/* Navigation */}
+      {/* 이전·다음 이동 */}
       <motion.div
         className="flex justify-between items-center pt-8 border-t border-surface-200"
         initial={{ opacity: 0, y: 20 }}
