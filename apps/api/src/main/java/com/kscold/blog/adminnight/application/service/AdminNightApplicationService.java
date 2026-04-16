@@ -3,19 +3,17 @@ package com.kscold.blog.adminnight.application.service;
 import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
 import com.kscold.blog.adminnight.application.port.in.AdminNightUseCase;
+import com.kscold.blog.adminnight.application.port.out.AdminNightNotificationPort;
 import com.kscold.blog.adminnight.config.AdminNightProperties;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightRequestRepository;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryEmailComposer;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
-import com.kscold.blog.identity.application.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -24,7 +22,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminNightApplicationService implements AdminNightUseCase {
@@ -32,9 +29,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     private final AdminNightRequestRepository adminNightRequestRepository;
     private final UserRepository userRepository;
     private final UserQueryPort userQueryPort;
-    private final RecoveryMailSender recoveryMailSender;
-    private final RecoveryEmailComposer recoveryEmailComposer;
-    private final AdminNightProperties adminNightProperties;
+    private final AdminNightNotificationPort adminNightNotificationPort;
 
     @Override
     @Transactional
@@ -58,7 +53,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
                 .build();
 
         AdminNightRequest saved = adminNightRequestRepository.save(request);
-        sendRequestMailSafely(saved);
+        adminNightNotificationPort.notifyRequestCreated(saved);
         return saved;
     }
 
@@ -121,7 +116,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         request.setDecidedByName(null);
 
         AdminNightRequest saved = adminNightRequestRepository.save(request);
-        sendResubmittedMailSafely(saved);
+        adminNightNotificationPort.notifyRequestResubmitted(saved);
         return saved;
     }
 
@@ -144,7 +139,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         request.setDecidedByName(admin.displayName());
 
         AdminNightRequest saved = adminNightRequestRepository.save(request);
-        sendApprovalMailSafely(saved);
+        adminNightNotificationPort.notifyRequestApproved(saved);
         return saved;
     }
 
@@ -169,7 +164,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         request.setDecidedByName(admin.displayName());
 
         AdminNightRequest saved = adminNightRequestRepository.save(request);
-        sendInfoRequestedMailSafely(saved);
+        adminNightNotificationPort.notifyMoreInfoRequested(saved);
         return saved;
     }
 
@@ -190,7 +185,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         request.setDecidedByUserId(admin.id());
         request.setDecidedByName(admin.displayName());
         AdminNightRequest saved = adminNightRequestRepository.save(request);
-        sendRejectionMailSafely(saved);
+        adminNightNotificationPort.notifyRequestRejected(saved);
         return saved;
     }
 
@@ -268,91 +263,4 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         return StringUtils.hasText(value) ? value.trim() : null;
     }
 
-    private void sendRequestMailSafely(AdminNightRequest request) {
-        if (!recoveryMailSender.isAvailable()) {
-            return;
-        }
-
-        try {
-            recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightRequestConfirmation(request)
-            );
-            recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightRequestNotification(
-                            request,
-                            adminNightProperties.getAdminEmail()
-                    )
-            );
-        } catch (Exception exception) {
-            log.warn("Admin Night request mail skipped for {}", request.getRequesterEmail(), exception);
-        }
-    }
-
-    private void sendApprovalMailSafely(AdminNightRequest request) {
-        if (!recoveryMailSender.isAvailable()) {
-            return;
-        }
-
-        try {
-            recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightApprovedForRequester(request)
-            );
-            recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightApprovedForAdmin(
-                            request,
-                            adminNightProperties.getAdminEmail()
-                    )
-            );
-        } catch (Exception exception) {
-            log.warn("Admin Night approval mail skipped for {}", request.getRequesterEmail(), exception);
-        }
-    }
-
-    private void sendInfoRequestedMailSafely(AdminNightRequest request) {
-        if (!recoveryMailSender.isAvailable()) {
-            return;
-        }
-
-        try {
-            recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightInfoRequestedForRequester(request)
-            );
-        } catch (Exception exception) {
-            log.warn("Admin Night request-info mail skipped for {}", request.getRequesterEmail(), exception);
-        }
-    }
-
-    private void sendRejectionMailSafely(AdminNightRequest request) {
-        if (!recoveryMailSender.isAvailable()) {
-            return;
-        }
-
-        try {
-            recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightRejectedForRequester(request)
-            );
-        } catch (Exception exception) {
-            log.warn("Admin Night rejection mail skipped for {}", request.getRequesterEmail(), exception);
-        }
-    }
-
-    private void sendResubmittedMailSafely(AdminNightRequest request) {
-        if (!recoveryMailSender.isAvailable()) {
-            return;
-        }
-
-        try {
-            recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightResubmittedConfirmation(request)
-            );
-            recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightResubmittedNotification(
-                            request,
-                            adminNightProperties.getAdminEmail()
-                    )
-            );
-        } catch (Exception exception) {
-            log.warn("Admin Night resubmitted mail skipped for {}", request.getRequesterEmail(), exception);
-        }
-    }
 }

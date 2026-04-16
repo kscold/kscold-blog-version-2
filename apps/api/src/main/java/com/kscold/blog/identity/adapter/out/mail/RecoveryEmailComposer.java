@@ -365,12 +365,12 @@ public class RecoveryEmailComposer {
                 다만 실제 만남으로 이어가기 전에 조금 더 알고 싶은 정보가 있어, 아래 메모를 남겨 두었습니다.
                 """;
         String details = buildAdminNightDetails(
-                "INFO REQUESTED",
+                "추가 정보 요청",
                 request.getTaskTitle(),
                 request.getMessage(),
                 request.getParticipationMode(),
                 request.getPreferredSlot()
-        ) + buildAdminNightReviewNote("ADMIN NOTE", request.getReviewNote());
+        ) + buildAdminNightReviewNote("관리자 메모", request.getReviewNote());
         String plainText = """
                 %s님, Admin Night 신청에 추가 정보가 필요합니다.
 
@@ -413,7 +413,7 @@ public class RecoveryEmailComposer {
                 공개 캘린더와 참가자 안내 메일까지 함께 반영되었으니, 필요한 경우 여기서 다시 확인해 주세요.
                 """;
         String details = buildAdminNightDetails(
-                "APPROVED",
+                "승인 완료",
                 request.getRequesterName() + " · " + request.getTaskTitle(),
                 request.getMessage(),
                 request.getParticipationMode(),
@@ -459,7 +459,7 @@ public class RecoveryEmailComposer {
                 신청 내용과 시간대를 다시 review 한 뒤, 승인되면 실제 만남 일정으로 이어집니다.
                 """;
         String details = buildAdminNightDetails(
-                "RESUBMITTED",
+                "보완본 재접수",
                 request.getTaskTitle(),
                 request.getMessage(),
                 request.getParticipationMode(),
@@ -507,7 +507,7 @@ public class RecoveryEmailComposer {
                 관리자 보드에서 내용을 다시 확인하고, 승인하거나 필요한 경우 메모를 남겨 다시 요청할 수 있습니다.
                 """;
         String details = buildAdminNightDetails(
-                "RESUBMITTED PR",
+                "보완본 재검토",
                 request.getRequesterName() + " · " + request.getTaskTitle(),
                 request.getMessage(),
                 request.getParticipationMode(),
@@ -565,12 +565,12 @@ public class RecoveryEmailComposer {
                 그래도 Admin Night 문화 페이지는 계속 열려 있으니, 다음 시간대에 맞춰 다시 신청해도 괜찮습니다.
                 """;
         String details = buildAdminNightDetails(
-                "REQUEST STATUS",
+                "이번 일정 보류",
                 request.getTaskTitle(),
                 request.getMessage(),
                 request.getParticipationMode(),
                 request.getPreferredSlot()
-        ) + buildAdminNightReviewNote("ADMIN NOTE", request.getReviewNote());
+        ) + buildAdminNightReviewNote("관리자 메모", request.getReviewNote());
         String plainText = """
                 %s님, 이번 Admin Night 신청은 현재 일정에 바로 반영되지 않았습니다.
 
