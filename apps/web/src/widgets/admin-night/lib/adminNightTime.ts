@@ -1,4 +1,4 @@
-import type { AdminNightSlot } from '@/widgets/admin-night/lib/adminNight';
+import type { AdminNightSlot } from './adminNightSlots';
 
 export const ADMIN_NIGHT_REQUEST_START_MINUTES = 19 * 60;
 export const ADMIN_NIGHT_REQUEST_END_MINUTES = 23 * 60;
