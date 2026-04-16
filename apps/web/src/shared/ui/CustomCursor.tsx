@@ -93,7 +93,7 @@ export function CustomCursor() {
         y: cursorY,
         translateX: '-50%',
         translateY: '-50%',
-        // Force hardware acceleration and anti-aliasing
+        // 하드웨어 가속과 안티앨리어싱을 강제로 유지
         WebkitBackfaceVisibility: 'hidden',
         backfaceVisibility: 'hidden',
         WebkitTransform: 'translateZ(0)',

@@ -152,7 +152,7 @@ export function ImportFileList({
               {/* 발췌문 */}
               <p className="mt-3 text-sm text-surface-500 line-clamp-2">{file.excerpt}</p>
 
-              {/* Warnings */}
+              {/* 주의 사항 */}
               {file.parseWarnings.length > 0 && (
                 <div className="mt-2 text-xs text-amber-600">
                   {file.parseWarnings.join(', ')}
