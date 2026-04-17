@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -43,11 +42,11 @@ public class AdminNightController {
                         body.taskTitle(),
                         body.message(),
                         body.participationMode(),
-                        toSlot(body.preferredSlot())
+                        AdminNightWebMapper.toSlot(body.preferredSlot())
                 )
         );
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(toResponse(request), "Admin Night 신청을 보냈습니다."));
+                .body(ApiResponse.success(AdminNightWebMapper.toResponse(request), "Admin Night 신청을 보냈습니다."));
     }
 
     @PutMapping("/admin-night/requests/{id}/resubmit")
@@ -64,10 +63,10 @@ public class AdminNightController {
                         body.taskTitle(),
                         body.message(),
                         body.participationMode(),
-                        toSlot(body.preferredSlot())
+                        AdminNightWebMapper.toSlot(body.preferredSlot())
                 )
         );
-        return ResponseEntity.ok(ApiResponse.success(toResponse(request), "보완한 신청을 다시 보냈습니다."));
+        return ResponseEntity.ok(ApiResponse.success(AdminNightWebMapper.toResponse(request), "보완한 신청을 다시 보냈습니다."));
     }
 
     @GetMapping("/admin-night/requests/me")
@@ -75,7 +74,7 @@ public class AdminNightController {
             @AuthenticationPrincipal String userId
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success(adminNightUseCase.getMyRequests(userId).stream().map(this::toResponse).toList())
+                ApiResponse.success(adminNightUseCase.getMyRequests(userId).stream().map(AdminNightWebMapper::toResponse).toList())
         );
     }
 
@@ -87,7 +86,7 @@ public class AdminNightController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         adminNightUseCase.getApprovedRequests(from, to).stream()
-                                .map(this::toCalendarEntry)
+                                .map(AdminNightWebMapper::toCalendarEntry)
                                 .toList()
                 )
         );
@@ -100,7 +99,7 @@ public class AdminNightController {
     ) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        adminNightUseCase.getRequests(status).stream().map(this::toResponse).toList()
+                        adminNightUseCase.getRequests(status).stream().map(AdminNightWebMapper::toResponse).toList()
                 )
         );
     }
@@ -115,9 +114,9 @@ public class AdminNightController {
         AdminNightRequest request = adminNightUseCase.approve(
                 id,
                 userId,
-                new AdminNightDecisionCommand(toSlot(body.scheduledSlot()))
+                new AdminNightDecisionCommand(AdminNightWebMapper.toSlot(body.scheduledSlot()))
         );
-        return ResponseEntity.ok(ApiResponse.success(toResponse(request), "Admin Night 신청을 승인했습니다."));
+        return ResponseEntity.ok(ApiResponse.success(AdminNightWebMapper.toResponse(request), "Admin Night 신청을 승인했습니다."));
     }
 
     @PutMapping("/admin/admin-night/requests/{id}/reject")
@@ -128,7 +127,7 @@ public class AdminNightController {
             @RequestBody(required = false) ReviewRequestBody body
     ) {
         AdminNightRequest request = adminNightUseCase.reject(id, userId, body != null ? body.reviewNote() : null);
-        return ResponseEntity.ok(ApiResponse.success(toResponse(request), "Admin Night 신청을 거절했습니다."));
+        return ResponseEntity.ok(ApiResponse.success(AdminNightWebMapper.toResponse(request), "Admin Night 신청을 거절했습니다."));
     }
 
     @PutMapping("/admin/admin-night/requests/{id}/request-info")
@@ -139,135 +138,6 @@ public class AdminNightController {
             @RequestBody ReviewRequestBody body
     ) {
         AdminNightRequest request = adminNightUseCase.requestMoreInfo(id, userId, body.reviewNote());
-        return ResponseEntity.ok(ApiResponse.success(toResponse(request), "추가 정보 요청을 보냈습니다."));
+        return ResponseEntity.ok(ApiResponse.success(AdminNightWebMapper.toResponse(request), "추가 정보 요청을 보냈습니다."));
     }
-
-    private AdminNightRequest.SlotInfo toSlot(SlotBody slot) {
-        if (slot == null) {
-            return null;
-        }
-
-        return AdminNightRequest.SlotInfo.builder()
-                .slotKey(slot.slotKey())
-                .date(slot.date())
-                .weekday(slot.weekday())
-                .timeLabel(slot.timeLabel())
-                .focus(slot.focus())
-                .badgeLabel(slot.badgeLabel())
-                .build();
-    }
-
-    private RequestResponse toResponse(AdminNightRequest request) {
-        return new RequestResponse(
-                request.getId(),
-                request.getUserId(),
-                request.getRequesterName(),
-                request.getRequesterEmail(),
-                request.getTaskTitle(),
-                request.getMessage(),
-                request.getParticipationMode(),
-                request.getStatus(),
-                toSlotResponse(request.getPreferredSlot()),
-                toSlotResponse(request.getScheduledSlot()),
-                request.getReviewNote(),
-                request.getDecidedByName(),
-                request.getDecidedAt(),
-                request.getCreatedAt()
-        );
-    }
-
-    private CalendarEntryResponse toCalendarEntry(AdminNightRequest request) {
-        return new CalendarEntryResponse(
-                request.getId(),
-                maskName(request.getRequesterName()),
-                request.getTaskTitle(),
-                request.getParticipationMode(),
-                toSlotResponse(request.getScheduledSlot()),
-                request.getCreatedAt()
-        );
-    }
-
-    private SlotResponse toSlotResponse(AdminNightRequest.SlotInfo slot) {
-        if (slot == null) {
-            return null;
-        }
-
-        return new SlotResponse(
-                slot.getSlotKey(),
-                slot.getDate(),
-                slot.getWeekday(),
-                slot.getTimeLabel(),
-                slot.getFocus(),
-                slot.getBadgeLabel()
-        );
-    }
-
-    private String maskName(String name) {
-        if (name == null || name.isBlank()) {
-            return "익명";
-        }
-        if (name.length() == 1) {
-            return name + "*";
-        }
-        if (name.length() == 2) {
-            return name.charAt(0) + "*";
-        }
-        return name.charAt(0) + "*" + name.charAt(name.length() - 1);
-    }
-
-    record CreateRequestBody(
-            String requesterName,
-            String taskTitle,
-            String message,
-            AdminNightRequest.ParticipationMode participationMode,
-            SlotBody preferredSlot
-    ) {}
-
-    record ApproveRequestBody(SlotBody scheduledSlot) {}
-
-    record ReviewRequestBody(String reviewNote) {}
-
-    record SlotBody(
-            String slotKey,
-            LocalDate date,
-            String weekday,
-            String timeLabel,
-            String focus,
-            String badgeLabel
-    ) {}
-
-    public record SlotResponse(
-            String slotKey,
-            LocalDate date,
-            String weekday,
-            String timeLabel,
-            String focus,
-            String badgeLabel
-    ) {}
-
-    public record RequestResponse(
-            String id,
-            String userId,
-            String requesterName,
-            String requesterEmail,
-            String taskTitle,
-            String message,
-            AdminNightRequest.ParticipationMode participationMode,
-            AdminNightRequest.Status status,
-            SlotResponse preferredSlot,
-            SlotResponse scheduledSlot,
-            String reviewNote,
-            String decidedByName,
-            LocalDateTime decidedAt,
-            LocalDateTime createdAt
-    ) {}
-
-    public record CalendarEntryResponse(
-            String id,
-            String requesterLabel,
-            String taskTitle,
-            AdminNightRequest.ParticipationMode participationMode,
-            SlotResponse scheduledSlot,
-            LocalDateTime createdAt
-    ) {}
 }
