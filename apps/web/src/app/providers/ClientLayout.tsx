@@ -10,6 +10,7 @@ import { CustomCursor } from '@/shared/ui/CustomCursor';
 import { ScrollProgress } from '@/shared/ui/ScrollProgress';
 import { ViewerProvider } from '@/shared/model/ViewerProvider';
 import type { InitialViewer } from '@/shared/lib/initialViewer';
+import { PageVisitTracker } from '@/shared/analytics/PageVisitTracker';
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -23,6 +24,7 @@ export function ClientLayout({ children, initialViewer }: ClientLayoutProps) {
   return (
     <ViewerProvider initialViewer={initialViewer}>
       <div className={`flex flex-col relative z-0 ${isVaultPage ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'}`}>
+        <PageVisitTracker />
         <ScrollProgress />
         <Header />
         <div className={`flex flex-1 w-full ${isVaultPage ? 'mt-16 h-[calc(100dvh-4rem)] overflow-hidden' : 'pt-16'}`}>
