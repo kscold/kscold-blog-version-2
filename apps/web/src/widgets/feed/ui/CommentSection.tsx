@@ -11,6 +11,7 @@ import {
 import { useAlert } from '@/shared/model/alertStore';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
 import { Pagination } from '@/shared/ui/Pagination';
+import { LinkifiedText } from '@/shared/ui/LinkifiedText';
 import { useAuth } from '@/features/auth/api/useAuth';
 
 interface CommentSectionProps {
@@ -76,7 +77,11 @@ export function CommentSection({ feedId }: CommentSectionProps) {
                   )}
                   <span className="text-xs text-surface-400">{formatRelativeTime(comment.createdAt)}</span>
                 </div>
-                <p className="text-sm text-surface-700 mt-0.5">{comment.content}</p>
+                <LinkifiedText
+                  text={comment.content}
+                  className="text-sm text-surface-700 mt-0.5 whitespace-pre-wrap break-words"
+                />
+
               </div>
 
               {comment.canDelete && (
