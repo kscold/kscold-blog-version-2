@@ -1,5 +1,6 @@
 package com.kscold.blog.social.adapter.in.web;
 
+import com.kscold.blog.shared.analytics.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.social.adapter.in.web.dto.FeedResponse;
@@ -31,6 +32,7 @@ public class FeedController {
 
     private final FeedUseCase feedUseCase;
     private final ClientIdentifierResolver clientIdentifierResolver;
+    private final ViewCounter viewCounter;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<FeedResponse>>> getPublicFeeds(
@@ -62,6 +64,9 @@ public class FeedController {
     ) {
         Feed feed = feedUseCase.getById(id);
         String identifier = clientIdentifierResolver.resolve(request);
+        if (viewCounter.incrementIfUnique("feeds", feed.getId(), "FEED", identifier)) {
+            feed.setViews(feed.getViews() + 1);
+        }
         return ResponseEntity.ok(ApiResponse.success(FeedResponse.from(feed, identifier)));
     }
 

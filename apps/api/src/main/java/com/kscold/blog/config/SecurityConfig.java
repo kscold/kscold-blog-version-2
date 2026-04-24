@@ -84,6 +84,8 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**", "/socket.io/**").permitAll()
                         // 접근 요청 확인 (비로그인도 가능하게 - 필터에서 null userId 처리)
                         .requestMatchers(HttpMethod.GET, "/api/access-requests/check/**").permitAll()
+                        // 페이지 방문 트래킹 (비로그인 허용)
+                        .requestMatchers(HttpMethod.POST, "/api/analytics/page-visit").permitAll()
                         // 관리자 엔드포인트
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 그 외 모든 요청은 인증 필요

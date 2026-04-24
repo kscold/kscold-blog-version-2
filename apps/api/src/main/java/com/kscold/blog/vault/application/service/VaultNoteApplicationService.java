@@ -111,11 +111,8 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
                 .orElseThrow(() -> ResourceNotFoundException.vaultNote(id));
     }
 
-    @Transactional
     public VaultNote getById(String id) {
-        VaultNote note = findById(id);
-        note.setViews(note.getViews() + 1);
-        return vaultNoteRepository.save(note);
+        return findById(id);
     }
 
     public VaultNote getBySlug(String slug) {
@@ -123,11 +120,9 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
                 .orElseThrow(() -> ResourceNotFoundException.vaultNote(slug));
     }
 
-    @Transactional
+    /** 조회수 증가는 controller에서 IP 기반으로 별도 집계 */
     public VaultNote getBySlugWithView(String slug) {
-        VaultNote note = getBySlug(slug);
-        note.setViews(note.getViews() + 1);
-        return vaultNoteRepository.save(note);
+        return getBySlug(slug);
     }
 
     public Page<VaultNote> getAll(Pageable pageable) {

@@ -87,24 +87,18 @@ public class PostApplicationService implements PostUseCase {
     }
 
     /**
-     * 포스트 조회 (ID) - 조회수 증가
+     * 포스트 조회 (ID) - 조회수 증가는 controller에서 IP 기반으로 별도 집계
      */
-    @Transactional
     public Post getById(String id) {
-        Post post = findById(id);
-        post.setViews(post.getViews() + 1);
-        return postRepository.save(post);
+        return findById(id);
     }
 
     /**
-     * 포스트 조회 (Slug) - 조회수 증가
+     * 포스트 조회 (Slug)
      */
-    @Transactional
     public Post getBySlug(String slug) {
-        Post post = postRepository.findBySlug(slug)
+        return postRepository.findBySlug(slug)
                 .orElseThrow(() -> ResourceNotFoundException.postBySlug(slug));
-        post.setViews(post.getViews() + 1);
-        return postRepository.save(post);
     }
 
     /**

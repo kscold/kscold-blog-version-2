@@ -1,7 +1,10 @@
 package com.kscold.blog.vault.adapter.in.web;
 
+import com.kscold.blog.shared.analytics.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.vault.adapter.in.web.dto.VaultNoteResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import com.kscold.blog.vault.application.dto.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.NoteUpdateCommand;
@@ -29,6 +32,8 @@ import java.util.List;
 public class VaultNoteController {
 
     private final VaultNoteUseCase vaultNoteUseCase;
+    private final ViewCounter viewCounter;
+    private final ClientIdentifierResolver clientIdentifierResolver;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<VaultNoteResponse>>> getAllNotes(
@@ -41,15 +46,30 @@ public class VaultNoteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<VaultNoteResponse>> getNoteById(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<VaultNoteResponse>> getNoteById(
+            @PathVariable String id,
+            HttpServletRequest request
+    ) {
         VaultNote note = vaultNoteUseCase.getById(id);
+        recordNoteView(note, request);
         return ResponseEntity.ok(ApiResponse.success(VaultNoteResponse.from(note)));
     }
 
     @GetMapping("/slug/{slug}")
-    public ResponseEntity<ApiResponse<VaultNoteResponse>> getNoteBySlug(@PathVariable String slug) {
+    public ResponseEntity<ApiResponse<VaultNoteResponse>> getNoteBySlug(
+            @PathVariable String slug,
+            HttpServletRequest request
+    ) {
         VaultNote note = vaultNoteUseCase.getBySlugWithView(slug);
+        recordNoteView(note, request);
         return ResponseEntity.ok(ApiResponse.success(VaultNoteResponse.from(note)));
+    }
+
+    private void recordNoteView(VaultNote note, HttpServletRequest request) {
+        String ip = clientIdentifierResolver.resolve(request);
+        if (viewCounter.incrementIfUnique("vault_notes", note.getId(), "VAULT_NOTE", ip)) {
+            note.setViews(note.getViews() + 1);
+        }
     }
 
     @GetMapping("/folder/{folderId}")
