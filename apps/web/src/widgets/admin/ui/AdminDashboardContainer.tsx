@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useViewer } from '@/entities/user/model/useViewer';
 import { DashboardStats } from './DashboardStats';
 import { AdminUserStatsSection } from './AdminUserStatsSection';
+import { AdminPageVisitSection } from './AdminPageVisitSection';
 
 export function AdminDashboardContainer() {
   const { user, role } = useViewer();
@@ -90,6 +91,16 @@ export function AdminDashboardContainer() {
           </p>
         </div>
         <AdminUserStatsSection />
+      </div>
+
+      <div className="mt-12 space-y-4">
+        <div className="space-y-1">
+          <h2 className="text-lg font-bold text-surface-900">페이지 방문 추이</h2>
+          <p className="text-sm leading-6 text-surface-500">
+            방문자들이 어떤 페이지를 보는지 일별/페이지별로 집계합니다.
+          </p>
+        </div>
+        <AdminPageVisitSection />
       </div>
     </>
   );

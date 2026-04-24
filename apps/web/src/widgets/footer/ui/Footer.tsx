@@ -108,9 +108,17 @@ export function Footer() {
 
         {/* 하단 줄 */}
         <div className="mt-8 pt-6 border-t border-surface-100 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-surface-400 font-mono tracking-wider">
-            &copy; {currentYear} Colding. All rights reserved.
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-surface-400 font-mono tracking-wider">
+              &copy; {currentYear} Colding. All rights reserved.
+            </p>
+            <Link
+              href="/privacy"
+              className="text-xs text-surface-500 hover:text-surface-900 font-medium transition-colors"
+            >
+              개인정보 처리방침
+            </Link>
+          </div>
           <p className="text-[10px] text-surface-300 font-mono tracking-widest uppercase">
             Gimpo, South Korea
           </p>
