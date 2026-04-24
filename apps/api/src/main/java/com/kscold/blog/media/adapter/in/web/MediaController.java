@@ -21,7 +21,7 @@ public class MediaController {
     private final MediaUseCase mediaUseCase;
 
     @PostMapping("/upload")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<MediaResponse>> upload(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal String userId
