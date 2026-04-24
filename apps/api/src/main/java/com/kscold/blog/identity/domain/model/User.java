@@ -42,6 +42,13 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    /** 소프트 딜리트 타임스탬프 (null이면 활성 계정) */
+    private LocalDateTime deletedAt;
+
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
+
     public enum Role {
         ADMIN, USER
     }

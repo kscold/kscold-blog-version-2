@@ -78,6 +78,10 @@ public class AuthApplicationService implements AuthUseCase {
         User user = userRepository.findByEmail(command.getEmail())
                 .orElseThrow(() -> InvalidRequestException.invalidInput("이메일 또는 비밀번호가 올바르지 않습니다"));
 
+        if (user.isDeleted()) {
+            throw InvalidRequestException.invalidInput("비활성화된 계정입니다. 관리자에게 문의하세요");
+        }
+
         if (!passwordEncoder.matches(command.getPassword(), user.getPassword())) {
             throw InvalidRequestException.invalidInput("이메일 또는 비밀번호가 올바르지 않습니다");
         }

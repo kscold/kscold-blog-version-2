@@ -4,17 +4,20 @@ import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import com.kscold.blog.blog.domain.model.Post;
+import com.kscold.blog.blog.application.port.out.AccessRequestMailSender;
 import com.kscold.blog.blog.domain.port.out.AccessRequestRepository;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccessRequestService implements AccessRequestUseCase {
@@ -22,6 +25,7 @@ public class AccessRequestService implements AccessRequestUseCase {
     private final AccessRequestRepository accessRequestRepository;
     private final PostUseCase postUseCase;
     private final UserQueryPort userQueryPort;
+    private final AccessRequestMailSender accessRequestMailSender;
 
     @Override
     public AccessRequest requestAccess(String userId, String postId, String message) {
@@ -111,7 +115,18 @@ public class AccessRequestService implements AccessRequestUseCase {
         AccessRequest.GrantScope resolvedScope = resolveGrantScope(request, grantScope);
         request.setStatus(AccessRequest.Status.APPROVED);
         request.setGrantScope(resolvedScope);
-        return accessRequestRepository.save(request);
+        AccessRequest saved = accessRequestRepository.save(request);
+        notifyApproved(saved);
+        return saved;
+    }
+
+    private void notifyApproved(AccessRequest request) {
+        try {
+            UserQueryPort.UserInfo user = userQueryPort.getUserById(request.getUserId());
+            accessRequestMailSender.sendApproved(user.email(), user.displayName(), request);
+        } catch (Exception e) {
+            log.warn("승인 메일 발송 실패 (userId={}): {}", request.getUserId(), e.getMessage());
+        }
     }
 
     @Override
