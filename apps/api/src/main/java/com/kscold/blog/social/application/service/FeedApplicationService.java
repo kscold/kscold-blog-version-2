@@ -89,11 +89,8 @@ public class FeedApplicationService implements FeedUseCase {
         feedRepository.delete(feed);
     }
 
-    @Transactional
     public Feed getById(String id) {
-        Feed feed = findById(id);
-        feed.setViews(feed.getViews() + 1);
-        return feedRepository.save(feed);
+        return findById(id);
     }
 
     public Page<Feed> getPublicFeeds(Pageable pageable) {
@@ -104,19 +101,9 @@ public class FeedApplicationService implements FeedUseCase {
         return feedRepository.findAll(pageable);
     }
 
-    @Transactional
     public Feed toggleLike(String feedId, String identifier) {
-        Feed feed = findById(feedId);
-
-        if (feed.getLikedBy().contains(identifier)) {
-            feed.getLikedBy().remove(identifier);
-            feed.setLikesCount(Math.max(0, feed.getLikesCount() - 1));
-        } else {
-            feed.getLikedBy().add(identifier);
-            feed.setLikesCount(feed.getLikesCount() + 1);
-        }
-
-        return feedRepository.save(feed);
+        feedRepository.toggleLike(feedId, identifier);
+        return findById(feedId);
     }
 
     /**

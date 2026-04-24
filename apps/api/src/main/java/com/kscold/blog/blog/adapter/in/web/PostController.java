@@ -8,7 +8,10 @@ import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.adapter.in.web.dto.PostResponse;
+import com.kscold.blog.shared.analytics.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +39,8 @@ public class PostController {
     private final PostUseCase postUseCase;
     private final AccessRequestUseCase accessRequestUseCase;
     private final CategoryUseCase categoryUseCase;
+    private final ViewCounter viewCounter;
+    private final ClientIdentifierResolver clientIdentifierResolver;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<PostResponse>>> getAllPosts(
@@ -62,19 +67,31 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PostResponse>> getPostById(
             @PathVariable String id,
-            @AuthenticationPrincipal String userId
+            @AuthenticationPrincipal String userId,
+            HttpServletRequest request
     ) {
         Post post = postUseCase.getById(id);
+        recordView(post, request);
         return ResponseEntity.ok(ApiResponse.success(applyRestriction(post, userId)));
     }
 
     @GetMapping("/slug/{slug}")
     public ResponseEntity<ApiResponse<PostResponse>> getPostBySlug(
             @PathVariable String slug,
-            @AuthenticationPrincipal String userId
+            @AuthenticationPrincipal String userId,
+            HttpServletRequest request
     ) {
         Post post = postUseCase.getBySlug(slug);
+        recordView(post, request);
         return ResponseEntity.ok(ApiResponse.success(applyRestriction(post, userId)));
+    }
+
+    private void recordView(Post post, HttpServletRequest request) {
+        if (post.getStatus() != Post.Status.PUBLISHED) return;
+        String ip = clientIdentifierResolver.resolve(request);
+        if (viewCounter.incrementIfUnique("posts", post.getId(), "POST", ip)) {
+            post.setViews(post.getViews() + 1); // 응답에 최신값 반영
+        }
     }
 
     @GetMapping("/category/{categoryId}")

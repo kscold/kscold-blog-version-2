@@ -14,4 +14,7 @@ public interface FeedRepository {
     Page<Feed> findAll(Pageable pageable);
     void incrementCommentCount(String feedId);
     void decrementCommentCount(String feedId);
+
+    /** 좋아요 토글 - atomic. 좋아요 추가했으면 true, 취소했으면 false */
+    boolean toggleLike(String feedId, String identifier);
 }
