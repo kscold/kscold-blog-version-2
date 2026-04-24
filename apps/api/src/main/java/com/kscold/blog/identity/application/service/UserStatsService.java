@@ -60,7 +60,8 @@ public class UserStatsService {
                         u.getRole() != null ? u.getRole().name() : "USER",
                         u.getCreatedAt() != null
                                 ? u.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"))
-                                : "-"
+                                : "-",
+                        u.isDeleted()
                 ))
                 .toList();
 

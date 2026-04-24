@@ -20,6 +20,7 @@ public class UserQueryService implements UserQueryPort {
 
         String avatar = user.getProfile() != null ? user.getProfile().getAvatar() : null;
 
-        return new UserInfo(user.getId(), user.getDisplayName(), avatar, user.getRole() == User.Role.ADMIN);
+        return new UserInfo(user.getId(), user.getDisplayName(), avatar,
+                user.getRole() == User.Role.ADMIN, user.getEmail());
     }
 }

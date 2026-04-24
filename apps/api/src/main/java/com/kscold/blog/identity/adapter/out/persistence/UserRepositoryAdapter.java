@@ -69,4 +69,9 @@ public class UserRepositoryAdapter implements UserRepository {
     public List<User> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime after) {
         return mongoUserRepository.findByCreatedAtAfterOrderByCreatedAtDesc(after);
     }
+
+    @Override
+    public void deleteById(String id) {
+        mongoUserRepository.deleteById(id);
+    }
 }

@@ -12,6 +12,7 @@ public interface UserQueryPort {
             String id,
             String displayName,
             String avatar,
-            boolean isAdmin
+            boolean isAdmin,
+            String email
     ) {}
 }

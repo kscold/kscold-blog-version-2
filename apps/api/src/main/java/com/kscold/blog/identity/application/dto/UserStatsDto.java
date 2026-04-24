@@ -19,6 +19,7 @@ public record UserStatsDto(
             String email,
             String avatar,
             String role,
-            String createdAt
+            String createdAt,
+            boolean deleted
     ) {}
 }

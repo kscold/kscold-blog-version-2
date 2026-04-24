@@ -23,4 +23,7 @@ public interface UserRepository {
 
     /** 특정 기간 이후 가입자 목록 */
     List<User> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime after);
+
+    /** 영구 삭제 (하드 딜리트) */
+    void deleteById(String id);
 }
