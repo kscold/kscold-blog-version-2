@@ -9,6 +9,7 @@ import { useToggleLike } from '@/entities/feed/api/useFeeds';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
+import { LinkifiedText } from '@/shared/ui/LinkifiedText';
 
 interface FeedCardProps {
   feed: Feed;
@@ -126,10 +127,11 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
 
       {/* 본문 */}
       <div className="px-4 py-3">
-        <p className="text-sm text-surface-800 whitespace-pre-wrap leading-relaxed">
-          <span className="font-bold text-surface-900 mr-1.5">{feed.author.name}</span>
-          {feed.content}
-        </p>
+        <LinkifiedText
+          text={feed.content}
+          className="text-sm text-surface-800 whitespace-pre-wrap leading-relaxed"
+          prefix={<span className="font-bold text-surface-900 mr-1.5">{feed.author.name}</span>}
+        />
       </div>
 
       {/* 링크 미리보기 */}

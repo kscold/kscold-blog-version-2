@@ -19,7 +19,7 @@ export function FeedComposerHeader({
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-surface-400">
                 SHARE A NOTE
               </p>
-              <h2 className="mt-2 max-w-[18ch] text-balance text-2xl font-black tracking-tight text-surface-900 sm:max-w-[22ch] sm:text-3xl">
+              <h2 className="mt-2 text-balance text-2xl font-black tracking-tight text-surface-900 [word-break:keep-all] sm:text-3xl">
                 {currentUser.displayName}님, 지금 하고 있는 흐름을 남겨보세요
               </h2>
             </div>
