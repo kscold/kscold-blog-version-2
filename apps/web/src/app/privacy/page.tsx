@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: '콜딩(Colding)의 개인정보 처리방침입니다.',
 };
 
-const EFFECTIVE_DATE = '2026년 4월 22일';
+const EFFECTIVE_DATE = '2026년 4월 27일';
 
 export default function PrivacyPolicyPage() {
   return (
@@ -25,11 +25,11 @@ export default function PrivacyPolicyPage() {
 
         <div className="prose prose-sm sm:prose max-w-none text-surface-700 leading-7 space-y-10">
           <p>
-            콜딩(이하 “회사”)은 개인정보 보호법을 준수하며, 정보 주체의 개인정보를 보호하고 이와 관련한 고충을 신속하게 처리하기 위해 본 개인정보 처리방침을 수립·공개합니다.
+            김승찬(이하 “운영자”)은 개인정보 보호법을 준수하며, 정보 주체의 개인정보를 보호하고 이와 관련한 고충을 신속하게 처리하기 위해 본 개인정보 처리방침을 수립·공개합니다.
           </p>
 
           <Section title="1. 수집하는 개인정보 항목과 수집 방법">
-            <p>회사는 KSCOLD(kscold.com) 서비스 제공을 위해 아래 정보를 수집합니다.</p>
+            <p>운영자는 KSCOLD(kscold.com) 서비스 제공을 위해 아래 정보를 수집합니다.</p>
             <List>
               <li>회원가입 시: 이메일, 비밀번호(해시 저장), 닉네임/표시 이름</li>
               <li>프로필 설정 시(선택): 아바타 이미지, 소개, 소셜 링크</li>
@@ -72,16 +72,16 @@ export default function PrivacyPolicyPage() {
 
           <Section title="4. 개인정보의 제3자 제공">
             <p>
-              회사는 원칙적으로 이용자의 개인정보를 외부에 제공하지 않습니다. 예외적으로 법령에 근거하거나 수사기관의 적법한 요청이 있는 경우에만 제공합니다.
+              운영자는 원칙적으로 이용자의 개인정보를 외부에 제공하지 않습니다. 예외적으로 법령에 근거하거나 수사기관의 적법한 요청이 있는 경우에만 제공합니다.
             </p>
           </Section>
 
           <Section title="5. 개인정보 처리 위탁">
-            <p>서비스 제공을 위해 아래 처리자에게 개인정보 처리를 위탁하고 있습니다.</p>
+            <p>서비스 제공을 위해 아래 외부 서비스에 일부 개인정보 처리가 위탁됩니다.</p>
             <List>
-              <li>이메일 발송: 구글(Gmail SMTP) — 비밀번호 복구 및 접근 승인 알림 발송</li>
-              <li>실시간 알림: Discord — 방문자 채팅 내용 전달</li>
-              <li>이미지 저장: 자체 MinIO(S3 호환) — 프로필·피드 이미지 보관</li>
+              <li>이메일 발송 — 비밀번호 복구 및 알림 발송</li>
+              <li>방문 통계 분석: Google Analytics(Google LLC)</li>
+              <li>광고 게재: Google AdSense(Google LLC)</li>
             </List>
           </Section>
 
@@ -102,9 +102,71 @@ export default function PrivacyPolicyPage() {
             </List>
           </Section>
 
-          <Section title="8. 쿠키 사용">
+          <Section title="8. 쿠키 및 추적 기술 사용">
             <p>
-              로그인 상태 유지를 위해 JWT 토큰을 localStorage 및 HttpOnly 쿠키 형태로 저장합니다. 사용자는 브라우저 설정에서 쿠키 저장을 거부할 수 있으나, 이 경우 로그인 기반 기능을 이용할 수 없습니다.
+              <strong>1) 자체 쿠키:</strong> 로그인 상태 유지를 위해 JWT 토큰을 localStorage 및 HttpOnly 쿠키 형태로 저장합니다. 사용자는 브라우저 설정에서 쿠키 저장을 거부할 수 있으나, 이 경우 로그인 기반 기능을 이용할 수 없습니다.
+            </p>
+            <p className="mt-3">
+              <strong>2) Google Analytics:</strong> 본 사이트는 방문자의 사이트 이용 행태(페이지뷰, 체류 시간, 유입 경로 등)를 분석하기 위해 Google Analytics를 사용합니다. 분석 과정에서 IP 주소, 브라우저 정보 등이 수집되며, 이는 통계 목적으로만 사용됩니다.
+            </p>
+            <p className="mt-3">
+              <strong>3) Google AdSense 및 제3자 광고:</strong> 본 사이트는 광고 게재를 위해 Google AdSense를 사용합니다. Google 및 협력 광고 네트워크는 사용자에게 관심 기반의 광고를 제공하기 위해 쿠키 및 웹 비콘과 같은 추적 기술을 사용할 수 있습니다. 이 과정에서 다음과 같은 정보가 수집될 수 있습니다.
+            </p>
+            <List>
+              <li>IP 주소, 디바이스 식별자, 브라우저 종류 및 버전</li>
+              <li>본 사이트 및 다른 사이트에서의 방문 기록</li>
+              <li>광고 클릭 및 노출 정보</li>
+            </List>
+            <p className="mt-3">
+              <strong>4) 사용자 선택권:</strong> 이용자는 다음 방법으로 맞춤형 광고 및 추적을 비활성화할 수 있습니다.
+            </p>
+            <List>
+              <li>
+                Google 광고 설정에서 맞춤 광고 비활성화:{' '}
+                <a
+                  href="https://adssettings.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  https://adssettings.google.com
+                </a>
+              </li>
+              <li>
+                미국 DAA 옵트아웃 페이지:{' '}
+                <a
+                  href="https://www.aboutads.info/choices"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  https://www.aboutads.info/choices
+                </a>
+              </li>
+              <li>
+                EU EDAA 옵트아웃 페이지:{' '}
+                <a
+                  href="https://www.youronlinechoices.eu"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  https://www.youronlinechoices.eu
+                </a>
+              </li>
+              <li>브라우저 설정에서 제3자 쿠키 차단</li>
+            </List>
+            <p className="mt-3">
+              자세한 내용은 Google 개인정보처리방침(
+              <a
+                href="https://policies.google.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                policies.google.com/privacy
+              </a>
+              )을 참고하시기 바랍니다.
             </p>
           </Section>
 

@@ -7,14 +7,17 @@ declare global {
   interface Window {
     dataLayer?: Array<Record<string, unknown> | IArguments>;
     gtag?: (...args: unknown[]) => void;
+    adsbygoogle?: Array<Record<string, unknown>>;
     __KSCOLD_GTM_INITIALIZED__?: boolean;
     __KSCOLD_GA_INITIALIZED__?: boolean;
+    __KSCOLD_ADSENSE_INITIALIZED__?: boolean;
   }
 }
 
 interface AnalyticsScriptsProps {
   gtmId?: string;
   gaId?: string;
+  adsenseId?: string;
 }
 
 function ensureDataLayer() {
@@ -22,7 +25,7 @@ function ensureDataLayer() {
   return window.dataLayer;
 }
 
-export function AnalyticsScripts({ gtmId, gaId }: AnalyticsScriptsProps) {
+export function AnalyticsScripts({ gtmId, gaId, adsenseId }: AnalyticsScriptsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const search = searchParams.toString();
@@ -109,6 +112,29 @@ export function AnalyticsScripts({ gtmId, gaId }: AnalyticsScriptsProps) {
       page_title: document.title,
     });
   }, [gtmId, pathname, search]);
+
+  useEffect(() => {
+    if (!adsenseId || window.__KSCOLD_ADSENSE_INITIALIZED__) {
+      return;
+    }
+
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[data-kscold-adsense="true"]'
+    );
+
+    if (existingScript) {
+      window.__KSCOLD_ADSENSE_INITIALIZED__ = true;
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`;
+    script.crossOrigin = 'anonymous';
+    script.dataset.kscoldAdsense = 'true';
+    document.head.appendChild(script);
+    window.__KSCOLD_ADSENSE_INITIALIZED__ = true;
+  }, [adsenseId]);
 
   return null;
 }
