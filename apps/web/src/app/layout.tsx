@@ -74,10 +74,16 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  verification: {
+    other: {
+      'naver-site-verification': ['1dac7b194ac38f7dea77dcad259828346ccc564f'],
+    },
+  },
 };
 
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
+const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID;
 const siteJsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -135,7 +141,15 @@ export default async function RootLayout({
 
   return (
     <html lang="ko" suppressHydrationWarning>
-      <head />
+      <head>
+        {adsenseId && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
+            crossOrigin="anonymous"
+          />
+        )}
+      </head>
       <body className="antialiased bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50 min-h-screen relative selection:bg-accent-light/30 selection:text-accent-light transition-colors duration-300">
         <JsonLd id="site-graph" data={siteJsonLd} />
         <AnalyticsScripts gtmId={gtmId} gaId={gaId} />

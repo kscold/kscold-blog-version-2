@@ -119,9 +119,6 @@ export function Footer() {
               개인정보 처리방침
             </Link>
           </div>
-          <p className="text-[10px] text-surface-300 font-mono tracking-widest uppercase">
-            Gimpo, South Korea
-          </p>
         </div>
       </div>
     </footer>
