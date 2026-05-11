@@ -106,5 +106,6 @@ export function usePerformanceMode() {
     isTouchDevice,
     isMobileViewport,
     supportsHover,
+    prefersReducedMotion,
   };
 }
