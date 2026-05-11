@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { cookies } from 'next/headers';
 import { Providers } from '@/app/providers/providers';
 import { ClientLayout } from '@/app/providers/ClientLayout';
@@ -82,7 +83,6 @@ export const metadata: Metadata = {
   },
 };
 
-const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
 const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID;
 const siteJsonLd = {
@@ -153,17 +153,9 @@ export default async function RootLayout({
       </head>
       <body className="antialiased bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50 min-h-screen relative selection:bg-accent-light/30 selection:text-accent-light transition-colors duration-300">
         <JsonLd id="site-graph" data={siteJsonLd} />
-        <AnalyticsScripts gtmId={gtmId} gaId={gaId} />
-        {gtmId && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-              height="0"
-              width="0"
-              style={{ display: 'none', visibility: 'hidden' }}
-            />
-          </noscript>
-        )}
+        <Suspense>
+          <AnalyticsScripts gaId={gaId} />
+        </Suspense>
 
         <div className="fixed inset-0 z-[-1] pointer-events-none bg-surface-50 dark:bg-surface-950 transition-colors duration-300"></div>
 

@@ -1,140 +1,51 @@
 'use client';
 
-import { useEffect } from 'react';
+import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 declare global {
   interface Window {
     dataLayer?: Array<Record<string, unknown> | IArguments>;
     gtag?: (...args: unknown[]) => void;
-    adsbygoogle?: Array<Record<string, unknown>>;
-    __KSCOLD_GTM_INITIALIZED__?: boolean;
-    __KSCOLD_GA_INITIALIZED__?: boolean;
-    __KSCOLD_ADSENSE_INITIALIZED__?: boolean;
   }
 }
 
 interface AnalyticsScriptsProps {
   gtmId?: string;
   gaId?: string;
-  adsenseId?: string;
 }
 
-function ensureDataLayer() {
-  window.dataLayer = window.dataLayer || [];
-  return window.dataLayer;
-}
-
-export function AnalyticsScripts({ gtmId, gaId, adsenseId }: AnalyticsScriptsProps) {
+export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const search = searchParams.toString();
 
   useEffect(() => {
-    if (!gtmId) {
-      return;
-    }
-
-    ensureDataLayer().push({
-      'gtm.start': Date.now(),
-      event: 'gtm.js',
-    });
-
-    if (window.__KSCOLD_GTM_INITIALIZED__) {
-      return;
-    }
-
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      'script[data-kscold-gtm="true"]'
-    );
-
-    if (existingScript) {
-      window.__KSCOLD_GTM_INITIALIZED__ = true;
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtm.js?id=${gtmId}`;
-    script.dataset.kscoldGtm = 'true';
-    document.head.appendChild(script);
-    window.__KSCOLD_GTM_INITIALIZED__ = true;
-  }, [gtmId]);
-
-  useEffect(() => {
-    if (!gaId) {
-      return;
-    }
-
-    ensureDataLayer();
-
-    if (!window.gtag) {
-      window.gtag = (...args: unknown[]) => {
-        ensureDataLayer().push(args as unknown as IArguments);
-      };
-    }
-
-    if (!window.__KSCOLD_GA_INITIALIZED__) {
-      const existingScript = document.querySelector<HTMLScriptElement>(
-        'script[data-kscold-ga="true"]'
-      );
-
-      if (!existingScript) {
-        const script = document.createElement('script');
-        script.async = true;
-        script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
-        script.dataset.kscoldGa = 'true';
-        document.head.appendChild(script);
-      }
-
-      window.gtag('js', new Date());
-      window.__KSCOLD_GA_INITIALIZED__ = true;
-    }
-
-    const pagePath = `${pathname}${search ? `?${search}` : ''}`;
+    if (!gaId || !window.gtag) return;
+    const pagePath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
     window.gtag('config', gaId, {
       page_path: pagePath,
       page_location: window.location.href,
       page_title: document.title,
     });
-  }, [gaId, pathname, search]);
+  }, [gaId, pathname, searchParams]);
 
-  useEffect(() => {
-    if (!gtmId) {
-      return;
-    }
+  if (!gaId) return null;
 
-    const pagePath = `${pathname}${search ? `?${search}` : ''}`;
-    ensureDataLayer().push({
-      event: 'page_view',
-      page_path: pagePath,
-      page_location: window.location.href,
-      page_title: document.title,
-    });
-  }, [gtmId, pathname, search]);
-
-  useEffect(() => {
-    if (!adsenseId || window.__KSCOLD_ADSENSE_INITIALIZED__) {
-      return;
-    }
-
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      'script[data-kscold-adsense="true"]'
-    );
-
-    if (existingScript) {
-      window.__KSCOLD_ADSENSE_INITIALIZED__ = true;
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`;
-    script.crossOrigin = 'anonymous';
-    script.dataset.kscoldAdsense = 'true';
-    document.head.appendChild(script);
-    window.__KSCOLD_ADSENSE_INITIALIZED__ = true;
-  }, [adsenseId]);
-
-  return null;
+  return (
+    <>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        strategy="afterInteractive"
+      />
+      <Script id="ga-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${gaId}', { send_page_view: true });
+        `}
+      </Script>
+    </>
+  );
 }
