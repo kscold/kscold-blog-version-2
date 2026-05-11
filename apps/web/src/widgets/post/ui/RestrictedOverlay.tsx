@@ -22,13 +22,12 @@ export function RestrictedOverlay({
 }: RestrictedOverlayProps) {
   const { isAuthenticated } = useViewer();
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
-  const [message, setMessage] = useState('');
 
   const handleRequest = async () => {
     if (!postId) return;
     setStatus('loading');
     try {
-      await apiClient.post('/access-requests', { postId, message: message || null });
+      await apiClient.post('/access-requests', { postId, message: null });
       setStatus('sent');
     } catch {
       setStatus('error');
@@ -83,13 +82,6 @@ export function RestrictedOverlay({
           </div>
         ) : (
           <div className="mt-6 space-y-3">
-            <textarea
-              value={message}
-              onChange={e => setMessage(e.target.value)}
-              placeholder="요청 사유를 간단히 적어주세요 (선택)"
-              rows={2}
-              className="w-full max-w-md mx-auto block rounded-xl border border-surface-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-surface-300 resize-none"
-            />
             <button
               onClick={handleRequest}
               disabled={status === 'loading'}
