@@ -2,7 +2,6 @@ import type { MetadataRoute } from 'next';
 import type { PageResponse } from '@/types/api';
 import type { Category, Post, Tag } from '@/types/blog';
 import type { Feed } from '@/types/social';
-import type { GraphData } from '@/types/vault';
 import { SITE_URL, fetchPublicApi, flattenCategories } from '@/shared/lib/seo';
 
 const toDate = (date: Date | string | undefined): string =>
@@ -10,18 +9,16 @@ const toDate = (date: Date | string | undefined): string =>
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const [postsPage, categoryTree, tags, feedsPage, vaultGraph] = await Promise.all([
+  const [postsPage, categoryTree, tags, feedsPage] = await Promise.all([
     fetchPublicApi<PageResponse<Post>>('/posts?size=1000'),
     fetchPublicApi<Category[]>('/categories'),
     fetchPublicApi<Tag[]>('/tags'),
     fetchPublicApi<PageResponse<Feed>>('/feeds?page=0&size=2000'),
-    fetchPublicApi<GraphData>('/vault/notes/graph'),
   ]);
 
   const categories = flattenCategories(categoryTree || []);
   const posts = (postsPage?.content || []).filter(post => post.status === 'PUBLISHED');
   const feeds = (feedsPage?.content || []).filter(feed => feed.visibility === 'PUBLIC');
-  const vaultNodes = (vaultGraph?.nodes || []).filter(node => !node.isFolder && node.slug);
 
   return [
     {
@@ -41,18 +38,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: toDate(now),
       changeFrequency: 'daily',
       priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/admin-night`,
-      lastModified: toDate(now),
-      changeFrequency: 'weekly',
-      priority: 0.76,
-    },
-    {
-      url: `${SITE_URL}/vault`,
-      lastModified: toDate(now),
-      changeFrequency: 'weekly',
-      priority: 0.85,
     },
     {
       url: `${SITE_URL}/guestbook`,
@@ -95,12 +80,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: toDate(feed.updatedAt || feed.createdAt),
       changeFrequency: 'weekly' as const,
       priority: 0.55,
-    })),
-    ...vaultNodes.map(node => ({
-      url: `${SITE_URL}/vault/${node.slug}`,
-      lastModified: toDate(now),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
     })),
   ];
 }

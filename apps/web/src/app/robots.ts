@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/shared/lib/seo';
 
 export default function robots(): MetadataRoute.Robots {
-  const disallow = ['/admin', '/admin/', '/api/', '/login'];
+  const disallow = ['/admin', '/admin/', '/admin-night', '/api/', '/login', '/vault'];
   const majorBots = [
     'Googlebot',
     'Googlebot-Image',
