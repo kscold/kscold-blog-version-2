@@ -44,7 +44,7 @@ export function ClientLayout({ children, initialViewer }: ClientLayoutProps) {
             )}
           </main>
         </div>
-        <FloatingChatWidget />
+        {!isVaultPage && <FloatingChatWidget />}
         <AlertToast />
         <CustomCursor />
       </div>
