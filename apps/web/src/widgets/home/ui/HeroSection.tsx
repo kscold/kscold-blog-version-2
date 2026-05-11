@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function HeroSection() {
-  const { allowRichEffects, supportsHover, isTouchDevice } = usePerformanceMode();
+  const { allowRichEffects, supportsHover, isTouchDevice, prefersReducedMotion } = usePerformanceMode();
+  const logoAnimates = !prefersReducedMotion;
 
   return (
     <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center">
@@ -30,11 +31,11 @@ export function HeroSection() {
         <div className="relative group w-full flex justify-center">
           <motion.h1
             className="text-[14vw] md:text-[10vw] lg:text-[8rem] xl:text-[9.5rem] font-sans font-black tracking-tighter leading-none select-none relative z-10 text-surface-900"
-            initial={allowRichEffects ? { opacity: 0, y: 40 } : false}
-            animate={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
-            transition={allowRichEffects ? { duration: 1.2, delay: 0.3, ease: [0.76, 0, 0.24, 1] } : undefined}
+            initial={logoAnimates ? { opacity: 0, y: 40 } : false}
+            animate={logoAnimates ? { opacity: 1, y: 0 } : undefined}
+            transition={logoAnimates ? { duration: 1.2, delay: 0.3, ease: [0.76, 0, 0.24, 1] } : undefined}
           >
-            <span className={`bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] ${allowRichEffects ? 'bg-[size:200%_auto] animate-shimmer' : ''}`}>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] bg-[size:200%_auto] animate-shimmer">
               KSCOLD
             </span>
           </motion.h1>
