@@ -126,6 +126,7 @@ export function HeroSection() {
         >
           {[
             { label: 'Github', href: 'https://github.com/kscold' },
+            { label: 'Instagram', href: 'https://www.instagram.com/ks_cold' },
             { label: 'Email', href: 'mailto:contact@coldcraft.dev' },
           ].map(social => (
             <a
