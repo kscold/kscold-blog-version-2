@@ -7,23 +7,16 @@ export async function fetchPublicApi<T>(path: string, revalidate = 3600): Promis
   });
 }
 
-export async function fetchViewerApi<T>(path: string, revalidate = 3600): Promise<T | null> {
+export async function fetchViewerApi<T>(path: string): Promise<T | null> {
   const cookieStore = await cookies();
   const authToken = cookieStore.get('auth-token')?.value;
 
-  return fetchSeoApi<T>(
-    path,
-    authToken
-      ? {
-          headers: {
-            Cookie: `auth-token=${authToken}`,
-          },
-          cache: 'no-store',
-        }
-      : {
-          next: { revalidate },
-        }
-  );
+  return fetchSeoApi<T>(path, {
+    headers: authToken
+      ? { Cookie: `auth-token=${authToken}` }
+      : {},
+    cache: 'no-store',
+  });
 }
 
 async function fetchSeoApi<T>(path: string, init: RequestInit): Promise<T | null> {
