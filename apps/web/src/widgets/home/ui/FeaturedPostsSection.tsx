@@ -8,7 +8,7 @@ import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function FeaturedPostsSection() {
   const { allowRichEffects } = usePerformanceMode();
-  const { data: featuredPosts, isLoading } = useFeaturedPosts(6);
+  const { data: featuredPosts, isLoading } = useFeaturedPosts(3);
 
   return (
     <section className="py-32 px-4 sm:px-6 lg:px-8 bg-surface-50 relative border-t border-surface-200">
@@ -24,7 +24,7 @@ export function FeaturedPostsSection() {
             <h2 className="text-4xl sm:text-5xl font-sans font-bold text-surface-900 mb-2 tracking-tight">
               Featured <span className="text-accent-dark">Posts</span>
             </h2>
-            <p className="text-surface-500">엄선된 개발 이야기</p>
+            <p className="text-surface-500">최근 1달 기준 조회수 TOP 3</p>
           </div>
           <Link
             href="/blog"
@@ -35,37 +35,70 @@ export function FeaturedPostsSection() {
         </motion.div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="h-96 bg-white/50 border border-surface-200 rounded-3xl animate-pulse"
-              />
-            ))}
-          </div>
+          <>
+            {/* 데스크탑 skeleton */}
+            <div className="hidden sm:grid grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-96 bg-white/50 border border-surface-200 rounded-3xl animate-pulse" />
+              ))}
+            </div>
+            {/* 모바일 skeleton */}
+            <div className="sm:hidden divide-y divide-surface-200">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-12 bg-surface-100 rounded animate-pulse my-4" />
+              ))}
+            </div>
+          </>
         ) : featuredPosts && featuredPosts.length > 0 ? (
-          <motion.div
-            className="divide-y divide-surface-200"
-            initial={allowRichEffects ? 'hidden' : false}
-            whileInView={allowRichEffects ? 'visible' : undefined}
-            viewport={allowRichEffects ? { once: true } : undefined}
-            variants={allowRichEffects ? {
-              visible: { transition: { staggerChildren: 0.08 } },
-            } : undefined}
-          >
-            {featuredPosts.map((post) => (
-              <motion.div
-                key={post.id}
-                variants={allowRichEffects ? {
-                  hidden: { opacity: 0, x: -10 },
-                  visible: { opacity: 1, x: 0 },
-                } : undefined}
-                transition={allowRichEffects ? { duration: 0.4 } : undefined}
-              >
-                <PostCard post={post} titleOnly />
-              </motion.div>
-            ))}
-          </motion.div>
+          <>
+            {/* 데스크탑: 3열 카드 그리드 */}
+            <motion.div
+              className="hidden sm:grid grid-cols-3 gap-6"
+              initial={allowRichEffects ? 'hidden' : false}
+              whileInView={allowRichEffects ? 'visible' : undefined}
+              viewport={allowRichEffects ? { once: true } : undefined}
+              variants={allowRichEffects ? {
+                visible: { transition: { staggerChildren: 0.1 } },
+              } : undefined}
+            >
+              {featuredPosts.map((post) => (
+                <motion.div
+                  key={post.id}
+                  variants={allowRichEffects ? {
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0 },
+                  } : undefined}
+                  transition={allowRichEffects ? { duration: 0.4 } : undefined}
+                >
+                  <PostCard post={post} />
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* 모바일: 타이틀 리스트 */}
+            <motion.div
+              className="sm:hidden divide-y divide-surface-200"
+              initial={allowRichEffects ? 'hidden' : false}
+              whileInView={allowRichEffects ? 'visible' : undefined}
+              viewport={allowRichEffects ? { once: true } : undefined}
+              variants={allowRichEffects ? {
+                visible: { transition: { staggerChildren: 0.08 } },
+              } : undefined}
+            >
+              {featuredPosts.map((post) => (
+                <motion.div
+                  key={post.id}
+                  variants={allowRichEffects ? {
+                    hidden: { opacity: 0, x: -10 },
+                    visible: { opacity: 1, x: 0 },
+                  } : undefined}
+                  transition={allowRichEffects ? { duration: 0.4 } : undefined}
+                >
+                  <PostCard post={post} titleOnly />
+                </motion.div>
+              ))}
+            </motion.div>
+          </>
         ) : (
           <div className="text-center py-20 border border-surface-200 border-dashed rounded-3xl bg-white">
             <p className="text-lg text-surface-500 font-mono">작성된 포스트가 없습니다.</p>
