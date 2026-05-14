@@ -11,6 +11,7 @@ public interface FeedRepository {
     Feed save(Feed feed);
     void delete(Feed feed);
     Page<Feed> findByVisibility(Feed.Visibility visibility, Pageable pageable);
+    Page<Feed> findByVisibilityAndTag(Feed.Visibility visibility, String tag, Pageable pageable);
     Page<Feed> findAll(Pageable pageable);
     void incrementCommentCount(String feedId);
     void decrementCommentCount(String feedId);

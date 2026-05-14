@@ -102,9 +102,9 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
               {post.tags.slice(0, featured ? 5 : 3).map(tag => (
                 <span
                   key={tag.id}
-                  className="px-2.5 py-1 text-[10px] font-bold bg-surface-100 text-surface-500 rounded-md group-hover:bg-surface-200 group-hover:text-surface-900 transition-colors uppercase tracking-wider"
+                  className="px-2.5 py-1 text-[10px] font-bold bg-surface-100 text-surface-500 rounded-md group-hover:bg-surface-200 group-hover:text-surface-900 transition-colors tracking-wider"
                 >
-                  {tag.name}
+                  #{tag.name}
                 </span>
               ))}
             </div>

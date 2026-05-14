@@ -18,6 +18,7 @@ public class FeedResponse {
     private String id;
     private String content;
     private List<String> images;
+    private List<String> tags;
     private AuthorInfo author;
     private Feed.Visibility visibility;
     private LinkPreviewInfo linkPreview;
@@ -61,6 +62,7 @@ public class FeedResponse {
                 .id(feed.getId())
                 .content(feed.getContent())
                 .images(feed.getImages())
+                .tags(feed.getTags())
                 .author(feed.getAuthor() != null ? AuthorInfo.builder()
                         .id(feed.getAuthor().getId())
                         .name(feed.getAuthor().getName())

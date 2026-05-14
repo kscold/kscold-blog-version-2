@@ -97,6 +97,10 @@ public class FeedApplicationService implements FeedUseCase {
         return feedRepository.findByVisibility(Feed.Visibility.PUBLIC, pageable);
     }
 
+    public Page<Feed> getPublicFeedsByTag(String tag, Pageable pageable) {
+        return feedRepository.findByVisibilityAndTag(Feed.Visibility.PUBLIC, tag, pageable);
+    }
+
     public Page<Feed> getAllFeeds(Pageable pageable) {
         return feedRepository.findAll(pageable);
     }

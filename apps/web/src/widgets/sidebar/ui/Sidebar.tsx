@@ -138,7 +138,7 @@ export function Sidebar() {
                     className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
                   >
                     <div className="absolute inset-0 bg-surface-50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="relative z-10">{tag.name}</span>
+                    <span className="relative z-10">#{tag.name}</span>
                     {tag.postCount > 0 && (
                       <span className="relative z-10 ml-1 text-[10px] text-surface-400">
                         {tag.postCount}
