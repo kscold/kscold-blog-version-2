@@ -24,14 +24,84 @@ function extractStandaloneLink(children: React.ReactNode) {
 
 export function createMarkdownComponents(isDark: boolean): Components {
   return {
-    p: ({ children }) => {
+    p: ({ children, className, node }) => {
       const standaloneLink = extractStandaloneLink(children);
-
       if (standaloneLink && getVideoEmbedConfig(standaloneLink)) {
         return <VideoEmbed url={standaloneLink} />;
       }
 
+      // hast는 className을 string 또는 string[] 로 전달 — 둘 다 처리
+      const classStr = Array.isArray(className) ? className.join(' ') : (className ?? '');
+      const isGrid = classStr.includes('md-image-grid');
+      if (isGrid) {
+        const hastChildren = (node as any)?.children ?? [];
+        const imgNodes = hastChildren.filter(
+          (c: any) => c.type === 'element' && c.tagName === 'img',
+        );
+        if (imgNodes.length >= 2) {
+          return (
+            <div className={`my-8 grid gap-3 ${imgNodes.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+              {imgNodes.map((imgNode: any, i: number) => {
+                const src = imgNode.properties?.src as string | undefined;
+                const alt = (imgNode.properties?.alt as string | undefined) ?? '';
+                return (
+                  <div key={i}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={src}
+                      alt={alt}
+                      className="w-full rounded-2xl border border-white/10 shadow-lg object-cover"
+                      loading="lazy"
+                    />
+                    {alt && (
+                      <span className="mt-2 block text-center font-mono text-sm text-surface-500">
+                        {alt}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+      }
+
       return <p>{children}</p>;
+    },
+    div: ({ children, className, node }) => {
+      const classStr = Array.isArray(className) ? className.join(' ') : (className ?? '');
+      if (classStr.includes('md-image-grid')) {
+        const imgNodes = ((node as any)?.children ?? []).filter(
+          (c: any) => c.type === 'element' && c.tagName === 'img',
+        );
+        if (imgNodes.length >= 2) {
+          return (
+            <div className={`my-8 grid gap-3 ${imgNodes.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+              {imgNodes.map((imgNode: any, i: number) => {
+                const src = imgNode.properties?.src as string | undefined;
+                const alt = (imgNode.properties?.alt as string | undefined) ?? '';
+                return (
+                  <div key={i}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={src}
+                      alt={alt}
+                      className="w-full rounded-2xl border border-white/10 shadow-lg object-cover"
+                      loading="lazy"
+                    />
+                    {alt && (
+                      <span className="mt-2 block text-center font-mono text-sm text-surface-500">
+                        {alt}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+      }
+      return <div className={classStr}>{children}</div>;
     },
     a: ({ href, children }) => (
       <a href={href} target="_blank" rel="noopener noreferrer">
