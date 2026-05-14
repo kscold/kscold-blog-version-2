@@ -45,28 +45,24 @@ export function FeaturedPostsSection() {
           </div>
         ) : featuredPosts && featuredPosts.length > 0 ? (
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="divide-y divide-surface-200"
             initial={allowRichEffects ? 'hidden' : false}
             whileInView={allowRichEffects ? 'visible' : undefined}
             viewport={allowRichEffects ? { once: true } : undefined}
             variants={allowRichEffects ? {
-              visible: {
-                transition: {
-                  staggerChildren: 0.1,
-                },
-              },
+              visible: { transition: { staggerChildren: 0.08 } },
             } : undefined}
           >
-            {featuredPosts.map((post, index) => (
+            {featuredPosts.map((post) => (
               <motion.div
                 key={post.id}
                 variants={allowRichEffects ? {
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 },
+                  hidden: { opacity: 0, x: -10 },
+                  visible: { opacity: 1, x: 0 },
                 } : undefined}
-                transition={allowRichEffects ? { duration: 0.5 } : undefined}
+                transition={allowRichEffects ? { duration: 0.4 } : undefined}
               >
-                <PostCard post={post} featured={index === 0} />
+                <PostCard post={post} titleOnly />
               </motion.div>
             ))}
           </motion.div>
