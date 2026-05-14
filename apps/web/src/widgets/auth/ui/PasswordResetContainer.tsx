@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { PasswordResetForm } from '@/features/auth/ui/recovery/PasswordResetForm';
+import { PasswordResetForm } from '@/features/auth';
 import { LoginPageSkeleton } from '@/shared/ui/RouteSkeletons';
 
 export function PasswordResetContainer() {

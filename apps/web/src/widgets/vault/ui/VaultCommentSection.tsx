@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/features/auth/api/useAuth';
+import { useAuth } from '@/features/auth';
 import {
   useVaultComments,
   useCreateVaultComment,

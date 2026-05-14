@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { LoginForm } from '@/features/auth/ui/LoginForm';
+import { LoginForm } from '@/features/auth';
 import { LoginPageSkeleton } from '@/shared/ui/RouteSkeletons';
 
 export function LoginContainer() {

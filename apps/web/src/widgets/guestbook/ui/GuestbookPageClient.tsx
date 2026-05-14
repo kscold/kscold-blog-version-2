@@ -7,7 +7,7 @@ import {
   useDeleteGuestbookEntry,
   useGuestbookEntries,
 } from '@/entities/guestbook/api/useGuestbook';
-import { useAuth } from '@/features/auth/api/useAuth';
+import { useAuth } from '@/features/auth';
 import { useAlert } from '@/shared/model/alertStore';
 import { GuestbookHero } from '@/widgets/guestbook/ui/guestbook-page/GuestbookHero';
 import { GuestbookComposerCard } from '@/widgets/guestbook/ui/guestbook-page/GuestbookComposerCard';
