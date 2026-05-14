@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -116,10 +117,22 @@ public class PostApplicationService implements PostUseCase {
     }
 
     /**
-     * 추천 포스트 조회
+     * 최근 1달 기준 조회수 상위 포스트 조회 (공개 포스트)
+     * 1달 이내 결과가 limit에 미치지 못하면 전체 기간으로 fallback
      */
     public List<Post> getFeatured(Pageable pageable) {
-        return postRepository.findFeaturedPosts(pageable);
+        int limit = pageable.getPageSize();
+        LocalDateTime since = LocalDateTime.now().minusDays(30);
+
+        // 최근 1달 이내 posts 중 views 상위
+        List<Post> all = postRepository.findAllPublished(pageable);
+        List<Post> recent = all.stream()
+                .filter(p -> p.getPublishedAt() != null && p.getPublishedAt().isAfter(since))
+                .limit(limit)
+                .toList();
+
+        // 1달 이내 결과 부족하면 전체 기간 views 상위
+        return recent.size() >= limit ? recent : all;
     }
 
     /**
