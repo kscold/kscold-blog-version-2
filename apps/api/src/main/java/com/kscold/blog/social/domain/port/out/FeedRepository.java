@@ -4,6 +4,8 @@ import com.kscold.blog.social.domain.model.Feed;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface FeedRepository {
@@ -18,4 +20,7 @@ public interface FeedRepository {
 
     /** 좋아요 토글 - atomic. 좋아요 추가했으면 true, 취소했으면 false */
     boolean toggleLike(String feedId, String identifier);
+
+    /** PUBLIC 피드의 태그별 사용 횟수: [{name, count}] 내림차순 */
+    List<Map<String, Object>> aggregateTags();
 }

@@ -5,6 +5,8 @@ import com.kscold.blog.social.application.dto.FeedUpdateCommand;
 import com.kscold.blog.social.domain.model.Feed;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.List;
+import java.util.Map;
 
 public interface FeedUseCase {
 
@@ -29,4 +31,6 @@ public interface FeedUseCase {
     void decrementCommentCount(String feedId);
 
     void validateOwnership(String feedId, String userId, boolean isAdmin);
+
+    List<Map<String, Object>> getFeedTags();
 }

@@ -11,7 +11,15 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.bson.Document;
+
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("null")
 @Component
@@ -67,6 +75,21 @@ public class FeedRepositoryAdapter implements FeedRepository {
                 new Update().inc("commentsCount", -1),
                 Feed.class
         );
+    }
+
+    @Override
+    public List<Map<String, Object>> aggregateTags() {
+        Aggregation agg = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("visibility").is("PUBLIC").and("tags").exists(true).ne(java.util.Collections.emptyList())),
+                Aggregation.unwind("tags"),
+                Aggregation.group("tags").count().as("count"),
+                Aggregation.project("count").and("_id").as("name"),
+                Aggregation.sort(Sort.Direction.DESC, "count")
+        );
+        AggregationResults<Document> results = mongoTemplate.aggregate(agg, "feeds", Document.class);
+        return results.getMappedResults().stream()
+                .map(doc -> Map.<String, Object>of("name", doc.getString("name"), "count", doc.getInteger("count")))
+                .collect(Collectors.toList());
     }
 
     /**

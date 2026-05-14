@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,6 +49,11 @@ public class FeedController {
                 : feedUseCase.getPublicFeeds(pageable);
         String identifier = clientIdentifierResolver.resolve(request);
         return ResponseEntity.ok(ApiResponse.success(feeds.map(feed -> FeedResponse.from(feed, identifier))));
+    }
+
+    @GetMapping("/tags")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getFeedTags() {
+        return ResponseEntity.ok(ApiResponse.success(feedUseCase.getFeedTags()));
     }
 
     @GetMapping("/admin")
