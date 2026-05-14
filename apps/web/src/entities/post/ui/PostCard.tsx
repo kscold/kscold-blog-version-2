@@ -9,9 +9,10 @@ import { Post } from '@/types/blog';
 interface PostCardProps {
   post: Post;
   featured?: boolean;
+  titleOnly?: boolean;
 }
 
-export function PostCard({ post, featured = false }: PostCardProps) {
+export function PostCard({ post, featured = false, titleOnly = false }: PostCardProps) {
   const { allowRichEffects, supportsHover, reduceMotion, isTouchDevice } = usePerformanceMode();
   const formattedDate = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString('ko-KR', {
@@ -20,6 +21,19 @@ export function PostCard({ post, featured = false }: PostCardProps) {
         day: 'numeric',
       })
     : '';
+
+  if (titleOnly) {
+    return (
+      <Link
+        href={`/blog/${post.category.slug}/${post.slug}`}
+        className="group block border-b border-surface-200 py-5 transition-colors hover:text-surface-600"
+      >
+        <h3 className="font-sans font-black text-xl tracking-tight text-surface-900 group-hover:text-surface-600 transition-colors">
+          {post.title}
+        </h3>
+      </Link>
+    );
+  }
 
   return (
     <motion.article
