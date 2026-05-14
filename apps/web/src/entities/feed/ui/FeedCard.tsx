@@ -140,7 +140,7 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
           {feed.tags.map(tag => (
             <Link
               key={tag}
-              href={`/feed?tag=${encodeURIComponent(tag)}`}
+              href={`/tags/${encodeURIComponent(tag)}`}
               className="text-xs font-bold text-surface-400 hover:text-surface-700 transition-colors"
             >
               #{tag}

@@ -100,12 +100,14 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {post.tags.slice(0, featured ? 5 : 3).map(tag => (
-                <span
+                <Link
                   key={tag.id}
-                  className="px-2.5 py-1 text-[10px] font-bold bg-surface-100 text-surface-500 rounded-md group-hover:bg-surface-200 group-hover:text-surface-900 transition-colors tracking-wider"
+                  href={`/tags/${encodeURIComponent(tag.name)}`}
+                  onClick={e => e.stopPropagation()}
+                  className="px-2.5 py-1 text-[10px] font-bold bg-surface-100 text-surface-500 rounded-md hover:bg-surface-200 hover:text-surface-900 transition-colors tracking-wider"
                 >
                   #{tag.name}
-                </span>
+                </Link>
               ))}
             </div>
           )}

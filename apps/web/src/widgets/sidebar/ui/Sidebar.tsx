@@ -133,7 +133,7 @@ export function Sidebar() {
                 tags.slice(0, 10).map(tag => (
                   <Link
                     key={tag.id}
-                    href={`/blog/tags/${tag.slug}`}
+                    href={`/tags/${encodeURIComponent(tag.name)}`}
                     onClick={closeSidebar}
                     className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
                   >
