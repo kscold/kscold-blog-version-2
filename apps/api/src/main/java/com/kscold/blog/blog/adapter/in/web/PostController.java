@@ -59,7 +59,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<List<PostResponse>>> getFeaturedPosts(
             @RequestParam(defaultValue = "5") int limit
     ) {
-        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "publishedAt"));
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "views"));
         List<Post> posts = postUseCase.getFeatured(pageable);
         return ResponseEntity.ok(ApiResponse.success(PostResponse.from(posts)));
     }

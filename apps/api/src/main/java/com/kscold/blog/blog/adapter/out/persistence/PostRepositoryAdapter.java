@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,6 +55,16 @@ public class PostRepositoryAdapter implements PostRepository {
     @Override
     public List<Post> findFeaturedPosts(Pageable pageable) {
         return mongoPostRepository.findFeaturedPosts(pageable);
+    }
+
+    @Override
+    public List<Post> findHotPosts(LocalDateTime since, Pageable pageable) {
+        return mongoPostRepository.findByStatusAndPublishedAtAfter(Post.Status.PUBLISHED, since, pageable);
+    }
+
+    @Override
+    public List<Post> findAllPublished(Pageable pageable) {
+        return mongoPostRepository.findByStatus(Post.Status.PUBLISHED, pageable).getContent();
     }
 
     @Override
