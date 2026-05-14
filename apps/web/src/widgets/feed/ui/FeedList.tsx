@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useFeeds } from '@/entities/feed/api/useFeeds';
 import { FeedCard } from '@/entities/feed/ui/FeedCard';
-import { FeedComposer } from '@/features/feed/ui/FeedComposer';
-import { useAuth } from '@/features/auth/api/useAuth';
+import { FeedComposer } from '@/features/feed';
+import { useAuth } from '@/features/auth';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 

@@ -12,7 +12,7 @@ import { useAlert } from '@/shared/model/alertStore';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
 import { Pagination } from '@/shared/ui/Pagination';
 import { LinkifiedText } from '@/shared/ui/LinkifiedText';
-import { useAuth } from '@/features/auth/api/useAuth';
+import { useAuth } from '@/features/auth';
 
 interface CommentSectionProps {
   feedId: string;

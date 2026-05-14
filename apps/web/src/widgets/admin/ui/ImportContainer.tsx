@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useImportProcessor } from '@/features/import/lib/useImportProcessor';
-import { ImportFileList } from '@/features/import/ui/ImportFileList';
+import { useImportProcessor } from '@/features/import';
+import { ImportFileList } from '@/features/import';
 
 export function ImportContainer() {
   const [globalCategoryId, setGlobalCategoryId] = useState('');

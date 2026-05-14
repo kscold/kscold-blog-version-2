@@ -9,7 +9,7 @@ import {
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useAlert } from '@/shared/model/alertStore';
-import { useAuth } from '@/features/auth/api/useAuth';
+import { useAuth } from '@/features/auth';
 
 function SparkBar({ value, max }: { value: number; max: number }) {
   const pct = max === 0 ? 0 : Math.round((value / max) * 100);

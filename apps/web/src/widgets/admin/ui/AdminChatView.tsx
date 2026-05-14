@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useChatAdmin } from '@/features/chat/lib/useChatAdmin';
+import { useChatAdmin } from '@/features/chat';
 import { AdminChatComposer } from './chat/AdminChatComposer';
 import { AdminChatConversation } from './chat/AdminChatConversation';
 import { AdminChatRoomList } from './chat/AdminChatRoomList';

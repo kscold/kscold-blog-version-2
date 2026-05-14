@@ -1,6 +1,6 @@
 'use client';
 
-import FloatingChat from '@/features/chat/ui/FloatingChat';
+import { FloatingChat } from '@/features/chat';
 import { useViewer } from '@/entities/user/model/useViewer';
 
 export function FloatingChatWidget() {

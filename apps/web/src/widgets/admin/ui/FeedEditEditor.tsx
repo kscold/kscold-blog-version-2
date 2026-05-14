@@ -1,7 +1,7 @@
 'use client';
 
-import FeedEditor from '@/features/feed/ui/FeedEditor';
-import { useFeedEdit } from '@/features/feed/lib/useFeedEdit';
+import { FeedEditor } from '@/features/feed';
+import { useFeedEdit } from '@/features/feed';
 import { AdminEditorSkeleton } from '@/shared/ui/RouteSkeletons';
 
 interface FeedEditEditorProps {
