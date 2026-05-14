@@ -82,6 +82,19 @@ export function useToggleLike() {
   });
 }
 
+export interface FeedTagInfo {
+  name: string;
+  count: number;
+}
+
+export function useFeedTags() {
+  return useQuery({
+    queryKey: ['feed-tags'],
+    queryFn: () => apiClient.get<FeedTagInfo[]>('/feeds/tags'),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 export function useLinkPreview(url: string) {
   return useQuery({
     queryKey: ['link-preview', url],

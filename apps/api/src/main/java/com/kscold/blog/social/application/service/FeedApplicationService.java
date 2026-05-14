@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -108,6 +110,10 @@ public class FeedApplicationService implements FeedUseCase {
     public Feed toggleLike(String feedId, String identifier) {
         feedRepository.toggleLike(feedId, identifier);
         return findById(feedId);
+    }
+
+    public List<Map<String, Object>> getFeedTags() {
+        return feedRepository.aggregateTags();
     }
 
     /**

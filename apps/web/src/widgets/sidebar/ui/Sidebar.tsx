@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'; // overlay 애니메이
 import { usePathname } from 'next/navigation';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { useTags } from '@/entities/tag/api/useTags';
+import { useFeedTags } from '@/entities/feed/api/useFeeds';
 import { useUiStore } from '@/shared/model/uiStore';
 import { useViewer } from '@/entities/user/model/useViewer';
 import { Skeleton } from '@/shared/ui/Skeleton';
@@ -52,7 +53,24 @@ function CategoryTree({ categories, depth = 0, onNavigate }: { categories: Categ
 export function Sidebar() {
   const { data: categories } = useCategories();
   const { sidebarOpen, setSidebarOpen } = useUiStore();
-  const { data: tags } = useTags();
+  const { data: blogTags } = useTags();
+  const { data: feedTagsRaw } = useFeedTags();
+
+  // 블로그 태그 + 피드 태그 통합 (이름 기준 중복 제거, 카운트 합산)
+  const tags = (() => {
+    const map = new Map<string, { name: string; slug?: string; count: number }>();
+    blogTags?.forEach(t => map.set(t.name, { name: t.name, slug: t.slug, count: t.postCount }));
+    feedTagsRaw?.forEach(ft => {
+      const existing = map.get(ft.name);
+      if (existing) {
+        map.set(ft.name, { ...existing, count: existing.count + ft.count });
+      } else {
+        map.set(ft.name, { name: ft.name, count: ft.count });
+      }
+    });
+    return [...map.values()].sort((a, b) => b.count - a.count);
+  })();
+  const isTagsLoading = !blogTags && !feedTagsRaw;
   const { role } = useViewer();
   const { isTouchDevice } = usePerformanceMode();
   const closeSidebar = () => setSidebarOpen(false);
@@ -128,20 +146,20 @@ export function Sidebar() {
               Popular Tags
             </h2>
             <div className="flex flex-wrap gap-2">
-              {tags ? (
+              {!isTagsLoading ? (
                 tags.length > 0 ? (
-                tags.slice(0, 10).map(tag => (
+                tags.slice(0, 12).map(tag => (
                   <Link
-                    key={tag.id}
+                    key={tag.name}
                     href={`/tags/${encodeURIComponent(tag.name)}`}
                     onClick={closeSidebar}
                     className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
                   >
                     <div className="absolute inset-0 bg-surface-50 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <span className="relative z-10">#{tag.name}</span>
-                    {tag.postCount > 0 && (
+                    {tag.count > 0 && (
                       <span className="relative z-10 ml-1 text-[10px] text-surface-400">
-                        {tag.postCount}
+                        {tag.count}
                       </span>
                     )}
                   </Link>
