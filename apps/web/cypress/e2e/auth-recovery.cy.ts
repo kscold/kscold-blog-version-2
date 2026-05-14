@@ -48,6 +48,27 @@ describe('계정 복구 시나리오', () => {
     cy.get('[data-cy="recovery-success"]').should('contain.text', '가입한 이메일로 아이디 안내를 보냈습니다');
   });
 
+  it('시나리오: 가입되지 않은 이메일로 비밀번호 재설정 시도 시 에러 메시지를 보여준다', () => {
+    cy.intercept('POST', '**/api/auth/request-password-reset', {
+      statusCode: 400,
+      body: {
+        success: false,
+        data: null,
+        message: '가입되지 않은 이메일입니다.',
+        errorCode: 'INVALID_INPUT',
+        timestamp: '2026-04-13T00:00:00',
+      },
+    }).as('requestPasswordResetNotFound');
+
+    cy.visit('/login/recovery?tab=password');
+    cy.get('[data-cy="recovery-email-input"]').type('notregistered@example.com');
+    cy.get('[data-cy="recovery-submit"]').click();
+
+    cy.wait('@requestPasswordResetNotFound');
+    cy.get('[data-cy="recovery-error"]').should('contain.text', '가입되지 않은 이메일입니다.');
+    cy.get('[data-cy="recovery-success"]').should('not.exist');
+  });
+
   it('시나리오: 비밀번호 재설정 탭은 메일함으로 링크를 보내고 성공 상태를 보여준다', () => {
     cy.intercept('POST', '**/api/auth/request-password-reset', req => {
       expect(req.body).to.deep.equal({ email: 'hello@kscold.com' });

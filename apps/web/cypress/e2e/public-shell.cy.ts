@@ -50,6 +50,55 @@ describe('공개 페이지 핵심 시나리오', () => {
     cy.get('[data-cy="nav-link-guestbook"]').should('have.attr', 'href', '/guestbook');
   });
 
+  it('시나리오: 방문자는 Blog 링크를 클릭하면 블로그 목록 페이지로 이동한다', () => {
+    cy.intercept('GET', '**/api/posts/public?page=0&size=*', {
+      statusCode: 200,
+      body: success({
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        size: 10,
+        number: 0,
+        first: true,
+        last: true,
+        empty: true,
+      }),
+    }).as('posts');
+
+    cy.visit('/');
+    cy.get('[data-cy="hero-primary-cta"]').click();
+
+    cy.url().should('include', '/blog');
+    cy.wait('@posts');
+  });
+
+  it('시나리오: 방문자는 Feed 링크를 클릭하면 피드 페이지로 이동한다', () => {
+    cy.intercept('GET', '**/api/feeds*', {
+      statusCode: 200,
+      body: success({
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        size: 10,
+        number: 0,
+        first: true,
+        last: true,
+        empty: true,
+      }),
+    }).as('feeds');
+
+    cy.visit('/');
+    cy.get('[data-cy="hero-secondary-cta"]').click();
+
+    cy.url().should('include', '/feed');
+  });
+
+  it('시나리오: 비로그인 상태에서는 헤더에 LOGIN 버튼이 노출된다', () => {
+    cy.visit('/');
+
+    cy.get('[data-cy="header-login-btn"]').should('be.visible').and('contain.text', 'LOGIN');
+  });
+
   it('시나리오: 방문자는 헤더에서 방명록으로 이동해 빈 상태를 확인할 수 있다', () => {
     cy.intercept('GET', '**/api/guestbook?page=0&size=12', {
       statusCode: 200,
