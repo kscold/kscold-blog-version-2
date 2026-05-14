@@ -40,6 +40,9 @@ public class Feed {
     private LinkPreview linkPreview;
 
     @Builder.Default
+    private List<String> tags = new ArrayList<>();
+
+    @Builder.Default
     private Set<String> likedBy = new HashSet<>();
 
     @Builder.Default

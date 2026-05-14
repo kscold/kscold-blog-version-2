@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useFeeds } from '@/entities/feed/api/useFeeds';
 import { FeedCard } from '@/entities/feed/ui/FeedCard';
 import { FeedComposer } from '@/features/feed';
@@ -9,15 +10,28 @@ import { useAuth } from '@/features/auth';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 
-export function FeedList() {
+interface FeedListProps {
+  initialTag?: string;
+}
+
+export function FeedList({ initialTag }: FeedListProps = {}) {
   const { currentUser } = useAuth();
   const { allowRichEffects } = usePerformanceMode();
   const [page, setPage] = useState(0);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeTag = searchParams.get('tag') ?? initialTag ?? undefined;
 
-  const { data: feedsData, isLoading } = useFeeds({ page, size: 12 });
+  const { data: feedsData, isLoading } = useFeeds({ page, size: 12, tag: activeTag });
 
   const feeds = feedsData?.content || [];
   const totalPages = feedsData?.totalPages || 0;
+
+  const clearTag = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('tag');
+    router.push(`/feed${params.toString() ? `?${params.toString()}` : ''}`);
+  };
 
   if (isLoading) {
     return (
@@ -47,9 +61,11 @@ export function FeedList() {
         <FeedComposer currentUser={currentUser ?? null} />
         <div className="text-center py-20">
           <h2 className="text-xl font-black tracking-tight text-surface-900 mb-2">
-            아직 피드가 없습니다
+            {activeTag ? `#${activeTag} 피드가 없습니다` : '아직 피드가 없습니다'}
           </h2>
-          <p className="text-sm text-surface-500">첫 번째 피드를 작성해보세요!</p>
+          <p className="text-sm text-surface-500">
+            {activeTag ? '다른 태그를 선택해보세요.' : '첫 번째 피드를 작성해보세요!'}
+          </p>
         </div>
       </div>
     );
@@ -58,6 +74,19 @@ export function FeedList() {
   return (
     <>
       <FeedComposer currentUser={currentUser ?? null} />
+
+      {activeTag && (
+        <div className="flex items-center gap-2 my-4">
+          <span className="text-xs text-surface-500 font-medium">필터:</span>
+          <button
+            onClick={clearTag}
+            className="flex items-center gap-1 px-3 py-1 bg-surface-900 text-white text-xs font-bold rounded-full hover:bg-surface-700 transition-colors"
+          >
+            #{activeTag}
+            <span className="ml-1 opacity-70">×</span>
+          </button>
+        </div>
+      )}
 
       <motion.div
         className="space-y-6"

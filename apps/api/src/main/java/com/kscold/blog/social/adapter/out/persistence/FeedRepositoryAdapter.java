@@ -37,6 +37,11 @@ public class FeedRepositoryAdapter implements FeedRepository {
     }
 
     @Override
+    public Page<Feed> findByVisibilityAndTag(Feed.Visibility visibility, String tag, Pageable pageable) {
+        return mongoFeedRepository.findByVisibilityAndTagsContaining(visibility, tag, pageable);
+    }
+
+    @Override
     public Page<Feed> findAll(Pageable pageable) {
         return mongoFeedRepository.findAll(pageable);
     }

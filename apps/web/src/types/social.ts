@@ -2,6 +2,7 @@ export interface Feed {
   id: string;
   content: string;
   images: string[];
+  tags?: string[];
   author: {
     id: string;
     name: string;

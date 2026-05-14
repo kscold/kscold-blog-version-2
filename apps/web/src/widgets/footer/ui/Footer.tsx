@@ -23,7 +23,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="relative mt-20 bg-white border-t border-surface-200">
+    <footer className="relative mt-20 bg-white border border-surface-200 lg:rounded-tl-3xl lg:border-b-0 lg:border-r-0">
       <div className="max-w-7xl mx-auto px-6 py-16 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-24">
           {/* 브랜드 영역 */}

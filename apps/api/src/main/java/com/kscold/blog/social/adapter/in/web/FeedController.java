@@ -38,10 +38,13 @@ public class FeedController {
     public ResponseEntity<ApiResponse<Page<FeedResponse>>> getPublicFeeds(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
+            @RequestParam(required = false) String tag,
             HttpServletRequest request
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Feed> feeds = feedUseCase.getPublicFeeds(pageable);
+        Page<Feed> feeds = (tag != null && !tag.isBlank())
+                ? feedUseCase.getPublicFeedsByTag(tag, pageable)
+                : feedUseCase.getPublicFeeds(pageable);
         String identifier = clientIdentifierResolver.resolve(request);
         return ResponseEntity.ok(ApiResponse.success(feeds.map(feed -> FeedResponse.from(feed, identifier))));
     }

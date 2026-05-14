@@ -6,14 +6,17 @@ import { PageResponse } from '@/types/api';
 interface UseFeedsOptions {
   page?: number;
   size?: number;
+  tag?: string;
 }
 
 export function useFeeds(options: UseFeedsOptions = {}) {
-  const { page = 0, size = 12 } = options;
+  const { page = 0, size = 12, tag } = options;
+  const params = new URLSearchParams({ page: String(page), size: String(size) });
+  if (tag) params.set('tag', tag);
 
   return useQuery({
-    queryKey: ['feeds', { page, size }],
-    queryFn: () => apiClient.get<PageResponse<Feed>>(`/feeds?page=${page}&size=${size}`),
+    queryKey: ['feeds', { page, size, tag }],
+    queryFn: () => apiClient.get<PageResponse<Feed>>(`/feeds?${params.toString()}`),
   });
 }
 

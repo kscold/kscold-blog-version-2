@@ -18,6 +18,8 @@ public interface FeedUseCase {
 
     Page<Feed> getPublicFeeds(Pageable pageable);
 
+    Page<Feed> getPublicFeedsByTag(String tag, Pageable pageable);
+
     Page<Feed> getAllFeeds(Pageable pageable);
 
     Feed toggleLike(String feedId, String identifier);

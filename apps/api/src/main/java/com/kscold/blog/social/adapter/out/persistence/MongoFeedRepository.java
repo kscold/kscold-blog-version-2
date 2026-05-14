@@ -8,4 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface MongoFeedRepository extends MongoRepository<Feed, String> {
 
     Page<Feed> findByVisibility(Feed.Visibility visibility, Pageable pageable);
+
+    Page<Feed> findByVisibilityAndTagsContaining(Feed.Visibility visibility, String tag, Pageable pageable);
 }

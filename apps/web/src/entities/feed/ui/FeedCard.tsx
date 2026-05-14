@@ -134,6 +134,21 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
         />
       </div>
 
+      {/* 해시태그 */}
+      {feed.tags && feed.tags.length > 0 && (
+        <div className="px-4 pb-2 flex flex-wrap gap-1.5">
+          {feed.tags.map(tag => (
+            <Link
+              key={tag}
+              href={`/feed?tag=${encodeURIComponent(tag)}`}
+              className="text-xs font-bold text-surface-400 hover:text-surface-700 transition-colors"
+            >
+              #{tag}
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* 링크 미리보기 */}
       {feed.linkPreview && (
         <div className="px-4 pb-3">
