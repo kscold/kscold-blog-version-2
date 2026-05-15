@@ -51,8 +51,8 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
 
           {post.coverImage && (
             <div
-              className={`relative overflow-hidden mb-6 rounded-[16px] ${
-                featured ? 'h-64' : 'h-48'
+              className={`relative overflow-hidden mb-4 sm:mb-6 rounded-[16px] ${
+                featured ? 'h-48 sm:h-64' : 'h-40 sm:h-48'
               }`}
             >
               <Image
