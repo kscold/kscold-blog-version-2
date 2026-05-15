@@ -72,9 +72,9 @@ export function HeroSection() {
         </motion.p>
 
         <motion.div
-          className="w-[1px] h-24 bg-gradient-to-b from-surface-200/0 via-surface-300 to-surface-200/0 mx-auto mt-12"
-          initial={animate ? { height: 0 } : false}
-          animate={animate ? { height: 128 } : undefined}
+          className="w-[1px] h-[10rem] sm:h-[8rem] bg-gradient-to-b from-surface-200/0 via-surface-300 to-surface-200/0 mx-auto mt-12 origin-top"
+          initial={animate ? { scaleY: 0 } : false}
+          animate={animate ? { scaleY: 1 } : undefined}
           transition={animate ? { duration: 1.5, delay: 1, ease: [0.76, 0, 0.24, 1] } : undefined}
         />
 
