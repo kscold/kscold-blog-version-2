@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion'; // overlay 애니메이션에만 사용
+import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useCategories } from '@/entities/category/api/useCategories';
 import { useTags } from '@/entities/tag/api/useTags';
@@ -56,7 +56,6 @@ export function Sidebar() {
   const { data: blogTags } = useTags();
   const { data: feedTagsRaw } = useFeedTags();
 
-  // 블로그 태그 + 피드 태그 통합 (이름 기준 중복 제거, 카운트 합산)
   const tags = (() => {
     const map = new Map<string, { name: string; slug?: string; count: number }>();
     blogTags?.forEach(t => map.set(t.name, { name: t.name, slug: t.slug, count: t.postCount }));
@@ -70,14 +69,14 @@ export function Sidebar() {
     });
     return [...map.values()].sort((a, b) => b.count - a.count);
   })();
+
   const isTagsLoading = !blogTags && !feedTagsRaw;
   const { role } = useViewer();
   const { isTouchDevice } = usePerformanceMode();
   const closeSidebar = () => setSidebarOpen(false);
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
-  const mobileSidebarState = sidebarOpen ? 'block translate-x-4' : 'hidden';
-  const desktopSidebarState = isVaultPage ? 'lg:hidden' : 'lg:block lg:translate-x-0';
+
   const mobileLinks = [
     ...(role === 'ADMIN' ? [{ label: 'Admin', href: '/admin', highlighted: true }] : []),
     { label: 'Home', href: '/' },
@@ -89,8 +88,89 @@ export function Sidebar() {
     { label: 'Info', href: '/info' },
   ];
 
+  const asideBaseClass = `fixed top-[88px] left-4 bottom-4 w-56 z-40 overflow-y-auto ${
+    isTouchDevice
+      ? 'bg-white border border-surface-200 rounded-2xl shadow-md'
+      : 'bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm'
+  }`;
+
+  const innerContent = (
+    <div className="p-6 space-y-8 relative">
+      {/* 모바일 네비게이션 링크 */}
+      <div className="lg:hidden pb-6 border-b border-surface-200/50 space-y-1 mt-2">
+        {mobileLinks.map(link => (
+          <Link
+            key={link.href}
+            href={link.href}
+            data-cy={`sidebar-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
+            onClick={closeSidebar}
+            className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              link.highlighted
+                ? 'bg-surface-900 text-white hover:bg-surface-800'
+                : 'text-surface-600 hover:text-surface-900 hover:bg-surface-50'
+            }`}
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+
+      <div>
+        <h2 className="text-xs font-bold text-surface-400 mb-4 tracking-[0.2em] uppercase">
+          Categories
+        </h2>
+        {categories ? (
+          <CategoryTree categories={categories} onNavigate={closeSidebar} />
+        ) : (
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-4/5 rounded-md" />
+            <Skeleton className="h-4 w-3/5 rounded-md" />
+            <Skeleton className="h-4 w-2/3 rounded-md" />
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="text-xs font-bold text-surface-400 mb-4 tracking-[0.2em] uppercase">
+          Popular Tags
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          {!isTagsLoading ? (
+            tags.length > 0 ? (
+              tags.slice(0, 12).map(tag => (
+                <Link
+                  key={tag.name}
+                  href={`/tags/${encodeURIComponent(tag.name)}`}
+                  onClick={closeSidebar}
+                  className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
+                >
+                  <div className="absolute inset-0 bg-surface-50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="relative z-10">#{tag.name}</span>
+                  {tag.count > 0 && (
+                    <span className="relative z-10 ml-1 text-[10px] text-surface-400">
+                      {tag.count}
+                    </span>
+                  )}
+                </Link>
+              ))
+            ) : (
+              <p className="text-xs text-surface-400">태그가 없습니다</p>
+            )
+          ) : (
+            <>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <Skeleton key={index} className="h-8 w-16 rounded-lg" />
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <>
+      {/* 모바일 딤 오버레이 */}
       <AnimatePresence>
         {sidebarOpen && (
           <motion.div
@@ -98,86 +178,33 @@ export function Sidebar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSidebarOpen(false)}
+            transition={{ duration: 0.2 }}
+            onClick={closeSidebar}
           />
         )}
       </AnimatePresence>
 
-      <aside
-        className={`fixed top-[88px] left-0 lg:left-4 bottom-4 w-56 z-40 overflow-y-auto transition-transform duration-300 ease-out ${mobileSidebarState} ${desktopSidebarState} ${isTouchDevice ? 'bg-white border border-surface-200 rounded-2xl shadow-md' : 'bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm'}`}
-      >
-        <div className="p-6 space-y-8 relative">
-          {/* 모바일 사이드바 바로가기 */}
-          <div className="lg:hidden pb-6 border-b border-surface-200/50 space-y-1 mt-2">
-            {mobileLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                data-cy={`sidebar-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
-                onClick={() => setSidebarOpen(false)}
-                className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  link.highlighted
-                    ? 'bg-surface-900 text-white hover:bg-surface-800'
-                    : 'text-surface-600 hover:text-surface-900 hover:bg-surface-50'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+      {/* 모바일 사이드바: 슬라이드 인/아웃 */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.aside
+            className={`${asideBaseClass} lg:hidden`}
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -20, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 40, mass: 0.6 }}
+          >
+            {innerContent}
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
-          <div>
-            <h2 className="text-xs font-bold text-surface-400 mb-4 tracking-[0.2em] uppercase">
-              Categories
-            </h2>
-            {categories ? (
-              <CategoryTree categories={categories} onNavigate={closeSidebar} />
-            ) : (
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-4/5 rounded-md" />
-                <Skeleton className="h-4 w-3/5 rounded-md" />
-                <Skeleton className="h-4 w-2/3 rounded-md" />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <h2 className="text-xs font-bold text-surface-400 mb-4 tracking-[0.2em] uppercase">
-              Popular Tags
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {!isTagsLoading ? (
-                tags.length > 0 ? (
-                tags.slice(0, 12).map(tag => (
-                  <Link
-                    key={tag.name}
-                    href={`/tags/${encodeURIComponent(tag.name)}`}
-                    onClick={closeSidebar}
-                    className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
-                  >
-                    <div className="absolute inset-0 bg-surface-50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="relative z-10">#{tag.name}</span>
-                    {tag.count > 0 && (
-                      <span className="relative z-10 ml-1 text-[10px] text-surface-400">
-                        {tag.count}
-                      </span>
-                    )}
-                  </Link>
-                ))
-              ) : (
-                <p className="text-xs text-surface-400">태그가 없습니다</p>
-                )
-              ) : (
-                <>
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <Skeleton key={index} className="h-8 w-16 rounded-lg" />
-                  ))}
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </aside>
+      {/* 데스크탑 사이드바: 항상 렌더링, Vault 페이지에서는 숨김 */}
+      {!isVaultPage && (
+        <aside className={`${asideBaseClass} hidden lg:block`}>
+          {innerContent}
+        </aside>
+      )}
     </>
   );
 }
