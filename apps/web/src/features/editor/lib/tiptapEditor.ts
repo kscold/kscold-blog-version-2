@@ -6,6 +6,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Markdown } from 'tiptap-markdown';
 import { createLowlight, common } from 'lowlight';
+import { ImageRowExtension } from '@/features/editor/extensions/imageRow';
 
 const lowlight = createLowlight(common);
 
@@ -33,6 +34,7 @@ export function buildEditorExtensions(placeholder: string) {
     }),
     CodeBlockLowlight.configure({ lowlight }),
     ImageExtension.configure({ inline: false, allowBase64: false }),
+    ImageRowExtension,
     Link.configure({ openOnClick: false, autolink: true }),
     Placeholder.configure({ placeholder }),
     Markdown.configure({ transformPastedText: true }),
@@ -140,6 +142,29 @@ export async function promptImageUpload(editor: Editor | null, uploadImage: Uplo
   input.onchange = async () => {
     const files = Array.from(input.files || []);
     await insertImageFiles(editor, files, uploadImage);
+  };
+  input.click();
+}
+
+export async function promptImageRowUpload(editor: Editor | null, uploadImage: UploadImage) {
+  if (!editor) return;
+
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.multiple = true;
+  input.onchange = async () => {
+    const files = Array.from(input.files || []).slice(0, 3);
+    if (!files.length) return;
+
+    const srcs: string[] = [];
+    for (const file of files) {
+      const url = await uploadImage(file);
+      if (url) srcs.push(url);
+    }
+    if (srcs.length > 0) {
+      editor.chain().focus().insertContent({ type: 'imageRow', attrs: { srcs } }).run();
+    }
   };
   input.click();
 }

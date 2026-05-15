@@ -28,8 +28,9 @@ export function StatsSection() {
   ];
 
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white border-t border-surface-200">
-      <div className="max-w-5xl mx-auto space-y-12">
+    <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-surface-50/60">
+      <div className="max-w-5xl mx-auto">
+      <div className="rounded-tl-3xl rounded-bl-3xl border border-surface-200 bg-white px-8 sm:px-12 py-12 sm:py-16 space-y-12 shadow-sm">
         <motion.div
           className="text-center"
           initial={allowRichEffects ? { opacity: 0, y: 16 } : false}
@@ -59,6 +60,7 @@ export function StatsSection() {
             Knowledge Graph 보기
           </Link>
         </motion.div>
+      </div>
       </div>
     </section>
   );

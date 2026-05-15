@@ -12,6 +12,7 @@ interface ToolbarActions {
   addLink: () => void;
   addVideo: () => void;
   addImage: () => void;
+  addImageRow: () => void;
   setCodeBlockLanguage: () => void;
   setText: () => void;
   setBulletList: () => void;
@@ -69,6 +70,12 @@ export function buildPrimaryToolbarButtons(
       label: '이미지',
       title: '이미지 업로드',
       onClick: actions.addImage,
+      tone: 'accent',
+    },
+    {
+      label: '가로 이미지',
+      title: '이미지 가로 배치 (2~3장)',
+      onClick: actions.addImageRow,
       tone: 'accent',
     },
   ];
