@@ -4,7 +4,9 @@ import com.kscold.blog.blog.application.dto.PostCreateCommand;
 import com.kscold.blog.blog.application.dto.PostUpdateCommand;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Post;
+import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.port.out.PostRepository;
+import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.util.SlugUtils;
@@ -17,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 포스트 비즈니스 로직 애플리케이션 서비스
@@ -30,6 +34,10 @@ public class PostApplicationService implements PostUseCase {
     private final PostRepository postRepository;
     private final PostDraftService postDraftService;
     private final PostReferenceService postReferenceService;
+    private final TagRepository tagRepository;
+
+    private static final String TAG_PUBLIC  = "공개";
+    private static final String TAG_PRIVATE = "비공개";
 
     /**
      * 포스트 생성
@@ -63,9 +71,61 @@ public class PostApplicationService implements PostUseCase {
             post.setSlug(command.getSlug());
         }
 
+        // publicOverride 변경 시 공개/비공개 태그 자동 스왑
+        if (command.getPublicOverride() != null) {
+            Boolean prev = post.getPublicOverride();
+            boolean nowPublic = command.getPublicOverride();
+            boolean wasPublic = Boolean.TRUE.equals(prev);
+            if (nowPublic != wasPublic) {
+                // tagIds를 직접 지정하지 않은 경우에만 자동 스왑
+                if (command.getTagIds() == null) {
+                    List<Post.TagInfo> swapped = swapVisibilityTag(post.getTags(), nowPublic);
+                    command.setTagIds(null); // tagInfos 경로를 우회
+                    tagInfos = swapped;
+                }
+            }
+        }
+
         postDraftService.applyUpdate(post, command, categoryInfo, tagInfos);
 
         return postRepository.save(post);
+    }
+
+    /**
+     * 태그 목록에서 공개↔비공개 태그를 스왑하고 카운트를 보정한다.
+     */
+    private List<Post.TagInfo> swapVisibilityTag(List<Post.TagInfo> current, boolean nowPublic) {
+        String addName    = nowPublic ? TAG_PUBLIC  : TAG_PRIVATE;
+        String removeName = nowPublic ? TAG_PRIVATE : TAG_PUBLIC;
+
+        List<Post.TagInfo> result = new ArrayList<>();
+        boolean hadRemove = false;
+        boolean hasAdd    = false;
+
+        for (Post.TagInfo t : current) {
+            if (removeName.equals(t.getName())) {
+                hadRemove = true;        // 기존 태그 제거 (목록에 넣지 않음)
+            } else {
+                if (addName.equals(t.getName())) hasAdd = true;
+                result.add(t);
+            }
+        }
+
+        // 추가 태그 삽입
+        if (!hasAdd) {
+            Optional<Tag> addTag = tagRepository.findByName(addName);
+            addTag.ifPresent(tag -> result.add(Post.TagInfo.builder().id(tag.getId()).name(tag.getName()).build()));
+        }
+
+        // 카운트 보정
+        if (hadRemove) {
+            tagRepository.findByName(removeName).ifPresent(tag -> tagRepository.decrementPostCount(tag.getId()));
+        }
+        if (!hasAdd) {
+            tagRepository.findByName(addName).ifPresent(tag -> tagRepository.incrementPostCount(tag.getId()));
+        }
+
+        return result;
     }
 
     /**
