@@ -97,8 +97,8 @@ export function usePerformanceMode() {
     prefersReducedMotion,
   } = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  const reduceMotion = !hasResolved || prefersReducedMotion || isTouchDevice;
-  const allowRichEffects = hasResolved && !reduceMotion && !isMobileViewport;
+  const reduceMotion = !hasResolved || prefersReducedMotion;
+  const allowRichEffects = hasResolved && !prefersReducedMotion;
 
   return {
     reduceMotion,
