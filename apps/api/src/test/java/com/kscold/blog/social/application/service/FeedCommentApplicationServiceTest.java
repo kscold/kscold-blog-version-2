@@ -69,7 +69,7 @@ class FeedCommentApplicationServiceTest {
                 "user-1"
         );
 
-        ArgumentCaptor<List<FeedComment>> claimedCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<FeedComment>> claimedCaptor = ArgumentCaptor.captor();
         verify(feedCommentRepository).saveAll(claimedCaptor.capture());
         FeedComment claimed = claimedCaptor.getValue().get(0);
         assertThat(claimed.getUserId()).isEqualTo("user-1");

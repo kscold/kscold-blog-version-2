@@ -7,6 +7,7 @@ import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -54,7 +55,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     private final Map<String, SessionInfo> sessions = new ConcurrentHashMap<>();
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
         String sessionId = session.getId();
         String userId   = (String) session.getAttributes().get("userId");
         String username = (String) session.getAttributes().get("username");
@@ -87,7 +88,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    protected void handleTextMessage(@NonNull WebSocketSession session, @NonNull TextMessage message) throws Exception {
         String sessionId = session.getId();
         SessionInfo info = sessions.get(sessionId);
         if (info == null) return;
@@ -132,7 +133,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) throws Exception {
         SessionInfo info = sessions.remove(session.getId());
         if (info == null) return;
 
@@ -149,7 +150,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     }
 
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+    public void handleTransportError(@NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
         log.error("WebSocket error for session {}: {}", session.getId(), exception.getMessage());
         session.close(CloseStatus.SERVER_ERROR);
     }

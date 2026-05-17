@@ -46,13 +46,13 @@ public class ViewCounter {
         String ipHash = hash(clientIp);
 
         try {
-            ViewLog log = ViewLog.builder()
+            ViewLog viewLog = ViewLog.builder()
                     .entityType(entityType)
                     .entityId(entityId)
                     .ipHash(ipHash)
                     .createdAt(Instant.now())
                     .build();
-            mongoTemplate.insert(log);
+            mongoTemplate.insert(viewLog);
         } catch (org.springframework.dao.DuplicateKeyException | DuplicateKeyException e) {
             // 이미 1시간 내 조회 → 증가 skip
             return false;

@@ -6,7 +6,6 @@ import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

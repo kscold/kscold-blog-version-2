@@ -69,7 +69,7 @@ class VaultNoteCommentApplicationServiceTest {
                 "user-1"
         );
 
-        ArgumentCaptor<List<VaultNoteComment>> claimedCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<VaultNoteComment>> claimedCaptor = ArgumentCaptor.captor();
         verify(commentRepository).saveAll(claimedCaptor.capture());
         VaultNoteComment claimed = claimedCaptor.getValue().get(0);
         assertThat(claimed.getUserId()).isEqualTo("user-1");

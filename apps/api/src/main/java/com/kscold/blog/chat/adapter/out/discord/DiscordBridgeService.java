@@ -1,6 +1,5 @@
 package com.kscold.blog.chat.adapter.out.discord;
 
-import com.kscold.blog.chat.domain.model.ChatDiscordThreadLink;
 import com.kscold.blog.chat.domain.port.out.ChatDiscordThreadLinkRepository;
 import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
@@ -50,7 +49,7 @@ public class DiscordBridgeService implements ChatNotificationPort {
                 return;
             }
 
-            ThreadChannel thread = resolveThreadForRoom(channel, roomId, username);
+            ThreadChannel thread = resolveThreadForRoom(jda, channel, roomId, username);
 
             if (thread == null) {
                 log.error("Discord 스레드를 생성하거나 복구하지 못했습니다. roomId={}", roomId);
@@ -118,7 +117,7 @@ public class DiscordBridgeService implements ChatNotificationPort {
         return threadLinkService.getRoomIdByThread(threadId, jda);
     }
 
-    private ThreadChannel resolveThreadForRoom(TextChannel channel, String roomId, String username) {
+    private ThreadChannel resolveThreadForRoom(JDA jda, TextChannel channel, String roomId, String username) {
         String threadId = threadLinkService.findThreadIdByRoomId(roomId).orElse(null);
         ThreadChannel thread = threadId != null ? jda.getThreadChannelById(threadId) : null;
 

@@ -2,6 +2,7 @@ package com.kscold.blog.shared.analytics;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -42,7 +43,7 @@ public class PageVisitService {
                     "|privacy" +
                     ")$");
 
-    public void record(String path, String clientIp, String userId, String username) {
+    public void record(String path, @Nullable String clientIp, @Nullable String userId, @Nullable String username) {
         if (!StringUtils.hasText(path)) return;
         String normalized = normalize(path);
         if (!ALLOWED_PATH.matcher(normalized).matches()) {
