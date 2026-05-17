@@ -11,6 +11,7 @@ import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -65,7 +66,7 @@ public class AccessRequestService implements AccessRequestUseCase {
     }
 
     @Override
-    public boolean hasAccess(String userId, String categoryId) {
+    public boolean hasAccess(@Nullable String userId, String categoryId) {
         if (userId == null) return false;
 
         try {
@@ -109,7 +110,7 @@ public class AccessRequestService implements AccessRequestUseCase {
     }
 
     @Override
-    public AccessRequest approve(String requestId, AccessRequest.GrantScope grantScope) {
+    public AccessRequest approve(String requestId, @Nullable AccessRequest.GrantScope grantScope) {
         AccessRequest request = accessRequestRepository.findById(requestId)
                 .orElseThrow(() -> new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "요청을 찾을 수 없습니다"));
         AccessRequest.GrantScope resolvedScope = resolveGrantScope(request, grantScope);
@@ -191,7 +192,7 @@ public class AccessRequestService implements AccessRequestUseCase {
         return request.getGrantScope() == AccessRequest.GrantScope.POST;
     }
 
-    private AccessRequest.GrantScope resolveGrantScope(AccessRequest request, AccessRequest.GrantScope requestedScope) {
+    private AccessRequest.GrantScope resolveGrantScope(AccessRequest request, @Nullable AccessRequest.GrantScope requestedScope) {
         AccessRequest.GrantScope scope = requestedScope != null ? requestedScope : request.getGrantScope();
         if (scope == null) {
             throw InvalidRequestException.invalidInput("승인 범위를 찾을 수 없습니다");

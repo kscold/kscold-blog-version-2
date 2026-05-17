@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -42,7 +43,7 @@ public class SmtpAccessRequestMailSender implements AccessRequestMailSender {
     }
 
     @Override
-    public void sendApproved(String toEmail, String displayName, AccessRequest request) {
+    public void sendApproved(@Nullable String toEmail, @Nullable String displayName, AccessRequest request) {
         if (!isAvailable() || !StringUtils.hasText(toEmail)) return;
 
         String base = StringUtils.trimTrailingCharacter(publicUrl.trim(), '/');

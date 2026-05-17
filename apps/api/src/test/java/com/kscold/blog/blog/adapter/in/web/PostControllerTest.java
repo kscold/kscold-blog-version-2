@@ -6,7 +6,10 @@ import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
+import com.kscold.blog.shared.analytics.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +35,15 @@ class PostControllerTest {
     @Mock
     private CategoryUseCase categoryUseCase;
 
+    @Mock
+    private ViewCounter viewCounter;
+
+    @Mock
+    private ClientIdentifierResolver clientIdentifierResolver;
+
+    @Mock
+    private HttpServletRequest httpServletRequest;
+
     @InjectMocks
     private PostController postController;
 
@@ -41,7 +53,7 @@ class PostControllerTest {
         Post post = post(true);
         when(postUseCase.getById("post-1")).thenReturn(post);
 
-        ResponseEntity<ApiResponse<PostResponse>> response = postController.getPostById("post-1", "user-1");
+        ResponseEntity<ApiResponse<PostResponse>> response = postController.getPostById("post-1", "user-1", httpServletRequest);
 
         assertThat(response.getBody()).isNotNull();
         PostResponse data = response.getBody().getData();
@@ -65,7 +77,7 @@ class PostControllerTest {
         when(categoryUseCase.getById("cat-1")).thenReturn(restrictedCategory);
         when(accessRequestUseCase.hasAccess("user-1", "post-1", "cat-1")).thenReturn(false);
 
-        ResponseEntity<ApiResponse<PostResponse>> response = postController.getPostById("post-1", "user-1");
+        ResponseEntity<ApiResponse<PostResponse>> response = postController.getPostById("post-1", "user-1", httpServletRequest);
 
         assertThat(response.getBody()).isNotNull();
         PostResponse data = response.getBody().getData();

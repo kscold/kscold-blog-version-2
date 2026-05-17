@@ -95,7 +95,7 @@ class AdminNightApplicationServiceTest {
                 .build();
         AdminNightRequest.SlotInfo scheduledSlot = slot("2026-04-18", "토", "14:00 - 16:30", "Weekend Reset", "Weekend");
         when(adminNightRequestRepository.findById("request-1")).thenReturn(Optional.of(request));
-        when(userQueryPort.getUserById("admin-1")).thenReturn(new UserQueryPort.UserInfo("admin-1", "김승찬", null, true));
+        when(userQueryPort.getUserById("admin-1")).thenReturn(new UserQueryPort.UserInfo("admin-1", "김승찬", null, true, null));
         when(adminNightRequestRepository.save(any(AdminNightRequest.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         AdminNightRequest approved = adminNightApplicationService.approve(
@@ -125,7 +125,7 @@ class AdminNightApplicationServiceTest {
                 .status(AdminNightRequest.Status.PENDING)
                 .build();
         when(adminNightRequestRepository.findById("request-1")).thenReturn(Optional.of(request));
-        when(userQueryPort.getUserById("admin-1")).thenReturn(new UserQueryPort.UserInfo("admin-1", "김승찬", null, true));
+        when(userQueryPort.getUserById("admin-1")).thenReturn(new UserQueryPort.UserInfo("admin-1", "김승찬", null, true, null));
         when(adminNightRequestRepository.save(any(AdminNightRequest.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         AdminNightRequest infoRequested = adminNightApplicationService.requestMoreInfo(

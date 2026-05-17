@@ -43,7 +43,7 @@ class AccessRequestServiceTest {
     void requestAccessStoresPostAndCategoryContext() {
         Post post = post("post-1", "권한 모델", "access-model", "cat-1", "개발 이야기");
         when(postUseCase.getById("post-1")).thenReturn(post);
-        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false));
+        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1")).thenReturn(List.of());
         when(accessRequestRepository.findByUserIdAndPostId("user-1", "post-1")).thenReturn(Optional.empty());
         when(accessRequestRepository.save(any(AccessRequest.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -72,7 +72,7 @@ class AccessRequestServiceTest {
                 .grantScope(AccessRequest.GrantScope.POST)
                 .build();
 
-        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false));
+        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1")).thenReturn(List.of(approvedPostGrant));
         when(accessRequestRepository.findByUserIdAndPostId("user-1", "post-1")).thenReturn(Optional.of(approvedPostGrant));
         when(accessRequestRepository.findByUserIdAndPostId("user-1", "post-2")).thenReturn(Optional.empty());
@@ -92,7 +92,7 @@ class AccessRequestServiceTest {
                 .grantScope(AccessRequest.GrantScope.CATEGORY)
                 .build();
 
-        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false));
+        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1")).thenReturn(List.of(approvedCategoryGrant));
 
         assertThat(accessRequestService.hasAccess("user-1", "post-999", "cat-1")).isTrue();
@@ -109,7 +109,7 @@ class AccessRequestServiceTest {
                 .grantScope(AccessRequest.GrantScope.CATEGORY)
                 .build();
 
-        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false));
+        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1")).thenReturn(List.of(categoryApprovedRequest));
 
         assertThat(accessRequestService.hasAccess("user-1", "post-legacy", "cat-1")).isTrue();
@@ -134,7 +134,7 @@ class AccessRequestServiceTest {
                 .build();
 
         when(postUseCase.getById("post-1")).thenReturn(post);
-        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false));
+        when(userQueryPort.getUserById("user-1")).thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1")).thenReturn(List.of(rejectedPostRequest));
         when(accessRequestRepository.findByUserIdAndPostId("user-1", "post-1")).thenReturn(Optional.of(rejectedPostRequest));
         when(accessRequestRepository.save(any(AccessRequest.class))).thenAnswer(invocation -> invocation.getArgument(0));

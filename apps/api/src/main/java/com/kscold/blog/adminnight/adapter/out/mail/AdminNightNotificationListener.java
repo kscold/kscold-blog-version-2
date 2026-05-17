@@ -1,7 +1,6 @@
 package com.kscold.blog.adminnight.adapter.out.mail;
 
 import com.kscold.blog.adminnight.application.event.AdminNightNotificationEvent;
-import com.kscold.blog.adminnight.application.event.AdminNightNotificationType;
 import com.kscold.blog.adminnight.config.AdminNightProperties;
 import com.kscold.blog.identity.adapter.out.mail.RecoveryEmailComposer;
 import com.kscold.blog.identity.application.port.out.RecoveryMailSender;
