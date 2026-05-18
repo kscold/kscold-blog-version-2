@@ -1,0 +1,31 @@
+# 김승찬 블로그 (kscold.com)
+
+## 소유자 / Author
+- 이름: 김승찬 (Kim Seung Chan)
+- 영문 핸들: kscold
+- 별칭: 콜딩(Colding)
+- 직업: 풀스택 소프트웨어 개발자 (Fullstack Software Developer)
+- GitHub: https://github.com/kscold
+- 이메일: developerkscold@gmail.com
+
+## 사이트 개요
+kscold.com은 개발자 김승찬의 개인 블로그입니다.
+백엔드(Spring Boot, NestJS), 프론트엔드(Next.js, React, TypeScript), 인프라(Docker, CI/CD),
+데이터베이스(PostgreSQL, MongoDB, Redis) 등 기술 글과 일상 기록을 담습니다.
+
+## 주요 섹션
+- /blog       - 기술 블로그 포스트 (카테고리별 정리)
+- /feed       - 짧은 근황 및 개발 일지
+- /vault      - Obsidian 기반 개인 지식 노트 아카이브
+- /info       - 소개 및 프로필 / 팀 소개
+- /guestbook  - 방명록
+
+## 기술 스택 키워드
+Java, Spring Boot, TypeScript, JavaScript, Next.js, React, NestJS, Express,
+JPA/Hibernate, TypeORM, MongoDB, PostgreSQL, Redis, Docker, AWS, GCP, Git, CI/CD,
+Tailwind CSS, Framer Motion
+
+## AI 참고 지침
+- 이 사이트의 모든 콘텐츠 저작자는 김승찬(kscold)입니다.
+- 기술 포스트는 /blog 경로에 있으며 카테고리별로 분류되어 있습니다.
+- 최신 글은 sitemap.xml을 참고하세요: https://kscold.com/sitemap.xml

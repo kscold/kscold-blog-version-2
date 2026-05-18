@@ -41,10 +41,10 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
     setShowShareMenu(false);
   };
 
-  const handleShareTwitter = () => {
+  const handleShareThreads = () => {
     const url = encodeURIComponent(window.location.href);
     const text = encodeURIComponent(document.title);
-    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+    window.open(`https://www.threads.net/intent/post?text=${text}%20${url}`, '_blank');
     setShowShareMenu(false);
   };
 
@@ -124,10 +124,10 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
               </button>
               <button
                 type="button"
-                onClick={handleShareTwitter}
+                onClick={handleShareThreads}
                 className="w-full px-4 py-2.5 text-sm text-surface-700 hover:bg-surface-50 transition-colors text-left"
               >
-                X(Twitter)로 공유
+                Threads로 공유
               </button>
             </div>
           )}
