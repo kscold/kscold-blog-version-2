@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -19,8 +20,13 @@ interface FeedCardProps {
 export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
   const { allowRichEffects, reduceMotion } = usePerformanceMode();
   const toggleLike = useToggleLike();
+  const router = useRouter();
   const [isLiked, setIsLiked] = useState(feed.isLiked);
   const [likesCount, setLikesCount] = useState(feed.likesCount);
+
+  const handleCardClick = () => {
+    if (showCommentLink) router.push(`/feed/${feed.id}`);
+  };
 
   const handleLike = async () => {
     const wasLiked = isLiked;
@@ -54,6 +60,8 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
       initial={allowRichEffects ? { opacity: 0, y: 20 } : false}
       animate={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
       transition={allowRichEffects ? { duration: 0.4 } : undefined}
+      onClick={handleCardClick}
+      style={showCommentLink ? { cursor: 'pointer' } : undefined}
     >
       {/* 작성자 정보 */}
       <div className="flex items-center gap-3 px-4 py-3">
@@ -83,7 +91,7 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
       {/* 반응 영역 */}
       <div className="px-4 pt-3">
         <div className="flex items-center gap-4">
-          <button onClick={handleLike} className="flex items-center gap-1.5 group">
+          <button onClick={e => { e.stopPropagation(); handleLike(); }} className="flex items-center gap-1.5 group">
             <motion.svg
               className={`w-6 h-6 transition-colors ${isLiked ? 'text-red-500 fill-red-500' : 'text-surface-700'}`}
               viewBox="0 0 24 24"
@@ -142,6 +150,7 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
               key={tag}
               href={`/tags/${encodeURIComponent(tag)}`}
               className="text-xs font-bold text-surface-400 hover:text-surface-700 transition-colors"
+              onClick={e => e.stopPropagation()}
             >
               #{tag}
             </Link>
@@ -151,7 +160,7 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
 
       {/* 링크 미리보기 */}
       {feed.linkPreview && (
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-3" onClick={e => e.stopPropagation()}>
           <LinkPreviewCard preview={feed.linkPreview} />
         </div>
       )}
