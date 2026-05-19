@@ -116,6 +116,15 @@ export function Header() {
                     Admin
                   </Link>
                 )}
+                <Link
+                  href="/settings/profile"
+                  className="p-2 text-surface-500 hover:text-surface-900 hover:bg-surface-100 rounded-full transition-colors"
+                  title="프로필 설정"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                </Link>
                 <button
                   onClick={logout}
                   className="px-1.5 py-1.5 text-[11px] font-medium text-surface-500 hover:text-surface-900 transition-colors sm:px-4 sm:py-2 sm:text-sm"
