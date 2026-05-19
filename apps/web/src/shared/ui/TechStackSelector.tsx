@@ -93,7 +93,7 @@ export function TechStackSelector({ value, sharedStacks = [], onChange }: TechSt
               className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-surface-50 transition-colors border-b border-surface-100"
             >
               <span className="text-surface-400 text-xs">추가</span>
-              <span className="font-medium text-surface-900">"{input.trim()}"</span>
+              <span className="font-medium text-surface-900">&ldquo;{input.trim()}&rdquo;</span>
               <span className="ml-auto text-[10px] text-surface-400">Enter</span>
             </button>
           )}
