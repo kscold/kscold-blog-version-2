@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -63,6 +64,7 @@ public class User {
         private String bio;
         private String avatar;
         private Map<String, String> socialLinks;
+        private List<String> techStack;
     }
 
     /**

@@ -49,6 +49,7 @@ export function AdminDashboardContainer() {
   ];
 
   const quickActions = [
+    { name: '사용자 관리', description: '전체 사용자 프로필을 조회하고 관리합니다', link: '/admin/users' },
     { name: '새 포스트 작성', description: '블로그 포스트를 작성합니다', link: '/admin/posts/new' },
     { name: '새 피드 작성', description: '일상 피드를 작성합니다', link: '/admin/feed/new' },
     { name: '새 노트 작성', description: 'Vault 노트를 작성합니다', link: '/admin/vault/new' },

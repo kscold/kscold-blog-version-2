@@ -4,6 +4,10 @@ export interface User {
   username: string;
   displayName: string;
   role: 'ADMIN' | 'USER';
+  avatar?: string;
+  bio?: string;
+  socialLinks?: Record<string, string>;
+  techStack?: string[];
 }
 
 export interface AuthResponse {

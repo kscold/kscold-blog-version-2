@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -26,5 +29,24 @@ public class AuthResult {
         private String username;
         private String displayName;
         private User.Role role;
+        private String avatar;
+        private String bio;
+        private Map<String, String> socialLinks;
+        private List<String> techStack;
+
+        public static UserInfo from(User user) {
+            User.Profile p = user.getProfile();
+            return UserInfo.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .username(user.getUsername())
+                    .displayName(user.getDisplayName())
+                    .role(user.getRole())
+                    .avatar(p != null ? p.getAvatar() : null)
+                    .bio(p != null ? p.getBio() : null)
+                    .socialLinks(p != null ? p.getSocialLinks() : null)
+                    .techStack(p != null ? p.getTechStack() : null)
+                    .build();
+        }
     }
 }

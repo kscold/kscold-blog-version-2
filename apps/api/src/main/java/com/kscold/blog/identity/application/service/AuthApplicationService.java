@@ -112,13 +112,7 @@ public class AuthApplicationService implements AuthUseCase {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
-        return AuthResult.UserInfo.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .displayName(user.getDisplayName())
-                .role(user.getRole())
-                .build();
+        return AuthResult.UserInfo.from(user);
     }
 
     @Override
@@ -178,13 +172,7 @@ public class AuthApplicationService implements AuthUseCase {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .user(AuthResult.UserInfo.builder()
-                        .id(user.getId())
-                        .email(user.getEmail())
-                        .username(user.getUsername())
-                        .displayName(user.getDisplayName())
-                        .role(user.getRole())
-                        .build())
+                .user(AuthResult.UserInfo.from(user))
                 .build();
     }
 
