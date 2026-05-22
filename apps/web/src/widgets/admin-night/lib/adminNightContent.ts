@@ -67,6 +67,6 @@ export const ADMIN_NIGHT_STEPS: AdminNightStep[] = [
   {
     id: 'merge-meet',
     title: 'Merge / Meet',
-    description: '김승찬이 확인하고 승인하면 일정이 캘린더에 올라가고, 같은 시간대의 조용한 만남으로 이어집니다.',
+    description: '확인 후 승인되면 일정이 캘린더에 올라가고, 같은 시간대의 조용한 만남으로 이어집니다.',
   },
 ];
