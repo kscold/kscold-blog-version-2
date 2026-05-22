@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import type { Components } from 'react-markdown';
 import { getVideoEmbedConfig } from '@/shared/lib/videoEmbed';
 import { VideoEmbed } from '@/shared/ui/VideoEmbed';
@@ -103,11 +104,17 @@ export function createMarkdownComponents(isDark: boolean): Components {
       }
       return <div className={classStr}>{children}</div>;
     },
-    a: ({ href, children }) => (
-      <a href={href} target="_blank" rel="noopener noreferrer">
-        {children}
-      </a>
-    ),
+    a: ({ href, children }) => {
+      const isInternal = href && (href.startsWith('/') || href.startsWith('#'));
+      if (isInternal) {
+        return <Link href={href}>{children}</Link>;
+      }
+      return (
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          {children}
+        </a>
+      );
+    },
     strong: ({ children }) => <strong className="markdown-strong">{children}</strong>,
     code(props) {
       const { className, children } = props;

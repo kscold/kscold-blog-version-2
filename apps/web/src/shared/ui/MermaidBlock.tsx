@@ -66,7 +66,7 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
       : 'border-surface-200 bg-surface-50';
 
   return (
-    <div className="not-prose relative my-6 overflow-hidden rounded-2xl border shadow-sm">
+    <div className="not-prose relative my-6 rounded-2xl border shadow-sm">
       <div className={`border-b px-4 py-3 ${panelClasses}`}>
         <div className="flex items-center justify-between gap-3">
           <div className="inline-flex items-center gap-2">
