@@ -41,13 +41,14 @@ public class FeedController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) String tag,
+            @AuthenticationPrincipal String userId,
             HttpServletRequest request
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Feed> feeds = (tag != null && !tag.isBlank())
                 ? feedUseCase.getPublicFeedsByTag(tag, pageable)
                 : feedUseCase.getPublicFeeds(pageable);
-        String identifier = clientIdentifierResolver.resolve(request);
+        String identifier = resolveIdentifier(userId, request);
         return ResponseEntity.ok(ApiResponse.success(feeds.map(feed -> FeedResponse.from(feed, identifier))));
     }
 
@@ -70,10 +71,11 @@ public class FeedController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<FeedResponse>> getFeedById(
             @PathVariable String id,
+            @AuthenticationPrincipal String userId,
             HttpServletRequest request
     ) {
         Feed feed = feedUseCase.getById(id);
-        String identifier = clientIdentifierResolver.resolve(request);
+        String identifier = resolveIdentifier(userId, request);
         if (viewCounter.incrementIfUnique("feeds", feed.getId(), "FEED", identifier)) {
             feed.setViews(feed.getViews() + 1);
         }
@@ -121,11 +123,17 @@ public class FeedController {
     @PostMapping("/{id}/like")
     public ResponseEntity<ApiResponse<FeedResponse>> toggleLike(
             @PathVariable String id,
+            @AuthenticationPrincipal String userId,
             HttpServletRequest request
     ) {
-        String identifier = clientIdentifierResolver.resolve(request);
+        String identifier = resolveIdentifier(userId, request);
         Feed feed = feedUseCase.toggleLike(id, identifier);
         return ResponseEntity.ok(ApiResponse.success(FeedResponse.from(feed, identifier)));
+    }
+
+    /** 로그인 유저 → userId, 비로그인 → IP */
+    private String resolveIdentifier(String userId, HttpServletRequest request) {
+        return (userId != null) ? userId : clientIdentifierResolver.resolve(request);
     }
 
 }
