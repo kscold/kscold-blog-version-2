@@ -2,6 +2,7 @@ package com.kscold.blog.identity.application.service;
 
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.dto.AuthResult;
+import com.kscold.blog.identity.application.dto.PublicProfileDto;
 import com.kscold.blog.identity.application.dto.UpdateProfileCommand;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.domain.model.User;
@@ -38,6 +39,13 @@ public class UserProfileService implements UserProfileUseCase {
                 .distinct()
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PublicProfileDto getPublicProfile(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> ResourceNotFoundException.user(username));
+        return PublicProfileDto.from(user);
     }
 
     private AuthResult.UserInfo applyProfileUpdate(String userId, UpdateProfileCommand command) {

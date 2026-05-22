@@ -49,6 +49,7 @@ public class FeedApplicationService implements FeedUseCase {
                 .images(command.getImages() != null ? command.getImages() : new ArrayList<>())
                 .author(Feed.AuthorInfo.builder()
                         .id(author.id())
+                        .username(author.username())
                         .name(author.displayName())
                         .avatar(author.avatar())
                         .build())
@@ -101,6 +102,10 @@ public class FeedApplicationService implements FeedUseCase {
 
     public Page<Feed> getPublicFeedsByTag(String tag, Pageable pageable) {
         return feedRepository.findByVisibilityAndTag(Feed.Visibility.PUBLIC, tag, pageable);
+    }
+
+    public Page<Feed> getPublicFeedsByAuthorId(String authorId, Pageable pageable) {
+        return feedRepository.findByAuthorIdAndVisibility(authorId, Feed.Visibility.PUBLIC, pageable);
     }
 
     public Page<Feed> getAllFeeds(Pageable pageable) {

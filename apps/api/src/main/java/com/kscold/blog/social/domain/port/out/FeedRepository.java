@@ -21,6 +21,9 @@ public interface FeedRepository {
     /** 좋아요 토글 - atomic. 좋아요 추가했으면 true, 취소했으면 false */
     boolean toggleLike(String feedId, String identifier);
 
+    /** 특정 작성자의 공개 피드 */
+    Page<Feed> findByAuthorIdAndVisibility(String authorId, Feed.Visibility visibility, Pageable pageable);
+
     /** PUBLIC 피드의 태그별 사용 횟수: [{name, count}] 내림차순 */
     List<Map<String, Object>> aggregateTags();
 }
