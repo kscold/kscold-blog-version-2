@@ -81,3 +81,6 @@ CLAUDE.md
 
 # Serena
 .serena/
+
+# Local scripts (personal utility scripts, not for repo)
+scripts/
