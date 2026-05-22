@@ -90,3 +90,9 @@ export function useUserFeeds(username: string, page = 0) {
     enabled: !!username,
   });
 }
+
+export function useWithdrawAccount() {
+  return useMutation({
+    mutationFn: () => apiClient.delete<void>('/users/me'),
+  });
+}
