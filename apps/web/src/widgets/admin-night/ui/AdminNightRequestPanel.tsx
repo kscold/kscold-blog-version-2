@@ -63,7 +63,7 @@ export function AdminNightRequestPanel({
   const panelTitle = activeEditingRequestId ? '추가 정보를 반영해 다시 보내 주세요' : '만나고 싶은 일과 시간을 남겨 주세요';
   const panelDescription = activeEditingRequestId
     ? '관리자 메모를 반영해 내용을 보완하면 같은 신청이 다시 대기열로 올라갑니다. 확인이 끝나면 승인과 함께 실제 만남 일정으로 이어집니다.'
-    : '오늘 끝낼 일과 가능한 시간대를 남겨 주세요. 김승찬이 확인하고 승인하면 일정이 캘린더에 merge 되고, 실제 온·오프라인의 만남 흐름으로 이어집니다.';
+    : '오늘 끝낼 일과 가능한 시간대를 남겨 주세요. 확인 후 승인되면 일정이 캘린더에 merge 되고, 실제 온·오프라인의 만남 흐름으로 이어집니다.';
 
   return (
     <div className="space-y-4">
