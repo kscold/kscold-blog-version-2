@@ -19,7 +19,7 @@ export const SKILL_CATEGORIES = [
   },
   {
     label: 'Backend Framework',
-    skills: ['Spring Boot', 'NestJS', 'Express'],
+    skills: ['Spring Boot', 'NestJS'],
   },
   {
     label: 'Backend ORM',
@@ -36,6 +36,10 @@ export const SKILL_CATEGORIES = [
   {
     label: 'Database',
     skills: ['MariaDB', 'PostgreSQL', 'MongoDB', 'Redis'],
+  },
+  {
+    label: 'AI Agent',
+    skills: ['LangGraph', 'LangChain', 'RAG', 'Harness Engineering', 'Prompt Engineering', 'Claude API'],
   },
   {
     label: 'DevOps',
