@@ -35,6 +35,7 @@ public class FeedResponse {
     @AllArgsConstructor
     public static class AuthorInfo {
         private String id;
+        private String username;
         private String name;
         private String avatar;
     }
@@ -65,6 +66,7 @@ public class FeedResponse {
                 .tags(feed.getTags())
                 .author(feed.getAuthor() != null ? AuthorInfo.builder()
                         .id(feed.getAuthor().getId())
+                        .username(feed.getAuthor().getUsername())
                         .name(feed.getAuthor().getName())
                         .avatar(feed.getAuthor().getAvatar())
                         .build() : null)

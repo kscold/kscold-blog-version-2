@@ -5,6 +5,7 @@ export interface Feed {
   tags?: string[];
   author: {
     id: string;
+    username?: string;
     name: string;
     avatar?: string;
   };

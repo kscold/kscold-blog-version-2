@@ -71,6 +71,7 @@ public class Feed {
     @AllArgsConstructor
     public static class AuthorInfo {
         private String id;
+        private String username;
         private String name;
         private String avatar;
     }

@@ -1,6 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/shared/api/api-client';
 import { User } from '@/types/user';
+import { Feed } from '@/types/social';
+import { PageResponse } from '@/types/api';
+
+export interface PublicProfile {
+  id: string;
+  username: string;
+  displayName: string;
+  avatar?: string;
+  bio?: string;
+  socialLinks?: Record<string, string>;
+  techStack?: string[];
+}
 
 export interface UpdateProfilePayload {
   displayName?: string;
@@ -59,5 +71,22 @@ export function useAdminUpdateProfile() {
       qc.invalidateQueries({ queryKey: ['admin', 'users', 'list'] });
       qc.invalidateQueries({ queryKey: ['admin', 'users', 'stats'] });
     },
+  });
+}
+
+export function usePublicProfile(username: string) {
+  return useQuery<PublicProfile>({
+    queryKey: ['users', 'profile', username],
+    queryFn: () => apiClient.get<PublicProfile>(`/users/profile/${username}`),
+    enabled: !!username,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useUserFeeds(username: string, page = 0) {
+  return useQuery<PageResponse<Feed>>({
+    queryKey: ['users', username, 'feeds', page],
+    queryFn: () => apiClient.get<PageResponse<Feed>>(`/users/${username}/feeds?page=${page}&size=12`),
+    enabled: !!username,
   });
 }

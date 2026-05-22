@@ -65,21 +65,45 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
     >
       {/* 작성자 정보 */}
       <div className="flex items-center gap-3 px-4 py-3">
-        <div className="relative w-9 h-9 bg-surface-200 rounded-full flex items-center justify-center overflow-hidden">
-          {feed.author.avatar ? (
-            <Image src={feed.author.avatar} alt="" fill sizes="36px" className="object-cover" />
-          ) : (
-            <span className="text-sm font-bold text-surface-600">
-              {feed.author.name.charAt(0).toUpperCase()}
-            </span>
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-surface-900">{feed.author.name}</p>
-          <p className="text-xs text-surface-400">{formatTime(feed.createdAt)}</p>
-        </div>
+        {feed.author.username ? (
+          <Link
+            href={`/profile/${feed.author.username}`}
+            className="flex items-center gap-3 flex-1 min-w-0 group"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="relative w-9 h-9 bg-surface-200 rounded-full flex items-center justify-center overflow-hidden shrink-0">
+              {feed.author.avatar ? (
+                <Image src={feed.author.avatar} alt="" fill sizes="36px" className="object-cover" />
+              ) : (
+                <span className="text-sm font-bold text-surface-600">
+                  {feed.author.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-surface-900 group-hover:text-surface-600 transition-colors">{feed.author.name}</p>
+              <p className="text-xs text-surface-400">{formatTime(feed.createdAt)}</p>
+            </div>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="relative w-9 h-9 bg-surface-200 rounded-full flex items-center justify-center overflow-hidden shrink-0">
+              {feed.author.avatar ? (
+                <Image src={feed.author.avatar} alt="" fill sizes="36px" className="object-cover" />
+              ) : (
+                <span className="text-sm font-bold text-surface-600">
+                  {feed.author.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-surface-900">{feed.author.name}</p>
+              <p className="text-xs text-surface-400">{formatTime(feed.createdAt)}</p>
+            </div>
+          </div>
+        )}
         {feed.visibility === 'PRIVATE' && (
-          <span className="text-[10px] px-2 py-0.5 bg-surface-100 text-surface-500 rounded-full font-medium">
+          <span className="text-[10px] px-2 py-0.5 bg-surface-100 text-surface-500 rounded-full font-medium shrink-0">
             비공개
           </span>
         )}

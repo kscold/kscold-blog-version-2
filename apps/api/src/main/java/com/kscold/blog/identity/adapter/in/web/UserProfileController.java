@@ -1,17 +1,26 @@
 package com.kscold.blog.identity.adapter.in.web;
 
 import com.kscold.blog.identity.application.dto.AuthResult;
+import com.kscold.blog.identity.application.dto.PublicProfileDto;
 import com.kscold.blog.identity.application.dto.UpdateProfileCommand;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.social.adapter.in.web.dto.FeedResponse;
+import com.kscold.blog.social.application.port.in.FeedUseCase;
+import com.kscold.blog.social.domain.model.Feed;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -22,6 +31,7 @@ import java.util.List;
 public class UserProfileController {
 
     private final UserProfileUseCase userProfileUseCase;
+    private final FeedUseCase feedUseCase;
 
     @PatchMapping("/me/profile")
     @PreAuthorize("isAuthenticated()")
@@ -36,5 +46,26 @@ public class UserProfileController {
     @GetMapping("/tech-stacks")
     public ResponseEntity<ApiResponse<List<String>>> getTechStacks() {
         return ResponseEntity.ok(ApiResponse.success(userProfileUseCase.getAllTechStacks()));
+    }
+
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<ApiResponse<PublicProfileDto>> getPublicProfile(
+            @PathVariable String username
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(userProfileUseCase.getPublicProfile(username)));
+    }
+
+    @GetMapping("/{username}/feeds")
+    public ResponseEntity<ApiResponse<Page<FeedResponse>>> getUserFeeds(
+            @PathVariable String username,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ) {
+        PublicProfileDto profile = userProfileUseCase.getPublicProfile(username);
+        Page<Feed> feeds = feedUseCase.getPublicFeedsByAuthorId(
+                profile.id(),
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
+        );
+        return ResponseEntity.ok(ApiResponse.success(feeds.map(FeedResponse::from)));
     }
 }

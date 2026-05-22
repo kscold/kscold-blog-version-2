@@ -60,6 +60,11 @@ public class FeedRepositoryAdapter implements FeedRepository {
     }
 
     @Override
+    public Page<Feed> findByAuthorIdAndVisibility(String authorId, Feed.Visibility visibility, Pageable pageable) {
+        return mongoFeedRepository.findByAuthorIdAndVisibility(authorId, visibility, pageable);
+    }
+
+    @Override
     public void incrementCommentCount(String feedId) {
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(feedId)),
