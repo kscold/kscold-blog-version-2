@@ -42,16 +42,24 @@ function validateRegistrationForm(formData: LoginFormData) {
     return '이메일을 입력해주세요.';
   }
 
+  if (!displayName) {
+    return '이름을 입력해주세요.';
+  }
+
+  if (displayName.length > 30) {
+    return '이름은 30자 이내로 입력해주세요.';
+  }
+
   if (!username) {
-    return '사용자명을 입력해주세요.';
+    return '아이디를 입력해주세요.';
   }
 
   if (username.length < 3 || username.length > 20) {
-    return '사용자명은 3-20자여야 합니다.';
+    return '아이디는 3-20자여야 합니다.';
   }
 
-  if (displayName && displayName.length > 30) {
-    return '표시 이름은 30자 이내로 입력해주세요.';
+  if (!/^[a-z0-9_]+$/.test(username)) {
+    return '아이디는 영문 소문자, 숫자, 밑줄(_)만 사용할 수 있어요.';
   }
 
   if (!password) {
@@ -160,7 +168,7 @@ export function useLoginForm() {
         email: formData.email.trim(),
         password: formData.password,
         username: formData.username.trim(),
-        displayName: formData.displayName.trim() || formData.username.trim(),
+        displayName: formData.displayName.trim(),
       });
 
       router.push(resolveSafeRedirect(redirect, result.user.role));

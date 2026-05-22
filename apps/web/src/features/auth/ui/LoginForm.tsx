@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Input from '@/shared/ui/Input';
@@ -7,8 +8,32 @@ import Button from '@/shared/ui/Button';
 import { AuthToggle } from '@/features/auth/ui/AuthToggle';
 import { useLoginForm } from '@/features/auth/model/useLoginForm';
 
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s_]/g, '')
+    .replace(/\s+/g, '_')
+    .replace(/_{2,}/g, '_')
+    .replace(/^_|_$/g, '')
+    .slice(0, 20);
+}
+
 export function LoginForm() {
   const { error, formData, handleSubmit, isLoading, isLogin, setIsLogin, updateField } = useLoginForm();
+  const usernameManuallyEdited = useRef(false);
+
+  const handleDisplayNameChange = (value: string) => {
+    updateField('displayName', value);
+    if (!usernameManuallyEdited.current) {
+      const suggested = slugify(value);
+      updateField('username', suggested);
+    }
+  };
+
+  const handleUsernameChange = (value: string) => {
+    usernameManuallyEdited.current = value !== slugify(formData.displayName);
+    updateField('username', value.toLowerCase().replace(/[^a-z0-9_]/g, ''));
+  };
 
   return (
     <div className="relative flex min-h-screen items-start justify-center overflow-hidden bg-surface-50 px-4 pb-10 pt-24 sm:items-center sm:p-4">
@@ -78,27 +103,38 @@ export function LoginForm() {
                   <>
                     <Input
                       type="text"
-                      placeholder="사용자명"
-                      value={formData.username}
-                      onChange={e => updateField('username', e.target.value)}
-                      helperText="사용자명은 3-20자까지 사용할 수 있어요."
-                      autoComplete="username"
-                      data-cy="register-username-input"
-                      minLength={3}
-                      maxLength={20}
+                      placeholder="이름 (예: 홍길동)"
+                      value={formData.displayName}
+                      onChange={e => handleDisplayNameChange(e.target.value)}
+                      helperText="실명 또는 닉네임을 입력해 주세요. 피드·댓글에 표시됩니다."
+                      autoComplete="name"
+                      data-cy="register-display-name-input"
+                      maxLength={30}
                       required
                     />
 
-                    <Input
-                      type="text"
-                      placeholder="표시 이름 (선택)"
-                      value={formData.displayName}
-                      onChange={e => updateField('displayName', e.target.value)}
-                      helperText="비워두면 사용자명이 그대로 표시됩니다."
-                      autoComplete="nickname"
-                      data-cy="register-display-name-input"
-                      maxLength={30}
-                    />
+                    <div className="space-y-1">
+                      <Input
+                        type="text"
+                        placeholder="아이디 (예: hong_gildong)"
+                        value={formData.username}
+                        onChange={e => handleUsernameChange(e.target.value)}
+                        helperText="영문 소문자·숫자·밑줄(_) 3-20자 · 프로필 URL에 사용됩니다."
+                        autoComplete="username"
+                        data-cy="register-username-input"
+                        minLength={3}
+                        maxLength={20}
+                        required
+                      />
+                      {formData.username && (
+                        <p className="text-[11px] text-surface-400 px-1">
+                          프로필:{' '}
+                          <span className="text-surface-600 font-medium">
+                            kscold.com/profile/{formData.username}
+                          </span>
+                        </p>
+                      )}
+                    </div>
                   </>
                 )}
 
