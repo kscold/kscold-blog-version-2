@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useDailyVisits, useTopPaths, useVisitHistory } from '@/entities/analytics/api/useAnalytics';
+import { formatRelativeTime } from '@/shared/lib/format-utils';
 
 type Window = 7 | 14 | 30;
 
@@ -188,7 +189,7 @@ export function AdminPageVisitSection() {
                   </code>
                 </div>
                 <span className="text-[11px] text-surface-400 tabular-nums shrink-0">
-                  {formatTime(entry.visitedAt)}
+                  {formatRelativeTime(entry.visitedAt)}
                 </span>
               </div>
             ))
@@ -199,19 +200,3 @@ export function AdminPageVisitSection() {
   );
 }
 
-function formatTime(iso: string): string {
-  try {
-    const date = new Date(iso);
-    const diff = Date.now() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return '방금';
-    if (minutes < 60) return `${minutes}분 전`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}시간 전`;
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `${days}일 전`;
-    return date.toLocaleDateString('ko-KR');
-  } catch {
-    return iso;
-  }
-}

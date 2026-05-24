@@ -11,6 +11,7 @@ import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import { LinkifiedText } from '@/shared/ui/LinkifiedText';
+import { formatRelativeTime } from '@/shared/lib/format-utils';
 
 interface FeedCardProps {
   feed: Feed;
@@ -41,19 +42,6 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
     }
   };
 
-  const formatTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const diff = Date.now() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return '방금';
-    if (minutes < 60) return `${minutes}분 전`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}시간 전`;
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `${days}일 전`;
-    return date.toLocaleDateString('ko-KR');
-  };
-
   return (
     <motion.article
       className="bg-white border border-surface-200 rounded-2xl overflow-hidden"
@@ -82,7 +70,7 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold text-surface-900 group-hover:text-surface-600 transition-colors">{feed.author.name}</p>
-              <p className="text-xs text-surface-400">{formatTime(feed.createdAt)}</p>
+              <p className="text-xs text-surface-400">{formatRelativeTime(feed.createdAt)}</p>
             </div>
           </Link>
         ) : (
@@ -98,7 +86,7 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold text-surface-900">{feed.author.name}</p>
-              <p className="text-xs text-surface-400">{formatTime(feed.createdAt)}</p>
+              <p className="text-xs text-surface-400">{formatRelativeTime(feed.createdAt)}</p>
             </div>
           </div>
         )}
