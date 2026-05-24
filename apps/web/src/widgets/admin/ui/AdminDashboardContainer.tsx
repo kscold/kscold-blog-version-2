@@ -8,9 +8,9 @@ import { useTags } from '@/entities/tag/api/useTags';
 import { fetchChatRooms } from '@/entities/chat/api/chatAdminApi';
 import { useQuery } from '@tanstack/react-query';
 import { useViewer } from '@/entities/user/model/useViewer';
-import { DashboardStats } from './DashboardStats';
-import { AdminUserStatsSection } from './AdminUserStatsSection';
-import { AdminPageVisitSection } from './AdminPageVisitSection';
+import { DashboardStats } from './analytics/DashboardStats';
+import { AdminUserStatsSection } from './analytics/AdminUserStatsSection';
+import { AdminPageVisitSection } from './analytics/AdminPageVisitSection';
 
 export function AdminDashboardContainer() {
   const { user, role } = useViewer();

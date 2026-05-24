@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { CategoryTree } from './CategoryTree';
 import { CategoryModal } from './CategoryModal';
-import { useAdminCategories } from '../api/useAdminCategories';
+import { useAdminCategories } from '../../api/useAdminCategories';
 
 export function AdminCategoriesSection() {
   const {
