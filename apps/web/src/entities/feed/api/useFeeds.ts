@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { Feed, FeedCreateRequest, FeedUpdateRequest, LinkPreview } from '@/types/social';
+import { Feed, LinkPreview } from '@/types/social';
 import { PageResponse } from '@/types/api';
 
 interface UseFeedsOptions {
@@ -32,53 +32,6 @@ export function useAdminFeeds(page: number = 0, size: number = 12) {
   return useQuery({
     queryKey: ['feeds', 'admin', { page, size }],
     queryFn: () => apiClient.get<PageResponse<Feed>>(`/feeds/admin?page=${page}&size=${size}`),
-  });
-}
-
-export function useCreateFeed() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: FeedCreateRequest) => apiClient.post<Feed>('/feeds', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feeds'] });
-    },
-  });
-}
-
-export function useUpdateFeed() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: FeedUpdateRequest }) =>
-      apiClient.put<Feed>(`/feeds/${id}`, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['feeds'] });
-      queryClient.invalidateQueries({ queryKey: ['feeds', variables.id] });
-    },
-  });
-}
-
-export function useDeleteFeed() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => apiClient.delete<void>(`/feeds/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feeds'] });
-    },
-  });
-}
-
-export function useToggleLike() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (feedId: string) => apiClient.post<Feed>(`/feeds/${feedId}/like`),
-    onSuccess: (_, feedId) => {
-      queryClient.invalidateQueries({ queryKey: ['feeds'] });
-      queryClient.invalidateQueries({ queryKey: ['feeds', feedId] });
-    },
   });
 }
 

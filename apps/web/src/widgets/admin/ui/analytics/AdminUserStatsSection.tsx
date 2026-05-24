@@ -1,11 +1,7 @@
 'use client';
 
-import {
-  useUserStats,
-  useSoftDeleteUser,
-  useHardDeleteUser,
-  type RecentUser,
-} from '@/entities/user/api/useUserStats';
+import { useUserStats, type RecentUser } from '@/entities/user/api/useUserStats';
+import { useSoftDeleteUser, useHardDeleteUser } from '@/features/user/api/useUserMutations';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useAlert } from '@/shared/model/alertStore';

@@ -7,7 +7,7 @@ import { useTags } from '@/entities/tag/api/useTags';
 import { usePostsByTag } from '@/entities/post/api/usePosts';
 import { useFeeds } from '@/entities/feed/api/useFeeds';
 import { PostCard } from '@/entities/post/ui/PostCard';
-import { FeedCard } from '@/entities/feed/ui/FeedCard';
+import { FeedCard } from '@/features/feed/ui/FeedCard';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useFeeds } from '@/entities/feed/api/useFeeds';
-import { FeedCard } from '@/entities/feed/ui/FeedCard';
+import { FeedCard } from '@/features/feed/ui/FeedCard';
 import { FeedComposer } from '@/features/feed';
 import { useAuth } from '@/features/auth';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';

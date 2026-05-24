@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Feed } from '@/types/social';
-import { useToggleLike } from '@/entities/feed/api/useFeeds';
+import { useToggleLike } from '@/features/feed/api/useFeedMutations';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';

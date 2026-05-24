@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from '@/entities/tag/api/useTags';
+import { useTags } from '@/entities/tag/api/useTags';
+import { useCreateTag, useUpdateTag, useDeleteTag } from '@/features/tag/api/useTagMutations';
 import { Tag } from '@/types/blog';
 import { TagManagementTable } from './TagManagementTable';
 

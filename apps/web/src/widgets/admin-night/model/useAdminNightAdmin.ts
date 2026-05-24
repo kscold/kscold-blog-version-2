@@ -1,12 +1,12 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useAdminNightRequests } from '@/entities/admin-night/api/useAdminNight';
 import {
-  useAdminNightRequests,
   useApproveAdminNightRequest,
   useRejectAdminNightRequest,
   useRequestMoreAdminNightInfo,
-} from '@/entities/admin-night/api/useAdminNight';
+} from '@/features/admin-night/api/useAdminNightMutations';
 import type { AdminNightRequest } from '@/entities/admin-night/model/types';
 import { buildUpcomingAdminNightSlots } from '@/widgets/admin-night/lib/adminNight';
 

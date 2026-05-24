@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAdminPosts as useAdminPostsQuery, useDeletePost } from '@/entities/post/api/usePosts';
+import { useAdminPosts as useAdminPostsQuery } from '@/entities/post/api/usePosts';
+import { useDeletePost } from '@/features/post/api/usePostMutations';
 import { useAlert } from '@/shared/model/alertStore';
 
 export function useAdminPosts() {
