@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useAllVaultNotes, useDeleteVaultNote } from '@/entities/vault/api/useVault';
+import { useAllVaultNotes } from '@/entities/vault/api/useVault';
+import { useDeleteVaultNote } from '@/features/vault/api/useVaultNoteMutations';
 import { VaultNote } from '@/types/vault';
 import { VaultNoteList } from './VaultNoteList';
 import { useAlert } from '@/shared/model/alertStore';

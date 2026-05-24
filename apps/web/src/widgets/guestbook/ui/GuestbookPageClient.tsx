@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useGuestbookEntries } from '@/entities/guestbook/api/useGuestbook';
 import {
   useCreateGuestbookEntry,
   useDeleteGuestbookEntry,
-  useGuestbookEntries,
-} from '@/entities/guestbook/api/useGuestbook';
+} from '@/features/guestbook/api/useGuestbookMutations';
 import { useAuth } from '@/features/auth';
 import { useAlert } from '@/shared/model/alertStore';
 import { GuestbookHero } from '@/widgets/guestbook/ui/guestbook-page/GuestbookHero';

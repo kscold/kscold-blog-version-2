@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useAdminUsers, useAdminUpdateProfile, AdminUser, UpdateProfilePayload } from '@/features/profile';
-import { useSoftDeleteUser, useHardDeleteUser } from '@/entities/user/api/useUserStats';
+import { useSoftDeleteUser, useHardDeleteUser } from '@/features/user/api/useUserMutations';
 import { useTechStacks } from '@/features/profile';
 import { TechStackSelector } from '@/shared/ui/TechStackSelector';
 import { useAlert } from '@/shared/model/alertStore';

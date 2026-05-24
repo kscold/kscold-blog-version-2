@@ -1,12 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import {
-  VaultNote,
-  VaultFolder,
-  GraphData,
-  VaultNoteCreateRequest,
-  VaultNoteUpdateRequest,
-} from '@/types/vault';
+import { VaultNote, VaultFolder, GraphData } from '@/types/vault';
 import { PageResponse } from '@/types/api';
 
 export function useVaultFolders() {
@@ -66,37 +60,6 @@ export function useVaultSearch(query: string, page: number = 0) {
         `/vault/notes/search?q=${encodeURIComponent(query)}&page=${page}`
       ),
     enabled: !!query && query.length > 0,
-  });
-}
-
-export function useCreateVaultNote() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: VaultNoteCreateRequest) => apiClient.post<VaultNote>('/vault/notes', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vault'] });
-    },
-  });
-}
-
-export function useUpdateVaultNote() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: VaultNoteUpdateRequest }) =>
-      apiClient.put<VaultNote>(`/vault/notes/${id}`, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vault'] });
-    },
-  });
-}
-
-export function useDeleteVaultNote() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => apiClient.delete<void>(`/vault/notes/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['vault'] });
-    },
   });
 }
 

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useFeed } from '@/entities/feed/api/useFeeds';
 import { FeedDetailPageSkeleton } from '@/shared/ui/RouteSkeletons';
-import { FeedCard } from '@/entities/feed/ui/FeedCard';
+import { FeedCard } from '@/features/feed/ui/FeedCard';
 import { CommentSection } from './CommentSection';
 
 export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {

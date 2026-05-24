@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { usePublicProfile, useUserFeeds } from '@/features/profile/api/useProfile';
-import { FeedCard } from '@/entities/feed/ui/FeedCard';
+import { FeedCard } from '@/features/feed/ui/FeedCard';
 
 interface Props {
   username: string;

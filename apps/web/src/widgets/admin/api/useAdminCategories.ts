@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useCategories } from '@/entities/category/api/useCategories';
 import {
-  useCategories,
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
-} from '@/entities/category/api/useCategories';
+} from '@/features/category/api/useCategoryMutations';
 import { Category } from '@/types/blog';
 import { useAlert } from '@/shared/model/alertStore';
 
