@@ -1,8 +1,8 @@
 'use client';
 
-import { AdminTestingArtifactsPanel } from '@/widgets/admin/ui/AdminTestingArtifactsPanel';
-import { AdminTestingReferencePanels } from '@/widgets/admin/ui/AdminTestingReferencePanels';
-import { AdminTestingRunPanel } from '@/widgets/admin/ui/AdminTestingRunPanel';
+import { AdminTestingArtifactsPanel } from '@/widgets/admin/ui/testing/AdminTestingArtifactsPanel';
+import { AdminTestingReferencePanels } from '@/widgets/admin/ui/testing/AdminTestingReferencePanels';
+import { AdminTestingRunPanel } from '@/widgets/admin/ui/testing/AdminTestingRunPanel';
 import { useAdminQaSession } from '@/widgets/admin/lib/useAdminQaSession';
 
 export function AdminTestingSection() {

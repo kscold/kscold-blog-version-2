@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { useChatAdmin } from '@/features/chat';
-import { AdminChatComposer } from './chat/AdminChatComposer';
-import { AdminChatConversation } from './chat/AdminChatConversation';
-import { AdminChatRoomList } from './chat/AdminChatRoomList';
+import { AdminChatComposer } from './AdminChatComposer';
+import { AdminChatConversation } from './AdminChatConversation';
+import { AdminChatRoomList } from './AdminChatRoomList';
 
 export default function AdminChatView() {
   const { rooms, isConnected, selectedRoomId, selectRoom, clearSelectedRoom, sendMessage } = useChatAdmin();

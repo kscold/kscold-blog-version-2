@@ -2,10 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { VaultNote } from '@/types/vault';
-import { VaultNoteDesktopTable } from '@/widgets/admin/ui/vault/VaultNoteDesktopTable';
-import { VaultNoteEmptyState } from '@/widgets/admin/ui/vault/VaultNoteEmptyState';
-import { VaultNoteMobileList } from '@/widgets/admin/ui/vault/VaultNoteMobileList';
-import { VaultNotePagination } from '@/widgets/admin/ui/vault/VaultNotePagination';
+import { VaultNoteDesktopTable } from './VaultNoteDesktopTable';
+import { VaultNoteEmptyState } from './VaultNoteEmptyState';
+import { VaultNoteMobileList } from './VaultNoteMobileList';
+import { VaultNotePagination } from './VaultNotePagination';
 
 interface VaultNoteListProps {
   notes: VaultNote[];

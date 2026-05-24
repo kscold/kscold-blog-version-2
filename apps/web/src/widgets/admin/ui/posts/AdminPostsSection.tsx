@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { PostsTable } from './PostsTable';
-import { useAdminPosts } from '../api/useAdminPosts';
+import { useAdminPosts } from '../../api/useAdminPosts';
 
 export function AdminPostsSection() {
   const { posts, totalPages, page, setPage, isLoading, handleDelete } = useAdminPosts();

@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { Tag } from '@/types/blog';
-import { TagManagementDesktopTable } from '@/widgets/admin/ui/tags/TagManagementDesktopTable';
-import { TagManagementMobileList } from '@/widgets/admin/ui/tags/TagManagementMobileList';
-import { TagManagementSkeleton } from '@/widgets/admin/ui/tags/TagManagementSkeleton';
+import { TagManagementDesktopTable } from './TagManagementDesktopTable';
+import { TagManagementMobileList } from './TagManagementMobileList';
+import { TagManagementSkeleton } from './TagManagementSkeleton';
 
 interface TagManagementTableProps {
   tags: Tag[];

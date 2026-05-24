@@ -3,13 +3,13 @@
 import { ChangeEvent, DragEvent, FormEvent, useState } from 'react';
 import { storageBreadcrumbs } from '@/widgets/admin/lib/adminStorage';
 import { useAdminStorage } from '@/widgets/admin/lib/useAdminStorage';
-import { AdminStorageBrowser } from './storage/AdminStorageBrowser';
-import { AdminStorageFolderPanel } from './storage/AdminStorageFolderPanel';
-import { AdminStorageGuidePanel } from './storage/AdminStorageGuidePanel';
-import { AdminStorageHeader } from './storage/AdminStorageHeader';
-import { AdminStorageOverview } from './storage/AdminStorageOverview';
-import { AdminStoragePreviewPanel } from './storage/AdminStoragePreviewPanel';
-import { AdminStorageUploadPanel } from './storage/AdminStorageUploadPanel';
+import { AdminStorageBrowser } from './AdminStorageBrowser';
+import { AdminStorageFolderPanel } from './AdminStorageFolderPanel';
+import { AdminStorageGuidePanel } from './AdminStorageGuidePanel';
+import { AdminStorageHeader } from './AdminStorageHeader';
+import { AdminStorageOverview } from './AdminStorageOverview';
+import { AdminStoragePreviewPanel } from './AdminStoragePreviewPanel';
+import { AdminStorageUploadPanel } from './AdminStorageUploadPanel';
 
 export function AdminStorageSection() {
   const {
