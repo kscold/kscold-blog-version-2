@@ -3,7 +3,10 @@ import Link from 'next/link';
 import type { Components } from 'react-markdown';
 import { getVideoEmbedConfig } from '@/shared/lib/videoEmbed';
 import { VideoEmbed } from '@/shared/ui/VideoEmbed';
+import { VideoPlayer } from '@/shared/ui/VideoPlayer';
 import { MarkdownCodeBlock } from './markdownCodeBlock';
+
+const VIDEO_FILE_PATTERN = /\.(mp4|webm|mov)(\?.*)?$/i;
 
 function extractStandaloneLink(children: React.ReactNode) {
   const childArray = React.Children.toArray(children);
@@ -29,6 +32,9 @@ export function createMarkdownComponents(isDark: boolean): Components {
       const standaloneLink = extractStandaloneLink(children);
       if (standaloneLink && getVideoEmbedConfig(standaloneLink)) {
         return <VideoEmbed url={standaloneLink} />;
+      }
+      if (standaloneLink && VIDEO_FILE_PATTERN.test(standaloneLink)) {
+        return <VideoPlayer src={standaloneLink} />;
       }
 
       // hast는 className을 string 또는 string[] 로 전달 — 둘 다 처리
