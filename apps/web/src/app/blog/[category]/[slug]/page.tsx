@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { PostDetail } from '@/widgets/post/ui/PostDetail';
 import type { Post } from '@/types/blog';
@@ -13,16 +12,14 @@ import {
   uniqueKeywords,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
-import { resolveInitialViewer } from '@/shared/lib/initialViewer';
 
 async function getPost(slug: string) {
   return fetchViewerApi<Post>(`/posts/slug/${slug}`);
 }
 
 async function isAdmin(): Promise<boolean> {
-  const cookieStore = await cookies();
-  const viewer = resolveInitialViewer(cookieStore.get('auth-token')?.value);
-  return viewer.role === 'ADMIN';
+  const me = await fetchViewerApi<{ role: string }>('/auth/me');
+  return me?.role === 'ADMIN';
 }
 
 export async function generateMetadata({
