@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { Skeleton } from '@/shared/ui/Skeleton';
+import { useMermaidInteraction } from '@/shared/ui/useMermaidInteraction';
 
 interface MermaidBlockProps {
   chart: string;
@@ -15,24 +16,19 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
   const diagramId = `mermaid-${blockId}`;
   const [svg, setSvg] = useState('');
   const [renderState, setRenderState] = useState<RenderState>('loading');
-  const [dragging, setDragging] = useState(false);
-  const [tf, setTf] = useState({ s: 1, x: 0, y: 0 });
-  const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
 
-  const scaleRef = useRef(1);
-  const txRef = useRef(0);
-  const tyRef = useRef(0);
-  const isDragging = useRef(false);
-  const lastPos = useRef({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  const commit = useCallback((s: number, x: number, y: number) => {
-    scaleRef.current = s;
-    txRef.current = x;
-    tyRef.current = y;
-    setTf({ s, x, y });
-  }, []);
+  const {
+    containerRef,
+    contentRef,
+    transform: tf,
+    dragging,
+    containerHeight,
+    isTransformed,
+    reset,
+    onMouseDown,
+    onMouseMove,
+    stopDrag,
+  } = useMermaidInteraction(renderState);
 
   useEffect(() => {
     let active = true;
@@ -40,8 +36,6 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
     const renderDiagram = async () => {
       setRenderState('loading');
       setSvg('');
-      setContainerHeight(undefined);
-      commit(1, 0, 0);
 
       try {
         const mermaid = (await import('mermaid')).default;
@@ -71,128 +65,8 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
     return () => {
       active = false;
     };
-  }, [chart, diagramId, theme, commit]);
+  }, [chart, diagramId, theme]);
 
-  // Auto-fit: scale down to container width if the SVG is wider; record container height
-  useEffect(() => {
-    if (renderState !== 'rendered') return;
-    const raf = requestAnimationFrame(() => {
-      if (!containerRef.current || !contentRef.current) return;
-      const svgEl = contentRef.current.querySelector('svg');
-      if (!svgEl) return;
-
-      const padding = 32; // px-4 sm:px-6 approx
-      const containerW = containerRef.current.clientWidth - padding;
-      const svgRect = svgEl.getBoundingClientRect();
-      const svgW = svgRect.width;
-      const svgH = svgRect.height;
-
-      if (svgW > containerW) {
-        const fitScale = containerW / svgW;
-        commit(fitScale, 0, 0);
-        setContainerHeight(Math.ceil(svgH * fitScale) + 40);
-      } else {
-        setContainerHeight(Math.ceil(svgH) + 40);
-      }
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [renderState, commit]);
-
-  // Wheel zoom centered on cursor position
-  useEffect(() => {
-    if (renderState !== 'rendered') return;
-    const el = containerRef.current;
-    if (!el) return;
-
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const rect = el.getBoundingClientRect();
-      const cx = e.clientX - rect.left;
-      const cy = e.clientY - rect.top;
-      const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
-      const ns = Math.min(4, Math.max(0.15, scaleRef.current * factor));
-      const r = ns / scaleRef.current;
-      commit(ns, cx + r * (txRef.current - cx), cy + r * (tyRef.current - cy));
-    };
-
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
-  }, [renderState, commit]);
-
-  // Touch pinch-to-zoom + single-finger pan
-  useEffect(() => {
-    if (renderState !== 'rendered') return;
-    const el = containerRef.current;
-    if (!el) return;
-
-    let lastDist: number | null = null;
-
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 2) {
-        const [t1, t2] = Array.from(e.touches);
-        lastDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-      } else if (e.touches.length === 1) {
-        lastPos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        lastDist = null;
-      }
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      e.preventDefault();
-      if (e.touches.length === 2 && lastDist !== null) {
-        const [t1, t2] = Array.from(e.touches);
-        const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-        const mid = { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 };
-        const rect = el.getBoundingClientRect();
-        const cx = mid.x - rect.left;
-        const cy = mid.y - rect.top;
-        const factor = dist / lastDist;
-        const ns = Math.min(4, Math.max(0.15, scaleRef.current * factor));
-        const r = ns / scaleRef.current;
-        commit(ns, cx + r * (txRef.current - cx), cy + r * (tyRef.current - cy));
-        lastDist = dist;
-      } else if (e.touches.length === 1 && lastDist === null) {
-        const dx = e.touches[0].clientX - lastPos.current.x;
-        const dy = e.touches[0].clientY - lastPos.current.y;
-        lastPos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        commit(scaleRef.current, txRef.current + dx, tyRef.current + dy);
-      }
-    };
-
-    const onTouchEnd = () => { lastDist = null; };
-
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    el.addEventListener('touchend', onTouchEnd);
-    return () => {
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchmove', onTouchMove);
-      el.removeEventListener('touchend', onTouchEnd);
-    };
-  }, [renderState, commit]);
-
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
-    if (e.button !== 0) return;
-    isDragging.current = true;
-    setDragging(true);
-    lastPos.current = { x: e.clientX, y: e.clientY };
-    e.preventDefault();
-  }, []);
-
-  const onMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging.current) return;
-    const dx = e.clientX - lastPos.current.x;
-    const dy = e.clientY - lastPos.current.y;
-    lastPos.current = { x: e.clientX, y: e.clientY };
-    commit(scaleRef.current, txRef.current + dx, tyRef.current + dy);
-  }, [commit]);
-
-  const stopDrag = useCallback(() => {
-    isDragging.current = false;
-    setDragging(false);
-  }, []);
-
-  const isTransformed = tf.s !== 1 || tf.x !== 0 || tf.y !== 0;
   const panelClasses =
     theme === 'dark'
       ? 'border-surface-800 bg-[#0f111a]'
@@ -226,7 +100,7 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
             {isTransformed && (
               <button
                 type="button"
-                onClick={() => commit(1, 0, 0)}
+                onClick={reset}
                 className={`rounded-md border px-2.5 py-1.5 text-xs font-semibold transition-colors ${
                   theme === 'dark'
                     ? 'border-surface-700 bg-surface-800 text-surface-300 hover:bg-surface-700 hover:text-white'
