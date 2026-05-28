@@ -26,6 +26,47 @@ function extractStandaloneLink(children: React.ReactNode) {
   return href.startsWith('http://') || href.startsWith('https://') ? href : null;
 }
 
+function normalizeClassName(className: string | string[] | undefined): string {
+  // hast는 className을 string 또는 string[] 로 전달 — 둘 다 처리
+  return Array.isArray(className) ? className.join(' ') : (className ?? '');
+}
+
+interface ImgHastNode {
+  properties?: { src?: string; alt?: string };
+}
+
+function extractImageNodes(node: unknown): ImgHastNode[] {
+  const children = (node as { children?: Array<{ type: string; tagName: string }> })?.children ?? [];
+  return children.filter(c => c.type === 'element' && c.tagName === 'img') as ImgHastNode[];
+}
+
+function ImageGrid({ imgNodes }: { imgNodes: ImgHastNode[] }) {
+  return (
+    <div className={`my-8 grid gap-3 ${imgNodes.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+      {imgNodes.map((imgNode, i) => {
+        const src = imgNode.properties?.src;
+        const alt = imgNode.properties?.alt ?? '';
+        return (
+          <div key={i}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt={alt}
+              className="w-full rounded-2xl border border-white/10 shadow-lg object-cover"
+              loading="lazy"
+            />
+            {alt && (
+              <span className="mt-2 block text-center font-mono text-sm text-surface-500">
+                {alt}
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function createMarkdownComponents(isDark: boolean): Components {
   return {
     p: ({ children, className, node }) => {
@@ -37,75 +78,21 @@ export function createMarkdownComponents(isDark: boolean): Components {
         return <VideoPlayer src={standaloneLink} />;
       }
 
-      // hast는 className을 string 또는 string[] 로 전달 — 둘 다 처리
-      const classStr = Array.isArray(className) ? className.join(' ') : (className ?? '');
-      const isGrid = classStr.includes('md-image-grid');
-      if (isGrid) {
-        const hastChildren = (node as any)?.children ?? [];
-        const imgNodes = hastChildren.filter(
-          (c: any) => c.type === 'element' && c.tagName === 'img',
-        );
+      if (normalizeClassName(className).includes('md-image-grid')) {
+        const imgNodes = extractImageNodes(node);
         if (imgNodes.length >= 2) {
-          return (
-            <div className={`my-8 grid gap-3 ${imgNodes.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-              {imgNodes.map((imgNode: any, i: number) => {
-                const src = imgNode.properties?.src as string | undefined;
-                const alt = (imgNode.properties?.alt as string | undefined) ?? '';
-                return (
-                  <div key={i}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={src}
-                      alt={alt}
-                      className="w-full rounded-2xl border border-white/10 shadow-lg object-cover"
-                      loading="lazy"
-                    />
-                    {alt && (
-                      <span className="mt-2 block text-center font-mono text-sm text-surface-500">
-                        {alt}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          );
+          return <ImageGrid imgNodes={imgNodes} />;
         }
       }
 
       return <p>{children}</p>;
     },
     div: ({ children, className, node }) => {
-      const classStr = Array.isArray(className) ? className.join(' ') : (className ?? '');
+      const classStr = normalizeClassName(className);
       if (classStr.includes('md-image-grid')) {
-        const imgNodes = ((node as any)?.children ?? []).filter(
-          (c: any) => c.type === 'element' && c.tagName === 'img',
-        );
+        const imgNodes = extractImageNodes(node);
         if (imgNodes.length >= 2) {
-          return (
-            <div className={`my-8 grid gap-3 ${imgNodes.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-              {imgNodes.map((imgNode: any, i: number) => {
-                const src = imgNode.properties?.src as string | undefined;
-                const alt = (imgNode.properties?.alt as string | undefined) ?? '';
-                return (
-                  <div key={i}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={src}
-                      alt={alt}
-                      className="w-full rounded-2xl border border-white/10 shadow-lg object-cover"
-                      loading="lazy"
-                    />
-                    {alt && (
-                      <span className="mt-2 block text-center font-mono text-sm text-surface-500">
-                        {alt}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          );
+          return <ImageGrid imgNodes={imgNodes} />;
         }
       }
       return <div className={classStr}>{children}</div>;
