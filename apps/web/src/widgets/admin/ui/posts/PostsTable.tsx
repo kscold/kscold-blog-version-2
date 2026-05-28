@@ -76,7 +76,7 @@ export function PostsTable({ posts, totalPages, page, onPageChange, onDelete }: 
               </span>
               <div className="flex gap-2">
                 <Link
-                  href={`/blog/${post.category.slug}/${post.slug}`}
+                  href={post.status === 'PUBLISHED' ? `/blog/${post.category.slug}/${post.slug}` : `/admin/preview/${post.slug}`}
                   target="_blank"
                   className="px-2.5 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
                 >
@@ -137,7 +137,7 @@ export function PostsTable({ posts, totalPages, page, onPageChange, onDelete }: 
                   <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{new Date(post.createdAt).toLocaleDateString('ko-KR')}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Link href={`/blog/${post.category.slug}/${post.slug}`} target="_blank" className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">보기</Link>
+                      <Link href={post.status === 'PUBLISHED' ? `/blog/${post.category.slug}/${post.slug}` : `/admin/preview/${post.slug}`} target="_blank" className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">보기</Link>
                       <Link href={`/admin/posts/${post.id}/edit`} className="px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">수정</Link>
                       <button onClick={() => onDelete(post.id, post.title)} className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors">삭제</button>
                     </div>
