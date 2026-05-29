@@ -55,11 +55,6 @@ function ImageGrid({ imgNodes }: { imgNodes: ImgHastNode[] }) {
               className="w-full rounded-2xl border border-white/10 shadow-lg object-cover"
               loading="lazy"
             />
-            {alt && (
-              <span className="mt-2 block text-center font-mono text-sm text-surface-500">
-                {alt}
-              </span>
-            )}
           </div>
         );
       })}
@@ -122,7 +117,6 @@ export function createMarkdownComponents(isDark: boolean): Components {
           className="w-full rounded-2xl border border-white/10 shadow-lg"
           loading="lazy"
         />
-        {alt && <p className="mt-2 text-center font-mono text-sm text-surface-500">{alt}</p>}
       </div>
     ),
     table: ({ children }) => (
