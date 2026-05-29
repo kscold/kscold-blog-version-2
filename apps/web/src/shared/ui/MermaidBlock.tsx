@@ -70,6 +70,20 @@ function fitNodesToText(rawSvg: string): string {
       }
     });
 
+    // 노드를 키운 만큼 SVG viewBox를 전체 콘텐츠에 맞춰 다시 잡는다.
+    // (안 하면 커진 노드가 기존 viewBox 밖으로 나가 잘려 보인다.
+    //  width:100% · height:auto CSS가 새 viewBox 비율대로 스케일을 맞춘다)
+    try {
+      const bbox = svg.getBBox();
+      const m = 8;
+      svg.setAttribute(
+        'viewBox',
+        `${bbox.x - m} ${bbox.y - m} ${bbox.width + m * 2} ${bbox.height + m * 2}`
+      );
+    } catch {
+      /* getBBox 실패 시 원본 viewBox 유지 */
+    }
+
     return tmp.innerHTML;
   } catch {
     return rawSvg;
