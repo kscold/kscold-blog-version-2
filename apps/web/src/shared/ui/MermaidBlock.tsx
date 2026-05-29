@@ -11,6 +11,61 @@ interface MermaidBlockProps {
 
 type RenderState = 'loading' | 'rendered' | 'error';
 
+/**
+ * Mermaid가 측정한 노드 박스가 실제 렌더된 텍스트보다 작아 잘리는 경우,
+ * SVG를 화면 밖에 잠시 마운트해 각 노드 라벨의 실제 크기를 재고 박스를 키운다.
+ * (Pretendard 같은 웹폰트는 Mermaid 측정 폰트와 미세하게 달라 잘림이 생긴다)
+ */
+function fitNodesToText(rawSvg: string): string {
+  if (typeof document === 'undefined') return rawSvg;
+
+  const tmp = document.createElement('div');
+  tmp.className = 'mermaid-diagram';
+  tmp.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; width:auto;';
+  tmp.innerHTML = rawSvg;
+  document.body.appendChild(tmp);
+
+  try {
+    const svg = tmp.querySelector('svg');
+    if (!svg) return rawSvg;
+
+    const PAD = 10;
+    svg.querySelectorAll<SVGGElement>('g.node').forEach(node => {
+      const fo = node.querySelector('foreignObject');
+      const rect = node.querySelector<SVGRectElement>('rect');
+      const label = fo?.firstElementChild as HTMLElement | null;
+      if (!fo || !rect || !label) return;
+
+      // 실제 콘텐츠 크기 (transform/scale 영향 없는 레이아웃 픽셀)
+      const needH = label.scrollHeight;
+      const needW = label.scrollWidth;
+      const foH = fo.height.baseVal.value;
+      const foW = fo.width.baseVal.value;
+
+      if (needH > foH + 1) {
+        const dh = needH - foH + PAD;
+        fo.setAttribute('height', String(foH + dh));
+        fo.setAttribute('y', String(fo.y.baseVal.value - dh / 2));
+        rect.setAttribute('height', String(rect.height.baseVal.value + dh));
+        rect.setAttribute('y', String(rect.y.baseVal.value - dh / 2));
+      }
+      if (needW > foW + 1) {
+        const dw = needW - foW + PAD;
+        fo.setAttribute('width', String(foW + dw));
+        fo.setAttribute('x', String(fo.x.baseVal.value - dw / 2));
+        rect.setAttribute('width', String(rect.width.baseVal.value + dw));
+        rect.setAttribute('x', String(rect.x.baseVal.value - dw / 2));
+      }
+    });
+
+    return tmp.innerHTML;
+  } catch {
+    return rawSvg;
+  } finally {
+    document.body.removeChild(tmp);
+  }
+}
+
 export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
   const blockId = useId().replace(/:/g, '');
   const diagramId = `mermaid-${blockId}`;
@@ -70,7 +125,10 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
 
         // Remove max-width Mermaid injects so the SVG renders at its natural size
         const processed = raw.replace(/max-width\s*:\s*[\d.]+px\s*;?\s*/g, '');
-        setSvg(processed);
+        // 실제 텍스트 크기에 맞춰 노드 박스를 동적으로 키운다 (잘림 방지)
+        const fitted = fitNodesToText(processed);
+        if (!active) return;
+        setSvg(fitted);
         setRenderState('rendered');
       } catch (error) {
         console.error('Failed to render Mermaid diagram', error);
