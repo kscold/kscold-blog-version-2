@@ -38,10 +38,13 @@ function fitNodesToText(rawSvg: string): string {
       const label = fo?.firstElementChild as HTMLElement | null;
       if (!fo || !label) return;
 
-      // rect(사각형) 노드만 정확히 조정한다.
-      // 원통(path)·다이아몬드(polygon) 등 곡선 모양은 스케일 시 곡면이 텍스트를
-      // 덮는 부작용이 있어 건드리지 않는다 — 폰트 로드 후 Mermaid 측정이 정확해지면
-      // 곡선 노드는 자체적으로 알맞게 그려진다.
+      // 원통(path)·다이아몬드(polygon)·원(circle/ellipse) 등 곡선 모양이 있는 노드는
+      // 통째로 건드리지 않는다. 이런 노드는 라벨 배경용 작은 <rect>를 내부에 갖고 있어
+      // 그걸 잘못 키우면 작은 네모가 텍스트 위에 나타난다. 폰트 로드 후 Mermaid 측정이
+      // 정확해지면 곡선 노드는 자체적으로 알맞게 그려진다.
+      if (node.querySelector('path, polygon, ellipse, circle')) return;
+
+      // 순수 사각형(rect) 노드만 텍스트에 맞춰 정확히 조정한다.
       const rect = node.querySelector<SVGRectElement>('rect');
       if (!rect) return;
 
