@@ -29,11 +29,22 @@ function fitNodesToText(rawSvg: string): string {
     const svg = tmp.querySelector('svg');
     if (!svg) return rawSvg;
 
-    const PAD = 8;
+    // 텍스트 주위에 항상 확보할 최소 여백(상하/좌우 합산 px)
+    const VPAD = 22;
+    const HPAD = 24;
+    // 원통은 위아래 타원 곡면이 공간을 먹으므로 세로 여백을 더 준다
+    const CYLINDER_EXTRA_V = 24;
+
     svg.querySelectorAll<SVGGElement>('g.node').forEach(node => {
       const fo = node.querySelector('foreignObject');
       const label = fo?.firstElementChild as HTMLElement | null;
       if (!fo || !label) return;
+
+      const rect = node.querySelector<SVGRectElement>('rect');
+      const curveShape = rect
+        ? null
+        : node.querySelector<SVGGraphicsElement>('path, polygon, circle, ellipse');
+      const isCylinder = !rect && curveShape?.tagName.toLowerCase() === 'path';
 
       // 실제 콘텐츠 크기 (transform/scale 영향 없는 레이아웃 픽셀)
       const needH = label.scrollHeight;
@@ -41,8 +52,11 @@ function fitNodesToText(rawSvg: string): string {
       const foH = fo.height.baseVal.value;
       const foW = fo.width.baseVal.value;
 
-      const dh = needH > foH + 1 ? needH - foH + PAD : 0;
-      const dw = needW > foW + 1 ? needW - foW + PAD : 0;
+      // 넘칠 때뿐 아니라, 빠듯할 때도 최소 여백을 확보하도록 목표 크기를 계산
+      const targetH = needH + VPAD + (isCylinder ? CYLINDER_EXTRA_V : 0);
+      const targetW = needW + HPAD;
+      const dh = targetH > foH ? targetH - foH : 0;
+      const dw = targetW > foW ? targetW - foW : 0;
       if (dh === 0 && dw === 0) return;
 
       // foreignObject(라벨 영역) 확장 + 중심 유지
@@ -56,7 +70,6 @@ function fitNodesToText(rawSvg: string): string {
       }
 
       // 노드 모양(rect/cylinder/diamond 등)을 라벨에 맞춰 키운다.
-      const rect = node.querySelector<SVGRectElement>('rect');
       if (rect) {
         // 사각형은 width/height 속성을 직접 조정 (정확)
         if (dh > 0) {
@@ -67,18 +80,16 @@ function fitNodesToText(rawSvg: string): string {
           rect.setAttribute('width', String(rect.width.baseVal.value + dw));
           rect.setAttribute('x', String(rect.x.baseVal.value - dw / 2));
         }
-      } else {
+      } else if (curveShape) {
         // 원통(path)·다이아몬드(polygon)·원(circle) 등은 형태를 중심 기준으로 스케일
-        const shape = node.querySelector<SVGGraphicsElement>('path, polygon, circle, ellipse');
-        if (!shape) return;
-        const box = shape.getBBox();
+        const box = curveShape.getBBox();
         if (box.width === 0 || box.height === 0) return;
         const sx = dw > 0 ? (box.width + dw) / box.width : 1;
         const sy = dh > 0 ? (box.height + dh) / box.height : 1;
         const cx = box.x + box.width / 2;
         const cy = box.y + box.height / 2;
-        const prev = shape.getAttribute('transform') ?? '';
-        shape.setAttribute(
+        const prev = curveShape.getAttribute('transform') ?? '';
+        curveShape.setAttribute(
           'transform',
           `${prev} translate(${cx}, ${cy}) scale(${sx}, ${sy}) translate(${-cx}, ${-cy})`.trim()
         );
