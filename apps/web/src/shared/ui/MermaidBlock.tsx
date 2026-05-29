@@ -49,13 +49,15 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
             htmlLabels: true,
             useMaxWidth: true,
             padding: 12,
+            wrappingWidth: 260,
           },
         });
 
         // 폰트가 로드된 뒤 렌더해야 Mermaid가 노드 크기를 정확히 측정한다.
         // (폴백 폰트로 측정하면 텍스트가 박스를 넘어 잘릴 수 있음)
-        if (typeof document !== 'undefined' && document.fonts?.ready) {
+        if (typeof document !== 'undefined' && document.fonts) {
           try {
+            await document.fonts.load('400 16px "Pretendard Variable"');
             await document.fonts.ready;
           } catch {
             /* 폰트 로드 실패 시 그대로 진행 */
