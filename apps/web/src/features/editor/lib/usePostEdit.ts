@@ -18,7 +18,8 @@ export function usePostEdit(postId: string) {
         excerpt: post.excerpt || '',
         coverImage: post.coverImage || '',
         categoryId: post.category.id,
-        tagIds: post.tags?.map(t => t.id) || [],
+        // 깨진/유령 태그(id가 null·빈 값)는 제외 — 저장 시 백엔드 resolveTags 404 방지
+        tagIds: post.tags?.map(t => t.id).filter((id): id is string => Boolean(id)) || [],
         status: post.status,
         featured: post.featured || false,
         publicOverride: post.publicOverride || false,
@@ -34,6 +35,9 @@ export function usePostEdit(postId: string) {
       .map(k => k.trim())
       .filter(k => k);
 
+    // 혹시 모를 null·빈 태그 id를 한 번 더 제거 (백엔드 resolveTags 404 방지)
+    const tagIds = data.tagIds.filter((id): id is string => Boolean(id));
+
     await updatePost.mutateAsync({
       id: postId,
       data: {
@@ -43,7 +47,7 @@ export function usePostEdit(postId: string) {
         excerpt: data.excerpt || undefined,
         coverImage: data.coverImage || undefined,
         categoryId: data.categoryId,
-        tagIds: data.tagIds.length > 0 ? data.tagIds : undefined,
+        tagIds: tagIds.length > 0 ? tagIds : undefined,
         status: data.status,
         featured: data.featured,
         publicOverride: data.publicOverride,
