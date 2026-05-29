@@ -247,10 +247,9 @@
   /* htmlLabels 노드 텍스트가 박스 안에서 정상 줄바꿈되도록 (잘림 방지) */
   .mermaid-diagram svg .nodeLabel,
   .mermaid-diagram svg foreignObject div {
-    white-space: normal !important;
+    white-space: normal;
     overflow: visible;
-    word-break: keep-all;
-    overflow-wrap: anywhere;
+    line-height: 1.5;
   }
 
   .mermaid-diagram-wrapper {
