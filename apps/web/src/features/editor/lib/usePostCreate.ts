@@ -15,6 +15,9 @@ export function usePostCreate() {
         .map(k => k.trim())
         .filter(k => k);
 
+      // null·빈 태그 id 제거 (백엔드 resolveTags 404 방지)
+      const tagIds = data.tagIds.filter((id): id is string => Boolean(id));
+
       await createPost.mutateAsync({
         title: data.title,
         slug: data.slug || undefined,
@@ -22,7 +25,7 @@ export function usePostCreate() {
         excerpt: data.excerpt || undefined,
         coverImage: data.coverImage || undefined,
         categoryId: data.categoryId,
-        tagIds: data.tagIds.length > 0 ? data.tagIds : undefined,
+        tagIds: tagIds.length > 0 ? tagIds : undefined,
         status: data.status === 'ARCHIVED' ? 'DRAFT' : data.status,
         featured: data.featured,
         publicOverride: data.publicOverride,
