@@ -7,11 +7,12 @@ import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 import {
   buildEditorExtensions,
   buildEditorProps,
+  preprocessEditorMarkdown,
   promptCodeBlockLanguage,
   promptImageUpload,
   promptImageRowUpload,
   promptLinkUrl,
-  promptVideoUrl,
+  promptVideoUpload,
   readMarkdown,
 } from '@/features/editor/lib/tiptapEditor';
 import {
@@ -34,7 +35,7 @@ export default function TiptapEditor({
   placeholder = '문서를 작성하세요... 이미지를 붙여넣거나 드래그해서 바로 넣을 수 있어요.',
   minHeight = '560px',
 }: TiptapEditorProps) {
-  const { uploadFile, isUploading } = useMediaUpload();
+  const { uploadFile, uploadVideo, isUploading } = useMediaUpload();
   const editorRef = useRef<Editor | null>(null);
 
   const uploadImage = useCallback(
@@ -48,10 +49,22 @@ export default function TiptapEditor({
     [uploadFile]
   );
 
+  const uploadVideoFile = useCallback(
+    async (file: File): Promise<string | null> => {
+      try {
+        return await uploadVideo(file);
+      } catch (err) {
+        window.alert(err instanceof Error ? err.message : '동영상 업로드에 실패했습니다');
+        return null;
+      }
+    },
+    [uploadVideo]
+  );
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: buildEditorExtensions(placeholder),
-    content: defaultContent,
+    content: preprocessEditorMarkdown(defaultContent),
     onUpdate({ editor }) {
       editorRef.current = editor;
       onChange(readMarkdown(editor));
@@ -75,7 +88,7 @@ export default function TiptapEditor({
 
   const actions = {
     addLink: () => promptLinkUrl(editor),
-    addVideo: () => promptVideoUrl(editor),
+    addVideo: () => void promptVideoUpload(editor, uploadVideoFile),
     addImage: () => void promptImageUpload(editor, uploadImage),
     addImageRow: () => void promptImageRowUpload(editor, uploadImage),
     setCodeBlockLanguage: () => promptCodeBlockLanguage(editor),

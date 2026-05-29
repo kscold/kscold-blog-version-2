@@ -101,10 +101,12 @@ class ApiClient {
     return (response.data as { data: T }).data;
   }
 
-  public async upload<T>(url: string, formData: FormData): Promise<T> {
+  public async upload<T>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.post<{ data: T }>(url, formData, {
+      ...config,
       headers: {
         'Content-Type': 'multipart/form-data',
+        ...config?.headers,
       },
     });
     return response.data.data;
