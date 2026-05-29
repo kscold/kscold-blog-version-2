@@ -29,12 +29,11 @@ function fitNodesToText(rawSvg: string): string {
     const svg = tmp.querySelector('svg');
     if (!svg) return rawSvg;
 
-    const PAD = 10;
+    const PAD = 8;
     svg.querySelectorAll<SVGGElement>('g.node').forEach(node => {
       const fo = node.querySelector('foreignObject');
-      const rect = node.querySelector<SVGRectElement>('rect');
       const label = fo?.firstElementChild as HTMLElement | null;
-      if (!fo || !rect || !label) return;
+      if (!fo || !label) return;
 
       // 실제 콘텐츠 크기 (transform/scale 영향 없는 레이아웃 픽셀)
       const needH = label.scrollHeight;
@@ -42,19 +41,47 @@ function fitNodesToText(rawSvg: string): string {
       const foH = fo.height.baseVal.value;
       const foW = fo.width.baseVal.value;
 
-      if (needH > foH + 1) {
-        const dh = needH - foH + PAD;
+      const dh = needH > foH + 1 ? needH - foH + PAD : 0;
+      const dw = needW > foW + 1 ? needW - foW + PAD : 0;
+      if (dh === 0 && dw === 0) return;
+
+      // foreignObject(라벨 영역) 확장 + 중심 유지
+      if (dh > 0) {
         fo.setAttribute('height', String(foH + dh));
         fo.setAttribute('y', String(fo.y.baseVal.value - dh / 2));
-        rect.setAttribute('height', String(rect.height.baseVal.value + dh));
-        rect.setAttribute('y', String(rect.y.baseVal.value - dh / 2));
       }
-      if (needW > foW + 1) {
-        const dw = needW - foW + PAD;
+      if (dw > 0) {
         fo.setAttribute('width', String(foW + dw));
         fo.setAttribute('x', String(fo.x.baseVal.value - dw / 2));
-        rect.setAttribute('width', String(rect.width.baseVal.value + dw));
-        rect.setAttribute('x', String(rect.x.baseVal.value - dw / 2));
+      }
+
+      // 노드 모양(rect/cylinder/diamond 등)을 라벨에 맞춰 키운다.
+      const rect = node.querySelector<SVGRectElement>('rect');
+      if (rect) {
+        // 사각형은 width/height 속성을 직접 조정 (정확)
+        if (dh > 0) {
+          rect.setAttribute('height', String(rect.height.baseVal.value + dh));
+          rect.setAttribute('y', String(rect.y.baseVal.value - dh / 2));
+        }
+        if (dw > 0) {
+          rect.setAttribute('width', String(rect.width.baseVal.value + dw));
+          rect.setAttribute('x', String(rect.x.baseVal.value - dw / 2));
+        }
+      } else {
+        // 원통(path)·다이아몬드(polygon)·원(circle) 등은 형태를 중심 기준으로 스케일
+        const shape = node.querySelector<SVGGraphicsElement>('path, polygon, circle, ellipse');
+        if (!shape) return;
+        const box = shape.getBBox();
+        if (box.width === 0 || box.height === 0) return;
+        const sx = dw > 0 ? (box.width + dw) / box.width : 1;
+        const sy = dh > 0 ? (box.height + dh) / box.height : 1;
+        const cx = box.x + box.width / 2;
+        const cy = box.y + box.height / 2;
+        const prev = shape.getAttribute('transform') ?? '';
+        shape.setAttribute(
+          'transform',
+          `${prev} translate(${cx}, ${cy}) scale(${sx}, ${sy}) translate(${-cx}, ${-cy})`.trim()
+        );
       }
     });
 
