@@ -242,17 +242,13 @@
     height: auto;
     min-width: 640px;
     margin: 0 auto;
-    overflow: visible;
   }
 
-  /* 노드 텍스트가 박스 밖으로 잘리지 않도록 보장 */
+  /* htmlLabels 노드 텍스트가 강제 줄바꿈되어 잘리지 않도록 */
   .mermaid-diagram svg .nodeLabel,
-  .mermaid-diagram svg .edgeLabel {
+  .mermaid-diagram svg .edgeLabel,
+  .mermaid-diagram svg foreignObject div {
     white-space: nowrap;
-    overflow: visible;
-  }
-
-  .mermaid-diagram svg foreignObject {
     overflow: visible;
   }
 

@@ -47,10 +47,8 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
             'Pretendard Variable, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
           flowchart: {
             htmlLabels: true,
-            useMaxWidth: false,
+            useMaxWidth: true,
             padding: 12,
-            nodeSpacing: 60,
-            rankSpacing: 70,
           },
         });
 
