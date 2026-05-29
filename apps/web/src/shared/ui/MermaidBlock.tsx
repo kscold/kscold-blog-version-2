@@ -30,21 +30,20 @@ function fitNodesToText(rawSvg: string): string {
     if (!svg) return rawSvg;
 
     // 텍스트 주위에 항상 확보할 최소 여백(상하/좌우 합산 px)
-    const VPAD = 22;
+    const VPAD = 18;
     const HPAD = 24;
-    // 원통은 위아래 타원 곡면이 공간을 먹으므로 세로 여백을 더 준다
-    const CYLINDER_EXTRA_V = 24;
 
     svg.querySelectorAll<SVGGElement>('g.node').forEach(node => {
       const fo = node.querySelector('foreignObject');
       const label = fo?.firstElementChild as HTMLElement | null;
       if (!fo || !label) return;
 
+      // rect(사각형) 노드만 정확히 조정한다.
+      // 원통(path)·다이아몬드(polygon) 등 곡선 모양은 스케일 시 곡면이 텍스트를
+      // 덮는 부작용이 있어 건드리지 않는다 — 폰트 로드 후 Mermaid 측정이 정확해지면
+      // 곡선 노드는 자체적으로 알맞게 그려진다.
       const rect = node.querySelector<SVGRectElement>('rect');
-      const curveShape = rect
-        ? null
-        : node.querySelector<SVGGraphicsElement>('path, polygon, circle, ellipse');
-      const isCylinder = !rect && curveShape?.tagName.toLowerCase() === 'path';
+      if (!rect) return;
 
       // 실제 콘텐츠 크기 (transform/scale 영향 없는 레이아웃 픽셀)
       const needH = label.scrollHeight;
@@ -53,46 +52,21 @@ function fitNodesToText(rawSvg: string): string {
       const foW = fo.width.baseVal.value;
 
       // 넘칠 때뿐 아니라, 빠듯할 때도 최소 여백을 확보하도록 목표 크기를 계산
-      const targetH = needH + VPAD + (isCylinder ? CYLINDER_EXTRA_V : 0);
-      const targetW = needW + HPAD;
-      const dh = targetH > foH ? targetH - foH : 0;
-      const dw = targetW > foW ? targetW - foW : 0;
+      const dh = needH + VPAD > foH ? needH + VPAD - foH : 0;
+      const dw = needW + HPAD > foW ? needW + HPAD - foW : 0;
       if (dh === 0 && dw === 0) return;
 
-      // foreignObject(라벨 영역) 확장 + 중심 유지
       if (dh > 0) {
         fo.setAttribute('height', String(foH + dh));
         fo.setAttribute('y', String(fo.y.baseVal.value - dh / 2));
+        rect.setAttribute('height', String(rect.height.baseVal.value + dh));
+        rect.setAttribute('y', String(rect.y.baseVal.value - dh / 2));
       }
       if (dw > 0) {
         fo.setAttribute('width', String(foW + dw));
         fo.setAttribute('x', String(fo.x.baseVal.value - dw / 2));
-      }
-
-      // 노드 모양(rect/cylinder/diamond 등)을 라벨에 맞춰 키운다.
-      if (rect) {
-        // 사각형은 width/height 속성을 직접 조정 (정확)
-        if (dh > 0) {
-          rect.setAttribute('height', String(rect.height.baseVal.value + dh));
-          rect.setAttribute('y', String(rect.y.baseVal.value - dh / 2));
-        }
-        if (dw > 0) {
-          rect.setAttribute('width', String(rect.width.baseVal.value + dw));
-          rect.setAttribute('x', String(rect.x.baseVal.value - dw / 2));
-        }
-      } else if (curveShape) {
-        // 원통(path)·다이아몬드(polygon)·원(circle) 등은 형태를 중심 기준으로 스케일
-        const box = curveShape.getBBox();
-        if (box.width === 0 || box.height === 0) return;
-        const sx = dw > 0 ? (box.width + dw) / box.width : 1;
-        const sy = dh > 0 ? (box.height + dh) / box.height : 1;
-        const cx = box.x + box.width / 2;
-        const cy = box.y + box.height / 2;
-        const prev = curveShape.getAttribute('transform') ?? '';
-        curveShape.setAttribute(
-          'transform',
-          `${prev} translate(${cx}, ${cy}) scale(${sx}, ${sy}) translate(${-cx}, ${-cy})`.trim()
-        );
+        rect.setAttribute('width', String(rect.width.baseVal.value + dw));
+        rect.setAttribute('x', String(rect.x.baseVal.value - dw / 2));
       }
     });
 
