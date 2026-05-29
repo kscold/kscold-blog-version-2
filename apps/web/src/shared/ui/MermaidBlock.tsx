@@ -45,7 +45,25 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
           theme: theme === 'dark' ? 'dark' : 'default',
           fontFamily:
             'Pretendard Variable, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+          flowchart: {
+            htmlLabels: true,
+            useMaxWidth: false,
+            padding: 12,
+            nodeSpacing: 60,
+            rankSpacing: 70,
+          },
         });
+
+        // 폰트가 로드된 뒤 렌더해야 Mermaid가 노드 크기를 정확히 측정한다.
+        // (폴백 폰트로 측정하면 텍스트가 박스를 넘어 잘릴 수 있음)
+        if (typeof document !== 'undefined' && document.fonts?.ready) {
+          try {
+            await document.fonts.ready;
+          } catch {
+            /* 폰트 로드 실패 시 그대로 진행 */
+          }
+        }
+        if (!active) return;
 
         const { svg: raw } = await mermaid.render(diagramId, chart);
         if (!active) return;
