@@ -35,7 +35,12 @@ export function HeroSection() {
             animate={animate ? { opacity: 1, y: 0 } : undefined}
             transition={animate ? { duration: 1.2, delay: 0.3, ease: [0.76, 0, 0.24, 1] } : undefined}
           >
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] bg-[size:200%_auto] animate-shimmer">
+            {/* 검색·접근성용 제목 (시각적으로는 KSCOLD 로고 노출) */}
+            <span className="sr-only">김승찬 블로그 — 프로덕트 엔지니어 김승찬(kscold)</span>
+            <span
+              aria-hidden="true"
+              className="bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] bg-[size:200%_auto] animate-shimmer"
+            >
               KSCOLD
             </span>
           </motion.h1>
