@@ -62,9 +62,10 @@ export function buildPrimaryToolbarButtons(
       onClick: actions.addLink,
     },
     {
-      label: '비디오',
-      title: '비디오 임베드',
+      label: '동영상',
+      title: 'mp4 동영상 업로드',
       onClick: actions.addVideo,
+      tone: 'accent',
     },
     {
       label: '이미지',

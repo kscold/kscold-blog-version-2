@@ -7,8 +7,20 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Markdown } from 'tiptap-markdown';
 import { createLowlight, common } from 'lowlight';
 import { ImageRowExtension } from '@/features/editor/extensions/imageRow';
+import { VideoExtension } from '@/features/editor/extensions/video';
 
 const lowlight = createLowlight(common);
+
+// 단독 줄에 놓인 동영상 URL (mp4/webm/mov)
+const STANDALONE_VIDEO_RE = /^(https?:\/\/\S+\.(?:mp4|webm|mov)(?:\?\S*)?)[ \t]*$/gim;
+
+/**
+ * 에디터에 마크다운을 로드하기 전에, 단독 줄로 놓인 동영상 URL을
+ * <video> HTML로 바꿔 Video 노드로 인식되게 한다. (편집 시 미리보기 + 보존)
+ */
+export function preprocessEditorMarkdown(markdown: string): string {
+  return markdown.replace(STANDALONE_VIDEO_RE, '<video src="$1"></video>');
+}
 
 const editorSurfaceClassName =
   'tiptap-editor-surface prose prose-slate max-w-none min-h-[420px] px-5 py-6 text-[15px] leading-7 text-surface-800 focus:outline-none sm:min-h-[520px] sm:px-8 sm:py-8 sm:text-base prose-headings:font-black prose-headings:tracking-tight prose-headings:text-surface-900 prose-p:text-surface-700 prose-li:text-surface-700 prose-blockquote:border-l-surface-300 prose-blockquote:text-surface-500 prose-code:text-surface-900 prose-pre:rounded-2xl prose-pre:bg-surface-950 prose-pre:text-surface-100 prose-img:rounded-2xl prose-img:shadow-sm';
@@ -35,9 +47,11 @@ export function buildEditorExtensions(placeholder: string) {
     CodeBlockLowlight.configure({ lowlight }),
     ImageExtension.configure({ inline: false, allowBase64: false }),
     ImageRowExtension,
+    VideoExtension,
     Link.configure({ openOnClick: false, autolink: true }),
     Placeholder.configure({ placeholder }),
-    Markdown.configure({ transformPastedText: true }),
+    // html: true 로 둬야 전처리한 <video> 태그가 Video 노드로 파싱된다
+    Markdown.configure({ transformPastedText: true, html: true }),
   ];
 }
 
@@ -90,25 +104,50 @@ export function promptLinkUrl(editor: Editor | null) {
   editor.chain().focus().setLink({ href: url }).run();
 }
 
+const VIDEO_FILE_URL_RE = /\.(mp4|webm|mov)(\?\S*)?$/i;
+
+function insertVideoOrEmbed(editor: Editor, url: string) {
+  if (VIDEO_FILE_URL_RE.test(url)) {
+    // mp4/webm/mov 직접 링크 → Video 노드 (미리보기 + 보존)
+    editor.chain().focus().insertContent({ type: 'video', attrs: { src: url } }).run();
+  } else {
+    // YouTube/Vimeo/Loom 등 → 단독 URL 문단 (프론트가 임베드로 렌더)
+    editor
+      .chain()
+      .focus()
+      .insertContent([
+        { type: 'paragraph', content: [{ type: 'text', text: url }] },
+        { type: 'paragraph' },
+      ])
+      .run();
+  }
+}
+
 export function promptVideoUrl(editor: Editor | null) {
   if (!editor) return;
 
-  const url = window.prompt('비디오 URL을 입력하세요 (YouTube, Vimeo, Loom 지원)');
+  const url = window.prompt('비디오 URL을 입력하세요 (mp4 직접 링크 · YouTube · Vimeo · Loom)');
   if (!url) return;
 
-  editor
-    .chain()
-    .focus()
-    .insertContent([
-      {
-        type: 'paragraph',
-        content: [{ type: 'text', text: url }],
-      },
-      {
-        type: 'paragraph',
-      },
-    ])
-    .run();
+  insertVideoOrEmbed(editor, url.trim());
+}
+
+/** mp4/webm/mov 파일을 업로드해 Video 노드로 삽입한다. */
+export async function promptVideoUpload(editor: Editor | null, uploadFile: UploadImage) {
+  if (!editor) return;
+
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'video/mp4,video/webm,video/quicktime,video/*';
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+    const url = await uploadFile(file);
+    if (url) {
+      editor.chain().focus().insertContent({ type: 'video', attrs: { src: url } }).run();
+    }
+  };
+  input.click();
 }
 
 export function promptCodeBlockLanguage(editor: Editor | null) {
