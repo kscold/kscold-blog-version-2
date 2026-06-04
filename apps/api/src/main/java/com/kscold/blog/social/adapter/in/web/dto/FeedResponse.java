@@ -1,5 +1,6 @@
 package com.kscold.blog.social.adapter.in.web.dto;
 
+import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.social.domain.model.Feed;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -85,5 +86,26 @@ public class FeedResponse {
                 .createdAt(feed.getCreatedAt())
                 .updatedAt(feed.getUpdatedAt())
                 .build();
+    }
+
+    /**
+     * 작성자 최신 프로필(avatar·표시 이름)을 실시간으로 채워서 응답을 만든다.
+     * feed.author 는 작성 시점 스냅샷({id, name})이라 프로필 이미지가 빠져 있으므로,
+     * 조회 시점에 사용자 정보를 주입해 항상 최신 프로필이 보이도록 한다.
+     */
+    public static FeedResponse from(Feed feed, String requestIdentifier, UserQueryPort.UserInfo authorInfo) {
+        FeedResponse response = from(feed, requestIdentifier);
+        if (authorInfo != null) {
+            String displayName = authorInfo.displayName() != null && !authorInfo.displayName().isBlank()
+                    ? authorInfo.displayName()
+                    : authorInfo.username();
+            response.author = AuthorInfo.builder()
+                    .id(authorInfo.id())
+                    .username(authorInfo.username())
+                    .name(displayName)
+                    .avatar(authorInfo.avatar())
+                    .build();
+        }
+        return response;
     }
 }

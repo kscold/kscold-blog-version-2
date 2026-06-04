@@ -5,6 +5,7 @@ import com.kscold.blog.identity.application.dto.PublicProfileDto;
 import com.kscold.blog.identity.application.dto.UpdateProfileCommand;
 import com.kscold.blog.identity.application.port.in.UserManagementUseCase;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
+import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.social.adapter.in.web.dto.FeedResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
@@ -78,6 +79,9 @@ public class UserProfileController {
                 profile.id(),
                 PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
         );
-        return ResponseEntity.ok(ApiResponse.success(feeds.map(FeedResponse::from)));
+        // 작성자(=프로필 주인)의 최신 프로필로 피드 작성자 정보를 채운다.
+        UserQueryPort.UserInfo author = new UserQueryPort.UserInfo(
+                profile.id(), profile.username(), profile.displayName(), profile.avatar(), false, null);
+        return ResponseEntity.ok(ApiResponse.success(feeds.map(feed -> FeedResponse.from(feed, null, author))));
     }
 }
