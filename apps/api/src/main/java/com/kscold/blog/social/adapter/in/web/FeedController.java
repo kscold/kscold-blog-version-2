@@ -1,5 +1,6 @@
 package com.kscold.blog.social.adapter.in.web;
 
+import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.analytics.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,7 @@ public class FeedController {
     private final FeedUseCase feedUseCase;
     private final ClientIdentifierResolver clientIdentifierResolver;
     private final ViewCounter viewCounter;
+    private final UserQueryPort userQueryPort;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<FeedResponse>>> getPublicFeeds(
@@ -49,7 +52,7 @@ public class FeedController {
                 ? feedUseCase.getPublicFeedsByTag(tag, pageable)
                 : feedUseCase.getPublicFeeds(pageable);
         String identifier = resolveIdentifier(userId, request);
-        return ResponseEntity.ok(ApiResponse.success(feeds.map(feed -> FeedResponse.from(feed, identifier))));
+        return ResponseEntity.ok(ApiResponse.success(toResponsePage(feeds, identifier)));
     }
 
     @GetMapping("/tags")
@@ -65,7 +68,7 @@ public class FeedController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Feed> feeds = feedUseCase.getAllFeeds(pageable);
-        return ResponseEntity.ok(ApiResponse.success(feeds.map(FeedResponse::from)));
+        return ResponseEntity.ok(ApiResponse.success(toResponsePage(feeds, null)));
     }
 
     @GetMapping("/{id}")
@@ -79,7 +82,7 @@ public class FeedController {
         if (viewCounter.incrementIfUnique("feeds", feed.getId(), "FEED", identifier)) {
             feed.setViews(feed.getViews() + 1);
         }
-        return ResponseEntity.ok(ApiResponse.success(FeedResponse.from(feed, identifier)));
+        return ResponseEntity.ok(ApiResponse.success(toResponse(feed, identifier)));
     }
 
     @PostMapping
@@ -90,7 +93,7 @@ public class FeedController {
         Feed feed = feedUseCase.create(command, userId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(FeedResponse.from(feed), "피드가 생성되었습니다"));
+                .body(ApiResponse.success(toResponse(feed, userId), "피드가 생성되었습니다"));
     }
 
     @PutMapping("/{id}")
@@ -101,7 +104,7 @@ public class FeedController {
     ) {
         feedUseCase.validateOwnership(id, userId, hasAdminRole());
         Feed feed = feedUseCase.update(id, command);
-        return ResponseEntity.ok(ApiResponse.success(FeedResponse.from(feed), "피드가 수정되었습니다"));
+        return ResponseEntity.ok(ApiResponse.success(toResponse(feed, userId), "피드가 수정되었습니다"));
     }
 
     @DeleteMapping("/{id}")
@@ -128,12 +131,43 @@ public class FeedController {
     ) {
         String identifier = resolveIdentifier(userId, request);
         Feed feed = feedUseCase.toggleLike(id, identifier);
-        return ResponseEntity.ok(ApiResponse.success(FeedResponse.from(feed, identifier)));
+        return ResponseEntity.ok(ApiResponse.success(toResponse(feed, identifier)));
     }
 
     /** 로그인 유저 → userId, 비로그인 → IP */
     private String resolveIdentifier(String userId, HttpServletRequest request) {
         return (userId != null) ? userId : clientIdentifierResolver.resolve(request);
+    }
+
+    /** 작성자 최신 프로필을 안전하게 조회 (탈퇴·삭제 사용자는 null) */
+    private UserQueryPort.UserInfo lookupAuthor(String authorId) {
+        if (authorId == null) return null;
+        try {
+            return userQueryPort.getUserById(authorId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** 단건 피드를 작성자 최신 프로필로 채워 응답 변환 */
+    private FeedResponse toResponse(Feed feed, String identifier) {
+        String authorId = feed.getAuthor() != null ? feed.getAuthor().getId() : null;
+        return FeedResponse.from(feed, identifier, lookupAuthor(authorId));
+    }
+
+    /** 피드 목록을 작성자별 최신 프로필로 채워 응답 변환 (작성자 batch 조회) */
+    private Page<FeedResponse> toResponsePage(Page<Feed> feeds, String identifier) {
+        Map<String, UserQueryPort.UserInfo> authors = new HashMap<>();
+        for (Feed feed : feeds.getContent()) {
+            String authorId = feed.getAuthor() != null ? feed.getAuthor().getId() : null;
+            if (authorId != null && !authors.containsKey(authorId)) {
+                authors.put(authorId, lookupAuthor(authorId));
+            }
+        }
+        return feeds.map(feed -> {
+            String authorId = feed.getAuthor() != null ? feed.getAuthor().getId() : null;
+            return FeedResponse.from(feed, identifier, authorId != null ? authors.get(authorId) : null);
+        });
     }
 
 }
