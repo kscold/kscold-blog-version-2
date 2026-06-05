@@ -11,7 +11,16 @@ export function FeedComposerHeader({
     <div className="border-b border-surface-200 bg-surface-50/80 px-5 py-5 sm:px-6">
       <div className="flex items-start gap-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-surface-900 text-base font-black text-white">
-          {initials}
+          {currentUser.avatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={currentUser.avatar}
+              alt={currentUser.displayName || 'avatar'}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            initials
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
