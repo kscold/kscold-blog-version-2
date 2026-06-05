@@ -12,6 +12,7 @@ import { WithdrawModal } from './WithdrawModal';
 
 const SOCIAL_PLATFORMS = [
   { key: 'github', label: 'GitHub', placeholder: 'https://github.com/username' },
+  { key: 'instagram', label: 'Instagram', placeholder: 'https://www.instagram.com/username' },
   { key: 'linkedin', label: 'LinkedIn', placeholder: 'https://linkedin.com/in/username' },
   { key: 'website', label: '웹사이트', placeholder: 'https://example.com' },
   { key: 'twitter', label: 'X / Twitter', placeholder: 'https://x.com/username' },
