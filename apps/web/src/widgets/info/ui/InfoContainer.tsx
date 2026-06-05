@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PROFILE } from '@/entities/profile/model/profileData';
+import { PROFILE, PROFILE_FAQ } from '@/entities/profile/model/profileData';
 import { SkillsSection } from './SkillsSection';
 import { ContactSection } from './ContactSection';
 
@@ -78,6 +78,25 @@ export function InfoContainer() {
               emoji="🐾"
               externalUrl="https://pawpong.kr"
             />
+          </div>
+        </motion.section>
+
+        {/* 자주 묻는 질문 (FAQ) */}
+        <motion.section
+          className="mb-16"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          transition={{ duration: 0.6, delay: 0.48 }}
+        >
+          <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">FAQ</h2>
+          <div className="space-y-3">
+            {PROFILE_FAQ.map((item, i) => (
+              <div key={i} className="bg-white border border-surface-200 rounded-2xl p-5">
+                <h3 className="text-sm font-bold text-surface-900 mb-2">{item.q}</h3>
+                <p className="text-sm text-surface-600 leading-relaxed">{item.a}</p>
+              </div>
+            ))}
           </div>
         </motion.section>
 

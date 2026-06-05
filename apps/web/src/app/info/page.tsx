@@ -1,5 +1,5 @@
 import { InfoContainer } from '@/widgets/info/ui/InfoContainer';
-import { PROFILE } from '@/entities/profile/model/profileData';
+import { PROFILE, PROFILE_FAQ } from '@/entities/profile/model/profileData';
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 
@@ -28,10 +28,26 @@ const infoJsonLd = {
   },
 };
 
+// 화면 FAQ 섹션과 동일한 내용의 FAQPage 구조화 데이터 (검색 리치결과·GEO)
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  '@id': `${SITE_URL}/info#faq`,
+  mainEntity: PROFILE_FAQ.map(item => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+};
+
 export default function InfoPage() {
   return (
     <>
       <JsonLd id="info-page" data={infoJsonLd} />
+      <JsonLd id="info-faq" data={faqJsonLd} />
       <InfoContainer />
     </>
   );
