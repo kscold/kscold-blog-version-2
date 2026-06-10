@@ -34,7 +34,7 @@ export function renderGraphLink(
   );
   const isDimmed =
     Boolean(hoverNode && !isHovered) || Boolean(highlightFolderId && !touchesHighlightFolder);
-  const srcColor = folderColorMap[srcNode.folderId ?? ''] || '#64C8FF';
+  const srcColor = folderColorMap[srcNode.folderId ?? ''] || '#6E93C4';
   const tgtColor = folderColorMap[tgtNode.folderId ?? ''] || srcColor;
 
   if (reducedEffects) {
@@ -112,5 +112,5 @@ export function resolveLinkParticleColor(
   const sourceId = typeof link.source === 'string' ? link.source : link.source?.id;
   const folderId = sourceNode?.folderId || nodes.find(node => node.id === sourceId)?.folderId;
 
-  return folderColorMap[folderId ?? ''] || '#64C8FF';
+  return folderColorMap[folderId ?? ''] || '#6E93C4';
 }
