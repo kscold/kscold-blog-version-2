@@ -254,6 +254,22 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  /* 볼트 그래프 노드 클릭 리플 */
+  @keyframes vault-ripple {
+    0% {
+      transform: scale(1);
+      opacity: 0.85;
+    }
+    100% {
+      transform: scale(5.5);
+      opacity: 0;
+    }
+  }
+
+  .animate-vault-ripple {
+    animation: vault-ripple 0.65s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  }
+
   .markdown-prose {
     text-wrap: pretty;
   }

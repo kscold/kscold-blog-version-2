@@ -11,6 +11,7 @@ interface ClientVaultGraphProps {
   onFolderClick?: (folderId: string) => void;
   folderColorMap?: Record<string, string>;
   theme?: 'light' | 'dark' | 'system';
+  highlightFolderId?: string | null;
 }
 
 // SSR 비활성화하여 동적 import

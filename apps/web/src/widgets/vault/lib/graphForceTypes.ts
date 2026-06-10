@@ -21,6 +21,8 @@ export interface RenderNodeOptions {
   hoverNodeId?: string;
   /** 호버 중인 노드와 직접 연결된 노드 id 집합 — 나머지는 dim 처리 */
   connectedIds?: Set<string> | null;
+  /** 사이드바에서 호버 중인 폴더 id — 해당 폴더 소속 외 노드는 dim 처리 */
+  highlightFolderId?: string | null;
   folderColorMap: Record<string, string>;
   theme: 'light' | 'dark' | 'system';
   reducedEffects?: boolean;

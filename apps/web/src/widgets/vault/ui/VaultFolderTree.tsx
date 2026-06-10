@@ -11,9 +11,11 @@ interface VaultFolderTreeProps {
   folders: VaultFolder[];
   activeFolderId?: string | null;
   onFolderSelect?: (folderId: string | null) => void;
+  /** 폴더 행 호버 시 그래프 스포트라이트 연동 (데스크탑 전용) */
+  onFolderHover?: (folderId: string | null) => void;
 }
 
-export function VaultFolderTree({ folders, activeFolderId, onFolderSelect }: VaultFolderTreeProps) {
+export function VaultFolderTree({ folders, activeFolderId, onFolderSelect, onFolderHover }: VaultFolderTreeProps) {
   return (
     <div className="space-y-1">
       {folders.map(folder => (
@@ -22,6 +24,7 @@ export function VaultFolderTree({ folders, activeFolderId, onFolderSelect }: Vau
           folder={folder}
           activeFolderId={activeFolderId}
           onFolderSelect={onFolderSelect}
+          onFolderHover={onFolderHover}
         />
       ))}
     </div>
@@ -32,10 +35,12 @@ function FolderNode({
   folder,
   activeFolderId,
   onFolderSelect,
+  onFolderHover,
 }: {
   folder: VaultFolder;
   activeFolderId?: string | null;
   onFolderSelect?: (folderId: string | null) => void;
+  onFolderHover?: (folderId: string | null) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const { data: notesData, isLoading } = useVaultNotes(isOpen ? folder.id : '');
@@ -62,6 +67,8 @@ function FolderNode({
     <div className="select-none">
       <div
         onClick={handleHeaderClick}
+        onMouseEnter={() => onFolderHover?.(folder.id)}
+        onMouseLeave={() => onFolderHover?.(null)}
         className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-300 group ${
           isFolderActive
             ? 'bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-100 font-semibold'
@@ -131,6 +138,7 @@ function FolderNode({
                   folder={child}
                   activeFolderId={activeFolderId}
                   onFolderSelect={onFolderSelect}
+                  onFolderHover={onFolderHover}
                 />
               ))}
 

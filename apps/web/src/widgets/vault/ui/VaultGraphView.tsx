@@ -20,6 +20,15 @@ interface VaultGraphViewProps {
   onFolderClick?: (folderId: string) => void;
   folderColorMap?: Record<string, string>;
   theme?: 'light' | 'dark' | 'system';
+  /** 사이드바에서 호버 중인 폴더 — 해당 폴더만 스포트라이트 */
+  highlightFolderId?: string | null;
+}
+
+interface Ripple {
+  id: number;
+  x: number;
+  y: number;
+  color: string;
 }
 
 export function VaultGraphView({
@@ -29,6 +38,7 @@ export function VaultGraphView({
   onFolderClick,
   folderColorMap = {},
   theme = 'dark',
+  highlightFolderId = null,
 }: VaultGraphViewProps) {
   const fgRef = useRef<ForceGraphMethods | undefined>(undefined);
   const router = useRouter();
@@ -94,7 +104,25 @@ export function VaultGraphView({
     }
   }, [activeNodeSlug, gData, reducedGraphEffects]);
 
+  // 클릭 리플 — 이동/필터 액션의 출발점이 시각적으로 느껴지도록
+  const [ripples, setRipples] = useState<Ripple[]>([]);
+  const rippleSeq = useRef(0);
+
+  const spawnRipple = useCallback((node: NodeObject) => {
+    const fg = fgRef.current;
+    if (!fg || node.x == null || node.y == null) return;
+    const screen = fg.graph2ScreenCoords(node.x, node.y);
+    const gn = node as unknown as GraphNode;
+    const color = folderColorMap[gn.folderId ?? ''] || '#64C8FF';
+    const id = ++rippleSeq.current;
+    setRipples(prev => [...prev, { id, x: screen.x, y: screen.y, color }]);
+    setTimeout(() => {
+      setRipples(prev => prev.filter(r => r.id !== id));
+    }, 650);
+  }, [folderColorMap]);
+
   const handleNodeClick = useCallback((node: NodeObject) => {
+    if (!reduceMotion) spawnRipple(node);
     const gn = node as unknown as GraphNode;
     if (gn.isFolder && onFolderClick) {
       onFolderClick(gn.id);
@@ -105,7 +133,7 @@ export function VaultGraphView({
         router.push(`/vault/${gn.slug}`);
       }
     }
-  }, [onFolderClick, onNodeClick, router]);
+  }, [onFolderClick, onNodeClick, router, reduceMotion, spawnRipple]);
 
   const isLinkHovered = useCallback((link: GraphLink): boolean => {
     if (!hoverNode) return false;
@@ -119,19 +147,21 @@ export function VaultGraphView({
       activeNodeSlug,
       hoverNodeId: hoverNode?.id,
       connectedIds,
+      highlightFolderId,
       folderColorMap,
       theme,
       reducedEffects: reducedGraphEffects,
     });
-  }, [activeNodeSlug, hoverNode?.id, connectedIds, folderColorMap, theme, reducedGraphEffects]);
+  }, [activeNodeSlug, hoverNode?.id, connectedIds, highlightFolderId, folderColorMap, theme, reducedGraphEffects]);
 
   const linkCanvasObject = useCallback((link: GraphLink, ctx: CanvasRenderingContext2D) => {
     renderGraphLink(link, ctx, {
       hoverNode,
+      highlightFolderId,
       folderColorMap,
       reducedEffects: reducedGraphEffects,
     });
-  }, [hoverNode, folderColorMap, reducedGraphEffects]);
+  }, [hoverNode, highlightFolderId, folderColorMap, reducedGraphEffects]);
 
   const zoomBy = useCallback((factor: number) => {
     const fg = fgRef.current;
@@ -256,6 +286,25 @@ export function VaultGraphView({
         }}
         backgroundColor="transparent"
       />
+
+      {/* 노드 클릭 리플 — 클릭 지점에서 폴더 컬러 파동이 한 번 퍼진다 */}
+      {ripples.map(ripple => (
+        <span
+          key={ripple.id}
+          aria-hidden="true"
+          className="absolute z-10 pointer-events-none rounded-full animate-vault-ripple"
+          style={{
+            left: ripple.x,
+            top: ripple.y,
+            width: 14,
+            height: 14,
+            marginLeft: -7,
+            marginTop: -7,
+            border: `2px solid ${ripple.color}`,
+            boxShadow: `0 0 18px ${ripple.color}66`,
+          }}
+        />
+      ))}
 
       {/* 그래프 통계 HUD */}
       <div
