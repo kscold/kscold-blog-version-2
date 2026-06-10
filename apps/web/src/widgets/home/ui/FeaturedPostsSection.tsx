@@ -14,23 +14,37 @@ export function FeaturedPostsSection() {
     <section className="py-16 sm:py-32 px-4 sm:px-6 lg:px-8 bg-surface-50 relative border-t border-surface-200">
       <div className="max-w-7xl mx-auto">
         <motion.div
-          className="flex items-end justify-between mb-10 sm:mb-20 border-b border-white/10 pb-6 sm:pb-8"
+          className="flex items-end justify-between mb-10 sm:mb-20 border-b border-surface-200 pb-6 sm:pb-8"
           initial={allowRichEffects ? { opacity: 0, y: 20 } : false}
           whileInView={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
           viewport={allowRichEffects ? { once: true } : undefined}
           transition={allowRichEffects ? { duration: 0.6 } : undefined}
         >
           <div>
-            <h2 className="text-3xl sm:text-5xl font-sans font-bold text-surface-900 mb-2 tracking-tight">
+            <p className="mb-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-400">
+              <span className="font-mono text-surface-300">01</span>
+              <span className="h-px w-8 bg-surface-300" aria-hidden="true" />
+              Featured
+            </p>
+            <h2 className="text-3xl sm:text-5xl font-sans font-black text-surface-900 mb-2 tracking-tight">
               Featured <span className="text-accent-dark">Posts</span>
             </h2>
-            <p className="text-surface-500">최근 1달 기준 조회수 TOP 3</p>
+            <p className="text-sm sm:text-base text-surface-500">최근 1달 기준 조회수 TOP 3</p>
           </div>
           <Link
             href="/blog"
-            className="hidden sm:block text-surface-500 hover:text-surface-900 transition-colors uppercase text-sm tracking-widest font-bold"
+            className="group inline-flex shrink-0 items-center gap-1.5 text-surface-500 hover:text-surface-900 transition-colors uppercase text-xs sm:text-sm tracking-widest font-bold"
           >
             전체 보기
+            <svg
+              className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </Link>
         </motion.div>
 

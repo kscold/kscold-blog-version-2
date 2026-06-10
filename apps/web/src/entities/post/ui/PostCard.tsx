@@ -90,8 +90,8 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
           </h3>
 
           <p
-            className={`mb-6 text-sm font-medium leading-relaxed text-surface-500 break-words [overflow-wrap:anywhere] line-clamp-${
-              featured ? '4' : '3'
+            className={`mb-6 text-sm font-medium leading-relaxed text-surface-500 break-words [overflow-wrap:anywhere] ${
+              featured ? 'line-clamp-4' : 'line-clamp-3'
             }`}
           >
             {post.excerpt}
@@ -112,16 +112,25 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
             </div>
           )}
 
-          <div className="flex items-center gap-4 mt-6 pt-4 border-t border-surface-100">
-            <div className="flex items-center gap-1 text-xs text-surface-500 font-mono">
-              <span className="uppercase">Views</span>
-              <span>{post.views || 0}</span>
+          <div className="flex items-center justify-between mt-6 pt-4 border-t border-surface-100">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5 text-[11px] text-surface-400 font-mono">
+                <span className="uppercase tracking-wider">Views</span>
+                <span className="font-bold text-surface-600 tabular-nums">{post.views || 0}</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-[11px] text-surface-400 font-mono">
+                <span className="uppercase tracking-wider">Likes</span>
+                <span className="font-bold text-surface-600 tabular-nums">{post.likes || 0}</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-1 text-xs text-surface-500 font-mono">
-              <span className="uppercase">Likes</span>
-              <span>{post.likes || 0}</span>
-            </div>
+            <span
+              aria-hidden="true"
+              className={`text-surface-300 transition-all duration-300 ${supportsHover ? 'group-hover:text-surface-900 group-hover:translate-x-0.5' : ''}`}
+            >
+              →
+            </span>
           </div>
         </div>
       </Link>

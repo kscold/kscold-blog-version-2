@@ -9,9 +9,20 @@ export function HeroSection() {
   const animate = !prefersReducedMotion;
 
   return (
-    <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center">
+    <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
+      {/* 에디토리얼 무드의 미세 도트 그리드 — 순수 CSS라 성능 부담 없음 */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none opacity-[0.5]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgb(148 163 184 / 0.22) 1px, transparent 1px)',
+          backgroundSize: '28px 28px',
+          maskImage: 'radial-gradient(ellipse 70% 60% at 50% 42%, black 30%, transparent 75%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 42%, black 30%, transparent 75%)',
+        }}
+      />
       <motion.div
-        className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-12 text-center my-16"
+        className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-8 sm:gap-12 text-center my-12 sm:my-16"
         initial={animate ? { opacity: 0 } : false}
         animate={animate ? { opacity: 1 } : undefined}
         transition={animate ? { duration: 1 } : undefined}
@@ -77,14 +88,14 @@ export function HeroSection() {
         </motion.p>
 
         <motion.div
-          className="w-[1px] h-[10rem] sm:h-[8rem] bg-gradient-to-b from-surface-200/0 via-surface-300 to-surface-200/0 mx-auto mt-12 origin-top"
+          className="w-[1px] h-[5rem] sm:h-[8rem] bg-gradient-to-b from-surface-200/0 via-surface-300 to-surface-200/0 mx-auto mt-6 sm:mt-12 origin-top"
           initial={animate ? { scaleY: 0 } : false}
           animate={animate ? { scaleY: 1 } : undefined}
           transition={animate ? { duration: 1.5, delay: 1, ease: [0.76, 0, 0.24, 1] } : undefined}
         />
 
         <motion.div
-          className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-12 pb-20 w-full max-w-lg mx-auto"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-6 sm:pt-12 pb-12 sm:pb-20 w-full max-w-lg mx-auto"
           initial={animate ? { opacity: 0, y: 20 } : false}
           animate={animate ? { opacity: 1, y: 0 } : undefined}
           transition={animate ? { duration: 1.2, delay: 0.7, ease: [0.76, 0, 0.24, 1] } : undefined}
