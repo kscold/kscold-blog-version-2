@@ -2,6 +2,8 @@ import type { GraphLink, GraphNode } from '@/types/vault';
 
 interface RenderGraphLinkOptions {
   hoverNode: GraphNode | null;
+  /** 사이드바에서 호버 중인 폴더 id — 무관한 링크는 dim */
+  highlightFolderId?: string | null;
   folderColorMap: Record<string, string>;
   reducedEffects?: boolean;
 }
@@ -9,7 +11,7 @@ interface RenderGraphLinkOptions {
 export function renderGraphLink(
   link: GraphLink,
   ctx: CanvasRenderingContext2D,
-  { hoverNode, folderColorMap, reducedEffects = false }: RenderGraphLinkOptions
+  { hoverNode, highlightFolderId, folderColorMap, reducedEffects = false }: RenderGraphLinkOptions
 ) {
   const src = link.source;
   const tgt = link.target;
@@ -22,7 +24,16 @@ export function renderGraphLink(
   const tgtNode = tgt as GraphNode;
   const isHovered = Boolean(hoverNode && (srcNode.id === hoverNode.id || tgtNode.id === hoverNode.id));
   // 호버 포커스 모드: 호버 노드와 무관한 링크는 배경으로 가라앉힌다
-  const isDimmed = Boolean(hoverNode && !isHovered);
+  // 폴더 하이라이트 모드: 해당 폴더와 무관한 링크도 동일하게 처리
+  const touchesHighlightFolder = Boolean(
+    highlightFolderId &&
+      (srcNode.folderId === highlightFolderId ||
+        tgtNode.folderId === highlightFolderId ||
+        String(srcNode.id) === highlightFolderId ||
+        String(tgtNode.id) === highlightFolderId)
+  );
+  const isDimmed =
+    Boolean(hoverNode && !isHovered) || Boolean(highlightFolderId && !touchesHighlightFolder);
   const srcColor = folderColorMap[srcNode.folderId ?? ''] || '#64C8FF';
   const tgtColor = folderColorMap[tgtNode.folderId ?? ''] || srcColor;
 

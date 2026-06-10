@@ -19,6 +19,7 @@ export function VaultGraphLayout() {
   const searchParams = useSearchParams();
   const initialFolder = searchParams.get('folder');
   const [activeFolderId, setActiveFolderId] = useState<string | null>(initialFolder);
+  const [hoverFolderId, setHoverFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isDesktop, setIsDesktop] = useState(false);
@@ -113,6 +114,7 @@ export function VaultGraphLayout() {
                 folders={folders}
                 activeFolderId={activeFolderId}
                 onFolderSelect={setActiveFolderId}
+                onFolderHover={isTouchDevice ? undefined : setHoverFolderId}
               />
             )}
           </div>
@@ -151,6 +153,7 @@ export function VaultGraphLayout() {
               folderColorMap={colorMap}
               onFolderClick={setActiveFolderId}
               theme={theme}
+              highlightFolderId={hoverFolderId}
             />
           </div>
         ) : (

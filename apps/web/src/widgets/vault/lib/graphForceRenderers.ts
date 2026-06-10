@@ -160,6 +160,7 @@ export function renderNode(
       activeNodeSlug,
       hoverNodeId,
       connectedIds,
+      highlightFolderId,
       folderColorMap,
       theme,
       reducedEffects = false,
@@ -173,9 +174,14 @@ export function renderNode(
     // 호버 포커스 모드: 호버 노드와 직접 연결되지 않은 노드는 흐린 원 하나로
     // 가라앉혀, 연결 관계만 또렷하게 떠오르도록 한다 (Obsidian 그래프 인터랙션).
     // 디테일 렌더(그라디언트·글로우)를 통째로 건너뛰므로 호버 중 성능도 좋아진다.
-    const dimmed = Boolean(
+    const dimmedByHover = Boolean(
       hoverNodeId && !focused && connectedIds && !connectedIds.has(String(node.id))
     );
+    // 사이드바 폴더 호버 연동: 해당 폴더 소속이 아닌 노드는 가라앉힌다
+    const inHighlightFolder =
+      node.folderId === highlightFolderId || String(node.id) === highlightFolderId;
+    const dimmedByFolder = Boolean(highlightFolderId && !inHighlightFolder);
+    const dimmed = dimmedByHover || dimmedByFolder;
 
     if (dimmed) {
       ctx.save();
@@ -194,7 +200,8 @@ export function renderNode(
       renderDetailedNode(node, ctx, globalScale, focused, isFolder, isDark, nodeColor, radius);
     }
 
-    if (isFolder || focused || globalScale > (reducedEffects ? 1.15 : 0.8)) {
+    const folderSpotlight = Boolean(highlightFolderId) && inHighlightFolder;
+    if (isFolder || focused || folderSpotlight || globalScale > (reducedEffects ? 1.15 : 0.8)) {
       renderGraphLabel(node, ctx, globalScale, {
         label: node.name || '',
         isFolder,
