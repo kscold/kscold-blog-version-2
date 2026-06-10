@@ -1,12 +1,17 @@
 import { VaultFolder } from '@/types/vault';
 
+/**
+ * 뮤트 톤으로 큐레이션한 폴더 팔레트.
+ * 명도를 비슷하게 맞춘 dusty 계열이라 흰 배경 위에서 서로 조화롭고,
+ * 글로우·그라디언트(알파 suffix 결합)에서도 차분하게 빛난다.
+ */
 const CATEGORY_COLORS = [
-  '#64C8FF',
-  '#A855F7',
-  '#F43F5E',
-  '#10B981',
-  '#F59E0B',
-  '#3B82F6',
+  '#6E93C4', // dusty blue
+  '#A38FC2', // soft mauve
+  '#C48A96', // dusty rose
+  '#8FAE8B', // sage
+  '#C9A368', // warm amber
+  '#6FA8A4', // slate teal
 ];
 
 export function buildFolderColorMap(folders: VaultFolder[]): Record<string, string> {

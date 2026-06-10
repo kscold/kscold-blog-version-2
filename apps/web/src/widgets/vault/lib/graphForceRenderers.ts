@@ -168,7 +168,7 @@ export function renderNode(
     const isFolder = Boolean(node.isFolder);
     const focused = activeNodeSlug === node.slug || hoverNodeId === node.id;
     const isDark = isDarkGraphTheme(theme);
-    const nodeColor = folderColorMap[node.folderId ?? ''] || '#64C8FF';
+    const nodeColor = folderColorMap[node.folderId ?? ''] || '#6E93C4';
     const radius = getNodeRadius(node);
 
     // 호버 포커스 모드: 호버 노드와 직접 연결되지 않은 노드는 흐린 원 하나로

@@ -12,6 +12,18 @@ import {
   renderNode,
   renderNodeHitArea,
 } from '../lib/graphForceConfig';
+import { isDarkGraphTheme } from '../lib/graphForceUtils';
+
+interface ParallaxStar {
+  x: number;
+  y: number;
+  r: number;
+  baseAlpha: number;
+  /** 패럴랙스 팩터 — 작을수록 멀리 있는 별처럼 천천히 움직인다 */
+  p: number;
+  tw: number;
+  ph: number;
+}
 
 interface VaultGraphViewProps {
   graphData: GraphData;
@@ -113,7 +125,7 @@ export function VaultGraphView({
     if (!fg || node.x == null || node.y == null) return;
     const screen = fg.graph2ScreenCoords(node.x, node.y);
     const gn = node as unknown as GraphNode;
-    const color = folderColorMap[gn.folderId ?? ''] || '#64C8FF';
+    const color = folderColorMap[gn.folderId ?? ''] || '#6E93C4';
     const id = ++rippleSeq.current;
     setRipples(prev => [...prev, { id, x: screen.x, y: screen.y, color }]);
     setTimeout(() => {
@@ -173,6 +185,61 @@ export function VaultGraphView({
     fgRef.current?.zoomToFit(420, 48);
   }, []);
 
+  // 줌 배율 HUD — 줌 동작이 끝날 때만 갱신해 리렌더 부담 최소화
+  const [zoomPct, setZoomPct] = useState(100);
+
+  // ── 패럴랙스 별 필드 ──
+  // 그래프와 같은 캔버스에서, 카메라 이동에 노드보다 "느리게" 반응하는 별을 그린다.
+  // 팬/줌할 때 별이 천천히 비켜나며 원근감이 생긴다 (배경이 벽지가 아니라 먼 우주가 됨).
+  const starsRef = useRef<ParallaxStar[] | null>(null);
+
+  const renderStarfield = useCallback(
+    (ctx: CanvasRenderingContext2D, globalScale: number) => {
+      const fg = fgRef.current;
+      if (!fg) return;
+
+      if (!starsRef.current) {
+        const count = reducedGraphEffects ? 40 : 90;
+        const stars: ParallaxStar[] = [];
+        for (let i = 0; i < count; i++) {
+          const far = i % 3 !== 0; // 2/3 원경 · 1/3 근경, 두 겹의 깊이
+          stars.push({
+            x: (Math.random() - 0.5) * 3200,
+            y: (Math.random() - 0.5) * 3200,
+            r: far ? 0.8 + Math.random() * 0.7 : 1.3 + Math.random() * 1.1,
+            baseAlpha: far ? 0.22 + Math.random() * 0.18 : 0.32 + Math.random() * 0.22,
+            p: far ? 0.12 : 0.3,
+            tw: 0.6 + Math.random() * 1.4,
+            ph: Math.random() * Math.PI * 2,
+          });
+        }
+        starsRef.current = stars;
+      }
+
+      const center = fg.centerAt() as { x: number; y: number };
+      if (!center || !isFinite(center.x) || !isFinite(center.y)) return;
+
+      const isDark = isDarkGraphTheme(theme);
+      const t = performance.now() / 1000;
+
+      ctx.save();
+      ctx.fillStyle = isDark ? '#cbd5e1' : '#64748b';
+      for (const star of starsRef.current) {
+        // 카메라 이동량의 (1-p)만큼 별을 따라 보정 → 화면상 p배 속도로만 움직임
+        const wx = star.x + center.x * (1 - star.p);
+        const wy = star.y + center.y * (1 - star.p);
+        const r = star.r / globalScale; // 줌과 무관하게 화면 크기 고정
+        const twinkle = reducedGraphEffects ? 1 : 0.7 + 0.3 * Math.sin(t * star.tw + star.ph);
+        ctx.globalAlpha = star.baseAlpha * twinkle;
+        ctx.beginPath();
+        ctx.arc(wx, wy, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    },
+    [reducedGraphEffects, theme]
+  );
+
   return (
     <div
       ref={containerRef}
@@ -195,51 +262,18 @@ export function VaultGraphView({
               'radial-gradient(ellipse 80% 70% at 50% 45%, rgba(30,41,59,0.0) 0%, rgba(2,6,23,0.35) 100%)',
           }}
         />
-        {/* 성긴 별가루: 두 겹의 미세 도트를 어긋나게 겹쳐 무작위 별처럼 */}
-        <div
-          className="absolute inset-0 opacity-70 dark:opacity-40"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle, rgb(100 116 139 / 0.16) 1px, transparent 1px), radial-gradient(circle, rgb(148 163 184 / 0.10) 1px, transparent 1px)',
-            backgroundSize: '96px 96px, 56px 56px',
-            backgroundPosition: '0 0, 28px 34px',
-            maskImage: 'radial-gradient(ellipse 75% 70% at 50% 45%, black 35%, transparent 80%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 75% 70% at 50% 45%, black 35%, transparent 80%)',
-          }}
-        />
+        {/* 별은 캔버스 패럴랙스 필드(renderStarfield)가 담당 — 팬/줌에 원근으로 반응 */}
         {/* 은하수 무드의 오로라 — 폴더 컬러 톤과 어울리는 한 줄기 */}
         {!reducedGraphEffects && (
           <>
             <div
               className="absolute -left-1/4 top-[12%] h-[42%] w-[70%] rounded-full blur-3xl opacity-[0.05] dark:opacity-[0.08] animate-pulse"
-              style={{ background: 'linear-gradient(100deg, #64C8FF, transparent 70%)', animationDuration: '7s' }}
+              style={{ background: 'linear-gradient(100deg, #6E93C4, transparent 70%)', animationDuration: '7s' }}
             />
             <div
               className="absolute -right-1/4 bottom-[10%] h-[38%] w-[64%] rounded-full blur-3xl opacity-[0.04] dark:opacity-[0.07] animate-pulse"
               style={{ background: 'linear-gradient(260deg, #a78bfa, transparent 70%)', animationDuration: '9s', animationDelay: '2.5s' }}
             />
-            {/* 천천히 숨 쉬는 별 — 위치·주기를 어긋나게 해 무작위 반짝임처럼 */}
-            {[
-              { top: '18%', left: '14%', size: 3, duration: '4.5s', delay: '0s' },
-              { top: '26%', left: '78%', size: 2, duration: '6s', delay: '1.2s' },
-              { top: '64%', left: '8%', size: 2, duration: '5.2s', delay: '2.8s' },
-              { top: '74%', left: '86%', size: 3, duration: '7s', delay: '0.8s' },
-              { top: '10%', left: '52%', size: 2, duration: '5.8s', delay: '3.5s' },
-            ].map((star, i) => (
-              <span
-                key={i}
-                className="absolute rounded-full bg-surface-400/50 dark:bg-white/40 animate-pulse"
-                style={{
-                  top: star.top,
-                  left: star.left,
-                  width: star.size,
-                  height: star.size,
-                  animationDuration: star.duration,
-                  animationDelay: star.delay,
-                  boxShadow: '0 0 6px rgb(148 163 184 / 0.35)',
-                }}
-              />
-            ))}
           </>
         )}
         {/* 가장자리 비네트: 시선을 그래프 중심으로 */}
@@ -258,7 +292,7 @@ export function VaultGraphView({
         width={width > 0 ? width : 100}
         height={height > 0 ? height : 100}
         nodeLabel={() => ''}
-        nodeColor={(node: NodeObject) => folderColorMap[(node as unknown as GraphNode).folderId ?? ''] || '#64C8FF'}
+        nodeColor={(node: NodeObject) => folderColorMap[(node as unknown as GraphNode).folderId ?? ''] || '#6E93C4'}
         nodeRelSize={4}
         linkWidth={() => 0}
         linkColor={() => 'transparent'}
@@ -284,6 +318,8 @@ export function VaultGraphView({
           const el = document.querySelector('canvas');
           if (el) el.style.cursor = node ? 'pointer' : 'default';
         }}
+        onRenderFramePre={renderStarfield}
+        onZoomEnd={({ k }) => setZoomPct(Math.round(k * 100))}
         backgroundColor="transparent"
       />
 
@@ -311,7 +347,7 @@ export function VaultGraphView({
         aria-hidden="true"
         className="absolute bottom-3 left-3 z-10 pointer-events-none select-none rounded-full border border-surface-200/60 dark:border-surface-700/60 bg-white/70 dark:bg-surface-900/70 px-3 py-1.5 font-mono text-[10px] tracking-wider text-surface-400 backdrop-blur-sm"
       >
-        {gData.nodes.length} notes · {gData.links.length} links
+        {gData.nodes.length} notes · {gData.links.length} links · {zoomPct}%
       </div>
 
       {/* 줌 컨트롤 — 모바일에선 폴더 FAB와 겹치지 않게 위로 */}
