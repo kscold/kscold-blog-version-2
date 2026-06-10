@@ -148,6 +148,80 @@ export function VaultGraphView({
       ref={containerRef}
       className={`w-full h-full relative overflow-hidden rounded-xl gallery-card transition-[opacity,transform] duration-700 ease-out ${entered ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.985]'}`}
     >
+      {/* ── 화이트 우주 배경 (순수 CSS — 캔버스 성능 영향 없음) ── */}
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+        {/* 중앙 광원: 종이 위에 빛이 고이는 듯한 깊이감 */}
+        <div
+          className="absolute inset-0 dark:opacity-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 80% 70% at 50% 45%, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.4) 55%, rgba(226,232,240,0.35) 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-0 dark:opacity-100"
+          style={{
+            background:
+              'radial-gradient(ellipse 80% 70% at 50% 45%, rgba(30,41,59,0.0) 0%, rgba(2,6,23,0.35) 100%)',
+          }}
+        />
+        {/* 성긴 별가루: 두 겹의 미세 도트를 어긋나게 겹쳐 무작위 별처럼 */}
+        <div
+          className="absolute inset-0 opacity-70 dark:opacity-40"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle, rgb(100 116 139 / 0.16) 1px, transparent 1px), radial-gradient(circle, rgb(148 163 184 / 0.10) 1px, transparent 1px)',
+            backgroundSize: '96px 96px, 56px 56px',
+            backgroundPosition: '0 0, 28px 34px',
+            maskImage: 'radial-gradient(ellipse 75% 70% at 50% 45%, black 35%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 75% 70% at 50% 45%, black 35%, transparent 80%)',
+          }}
+        />
+        {/* 은하수 무드의 오로라 — 폴더 컬러 톤과 어울리는 한 줄기 */}
+        {!reducedGraphEffects && (
+          <>
+            <div
+              className="absolute -left-1/4 top-[12%] h-[42%] w-[70%] rounded-full blur-3xl opacity-[0.05] dark:opacity-[0.08] animate-pulse"
+              style={{ background: 'linear-gradient(100deg, #64C8FF, transparent 70%)', animationDuration: '7s' }}
+            />
+            <div
+              className="absolute -right-1/4 bottom-[10%] h-[38%] w-[64%] rounded-full blur-3xl opacity-[0.04] dark:opacity-[0.07] animate-pulse"
+              style={{ background: 'linear-gradient(260deg, #a78bfa, transparent 70%)', animationDuration: '9s', animationDelay: '2.5s' }}
+            />
+            {/* 천천히 숨 쉬는 별 — 위치·주기를 어긋나게 해 무작위 반짝임처럼 */}
+            {[
+              { top: '18%', left: '14%', size: 3, duration: '4.5s', delay: '0s' },
+              { top: '26%', left: '78%', size: 2, duration: '6s', delay: '1.2s' },
+              { top: '64%', left: '8%', size: 2, duration: '5.2s', delay: '2.8s' },
+              { top: '74%', left: '86%', size: 3, duration: '7s', delay: '0.8s' },
+              { top: '10%', left: '52%', size: 2, duration: '5.8s', delay: '3.5s' },
+            ].map((star, i) => (
+              <span
+                key={i}
+                className="absolute rounded-full bg-surface-400/50 dark:bg-white/40 animate-pulse"
+                style={{
+                  top: star.top,
+                  left: star.left,
+                  width: star.size,
+                  height: star.size,
+                  animationDuration: star.duration,
+                  animationDelay: star.delay,
+                  boxShadow: '0 0 6px rgb(148 163 184 / 0.35)',
+                }}
+              />
+            ))}
+          </>
+        )}
+        {/* 가장자리 비네트: 시선을 그래프 중심으로 */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 120% 110% at 50% 50%, transparent 60%, rgb(100 116 139 / 0.06) 100%)',
+          }}
+        />
+      </div>
+
       <ForceGraph2D
         ref={fgRef}
         graphData={gData}
