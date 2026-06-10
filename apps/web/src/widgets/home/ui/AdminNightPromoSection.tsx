@@ -8,19 +8,21 @@ export function AdminNightPromoSection() {
   const { allowRichEffects } = usePerformanceMode();
 
   return (
-    <section className="border-t border-surface-200 bg-surface-50/80 px-4 py-20 sm:px-6 lg:px-8">
+    <section className="border-t border-surface-200 bg-surface-50/80 px-4 py-14 sm:py-20 sm:px-6 lg:px-8">
       <motion.div
-        className="mx-auto grid max-w-5xl gap-6 rounded-[32px] border border-surface-200 bg-white p-6 shadow-sm lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:p-8"
+        className="mx-auto grid max-w-5xl gap-6 rounded-[32px] border border-surface-200 bg-white p-5 shadow-sm sm:p-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:p-8"
         initial={allowRichEffects ? { opacity: 0, y: 16 } : false}
         whileInView={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
         viewport={allowRichEffects ? { once: true } : undefined}
         transition={allowRichEffects ? { duration: 0.6 } : undefined}
       >
         <div className="space-y-4">
-          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-surface-400">
+          <p className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-400">
+            <span className="font-mono text-surface-300">03</span>
+            <span className="h-px w-8 bg-surface-300" aria-hidden="true" />
             Admin Night
           </p>
-          <h2 className="text-3xl font-black tracking-tight text-surface-900">
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-surface-900">
             퇴근 후, 각자 할 일을 끝내는
             <br />
             조용한 작업의 밤

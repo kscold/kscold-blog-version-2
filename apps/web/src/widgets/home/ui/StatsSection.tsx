@@ -30,7 +30,7 @@ export function StatsSection() {
   return (
     <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-surface-50/60">
       <div className="max-w-5xl mx-auto">
-      <div className="rounded-tl-3xl rounded-bl-3xl border border-surface-200 bg-white px-8 sm:px-12 py-12 sm:py-16 space-y-12 shadow-sm">
+      <div className="rounded-[32px] border border-surface-200 bg-white px-5 sm:px-12 py-10 sm:py-16 space-y-10 sm:space-y-12 shadow-sm">
         <motion.div
           className="text-center"
           initial={allowRichEffects ? { opacity: 0, y: 16 } : false}
@@ -38,8 +38,12 @@ export function StatsSection() {
           viewport={allowRichEffects ? { once: true } : undefined}
           transition={allowRichEffects ? { duration: 0.6 } : undefined}
         >
-          <p className="text-xs font-bold tracking-[0.25em] text-surface-400 uppercase mb-3">By the Numbers</p>
-          <p className="text-surface-500 text-base leading-relaxed">지식을 기록하고, 기록을 연결하고, 연결을 공유합니다.</p>
+          <p className="mb-3 flex items-center justify-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-400">
+            <span className="font-mono text-surface-300">02</span>
+            <span className="h-px w-8 bg-surface-300" aria-hidden="true" />
+            By the Numbers
+          </p>
+          <p className="text-surface-500 text-sm sm:text-base leading-relaxed">지식을 기록하고, 기록을 연결하고, 연결을 공유합니다.</p>
         </motion.div>
 
         <StatsGrid stats={stats} />
