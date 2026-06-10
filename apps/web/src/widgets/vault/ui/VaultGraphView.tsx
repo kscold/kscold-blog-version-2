@@ -47,6 +47,32 @@ export function VaultGraphView({
     };
   }, [graphData]);
 
+  // 노드별 인접 노드 집합 — 호버 포커스(비연결 dim)용
+  const adjacency = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const link of gData.links) {
+      const srcId = String(typeof link.source === 'object' ? link.source?.id : link.source);
+      const tgtId = String(typeof link.target === 'object' ? link.target?.id : link.target);
+      if (!map.has(srcId)) map.set(srcId, new Set());
+      if (!map.has(tgtId)) map.set(tgtId, new Set());
+      map.get(srcId)!.add(tgtId);
+      map.get(tgtId)!.add(srcId);
+    }
+    return map;
+  }, [gData.links]);
+
+  const connectedIds = useMemo(() => {
+    if (!hoverNode) return null;
+    return adjacency.get(String(hoverNode.id)) ?? new Set<string>();
+  }, [hoverNode, adjacency]);
+
+  // 진입 페이드 — 시뮬레이션 워밍업 동안의 어수선한 첫 프레임을 가린다
+  const [entered, setEntered] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setEntered(true), 80);
+    return () => clearTimeout(t);
+  }, []);
+
   // 포스 시뮬레이션 설정
   useEffect(() => {
     const fg = fgRef.current;
@@ -92,11 +118,12 @@ export function VaultGraphView({
     renderNode(node, ctx, globalScale, {
       activeNodeSlug,
       hoverNodeId: hoverNode?.id,
+      connectedIds,
       folderColorMap,
       theme,
       reducedEffects: reducedGraphEffects,
     });
-  }, [activeNodeSlug, hoverNode?.id, folderColorMap, theme, reducedGraphEffects]);
+  }, [activeNodeSlug, hoverNode?.id, connectedIds, folderColorMap, theme, reducedGraphEffects]);
 
   const linkCanvasObject = useCallback((link: GraphLink, ctx: CanvasRenderingContext2D) => {
     renderGraphLink(link, ctx, {
@@ -106,10 +133,20 @@ export function VaultGraphView({
     });
   }, [hoverNode, folderColorMap, reducedGraphEffects]);
 
+  const zoomBy = useCallback((factor: number) => {
+    const fg = fgRef.current;
+    if (!fg) return;
+    fg.zoom(fg.zoom() * factor, 240);
+  }, []);
+
+  const zoomToFit = useCallback(() => {
+    fgRef.current?.zoomToFit(420, 48);
+  }, []);
+
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative overflow-hidden rounded-xl gallery-card"
+      className={`w-full h-full relative overflow-hidden rounded-xl gallery-card transition-[opacity,transform] duration-700 ease-out ${entered ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.985]'}`}
     >
       <ForceGraph2D
         ref={fgRef}
@@ -121,7 +158,9 @@ export function VaultGraphView({
         nodeRelSize={4}
         linkWidth={() => 0}
         linkColor={() => 'transparent'}
-        linkDirectionalParticles={(link: GraphLink) => (reducedGraphEffects ? 0 : isLinkHovered(link) ? 8 : 4)}
+        linkDirectionalParticles={(link: GraphLink) =>
+          reducedGraphEffects ? 0 : hoverNode ? (isLinkHovered(link) ? 8 : 0) : 4
+        }
         linkDirectionalParticleWidth={(link: GraphLink) => (reducedGraphEffects ? 0 : isLinkHovered(link) ? 4 : 2.5)}
         linkDirectionalParticleSpeed={reducedGraphEffects ? 0 : 0.006}
         linkDirectionalParticleColor={(link: GraphLink) =>
@@ -143,6 +182,54 @@ export function VaultGraphView({
         }}
         backgroundColor="transparent"
       />
+
+      {/* 그래프 통계 HUD */}
+      <div
+        aria-hidden="true"
+        className="absolute bottom-3 left-3 z-10 pointer-events-none select-none rounded-full border border-surface-200/60 dark:border-surface-700/60 bg-white/70 dark:bg-surface-900/70 px-3 py-1.5 font-mono text-[10px] tracking-wider text-surface-400 backdrop-blur-sm"
+      >
+        {gData.nodes.length} notes · {gData.links.length} links
+      </div>
+
+      {/* 줌 컨트롤 — 모바일에선 폴더 FAB와 겹치지 않게 위로 */}
+      <div className="absolute bottom-20 right-3 lg:bottom-4 lg:right-4 z-10 flex flex-col overflow-hidden rounded-2xl border border-surface-200/70 dark:border-surface-700/70 bg-white/80 dark:bg-surface-900/80 shadow-sm backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => zoomBy(1.45)}
+          aria-label="확대"
+          className="flex h-10 w-10 items-center justify-center text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white active:bg-surface-200/70"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+        </button>
+        <div className="h-px bg-surface-200/70 dark:bg-surface-700/70" />
+        <button
+          type="button"
+          onClick={() => zoomBy(1 / 1.45)}
+          aria-label="축소"
+          className="flex h-10 w-10 items-center justify-center text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white active:bg-surface-200/70"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15" />
+          </svg>
+        </button>
+        <div className="h-px bg-surface-200/70 dark:bg-surface-700/70" />
+        <button
+          type="button"
+          onClick={zoomToFit}
+          aria-label="전체 보기"
+          className="flex h-10 w-10 items-center justify-center text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white active:bg-surface-200/70"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3.75 9V5.25A1.5 1.5 0 015.25 3.75H9m6 0h3.75a1.5 1.5 0 011.5 1.5V9m0 6v3.75a1.5 1.5 0 01-1.5 1.5H15m-6 0H5.25a1.5 1.5 0 01-1.5-1.5V15"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }

@@ -156,12 +156,37 @@ export function renderNode(
   if (node.x == null || node.y == null || !isFinite(node.x) || !isFinite(node.y)) return;
 
   try {
-    const { activeNodeSlug, hoverNodeId, folderColorMap, theme, reducedEffects = false } = options;
+    const {
+      activeNodeSlug,
+      hoverNodeId,
+      connectedIds,
+      folderColorMap,
+      theme,
+      reducedEffects = false,
+    } = options;
     const isFolder = Boolean(node.isFolder);
     const focused = activeNodeSlug === node.slug || hoverNodeId === node.id;
     const isDark = isDarkGraphTheme(theme);
     const nodeColor = folderColorMap[node.folderId ?? ''] || '#64C8FF';
     const radius = getNodeRadius(node);
+
+    // 호버 포커스 모드: 호버 노드와 직접 연결되지 않은 노드는 흐린 원 하나로
+    // 가라앉혀, 연결 관계만 또렷하게 떠오르도록 한다 (Obsidian 그래프 인터랙션).
+    // 디테일 렌더(그라디언트·글로우)를 통째로 건너뛰므로 호버 중 성능도 좋아진다.
+    const dimmed = Boolean(
+      hoverNodeId && !focused && connectedIds && !connectedIds.has(String(node.id))
+    );
+
+    if (dimmed) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(node.x!, node.y!, radius, 0, Math.PI * 2);
+      ctx.fillStyle = nodeColor;
+      ctx.globalAlpha = 0.12;
+      ctx.fill();
+      ctx.restore();
+      return;
+    }
 
     if (reducedEffects) {
       renderReducedNode(node, ctx, globalScale, focused, isFolder, nodeColor, radius);
