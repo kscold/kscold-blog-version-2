@@ -56,7 +56,7 @@ export function VaultGraphView({
   const router = useRouter();
   const [containerRef, { width, height }] = useMeasure<HTMLDivElement>();
   const [hoverNode, setHoverNode] = useState<GraphNode | null>(null);
-  const { reduceMotion, isTouchDevice } = usePerformanceMode();
+  const { reduceMotion, isTouchDevice, supportsHover } = usePerformanceMode();
   const reducedGraphEffects = reduceMotion || isTouchDevice;
 
   const gData = useMemo(() => {
@@ -93,6 +93,29 @@ export function VaultGraphView({
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 80);
     return () => clearTimeout(t);
+  }, []);
+
+  // 그래프(폴더 필터)가 바뀔 때마다 엔진 안정 후 1회 화면에 맞춰 줌
+  const hasAutoFitRef = useRef(false);
+  useEffect(() => {
+    hasAutoFitRef.current = false;
+  }, [gData]);
+
+  const handleEngineStop = useCallback(() => {
+    if (hasAutoFitRef.current || activeNodeSlug) return;
+    hasAutoFitRef.current = true;
+    fgRef.current?.zoomToFit(600, 80);
+  }, [activeNodeSlug]);
+
+  // 마우스 기울임 시차 — 데스크탑에서 커서를 움직이면 별 레이어가 깊이별로
+  // 살짝 어긋나며 3D 입체감을 만든다 (캔버스 렌더 루프에서 ref만 읽으므로 무비용)
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const handleParallaxMouse = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mouseRef.current = {
+      x: ((e.clientX - rect.left) / rect.width - 0.5) * 2,
+      y: ((e.clientY - rect.top) / rect.height - 0.5) * 2,
+    };
   }, []);
 
   // 포스 시뮬레이션 설정
@@ -208,7 +231,7 @@ export function VaultGraphView({
             y: (Math.random() - 0.5) * 3200,
             r: far ? 0.8 + Math.random() * 0.7 : 1.3 + Math.random() * 1.1,
             baseAlpha: far ? 0.22 + Math.random() * 0.18 : 0.32 + Math.random() * 0.22,
-            p: far ? 0.12 : 0.3,
+            p: far ? 0.08 : 0.35,
             tw: 0.6 + Math.random() * 1.4,
             ph: Math.random() * Math.PI * 2,
           });
@@ -222,12 +245,17 @@ export function VaultGraphView({
       const isDark = isDarkGraphTheme(theme);
       const t = performance.now() / 1000;
 
+      // 마우스 기울임 시차 — 가까운 별(p 큼)일수록 커서 반대편으로 더 크게 밀린다
+      const tiltX = supportsHover ? mouseRef.current.x : 0;
+      const tiltY = supportsHover ? mouseRef.current.y : 0;
+
       ctx.save();
       ctx.fillStyle = isDark ? '#cbd5e1' : '#64748b';
       for (const star of starsRef.current) {
         // 카메라 이동량의 (1-p)만큼 별을 따라 보정 → 화면상 p배 속도로만 움직임
-        const wx = star.x + center.x * (1 - star.p);
-        const wy = star.y + center.y * (1 - star.p);
+        const tiltShift = (star.p * 26) / globalScale;
+        const wx = star.x + center.x * (1 - star.p) - tiltX * tiltShift;
+        const wy = star.y + center.y * (1 - star.p) - tiltY * tiltShift;
         const r = star.r / globalScale; // 줌과 무관하게 화면 크기 고정
         const twinkle = reducedGraphEffects ? 1 : 0.7 + 0.3 * Math.sin(t * star.tw + star.ph);
         ctx.globalAlpha = star.baseAlpha * twinkle;
@@ -237,12 +265,13 @@ export function VaultGraphView({
       }
       ctx.restore();
     },
-    [reducedGraphEffects, theme]
+    [reducedGraphEffects, theme, supportsHover]
   );
 
   return (
     <div
       ref={containerRef}
+      onMouseMove={supportsHover ? handleParallaxMouse : undefined}
       className={`w-full h-full relative overflow-hidden rounded-xl gallery-card transition-[opacity,transform] duration-700 ease-out ${entered ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.985]'}`}
     >
       {/* ── 화이트 우주 배경 (순수 CSS — 캔버스 성능 영향 없음) ── */}
@@ -319,6 +348,7 @@ export function VaultGraphView({
           if (el) el.style.cursor = node ? 'pointer' : 'default';
         }}
         onRenderFramePre={renderStarfield}
+        onEngineStop={handleEngineStop}
         onZoomEnd={({ k }) => setZoomPct(Math.round(k * 100))}
         backgroundColor="transparent"
       />
