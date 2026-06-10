@@ -21,6 +21,8 @@ export function renderGraphLink(
   const srcNode = src as GraphNode;
   const tgtNode = tgt as GraphNode;
   const isHovered = Boolean(hoverNode && (srcNode.id === hoverNode.id || tgtNode.id === hoverNode.id));
+  // 호버 포커스 모드: 호버 노드와 무관한 링크는 배경으로 가라앉힌다
+  const isDimmed = Boolean(hoverNode && !isHovered);
   const srcColor = folderColorMap[srcNode.folderId ?? ''] || '#64C8FF';
   const tgtColor = folderColorMap[tgtNode.folderId ?? ''] || srcColor;
 
@@ -29,7 +31,7 @@ export function renderGraphLink(
     ctx.beginPath();
     ctx.moveTo(src.x, src.y);
     ctx.lineTo(tgt.x, tgt.y);
-    ctx.strokeStyle = isHovered ? `${srcColor}aa` : `${srcColor}44`;
+    ctx.strokeStyle = isHovered ? `${srcColor}aa` : isDimmed ? `${srcColor}11` : `${srcColor}44`;
     ctx.lineWidth = isHovered ? 1.6 : 0.9;
     ctx.stroke();
     ctx.restore();
@@ -65,6 +67,14 @@ export function renderGraphLink(
     ctx.lineWidth = 2;
     ctx.shadowColor = srcColor;
     ctx.shadowBlur = 8;
+    ctx.stroke();
+  } else if (isDimmed) {
+    // 호버 중 무관한 링크: 그라디언트 생략하고 얇고 흐린 단색 곡선만
+    ctx.beginPath();
+    ctx.moveTo(src.x, src.y);
+    ctx.quadraticCurveTo(controlX, controlY, tgt.x, tgt.y);
+    ctx.strokeStyle = `${srcColor}14`;
+    ctx.lineWidth = 0.8;
     ctx.stroke();
   } else {
     const gradient = ctx.createLinearGradient(src.x, src.y, tgt.x, tgt.y);

@@ -19,6 +19,8 @@ export interface ConfigureForcesOptions {
 export interface RenderNodeOptions {
   activeNodeSlug?: string;
   hoverNodeId?: string;
+  /** 호버 중인 노드와 직접 연결된 노드 id 집합 — 나머지는 dim 처리 */
+  connectedIds?: Set<string> | null;
   folderColorMap: Record<string, string>;
   theme: 'light' | 'dark' | 'system';
   reducedEffects?: boolean;
