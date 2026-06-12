@@ -10,6 +10,7 @@ import { PostCard } from '@/entities/post/ui/PostCard';
 import { FeedCard } from '@/features/feed/ui/FeedCard';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 interface UnifiedTagContainerProps {
   tagName: string;
@@ -39,6 +40,7 @@ export function UnifiedTagContainer({ tagName }: UnifiedTagContainerProps) {
   return (
     <div className="min-h-screen bg-surface-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {(posts.length > 0 || feeds.length > 0) && <AdSenseScript />}
         {/* 브레드크럼 */}
         <motion.nav
           className="mb-8 flex items-center gap-2 text-sm text-surface-500"

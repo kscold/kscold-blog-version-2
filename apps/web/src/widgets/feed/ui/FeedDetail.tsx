@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useFeed } from '@/entities/feed/api/useFeeds';
 import { FeedDetailPageSkeleton } from '@/shared/ui/RouteSkeletons';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 import { FeedCard } from '@/features/feed/ui/FeedCard';
 import { CommentSection } from './CommentSection';
 
@@ -35,6 +36,7 @@ export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {
 
   return (
     <div className="min-h-screen bg-surface-50">
+      <AdSenseScript />
       <div className="max-w-xl mx-auto px-4 py-8">
         <motion.div
           className="mb-6"

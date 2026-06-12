@@ -4,6 +4,7 @@ import { TeamDetailPage } from '@/widgets/info/ui/TeamDetailPage';
 import { BUSINESS_INFO, TEAM_MEMBERS } from '@/entities/profile/model/teamData';
 import { buildBreadcrumbJsonLd, buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 function getTeamPageData(teamId: string) {
   if (teamId !== 'pawpong') {
@@ -101,6 +102,7 @@ export default async function Page({ params }: { params: Promise<{ teamId: strin
   return (
     <>
       <JsonLd id={`team-${team.id}`} data={jsonLd} />
+      <AdSenseScript />
       <TeamDetailPage teamId={team.id} />
     </>
   );

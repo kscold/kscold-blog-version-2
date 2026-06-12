@@ -12,6 +12,7 @@ import {
   uniqueKeywords,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 async function getPost(slug: string) {
   return fetchViewerApi<Post>(`/posts/slug/${slug}`);
@@ -116,6 +117,7 @@ export default async function PostPage({
   return (
     <>
       <JsonLd id={`post-${post.id}`} data={jsonLd} />
+      <AdSenseScript />
       <PostDetail post={post} />
     </>
   );

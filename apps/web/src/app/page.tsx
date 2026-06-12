@@ -6,6 +6,7 @@ import { StatsSection } from '@/widgets/home/ui/StatsSection';
 import { PROFILE } from '@/entities/profile/model/profileData';
 import { SITE_NAME, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 export const metadata: Metadata = {
   alternates: {
@@ -44,6 +45,7 @@ export default function HomePage() {
   return (
     <>
       <JsonLd id="home-page" data={homeJsonLd} />
+      <AdSenseScript />
       <main className="min-h-screen text-surface-900">
         <HeroSection />
 
