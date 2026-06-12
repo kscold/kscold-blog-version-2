@@ -8,6 +8,7 @@ import { Markdown } from 'tiptap-markdown';
 import { createLowlight, common } from 'lowlight';
 import { ImageRowExtension } from '@/features/editor/extensions/imageRow';
 import { VideoExtension } from '@/features/editor/extensions/video';
+import { SlashCommand, type SlashCommandActions } from '@/features/editor/extensions/slashCommand';
 
 const lowlight = createLowlight(common);
 
@@ -39,7 +40,7 @@ async function insertImageFiles(editor: Editor | null, files: File[], uploadImag
   }
 }
 
-export function buildEditorExtensions(placeholder: string) {
+export function buildEditorExtensions(placeholder: string, slashActions?: SlashCommandActions) {
   return [
     StarterKit.configure({
       codeBlock: false,
@@ -48,6 +49,8 @@ export function buildEditorExtensions(placeholder: string) {
     ImageExtension.configure({ inline: false, allowBase64: false }),
     ImageRowExtension,
     VideoExtension,
+    // 노션식 '/' 블록 메뉴 — 미디어 삽입 액션은 에디터 컴포넌트가 주입
+    SlashCommand.configure(slashActions ?? {}),
     Link.configure({ openOnClick: false, autolink: true }),
     Placeholder.configure({ placeholder }),
     // html: true 로 둬야 전처리한 <video> 태그가 Video 노드로 파싱된다
