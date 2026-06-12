@@ -380,42 +380,6 @@
   div:has(> .tiptap-editor-surface) {
     position: relative;
   }
-
-  /* 노션식 블록 드래그 핸들 (tiptap-extension-global-drag-handle) */
-  .drag-handle {
-    position: absolute;
-    width: 1.4rem;
-    height: 1.6rem;
-    z-index: 40;
-    cursor: grab;
-    border-radius: 0.375rem;
-    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20viewBox='0%200%2016%2016'%20fill='%2394a3b8'%3E%3Ccircle%20cx='5'%20cy='3.5'%20r='1.4'/%3E%3Ccircle%20cx='11'%20cy='3.5'%20r='1.4'/%3E%3Ccircle%20cx='5'%20cy='8'%20r='1.4'/%3E%3Ccircle%20cx='11'%20cy='8'%20r='1.4'/%3E%3Ccircle%20cx='5'%20cy='12.5'%20r='1.4'/%3E%3Ccircle%20cx='11'%20cy='12.5'%20r='1.4'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 1rem;
-    opacity: 0.55;
-    transition: opacity 150ms ease, background-color 150ms ease;
-  }
-
-  .drag-handle:hover {
-    opacity: 1;
-    background-color: rgba(148, 163, 184, 0.16);
-  }
-
-  .drag-handle:active {
-    cursor: grabbing;
-  }
-
-  .drag-handle.hide {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  @media (max-width: 640px) {
-    .drag-handle {
-      display: none;
-    }
-  }
 }
 
 @layer utilities {
@@ -461,5 +425,45 @@
   /* 텍스트 균형 (제목용) */
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+
+/* ─────────────── 노션식 블록 드래그 핸들 ───────────────
+   .drag-handle / .hide 는 tiptap-extension-global-drag-handle 가 런타임에
+   DOM 에 붙이는 클래스라 소스 스캔에 안 잡힌다. @layer 안에 두면 Tailwind
+   purge 로 빌드에서 사라지므로(=핸들이 0×0 으로 안 보임), @layer 밖에 둔다. */
+.drag-handle {
+  position: absolute;
+  width: 1.4rem;
+  height: 1.6rem;
+  z-index: 40;
+  cursor: grab;
+  border-radius: 0.375rem;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20viewBox='0%200%2016%2016'%20fill='%2394a3b8'%3E%3Ccircle%20cx='5'%20cy='3.5'%20r='1.4'/%3E%3Ccircle%20cx='11'%20cy='3.5'%20r='1.4'/%3E%3Ccircle%20cx='5'%20cy='8'%20r='1.4'/%3E%3Ccircle%20cx='11'%20cy='8'%20r='1.4'/%3E%3Ccircle%20cx='5'%20cy='12.5'%20r='1.4'/%3E%3Ccircle%20cx='11'%20cy='12.5'%20r='1.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 1rem;
+  opacity: 0.55;
+  transition: opacity 150ms ease, background-color 150ms ease;
+}
+
+.drag-handle:hover {
+  opacity: 1;
+  background-color: rgba(148, 163, 184, 0.16);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .drag-handle {
+    display: none;
   }
 }
