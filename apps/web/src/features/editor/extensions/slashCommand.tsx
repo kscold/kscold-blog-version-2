@@ -8,25 +8,6 @@ import {
   type ReactNode,
 } from 'react';
 import { Extension, ReactRenderer, type Editor, type Range } from '@tiptap/react';
-
-/**
- * 슬래시 메뉴에서 쓰는 블록 명령 체인.
- * 모듈 증강(ChainedCommands)이 이 파일에서 안정적으로 로드되지 않아,
- * 실제 런타임 메서드와 동일한 시그니처를 명시해 사용한다.
- */
-interface BlockChain {
-  setParagraph(): BlockChain;
-  setHeading(attrs: { level: 1 | 2 | 3 }): BlockChain;
-  toggleBulletList(): BlockChain;
-  toggleOrderedList(): BlockChain;
-  toggleBlockquote(): BlockChain;
-  toggleCodeBlock(): BlockChain;
-  setHorizontalRule(): BlockChain;
-  run(): boolean;
-}
-
-const blockChain = (editor: Editor): BlockChain =>
-  editor.chain().focus() as unknown as BlockChain;
 import Suggestion, {
   type SuggestionKeyDownProps,
   type SuggestionProps,

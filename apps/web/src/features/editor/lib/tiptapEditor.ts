@@ -6,6 +6,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { Markdown } from 'tiptap-markdown';
 import { createLowlight, common } from 'lowlight';
+import GlobalDragHandle from 'tiptap-extension-global-drag-handle';
 import { ImageRowExtension } from '@/features/editor/extensions/imageRow';
 import { VideoExtension } from '@/features/editor/extensions/video';
 import { SlashCommand, type SlashCommandActions } from '@/features/editor/extensions/slashCommand';
@@ -52,7 +53,16 @@ export function buildEditorExtensions(placeholder: string, slashActions?: SlashC
     // 노션식 '/' 블록 메뉴 — 미디어 삽입 액션은 에디터 컴포넌트가 주입
     SlashCommand.configure(slashActions ?? {}),
     Link.configure({ openOnClick: false, autolink: true }),
-    Placeholder.configure({ placeholder }),
+    // 현재 빈 블록에만 안내를 띄운다 (제목은 "제목 N", 그 외엔 '/' 안내)
+    Placeholder.configure({
+      includeChildren: false,
+      placeholder: ({ node }) =>
+        node.type.name === 'heading'
+          ? `제목 ${node.attrs.level}`
+          : placeholder,
+    }),
+    // 노션식 블록 드래그 핸들 — hover 시 블록 왼쪽 ⠿ 핸들로 순서 변경
+    GlobalDragHandle.configure({ dragHandleWidth: 24 }),
     // html: true 로 둬야 전처리한 <video> 태그가 Video 노드로 파싱된다
     Markdown.configure({ transformPastedText: true, html: true }),
   ];
