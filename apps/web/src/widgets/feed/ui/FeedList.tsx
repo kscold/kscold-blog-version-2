@@ -9,6 +9,7 @@ import { FeedComposer } from '@/features/feed';
 import { useAuth } from '@/features/auth';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 interface FeedListProps {
   initialTag?: string;
@@ -73,6 +74,7 @@ export function FeedList({ initialTag }: FeedListProps = {}) {
 
   return (
     <>
+      <AdSenseScript />
       <FeedComposer currentUser={currentUser ?? null} />
 
       {activeTag && (

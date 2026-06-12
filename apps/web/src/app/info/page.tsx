@@ -2,6 +2,7 @@ import { InfoContainer } from '@/widgets/info/ui/InfoContainer';
 import { PROFILE, PROFILE_FAQ } from '@/entities/profile/model/profileData';
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 export const metadata = buildPageMetadata({
   title: '소개 | 개발자 김승찬(kscold)',
@@ -48,6 +49,7 @@ export default function InfoPage() {
     <>
       <JsonLd id="info-page" data={infoJsonLd} />
       <JsonLd id="info-faq" data={faqJsonLd} />
+      <AdSenseScript />
       <InfoContainer />
     </>
   );

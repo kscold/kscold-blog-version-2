@@ -9,6 +9,7 @@ import { PostCard } from '@/entities/post/ui/PostCard';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { CategoryHeader } from './CategoryHeader';
 import { Pagination } from '@/shared/ui/Pagination';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 interface CategoryPostContainerProps {
   categorySlug: string;
@@ -60,6 +61,7 @@ export function CategoryPostContainer({ categorySlug }: CategoryPostContainerPro
           </div>
         ) : posts.length > 0 ? (
           <>
+            <AdSenseScript />
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
               initial={allowRichEffects ? 'hidden' : false}

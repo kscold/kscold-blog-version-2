@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { PostCard } from '@/entities/post/ui/PostCard';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 import { CategoryFilter } from './CategoryFilter';
 import { Post, Category } from '@/types/blog';
 
@@ -52,6 +53,7 @@ export default function BlogPostGrid({
         </div>
       ) : posts.length > 0 ? (
         <>
+          <AdSenseScript />
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
             initial={allowRichEffects ? 'hidden' : false}

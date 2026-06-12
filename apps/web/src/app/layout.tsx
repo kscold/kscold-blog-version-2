@@ -8,7 +8,6 @@ import { BUSINESS_INFO } from '@/entities/profile/model/teamData';
 import { resolveInitialViewer } from '@/shared/lib/initialViewer';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, toOgImage } from '@/shared/lib/seo';
 import { AnalyticsScripts } from '@/shared/ui/AnalyticsScripts';
-import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import './globals.css';
 
@@ -97,7 +96,6 @@ export const metadata: Metadata = {
 };
 
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
-const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID;
 const siteJsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -187,8 +185,6 @@ export default async function RootLayout({
         <JsonLd id="site-graph" data={siteJsonLd} />
         <Suspense>
           <AnalyticsScripts gaId={gaId} />
-          {/* 콘텐츠 페이지에서만 광고 로드 (애드센스 정책 준수) */}
-          {adsenseId && <AdSenseScript clientId={adsenseId} />}
         </Suspense>
 
         <div className="fixed inset-0 z-[-1] pointer-events-none bg-surface-50 dark:bg-surface-950 transition-colors duration-300"></div>
