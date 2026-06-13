@@ -11,6 +11,17 @@ export const VIEWPORTS = [
   { label: 'desktop', width: 1440, height: 900 },
 ] as const;
 
+/** range(slider) input 에 값을 넣고 input·change 이벤트를 발생시킨다 (React 인식용) */
+export async function setRangeValue(page: Page, selector: string, value: string): Promise<void> {
+  await page.locator(selector).evaluate((el, val) => {
+    const input = el as HTMLInputElement;
+    const descriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+    descriptor?.set?.call(input, val);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }, value);
+}
+
 /** 요소가 보이고, 가로로 뷰포트 폭 안에 들어오는지 검증 */
 export async function expectWithinViewport(
   page: Page,
