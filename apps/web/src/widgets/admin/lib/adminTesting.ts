@@ -61,8 +61,8 @@ export const commands = [
     dataCy: 'admin-qa-command-run',
   },
   {
-    title: 'Cypress 러너 열기',
-    command: 'pnpm --dir apps/web cy:open',
+    title: 'Playwright UI 모드 열기',
+    command: 'pnpm --dir apps/web test:e2e:ui',
     dataCy: 'admin-qa-command-open',
   },
 ] as const;
@@ -103,7 +103,7 @@ export function formatLogOutput(lines: string[]) {
   return lines
     .map(line =>
       line
-        .replace(/admin-smoke\.cy\.ts/gi, 'admin-test.cy.ts')
+        .replace(/admin-smoke\.spec\.ts/gi, 'admin-test.spec.ts')
         .replace(/admin_smoke/gi, 'qa-session')
         .replace(/admin-smoke/gi, 'qa-session')
         .replace(/\bsmoke\b/gi, 'test')

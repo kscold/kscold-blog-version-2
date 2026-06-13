@@ -61,7 +61,7 @@ export function AdminDashboardContainer() {
     { name: '열람 요청 관리', description: '글 열람 권한 요청을 승인/거절합니다', link: '/admin/access-requests' },
     {
       name: 'QA / E2E',
-      description: '시나리오 링크와 Cypress 실행 명령을 확인합니다',
+      description: '시나리오 링크와 Playwright 실행 명령을 확인합니다',
       link: '/admin/testing',
       dataCy: 'admin-qa-link',
     },
