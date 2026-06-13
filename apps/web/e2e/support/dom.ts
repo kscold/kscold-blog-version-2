@@ -10,3 +10,19 @@ export const VIEWPORTS = [
   { label: 'mobile', width: 390, height: 844 },
   { label: 'desktop', width: 1440, height: 900 },
 ] as const;
+
+/** 요소가 보이고, 가로로 뷰포트 폭 안에 들어오는지 검증 */
+export async function expectWithinViewport(
+  page: Page,
+  selector: string,
+  width: number
+): Promise<void> {
+  const locator = page.locator(selector);
+  await expect(locator).toBeVisible();
+  const box = await locator.boundingBox();
+  expect(box).not.toBeNull();
+  if (box) {
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
+  }
+}
