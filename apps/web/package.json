@@ -49,6 +49,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/d3-force": "^3.0.10",
     "@types/node": "^22.10.1",
     "@types/react": "^19.0.1",
