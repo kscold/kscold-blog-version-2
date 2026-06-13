@@ -20,6 +20,25 @@ export interface SlashCommandActions {
   insertVideo?: (editor: Editor) => void;
 }
 
+/**
+ * 슬래시 메뉴 블록 명령 체인.
+ * 모듈 증강(ChainedCommands)이 이 파일에서 안정적으로 로드되지 않아,
+ * 런타임에 존재하는 메서드와 동일한 시그니처를 명시해 사용한다.
+ */
+interface BlockChain {
+  setParagraph(): BlockChain;
+  setHeading(attrs: { level: 1 | 2 | 3 }): BlockChain;
+  toggleBulletList(): BlockChain;
+  toggleOrderedList(): BlockChain;
+  toggleBlockquote(): BlockChain;
+  toggleCodeBlock(): BlockChain;
+  setHorizontalRule(): BlockChain;
+  run(): boolean;
+}
+
+const blockChain = (editor: Editor): BlockChain =>
+  editor.chain().focus() as unknown as BlockChain;
+
 interface CommandItem {
   title: string;
   description: string;
@@ -36,63 +55,63 @@ const baseCommands: CommandItem[] = [
     description: '일반 문단으로 씁니다.',
     keywords: 'text paragraph 텍스트 문단 본문 p',
     glyph: <span className="text-[15px] font-medium">Aa</span>,
-    run: editor => editor.chain().focus().setParagraph().run(),
+    run: editor => blockChain(editor).setParagraph().run(),
   },
   {
     title: '제목 1',
     description: '큰 섹션 제목',
     keywords: 'heading1 h1 제목 헤딩 큰제목',
     glyph: <span className="text-[15px] font-black">H1</span>,
-    run: editor => editor.chain().focus().setHeading({ level: 1 }).run(),
+    run: editor => blockChain(editor).setHeading({ level: 1 }).run(),
   },
   {
     title: '제목 2',
     description: '중간 섹션 제목',
     keywords: 'heading2 h2 제목 헤딩',
     glyph: <span className="text-[14px] font-black">H2</span>,
-    run: editor => editor.chain().focus().setHeading({ level: 2 }).run(),
+    run: editor => blockChain(editor).setHeading({ level: 2 }).run(),
   },
   {
     title: '제목 3',
     description: '작은 섹션 제목',
     keywords: 'heading3 h3 제목 헤딩',
     glyph: <span className="text-[13px] font-black">H3</span>,
-    run: editor => editor.chain().focus().setHeading({ level: 3 }).run(),
+    run: editor => blockChain(editor).setHeading({ level: 3 }).run(),
   },
   {
     title: '글머리 목록',
     description: '순서 없는 목록을 만듭니다.',
     keywords: 'bullet list 목록 리스트 ul',
     glyph: <span className="text-[15px]">•</span>,
-    run: editor => editor.chain().focus().toggleBulletList().run(),
+    run: editor => blockChain(editor).toggleBulletList().run(),
   },
   {
     title: '번호 목록',
     description: '순서 있는 목록을 만듭니다.',
     keywords: 'numbered ordered list 번호 목록 ol',
     glyph: <span className="text-[12px] font-bold font-mono">1.</span>,
-    run: editor => editor.chain().focus().toggleOrderedList().run(),
+    run: editor => blockChain(editor).toggleOrderedList().run(),
   },
   {
     title: '인용',
     description: '인용문 블록을 만듭니다.',
     keywords: 'quote blockquote 인용 인용문',
     glyph: <span className="text-[17px] font-serif leading-none">&ldquo;</span>,
-    run: editor => editor.chain().focus().toggleBlockquote().run(),
+    run: editor => blockChain(editor).toggleBlockquote().run(),
   },
   {
     title: '코드 블록',
     description: '코드를 구문 강조와 함께 넣습니다.',
     keywords: 'code codeblock 코드 코드블록',
     glyph: <span className="text-[12px] font-mono font-bold">&lt;/&gt;</span>,
-    run: editor => editor.chain().focus().toggleCodeBlock().run(),
+    run: editor => blockChain(editor).toggleCodeBlock().run(),
   },
   {
     title: '구분선',
     description: '내용을 구분하는 가로선',
     keywords: 'divider hr horizontal rule 구분선 라인',
     glyph: <span className="text-[15px] font-bold">—</span>,
-    run: editor => editor.chain().focus().setHorizontalRule().run(),
+    run: editor => blockChain(editor).setHorizontalRule().run(),
   },
   {
     title: '이미지',
