@@ -135,6 +135,7 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
+                data-cy="header-login-btn"
                 className="px-5 py-2 text-xs sm:text-sm font-bold text-white bg-surface-900 hover:bg-surface-800 transition-colors rounded-full"
               >
                 LOGIN
