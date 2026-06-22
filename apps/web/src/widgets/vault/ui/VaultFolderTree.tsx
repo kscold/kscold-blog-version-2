@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,12 +10,24 @@ import { useVaultNotes } from '@/entities/vault/api/useVault';
 interface VaultFolderTreeProps {
   folders: VaultFolder[];
   activeFolderId?: string | null;
+  activeNoteSlug?: string;
   onFolderSelect?: (folderId: string | null) => void;
   /** 폴더 행 호버 시 그래프 스포트라이트 연동 (데스크탑 전용) */
   onFolderHover?: (folderId: string | null) => void;
 }
 
-export function VaultFolderTree({ folders, activeFolderId, onFolderSelect, onFolderHover }: VaultFolderTreeProps) {
+export function VaultFolderTree({
+  folders,
+  activeFolderId,
+  activeNoteSlug,
+  onFolderSelect,
+  onFolderHover,
+}: VaultFolderTreeProps) {
+  const autoExpandedFolderIds = useMemo(
+    () => new Set(activeFolderId ? getFolderPathIds(folders, activeFolderId) : []),
+    [folders, activeFolderId]
+  );
+
   return (
     <div className="space-y-1">
       {folders.map(folder => (
@@ -23,6 +35,8 @@ export function VaultFolderTree({ folders, activeFolderId, onFolderSelect, onFol
           key={folder.id}
           folder={folder}
           activeFolderId={activeFolderId}
+          activeNoteSlug={activeNoteSlug}
+          autoExpandedFolderIds={autoExpandedFolderIds}
           onFolderSelect={onFolderSelect}
           onFolderHover={onFolderHover}
         />
@@ -34,19 +48,54 @@ export function VaultFolderTree({ folders, activeFolderId, onFolderSelect, onFol
 function FolderNode({
   folder,
   activeFolderId,
+  activeNoteSlug,
+  autoExpandedFolderIds,
   onFolderSelect,
   onFolderHover,
 }: {
   folder: VaultFolder;
   activeFolderId?: string | null;
+  activeNoteSlug?: string;
+  autoExpandedFolderIds: Set<string>;
   onFolderSelect?: (folderId: string | null) => void;
   onFolderHover?: (folderId: string | null) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const { data: notesData, isLoading } = useVaultNotes(isOpen ? folder.id : '');
+  const shouldAutoOpen = autoExpandedFolderIds.has(folder.id);
+  const [isOpen, setIsOpen] = useState(shouldAutoOpen);
+  const activeNoteRef = useRef<HTMLAnchorElement | null>(null);
+  const notePageSize = Math.max(folder.noteCount || 0, 20);
+  const { data: notesData, isLoading } = useVaultNotes(isOpen ? folder.id : '', 0, notePageSize);
   const pathname = usePathname();
 
   const isFolderActive = activeFolderId === folder.id;
+
+  useEffect(() => {
+    if (shouldAutoOpen) {
+      setIsOpen(true);
+    }
+  }, [shouldAutoOpen]);
+
+  useEffect(() => {
+    if (!activeNoteSlug || !isOpen) {
+      return;
+    }
+
+    const scrollActiveNoteIntoView = () => {
+      activeNoteRef.current?.scrollIntoView({
+        block: 'center',
+        inline: 'nearest',
+        behavior: 'auto',
+      });
+    };
+
+    const frameId = window.requestAnimationFrame(scrollActiveNoteIntoView);
+    const timeoutId = window.setTimeout(scrollActiveNoteIntoView, 260);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [activeNoteSlug, isOpen, notesData?.content]);
 
   const handleHeaderClick = () => {
     if (!isOpen) setIsOpen(true);
@@ -137,6 +186,8 @@ function FolderNode({
                   key={child.id}
                   folder={child}
                   activeFolderId={activeFolderId}
+                  activeNoteSlug={activeNoteSlug}
+                  autoExpandedFolderIds={autoExpandedFolderIds}
                   onFolderSelect={onFolderSelect}
                   onFolderHover={onFolderHover}
                 />
@@ -151,10 +202,11 @@ function FolderNode({
             {!isLoading &&
               notesData?.content &&
               notesData.content.map((note: VaultNote) => {
-                const isActive = pathname === `/vault/${note.slug}`;
+                const isActive = note.slug === activeNoteSlug || pathname === `/vault/${note.slug}`;
                 return (
                   <Link
                     key={note.id}
+                    ref={isActive ? activeNoteRef : undefined}
                     href={`/vault/${note.slug}`}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-300 ${
                       isActive
@@ -184,4 +236,19 @@ function FolderNode({
       </AnimatePresence>
     </div>
   );
+}
+
+function getFolderPathIds(folders: VaultFolder[], targetId: string): string[] {
+  for (const folder of folders) {
+    if (folder.id === targetId) {
+      return [folder.id];
+    }
+
+    const childPath = getFolderPathIds(folder.children || [], targetId);
+    if (childPath.length > 0) {
+      return [folder.id, ...childPath];
+    }
+  }
+
+  return [];
 }

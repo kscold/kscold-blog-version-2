@@ -34,12 +34,32 @@ public class BacklinkParsingService {
         Matcher matcher = BACKLINK_PATTERN.matcher(content);
 
         while (matcher.find()) {
-            String linkTitle = matcher.group(1).trim();
+            String linkTitle = normalizeLinkTitle(matcher.group(1));
+            if (linkTitle.isBlank()) {
+                continue;
+            }
             String slug = SlugUtils.generate(linkTitle);
             vaultNoteRepository.findBySlug(slug)
-                    .ifPresent(note -> links.add(note.getId()));
+                    .ifPresent(note -> {
+                        if (!links.contains(note.getId())) {
+                            links.add(note.getId());
+                        }
+                    });
         }
 
         return links;
+    }
+
+    private String normalizeLinkTitle(String rawTitle) {
+        String title = rawTitle.trim();
+        int pipeIndex = title.indexOf('|');
+        if (pipeIndex >= 0) {
+            title = title.substring(0, pipeIndex);
+        }
+        int anchorIndex = title.indexOf('#');
+        if (anchorIndex >= 0) {
+            title = title.substring(0, anchorIndex);
+        }
+        return title.trim();
     }
 }

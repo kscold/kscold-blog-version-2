@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useUiStore } from '@/shared/model/uiStore';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { useVaultNoteData } from '@/features/vault/lib/useVaultNote';
@@ -33,6 +34,12 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
     titleSlugMap,
   } = useVaultNoteData(slug);
 
+  useEffect(() => {
+    if (note?.folderId) {
+      setActiveFolderId(note.folderId);
+    }
+  }, [note?.folderId, setActiveFolderId]);
+
   if (isError) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -60,6 +67,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
         isFoldersLoading={isFoldersLoading}
         isMobileOpen={isMobileOpen}
         isTouchDevice={isTouchDevice}
+        activeNoteSlug={note?.slug}
         onFolderSelect={handleFolderSelect}
         onResizeStart={handleResizeStart}
         sidebarWidth={sidebarWidth}

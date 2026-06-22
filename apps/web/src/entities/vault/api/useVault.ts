@@ -31,7 +31,7 @@ export function useAllVaultNotes(page: number = 0, size: number = 50) {
 export function useVaultNote(slug: string) {
   return useQuery({
     queryKey: ['vault', 'notes', 'slug', slug],
-    queryFn: () => apiClient.get<VaultNote>(`/vault/notes/slug/${slug}`),
+    queryFn: () => apiClient.get<VaultNote>(`/vault/notes/slug/${encodeURIComponent(slug)}`),
     enabled: !!slug,
   });
 }

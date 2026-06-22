@@ -5,6 +5,7 @@ import { VaultFolder } from '@/types/vault';
 
 interface VaultNoteSidebarProps {
   activeFolderId: string | null;
+  activeNoteSlug?: string;
   folders: VaultFolder[];
   isDesktop: boolean;
   isFoldersLoading: boolean;
@@ -17,6 +18,7 @@ interface VaultNoteSidebarProps {
 
 export function VaultNoteSidebar({
   activeFolderId,
+  activeNoteSlug,
   folders,
   isDesktop,
   isFoldersLoading,
@@ -45,6 +47,7 @@ export function VaultNoteSidebar({
             <VaultFolderTree
               folders={folders}
               activeFolderId={activeFolderId}
+              activeNoteSlug={activeNoteSlug}
               onFolderSelect={onFolderSelect}
             />
           )}
