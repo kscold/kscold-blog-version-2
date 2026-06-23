@@ -42,7 +42,7 @@ export async function generateMetadata({
   }
 
   const title = post.seo?.metaTitle || post.title;
-  const description = post.seo?.metaDescription || post.excerpt || toMetaDescription(post.content);
+  const description = toMetaDescription(post.seo?.metaDescription || post.excerpt || post.content);
   const keywords = uniqueKeywords([...(post.seo?.keywords || []), ...post.tags.map(tag => tag.name), post.category.name]);
 
   return buildPageMetadata({
@@ -76,7 +76,7 @@ export default async function PostPage({
     redirect(`/blog/${post.category.slug}/${post.slug}`);
   }
 
-  const description = post.seo?.metaDescription || post.excerpt || toMetaDescription(post.content);
+  const description = toMetaDescription(post.seo?.metaDescription || post.excerpt || post.content);
   const canonicalPath = `/blog/${post.category.slug}/${post.slug}`;
   const jsonLd = {
     '@context': 'https://schema.org',

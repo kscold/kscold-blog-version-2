@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { filterVisibleTagInfos } from '@/shared/lib/tags';
+import { toPreviewText } from '@/shared/lib/seo/text';
 import { Post } from '@/types/blog';
 
 interface PostCardProps {
@@ -16,6 +17,7 @@ interface PostCardProps {
 export function PostCard({ post, featured = false, titleOnly = false }: PostCardProps) {
   const { allowRichEffects, supportsHover, reduceMotion, isTouchDevice } = usePerformanceMode();
   const visibleTags = filterVisibleTagInfos(post.tags);
+  const previewText = toPreviewText(post.excerpt || post.content, post.title, featured ? 220 : 160);
   const formattedDate = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString('ko-KR', {
         year: 'numeric',
@@ -96,7 +98,7 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
               featured ? 'line-clamp-4' : 'line-clamp-3'
             }`}
           >
-            {post.excerpt}
+            {previewText}
           </p>
 
           {visibleTags.length > 0 && (
