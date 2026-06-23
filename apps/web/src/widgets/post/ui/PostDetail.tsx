@@ -99,6 +99,7 @@ export function PostDetail({ post }: PostDetailProps) {
           likes={resolvedPost.likes}
           featured={resolvedPost.featured}
           formattedDate={formattedDate}
+          restricted={Boolean(resolvedPost.restricted)}
         />
 
         {isCheckingRestrictedAccess ? (

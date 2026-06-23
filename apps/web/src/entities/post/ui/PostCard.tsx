@@ -14,9 +14,48 @@ interface PostCardProps {
   titleOnly?: boolean;
 }
 
+function LockIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+      />
+    </svg>
+  );
+}
+
+function RestrictedPostBadge({ compact = false }: { compact?: boolean }) {
+  if (compact) {
+    return (
+      <span
+        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-100 text-surface-500"
+        title="제한 글"
+        aria-label="제한 글"
+      >
+        <LockIcon />
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full bg-surface-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-surface-500"
+      title="제한 글"
+      aria-label="제한 글"
+    >
+      <LockIcon className="h-3 w-3" />
+      비공개
+    </span>
+  );
+}
+
 export function PostCard({ post, featured = false, titleOnly = false }: PostCardProps) {
   const { allowRichEffects, supportsHover, reduceMotion, isTouchDevice } = usePerformanceMode();
   const visibleTags = filterVisibleTagInfos(post.tags);
+  const isRestricted = Boolean(post.restricted);
   const previewText = toPreviewText(post.excerpt || post.content, post.title, featured ? 220 : 160);
   const formattedDate = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString('ko-KR', {
@@ -32,9 +71,12 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
         href={`/blog/${post.category.slug}/${post.slug}`}
         className="group block border-b border-surface-200 py-5 transition-colors hover:text-surface-600"
       >
-        <h3 className="font-sans font-black text-xl tracking-tight text-surface-900 group-hover:text-surface-600 transition-colors">
-          {post.title}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="font-sans font-black text-xl tracking-tight text-surface-900 group-hover:text-surface-600 transition-colors">
+            {post.title}
+          </h3>
+          {isRestricted && <RestrictedPostBadge compact />}
+        </div>
       </Link>
     );
   }
@@ -83,6 +125,7 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
             </span>
             <span className="text-xs text-surface-400">•</span>
             <time className="text-xs text-surface-500 font-mono">{formattedDate}</time>
+            {isRestricted && <RestrictedPostBadge />}
           </div>
 
           <h3

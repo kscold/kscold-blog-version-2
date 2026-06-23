@@ -21,6 +21,33 @@ interface PostHeaderProps {
   likes: number;
   featured: boolean;
   formattedDate: string;
+  restricted?: boolean;
+}
+
+function LockIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+      />
+    </svg>
+  );
+}
+
+function RestrictedPostBadge() {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full border border-surface-200 bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-surface-500 shadow-sm"
+      title="제한 글"
+      aria-label="제한 글"
+    >
+      <LockIcon />
+      비공개
+    </span>
+  );
 }
 
 export function PostHeader({
@@ -33,6 +60,7 @@ export function PostHeader({
   likes,
   featured,
   formattedDate,
+  restricted = false,
 }: PostHeaderProps) {
   const previewExcerpt = toPreviewText(excerpt, '', 220);
 
@@ -76,6 +104,7 @@ export function PostHeader({
             {category.name}
           </Link>
           <span className="text-sm text-surface-400">{formattedDate}</span>
+          {restricted && <RestrictedPostBadge />}
           {featured && (
             <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-medium border border-amber-200">
               Featured

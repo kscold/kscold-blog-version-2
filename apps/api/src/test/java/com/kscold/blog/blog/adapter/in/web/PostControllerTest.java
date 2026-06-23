@@ -108,15 +108,20 @@ class PostControllerTest {
                 )
         );
         Post post = post(false);
+        Category restrictedCategory = Category.builder()
+                .id("cat-1")
+                .name("개발 이야기")
+                .restricted(true)
+                .build();
         when(postUseCase.getById("post-1")).thenReturn(post);
+        when(categoryUseCase.getById("cat-1")).thenReturn(restrictedCategory);
 
         ResponseEntity<ApiResponse<PostResponse>> response = postController.getPostById("post-1", "admin-1", httpServletRequest);
 
         assertThat(response.getBody()).isNotNull();
         PostResponse data = response.getBody().getData();
-        assertThat(data.getRestricted()).isNull();
+        assertThat(data.getRestricted()).isTrue();
         assertThat(data.getContent()).isEqualTo("본문");
-        verify(categoryUseCase, never()).getById("cat-1");
         verify(accessRequestUseCase, never()).hasAccess("admin-1", "post-1", "cat-1");
     }
 
