@@ -1,5 +1,6 @@
 import matter from 'gray-matter';
 import { ParsedMarkdownFile } from '@/types/import';
+import { toPreviewText } from '@/shared/lib/seo/text';
 
 /**
  * .md 파일을 파싱하여 블로그 포스트 데이터로 변환
@@ -133,18 +134,9 @@ function extractCoverImage(fm: Record<string, unknown>): string | null {
 
 function extractExcerpt(fm: Record<string, unknown>, content: string): string {
   const raw = fm.excerpt ?? fm.description ?? fm.summary ?? fm.abstract;
-  if (typeof raw === 'string' && raw.trim()) return raw.trim();
+  if (typeof raw === 'string' && raw.trim()) return toPreviewText(raw, '', 200);
 
-  // 본문에서 자동 생성 (마크다운 문법 제거, 200자)
-  const plain = content
-    .replace(/^#.*$/gm, '') // 헤딩 제거
-    .replace(/!\[.*?\]\(.*?\)/g, '') // 이미지 제거
-    .replace(/\[([^\]]*)\]\(.*?\)/g, '$1') // 링크를 텍스트만
-    .replace(/[*_`~>#-]/g, '') // 마크다운 문법 제거
-    .replace(/\n+/g, ' ')
-    .trim();
-
-  return plain.length <= 200 ? plain : plain.substring(0, 200) + '...';
+  return toPreviewText(content, '', 200);
 }
 
 /**

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { toPreviewText } from '@/shared/lib/seo/text';
 
 interface PostHeaderProps {
   title: string;
@@ -33,6 +34,8 @@ export function PostHeader({
   featured,
   formattedDate,
 }: PostHeaderProps) {
+  const previewExcerpt = toPreviewText(excerpt, '', 220);
+
   return (
     <>
       {/* 현재 위치 */}
@@ -86,9 +89,9 @@ export function PostHeader({
         </h1>
 
         {/* 요약 */}
-        {excerpt?.trim() ? (
+        {previewExcerpt ? (
           <p className="mb-8 text-lg leading-relaxed text-surface-500 break-words [overflow-wrap:anywhere]">
-            {excerpt}
+            {previewExcerpt}
           </p>
         ) : null}
 

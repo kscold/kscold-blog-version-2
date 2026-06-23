@@ -62,10 +62,32 @@ public class PostDraftService {
     }
 
     private String resolveExcerpt(String excerpt, String content) {
-        if (excerpt != null && !excerpt.isBlank()) return excerpt;
-        if (content == null || content.isBlank()) return "";
-        String plainText = content.replaceAll("[#*`\\[\\]()>-]", "").trim();
+        String source = excerpt != null && !excerpt.isBlank() ? excerpt : content;
+        if (source == null || source.isBlank()) return "";
+        String plainText = stripRichText(source);
         return plainText.length() <= 200 ? plainText : plainText.substring(0, 200) + "...";
+    }
+
+    private String stripRichText(String value) {
+        return value
+                .replaceAll("(?s)```.*?```", " ")
+                .replaceAll("(?s)~~~.*?~~~", " ")
+                .replaceAll("`([^`]+)`", "$1")
+                .replaceAll("!\\[\\[[^\\]]*]?]?", " ")
+                .replaceAll("!\\[[^\\]]*]?\\([^)]*(?:\\)|$)", " ")
+                .replaceAll("!\\[[^\\]]*]?", " ")
+                .replaceAll("\\[\\[([^\\]|]+)\\|([^\\]]+)]]", "$2")
+                .replaceAll("\\[\\[([^\\]|]+)(?:\\|[^\\]]+)?]]", "$1")
+                .replaceAll("\\[([^\\]]+)]\\([^)]*(?:\\)|$)", "$1")
+                .replaceAll("https?://\\S+", " ")
+                .replaceAll("<[^>]+>", " ")
+                .replaceAll("(?m)^\\s*#{1,6}\\s+", "")
+                .replaceAll("(?m)^\\s*[-+*]\\s+", "")
+                .replaceAll("(?m)^\\s*\\d+\\.\\s+", "")
+                .replaceAll("(?m)^\\s*>+\\s?", "")
+                .replaceAll("[!*_~`>#\\[\\]()`|]", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
     private Post.SeoInfo buildSeoInfo(PostCreateCommand command, String excerpt) {

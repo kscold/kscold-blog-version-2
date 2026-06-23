@@ -4,6 +4,7 @@ import { useState } from 'react';
 import apiClient from '@/shared/api/api-client';
 import Link from 'next/link';
 import { useViewer } from '@/entities/user/model/useViewer';
+import { toPreviewText } from '@/shared/lib/seo/text';
 
 interface RestrictedOverlayProps {
   postId?: string;
@@ -22,6 +23,7 @@ export function RestrictedOverlay({
 }: RestrictedOverlayProps) {
   const { isAuthenticated } = useViewer();
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
+  const previewExcerpt = toPreviewText(excerpt, '', 220);
 
   const handleRequest = async () => {
     if (!postId) return;
@@ -37,10 +39,10 @@ export function RestrictedOverlay({
   return (
     <div className="relative mb-12">
       {/* 블러된 미리보기 */}
-      {excerpt && (
+      {previewExcerpt && (
         <div className="select-none pointer-events-none" aria-hidden>
           <div className="prose prose-lg max-w-none text-surface-700 blur-sm opacity-50 break-words [overflow-wrap:anywhere]">
-            <p className="break-words [overflow-wrap:anywhere]">{excerpt}</p>
+            <p className="break-words [overflow-wrap:anywhere]">{previewExcerpt}</p>
             <p className="text-surface-400">
               이 글의 나머지 내용은 열람 권한이 필요합니다. 아래에서 접근을 요청할 수 있습니다.
               이 글의 나머지 내용은 열람 권한이 필요합니다. 아래에서 접근을 요청할 수 있습니다.

@@ -14,4 +14,4 @@ export {
   flattenCategories,
   toOgImage,
 } from './seo/metadata';
-export { stripRichText, toMetaDescription, uniqueKeywords } from './seo/text';
+export { stripRichText, toMetaDescription, toPreviewText, uniqueKeywords } from './seo/text';
