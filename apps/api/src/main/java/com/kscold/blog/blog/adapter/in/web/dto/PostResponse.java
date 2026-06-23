@@ -94,6 +94,13 @@ public class PostResponse {
      * Post 엔티티를 PostResponse로 변환
      */
     public static PostResponse from(Post post) {
+        return from(post, false);
+    }
+
+    /**
+     * Post 엔티티를 PostResponse로 변환하고, 제한 글 표시 여부를 함께 전달
+     */
+    public static PostResponse from(Post post, boolean restricted) {
         return PostResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -121,6 +128,7 @@ public class PostResponse {
                 .originalFilename(post.getOriginalFilename())
                 .featured(post.getFeatured())
                 .publicOverride(post.getPublicOverride())
+                .restricted(restricted ? true : null)
                 .views(post.getViews())
                 .likes(post.getLikes())
                 .seo(post.getSeo() != null ? SeoInfo.builder()
@@ -138,7 +146,7 @@ public class PostResponse {
      * restricted 포스트 — 본문 제거, excerpt만 반환
      */
     public static PostResponse restricted(Post post) {
-        PostResponse resp = from(post);
+        PostResponse resp = from(post, true);
         return PostResponse.builder()
                 .id(resp.getId())
                 .title(resp.getTitle())

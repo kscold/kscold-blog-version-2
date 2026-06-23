@@ -54,7 +54,7 @@ public class PostController {
         Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         Page<Post> posts = postUseCase.getAll(pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.map(PostResponse::from)));
+        return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
     }
 
     @GetMapping("/featured")
@@ -63,7 +63,7 @@ public class PostController {
     ) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "views"));
         List<Post> posts = postUseCase.getFeatured(pageable);
-        return ResponseEntity.ok(ApiResponse.success(PostResponse.from(posts)));
+        return ResponseEntity.ok(ApiResponse.success(posts.stream().map(this::toPublicPostResponse).toList()));
     }
 
     @GetMapping("/{id}")
@@ -104,7 +104,7 @@ public class PostController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByCategory(categoryId, pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.map(PostResponse::from)));
+        return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
     }
 
     @GetMapping("/tag/{tagId}")
@@ -115,7 +115,7 @@ public class PostController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByTag(tagId, pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.map(PostResponse::from)));
+        return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
     }
 
     @GetMapping("/search")
@@ -126,7 +126,7 @@ public class PostController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.search(q, pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.map(PostResponse::from)));
+        return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
     }
 
     @PostMapping
@@ -138,7 +138,7 @@ public class PostController {
         Post post = postUseCase.create(command, userId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(PostResponse.from(post), "포스트가 생성되었습니다"));
+                .body(ApiResponse.success(toFullPostResponse(post), "포스트가 생성되었습니다"));
     }
 
     @PutMapping("/{id}")
@@ -148,7 +148,7 @@ public class PostController {
             @Valid @RequestBody PostUpdateCommand command
     ) {
         Post post = postUseCase.update(id, command);
-        return ResponseEntity.ok(ApiResponse.success(PostResponse.from(post), "포스트가 수정되었습니다"));
+        return ResponseEntity.ok(ApiResponse.success(toFullPostResponse(post), "포스트가 수정되었습니다"));
     }
 
     @DeleteMapping("/{id}")
@@ -166,7 +166,7 @@ public class PostController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Post> posts = postUseCase.getAllAdmin(pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.map(PostResponse::from)));
+        return ResponseEntity.ok(ApiResponse.success(posts.map(this::toFullPostResponse)));
     }
 
     @GetMapping("/exists/slug/{slug}")
@@ -176,20 +176,39 @@ public class PostController {
     }
 
     private PostResponse applyRestriction(Post post, String userId) {
-        if (hasAdminRole()) return PostResponse.from(post);
-        if (post.getCategory() == null) return PostResponse.from(post);
-        if (Boolean.TRUE.equals(post.getPublicOverride())) {
+        boolean restrictedPost = isRestrictedPost(post);
+        if (!restrictedPost) {
             return PostResponse.from(post);
         }
+        if (hasAdminRole() || accessRequestUseCase.hasAccess(userId, post.getId(), post.getCategory().getId())) {
+            return PostResponse.from(post, true);
+        }
+
+        return PostResponse.restricted(post);
+    }
+
+    private PostResponse toPublicPostResponse(Post post) {
+        if (isRestrictedPost(post)) {
+            return PostResponse.restricted(post);
+        }
+
+        return PostResponse.from(post);
+    }
+
+    private PostResponse toFullPostResponse(Post post) {
+        return PostResponse.from(post, isRestrictedPost(post));
+    }
+
+    private boolean isRestrictedPost(Post post) {
+        if (post.getCategory() == null) return false;
+        if (Boolean.TRUE.equals(post.getPublicOverride())) return false;
+
         try {
             Category category = categoryUseCase.getById(post.getCategory().getId());
-            if (Boolean.TRUE.equals(category.getRestricted())
-                    && !accessRequestUseCase.hasAccess(userId, post.getId(), category.getId())) {
-                return PostResponse.restricted(post);
-            }
+            return Boolean.TRUE.equals(category.getRestricted());
         } catch (Exception ignored) {
+            return false;
         }
-        return PostResponse.from(post);
     }
 
     private boolean hasAdminRole() {
