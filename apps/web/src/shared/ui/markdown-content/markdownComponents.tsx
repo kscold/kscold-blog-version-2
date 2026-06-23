@@ -35,6 +35,18 @@ interface ImgHastNode {
   properties?: { src?: string; alt?: string };
 }
 
+function hasOnlyImages(node: unknown, count = 1): boolean {
+  const children =
+    (node as { children?: Array<{ type: string; tagName?: string; value?: string }> })?.children ?? [];
+  const nonWhitespaceChildren = children.filter(
+    child => !(child.type === 'text' && (child.value ?? '').trim() === ''),
+  );
+  return (
+    nonWhitespaceChildren.length === count &&
+    nonWhitespaceChildren.every(child => child.type === 'element' && child.tagName === 'img')
+  );
+}
+
 function extractImageNodes(node: unknown): ImgHastNode[] {
   const children = (node as { children?: Array<{ type: string; tagName: string }> })?.children ?? [];
   return children.filter(c => c.type === 'element' && c.tagName === 'img') as ImgHastNode[];
@@ -63,6 +75,17 @@ function ImageGrid({ imgNodes }: { imgNodes: ImgHastNode[] }) {
 }
 
 export function createMarkdownComponents(isDark: boolean): Components {
+  const tableSurfaceClass = isDark
+    ? 'border-surface-800 bg-surface-950/30'
+    : 'border-surface-200 bg-white shadow-sm';
+  const tableHeaderClass = isDark
+    ? 'border-surface-700 bg-surface-900/90 text-surface-100'
+    : 'border-surface-200 bg-surface-50 text-surface-900';
+  const tableCellClass = isDark
+    ? 'border-surface-800 text-surface-300'
+    : 'border-surface-200 text-surface-700';
+  const tableBodyClass = isDark ? 'divide-y divide-surface-800' : 'divide-y divide-surface-200/80';
+
   return {
     p: ({ children, className, node }) => {
       const standaloneLink = extractStandaloneLink(children);
@@ -78,6 +101,9 @@ export function createMarkdownComponents(isDark: boolean): Components {
         if (imgNodes.length >= 2) {
           return <ImageGrid imgNodes={imgNodes} />;
         }
+      }
+      if (hasOnlyImages(node)) {
+        return <div className="my-8">{children}</div>;
       }
 
       return <p>{children}</p>;
@@ -109,37 +135,34 @@ export function createMarkdownComponents(isDark: boolean): Components {
       return <MarkdownCodeBlock className={className} isDark={isDark}>{children}</MarkdownCodeBlock>;
     },
     img: ({ src, alt }) => (
-      <div className="my-8">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={src}
-          alt={alt || ''}
-          className="w-full rounded-2xl border border-white/10 shadow-lg"
-          loading="lazy"
-        />
-      </div>
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        src={src}
+        alt={alt || ''}
+        className="w-full rounded-2xl border border-white/10 shadow-lg"
+        loading="lazy"
+      />
     ),
     table: ({ children }) => (
-      <div className="my-8 overflow-x-auto">
-        <table className="min-w-full border-collapse text-sm">{children}</table>
+      <div className={`not-prose my-8 overflow-x-auto rounded-2xl border ${tableSurfaceClass}`}>
+        <table className="m-0 w-full min-w-[720px] border-separate border-spacing-0 text-sm leading-6">
+          {children}
+        </table>
       </div>
     ),
+    thead: ({ children }) => <thead>{children}</thead>,
+    tbody: ({ children }) => <tbody className={tableBodyClass}>{children}</tbody>,
+    tr: ({ children }) => <tr>{children}</tr>,
     th: ({ children }) => (
       <th
-        className={`whitespace-nowrap border px-4 py-2 text-left font-semibold ${
-          isDark
-            ? 'border-surface-700 bg-surface-900 text-surface-100'
-            : 'border-surface-200 bg-surface-50 text-surface-900'
-        }`}
+        className={`whitespace-nowrap border-b border-r px-4 py-3 text-left text-xs font-black uppercase tracking-[0.12em] last:border-r-0 ${tableHeaderClass}`}
       >
         {children}
       </th>
     ),
     td: ({ children }) => (
       <td
-        className={`border px-4 py-2 align-top ${
-          isDark ? 'border-surface-800 text-surface-300' : 'border-surface-200 text-surface-700'
-        }`}
+        className={`border-r px-4 py-3 align-top last:border-r-0 ${tableCellClass}`}
       >
         {children}
       </td>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
+import { filterVisibleTagInfos } from '@/shared/lib/tags';
 import { Post } from '@/types/blog';
 
 interface PostCardProps {
@@ -14,6 +15,7 @@ interface PostCardProps {
 
 export function PostCard({ post, featured = false, titleOnly = false }: PostCardProps) {
   const { allowRichEffects, supportsHover, reduceMotion, isTouchDevice } = usePerformanceMode();
+  const visibleTags = filterVisibleTagInfos(post.tags);
   const formattedDate = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString('ko-KR', {
         year: 'numeric',
@@ -97,9 +99,9 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
             {post.excerpt}
           </p>
 
-          {post.tags && post.tags.length > 0 && (
+          {visibleTags.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {post.tags.slice(0, featured ? 5 : 3).map(tag => (
+              {visibleTags.slice(0, featured ? 5 : 3).map(tag => (
                 <Link
                   key={tag.id}
                   href={`/tags/${encodeURIComponent(tag.name)}`}

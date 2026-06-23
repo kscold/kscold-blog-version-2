@@ -4,6 +4,7 @@ import ImageExtension from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import { Table, TableCell, TableHeader, TableRow } from '@tiptap/extension-table';
 import { Markdown } from 'tiptap-markdown';
 import { createLowlight, common } from 'lowlight';
 import GlobalDragHandle from 'tiptap-extension-global-drag-handle';
@@ -48,6 +49,10 @@ export function buildEditorExtensions(placeholder: string, slashActions?: SlashC
     }),
     CodeBlockLowlight.configure({ lowlight }),
     ImageExtension.configure({ inline: false, allowBase64: false }),
+    Table.configure({ resizable: true }),
+    TableRow,
+    TableHeader,
+    TableCell,
     ImageRowExtension,
     VideoExtension,
     // 노션식 '/' 블록 메뉴 — 미디어 삽입 액션은 에디터 컴포넌트가 주입

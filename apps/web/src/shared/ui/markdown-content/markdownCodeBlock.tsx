@@ -94,8 +94,8 @@ export function MarkdownCodeBlock({
 
   if (!language) {
     return (
-      <div className="not-prose relative my-6">
-        <MarkdownCopyButton codeText={codeText} isDark={isDark} />
+      <div className="not-prose group relative my-6">
+        <MarkdownCopyButton codeText={codeText} isDark={isDark} variant="overlay" />
         <pre
           className={`my-0 overflow-x-auto rounded-xl border p-5 shadow-sm ${
             isDark ? 'border-surface-800 bg-[#0f111a]' : 'border-surface-200 bg-surface-50'
@@ -114,23 +114,27 @@ export function MarkdownCodeBlock({
   }
 
   return (
-    <div className="not-prose relative my-6 group">
-      <div className="absolute left-3 top-3 z-10">
+    <div
+      className={`not-prose my-6 overflow-hidden rounded-xl border shadow-sm ${
+        isDark ? 'border-surface-800 bg-[#0f111a]' : 'border-surface-200 bg-surface-50'
+      }`}
+    >
+      <div
+        className={`flex items-center justify-between gap-3 border-b px-4 py-2.5 ${
+          isDark ? 'border-surface-800 bg-surface-900/70' : 'border-surface-200 bg-white/80'
+        }`}
+      >
         <span
           data-code-language={rawLanguage.toLowerCase()}
           className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
-            isDark ? 'bg-surface-800/90 text-surface-300' : 'bg-white/90 text-surface-500 shadow-sm'
+            isDark ? 'bg-surface-800/90 text-surface-300' : 'bg-surface-50 text-surface-500 shadow-sm'
           }`}
         >
           {formatLanguageLabel(rawLanguage)}
         </span>
+        <MarkdownCopyButton codeText={codeText} isDark={isDark} variant="inline" />
       </div>
-      <MarkdownCopyButton codeText={codeText} isDark={isDark} />
-      <div
-        className={`overflow-x-auto rounded-xl border shadow-sm ${
-          isDark ? 'border-surface-800 bg-[#0f111a]' : 'border-surface-200 bg-surface-50'
-        }`}
-      >
+      <div className="overflow-x-auto">
         <SyntaxHighlighter
           style={isDark ? vscDarkPlus : oneLight}
           language={language}
@@ -150,21 +154,37 @@ export function MarkdownCodeBlock({
   );
 }
 
-function MarkdownCopyButton({ codeText, isDark }: { codeText: string; isDark: boolean }) {
+function MarkdownCopyButton({
+  codeText,
+  isDark,
+  variant,
+}: {
+  codeText: string;
+  isDark: boolean;
+  variant: 'inline' | 'overlay';
+}) {
+  const button = (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(codeText);
+      }}
+      className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors ${
+        isDark
+          ? 'border border-surface-700 bg-surface-800 text-surface-100 hover:bg-surface-700 hover:text-white'
+          : 'border border-surface-200 bg-surface-100 text-surface-600 hover:bg-surface-200 hover:text-surface-900'
+      }`}
+    >
+      Copy
+    </button>
+  );
+
+  if (variant === 'inline') {
+    return button;
+  }
+
   return (
     <div className="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-hover:opacity-100">
-      <button
-        onClick={() => {
-          navigator.clipboard.writeText(codeText);
-        }}
-        className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors ${
-          isDark
-            ? 'border border-surface-700 bg-surface-800 text-surface-100 hover:bg-surface-700 hover:text-white'
-            : 'border border-surface-200 bg-surface-100 text-surface-600 hover:bg-surface-200 hover:text-surface-900'
-        }`}
-      >
-        Copy
-      </button>
+      {button}
     </div>
   );
 }

@@ -58,6 +58,9 @@ importers:
       '@tiptap/extension-placeholder':
         specifier: ^3.20.2
         version: 3.20.2(@tiptap/extensions@3.20.2)
+      '@tiptap/extension-table':
+        specifier: 3.20.2
+        version: 3.20.2(@tiptap/core@3.20.2)(@tiptap/pm@3.20.2)
       '@tiptap/pm':
         specifier: 3.20.2
         version: 3.20.2
@@ -2359,6 +2362,16 @@ packages:
       '@tiptap/core': 3.20.2
     dependencies:
       '@tiptap/core': 3.20.2(@tiptap/pm@3.20.2)
+    dev: false
+
+  /@tiptap/extension-table@3.20.2(@tiptap/core@3.20.2)(@tiptap/pm@3.20.2):
+    resolution: {integrity: sha512-kURWr90j3sfuC2AkM73lwoWfeDxj+zWK38gbld58/cHUREoWK9lxFEdeCCZOge6Z97ZQRvqRiEGeQ/X3GmUiYg==}
+    peerDependencies:
+      '@tiptap/core': 3.20.2
+      '@tiptap/pm': 3.20.2
+    dependencies:
+      '@tiptap/core': 3.20.2(@tiptap/pm@3.20.2)
+      '@tiptap/pm': 3.20.2
     dev: false
 
   /@tiptap/extension-text@3.20.2(@tiptap/core@3.20.2):
