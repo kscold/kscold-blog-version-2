@@ -22,7 +22,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -174,6 +176,7 @@ public class PostController {
     }
 
     private PostResponse applyRestriction(Post post, String userId) {
+        if (hasAdminRole()) return PostResponse.from(post);
         if (post.getCategory() == null) return PostResponse.from(post);
         if (Boolean.TRUE.equals(post.getPublicOverride())) {
             return PostResponse.from(post);
@@ -187,5 +190,11 @@ public class PostController {
         } catch (Exception ignored) {
         }
         return PostResponse.from(post);
+    }
+
+    private boolean hasAdminRole() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }
