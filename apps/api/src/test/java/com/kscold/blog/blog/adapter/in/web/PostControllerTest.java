@@ -10,6 +10,7 @@ import com.kscold.blog.shared.analytics.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import jakarta.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
@@ -46,6 +52,11 @@ class PostControllerTest {
 
     @InjectMocks
     private PostController postController;
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     @DisplayName("시나리오: 제한 카테고리 글이어도 완전 공개가 켜져 있으면 본문을 그대로 반환한다")
@@ -84,6 +95,29 @@ class PostControllerTest {
         assertThat(data.getRestricted()).isTrue();
         assertThat(data.getContent()).isNull();
         assertThat(data.getPublicOverride()).isFalse();
+    }
+
+    @Test
+    @DisplayName("시나리오: 관리자라면 제한 카테고리 글도 승인 요청 없이 본문을 그대로 반환한다")
+    void getPostByIdReturnsFullPostForAdmin() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        "admin-1",
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                )
+        );
+        Post post = post(false);
+        when(postUseCase.getById("post-1")).thenReturn(post);
+
+        ResponseEntity<ApiResponse<PostResponse>> response = postController.getPostById("post-1", "admin-1", httpServletRequest);
+
+        assertThat(response.getBody()).isNotNull();
+        PostResponse data = response.getBody().getData();
+        assertThat(data.getRestricted()).isNull();
+        assertThat(data.getContent()).isEqualTo("본문");
+        verify(categoryUseCase, never()).getById("cat-1");
+        verify(accessRequestUseCase, never()).hasAccess("admin-1", "post-1", "cat-1");
     }
 
     private static Post post(boolean publicOverride) {
