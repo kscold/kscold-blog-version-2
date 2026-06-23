@@ -12,6 +12,7 @@ import { ImageCarousel } from '@/shared/ui/ImageCarousel';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import { LinkifiedText } from '@/shared/ui/LinkifiedText';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
+import { filterVisibleTagNames } from '@/shared/lib/tags';
 
 interface FeedCardProps {
   feed: Feed;
@@ -24,6 +25,7 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
   const router = useRouter();
   const [isLiked, setIsLiked] = useState(feed.isLiked);
   const [likesCount, setLikesCount] = useState(feed.likesCount);
+  const visibleTags = filterVisibleTagNames(feed.tags);
 
   const handleCardClick = () => {
     if (showCommentLink) router.push(`/feed/${feed.id}`);
@@ -155,9 +157,9 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
       </div>
 
       {/* 해시태그 */}
-      {feed.tags && feed.tags.length > 0 && (
+      {visibleTags.length > 0 && (
         <div className="px-4 pb-2 flex flex-wrap gap-1.5">
-          {feed.tags.map(tag => (
+          {visibleTags.map(tag => (
             <Link
               key={tag}
               href={`/tags/${encodeURIComponent(tag)}`}

@@ -10,6 +10,7 @@ import { useUiStore } from '@/shared/model/uiStore';
 import { useViewer } from '@/entities/user/model/useViewer';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
+import { isSystemTagName } from '@/shared/lib/tags';
 import { Category } from '@/types/blog';
 
 function CategoryTree({ categories, depth = 0, onNavigate }: { categories: Category[]; depth?: number; onNavigate?: () => void }) {
@@ -58,8 +59,11 @@ export function Sidebar() {
 
   const tags = (() => {
     const map = new Map<string, { name: string; slug?: string; count: number }>();
-    blogTags?.forEach(t => map.set(t.name, { name: t.name, slug: t.slug, count: t.postCount }));
+    blogTags
+      ?.filter(tag => !isSystemTagName(tag.name))
+      .forEach(t => map.set(t.name, { name: t.name, slug: t.slug, count: t.postCount }));
     feedTagsRaw?.forEach(ft => {
+      if (isSystemTagName(ft.name)) return;
       const existing = map.get(ft.name);
       if (existing) {
         map.set(ft.name, { ...existing, count: existing.count + ft.count });

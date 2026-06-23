@@ -193,6 +193,58 @@
     @apply bg-transparent p-0 text-inherit;
   }
 
+  .tiptap-editor-surface .tableWrapper {
+    @apply my-6 overflow-x-auto;
+  }
+
+  .tiptap-editor-surface table {
+    @apply my-6 w-full min-w-[720px] table-auto overflow-hidden rounded-2xl border-collapse text-sm;
+  }
+
+  .tiptap-editor-surface .tableWrapper table {
+    @apply my-0;
+  }
+
+  .tiptap-editor-surface th,
+  .tiptap-editor-surface td {
+    @apply border border-surface-200 px-4 py-3 align-top;
+    min-width: 96px;
+    position: relative;
+  }
+
+  .tiptap-editor-surface th {
+    @apply bg-surface-50 font-bold text-surface-900;
+  }
+
+  .tiptap-editor-surface td {
+    @apply bg-white text-surface-700;
+  }
+
+  .tiptap-editor-surface .selectedCell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: rgba(14, 165, 233, 0.16);
+  }
+
+  .tiptap-editor-surface .column-resize-handle {
+    position: absolute;
+    top: 0;
+    right: -2px;
+    bottom: -2px;
+    z-index: 3;
+    width: 4px;
+    pointer-events: none;
+    background: #38bdf8;
+  }
+
+  .resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+  }
+
   .tiptap-editor-surface .hljs-comment,
   .tiptap-editor-surface .hljs-quote {
     color: #7c8597;

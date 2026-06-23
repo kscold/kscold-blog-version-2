@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
+import { filterVisibleTagInfos } from '@/shared/lib/tags';
 import type { Tag } from '@/types/blog';
 
 type PostTagInfo = Pick<Tag, 'id' | 'name'>;
@@ -16,6 +17,7 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const visibleTags = filterVisibleTagInfos(tags);
 
   useEffect(() => {
     return () => {
@@ -51,7 +53,7 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
   return (
     <>
       {/* 태그 목록 */}
-      {tags && tags.length > 0 && (
+      {visibleTags.length > 0 && (
         <motion.div
           className="mb-12 pt-8 border-t border-surface-200"
           initial={{ opacity: 0, y: 20 }}
@@ -62,10 +64,10 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
             Tags
           </h3>
           <div className="flex flex-wrap gap-2">
-            {tags.map(tag => (
+            {visibleTags.map(tag => (
               <Link
                 key={tag.id}
-                href={`/blog/tags/${encodeURIComponent(tag.name.toLowerCase())}`}
+                href={`/tags/${encodeURIComponent(tag.name)}`}
                 className="px-3 py-1.5 bg-white border border-surface-200 text-surface-600 rounded-lg hover:border-surface-900 hover:text-surface-900 transition-all text-sm font-medium"
               >
                 #{tag.name}
