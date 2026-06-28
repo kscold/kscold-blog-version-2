@@ -2,8 +2,10 @@ package com.kscold.blog.adminnight.adapter.in.web;
 
 import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
+import com.kscold.blog.adminnight.application.dto.AdminNightProgramVoteCommand;
 import com.kscold.blog.adminnight.application.port.in.AdminNightUseCase;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
+import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.shared.web.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -92,6 +94,61 @@ public class AdminNightController {
         );
     }
 
+    @PostMapping("/admin-night/programs/{programKey}/votes")
+    public ResponseEntity<ApiResponse<ProgramVoteResponse>> upsertProgramVote(
+            @PathVariable String programKey,
+            @AuthenticationPrincipal String userId,
+            @RequestBody ProgramVoteBody body
+    ) {
+        AdminNightProgramVote vote = adminNightUseCase.upsertProgramVote(
+                programKey,
+                userId,
+                new AdminNightProgramVoteCommand(
+                        body.requesterName(),
+                        body.contactEmail(),
+                        body.contact(),
+                        body.interestLevel(),
+                        body.preferredFormat(),
+                        body.experienceLevel(),
+                        body.sessionStyle(),
+                        body.sessionLength(),
+                        body.foodPreference(),
+                        body.preferredDays(),
+                        body.preferredTimes(),
+                        body.interestedTopics(),
+                        body.desiredTakeaways(),
+                        body.message()
+                )
+        );
+        return ResponseEntity.ok(
+                ApiResponse.success(AdminNightWebMapper.toProgramVoteResponse(vote), "AI Agent Bloom 관심 투표를 저장했습니다.")
+        );
+    }
+
+    @GetMapping("/admin-night/programs/{programKey}/votes/me")
+    public ResponseEntity<ApiResponse<ProgramVoteResponse>> getMyProgramVote(
+            @PathVariable String programKey,
+            @AuthenticationPrincipal String userId
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        adminNightUseCase.getMyProgramVote(programKey, userId)
+                                .map(AdminNightWebMapper::toProgramVoteResponse)
+                                .orElse(null)
+                )
+        );
+    }
+
+    @GetMapping("/admin-night/programs/{programKey}/summary")
+    public ResponseEntity<ApiResponse<ProgramVoteSummaryResponse>> getProgramVoteSummary(
+            @PathVariable String programKey
+    ) {
+        List<AdminNightProgramVote> votes = adminNightUseCase.getProgramVotes(programKey);
+        return ResponseEntity.ok(
+                ApiResponse.success(AdminNightWebMapper.toProgramVoteSummary(programKey, votes))
+        );
+    }
+
     @GetMapping("/admin/admin-night/requests")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<RequestResponse>>> getAdminRequests(
@@ -139,5 +196,19 @@ public class AdminNightController {
     ) {
         AdminNightRequest request = adminNightUseCase.requestMoreInfo(id, userId, body.reviewNote());
         return ResponseEntity.ok(ApiResponse.success(AdminNightWebMapper.toResponse(request), "추가 정보 요청을 보냈습니다."));
+    }
+
+    @GetMapping("/admin/admin-night/programs/{programKey}/votes")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<List<ProgramVoteResponse>>> getAdminProgramVotes(
+            @PathVariable String programKey
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        adminNightUseCase.getProgramVotes(programKey).stream()
+                                .map(AdminNightWebMapper::toProgramVoteResponse)
+                                .toList()
+                )
+        );
     }
 }

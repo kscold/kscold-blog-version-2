@@ -2,10 +2,13 @@ package com.kscold.blog.adminnight.application.port.in;
 
 import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
+import com.kscold.blog.adminnight.application.dto.AdminNightProgramVoteCommand;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
+import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface AdminNightUseCase {
 
@@ -24,4 +27,10 @@ public interface AdminNightUseCase {
     AdminNightRequest requestMoreInfo(String requestId, String adminUserId, String reviewNote);
 
     AdminNightRequest reject(String requestId, String adminUserId, String reviewNote);
+
+    AdminNightProgramVote upsertProgramVote(String programKey, String userId, AdminNightProgramVoteCommand command);
+
+    Optional<AdminNightProgramVote> getMyProgramVote(String programKey, String userId);
+
+    List<AdminNightProgramVote> getProgramVotes(String programKey);
 }

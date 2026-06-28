@@ -2,8 +2,10 @@ package com.kscold.blog.adminnight.adapter.out.mail;
 
 import com.kscold.blog.adminnight.application.event.AdminNightNotificationEvent;
 import com.kscold.blog.adminnight.application.event.AdminNightNotificationType;
+import com.kscold.blog.adminnight.application.event.AdminNightProgramVoteNotificationEvent;
 import com.kscold.blog.adminnight.application.port.out.AdminNightNotificationPort;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
+import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,11 @@ public class AdminNightNotificationAdapter implements AdminNightNotificationPort
     @Override
     public void notifyRequestRejected(AdminNightRequest request) {
         publish(AdminNightNotificationType.REQUEST_REJECTED, request);
+    }
+
+    @Override
+    public void notifyProgramVoteSubmitted(AdminNightProgramVote vote) {
+        applicationEventPublisher.publishEvent(new AdminNightProgramVoteNotificationEvent(vote));
     }
 
     private void publish(AdminNightNotificationType type, AdminNightRequest request) {

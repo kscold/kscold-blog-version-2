@@ -1,24 +1,10 @@
-package com.kscold.blog.adminnight.adapter.in.web;
+package com.kscold.blog.adminnight.application.dto;
 
-import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 
-import java.time.LocalDate;
 import java.util.List;
 
-record CreateRequestBody(
-        String requesterName,
-        String taskTitle,
-        String message,
-        AdminNightRequest.ParticipationMode participationMode,
-        SlotBody preferredSlot
-) {}
-
-record ApproveRequestBody(SlotBody scheduledSlot) {}
-
-record ReviewRequestBody(String reviewNote) {}
-
-record ProgramVoteBody(
+public record AdminNightProgramVoteCommand(
         String requesterName,
         String contactEmail,
         String contact,
@@ -33,13 +19,4 @@ record ProgramVoteBody(
         List<String> interestedTopics,
         String desiredTakeaways,
         String message
-) {}
-
-record SlotBody(
-        String slotKey,
-        LocalDate date,
-        String weekday,
-        String timeLabel,
-        String focus,
-        String badgeLabel
 ) {}

@@ -4,6 +4,7 @@ import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
 import com.kscold.blog.adminnight.application.port.out.AdminNightNotificationPort;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
+import com.kscold.blog.adminnight.domain.port.out.AdminNightProgramVoteRepository;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightRequestRepository;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.domain.model.User;
@@ -31,6 +32,9 @@ class AdminNightApplicationServiceTest {
 
     @Mock
     private AdminNightRequestRepository adminNightRequestRepository;
+
+    @Mock
+    private AdminNightProgramVoteRepository adminNightProgramVoteRepository;
 
     @Mock
     private UserRepository userRepository;
