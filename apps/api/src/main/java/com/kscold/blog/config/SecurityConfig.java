@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/link-preview").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/guestbook/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/admin-night/calendar").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/admin-night/programs/*/summary").permitAll()
                         // Vault 공개 엔드포인트
                         .requestMatchers(HttpMethod.GET, "/api/vault/**").permitAll()
                         .requestMatchers(
