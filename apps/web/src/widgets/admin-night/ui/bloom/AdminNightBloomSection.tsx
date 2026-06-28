@@ -128,7 +128,6 @@ export function AdminNightBloomSection() {
     form.requesterName.trim().length > 0 &&
     form.contactEmail.trim().length > 0 &&
     form.contact.trim().length > 0 &&
-    form.desiredTakeaways.trim().length > 0 &&
     form.preferredDays.length > 0 &&
     form.preferredTimes.length > 0;
 
@@ -138,7 +137,7 @@ export function AdminNightBloomSection() {
 
   const handleSubmit = async () => {
     if (!canSubmit) {
-      setStatusMessage('본명, 이메일, 연락처, 희망 요일/시간, 얻어가고 싶은 내용을 먼저 남겨주세요.');
+      setStatusMessage('본명, 이메일, 연락처, 희망 요일과 시간대를 먼저 남겨주세요.');
       return;
     }
 
@@ -258,61 +257,68 @@ export function AdminNightBloomSection() {
             <p className="text-[11px] font-black uppercase tracking-[0.28em] text-surface-400">Interest Form</p>
             <h3 className="text-2xl font-black tracking-tight">AI Agent Bloom 투표</h3>
             <p className="text-sm leading-7 text-surface-500">
-              오프라인 고정으로 진행할 예정입니다. 바이브코딩을 적극 활용하며, 장소 대관, 음식/음료, 강의 준비를 포함해 예상 참가비는 2만~3만 원 사이입니다.
+              진행 방식은 오프라인 고정입니다. 바이브코딩을 적극 활용하며, 장소 대관·음식/음료·강의 준비를 포함한 예상 참가비는 2만~3만 원 사이입니다.
             </p>
           </div>
 
           <div className="mt-6 space-y-5">
-              {!isAuthenticated && (
-                <div className="rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm leading-7 text-cyan-900">
-                  <p className="font-black">로그인 없이도 투표할 수 있어요.</p>
-                  <p className="mt-1 text-cyan-800">
-                    일정 안내와 감사 메일을 보낼 수 있도록 본명, 이메일, 연락처만 정확히 남겨주세요.
-                  </p>
-                </div>
-              )}
+            <div className="rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm leading-7 text-cyan-900">
+              <p className="font-black">진행 방식: 오프라인 고정</p>
+              <p className="mt-1 text-cyan-800">
+                강의 중심, 실습 중심, 네트워킹 비중은 아래 투표 결과를 보고 조정합니다.
+              </p>
+            </div>
 
+            {!isAuthenticated && (
+              <div className="rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 text-surface-600">
+                <p className="font-black text-surface-900">로그인 없이도 투표할 수 있어요.</p>
+                <p className="mt-1">
+                  일정 안내와 감사 메일을 보낼 수 있도록 본명, 이메일, 연락처만 정확히 남겨주세요.
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label htmlFor="ai-agent-bloom-name" className="text-sm font-bold text-surface-900">
+                실제 본명 <span className="text-cyan-600">*</span>
+              </label>
+              <input
+                id="ai-agent-bloom-name"
+                value={form.requesterName}
+                onChange={event => updateForm('requesterName', event.target.value)}
+                placeholder="실제 진행 안내에 사용할 본명"
+                className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+              />
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
-                <label htmlFor="ai-agent-bloom-name" className="text-sm font-bold text-surface-900">
-                  실제 본명
+                <label htmlFor="ai-agent-bloom-email" className="text-sm font-bold text-surface-900">
+                  안내 받을 이메일 <span className="text-cyan-600">*</span>
                 </label>
                 <input
-                  id="ai-agent-bloom-name"
-                  value={form.requesterName}
-                  onChange={event => updateForm('requesterName', event.target.value)}
-                  placeholder="실제 진행 안내에 사용할 본명"
+                  id="ai-agent-bloom-email"
+                  type="email"
+                  value={form.contactEmail}
+                  onChange={event => updateForm('contactEmail', event.target.value)}
+                  placeholder="schedule@example.com"
                   className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
                 />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="ai-agent-bloom-email" className="text-sm font-bold text-surface-900">
-                    안내 받을 이메일
-                  </label>
-                  <input
-                    id="ai-agent-bloom-email"
-                    type="email"
-                    value={form.contactEmail}
-                    onChange={event => updateForm('contactEmail', event.target.value)}
-                    placeholder="schedule@example.com"
-                    className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="ai-agent-bloom-contact" className="text-sm font-bold text-surface-900">
-                    연락처
-                  </label>
-                  <input
-                    id="ai-agent-bloom-contact"
-                    value={form.contact}
-                    onChange={event => updateForm('contact', event.target.value)}
-                    placeholder="전화, 카톡, 슬랙 등 편한 연락처"
-                    className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
-                  />
-                </div>
+              <div className="space-y-2">
+                <label htmlFor="ai-agent-bloom-contact" className="text-sm font-bold text-surface-900">
+                  연락처 <span className="text-cyan-600">*</span>
+                </label>
+                <input
+                  id="ai-agent-bloom-contact"
+                  value={form.contact}
+                  onChange={event => updateForm('contact', event.target.value)}
+                  placeholder="전화, 카톡, 슬랙 등 편한 연락처"
+                  className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+                />
               </div>
+            </div>
 
               <OptionButtonGroup
                 title="참여 의향"
@@ -320,13 +326,6 @@ export function AdminNightBloomSection() {
                 value={form.interestLevel}
                 onChange={value => updateForm('interestLevel', value as AdminNightProgramInterestLevel)}
               />
-
-              <div className="rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm leading-7 text-cyan-900">
-                <p className="font-black">진행 방식: 오프라인 고정</p>
-                <p className="mt-1 text-cyan-800">
-                  이번 Bloom은 실제 장소에서 바이브코딩을 적극 활용한 어젠다 강의와 가벼운 네트워킹으로 잡습니다.
-                </p>
-              </div>
 
               <OptionButtonGroup
                 title="현재 경험 수준"
@@ -381,7 +380,7 @@ export function AdminNightBloomSection() {
 
               <div className="space-y-2">
                 <label htmlFor="ai-agent-bloom-takeaways" className="text-sm font-bold text-surface-900">
-                  얻어가고 싶은 것
+                  얻어가고 싶은 것 <span className="text-surface-400">(선택)</span>
                 </label>
                 <textarea
                   id="ai-agent-bloom-takeaways"
@@ -394,7 +393,7 @@ export function AdminNightBloomSection() {
 
               <div className="space-y-2">
                 <label htmlFor="ai-agent-bloom-message" className="text-sm font-bold text-surface-900">
-                  추가로 남길 말
+                  추가로 남길 말 <span className="text-surface-400">(선택)</span>
                 </label>
                 <textarea
                   id="ai-agent-bloom-message"

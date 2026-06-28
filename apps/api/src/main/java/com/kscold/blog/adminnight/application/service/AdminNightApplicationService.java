@@ -206,12 +206,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         vote.setPreferredDays(normalizePreferredDays(command.preferredDays()));
         vote.setPreferredTimes(normalizeList(command.preferredTimes(), 8));
         vote.setInterestedTopics(normalizeList(command.interestedTopics(), 12));
-        vote.setDesiredTakeaways(normalizeRequiredText(
-                command.desiredTakeaways(),
-                "얻어가고 싶은 내용을 적어주세요.",
-                1000,
-                "얻어가고 싶은 내용이 너무 깁니다."
-        ));
+        vote.setDesiredTakeaways(normalizeOptionalText(command.desiredTakeaways(), 1000));
         vote.setMessage(normalizeOptionalText(command.message(), 1000));
 
         AdminNightProgramVote saved = adminNightProgramVoteRepository.save(vote);
