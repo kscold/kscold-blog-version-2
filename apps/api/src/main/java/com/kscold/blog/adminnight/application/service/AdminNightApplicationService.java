@@ -33,6 +33,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
     private static final Pattern PROGRAM_KEY_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9-]{1,80}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+    private static final String ANONYMOUS_PRINCIPAL = "anonymousUser";
 
     private final AdminNightRequestRepository adminNightRequestRepository;
     private final AdminNightProgramVoteRepository adminNightProgramVoteRepository;
@@ -176,18 +177,25 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     @Transactional
     public AdminNightProgramVote upsertProgramVote(String programKey, String userId, AdminNightProgramVoteCommand command) {
         String normalizedProgramKey = normalizeProgramKey(programKey);
-        User user = requireUser(userId);
-        AdminNightProgramVote vote = adminNightProgramVoteRepository
-                .findByProgramKeyAndUserId(normalizedProgramKey, user.getId())
-                .orElseGet(() -> AdminNightProgramVote.builder()
-                        .programKey(normalizedProgramKey)
-                        .userId(user.getId())
-                        .requesterEmail(user.getEmail())
-                        .build());
+        User user = findAuthenticatedUser(userId).orElse(null);
+        String contactEmail = normalizeEmail(command.contactEmail(), user != null ? user.getEmail() : null);
+        Optional<AdminNightProgramVote> existingVote = user != null
+                ? adminNightProgramVoteRepository.findByProgramKeyAndUserId(normalizedProgramKey, user.getId())
+                : Optional.empty();
+        if (existingVote.isEmpty()) {
+            existingVote = adminNightProgramVoteRepository
+                    .findByProgramKeyAndContactEmail(normalizedProgramKey, contactEmail)
+                    .filter(vote -> user != null || !StringUtils.hasText(vote.getUserId()));
+        }
+        AdminNightProgramVote vote = existingVote.orElseGet(() -> AdminNightProgramVote.builder()
+                .programKey(normalizedProgramKey)
+                .build());
 
+        vote.setProgramKey(normalizedProgramKey);
+        vote.setUserId(user != null ? user.getId() : vote.getUserId());
         vote.setRequesterName(normalizeText(command.requesterName(), "이름을 적어주세요."));
-        vote.setRequesterEmail(user.getEmail());
-        vote.setContactEmail(normalizeEmail(command.contactEmail(), user.getEmail()));
+        vote.setRequesterEmail(user != null ? user.getEmail() : contactEmail);
+        vote.setContactEmail(contactEmail);
         vote.setContact(normalizeRequiredText(command.contact(), "연락처를 적어주세요.", 120, "연락처는 120자를 넘길 수 없습니다."));
         vote.setInterestLevel(requireInterestLevel(command.interestLevel()));
         vote.setPreferredFormat(requirePreferredFormat(command.preferredFormat()));
@@ -226,12 +234,27 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     }
 
     private User requireUser(String userId) {
-        if (!StringUtils.hasText(userId)) {
+        if (!hasAuthenticatedUserId(userId)) {
             throw InvalidRequestException.invalidInput("로그인이 필요합니다.");
         }
 
-        return userRepository.findById(userId)
+        return findAuthenticatedUser(userId)
                 .orElseThrow(() -> ResourceNotFoundException.user(userId));
+    }
+
+    private Optional<User> findAuthenticatedUser(String userId) {
+        if (!hasAuthenticatedUserId(userId)) {
+            return Optional.empty();
+        }
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw ResourceNotFoundException.user(userId);
+        }
+        return user;
+    }
+
+    private boolean hasAuthenticatedUserId(String userId) {
+        return StringUtils.hasText(userId) && !ANONYMOUS_PRINCIPAL.equals(userId);
     }
 
     private UserQueryPort.UserInfo requireAdmin(String userId) {

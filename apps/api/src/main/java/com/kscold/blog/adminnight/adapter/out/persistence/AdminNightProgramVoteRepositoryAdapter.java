@@ -26,6 +26,11 @@ public class AdminNightProgramVoteRepositoryAdapter implements AdminNightProgram
     }
 
     @Override
+    public Optional<AdminNightProgramVote> findByProgramKeyAndContactEmail(String programKey, String contactEmail) {
+        return mongoAdminNightProgramVoteRepository.findByProgramKeyAndContactEmail(programKey, contactEmail);
+    }
+
+    @Override
     public List<AdminNightProgramVote> findByProgramKeyOrderByCreatedAtDesc(String programKey) {
         return mongoAdminNightProgramVoteRepository.findByProgramKeyOrderByCreatedAtDesc(programKey);
     }

@@ -262,8 +262,16 @@ export function AdminNightBloomSection() {
             </p>
           </div>
 
-          {isAuthenticated ? (
-            <div className="mt-6 space-y-5">
+          <div className="mt-6 space-y-5">
+              {!isAuthenticated && (
+                <div className="rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm leading-7 text-cyan-900">
+                  <p className="font-black">로그인 없이도 투표할 수 있어요.</p>
+                  <p className="mt-1 text-cyan-800">
+                    일정 안내와 감사 메일을 보낼 수 있도록 본명, 이메일, 연락처만 정확히 남겨주세요.
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <label htmlFor="ai-agent-bloom-name" className="text-sm font-bold text-surface-900">
                   실제 본명
@@ -412,20 +420,6 @@ export function AdminNightBloomSection() {
                 </p>
               )}
             </div>
-          ) : (
-            <div className="mt-6 rounded-[24px] border border-surface-200 bg-surface-50 p-5">
-              <h4 className="text-lg font-black tracking-tight">로그인 후 투표할 수 있어요.</h4>
-              <p className="mt-2 text-sm leading-7 text-surface-500">
-                중복 투표를 막고, 이후 일정 안내를 이어가기 위해 로그인한 사용자만 투표를 남길 수 있습니다.
-              </p>
-              <Link
-                href="/login?redirect=/admin-night/ai-agent-bloom%23ai-agent-bloom"
-                className="mt-4 inline-flex rounded-2xl bg-surface-900 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-surface-800"
-              >
-                로그인하고 투표하기
-              </Link>
-            </div>
-          )}
         </div>
       </div>
     </section>

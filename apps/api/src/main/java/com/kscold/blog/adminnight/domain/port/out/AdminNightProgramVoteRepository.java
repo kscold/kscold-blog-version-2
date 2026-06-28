@@ -11,5 +11,7 @@ public interface AdminNightProgramVoteRepository {
 
     Optional<AdminNightProgramVote> findByProgramKeyAndUserId(String programKey, String userId);
 
+    Optional<AdminNightProgramVote> findByProgramKeyAndContactEmail(String programKey, String contactEmail);
+
     List<AdminNightProgramVote> findByProgramKeyOrderByCreatedAtDesc(String programKey);
 }
