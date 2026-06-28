@@ -3,6 +3,7 @@
 import { describeParticipationMode } from '@/widgets/admin-night/lib/adminNight';
 import { useAdminNightAdmin } from '@/widgets/admin-night/model/useAdminNightAdmin';
 import { AdminNightPendingActions } from './AdminNightPendingActions';
+import { AdminNightProgramVoteSection } from './AdminNightProgramVoteSection';
 import { AdminNightRequestMeta } from './AdminNightRequestMeta';
 import { AdminNightStatusSection } from './AdminNightStatusSection';
 
@@ -19,6 +20,8 @@ export function AdminNightAdminSection() {
           메모와 함께 추가 정보를 요청하고, 신청자가 보완본을 다시 보내면 다시 review 합니다.
         </p>
       </div>
+
+      <AdminNightProgramVoteSection />
 
       <AdminNightStatusSection
         title="대기 중인 신청"
