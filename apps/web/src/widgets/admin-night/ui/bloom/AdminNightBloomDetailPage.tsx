@@ -10,11 +10,11 @@ import { AdminNightBloomSection } from './AdminNightBloomSection';
 
 export function AdminNightBloomDetailPage() {
   return (
-    <main className="min-h-screen px-4 pb-20 pt-28 sm:px-6 lg:px-8">
+    <main className="min-h-screen px-4 pb-20 pt-5 sm:px-6 sm:pt-10 lg:px-8 lg:pt-20">
       <div className="mx-auto max-w-6xl space-y-8">
         <section className="overflow-hidden rounded-[36px] border border-surface-200 bg-white shadow-soft">
           <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <div className="space-y-6 p-6 sm:p-8 lg:p-10">
+            <div className="space-y-5 p-5 sm:space-y-6 sm:p-8 lg:p-10">
               <Link
                 href="/admin-night"
                 className="inline-flex items-center rounded-full border border-surface-200 bg-surface-50 px-4 py-2 text-xs font-bold text-surface-500 transition-colors hover:border-surface-300 hover:text-surface-900"
@@ -25,8 +25,10 @@ export function AdminNightBloomDetailPage() {
                 <p className="text-[11px] font-black uppercase tracking-[0.28em] text-cyan-600">
                   AI Agent Bloom
                 </p>
-                <h1 className="max-w-4xl text-4xl font-black tracking-tight text-surface-950 sm:text-6xl">
-                  오프라인 AI Agent 어젠다 강의
+                <h1 className="max-w-4xl text-[2.35rem] font-black leading-[1.08] tracking-tight text-surface-950 [word-break:keep-all] sm:text-6xl sm:leading-[1.05]">
+                  <span className="inline-block">오프라인</span>{' '}
+                  <span className="inline-block">AI Agent</span>{' '}
+                  <span className="inline-block">어젠다 강의</span>
                 </h1>
                 <p className="max-w-3xl text-sm leading-8 text-surface-500 sm:text-base">
                   작은 LLM 호출에서 시작해 LCEL, Memory, LangGraph 기본 그래프, 조건부/병렬 실행, 로컬 우선
