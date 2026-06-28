@@ -2,7 +2,9 @@ package com.kscold.blog.adminnight.application.service;
 
 import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
+import com.kscold.blog.adminnight.application.dto.AdminNightProgramVoteCommand;
 import com.kscold.blog.adminnight.application.port.out.AdminNightNotificationPort;
+import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightProgramVoteRepository;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightRequestRepository;
@@ -20,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -99,7 +102,7 @@ class AdminNightApplicationServiceTest {
                 .build();
         AdminNightRequest.SlotInfo scheduledSlot = slot("2026-04-18", "토", "14:00 - 16:30", "Weekend Reset", "Weekend");
         when(adminNightRequestRepository.findById("request-1")).thenReturn(Optional.of(request));
-        when(userQueryPort.getUserById("admin-1")).thenReturn(new UserQueryPort.UserInfo("admin-1", "김승찬", null, true, null));
+        when(userQueryPort.getUserById("admin-1")).thenReturn(new UserQueryPort.UserInfo("admin-1", "kscold", "김승찬", null, true, null));
         when(adminNightRequestRepository.save(any(AdminNightRequest.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         AdminNightRequest approved = adminNightApplicationService.approve(
@@ -129,7 +132,7 @@ class AdminNightApplicationServiceTest {
                 .status(AdminNightRequest.Status.PENDING)
                 .build();
         when(adminNightRequestRepository.findById("request-1")).thenReturn(Optional.of(request));
-        when(userQueryPort.getUserById("admin-1")).thenReturn(new UserQueryPort.UserInfo("admin-1", "김승찬", null, true, null));
+        when(userQueryPort.getUserById("admin-1")).thenReturn(new UserQueryPort.UserInfo("admin-1", "kscold", "김승찬", null, true, null));
         when(adminNightRequestRepository.save(any(AdminNightRequest.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         AdminNightRequest infoRequested = adminNightApplicationService.requestMoreInfo(
@@ -185,6 +188,47 @@ class AdminNightApplicationServiceTest {
         assertThat(resubmitted.getDecidedByUserId()).isNull();
         assertThat(resubmitted.getDecidedAt()).isNull();
         verify(adminNightNotificationPort).notifyRequestResubmitted(resubmitted);
+    }
+
+    @Test
+    @DisplayName("시나리오: 비로그인 사용자도 이메일과 연락처로 AI Agent Bloom 투표를 남길 수 있다")
+    void guestCanSubmitProgramVoteWithContactEmail() {
+        when(adminNightProgramVoteRepository.findByProgramKeyAndContactEmail("ai-agent-bloom", "guest@example.com"))
+                .thenReturn(Optional.empty());
+        when(adminNightProgramVoteRepository.save(any(AdminNightProgramVote.class))).thenAnswer(invocation -> {
+            AdminNightProgramVote vote = invocation.getArgument(0);
+            vote.setId("vote-1");
+            return vote;
+        });
+
+        AdminNightProgramVote saved = adminNightApplicationService.upsertProgramVote(
+                "AI-Agent-Bloom",
+                "anonymousUser",
+                new AdminNightProgramVoteCommand(
+                        "류태호",
+                        "guest@example.com",
+                        "010-0000-0000",
+                        AdminNightProgramVote.InterestLevel.WANT_TO_ATTEND,
+                        AdminNightProgramVote.PreferredFormat.OFFLINE,
+                        AdminNightProgramVote.ExperienceLevel.NEW_TO_AGENT,
+                        AdminNightProgramVote.SessionStyle.MIXED,
+                        AdminNightProgramVote.SessionLength.STANDARD_120,
+                        AdminNightProgramVote.FoodPreference.LIGHT_SNACK,
+                        List.of(AdminNightProgramVote.PreferredDay.SATURDAY),
+                        List.of("weekend-day"),
+                        List.of("agent-methodology"),
+                        "LangGraph 기반 Agent 흐름을 실제로 따라가보고 싶어요.",
+                        "로그인 없이 수요조사 남깁니다."
+                )
+        );
+
+        assertThat(saved.getId()).isEqualTo("vote-1");
+        assertThat(saved.getUserId()).isNull();
+        assertThat(saved.getRequesterEmail()).isEqualTo("guest@example.com");
+        assertThat(saved.getContactEmail()).isEqualTo("guest@example.com");
+        assertThat(saved.getProgramKey()).isEqualTo("ai-agent-bloom");
+        assertThat(saved.getPreferredFormat()).isEqualTo(AdminNightProgramVote.PreferredFormat.OFFLINE);
+        verify(adminNightNotificationPort).notifyProgramVoteSubmitted(saved);
     }
 
     private AdminNightRequest.SlotInfo slot(String date, String weekday, String timeLabel, String focus, String badgeLabel) {

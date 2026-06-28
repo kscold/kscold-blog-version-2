@@ -50,7 +50,7 @@ export interface AdminNightCalendarEntry {
 export interface AdminNightProgramVote {
   id: string;
   programKey: string;
-  userId: string;
+  userId?: string | null;
   requesterName: string;
   requesterEmail?: string;
   contactEmail?: string;
