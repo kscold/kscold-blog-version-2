@@ -92,14 +92,14 @@ function UpcomingOfflineSessionCard() {
               진행 예정인 오프라인 세션을 준비 중입니다.
             </h2>
             <p className="text-sm leading-8 text-white/65">
-              AI Agent Bloom은 바이브코딩을 적극 활용해 LangGraph 기반 Agent 흐름을 함께 따라가는 오프라인 어젠다 강의입니다.
-              장소 대관, 음식/음료, 강의 준비를 포함해 예상 참가비는 2만~3만 원 사이입니다.
+              AI Agent Bloom은 LangGraph 기반 Agent 흐름을 함께 따라가 보는 오프라인 공유 세션입니다.
+              바이브코딩을 적극 활용하며, 장소 대관·음식/음료·강의 준비를 포함한 예상 참가비는 2만~3만 원 사이입니다.
             </p>
           </div>
         </div>
         <div className="flex flex-col justify-center gap-3 border-t border-white/10 bg-white/[0.04] p-6 sm:p-8 lg:border-l lg:border-t-0">
           <div className="flex flex-wrap gap-2">
-            {['오프라인 고정', '바이브코딩 활용', '2만~3만 원 예상'].map(label => (
+            {['오프라인 고정', '바이브코딩 활용', '예상 2만~3만 원'].map(label => (
               <span key={label} className="rounded-full border border-white/10 bg-white/10 px-3 py-2 text-xs font-black text-white/75">
                 {label}
               </span>
@@ -109,7 +109,7 @@ function UpcomingOfflineSessionCard() {
             href={AI_AGENT_BLOOM_DETAIL_PATH}
             className="inline-flex justify-center rounded-2xl bg-white px-5 py-3 text-sm font-black text-surface-950 transition-colors hover:bg-cyan-50"
           >
-            진행 예정인 오프라인 세션 보러가기
+            오프라인 세션 보러가기
           </Link>
         </div>
       </div>

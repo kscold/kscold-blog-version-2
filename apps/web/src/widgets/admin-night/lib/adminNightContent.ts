@@ -152,7 +152,7 @@ export const AI_AGENT_BLOOM_FORMAT_OPTIONS: AdminNightOption<AdminNightProgramPr
   {
     value: 'OFFLINE',
     label: '오프라인 고정',
-    description: '장소에서 어젠다 강의와 가벼운 네트워킹으로 진행합니다.',
+    description: '같은 장소에서 진행하며, 세부 구성은 투표 결과를 보고 정합니다.',
   },
 ];
 

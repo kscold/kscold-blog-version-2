@@ -217,7 +217,7 @@ class AdminNightApplicationServiceTest {
                         List.of(AdminNightProgramVote.PreferredDay.SATURDAY),
                         List.of("weekend-day"),
                         List.of("agent-methodology"),
-                        "LangGraph 기반 Agent 흐름을 실제로 따라가보고 싶어요.",
+                        null,
                         "로그인 없이 수요조사 남깁니다."
                 )
         );
@@ -226,6 +226,7 @@ class AdminNightApplicationServiceTest {
         assertThat(saved.getUserId()).isNull();
         assertThat(saved.getRequesterEmail()).isEqualTo("guest@example.com");
         assertThat(saved.getContactEmail()).isEqualTo("guest@example.com");
+        assertThat(saved.getDesiredTakeaways()).isNull();
         assertThat(saved.getProgramKey()).isEqualTo("ai-agent-bloom");
         assertThat(saved.getPreferredFormat()).isEqualTo(AdminNightProgramVote.PreferredFormat.OFFLINE);
         verify(adminNightNotificationPort).notifyProgramVoteSubmitted(saved);
