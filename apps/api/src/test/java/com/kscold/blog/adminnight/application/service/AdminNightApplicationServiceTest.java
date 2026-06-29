@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -207,7 +208,7 @@ class AdminNightApplicationServiceTest {
                 new AdminNightProgramVoteCommand(
                         "류태호",
                         "guest@example.com",
-                        "010-0000-0000",
+                        "01000000000",
                         AdminNightProgramVote.InterestLevel.WANT_TO_ATTEND,
                         AdminNightProgramVote.PreferredFormat.OFFLINE,
                         AdminNightProgramVote.ExperienceLevel.NEW_TO_AGENT,
@@ -226,10 +227,69 @@ class AdminNightApplicationServiceTest {
         assertThat(saved.getUserId()).isNull();
         assertThat(saved.getRequesterEmail()).isEqualTo("guest@example.com");
         assertThat(saved.getContactEmail()).isEqualTo("guest@example.com");
+        assertThat(saved.getContact()).isEqualTo("010-0000-0000");
         assertThat(saved.getDesiredTakeaways()).isNull();
         assertThat(saved.getProgramKey()).isEqualTo("ai-agent-bloom");
         assertThat(saved.getPreferredFormat()).isEqualTo(AdminNightProgramVote.PreferredFormat.OFFLINE);
         verify(adminNightNotificationPort).notifyProgramVoteSubmitted(saved);
+    }
+
+    @Test
+    @DisplayName("시나리오: AI Agent Bloom 투표 이메일 형식이 잘못되면 거절한다")
+    void rejectInvalidProgramVoteEmail() {
+        assertThatThrownBy(() -> adminNightApplicationService.upsertProgramVote(
+                "ai-agent-bloom",
+                "anonymousUser",
+                validProgramVoteCommand("잘못된이메일", "01012345678", List.of("agent-methodology"))
+        ))
+                .hasMessageContaining("이메일");
+    }
+
+    @Test
+    @DisplayName("시나리오: AI Agent Bloom 투표 연락처 형식이 잘못되면 거절한다")
+    void rejectInvalidProgramVoteContact() {
+        when(adminNightProgramVoteRepository.findByProgramKeyAndContactEmail("ai-agent-bloom", "guest@example.com"))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> adminNightApplicationService.upsertProgramVote(
+                "ai-agent-bloom",
+                "anonymousUser",
+                validProgramVoteCommand("guest@example.com", "1234", List.of("agent-methodology"))
+        ))
+                .hasMessageContaining("연락처");
+    }
+
+    @Test
+    @DisplayName("시나리오: AI Agent Bloom 투표 주제를 고르지 않으면 거절한다")
+    void rejectProgramVoteWithoutInterestedTopics() {
+        when(adminNightProgramVoteRepository.findByProgramKeyAndContactEmail("ai-agent-bloom", "guest@example.com"))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> adminNightApplicationService.upsertProgramVote(
+                "ai-agent-bloom",
+                "anonymousUser",
+                validProgramVoteCommand("guest@example.com", "01012345678", List.of())
+        ))
+                .hasMessageContaining("듣고 싶은 주제");
+    }
+
+    private AdminNightProgramVoteCommand validProgramVoteCommand(String email, String contact, List<String> interestedTopics) {
+        return new AdminNightProgramVoteCommand(
+                "류태호",
+                email,
+                contact,
+                AdminNightProgramVote.InterestLevel.WANT_TO_ATTEND,
+                AdminNightProgramVote.PreferredFormat.OFFLINE,
+                AdminNightProgramVote.ExperienceLevel.NEW_TO_AGENT,
+                AdminNightProgramVote.SessionStyle.MIXED,
+                AdminNightProgramVote.SessionLength.STANDARD_120,
+                AdminNightProgramVote.FoodPreference.LIGHT_SNACK,
+                List.of(AdminNightProgramVote.PreferredDay.SATURDAY),
+                List.of("weekend-day"),
+                interestedTopics,
+                null,
+                "로그인 없이 수요조사 남깁니다."
+        );
     }
 
     private AdminNightRequest.SlotInfo slot(String date, String weekday, String timeLabel, String focus, String badgeLabel) {

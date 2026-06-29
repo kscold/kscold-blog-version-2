@@ -26,21 +26,33 @@ export function AdminNightBloomDetailPage() {
                   AI Agent Bloom
                 </p>
                 <h1 className="max-w-4xl text-[2.35rem] font-black leading-[1.08] tracking-tight text-surface-950 [word-break:keep-all] sm:text-6xl sm:leading-[1.05]">
-                  <span className="inline-block">오프라인</span>{' '}
-                  <span className="inline-block">AI Agent</span>{' '}
-                  <span className="inline-block">어젠다 강의</span>
+                  <span className="inline-block">AI Agent,</span>{' '}
+                  <span className="inline-block">같이 만들고</span>{' '}
+                  <span className="inline-block">피워보는 Bloom</span>
                 </h1>
-                <p className="max-w-3xl text-sm leading-8 text-surface-500 sm:text-base">
-                  작은 LLM 호출에서 시작해 LCEL, Memory, LangGraph 기본 그래프, 조건부/병렬 실행, 로컬 우선
-                  Multi-Agent System, RAG fallback, 평가와 관측까지 이어지는 오프라인 강의형 공유입니다. 강의는 바이브코딩을 적극 활용해 실제 구현 흐름을 함께 따라갑니다. 지금은 확정 신청이
-                  아니라 수요조사 단계이며, 장소 대관·음식/음료·강의 준비를 포함해 참가비는 2만~3만 원 사이로 예상합니다.
-                </p>
+                <div className="max-w-3xl space-y-3 text-sm leading-8 text-surface-500 sm:text-base">
+                  <p>
+                    처음부터 거창한 멀티 에이전트를 만들지는 않습니다. 작은 LLM 호출 하나에서 시작해
+                    LCEL, Memory, LangGraph, RAG fallback까지 차근차근 이어갑니다.
+                  </p>
+                  <p>
+                    바이브코딩을 적극 활용해 실제 구현 흐름을 함께 따라가고, 각자 떠올린 아이디어도 가볍게 나눠보는 자리로 준비하고 있습니다.
+                    지금은 확정 신청이 아니라 수요조사 단계이며, 예상 참가비는 2만~3만 원 사이입니다.
+                  </p>
+                </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <InfoPill label="진행 방식" value="오프라인 고정" />
                 <InfoPill label="강의 방식" value="바이브코딩 적극 활용" />
                 <InfoPill label="예상 참가비" value="2만~3만 원" />
-                <InfoPill label="포함 항목" value="장소·음식·강의" />
+                <InfoPill label="제공 기간" value="결제 즉시 확정·1일 이내 안내" />
+              </div>
+              <div className="rounded-3xl border border-cyan-100 bg-cyan-50 px-5 py-4 text-sm leading-7 text-cyan-900">
+                <p className="font-black">서비스 제공 기간</p>
+                <p className="mt-1 text-cyan-800">
+                  실제 일정 확정 후 결제 완료 시 참가권이 즉시 확정되며, 최종 장소와 시간 등 상세 안내는 1일 이내 이메일로 제공합니다.
+                  오프라인 세션은 공지된 일정에 현장에서 제공됩니다.
+                </p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <a
@@ -90,7 +102,8 @@ export function AdminNightBloomDetailPage() {
             <p className="text-[11px] font-black uppercase tracking-[0.28em] text-surface-400">2 Hours Flow</p>
             <h2 className="text-3xl font-black tracking-tight text-surface-950">2시간 공유 실습 흐름</h2>
             <p className="text-sm leading-7 text-surface-500">
-              오프라인 자리에서 처음부터 복잡한 멀티 에이전트로 들어가지 않고, 바이브코딩을 적극 활용해 LLM 호출에서 LangGraph MAS까지 단계적으로 확장합니다.
+              작은 호출에서 시작해 그래프 구조로 넓혀갑니다. 중간중간 실행 결과를 확인하면서,
+              어디서 Agent가 필요하고 어디서는 Workflow가 더 나은지 함께 봅니다.
             </p>
           </div>
 
@@ -110,7 +123,8 @@ export function AdminNightBloomDetailPage() {
             <p className="text-[11px] font-black uppercase tracking-[0.28em] text-surface-400">Agenda</p>
             <h2 className="text-3xl font-black tracking-tight text-surface-950">강의 어젠다</h2>
             <p className="text-sm leading-7 text-surface-500">
-              방향은 “데모를 만드는 법”보다 “그래프 흐름을 검증하고 실제로 쓸 수 있는 Agent 시스템으로 확장하는 법”에 맞춰 둡니다.
+              단순히 데모 하나를 완성하는 자리는 아닙니다. 만든 흐름을 어떻게 확인하고,
+              실제로 쓸 수 있는 구조로 어떻게 넓혀갈지에 더 초점을 둡니다.
             </p>
           </div>
 

@@ -5,9 +5,9 @@ import { AdminNightBloomDetailPage } from '@/widgets/admin-night/ui/bloom/AdminN
 export const metadata = buildPageMetadata({
   title: 'AI Agent Bloom',
   description:
-    '바이브코딩을 적극 활용하는 오프라인 AI Agent 어젠다 강의. LLM 호출에서 LCEL, Memory, LangGraph MAS, RAG fallback, 평가와 관측까지 이어집니다.',
+    'AI Agent를 같이 만들고 서로 공유해보는 오프라인 Bloom. 바이브코딩을 적극 활용해 LLM 호출에서 LangGraph, RAG fallback, 평가와 관측까지 이어갑니다.',
   path: '/admin-night/ai-agent-bloom',
-  keywords: ['AI Agent', 'LangGraph', 'RAG', 'Tool Calling', 'Vibe Coding', '바이브코딩', 'Admin Night', '오프라인 강의', '수요조사'],
+  keywords: ['AI Agent', 'LangGraph', 'RAG', 'Tool Calling', 'Vibe Coding', '바이브코딩', 'Admin Night', '오프라인 모임', '수요조사'],
 });
 
 const pageJsonLd = {
@@ -15,9 +15,9 @@ const pageJsonLd = {
   '@type': 'Event',
   '@id': `${SITE_URL}/admin-night/ai-agent-bloom#event`,
   url: `${SITE_URL}/admin-night/ai-agent-bloom`,
-  name: 'AI Agent Bloom: 오프라인 AI Agent 어젠다 강의',
+  name: 'AI Agent Bloom: 같이 만들고 피워보는 모임',
   description:
-    '바이브코딩을 적극 활용해 LLM 호출에서 LCEL, Memory, LangGraph MAS, RAG fallback, 평가와 관측까지 이어지는 오프라인 공유 강의입니다.',
+    'AI Agent를 같이 만들고 서로 공유해보는 오프라인 Bloom입니다. 바이브코딩을 적극 활용해 LLM 호출에서 LangGraph, RAG fallback, 평가와 관측까지 이어갑니다.',
   eventStatus: 'https://schema.org/EventScheduled',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   organizer: {

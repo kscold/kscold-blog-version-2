@@ -111,21 +111,21 @@ export const AI_AGENT_BLOOM_PHASES: AdminNightProgramPhase[] = [
     id: 'outline',
     label: '01',
     title: '어젠다 공개',
-    description: '바이브코딩을 적극 활용하는 오프라인 강의 어젠다와 실습 범위를 먼저 공개합니다.',
+    description: '어떤 흐름으로 볼지, 어느 정도까지 실습할지 먼저 열어둡니다.',
     state: 'next',
   },
   {
     id: 'vote',
     label: '02',
     title: '관심 투표',
-    description: '듣고 싶은 사람, 강의/네트워킹 선호, 가능한 요일과 시간대를 먼저 모읍니다.',
+    description: '듣고 싶은 사람과 가능한 요일, 원하는 진행 방식을 먼저 모읍니다.',
     state: 'active',
   },
   {
     id: 'schedule',
     label: '03',
     title: '일정 확정',
-    description: '충분한 관심이 모이면 실제 일정, 장소, 준비물, 예상 참가비 2만~3만 원 범위를 별도로 공지합니다.',
+    description: '관심이 충분히 모이면 날짜, 장소, 준비물, 참가비를 따로 안내합니다.',
     state: 'later',
   },
 ];
@@ -138,8 +138,8 @@ export const AI_AGENT_BLOOM_INTEREST_OPTIONS: AdminNightOption<AdminNightProgram
   },
   {
     value: 'WANT_TO_ATTEND',
-    label: '듣고 싶어요',
-    description: '오프라인 AI Agent 어젠다 강의를 실제로 들어보고 싶어요.',
+    label: '같이 만들어보고 싶어요',
+    description: 'AI Agent를 직접 만들고, 서로의 아이디어를 나눠보고 싶어요.',
   },
   {
     value: 'READY_IF_SCHEDULE_FITS',
@@ -251,19 +251,19 @@ export const AI_AGENT_BLOOM_TOPIC_OPTIONS: AdminNightOption[] = [
 export const AI_AGENT_BLOOM_DETAIL_PATH = '/admin-night/ai-agent-bloom';
 
 export const AI_AGENT_BLOOM_AUDIENCE = [
-  'LLM 호출 예제를 넘어 LangGraph 기반 Agent 아키텍처까지 단계적으로 확장해보고 싶은 사람',
-  '바이브코딩을 적극 활용해 Agent 구현 흐름을 실제로 따라가보고 싶은 사람',
-  'State, Node, Edge, Reducer, START/END 같은 LangGraph 핵심 문법을 코드 흐름으로 이해하고 싶은 사람',
-  'DB/CSV/Web/RAG Agent를 조합하고, 정보가 부족할 때 RAG fallback으로 보강하는 구조를 보고 싶은 사람',
-  'Hybrid Search, RRF, Tool Observability, Golden Test, LLM-as-Judge 같은 실전 고도화 포인트가 궁금한 사람',
+  'LLM 호출 예제에서 멈추지 않고, Agent 구조까지 한 단계씩 이어가보고 싶은 사람',
+  '바이브코딩을 써서 아이디어를 빠르게 코드로 옮기는 흐름을 직접 보고 싶은 사람',
+  'State, Node, Edge, Reducer 같은 LangGraph 문법이 실제 실행 흐름에서 어떻게 쓰이는지 알고 싶은 사람',
+  'DB, CSV, Web, RAG를 한 흐름 안에서 나누어 쓰는 감각을 잡고 싶은 사람',
+  '평가, 관측, fallback처럼 “만들고 난 뒤”에 필요한 기준까지 같이 보고 싶은 사람',
 ];
 
 export const AI_AGENT_BLOOM_OUTCOMES = [
-  'LLM 직접 호출, LCEL Chain, Prompt, Parser, Memory가 Agent 실습으로 이어지는 계단을 설명할 수 있습니다.',
-  '바이브코딩을 활용해 Agent 기능을 빠르게 만들고 검증하는 흐름을 경험할 수 있습니다.',
-  'LangGraph 직렬 그래프, 조건부 분기, 병렬 fan-out, reducer가 왜 필요한지 코드 기준으로 이해할 수 있습니다.',
-  '로컬 우선 MAS 구조에서 DB/CSV Agent와 Web/RAG fallback을 언제 나눠야 하는지 판단할 수 있습니다.',
-  'trace, tool log, golden scenario, judge 평가처럼 실습 결과를 검증하는 기준을 잡을 수 있습니다.',
+  'Prompt, Parser, Memory가 어떻게 Agent 흐름으로 이어지는지 큰 그림을 잡습니다.',
+  '바이브코딩으로 빠르게 만들고, 바로 실행해보며 고치는 리듬을 경험합니다.',
+  '직렬 실행, 조건부 분기, 병렬 fan-out이 왜 필요한지 코드 흐름으로 이해합니다.',
+  'DB/CSV처럼 확실한 데이터와 Web/RAG처럼 보강이 필요한 경로를 나누어 보는 기준을 얻습니다.',
+  'trace, tool log, judge 평가처럼 결과를 확인하는 최소한의 체크포인트를 가져갑니다.',
 ];
 
 export const AI_AGENT_BLOOM_AGENDA: AdminNightProgramAgendaItem[] = [
@@ -272,7 +272,7 @@ export const AI_AGENT_BLOOM_AGENDA: AdminNightProgramAgendaItem[] = [
     eyebrow: 'Part 01',
     title: '핵심 개념 정리: LLM, Agent, Tool, Skill, Workflow',
     description:
-      'Agent를 “답변 생성기”가 아니라 목표를 보고 도구를 활용하는 실행 구조로 잡고, Workflow와 Agent의 경계를 먼저 맞춥니다.',
+      '먼저 말을 맞춥니다. Agent를 단순한 답변 생성기가 아니라, 목표를 보고 도구를 고르는 실행 구조로 놓고 시작합니다.',
     bullets: ['Agent와 Workflow의 차이', 'Tool과 Skill의 역할', '중요 흐름은 Graph로 통제하고 판단은 Agent에 위임'],
   },
   {
@@ -280,7 +280,7 @@ export const AI_AGENT_BLOOM_AGENDA: AdminNightProgramAgendaItem[] = [
     eyebrow: 'Part 02',
     title: 'LLM 직접 호출에서 LCEL Chain까지',
     description:
-      'LangGraph로 들어가기 전, `invoke`, Prompt, Parser, Chain, RunnableParallel, Memory의 최소 문법을 빠르게 확인합니다.',
+      'LangGraph로 바로 들어가지 않습니다. `invoke`, Prompt, Parser, Chain, Memory처럼 자주 쓰는 조각부터 짧게 연결해봅니다.',
     bullets: ['ChatOpenAI invoke', 'Prompt | LLM | Parser', 'JSON Parser와 RunnableParallel', '세션별 Memory'],
   },
   {
@@ -288,7 +288,7 @@ export const AI_AGENT_BLOOM_AGENDA: AdminNightProgramAgendaItem[] = [
     eyebrow: 'Part 03',
     title: 'LangGraph 기본 그래프: State, Node, Edge, Reducer',
     description:
-      'StateGraph를 도화지처럼 만들고, 노드를 등록한 뒤 START/END와 edge로 실행 순서를 명시하는 감각을 잡습니다.',
+      'StateGraph를 하나의 흐름도로 보고, 노드와 edge를 붙여가며 실행 순서를 직접 눈으로 확인합니다.',
     bullets: ['직렬 그래프', '조건부 분기', '병렬 fan-out', 'operator.add와 add_messages reducer'],
   },
   {
@@ -296,7 +296,7 @@ export const AI_AGENT_BLOOM_AGENDA: AdminNightProgramAgendaItem[] = [
     eyebrow: 'Part 04',
     title: '로컬 우선 MAS: DB Agent + CSV Agent + Web Agent + RAG Agent',
     description:
-      '정확한 로컬 키가 있으면 DB/CSV Agent를 병렬 실행하고, 정보가 부족하면 Web 경로를 거쳐 RAG Agent로 보강하는 구조를 만듭니다.',
+      '확실한 데이터는 DB/CSV에서 먼저 찾고, 부족한 부분은 Web/RAG로 보강합니다. 여러 Agent를 억지로 많이 붙이기보다 역할을 나누는 감각을 봅니다.',
     bullets: ['entry_node 라우팅', 'DB/CSV 병렬 수집', 'Web fallback', 'RAG Agent 의미 검색 보강', 'Reporter 합류'],
   },
   {
@@ -304,7 +304,7 @@ export const AI_AGENT_BLOOM_AGENDA: AdminNightProgramAgendaItem[] = [
     eyebrow: 'Part 05',
     title: '그래프 시각화, X-Ray, 경로 테스트',
     description:
-      '답변이 그럴듯한지보다 설계한 경로가 실제로 실행됐는지 확인합니다. trace와 used_agents로 Agent 흐름을 검증합니다.',
+      '답변이 그럴듯한지만 보지 않습니다. 내가 의도한 경로로 실제 실행됐는지 trace와 used_agents로 확인합니다.',
     bullets: ['Mermaid / X-Ray 시각화', '로컬 키 경로 검증', 'RAG fallback 경로 검증', 'Reporter 종료 검증'],
   },
   {
@@ -312,7 +312,7 @@ export const AI_AGENT_BLOOM_AGENDA: AdminNightProgramAgendaItem[] = [
     eyebrow: 'Part 06',
     title: '고도화 포인트: Hybrid Search, Observability, Judge',
     description:
-      '실습 그래프를 더 탄탄하게 만들기 위해 검색, 관측, 평가, 모델 정책, 문서 처리 파이프라인을 어떻게 확장할지 정리합니다.',
+      '마지막에는 더 잘 만들기 위한 갈림길을 정리합니다. 검색, 관측, 평가, 모델 정책을 어디서부터 붙이면 좋을지 이야기합니다.',
     bullets: ['BM25 + Embedding + Rule Search', 'RRF Merge', 'Tool Observability', 'Golden Test', 'LLM-as-Judge', 'Provider Policy'],
   },
 ];
@@ -321,37 +321,37 @@ export const AI_AGENT_BLOOM_TIMELINE: AdminNightProgramTimelineItem[] = [
   {
     time: '0~15분',
     title: '핵심 개념 정리',
-    goal: 'Agent, Tool, Skill, Workflow, LangGraph 용어를 맞춥니다.',
+    goal: 'Agent, Tool, Skill, Workflow가 어디서 갈라지는지 먼저 맞춥니다.',
   },
   {
     time: '15~35분',
     title: 'LLM 직접 호출과 LCEL',
-    goal: '바이브코딩을 활용해 invoke, Prompt, Parser, Chain 구조를 빠르게 연결합니다.',
+    goal: '작은 호출 하나에서 Prompt, Parser, Chain으로 자연스럽게 이어갑니다.',
   },
   {
     time: '35~55분',
     title: 'Prompt / Parser / Memory',
-    goal: '출력 형식 제어와 세션별 대화 기억의 필요성을 봅니다.',
+    goal: '출력 형식을 잡고, 대화 기억이 필요한 순간을 확인합니다.',
   },
   {
     time: '55~75분',
     title: 'LangGraph 기본 그래프',
-    goal: 'StateGraph, State, Node, Edge를 코드로 익힙니다.',
+    goal: 'State, Node, Edge를 직접 붙이며 그래프가 도는 모습을 봅니다.',
   },
   {
     time: '75~95분',
     title: '조건부/병렬 그래프',
-    goal: '라우팅, fan-out, reporter 합류 구조를 만듭니다.',
+    goal: '분기하고, 병렬로 보내고, 다시 합치는 구조를 만들어봅니다.',
   },
   {
     time: '95~115분',
     title: '로컬 우선 MAS + RAG fallback',
-    goal: 'DB/CSV/Web/RAG Agent를 조합하고 부족한 정보를 RAG로 보강합니다.',
+    goal: 'DB/CSV/Web/RAG를 역할별로 나누고, 비어 있는 정보를 보강합니다.',
   },
   {
     time: '115~120분',
     title: '고도화 포인트 정리',
-    goal: 'LangSmith, 평가, 관측성, RRF를 실습 확장 관점으로 연결합니다.',
+    goal: '관측, 평가, 검색 고도화를 다음 단계로 어떻게 붙일지 정리합니다.',
   },
 ];
 
