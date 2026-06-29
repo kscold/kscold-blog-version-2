@@ -48,6 +48,8 @@ interface BloomVoteFormState {
   message: string;
 }
 
+type BloomVoteFormErrors = Partial<Record<keyof BloomVoteFormState, string>>;
+
 const initialFormState: BloomVoteFormState = {
   requesterName: '',
   contactEmail: '',
@@ -64,6 +66,47 @@ const initialFormState: BloomVoteFormState = {
   message: '',
 };
 
+const NAME_PATTERN = /^[가-힣A-Za-z][가-힣A-Za-z\s·.-]{1,39}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function onlyPhoneDigits(value: string) {
+  return value.replace(/\D/g, '');
+}
+
+function formatPhoneNumber(value: string) {
+  const rawDigits = onlyPhoneDigits(value);
+  const digits = rawDigits.startsWith('02') ? rawDigits.slice(0, 10) : rawDigits.slice(0, 11);
+
+  if (digits.startsWith('02')) {
+    if (digits.length <= 2) {
+      return digits;
+    }
+    if (digits.length <= 5) {
+      return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+    }
+    if (digits.length <= 9) {
+      return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(5)}`;
+    }
+    return `${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+
+  if (digits.length <= 3) {
+    return digits;
+  }
+  if (digits.length <= 7) {
+    return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  }
+  if (digits.length === 10) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+}
+
+function isValidPhoneNumber(value: string) {
+  const digits = onlyPhoneDigits(value);
+  return /^(01[016789]\d{7,8}|02\d{7,8}|0[3-9]\d{8,9})$/.test(digits);
+}
+
 function optionLabel(options: AdminNightOption[], value: string) {
   return options.find(option => option.value === value)?.label ?? value;
 }
@@ -78,6 +121,75 @@ function toggleValue(values: string[], value: string) {
   return values.includes(value) ? values.filter(item => item !== value) : [...values, value];
 }
 
+function validateBloomVoteForm(form: BloomVoteFormState) {
+  const errors: BloomVoteFormErrors = {};
+  const requesterName = form.requesterName.trim();
+  const contactEmail = form.contactEmail.trim();
+
+  if (!requesterName) {
+    errors.requesterName = '실제 본명을 적어주세요.';
+  } else if (!NAME_PATTERN.test(requesterName)) {
+    errors.requesterName = '본명은 한글/영문 기준 2~40자로 적어주세요.';
+  }
+
+  if (!contactEmail) {
+    errors.contactEmail = '안내 받을 이메일을 적어주세요.';
+  } else if (contactEmail.length > 120 || !EMAIL_PATTERN.test(contactEmail)) {
+    errors.contactEmail = '이메일 형식이 올바르지 않습니다.';
+  }
+
+  if (!form.contact.trim()) {
+    errors.contact = '연락처를 적어주세요.';
+  } else if (!isValidPhoneNumber(form.contact)) {
+    errors.contact = '연락처는 010-1234-5678처럼 숫자 10~11자리로 적어주세요.';
+  }
+
+  if (!form.interestLevel) {
+    errors.interestLevel = '참여 의향을 골라주세요.';
+  }
+  if (!form.experienceLevel) {
+    errors.experienceLevel = '현재 경험 수준을 골라주세요.';
+  }
+  if (!form.sessionStyle) {
+    errors.sessionStyle = '선호 Bloom 형식을 골라주세요.';
+  }
+  if (!form.sessionLength) {
+    errors.sessionLength = '좋은 Bloom 시간을 골라주세요.';
+  }
+  if (!form.foodPreference) {
+    errors.foodPreference = '음식/음료 선호를 골라주세요.';
+  }
+  if (form.preferredDays.length === 0) {
+    errors.preferredDays = '희망 요일을 하나 이상 골라주세요.';
+  }
+  if (form.preferredTimes.length === 0) {
+    errors.preferredTimes = '가능한 시간대를 하나 이상 골라주세요.';
+  }
+  if (form.interestedTopics.length === 0) {
+    errors.interestedTopics = '듣고 싶은 주제를 하나 이상 골라주세요.';
+  }
+
+  return errors;
+}
+
+function firstFormError(errors: BloomVoteFormErrors) {
+  const order: (keyof BloomVoteFormState)[] = [
+    'requesterName',
+    'contactEmail',
+    'contact',
+    'interestLevel',
+    'experienceLevel',
+    'sessionStyle',
+    'sessionLength',
+    'foodPreference',
+    'preferredDays',
+    'preferredTimes',
+    'interestedTopics',
+  ];
+  const firstKey = order.find(key => errors[key]);
+  return firstKey ? errors[firstKey] ?? null : null;
+}
+
 export function AdminNightBloomSection() {
   const { isAuthenticated, user } = useViewer();
   const [form, setForm] = useState<BloomVoteFormState>({
@@ -85,6 +197,7 @@ export function AdminNightBloomSection() {
     requesterName: user?.displayName ?? '',
     contactEmail: user?.email ?? '',
   });
+  const [formErrors, setFormErrors] = useState<BloomVoteFormErrors>({});
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const { data: summary } = useAdminNightProgramVoteSummary(AI_AGENT_BLOOM_PROGRAM_KEY);
   const { data: myVote } = useMyAdminNightProgramVote(AI_AGENT_BLOOM_PROGRAM_KEY, isAuthenticated);
@@ -95,7 +208,7 @@ export function AdminNightBloomSection() {
       setForm({
         requesterName: myVote.requesterName,
         contactEmail: myVote.contactEmail ?? myVote.requesterEmail ?? user?.email ?? '',
-        contact: myVote.contact ?? '',
+        contact: formatPhoneNumber(myVote.contact ?? ''),
         interestLevel: myVote.interestLevel,
         experienceLevel: myVote.experienceLevel,
         sessionStyle: myVote.sessionStyle ?? initialFormState.sessionStyle,
@@ -124,28 +237,35 @@ export function AdminNightBloomSection() {
     () => summary?.interestLevelCounts.READY_IF_SCHEDULE_FITS ?? 0,
     [summary?.interestLevelCounts.READY_IF_SCHEDULE_FITS]
   );
-  const canSubmit =
-    form.requesterName.trim().length > 0 &&
-    form.contactEmail.trim().length > 0 &&
-    form.contact.trim().length > 0 &&
-    form.preferredDays.length > 0 &&
-    form.preferredTimes.length > 0;
 
   const updateForm = <TKey extends keyof BloomVoteFormState>(key: TKey, value: BloomVoteFormState[TKey]) => {
     setForm(prev => ({ ...prev, [key]: value }));
+    setFormErrors(prev => {
+      if (!prev[key]) {
+        return prev;
+      }
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+    setStatusMessage(null);
   };
 
   const handleSubmit = async () => {
-    if (!canSubmit) {
-      setStatusMessage('본명, 이메일, 연락처, 희망 요일과 시간대를 먼저 남겨주세요.');
+    const nextErrors = validateBloomVoteForm(form);
+    const firstError = firstFormError(nextErrors);
+    setFormErrors(nextErrors);
+
+    if (firstError) {
+      setStatusMessage(firstError);
       return;
     }
 
     try {
       await voteMutation.mutateAsync({
-        requesterName: form.requesterName,
-        contactEmail: form.contactEmail,
-        contact: form.contact,
+        requesterName: form.requesterName.trim(),
+        contactEmail: form.contactEmail.trim(),
+        contact: formatPhoneNumber(form.contact),
         interestLevel: form.interestLevel,
         preferredFormat: 'OFFLINE' as AdminNightProgramPreferredFormat,
         experienceLevel: form.experienceLevel,
@@ -170,18 +290,25 @@ export function AdminNightBloomSection() {
         <div className="space-y-8 p-6 sm:p-8 lg:p-10">
           <div className="space-y-4">
             <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.28em] text-white/70">
-              AI Agent Bloom · Offline Agenda
+              AI Agent Bloom · Build & Share
             </div>
-            <div className="max-w-3xl space-y-4">
-              <h2 className="text-4xl font-black tracking-tight sm:text-5xl">
-                오프라인 AI Agent 어젠다 강의,
+            <div className="max-w-3xl space-y-4 [word-break:keep-all]">
+              <h2 className="text-[2.45rem] font-black leading-[1.08] tracking-tight sm:text-5xl sm:leading-[1.08]">
+                <span className="inline-block">AI Agent,</span>{' '}
+                <span className="inline-block">같이 만들고</span>
+                <span className="hidden sm:inline">,</span>
                 <br />
-                먼저 듣고 싶은 사람을 모읍니다.
+                <span className="inline-block">서로 피워볼 사람?</span>
               </h2>
-              <p className="text-sm leading-8 text-white/68 sm:text-base">
-                LLM 호출에서 LCEL, Memory, LangGraph MAS, RAG fallback, 평가와 관측까지 이어지는 오프라인 강의형 공유입니다.
-                강의는 바이브코딩을 적극 활용해 실제 구현 흐름을 함께 따라가며, 장소 대관, 음식/음료, 강의 준비를 포함해 참가비는 2만~3만 원 사이로 예상합니다.
-              </p>
+              <div className="space-y-3 text-sm leading-8 text-white/68 sm:text-base">
+                <p>
+                  작은 LLM 호출 하나에서 시작해 Prompt, Memory, LangGraph, RAG fallback까지 천천히 이어가보려 합니다.
+                </p>
+                <p>
+                  바이브코딩을 적극 활용해 실제 구현 흐름을 함께 따라가고, 만든 아이디어를 서로 나눠보는 자리로 준비하고 있습니다.
+                  지금은 먼저 같이 해보고 싶은 사람과 가능한 일정을 모으는 단계입니다.
+                </p>
+              </div>
               <div className="flex flex-wrap gap-3">
                 <Link
                   href={AI_AGENT_BLOOM_DETAIL_PATH}
@@ -210,8 +337,8 @@ export function AdminNightBloomSection() {
                 }`}
               >
                 <p className="text-[11px] font-black uppercase tracking-[0.24em] text-white/45">{phase.label}</p>
-                <h3 className="mt-2 text-lg font-black tracking-tight">{phase.title}</h3>
-                <p className="mt-2 text-xs leading-6 text-white/58">{phase.description}</p>
+                <h3 className="mt-2 text-lg font-black tracking-tight [word-break:keep-all]">{phase.title}</h3>
+                <p className="mt-2 text-xs leading-6 text-white/58 [word-break:keep-all]">{phase.description}</p>
               </article>
             ))}
           </div>
@@ -229,9 +356,9 @@ export function AdminNightBloomSection() {
                   <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-white/45">ready</p>
                 </div>
               </div>
-              <p className="mt-4 text-xs leading-6 text-white/55">
-                ready는 “일정 맞으면 참여”를 고른 사람입니다. 이번 Bloom은 오프라인 고정이며,
-                바이브코딩을 적극 활용하는 강의형 세션으로 진행합니다. 실제 일정 확정 시 예상 참가비 2만~3만 원 범위로 안내합니다.
+              <p className="mt-4 text-xs leading-6 text-white/55 [word-break:keep-all]">
+                ready는 “일정 맞으면 참여”를 고른 사람입니다. 숫자가 쌓이면 실제 날짜와 장소,
+                참가비 범위를 따로 안내하겠습니다.
               </p>
             </article>
           </div>
@@ -257,7 +384,7 @@ export function AdminNightBloomSection() {
             <p className="text-[11px] font-black uppercase tracking-[0.28em] text-surface-400">Interest Form</p>
             <h3 className="text-2xl font-black tracking-tight">AI Agent Bloom 투표</h3>
             <p className="text-sm leading-7 text-surface-500">
-              진행 방식은 오프라인 고정입니다. 바이브코딩을 적극 활용하며, 장소 대관·음식/음료·강의 준비를 포함한 예상 참가비는 2만~3만 원 사이입니다.
+              오프라인으로 진행할 예정입니다. 아직 신청 확정은 아니고, 먼저 관심도와 가능한 시간을 모으는 단계입니다.
             </p>
           </div>
 
@@ -265,7 +392,7 @@ export function AdminNightBloomSection() {
             <div className="rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm leading-7 text-cyan-900">
               <p className="font-black">진행 방식: 오프라인 고정</p>
               <p className="mt-1 text-cyan-800">
-                강의 중심, 실습 중심, 네트워킹 비중은 아래 투표 결과를 보고 조정합니다.
+                세부 구성은 투표 결과를 보고 정합니다. 듣기 좋은 방식과 가능한 시간을 편하게 남겨주세요.
               </p>
             </div>
 
@@ -273,7 +400,7 @@ export function AdminNightBloomSection() {
               <div className="rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 text-surface-600">
                 <p className="font-black text-surface-900">로그인 없이도 투표할 수 있어요.</p>
                 <p className="mt-1">
-                  일정 안내와 감사 메일을 보낼 수 있도록 본명, 이메일, 연락처만 정확히 남겨주세요.
+                  나중에 일정 안내를 보낼 수 있도록 본명, 이메일, 연락처만 정확히 남겨주세요.
                 </p>
               </div>
             )}
@@ -287,8 +414,14 @@ export function AdminNightBloomSection() {
                 value={form.requesterName}
                 onChange={event => updateForm('requesterName', event.target.value)}
                 placeholder="실제 진행 안내에 사용할 본명"
-                className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+                aria-invalid={Boolean(formErrors.requesterName)}
+                className={`w-full rounded-2xl border bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900 ${
+                  formErrors.requesterName ? 'border-rose-300' : 'border-surface-200'
+                }`}
               />
+              {formErrors.requesterName && (
+                <p className="text-xs font-bold text-rose-500">{formErrors.requesterName}</p>
+              )}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
@@ -302,8 +435,15 @@ export function AdminNightBloomSection() {
                   value={form.contactEmail}
                   onChange={event => updateForm('contactEmail', event.target.value)}
                   placeholder="schedule@example.com"
-                  className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+                  autoComplete="email"
+                  aria-invalid={Boolean(formErrors.contactEmail)}
+                  className={`w-full rounded-2xl border bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900 ${
+                    formErrors.contactEmail ? 'border-rose-300' : 'border-surface-200'
+                  }`}
                 />
+                {formErrors.contactEmail && (
+                  <p className="text-xs font-bold text-rose-500">{formErrors.contactEmail}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -313,10 +453,18 @@ export function AdminNightBloomSection() {
                 <input
                   id="ai-agent-bloom-contact"
                   value={form.contact}
-                  onChange={event => updateForm('contact', event.target.value)}
-                  placeholder="전화, 카톡, 슬랙 등 편한 연락처"
-                  className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+                  onChange={event => updateForm('contact', formatPhoneNumber(event.target.value))}
+                  placeholder="010-1234-5678"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  aria-invalid={Boolean(formErrors.contact)}
+                  className={`w-full rounded-2xl border bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900 ${
+                    formErrors.contact ? 'border-rose-300' : 'border-surface-200'
+                  }`}
                 />
+                {formErrors.contact && (
+                  <p className="text-xs font-bold text-rose-500">{formErrors.contact}</p>
+                )}
               </div>
             </div>
 
@@ -325,6 +473,8 @@ export function AdminNightBloomSection() {
                 options={AI_AGENT_BLOOM_INTEREST_OPTIONS}
                 value={form.interestLevel}
                 onChange={value => updateForm('interestLevel', value as AdminNightProgramInterestLevel)}
+                error={formErrors.interestLevel}
+                required
               />
 
               <OptionButtonGroup
@@ -332,6 +482,8 @@ export function AdminNightBloomSection() {
                 options={AI_AGENT_BLOOM_EXPERIENCE_OPTIONS}
                 value={form.experienceLevel}
                 onChange={value => updateForm('experienceLevel', value as AdminNightProgramExperienceLevel)}
+                error={formErrors.experienceLevel}
+                required
               />
 
               <OptionButtonGroup
@@ -339,6 +491,8 @@ export function AdminNightBloomSection() {
                 options={AI_AGENT_BLOOM_SESSION_STYLE_OPTIONS}
                 value={form.sessionStyle}
                 onChange={value => updateForm('sessionStyle', value as AdminNightProgramSessionStyle)}
+                error={formErrors.sessionStyle}
+                required
               />
 
               <OptionButtonGroup
@@ -346,6 +500,8 @@ export function AdminNightBloomSection() {
                 options={AI_AGENT_BLOOM_SESSION_LENGTH_OPTIONS}
                 value={form.sessionLength}
                 onChange={value => updateForm('sessionLength', value as AdminNightProgramSessionLength)}
+                error={formErrors.sessionLength}
+                required
               />
 
               <OptionButtonGroup
@@ -353,6 +509,8 @@ export function AdminNightBloomSection() {
                 options={AI_AGENT_BLOOM_FOOD_OPTIONS}
                 value={form.foodPreference}
                 onChange={value => updateForm('foodPreference', value as AdminNightProgramFoodPreference)}
+                error={formErrors.foodPreference}
+                required
               />
 
               <MultiSelectGrid
@@ -362,6 +520,8 @@ export function AdminNightBloomSection() {
                 onToggle={value =>
                   updateForm('preferredDays', toggleValue(form.preferredDays, value) as AdminNightProgramPreferredDay[])
                 }
+                error={formErrors.preferredDays}
+                required
               />
 
               <MultiSelectGrid
@@ -369,6 +529,8 @@ export function AdminNightBloomSection() {
                 options={AI_AGENT_BLOOM_TIME_OPTIONS}
                 values={form.preferredTimes}
                 onToggle={value => updateForm('preferredTimes', toggleValue(form.preferredTimes, value))}
+                error={formErrors.preferredTimes}
+                required
               />
 
               <MultiSelectGrid
@@ -376,6 +538,8 @@ export function AdminNightBloomSection() {
                 options={AI_AGENT_BLOOM_TOPIC_OPTIONS}
                 values={form.interestedTopics}
                 onToggle={value => updateForm('interestedTopics', toggleValue(form.interestedTopics, value))}
+                error={formErrors.interestedTopics}
+                required
               />
 
               <div className="space-y-2">
@@ -386,7 +550,7 @@ export function AdminNightBloomSection() {
                   id="ai-agent-bloom-takeaways"
                   value={form.desiredTakeaways}
                   onChange={event => updateForm('desiredTakeaways', event.target.value)}
-                  placeholder="예: LangGraph 설계 감각, RAG fallback 구조, 실제 업무에 붙이는 기준 같은 것을 적어주세요."
+                  placeholder="예: LangGraph 흐름을 감으로 잡고 싶어요. 실제 업무에 붙일 때 기준이 궁금해요."
                   className="min-h-28 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
                 />
               </div>
@@ -399,7 +563,7 @@ export function AdminNightBloomSection() {
                   id="ai-agent-bloom-message"
                   value={form.message}
                   onChange={event => updateForm('message', event.target.value)}
-                  placeholder="목차에 꼭 들어가면 좋을 내용, 현재 막힌 지점, 같이 나누고 싶은 맥락을 적어주세요."
+                  placeholder="목차에 들어가면 좋을 내용이나 지금 궁금한 점이 있다면 편하게 남겨주세요."
                   className="min-h-28 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
                 />
               </div>
@@ -407,7 +571,7 @@ export function AdminNightBloomSection() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={!canSubmit || voteMutation.isPending}
+                disabled={voteMutation.isPending}
                 className="w-full rounded-2xl bg-surface-900 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-surface-800 disabled:cursor-not-allowed disabled:bg-surface-300"
               >
                 {voteMutation.isPending ? '투표 저장 중…' : myVote ? '투표 다시 저장하기' : '관심 투표 남기기'}
@@ -430,25 +594,34 @@ function OptionButtonGroup({
   options,
   value,
   onChange,
+  error,
+  required = false,
 }: {
   title: string;
   options: AdminNightOption[];
   value: string;
   onChange: (value: string) => void;
+  error?: string;
+  required?: boolean;
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-bold text-surface-900">{title}</p>
+      <p className="text-sm font-bold text-surface-900">
+        {title} {required && <span className="text-cyan-600">*</span>}
+      </p>
       <div className="grid gap-2 sm:grid-cols-2">
         {options.map(option => (
           <button
             key={option.value}
             type="button"
             onClick={() => onChange(option.value)}
+            aria-pressed={value === option.value}
             className={`rounded-2xl border px-4 py-3 text-left transition-colors ${
               value === option.value
                 ? 'border-surface-900 bg-surface-900 text-white'
-                : 'border-surface-200 bg-surface-50 text-surface-900 hover:border-surface-300'
+                : error
+                  ? 'border-rose-200 bg-rose-50 text-surface-900 hover:border-rose-300'
+                  : 'border-surface-200 bg-surface-50 text-surface-900 hover:border-surface-300'
             }`}
           >
             <p className="text-sm font-black">{option.label}</p>
@@ -456,6 +629,7 @@ function OptionButtonGroup({
           </button>
         ))}
       </div>
+      {error && <p className="text-xs font-bold text-rose-500">{error}</p>}
     </div>
   );
 }
@@ -465,15 +639,21 @@ function MultiSelectGrid({
   options,
   values,
   onToggle,
+  error,
+  required = false,
 }: {
   title: string;
   options: AdminNightOption[];
   values: string[];
   onToggle: (value: string) => void;
+  error?: string;
+  required?: boolean;
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-sm font-bold text-surface-900">{title}</p>
+      <p className="text-sm font-bold text-surface-900">
+        {title} {required && <span className="text-cyan-600">*</span>}
+      </p>
       <div className="grid gap-2 sm:grid-cols-2">
         {options.map(option => {
           const selected = values.includes(option.value);
@@ -482,10 +662,13 @@ function MultiSelectGrid({
               key={option.value}
               type="button"
               onClick={() => onToggle(option.value)}
+              aria-pressed={selected}
               className={`rounded-2xl border px-4 py-3 text-left transition-colors ${
                 selected
                   ? 'border-cyan-500 bg-cyan-50 text-surface-900'
-                  : 'border-surface-200 bg-surface-50 text-surface-900 hover:border-surface-300'
+                  : error
+                    ? 'border-rose-200 bg-rose-50 text-surface-900 hover:border-rose-300'
+                    : 'border-surface-200 bg-surface-50 text-surface-900 hover:border-surface-300'
               }`}
             >
               <p className="text-sm font-black">{option.label}</p>
@@ -494,6 +677,7 @@ function MultiSelectGrid({
           );
         })}
       </div>
+      {error && <p className="text-xs font-bold text-rose-500">{error}</p>}
     </div>
   );
 }

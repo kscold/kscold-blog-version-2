@@ -33,6 +33,8 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
     private static final Pattern PROGRAM_KEY_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9-]{1,80}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+    private static final Pattern REQUESTER_NAME_PATTERN = Pattern.compile("^[가-힣A-Za-z][가-힣A-Za-z\\s·.-]{1,39}$");
+    private static final Pattern PHONE_DIGITS_PATTERN = Pattern.compile("^(01[016789]\\d{7,8}|02\\d{7,8}|0[3-9]\\d{8,9})$");
     private static final String ANONYMOUS_PRINCIPAL = "anonymousUser";
 
     private final AdminNightRequestRepository adminNightRequestRepository;
@@ -196,7 +198,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         vote.setRequesterName(normalizeText(command.requesterName(), "이름을 적어주세요."));
         vote.setRequesterEmail(user != null ? user.getEmail() : contactEmail);
         vote.setContactEmail(contactEmail);
-        vote.setContact(normalizeRequiredText(command.contact(), "연락처를 적어주세요.", 120, "연락처는 120자를 넘길 수 없습니다."));
+        vote.setContact(normalizePhoneNumber(command.contact()));
         vote.setInterestLevel(requireInterestLevel(command.interestLevel()));
         vote.setPreferredFormat(requirePreferredFormat(command.preferredFormat()));
         vote.setExperienceLevel(requireExperienceLevel(command.experienceLevel()));
@@ -204,8 +206,8 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         vote.setSessionLength(requireSessionLength(command.sessionLength()));
         vote.setFoodPreference(requireFoodPreference(command.foodPreference()));
         vote.setPreferredDays(normalizePreferredDays(command.preferredDays()));
-        vote.setPreferredTimes(normalizeList(command.preferredTimes(), 8));
-        vote.setInterestedTopics(normalizeList(command.interestedTopics(), 12));
+        vote.setPreferredTimes(normalizeRequiredList(command.preferredTimes(), 8, "가능한 시간대를 하나 이상 골라주세요."));
+        vote.setInterestedTopics(normalizeRequiredList(command.interestedTopics(), 12, "듣고 싶은 주제를 하나 이상 골라주세요."));
         vote.setDesiredTakeaways(normalizeOptionalText(command.desiredTakeaways(), 1000));
         vote.setMessage(normalizeOptionalText(command.message(), 1000));
 
@@ -304,20 +306,29 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     }
 
     private AdminNightProgramVote.SessionStyle requireSessionStyle(AdminNightProgramVote.SessionStyle sessionStyle) {
-        return sessionStyle != null ? sessionStyle : AdminNightProgramVote.SessionStyle.MIXED;
+        if (sessionStyle == null) {
+            throw InvalidRequestException.invalidInput("선호 Bloom 형식을 골라주세요.");
+        }
+        return sessionStyle;
     }
 
     private AdminNightProgramVote.SessionLength requireSessionLength(AdminNightProgramVote.SessionLength sessionLength) {
-        return sessionLength != null ? sessionLength : AdminNightProgramVote.SessionLength.STANDARD_120;
+        if (sessionLength == null) {
+            throw InvalidRequestException.invalidInput("좋은 Bloom 시간을 골라주세요.");
+        }
+        return sessionLength;
     }
 
     private AdminNightProgramVote.FoodPreference requireFoodPreference(AdminNightProgramVote.FoodPreference foodPreference) {
-        return foodPreference != null ? foodPreference : AdminNightProgramVote.FoodPreference.LIGHT_SNACK;
+        if (foodPreference == null) {
+            throw InvalidRequestException.invalidInput("음식/음료 선호를 골라주세요.");
+        }
+        return foodPreference;
     }
 
     private List<AdminNightProgramVote.PreferredDay> normalizePreferredDays(List<AdminNightProgramVote.PreferredDay> values) {
         if (values == null || values.isEmpty()) {
-            return List.of(AdminNightProgramVote.PreferredDay.SATURDAY, AdminNightProgramVote.PreferredDay.SUNDAY);
+            throw InvalidRequestException.invalidInput("희망 요일을 하나 이상 골라주세요.");
         }
 
         LinkedHashSet<AdminNightProgramVote.PreferredDay> normalized = new LinkedHashSet<>();
@@ -347,9 +358,35 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         return email;
     }
 
-    private List<String> normalizeList(List<String> values, int maxSize) {
-        if (values == null) {
-            return List.of();
+    private String normalizePhoneNumber(String value) {
+        if (!StringUtils.hasText(value)) {
+            throw InvalidRequestException.invalidInput("연락처를 적어주세요.");
+        }
+
+        String digits = value.replaceAll("\\D", "");
+        if (!PHONE_DIGITS_PATTERN.matcher(digits).matches()) {
+            throw InvalidRequestException.invalidInput("연락처는 010-1234-5678처럼 숫자 10~11자리로 적어주세요.");
+        }
+        return formatPhoneNumber(digits);
+    }
+
+    private String formatPhoneNumber(String digits) {
+        if (digits.startsWith("02")) {
+            if (digits.length() == 9) {
+                return digits.substring(0, 2) + "-" + digits.substring(2, 5) + "-" + digits.substring(5);
+            }
+            return digits.substring(0, 2) + "-" + digits.substring(2, 6) + "-" + digits.substring(6);
+        }
+
+        if (digits.length() == 10) {
+            return digits.substring(0, 3) + "-" + digits.substring(3, 6) + "-" + digits.substring(6);
+        }
+        return digits.substring(0, 3) + "-" + digits.substring(3, 7) + "-" + digits.substring(7);
+    }
+
+    private List<String> normalizeRequiredList(List<String> values, int maxSize, String emptyMessage) {
+        if (values == null || values.isEmpty()) {
+            throw InvalidRequestException.invalidInput(emptyMessage);
         }
 
         LinkedHashSet<String> normalized = new LinkedHashSet<>();
@@ -366,6 +403,9 @@ public class AdminNightApplicationService implements AdminNightUseCase {
                 throw InvalidRequestException.invalidInput("선택 항목이 너무 많습니다.");
             }
         }
+        if (normalized.isEmpty()) {
+            throw InvalidRequestException.invalidInput(emptyMessage);
+        }
         return List.copyOf(normalized);
     }
 
@@ -374,19 +414,8 @@ public class AdminNightApplicationService implements AdminNightUseCase {
             throw InvalidRequestException.invalidInput(message);
         }
         String normalized = value.trim();
-        if (normalized.length() > 80) {
-            throw InvalidRequestException.invalidInput("이름은 80자를 넘길 수 없습니다.");
-        }
-        return normalized;
-    }
-
-    private String normalizeRequiredText(String value, String message, int maxLength, String maxLengthMessage) {
-        if (!StringUtils.hasText(value)) {
-            throw InvalidRequestException.invalidInput(message);
-        }
-        String normalized = value.trim();
-        if (normalized.length() > maxLength) {
-            throw InvalidRequestException.invalidInput(maxLengthMessage);
+        if (!REQUESTER_NAME_PATTERN.matcher(normalized).matches()) {
+            throw InvalidRequestException.invalidInput("본명은 한글/영문 기준 2~40자로 적어주세요.");
         }
         return normalized;
     }
