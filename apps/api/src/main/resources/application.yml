@@ -87,6 +87,12 @@ admin-night:
   admin-email: ${ADMIN_NIGHT_ADMIN_EMAIL:developerkscold@gmail.com}
   admin-name: ${ADMIN_NIGHT_ADMIN_NAME:김승찬}
 
+portone:
+  store-id: ${PORTONE_STORE_ID:}
+  kakao-pay-channel-key: ${PORTONE_KAKAOPAY_CHANNEL_KEY:}
+  api-secret: ${PORTONE_API_SECRET:}
+  api-base-url: ${PORTONE_API_BASE_URL:https://api.portone.io}
+
 # Logging
 logging:
   level:
