@@ -203,7 +203,7 @@ export function VaultAgentChatPanel({ graphData, activeFolderName, onClose }: Va
       </div>
 
       <div className="border-t border-surface-200/70 p-4 dark:border-surface-800">
-        <div className="mb-3 flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
+        <div className="mb-3 flex flex-wrap gap-2">
           {starterPrompts.map(prompt => (
             <button
               key={prompt}

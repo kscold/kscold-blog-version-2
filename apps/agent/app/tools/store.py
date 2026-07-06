@@ -5,6 +5,7 @@ import hashlib
 import re
 import uuid
 
+from bson import ObjectId
 from openai import OpenAI
 from pymongo import MongoClient
 from qdrant_client import QdrantClient
@@ -40,6 +41,7 @@ class VaultStore:
         self.mongo = MongoClient(config.mongodb_uri)
         self.db = self.mongo[config.mongodb_database]
         self.notes = self.db["vault_notes"]
+        self.folders = self.db["vault_folders"]
         self.runs = self.db["vault_agent_runs"]
         self.qdrant = QdrantClient(url=config.qdrant_url)
         self._ensure_collection()
@@ -90,24 +92,91 @@ class VaultStore:
         ).limit(limit)
         return [self._to_note(document) for document in documents]
 
-    def search(self, query: str, limit: int) -> list[SearchHit]:
+    def search(self, query: str, limit: int, active_folder_name: str = "") -> list[SearchHit]:
+        folder_ids = self.resolve_folder_scope(active_folder_name)
         if self.qdrant.count(collection_name=self.config.qdrant_collection, exact=True).count == 0:
-            self.reindex()
+            return self.keyword_search(query, limit, folder_ids)
 
-        query_vector = self.embed_text(query)
-        hits = self.qdrant.search(
-            collection_name=self.config.qdrant_collection,
-            query_vector=query_vector,
-            limit=limit,
-            with_payload=True,
-        )
+        try:
+            query_vector = self.embed_text(query)
+            hits = self.qdrant.search(
+                collection_name=self.config.qdrant_collection,
+                query_vector=query_vector,
+                limit=limit,
+                with_payload=True,
+            )
+        except Exception:
+            return self.keyword_search(query, limit)
+
         note_ids = [str(hit.payload.get("note_id")) for hit in hits if hit.payload]
         notes = {note.id: note for note in self.fetch_notes(note_ids)}
+        if folder_ids:
+            notes = {
+                note_id: note
+                for note_id, note in notes.items()
+                if note.folder_id in folder_ids
+            }
         return [
             SearchHit(note=notes[note_id], score=float(hit.score))
             for hit, note_id in zip(hits, note_ids)
             if note_id in notes
-        ]
+        ] or self.keyword_search(query, limit, folder_ids)
+
+    def keyword_search(self, query: str, limit: int, folder_ids: set[str] | None = None) -> list[SearchHit]:
+        terms = [
+            term
+            for term in re.split(r"[\s,./|:;()\[\]{}<>!?\"'`~]+", query)
+            if len(term.strip()) >= 2
+        ][:6]
+        folder_filter = {"folderId": {"$in": list(folder_ids)}} if folder_ids else {}
+        if not terms:
+            documents = self.notes.find(folder_filter).limit(limit)
+            return [SearchHit(note=self._to_note(document), score=0.35) for document in documents]
+
+        conditions = []
+        for term in terms:
+            pattern = re.escape(term)
+            conditions.extend(
+                [
+                    {"title": {"$regex": pattern, "$options": "i"}},
+                    {"content": {"$regex": pattern, "$options": "i"}},
+                    {"tags": {"$regex": pattern, "$options": "i"}},
+                ]
+            )
+
+        query_filter = {"$and": [folder_filter, {"$or": conditions}]} if folder_filter else {"$or": conditions}
+        documents = self.notes.find(query_filter).limit(limit)
+        return [SearchHit(note=self._to_note(document), score=0.45) for document in documents]
+
+    def resolve_folder_scope(self, active_folder_name: str) -> set[str | ObjectId]:
+        if not active_folder_name:
+            return set()
+
+        folder = self.folders.find_one(
+            {
+                "$or": [
+                    {"name": active_folder_name},
+                    {"slug": active_folder_name},
+                    {"slug": active_folder_name.lower()},
+                ]
+            }
+        )
+        if not folder:
+            return set()
+
+        folder_object_id = folder["_id"]
+        folder_id = str(folder_object_id)
+        descendants = self.folders.find(
+            {"$or": [{"ancestors": folder_object_id}, {"ancestors": folder_id}, {"parent": folder_object_id}, {"parent": folder_id}]},
+            {"_id": 1},
+        )
+        descendant_ids = [document["_id"] for document in descendants]
+        return {
+            folder_object_id,
+            folder_id,
+            *(descendant_id for descendant_id in descendant_ids),
+            *(str(descendant_id) for descendant_id in descendant_ids),
+        }
 
     def expand_graph(self, hits: list[SearchHit], limit: int) -> list[SearchHit]:
         seen = {hit.note.id for hit in hits}

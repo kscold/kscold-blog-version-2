@@ -33,21 +33,25 @@ class VaultRagGraph:
         graph.add_node("retrieve", self.retrieve)
         graph.add_node("expand", self.expand)
         graph.add_node("web_search", self.search_web)
-        graph.add_node("answer", self.answer)
+        graph.add_node("respond", self.answer)
         graph.set_entry_point("retrieve")
         graph.add_edge("retrieve", "expand")
         graph.add_edge("expand", "web_search")
-        graph.add_edge("web_search", "answer")
-        graph.add_edge("answer", END)
+        graph.add_edge("web_search", "respond")
+        graph.add_edge("respond", END)
         self.app = graph.compile()
 
     def retrieve(self, state: AgentState) -> AgentState:
-        hits = self.store.search(state["question"], self.config.max_context_notes)
+        hits = self.store.search(
+            state["question"],
+            self.config.max_context_notes,
+            state.get("active_folder_name", ""),
+        )
         state["hits"] = hits
         state["stages"].append(
             {
                 "name": "Retrieve",
-                "detail": f"Qdrant에서 Vault 노트 상위 {len(hits)}개를 검색했습니다.",
+                "detail": f"질문과 가까운 Vault 후보 노트 {len(hits)}개를 찾았습니다.",
             }
         )
         return state
