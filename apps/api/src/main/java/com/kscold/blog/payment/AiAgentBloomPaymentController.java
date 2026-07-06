@@ -42,6 +42,10 @@ public class AiAgentBloomPaymentController {
             @AuthenticationPrincipal String userId,
             @Valid @RequestBody CompletePaymentRequest request
     ) {
-        return ResponseEntity.ok(ApiResponse.success(aiAgentBloomPaymentService.complete(userId, request.paymentId())));
+        return ResponseEntity.ok(ApiResponse.success(aiAgentBloomPaymentService.complete(
+                userId,
+                request.paymentId(),
+                request.paymentAccessToken()
+        )));
     }
 }

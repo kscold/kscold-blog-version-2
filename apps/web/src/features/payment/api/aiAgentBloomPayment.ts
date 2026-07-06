@@ -19,6 +19,7 @@ export interface PrepareAiAgentBloomPaymentPayload {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  paymentAccessToken?: string;
 }
 
 export interface PreparedAiAgentBloomPayment {
@@ -49,6 +50,6 @@ export const aiAgentBloomPaymentApi = {
   getConfig: () => apiClient.get<AiAgentBloomPaymentConfig>(`${BASE_PATH}/config`),
   prepare: (payload: PrepareAiAgentBloomPaymentPayload) =>
     apiClient.post<PreparedAiAgentBloomPayment>(`${BASE_PATH}/prepare`, payload),
-  complete: (paymentId: string) =>
-    apiClient.post<CompleteAiAgentBloomPaymentResponse>(`${BASE_PATH}/complete`, { paymentId }),
+  complete: (paymentId: string, paymentAccessToken?: string) =>
+    apiClient.post<CompleteAiAgentBloomPaymentResponse>(`${BASE_PATH}/complete`, { paymentId, paymentAccessToken }),
 };

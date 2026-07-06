@@ -174,6 +174,7 @@ export default function PrivacyPolicyPage() {
             <address className="not-italic">
               <p>상호: 콜딩(Colding)</p>
               <p>대표자: 김승찬</p>
+              <p>전화: <a href="tel:010-6545-6502" className="underline">010-6545-6502</a></p>
               <p>이메일: <a href="mailto:developerkscold@gmail.com" className="underline">developerkscold@gmail.com</a></p>
               <p>사업자 문의: <a href="mailto:coldingcontact@gmail.com" className="underline">coldingcontact@gmail.com</a></p>
             </address>

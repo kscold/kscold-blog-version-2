@@ -8,6 +8,7 @@ import { ClientVaultGraph } from './ClientVaultGraph';
 import { VaultFolderTree } from './VaultFolderTree';
 import { useVaultGraphData } from '@/features/vault/lib/useVaultGraph';
 import { GraphPanelSkeleton } from '@/shared/ui/RouteSkeletons';
+import { VaultAgentChatPanel } from './VaultAgentChatPanel';
 
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 560;
@@ -21,6 +22,7 @@ export function VaultGraphLayout() {
   const [activeFolderId, setActiveFolderId] = useState<string | null>(initialFolder);
   const [hoverFolderId, setHoverFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isAgentOpen, setIsAgentOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -30,6 +32,10 @@ export function VaultGraphLayout() {
 
   const { folders, isFoldersLoading, isGraphLoading, filteredGraph, colorMap } =
     useVaultGraphData(activeFolderId);
+
+  const activeFolderName = activeFolderId
+    ? folders.find(folder => folder.id === activeFolderId)?.name
+    : undefined;
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -148,6 +154,25 @@ export function VaultGraphLayout() {
           <GraphPanelSkeleton />
         ) : filteredGraph ? (
           <div className={`w-full h-full flex flex-col overflow-hidden lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 lg:shadow-sm border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-surface-200/50 dark:border-surface-800/50'}`}>
+            <div className="absolute right-4 top-4 z-20 flex flex-col items-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsAgentOpen(prev => !prev)}
+                className={`group inline-flex cursor-pointer select-none items-center gap-2 rounded-full border px-5 py-3 text-sm font-black shadow-md outline-none transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-cyan-200 dark:focus-visible:ring-cyan-900 ${
+                  isAgentOpen
+                    ? 'border-cyan-300 bg-cyan-50 text-cyan-700 ring-2 ring-cyan-100 dark:border-cyan-700 dark:bg-cyan-950 dark:text-cyan-100 dark:ring-cyan-900/60'
+                    : isTouchDevice
+                      ? 'border-cyan-200 bg-white text-surface-900 hover:border-cyan-300 hover:text-cyan-700 dark:border-cyan-800 dark:bg-surface-900 dark:text-surface-100 dark:hover:text-cyan-100'
+                      : 'border-cyan-200 bg-white/90 text-surface-900 backdrop-blur-xl hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 dark:border-cyan-800 dark:bg-surface-900/90 dark:text-surface-100 dark:hover:bg-cyan-950 dark:hover:text-cyan-100'
+                }`}
+                aria-pressed={isAgentOpen}
+              >
+                <svg className="h-4 w-4 transition-transform duration-200 group-hover:rotate-6 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c.251.023.501.05.75.082m-.75-.082a24.301 24.301 0 0 0-4.5 0m4.5 0v.75m4.5-.75v5.714c0 .597.237 1.169.659 1.591L19 14.5m-4.5-11.396c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m-4.5 0v.75M5 14.5h14m-14 0v.75A2.25 2.25 0 0 0 7.25 17.5h9.5A2.25 2.25 0 0 0 19 15.25v-.75" />
+                </svg>
+                <span>Vault에게 묻기</span>
+              </button>
+            </div>
             <ClientVaultGraph
               graphData={filteredGraph}
               folderColorMap={colorMap}
@@ -155,6 +180,13 @@ export function VaultGraphLayout() {
               theme={theme}
               highlightFolderId={hoverFolderId}
             />
+            {isAgentOpen && (
+              <VaultAgentChatPanel
+                graphData={filteredGraph}
+                activeFolderName={activeFolderName}
+                onClose={() => setIsAgentOpen(false)}
+              />
+            )}
           </div>
         ) : (
           <div className={`text-surface-500 w-full h-full flex flex-col items-center justify-center lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md border-surface-200/50 dark:border-surface-800/50'}`}>No Data</div>

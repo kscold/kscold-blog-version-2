@@ -33,12 +33,14 @@ KSCOLD Blog v2는 단순히 글을 쌓아두는 블로그가 아니라,
 - Spring Security + JWT
 - WebSocket 기반 실시간 채팅
 - MinIO/S3 호환 업로드 + Discord 브릿지
+- gRPC 기반 Vault Agent Gateway
 
 ### 인프라
 
 - Turborepo + pnpm workspace
 - Docker + Docker Compose
 - Nginx 리버스 프록시
+- Python LangGraph Agent + Qdrant Vector DB
 
 ## 주요 기능
 
@@ -66,6 +68,16 @@ Feed는 완성된 글이 아니어도 바로 남길 수 있는 짧은 기록 공
 
 Vault는 블로그보다 더 밀도 높은 개인 지식 베이스 역할을 합니다.  
 개념과 개념을 서로 연결하고, 축적된 노트를 탐색 가능한 형태로 유지하는 데 초점을 둡니다.
+
+### Vault Agent
+
+Vault Agent는 기존 MongoDB의 `vault_notes`를 읽고, Qdrant의 `vault_notes` 컬렉션에 임베딩 인덱스를 유지합니다.  
+Spring API는 직접 LLM을 호출하지 않고 Python LangGraph gRPC 서비스에 질문을 전달합니다.
+
+- Source DB: 기존 MongoDB `vault_notes`, `vault_folders` 읽기 중심 사용
+- Vector DB: 새 Qdrant 컬렉션 `vault_notes`
+- Run Log: 새 MongoDB 컬렉션 `vault_agent_runs`
+- Safety: 기존 MongoDB 볼륨과 컬렉션은 삭제하지 않으며, 배포 시 `docker compose down -v`를 사용하지 않습니다.
 
 ### Admin
 
@@ -108,6 +120,10 @@ kscold-blog-version-2/
 │           ├── shared/      # 공통 응답, AOP, 공용 도메인
 │           ├── config/      # Spring 설정
 │           └── exception/   # 예외 처리
+│   └── agent/
+│       ├── app/             # Python LangGraph + gRPC Vault Agent
+│       ├── requirements.txt
+│       └── Dockerfile
 ├── docker/                  # 로컬/배포용 Docker 설정
 ├── turbo.json
 ├── pnpm-workspace.yaml

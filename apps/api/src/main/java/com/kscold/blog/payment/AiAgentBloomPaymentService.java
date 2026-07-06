@@ -56,8 +56,9 @@ public class AiAgentBloomPaymentService {
 
     @Transactional
     public PreparePaymentResponse prepare(String userId, PreparePaymentRequest request) {
-        if (userId == null || userId.isBlank()) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "로그인 후 결제할 수 있습니다.");
+        String paymentAccessToken = normalizePaymentAccessToken(request.paymentAccessToken());
+        if ((userId == null || userId.isBlank()) && paymentAccessToken == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "로그인하거나 안내받은 결제 링크로 접속해야 결제할 수 있습니다.");
         }
         if (!portOnePaymentProperties.isClientConfigured()) {
             throw InvalidRequestException.invalidInput(
@@ -70,6 +71,7 @@ public class AiAgentBloomPaymentService {
         PaymentOrder order = PaymentOrder.builder()
                 .paymentId(paymentId)
                 .userId(userId)
+                .paymentAccessToken(paymentAccessToken)
                 .programKey(PROGRAM_KEY)
                 .orderName(ORDER_NAME)
                 .totalAmount(TOTAL_AMOUNT)
@@ -103,18 +105,16 @@ public class AiAgentBloomPaymentService {
     }
 
     @Transactional
-    public CompletePaymentResponse complete(String userId, String paymentId) {
-        if (userId == null || userId.isBlank()) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "로그인 후 결제를 완료할 수 있습니다.");
-        }
+    public CompletePaymentResponse complete(String userId, String paymentId, String requestPaymentAccessToken) {
+        String paymentAccessToken = normalizePaymentAccessToken(requestPaymentAccessToken);
         if (!portOnePaymentProperties.isServerConfigured()) {
             throw InvalidRequestException.invalidInput("PORTONE_API_SECRET 설정 후 결제 검증을 완료할 수 있습니다.");
         }
 
         PaymentOrder order = paymentOrderRepository.findByPaymentId(paymentId)
                 .orElseThrow(() -> InvalidRequestException.invalidInput("등록되지 않은 결제 ID입니다."));
-        if (!userId.equals(order.getUserId())) {
-            throw new BusinessException(ErrorCode.FORBIDDEN, "본인의 결제 건만 확인할 수 있습니다.");
+        if (!canAccessOrder(userId, paymentAccessToken, order)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "본인의 결제 건 또는 안내받은 결제 링크로만 확인할 수 있습니다.");
         }
         if (order.getStatus() == PaymentOrderStatus.PAID) {
             return new CompletePaymentResponse(order.getPaymentId(), order.getStatus(), order.getPortOneStatus(), "이미 결제가 확인되었습니다.");
@@ -182,6 +182,20 @@ public class AiAgentBloomPaymentService {
             return totalAmount;
         }
         return amount.asLong(-1);
+    }
+
+    private boolean canAccessOrder(String userId, String paymentAccessToken, PaymentOrder order) {
+        if (userId != null && !userId.isBlank() && userId.equals(order.getUserId())) {
+            return true;
+        }
+        return paymentAccessToken != null && paymentAccessToken.equals(order.getPaymentAccessToken());
+    }
+
+    private String normalizePaymentAccessToken(String paymentAccessToken) {
+        if (paymentAccessToken == null || paymentAccessToken.isBlank()) {
+            return null;
+        }
+        return paymentAccessToken.trim();
     }
 
     private String createPaymentId() {

@@ -56,6 +56,7 @@ export function VaultGraphView({
   const router = useRouter();
   const [containerRef, { width, height }] = useMeasure<HTMLDivElement>();
   const [hoverNode, setHoverNode] = useState<GraphNode | null>(null);
+  const [isGraphHovered, setIsGraphHovered] = useState(false);
   const { reduceMotion, isTouchDevice, supportsHover } = usePerformanceMode();
   const reducedGraphEffects = reduceMotion || isTouchDevice;
 
@@ -105,6 +106,7 @@ export function VaultGraphView({
     if (hasAutoFitRef.current || activeNodeSlug) return;
     hasAutoFitRef.current = true;
     fgRef.current?.zoomToFit(600, 80);
+    window.setTimeout(() => fgRef.current?.pauseAnimation(), 700);
   }, [activeNodeSlug]);
 
   // 마우스 기울임 시차 — 데스크탑에서 커서를 움직이면 별 레이어가 깊이별로
@@ -117,6 +119,20 @@ export function VaultGraphView({
       y: ((e.clientY - rect.top) / rect.height - 0.5) * 2,
     };
   }, []);
+
+  const handleGraphMouseEnter = useCallback(() => {
+    if (!supportsHover) return;
+    setIsGraphHovered(true);
+    fgRef.current?.resumeAnimation();
+  }, [supportsHover]);
+
+  const handleGraphMouseLeave = useCallback(() => {
+    if (!supportsHover) return;
+    setIsGraphHovered(false);
+    setHoverNode(null);
+    mouseRef.current = { x: 0, y: 0 };
+    window.setTimeout(() => fgRef.current?.pauseAnimation(), 120);
+  }, [supportsHover]);
 
   // 포스 시뮬레이션 설정
   useEffect(() => {
@@ -243,7 +259,7 @@ export function VaultGraphView({
       if (!center || !isFinite(center.x) || !isFinite(center.y)) return;
 
       const isDark = isDarkGraphTheme(theme);
-      const t = performance.now() / 1000;
+      const t = isGraphHovered ? performance.now() / 1000 : 0;
 
       // 마우스 기울임 시차 — 가까운 별(p 큼)일수록 커서 반대편으로 더 크게 밀린다
       const tiltX = supportsHover ? mouseRef.current.x : 0;
@@ -265,12 +281,14 @@ export function VaultGraphView({
       }
       ctx.restore();
     },
-    [reducedGraphEffects, theme, supportsHover]
+    [isGraphHovered, reducedGraphEffects, theme, supportsHover]
   );
 
   return (
     <div
       ref={containerRef}
+      onMouseEnter={handleGraphMouseEnter}
+      onMouseLeave={handleGraphMouseLeave}
       onMouseMove={supportsHover ? handleParallaxMouse : undefined}
       className={`w-full h-full relative overflow-hidden rounded-xl gallery-card transition-[opacity,transform] duration-700 ease-out ${entered ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.985]'}`}
     >
@@ -297,11 +315,20 @@ export function VaultGraphView({
           <>
             <div
               className="absolute -left-1/4 top-[12%] h-[42%] w-[70%] rounded-full blur-3xl opacity-[0.05] dark:opacity-[0.08] animate-pulse"
-              style={{ background: 'linear-gradient(100deg, #6E93C4, transparent 70%)', animationDuration: '7s' }}
+              style={{
+                background: 'linear-gradient(100deg, #6E93C4, transparent 70%)',
+                animationDuration: '7s',
+                animationPlayState: isGraphHovered ? 'running' : 'paused',
+              }}
             />
             <div
               className="absolute -right-1/4 bottom-[10%] h-[38%] w-[64%] rounded-full blur-3xl opacity-[0.04] dark:opacity-[0.07] animate-pulse"
-              style={{ background: 'linear-gradient(260deg, #a78bfa, transparent 70%)', animationDuration: '9s', animationDelay: '2.5s' }}
+              style={{
+                background: 'linear-gradient(260deg, #a78bfa, transparent 70%)',
+                animationDuration: '9s',
+                animationDelay: '2.5s',
+                animationPlayState: isGraphHovered ? 'running' : 'paused',
+              }}
             />
           </>
         )}
@@ -326,10 +353,12 @@ export function VaultGraphView({
         linkWidth={() => 0}
         linkColor={() => 'transparent'}
         linkDirectionalParticles={(link: GraphLink) =>
-          reducedGraphEffects ? 0 : hoverNode ? (isLinkHovered(link) ? 8 : 0) : 4
+          reducedGraphEffects || !isGraphHovered || !hoverNode ? 0 : isLinkHovered(link) ? 8 : 0
         }
-        linkDirectionalParticleWidth={(link: GraphLink) => (reducedGraphEffects ? 0 : isLinkHovered(link) ? 4 : 2.5)}
-        linkDirectionalParticleSpeed={reducedGraphEffects ? 0 : 0.006}
+        linkDirectionalParticleWidth={(link: GraphLink) =>
+          reducedGraphEffects || !isGraphHovered ? 0 : isLinkHovered(link) ? 4 : 2.5
+        }
+        linkDirectionalParticleSpeed={reducedGraphEffects || !isGraphHovered ? 0 : 0.006}
         linkDirectionalParticleColor={(link: GraphLink) =>
           resolveLinkParticleColor(link, gData.nodes, folderColorMap)
         }

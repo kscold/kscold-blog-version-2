@@ -28,6 +28,9 @@ public class PaymentOrder {
     @Indexed
     private String userId;
 
+    @Indexed
+    private String paymentAccessToken;
+
     private String programKey;
     private String orderName;
     private int totalAmount;

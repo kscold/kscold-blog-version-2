@@ -101,6 +101,7 @@ export function Footer() {
             </div>
             <div className="space-y-1">
               <p><span className="text-surface-500 font-medium">주소</span> 경기도 김포시 김포한강9로75번길 66, 5층 (구래동, 국제프라자)</p>
+              <p><span className="text-surface-500 font-medium">대표전화</span> <a href="tel:010-6545-6502" className="hover:text-surface-600 transition-colors">010-6545-6502</a></p>
               <p><span className="text-surface-500 font-medium">개발자</span> <a href="mailto:developerkscold@gmail.com" className="hover:text-surface-600 transition-colors">developerkscold@gmail.com</a></p>
               <p><span className="text-surface-500 font-medium">사업자</span> <a href="mailto:coldingcontact@gmail.com" className="hover:text-surface-600 transition-colors">coldingcontact@gmail.com</a></p>
             </div>

@@ -34,7 +34,11 @@ public final class AiAgentBloomPaymentDtos {
 
             @NotBlank(message = "연락처를 입력해주세요.")
             @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "연락처는 010-0000-0000 형식으로 입력해주세요.")
-            String customerPhone
+            String customerPhone,
+
+            @Size(max = 120, message = "결제 링크 토큰은 120자 이하로 입력해주세요.")
+            @Pattern(regexp = "^[A-Za-z0-9._-]*$", message = "결제 링크 토큰 형식이 올바르지 않습니다.")
+            String paymentAccessToken
     ) {
     }
 
@@ -58,7 +62,11 @@ public final class AiAgentBloomPaymentDtos {
 
     public record CompletePaymentRequest(
             @NotBlank(message = "결제 ID가 필요합니다.")
-            String paymentId
+            String paymentId,
+
+            @Size(max = 120, message = "결제 링크 토큰은 120자 이하로 입력해주세요.")
+            @Pattern(regexp = "^[A-Za-z0-9._-]*$", message = "결제 링크 토큰 형식이 올바르지 않습니다.")
+            String paymentAccessToken
     ) {
     }
 

@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package kscold.vault.agent;
+
+option java_multiple_files = true;
+option java_package = "com.kscold.blog.vault.agent.grpc";
+option java_outer_classname = "VaultAgentProto";
+
+service VaultAgentService {
+  rpc Chat(ChatRequest) returns (ChatResponse);
+  rpc Reindex(ReindexRequest) returns (ReindexResponse);
+}
+
+message ChatRequest {
+  string message = 1;
+  string active_folder_name = 2;
+}
+
+message ChatResponse {
+  string answer = 1;
+  repeated AgentStage stages = 2;
+  repeated SourceNote sources = 3;
+}
+
+message AgentStage {
+  string name = 1;
+  string detail = 2;
+}
+
+message SourceNote {
+  string id = 1;
+  string title = 2;
+  string slug = 3;
+  double score = 4;
+}
+
+message ReindexRequest {
+  bool force = 1;
+}
+
+message ReindexResponse {
+  int32 total_notes = 1;
+  int32 indexed_notes = 2;
+  int32 skipped_notes = 3;
+}

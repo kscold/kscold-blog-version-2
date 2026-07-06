@@ -66,8 +66,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/admin-night/calendar").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/admin-night/programs/*/summary").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/admin-night/programs/*/votes").permitAll()
+                        .requestMatchers("/api/payments/ai-agent-bloom/**").permitAll()
                         // Vault 공개 엔드포인트
                         .requestMatchers(HttpMethod.GET, "/api/vault/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/vault/agent/chat").permitAll()
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/auth/register",

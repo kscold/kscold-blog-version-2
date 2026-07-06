@@ -93,6 +93,12 @@ portone:
   api-secret: ${PORTONE_API_SECRET:}
   api-base-url: ${PORTONE_API_BASE_URL:https://api.portone.io}
 
+vault:
+  agent:
+    host: ${VAULT_AGENT_GRPC_HOST:localhost}
+    port: ${VAULT_AGENT_GRPC_PORT:9090}
+    deadline-millis: ${VAULT_AGENT_GRPC_DEADLINE_MS:60000}
+
 # Logging
 logging:
   level:

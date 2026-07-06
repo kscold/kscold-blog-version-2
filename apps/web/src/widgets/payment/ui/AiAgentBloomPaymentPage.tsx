@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { PaymentResponse } from '@portone/browser-sdk/v2';
 import { useViewer } from '@/entities/user/model/useViewer';
 import {
@@ -14,7 +14,6 @@ const PRODUCT_NAME = 'AI Agent Bloom 참가권';
 const ORDER_NAME = 'AI Agent, 같이 만들고 피워보는 Bloom 참가권';
 const TOTAL_AMOUNT = 30_000;
 const PAYMENT_PATH = '/kakaopay/payment-path';
-const LOGIN_PATH = `/login?redirect=${encodeURIComponent(PAYMENT_PATH)}`;
 
 type FormState = {
   customerName: string;
@@ -45,8 +44,14 @@ export function AiAgentBloomPaymentPage() {
   const [config, setConfig] = useState<AiAgentBloomPaymentConfig | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [paymentAccessToken, setPaymentAccessToken] = useState<string | undefined>();
   const [isPreparing, setIsPreparing] = useState(false);
   const handledRedirectPaymentId = useRef<string | null>(null);
+  const canPay = isAuthenticated || !!paymentAccessToken;
+  const paymentPathWithToken = paymentAccessToken
+    ? `${PAYMENT_PATH}?token=${encodeURIComponent(paymentAccessToken)}`
+    : PAYMENT_PATH;
+  const loginPath = `/login?redirect=${encodeURIComponent(paymentPathWithToken)}`;
 
   const displayConfig = config ?? {
     configured: false,
@@ -65,10 +70,6 @@ export function AiAgentBloomPaymentPage() {
   );
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-
     let mounted = true;
     aiAgentBloomPaymentApi
       .getConfig()
@@ -89,7 +90,15 @@ export function AiAgentBloomPaymentPage() {
     return () => {
       mounted = false;
     };
-  }, [isAuthenticated]);
+  }, []);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const token = searchParams.get('token')?.trim();
+    if (token) {
+      setPaymentAccessToken(token);
+    }
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -103,8 +112,21 @@ export function AiAgentBloomPaymentPage() {
     }));
   }, [user]);
 
+  const completePayment = useCallback(async (paymentId: string) => {
+    try {
+      setIsPreparing(true);
+      setPaymentStatus('결제 결과를 확인하고 있습니다.');
+      const completed = await aiAgentBloomPaymentApi.complete(paymentId, paymentAccessToken);
+      setPaymentStatus(completed.message || '결제가 확인되었습니다.');
+    } catch (error) {
+      setPaymentStatus(resolveErrorMessage(error, '결제 결과 확인 중 오류가 발생했습니다.'));
+    } finally {
+      setIsPreparing(false);
+    }
+  }, [paymentAccessToken]);
+
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!canPay) {
       return;
     }
 
@@ -123,7 +145,7 @@ export function AiAgentBloomPaymentPage() {
 
     handledRedirectPaymentId.current = paymentId;
     completePayment(paymentId);
-  }, [isAuthenticated]);
+  }, [canPay, completePayment]);
 
   const updateField = (field: keyof FormState, value: string) => {
     const nextValue = field === 'customerPhone' ? formatPhoneNumber(value) : value;
@@ -141,8 +163,8 @@ export function AiAgentBloomPaymentPage() {
   };
 
   const openPaymentWindow = async () => {
-    if (!isAuthenticated) {
-      window.location.href = LOGIN_PATH;
+    if (!canPay) {
+      window.location.href = loginPath;
       return;
     }
     if (configError) {
@@ -169,6 +191,7 @@ export function AiAgentBloomPaymentPage() {
         customerName: form.customerName.trim(),
         customerEmail: form.customerEmail.trim(),
         customerPhone: form.customerPhone.trim(),
+        paymentAccessToken,
       });
       const paymentResponse = await requestKakaoPay(preparedPayment);
 
@@ -189,19 +212,6 @@ export function AiAgentBloomPaymentPage() {
     }
   };
 
-  const completePayment = async (paymentId: string) => {
-    try {
-      setIsPreparing(true);
-      setPaymentStatus('결제 결과를 확인하고 있습니다.');
-      const completed = await aiAgentBloomPaymentApi.complete(paymentId);
-      setPaymentStatus(completed.message || '결제가 확인되었습니다.');
-    } catch (error) {
-      setPaymentStatus(resolveErrorMessage(error, '결제 결과 확인 중 오류가 발생했습니다.'));
-    } finally {
-      setIsPreparing(false);
-    }
-  };
-
   return (
     <main className="min-h-screen bg-surface-50 px-4 py-8 text-surface-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-8">
@@ -212,20 +222,6 @@ export function AiAgentBloomPaymentPage() {
           <h1 className="mt-5 text-3xl font-black tracking-tight sm:text-5xl">
             AI Agent Bloom 테스트 결제
           </h1>
-          <p className="mt-4 max-w-3xl text-sm leading-7 text-surface-600 sm:text-base">
-            상품 확인부터 주문자 정보 입력, 카카오페이 테스트 결제창 진입 직전까지 한 흐름으로 정리했습니다.
-            실제 결제창 호출은 로그인한 사용자에게만 열립니다.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {['테스트 결제', '4-1 상품 상세', '05 상품 확인', '06 주문자 정보', '07 결제창 직전'].map((item) => (
-              <span
-                key={item}
-                className="rounded-full border border-surface-200 bg-white px-4 py-2 text-xs font-black text-surface-600"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
         </section>
 
         <section
@@ -302,7 +298,7 @@ export function AiAgentBloomPaymentPage() {
               <div className="rounded-[1.5rem] bg-white p-5 shadow-sm">
                 <p className="text-sm font-black text-surface-500">{displayConfig.productName}</p>
                 <p className="mt-2 text-4xl font-black tracking-tight">{formattedAmount}원</p>
-                {isAuthenticated ? (
+                {canPay ? (
                   <a
                     href="#orderer-info"
                     className="mt-5 inline-flex w-full justify-center rounded-2xl bg-surface-950 px-5 py-4 text-sm font-black text-white transition hover:bg-surface-800"
@@ -311,10 +307,10 @@ export function AiAgentBloomPaymentPage() {
                   </a>
                 ) : (
                   <Link
-                    href={LOGIN_PATH}
+                    href={loginPath}
                     className="mt-5 inline-flex w-full justify-center rounded-2xl bg-surface-950 px-5 py-4 text-sm font-black text-white transition hover:bg-surface-800"
                   >
-                    로그인하고 상품 확인하기
+                    로그인하고 결제하기
                   </Link>
                 )}
                 <p className="mt-3 text-xs font-bold text-surface-500">
@@ -340,9 +336,14 @@ export function AiAgentBloomPaymentPage() {
                   임의의 주문자 정보를 입력한 뒤 결제수단 선택 단계로 넘어가는 흐름입니다.
                   심사 화면에서 이름, 이메일, 연락처 입력란이 확인됩니다.
                 </p>
-                {!isAuthenticated && (
+                {!canPay && (
                   <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold leading-6 text-amber-900">
-                    결제는 로그인 후 진행됩니다. 상품 정보 확인은 비로그인 상태에서도 가능합니다.
+                    일반 결제는 로그인 후 진행됩니다. 신청자에게 발송된 특별 링크로 접속한 경우에는 로그인 없이 결제할 수 있습니다.
+                  </div>
+                )}
+                {paymentAccessToken && (
+                  <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-4 text-sm font-bold leading-6 text-cyan-950">
+                    특별 결제 링크로 접속했습니다. 주문자 정보만 확인하면 바로 카카오페이 결제창으로 이동할 수 있습니다.
                   </div>
                 )}
               </div>
@@ -352,7 +353,7 @@ export function AiAgentBloomPaymentPage() {
                   label="주문자명"
                   value={form.customerName}
                   placeholder="홍길동"
-                  disabled={!isAuthenticated || isPreparing}
+                  disabled={!canPay || isPreparing}
                   error={errors.customerName}
                   onChange={(value) => updateField('customerName', value)}
                 />
@@ -361,7 +362,7 @@ export function AiAgentBloomPaymentPage() {
                     label="연락처"
                     value={form.customerPhone}
                     placeholder="010-1234-5678"
-                    disabled={!isAuthenticated || isPreparing}
+                    disabled={!canPay || isPreparing}
                     error={errors.customerPhone}
                     inputMode="numeric"
                     onChange={(value) => updateField('customerPhone', value)}
@@ -370,7 +371,7 @@ export function AiAgentBloomPaymentPage() {
                     label="이메일"
                     value={form.customerEmail}
                     placeholder="buyer@example.com"
-                    disabled={!isAuthenticated || isPreparing}
+                    disabled={!canPay || isPreparing}
                     error={errors.customerEmail}
                     inputMode="email"
                     onChange={(value) => updateField('customerEmail', value)}
@@ -448,14 +449,14 @@ export function AiAgentBloomPaymentPage() {
                   </p>
                   <button
                     type="submit"
-                    disabled={isPreparing || !isAuthenticated}
+                    disabled={isPreparing || !canPay}
                     className="mt-6 inline-flex w-full justify-center rounded-2xl bg-white px-5 py-4 text-sm font-black text-surface-950 transition hover:bg-cyan-50 disabled:cursor-not-allowed disabled:bg-surface-600 disabled:text-surface-300"
                   >
-                    {isAuthenticated
+                    {canPay
                       ? isPreparing
                         ? '결제 확인 중...'
                         : '카카오페이 테스트 결제창으로 이동'
-                      : '로그인 후 결제할 수 있습니다'}
+                      : '로그인 또는 특별 링크가 필요합니다'}
                   </button>
                 </div>
               </div>
@@ -469,7 +470,11 @@ export function AiAgentBloomPaymentPage() {
 
 async function requestKakaoPay(preparedPayment: PreparedAiAgentBloomPayment): Promise<PaymentResponse | undefined> {
   const { requestPayment } = await import('@portone/browser-sdk/v2');
-  const currentUrl = `${window.location.origin}${window.location.pathname}`;
+  const redirectUrl = new URL(`${window.location.origin}${window.location.pathname}`);
+  const token = new URLSearchParams(window.location.search).get('token')?.trim();
+  if (token) {
+    redirectUrl.searchParams.set('token', token);
+  }
 
   return requestPayment({
     storeId: preparedPayment.storeId,
@@ -500,7 +505,7 @@ async function requestKakaoPay(preparedPayment: PreparedAiAgentBloomPayment): Pr
       },
     ],
     productType: 'DIGITAL',
-    redirectUrl: currentUrl,
+    redirectUrl: redirectUrl.toString(),
     customData: {
       programKey: preparedPayment.programKey,
       servicePeriod: preparedPayment.servicePeriod,
