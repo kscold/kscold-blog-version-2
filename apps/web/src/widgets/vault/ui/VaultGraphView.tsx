@@ -106,7 +106,6 @@ export function VaultGraphView({
     if (hasAutoFitRef.current || activeNodeSlug) return;
     hasAutoFitRef.current = true;
     fgRef.current?.zoomToFit(600, 80);
-    window.setTimeout(() => fgRef.current?.pauseAnimation(), 700);
   }, [activeNodeSlug]);
 
   // 마우스 기울임 시차 — 데스크탑에서 커서를 움직이면 별 레이어가 깊이별로
@@ -123,7 +122,6 @@ export function VaultGraphView({
   const handleGraphMouseEnter = useCallback(() => {
     if (!supportsHover) return;
     setIsGraphHovered(true);
-    fgRef.current?.resumeAnimation();
   }, [supportsHover]);
 
   const handleGraphMouseLeave = useCallback(() => {
@@ -131,7 +129,6 @@ export function VaultGraphView({
     setIsGraphHovered(false);
     setHoverNode(null);
     mouseRef.current = { x: 0, y: 0 };
-    window.setTimeout(() => fgRef.current?.pauseAnimation(), 120);
   }, [supportsHover]);
 
   // 포스 시뮬레이션 설정
@@ -192,6 +189,15 @@ export function VaultGraphView({
     const tgtId = typeof link.target === 'object' ? link.target?.id : link.target;
     return srcId === hoverNode.id || tgtId === hoverNode.id;
   }, [hoverNode]);
+
+  const getHoveredLinkParticleCount = useCallback((link: GraphLink): number => {
+    if (reducedGraphEffects || !isGraphHovered || !hoverNode || !isLinkHovered(link)) return 0;
+    const degree = connectedIds?.size ?? 0;
+    if (degree > 80) return 0;
+    if (degree > 40) return 1;
+    if (degree > 16) return 2;
+    return 4;
+  }, [connectedIds?.size, hoverNode, isGraphHovered, isLinkHovered, reducedGraphEffects]);
 
   const nodeCanvasObject = useCallback((node: NodeObject, ctx: CanvasRenderingContext2D, globalScale: number) => {
     renderNode(node, ctx, globalScale, {
@@ -352,13 +358,11 @@ export function VaultGraphView({
         nodeRelSize={4}
         linkWidth={() => 0}
         linkColor={() => 'transparent'}
-        linkDirectionalParticles={(link: GraphLink) =>
-          reducedGraphEffects || !isGraphHovered || !hoverNode ? 0 : isLinkHovered(link) ? 8 : 0
-        }
+        linkDirectionalParticles={getHoveredLinkParticleCount}
         linkDirectionalParticleWidth={(link: GraphLink) =>
-          reducedGraphEffects || !isGraphHovered ? 0 : isLinkHovered(link) ? 4 : 2.5
+          getHoveredLinkParticleCount(link) > 0 ? 2.5 : 0
         }
-        linkDirectionalParticleSpeed={reducedGraphEffects || !isGraphHovered ? 0 : 0.006}
+        linkDirectionalParticleSpeed={reducedGraphEffects || !isGraphHovered ? 0 : 0.004}
         linkDirectionalParticleColor={(link: GraphLink) =>
           resolveLinkParticleColor(link, gData.nodes, folderColorMap)
         }
