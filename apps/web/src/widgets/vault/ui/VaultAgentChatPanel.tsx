@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { FormEvent, MouseEvent as ReactMouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GraphData } from '@/types/vault';
 import { sendVaultAgentMessage, type VaultAgentSource } from '@/features/vault/api/vaultAgentApi';
 
@@ -45,7 +46,10 @@ export function VaultAgentChatPanel({ graphData, activeFolderName, onClose }: Va
   ]);
   const [input, setInput] = useState('');
   const [isThinking, setIsThinking] = useState(false);
+  const [panelWidth, setPanelWidth] = useState(420);
+  const [isResizing, setIsResizing] = useState(false);
   const nextIdRef = useRef(2);
+  const resizeStartRef = useRef({ x: 0, width: 420 });
 
   const graphSummary = useMemo(() => {
     const nodes = graphData?.nodes ?? [];
@@ -118,8 +122,46 @@ export function VaultAgentChatPanel({ graphData, activeFolderName, onClose }: Va
     setInput(prompt);
   };
 
+  const startResize = useCallback((event: ReactMouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    resizeStartRef.current = { x: event.clientX, width: panelWidth };
+    setIsResizing(true);
+  }, [panelWidth]);
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const delta = resizeStartRef.current.x - event.clientX;
+      const maxWidth = Math.min(window.innerWidth - 32, 720);
+      setPanelWidth(Math.min(maxWidth, Math.max(360, resizeStartRef.current.width + delta)));
+    };
+    const handleMouseUp = () => setIsResizing(false);
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing]);
+
   return (
-    <aside className="absolute inset-y-3 right-3 z-30 flex w-[min(420px,calc(100%-1.5rem))] flex-col overflow-hidden rounded-[2rem] border border-surface-200/70 bg-white/95 shadow-2xl backdrop-blur-2xl dark:border-surface-800 dark:bg-surface-950/95">
+    <aside
+      className="absolute inset-y-3 right-3 z-30 flex w-[calc(100%-1.5rem)] max-w-[calc(100%-1.5rem)] flex-col overflow-hidden rounded-[2rem] border border-surface-200/70 bg-white/95 shadow-2xl backdrop-blur-2xl dark:border-surface-800 dark:bg-surface-950/95 lg:max-w-[720px]"
+      style={{ width: panelWidth }}
+    >
+      <button
+        type="button"
+        aria-label="채팅창 크기 조절"
+        onMouseDown={startResize}
+        className={`absolute left-0 top-8 z-40 hidden h-24 w-2 -translate-x-1/2 cursor-col-resize rounded-full border border-cyan-200/70 bg-white/80 shadow-sm transition hover:w-3 hover:bg-cyan-50 dark:border-cyan-400/30 dark:bg-surface-900/80 dark:hover:bg-surface-800 lg:block ${isResizing ? 'w-3 bg-cyan-50 dark:bg-surface-800' : ''}`}
+      />
       <div className="border-b border-surface-200/70 p-5 dark:border-surface-800">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -179,15 +221,18 @@ export function VaultAgentChatPanel({ graphData, activeFolderName, onClose }: Va
                 <p className="mb-2 font-mono text-[10px] font-black uppercase tracking-[0.2em] text-surface-400">
                   Sources
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid gap-2">
                   {message.sources.map(source => (
-                    <a
+                    <Link
                       key={source.id}
-                      href={`/vault/${source.slug}`}
-                      className="rounded-full border border-surface-200 bg-surface-50 px-3 py-1.5 text-xs font-bold text-surface-600 transition hover:border-cyan-300 hover:text-cyan-700 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-300"
+                      href={`/vault/${encodeURIComponent(source.slug)}`}
+                      className="group flex items-center justify-between gap-3 rounded-2xl border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-bold text-surface-600 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-800 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-300 dark:hover:border-cyan-400/50 dark:hover:bg-cyan-950/30 dark:hover:text-cyan-100"
                     >
-                      {source.title} · {(source.score * 100).toFixed(1)}%
-                    </a>
+                      <span className="min-w-0 truncate">{source.title}</span>
+                      <span className="shrink-0 font-mono text-[10px] text-cyan-600 opacity-80 group-hover:opacity-100 dark:text-cyan-300">
+                        열기 · {(source.score * 100).toFixed(0)}%
+                      </span>
+                    </Link>
                   ))}
                 </div>
               </div>

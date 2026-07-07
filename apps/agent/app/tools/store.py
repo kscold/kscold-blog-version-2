@@ -31,6 +31,31 @@ class SearchHit:
     score: float
 
 
+QUERY_EXPANSIONS = {
+    "자바": ["java"],
+    "java": ["자바"],
+    "자바스크립트": ["javascript", "js"],
+    "javascript": ["자바스크립트", "js"],
+    "js": ["javascript", "자바스크립트"],
+    "배열": ["array", "arrays"],
+    "array": ["배열", "arrays"],
+    "arrays": ["array", "배열"],
+    "차이": ["비교", "difference"],
+    "비교": ["차이", "difference"],
+}
+
+LANGUAGE_FOLDER_HINTS = {
+    "java": "java",
+    "자바": "java",
+    "javascript": "javascript",
+    "자바스크립트": "javascript",
+    "js": "javascript",
+    "python": "python",
+    "파이썬": "python",
+    "sql": "sql",
+}
+
+
 class VaultStore:
     def __init__(self, config: AgentConfig):
         if not config.openai_api_key:
@@ -122,12 +147,9 @@ class VaultStore:
             if note_id in notes
         ] or self.keyword_search(query, limit, folder_ids)
 
-    def keyword_search(self, query: str, limit: int, folder_ids: set[str] | None = None) -> list[SearchHit]:
-        terms = [
-            term
-            for term in re.split(r"[\s,./|:;()\[\]{}<>!?\"'`~]+", query)
-            if len(term.strip()) >= 2
-        ][:6]
+    def keyword_search(self, query: str, limit: int, folder_ids: set[str | ObjectId] | None = None) -> list[SearchHit]:
+        terms = self._query_terms(query)
+        language_hints = self._language_hints(terms)
         folder_filter = {"folderId": {"$in": list(folder_ids)}} if folder_ids else {}
         if not terms:
             documents = self.notes.find(folder_filter).limit(limit)
@@ -145,8 +167,16 @@ class VaultStore:
             )
 
         query_filter = {"$and": [folder_filter, {"$or": conditions}]} if folder_filter else {"$or": conditions}
-        documents = self.notes.find(query_filter).limit(limit)
-        return [SearchHit(note=self._to_note(document), score=0.45) for document in documents]
+        candidates = list(self.notes.find(query_filter).limit(240))
+        scored = [
+            SearchHit(
+                note=self._to_note(document),
+                score=self._keyword_score(document, terms, language_hints, bool(folder_ids)),
+            )
+            for document in candidates
+        ]
+        scored.sort(key=lambda hit: hit.score, reverse=True)
+        return self._balanced_hits(scored, language_hints, terms, limit)
 
     def resolve_folder_scope(self, active_folder_name: str) -> set[str | ObjectId]:
         if not active_folder_name:
@@ -259,6 +289,8 @@ class VaultStore:
                     "content": (
                         "너는 KSCOLD Vault를 읽고 답하는 LangGraph RAG Agent다. "
                         "제공된 Vault context를 최우선 근거로 사용하고, 한국어로 답한다. "
+                        "질문이 비교형이면 각 대상에 해당하는 Vault 노트를 나누어 근거로 삼고 차이를 표로 정리한다. "
+                        "Vault context에 없는 핵심 차이는 일반 LLM 지식으로 보강하되, 반드시 'Vault 밖 일반 지식'이라고 표시한다. "
                         "web context는 최신 정보가 필요한 경우에만 보조 근거로 사용한다. "
                         "확실하지 않은 내용은 추정이라고 말하고, 답변 끝에 참고 Vault 노트를 bullet로 적는다."
                     ),
@@ -304,6 +336,191 @@ class VaultStore:
 
     def _point_id(self, note_id: str) -> str:
         return str(uuid.uuid5(uuid.NAMESPACE_URL, f"kscold-vault-note:{note_id}"))
+
+    def _query_terms(self, query: str) -> list[str]:
+        query_lower = query.lower()
+        raw_terms = [
+            term.strip()
+            for term in re.split(r"[\s,./|:;()\[\]{}<>!?\"'`~]+", query)
+            if len(term.strip()) >= 2
+        ]
+        terms: list[str] = []
+        for term in raw_terms:
+            lower = term.lower()
+            variants = [term, lower, self._strip_korean_particles(lower)]
+            for variant in variants:
+                if len(variant) < 2:
+                    continue
+                terms.append(variant)
+                terms.extend(QUERY_EXPANSIONS.get(variant, []))
+
+        for keyword, expansions in QUERY_EXPANSIONS.items():
+            if keyword in query_lower:
+                terms.append(keyword)
+                terms.extend(expansions)
+
+        return list(dict.fromkeys(terms))[:24]
+
+    def _strip_korean_particles(self, term: str) -> str:
+        for particle in ("에서는", "에게서", "으로부터", "에서", "으로", "로", "과", "와", "은", "는", "이", "가", "을", "를", "의"):
+            if term.endswith(particle) and len(term) > len(particle) + 1:
+                return term[: -len(particle)]
+        return term
+
+    def _language_hints(self, terms: list[str]) -> set[str]:
+        hints = {
+            folder_hint
+            for term in terms
+            if (folder_hint := LANGUAGE_FOLDER_HINTS.get(term.lower()))
+        }
+        lowered_terms = " ".join(term.lower() for term in terms)
+        for keyword, folder_hint in LANGUAGE_FOLDER_HINTS.items():
+            if keyword in lowered_terms:
+                hints.add(folder_hint)
+        return hints
+
+    def _folder_name(self, folder_id: object) -> str:
+        names = self._folder_names(folder_id)
+        return names[-1] if names else ""
+
+    def _folder_names(self, folder_id: object) -> list[str]:
+        if not folder_id:
+            return []
+
+        folder = self.folders.find_one({"_id": folder_id}, {"name": 1, "parent": 1, "ancestors": 1})
+        if not folder and ObjectId.is_valid(str(folder_id)):
+            folder = self.folders.find_one({"_id": ObjectId(str(folder_id))}, {"name": 1, "parent": 1, "ancestors": 1})
+        if not folder:
+            return []
+
+        ancestor_ids = list(folder.get("ancestors") or [])
+        names: list[str] = []
+        if ancestor_ids:
+            ancestor_lookup_ids: list[object] = []
+            for ancestor_id in ancestor_ids:
+                ancestor_lookup_ids.append(ancestor_id)
+                if ObjectId.is_valid(str(ancestor_id)):
+                    ancestor_lookup_ids.append(ObjectId(str(ancestor_id)))
+            ancestors = self.folders.find({"_id": {"$in": ancestor_lookup_ids}}, {"_id": 1, "name": 1})
+            ancestor_name_by_id = {str(document["_id"]): str(document.get("name") or "").lower() for document in ancestors}
+            names.extend(ancestor_name_by_id.get(str(ancestor_id), "") for ancestor_id in ancestor_ids)
+        names.append(str(folder.get("name") or "").lower())
+        return [name for name in names if name]
+
+    def _balanced_hits(self, hits: list[SearchHit], language_hints: set[str], terms: list[str], limit: int) -> list[SearchHit]:
+        if len(language_hints) <= 1 or limit <= 2:
+            return hits[:limit]
+
+        selected: list[SearchHit] = []
+        selected_ids: set[str] = set()
+        per_language_target = max(1, min(2, limit // len(language_hints)))
+        for hint in sorted(language_hints):
+            language_hits = [hit for hit in hits if self._note_matches_language(hit.note, hint)]
+            focused_language_hits = [hit for hit in language_hits if self._note_matches_query_focus(hit.note, terms)]
+            if focused_language_hits:
+                language_hits = focused_language_hits
+            for hit in language_hits[:per_language_target]:
+                if hit.note.id in selected_ids:
+                    continue
+                selected.append(hit)
+                selected_ids.add(hit.note.id)
+
+        for hit in hits:
+            if len(selected) >= limit:
+                break
+            if hit.note.id in selected_ids:
+                continue
+            selected.append(hit)
+            selected_ids.add(hit.note.id)
+
+        selected.sort(key=lambda hit: hit.score, reverse=True)
+        return selected[:limit]
+
+    def _note_matches_language(self, note: VaultNote, language_hint: str) -> bool:
+        folder_names = self._folder_names(note.folder_id)
+        if any(language_hint == name or language_hint in name for name in folder_names):
+            return True
+        combined = f"{note.title} {note.slug} {' '.join(note.tags)}".lower()
+        return language_hint in combined
+
+    def _note_matches_query_focus(self, note: VaultNote, terms: list[str]) -> bool:
+        title = note.title.lower()
+        slug = note.slug.lower()
+        if "배열" in terms or "array" in terms or "arrays" in terms:
+            return (
+                "array" in title
+                or "배열" in title
+                or "arrays" in title
+                or "arraylist" in title
+                or title in {"list", "toarray()"}
+                or "array" in slug
+                or "배열" in slug
+            )
+        return True
+
+    def _keyword_score(
+        self,
+        document: dict,
+        terms: list[str],
+        language_hints: set[str],
+        scoped: bool,
+    ) -> float:
+        title = str(document.get("title") or "")
+        slug = str(document.get("slug") or "")
+        content = str(document.get("content") or "")
+        tags = " ".join(str(tag) for tag in document.get("tags") or [])
+        folder_names = self._folder_names(document.get("folderId"))
+        title_lower = title.lower()
+        slug_lower = slug.lower()
+        content_lower = content.lower()
+        tags_lower = tags.lower()
+
+        score = 0.25
+        for term in terms:
+            lower = term.lower()
+            if not lower:
+                continue
+            if lower == title_lower:
+                score += 8
+            elif lower in title_lower:
+                score += 4
+            if lower in slug_lower:
+                score += 2.5
+            if lower in tags_lower:
+                score += 2
+            score += min(content_lower.count(lower), 6) * 0.35
+
+        if language_hints and folder_names:
+            for hint in language_hints:
+                if any(hint == folder_name or hint in folder_name for folder_name in folder_names):
+                    score += 5 if not scoped else 2
+
+        array_query = "배열" in terms or "array" in terms or "arrays" in terms
+        if array_query:
+            array_core = (
+                "array" in title_lower
+                or "배열" in title_lower
+                or "arrays" in title_lower
+                or "arraylist" in title_lower
+                or title_lower in {"list", "toarray()"}
+                or "array" in slug_lower
+                or "배열" in slug_lower
+            )
+            array_related = array_core or "배열" in content_lower or "array" in content_lower
+            if "array" in title_lower or "배열" in title_lower:
+                score += 8
+            if "arrays" in title_lower or "arraylist" in title_lower or "list" == title_lower or title_lower == "toarray()":
+                score += 4
+            if "array" in slug_lower or "배열" in slug_lower:
+                score += 3
+            if not array_core:
+                score *= 0.35 if array_related else 0.2
+
+        comparison_query = "차이" in terms or "비교" in terms or "difference" in terms
+        if comparison_query and len(language_hints) >= 2:
+            score += 1.5
+
+        return round(score, 4)
 
     def _extract_wiki_links(self, content: str) -> list[str]:
         if not content:
