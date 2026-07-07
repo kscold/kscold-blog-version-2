@@ -4,14 +4,13 @@ import com.kscold.blog.chat.domain.model.ChatDiscordThreadLink;
 import com.kscold.blog.chat.domain.port.out.ChatDiscordThreadLinkRepository;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.springframework.lang.Nullable;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 final class DiscordThreadLinkService {
@@ -22,9 +21,7 @@ final class DiscordThreadLinkService {
     private final UserRepository userRepository;
 
     DiscordThreadLinkService(
-            ChatDiscordThreadLinkRepository linkRepository,
-            UserRepository userRepository
-    ) {
+            ChatDiscordThreadLinkRepository linkRepository, UserRepository userRepository) {
         this.linkRepository = linkRepository;
         this.userRepository = userRepository;
     }
@@ -39,11 +36,13 @@ final class DiscordThreadLinkService {
             return Optional.of(cachedThreadId);
         }
 
-        return linkRepository.findByRoomId(roomId)
-                .map(link -> {
-                    cacheLink(link.getRoomId(), link.getThreadId());
-                    return link.getThreadId();
-                });
+        return linkRepository
+                .findByRoomId(roomId)
+                .map(
+                        link -> {
+                            cacheLink(link.getRoomId(), link.getThreadId());
+                            return link.getThreadId();
+                        });
     }
 
     @Nullable
@@ -74,25 +73,33 @@ final class DiscordThreadLinkService {
         }
 
         return restoreRoomIdFromThreadName(thread)
-                .map(roomId -> {
-                    log.info("Discord 스레드 매핑 복구: thread={} -> room={}", threadId, roomId);
-                    return roomId;
-                })
+                .map(
+                        roomId -> {
+                            log.info("Discord 스레드 매핑 복구: thread={} -> room={}", threadId, roomId);
+                            return roomId;
+                        })
                 .orElse(null);
     }
 
     void persistLink(String roomId, String threadId, String visitorName) {
-        String existingId = linkRepository.findByRoomId(roomId)
-                .map(ChatDiscordThreadLink::getId)
-                .or(() -> linkRepository.findByThreadId(threadId).map(ChatDiscordThreadLink::getId))
-                .orElse(null);
+        String existingId =
+                linkRepository
+                        .findByRoomId(roomId)
+                        .map(ChatDiscordThreadLink::getId)
+                        .or(
+                                () ->
+                                        linkRepository
+                                                .findByThreadId(threadId)
+                                                .map(ChatDiscordThreadLink::getId))
+                        .orElse(null);
 
-        linkRepository.save(ChatDiscordThreadLink.builder()
-                .id(existingId)
-                .roomId(roomId)
-                .threadId(threadId)
-                .visitorName(visitorName)
-                .build());
+        linkRepository.save(
+                ChatDiscordThreadLink.builder()
+                        .id(existingId)
+                        .roomId(roomId)
+                        .threadId(threadId)
+                        .visitorName(visitorName)
+                        .build());
         cacheLink(roomId, threadId);
     }
 
@@ -120,16 +127,16 @@ final class DiscordThreadLinkService {
             return Optional.empty();
         }
 
-        List<User> candidates = userRepository.findAllOrderByCreatedAtDesc().stream()
-                .filter(user -> matchesVisitorName(user, visitorName))
-                .toList();
+        List<User> candidates =
+                userRepository.findAllOrderByCreatedAtDesc().stream()
+                        .filter(user -> matchesVisitorName(user, visitorName))
+                        .toList();
 
         if (candidates.size() != 1) {
             log.warn(
                     "Discord 스레드에서 방문자 이름으로 roomId 복구 실패: name={}, candidates={}",
                     visitorName,
-                    candidates.size()
-            );
+                    candidates.size());
             return Optional.empty();
         }
 

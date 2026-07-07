@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * 태그 생성/수정 커맨드 DTO
- */
+/** 태그 생성/수정 커맨드 DTO */
 @Getter
 @Setter
 @NoArgsConstructor

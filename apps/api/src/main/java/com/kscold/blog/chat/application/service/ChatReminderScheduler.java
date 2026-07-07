@@ -7,12 +7,11 @@ import com.kscold.blog.identity.adapter.out.mail.RecoveryMailProperties;
 import com.kscold.blog.identity.application.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @Component
@@ -32,11 +31,14 @@ public class ChatReminderScheduler {
             return;
         }
 
-        LocalDateTime unreadBefore = LocalDateTime.now()
-                .minusMinutes(chatReminderProperties.getUnreadThresholdMinutes());
+        LocalDateTime unreadBefore =
+                LocalDateTime.now()
+                        .minusMinutes(chatReminderProperties.getUnreadThresholdMinutes());
 
-        for (ChatMessageRepository.PendingAdminReminder reminder : chatApplicationService.getPendingAdminReminders(unreadBefore)) {
-            userRepository.findById(reminder.roomId())
+        for (ChatMessageRepository.PendingAdminReminder reminder :
+                chatApplicationService.getPendingAdminReminders(unreadBefore)) {
+            userRepository
+                    .findById(reminder.roomId())
                     .ifPresent(user -> sendReminder(user, reminder, unreadBefore));
         }
     }
@@ -44,8 +46,7 @@ public class ChatReminderScheduler {
     private void sendReminder(
             User user,
             ChatMessageRepository.PendingAdminReminder reminder,
-            LocalDateTime unreadBefore
-    ) {
+            LocalDateTime unreadBefore) {
         try {
             recoveryMailSender.send(
                     recoveryEmailComposer.buildUnreadChatReminder(
@@ -53,9 +54,7 @@ public class ChatReminderScheduler {
                             reminder.adminName(),
                             reminder.latestContent(),
                             reminder.unreadCount(),
-                            recoveryMailProperties.resolvePublicUrl("/?chat=open")
-                    )
-            );
+                            recoveryMailProperties.resolvePublicUrl("/?chat=open")));
             chatApplicationService.markReminderSent(reminder.roomId(), unreadBefore);
         } catch (Exception exception) {
             log.warn("Unread chat reminder skipped for {}", user.getEmail(), exception);

@@ -9,15 +9,14 @@ import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -33,14 +32,15 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
         User user = getAuthenticatedUser(userId);
         claimAnonymousComments(feedId, user);
 
-        FeedComment comment = FeedComment.builder()
-                .feedId(feedId)
-                .authorName(user.getDisplayName())
-                .authorPassword(null)
-                .userId(user.getId())
-                .authorRole(user.getRole())
-                .content(command.getContent())
-                .build();
+        FeedComment comment =
+                FeedComment.builder()
+                        .feedId(feedId)
+                        .authorName(user.getDisplayName())
+                        .authorPassword(null)
+                        .userId(user.getId())
+                        .authorRole(user.getRole())
+                        .content(command.getContent())
+                        .build();
 
         FeedComment saved = feedCommentRepository.save(comment);
         feedRepository.incrementCommentCount(feedId);
@@ -49,7 +49,9 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
 
     public Page<FeedComment> getByFeedId(String feedId, Pageable pageable, String currentUserId) {
         if (currentUserId != null && !currentUserId.isBlank()) {
-            userRepository.findById(currentUserId).ifPresent(user -> claimAnonymousComments(feedId, user));
+            userRepository
+                    .findById(currentUserId)
+                    .ifPresent(user -> claimAnonymousComments(feedId, user));
         }
         return feedCommentRepository.findByFeedId(feedId, pageable);
     }
@@ -59,10 +61,13 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
         User user = getAuthenticatedUser(currentUserId);
         claimAnonymousComments(feedId, user);
 
-        FeedComment comment = feedCommentRepository.findById(commentId)
-                .orElseThrow(() -> ResourceNotFoundException.feedComment(commentId));
+        FeedComment comment =
+                feedCommentRepository
+                        .findById(commentId)
+                        .orElseThrow(() -> ResourceNotFoundException.feedComment(commentId));
 
-        boolean canDelete = user.getRole() == User.Role.ADMIN || user.getId().equals(comment.getUserId());
+        boolean canDelete =
+                user.getRole() == User.Role.ADMIN || user.getId().equals(comment.getUserId());
         if (!canDelete) {
             throw InvalidRequestException.invalidInput("본인이 작성한 댓글만 삭제할 수 있습니다");
         }
@@ -76,7 +81,8 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
             throw InvalidRequestException.invalidInput("로그인이 필요합니다");
         }
 
-        return userRepository.findById(userId)
+        return userRepository
+                .findById(userId)
                 .orElseThrow(() -> ResourceNotFoundException.user(userId));
     }
 
@@ -86,23 +92,27 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
             return;
         }
 
-        List<FeedComment> commentsToClaim = feedCommentRepository.findAnonymousByFeedIdAndAuthorNames(feedId, authorNames);
+        List<FeedComment> commentsToClaim =
+                feedCommentRepository.findAnonymousByFeedIdAndAuthorNames(feedId, authorNames);
         if (commentsToClaim.isEmpty()) {
             return;
         }
 
-        commentsToClaim.forEach(comment -> {
-            comment.setUserId(user.getId());
-            comment.setAuthorRole(user.getRole());
-            comment.setAuthorPassword(null);
-            comment.setAuthorName(user.getDisplayName());
-        });
+        commentsToClaim.forEach(
+                comment -> {
+                    comment.setUserId(user.getId());
+                    comment.setAuthorRole(user.getRole());
+                    comment.setAuthorPassword(null);
+                    comment.setAuthorName(user.getDisplayName());
+                });
         feedCommentRepository.saveAll(commentsToClaim);
     }
 
     private List<String> candidateAuthorNames(User user) {
         List<String> names = new ArrayList<>();
-        if (user.getProfile() != null && user.getProfile().getDisplayName() != null && !user.getProfile().getDisplayName().isBlank()) {
+        if (user.getProfile() != null
+                && user.getProfile().getDisplayName() != null
+                && !user.getProfile().getDisplayName().isBlank()) {
             names.add(user.getProfile().getDisplayName().trim());
         }
         if (user.getUsername() != null && !user.getUsername().isBlank()) {

@@ -2,11 +2,10 @@ package com.kscold.blog.adminnight.adapter.out.persistence;
 
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightProgramVoteRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings("null")
 @Component
@@ -21,17 +20,21 @@ public class AdminNightProgramVoteRepositoryAdapter implements AdminNightProgram
     }
 
     @Override
-    public Optional<AdminNightProgramVote> findByProgramKeyAndUserId(String programKey, String userId) {
+    public Optional<AdminNightProgramVote> findByProgramKeyAndUserId(
+            String programKey, String userId) {
         return mongoAdminNightProgramVoteRepository.findByProgramKeyAndUserId(programKey, userId);
     }
 
     @Override
-    public Optional<AdminNightProgramVote> findByProgramKeyAndContactEmail(String programKey, String contactEmail) {
-        return mongoAdminNightProgramVoteRepository.findByProgramKeyAndContactEmail(programKey, contactEmail);
+    public Optional<AdminNightProgramVote> findByProgramKeyAndContactEmail(
+            String programKey, String contactEmail) {
+        return mongoAdminNightProgramVoteRepository.findByProgramKeyAndContactEmail(
+                programKey, contactEmail);
     }
 
     @Override
     public List<AdminNightProgramVote> findByProgramKeyOrderByCreatedAtDesc(String programKey) {
-        return mongoAdminNightProgramVoteRepository.findByProgramKeyOrderByCreatedAtDesc(programKey);
+        return mongoAdminNightProgramVoteRepository.findByProgramKeyOrderByCreatedAtDesc(
+                programKey);
     }
 }

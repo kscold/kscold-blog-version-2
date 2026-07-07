@@ -9,17 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminStorageObjectItem {
-    @lombok.Getter
-    private String name;
-    @lombok.Getter
-    private String key;
-    @lombok.Getter
-    private long size;
-    @lombok.Getter
-    private String lastModified;
+    @lombok.Getter private String name;
+    @lombok.Getter private String key;
+    @lombok.Getter private long size;
+    @lombok.Getter private String lastModified;
     private boolean image;
-    @lombok.Getter
-    private String publicUrl;
+    @lombok.Getter private String publicUrl;
 
     @JsonProperty("isImage")
     public boolean isImage() {

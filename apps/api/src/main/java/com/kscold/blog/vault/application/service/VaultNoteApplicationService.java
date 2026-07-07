@@ -1,10 +1,10 @@
 package com.kscold.blog.vault.application.service;
 
-import com.kscold.blog.vault.application.dto.GraphDataResponse;
 import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.util.SlugUtils;
+import com.kscold.blog.vault.application.dto.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.NoteUpdateCommand;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
@@ -13,15 +13,14 @@ import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
 import com.kscold.blog.vault.domain.service.BacklinkParsingService;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -38,11 +37,16 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     public VaultNote create(NoteCreateCommand command, String userId) {
         // 폴더 존재 검증
         if (command.getFolderId() != null) {
-            vaultFolderRepository.findById(command.getFolderId())
-                    .orElseThrow(() -> ResourceNotFoundException.vaultFolder(command.getFolderId()));
+            vaultFolderRepository
+                    .findById(command.getFolderId())
+                    .orElseThrow(
+                            () -> ResourceNotFoundException.vaultFolder(command.getFolderId()));
         }
 
-        String slug = command.getSlug() != null ? command.getSlug() : SlugUtils.generate(command.getTitle());
+        String slug =
+                command.getSlug() != null
+                        ? command.getSlug()
+                        : SlugUtils.generate(command.getTitle());
         if (vaultNoteRepository.existsBySlug(slug)) {
             throw DuplicateResourceException.slug(slug);
         }
@@ -51,18 +55,20 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
 
         List<String> outgoingLinks = backlinkParsingService.parseBacklinks(command.getContent());
 
-        VaultNote note = VaultNote.builder()
-                .title(command.getTitle())
-                .slug(slug)
-                .content(command.getContent())
-                .folderId(command.getFolderId())
-                .author(VaultNote.AuthorInfo.builder()
-                        .id(author.id())
-                        .name(author.displayName())
-                        .build())
-                .outgoingLinks(outgoingLinks)
-                .tags(command.getTags() != null ? command.getTags() : new ArrayList<>())
-                .build();
+        VaultNote note =
+                VaultNote.builder()
+                        .title(command.getTitle())
+                        .slug(slug)
+                        .content(command.getContent())
+                        .folderId(command.getFolderId())
+                        .author(
+                                VaultNote.AuthorInfo.builder()
+                                        .id(author.id())
+                                        .name(author.displayName())
+                                        .build())
+                        .outgoingLinks(outgoingLinks)
+                        .tags(command.getTags() != null ? command.getTags() : new ArrayList<>())
+                        .build();
 
         VaultNote saved = vaultNoteRepository.save(note);
         vaultFolderRepository.incrementNoteCount(command.getFolderId());
@@ -107,7 +113,8 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     }
 
     private VaultNote findById(String id) {
-        return vaultNoteRepository.findById(id)
+        return vaultNoteRepository
+                .findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.vaultNote(id));
     }
 
@@ -116,7 +123,8 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     }
 
     public VaultNote getBySlug(String slug) {
-        return vaultNoteRepository.findBySlug(slug)
+        return vaultNoteRepository
+                .findBySlug(slug)
                 .orElseThrow(() -> ResourceNotFoundException.vaultNote(slug));
     }
 
@@ -137,54 +145,50 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
         return vaultNoteRepository.searchByText(query, pageable);
     }
 
-    /**
-     * 이 노트를 참조하는 다른 노트 목록 (백링크/역방향 참조)
-     */
+    /** 이 노트를 참조하는 다른 노트 목록 (백링크/역방향 참조) */
     public List<VaultNote> getBackreferences(String noteId) {
         return vaultNoteRepository.findByOutgoingLinksContaining(noteId);
     }
 
-    /**
-     * 전체 노트의 그래프 데이터 (노드 + 링크)
-     * Projection 쿼리로 필요한 필드만 조회하여 메모리 최적화
-     */
+    /** 전체 노트의 그래프 데이터 (노드 + 링크) Projection 쿼리로 필요한 필드만 조회하여 메모리 최적화 */
     public GraphDataResponse getGraphData() {
         List<VaultNote> allNotes = vaultNoteRepository.findAllForGraph();
 
-        List<GraphDataResponse.GraphNode> nodes = allNotes.stream()
-                .map(note -> {
-                    int size = note.getOutgoingLinks() != null ? note.getOutgoingLinks().size() + 1 : 1;
-                    return GraphDataResponse.GraphNode.builder()
-                            .id(note.getId())
-                            .name(note.getTitle())
-                            .slug(note.getSlug())
-                            .size(size)
-                            .folderId(note.getFolderId())
-                            .build();
-                })
-                .toList();
+        List<GraphDataResponse.GraphNode> nodes =
+                allNotes.stream()
+                        .map(
+                                note -> {
+                                    int size =
+                                            note.getOutgoingLinks() != null
+                                                    ? note.getOutgoingLinks().size() + 1
+                                                    : 1;
+                                    return GraphDataResponse.GraphNode.builder()
+                                            .id(note.getId())
+                                            .name(note.getTitle())
+                                            .slug(note.getSlug())
+                                            .size(size)
+                                            .folderId(note.getFolderId())
+                                            .build();
+                                })
+                        .toList();
 
         List<GraphDataResponse.GraphLink> links = new ArrayList<>();
         for (VaultNote note : allNotes) {
             if (note.getOutgoingLinks() != null) {
                 for (String targetId : note.getOutgoingLinks()) {
-                    links.add(GraphDataResponse.GraphLink.builder()
-                            .source(note.getId())
-                            .target(targetId)
-                            .build());
+                    links.add(
+                            GraphDataResponse.GraphLink.builder()
+                                    .source(note.getId())
+                                    .target(targetId)
+                                    .build());
                 }
             }
         }
 
-        return GraphDataResponse.builder()
-                .nodes(nodes)
-                .links(links)
-                .build();
+        return GraphDataResponse.builder().nodes(nodes).links(links).build();
     }
 
-    /**
-     * 전체 노트의 outgoingLinks 재인덱싱 (일괄 임포트 후 백링크 복원용)
-     */
+    /** 전체 노트의 outgoingLinks 재인덱싱 (일괄 임포트 후 백링크 복원용) */
     @Transactional
     public int reindexAllLinks() {
         List<VaultNote> allNotes = vaultNoteRepository.findAll();
@@ -201,16 +205,12 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
         return updated;
     }
 
-    /**
-     * 댓글 수 원자적 증가
-     */
+    /** 댓글 수 원자적 증가 */
     public void incrementCommentCount(String noteId) {
         vaultNoteRepository.incrementCommentCount(noteId);
     }
 
-    /**
-     * 댓글 수 원자적 감소 (최소 0)
-     */
+    /** 댓글 수 원자적 감소 (최소 0) */
     public void decrementCommentCount(String noteId) {
         vaultNoteRepository.decrementCommentCount(noteId);
     }

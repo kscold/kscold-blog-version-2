@@ -1,14 +1,12 @@
 package com.kscold.blog.chat.adapter.out.discord;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.awt.Color;
 import java.time.Instant;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 final class DiscordMessageEmbeds {
 
-    private DiscordMessageEmbeds() {
-    }
+    private DiscordMessageEmbeds() {}
 
     static EmbedBuilder visitorMessage(String username, String content) {
         return new EmbedBuilder()
@@ -29,7 +27,8 @@ final class DiscordMessageEmbeds {
     static EmbedBuilder threadOpened(String username, String roomId) {
         return new EmbedBuilder()
                 .setTitle("새 채팅 시작")
-                .setDescription("**" + username + "** 님이 블로그에서 채팅을 시작했습니다.\n이 스레드에서 답장하면 방문자에게 전달됩니다.")
+                .setDescription(
+                        "**" + username + "** 님이 블로그에서 채팅을 시작했습니다.\n이 스레드에서 답장하면 방문자에게 전달됩니다.")
                 .setFooter("roomId: " + roomId)
                 .setColor(new Color(30, 41, 59));
     }

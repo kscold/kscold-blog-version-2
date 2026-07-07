@@ -2,11 +2,10 @@ package com.kscold.blog.media.adapter.out.persistence;
 
 import com.kscold.blog.media.domain.model.Media;
 import com.kscold.blog.media.domain.port.out.MediaRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings("null")
 @Component

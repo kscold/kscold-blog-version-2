@@ -2,13 +2,12 @@ package com.kscold.blog.social.adapter.out.persistence;
 
 import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
 
 @SuppressWarnings("null")
 @Component
@@ -38,8 +37,10 @@ public class FeedCommentRepositoryAdapter implements FeedCommentRepository {
     }
 
     @Override
-    public List<FeedComment> findAnonymousByFeedIdAndAuthorNames(String feedId, List<String> authorNames) {
-        return mongoFeedCommentRepository.findByFeedIdAndUserIdIsNullAndAuthorNameIn(feedId, authorNames);
+    public List<FeedComment> findAnonymousByFeedIdAndAuthorNames(
+            String feedId, List<String> authorNames) {
+        return mongoFeedCommentRepository.findByFeedIdAndUserIdIsNullAndAuthorNameIn(
+                feedId, authorNames);
     }
 
     @Override

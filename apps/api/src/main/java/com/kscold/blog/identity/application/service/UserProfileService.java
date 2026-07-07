@@ -7,12 +7,11 @@ import com.kscold.blog.identity.application.dto.UpdateProfileCommand;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,8 @@ public class UserProfileService implements UserProfileUseCase {
     }
 
     @Override
-    public AuthResult.UserInfo updateUserProfile(String targetUserId, UpdateProfileCommand command) {
+    public AuthResult.UserInfo updateUserProfile(
+            String targetUserId, UpdateProfileCommand command) {
         return applyProfileUpdate(targetUserId, command);
     }
 
@@ -43,27 +43,49 @@ public class UserProfileService implements UserProfileUseCase {
 
     @Override
     public PublicProfileDto getPublicProfile(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> ResourceNotFoundException.user(username));
+        User user =
+                userRepository
+                        .findByUsername(username)
+                        .orElseThrow(() -> ResourceNotFoundException.user(username));
         return PublicProfileDto.from(user);
     }
 
     private AuthResult.UserInfo applyProfileUpdate(String userId, UpdateProfileCommand command) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> ResourceNotFoundException.user(userId));
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
         User.Profile existing = user.getProfile();
-        List<String> techStack = command.techStack() != null
-                ? command.techStack().stream().map(String::trim).filter(s -> !s.isBlank()).distinct().collect(Collectors.toList())
-                : (existing != null ? existing.getTechStack() : new ArrayList<>());
+        List<String> techStack =
+                command.techStack() != null
+                        ? command.techStack().stream()
+                                .map(String::trim)
+                                .filter(s -> !s.isBlank())
+                                .distinct()
+                                .collect(Collectors.toList())
+                        : (existing != null ? existing.getTechStack() : new ArrayList<>());
 
-        User.Profile updated = User.Profile.builder()
-                .displayName(command.displayName() != null ? command.displayName().trim() : (existing != null ? existing.getDisplayName() : null))
-                .bio(command.bio() != null ? command.bio().trim() : (existing != null ? existing.getBio() : null))
-                .avatar(command.avatar() != null ? command.avatar() : (existing != null ? existing.getAvatar() : null))
-                .socialLinks(command.socialLinks() != null ? command.socialLinks() : (existing != null ? existing.getSocialLinks() : null))
-                .techStack(techStack)
-                .build();
+        User.Profile updated =
+                User.Profile.builder()
+                        .displayName(
+                                command.displayName() != null
+                                        ? command.displayName().trim()
+                                        : (existing != null ? existing.getDisplayName() : null))
+                        .bio(
+                                command.bio() != null
+                                        ? command.bio().trim()
+                                        : (existing != null ? existing.getBio() : null))
+                        .avatar(
+                                command.avatar() != null
+                                        ? command.avatar()
+                                        : (existing != null ? existing.getAvatar() : null))
+                        .socialLinks(
+                                command.socialLinks() != null
+                                        ? command.socialLinks()
+                                        : (existing != null ? existing.getSocialLinks() : null))
+                        .techStack(techStack)
+                        .build();
 
         user.setProfile(updated);
         userRepository.save(user);

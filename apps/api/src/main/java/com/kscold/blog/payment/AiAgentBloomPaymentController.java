@@ -1,5 +1,11 @@
 package com.kscold.blog.payment;
 
+import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.CompletePaymentRequest;
+import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.CompletePaymentResponse;
+import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PaymentConfigResponse;
+import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PreparePaymentRequest;
+import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PreparePaymentResponse;
+
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.CompletePaymentRequest;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.CompletePaymentResponse;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PaymentConfigResponse;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PreparePaymentRequest;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PreparePaymentResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,20 +32,18 @@ public class AiAgentBloomPaymentController {
     @PostMapping("/prepare")
     public ResponseEntity<ApiResponse<PreparePaymentResponse>> prepare(
             @AuthenticationPrincipal String userId,
-            @Valid @RequestBody PreparePaymentRequest request
-    ) {
-        return ResponseEntity.ok(ApiResponse.success(aiAgentBloomPaymentService.prepare(userId, request)));
+            @Valid @RequestBody PreparePaymentRequest request) {
+        return ResponseEntity.ok(
+                ApiResponse.success(aiAgentBloomPaymentService.prepare(userId, request)));
     }
 
     @PostMapping("/complete")
     public ResponseEntity<ApiResponse<CompletePaymentResponse>> complete(
             @AuthenticationPrincipal String userId,
-            @Valid @RequestBody CompletePaymentRequest request
-    ) {
-        return ResponseEntity.ok(ApiResponse.success(aiAgentBloomPaymentService.complete(
-                userId,
-                request.paymentId(),
-                request.paymentAccessToken()
-        )));
+            @Valid @RequestBody CompletePaymentRequest request) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        aiAgentBloomPaymentService.complete(
+                                userId, request.paymentId(), request.paymentAccessToken())));
     }
 }

@@ -1,5 +1,12 @@
 package com.kscold.blog.vault.agent;
 
+import static com.kscold.blog.vault.agent.VaultAgentDtos.AgentStage;
+import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatHistoryMessage;
+import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatHistoryResponse;
+import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatResponse;
+import static com.kscold.blog.vault.agent.VaultAgentDtos.ReindexResponse;
+import static com.kscold.blog.vault.agent.VaultAgentDtos.SourceNote;
+
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.vault.agent.grpc.ChatRequest;
@@ -8,6 +15,11 @@ import com.kscold.blog.vault.agent.grpc.VaultAgentServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import jakarta.annotation.PreDestroy;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -16,19 +28,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import static com.kscold.blog.vault.agent.VaultAgentDtos.AgentStage;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatHistoryMessage;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatHistoryResponse;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatResponse;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ReindexResponse;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.SourceNote;
 
 @Slf4j
 @Service
@@ -45,10 +44,10 @@ public class VaultAgentService {
     public VaultAgentService(VaultAgentProperties properties, MongoTemplate mongoTemplate) {
         this.properties = properties;
         this.mongoTemplate = mongoTemplate;
-        this.channel = io.grpc.ManagedChannelBuilder
-                .forAddress(properties.getHost(), properties.getPort())
-                .usePlaintext()
-                .build();
+        this.channel =
+                io.grpc.ManagedChannelBuilder.forAddress(properties.getHost(), properties.getPort())
+                        .usePlaintext()
+                        .build();
         this.blockingStub = VaultAgentServiceGrpc.newBlockingStub(channel);
     }
 
@@ -58,59 +57,80 @@ public class VaultAgentService {
             return new ReindexResponse(
                     response.getTotalNotes(),
                     response.getIndexedNotes(),
-                    response.getSkippedNotes()
-            );
+                    response.getSkippedNotes());
         } catch (StatusRuntimeException exception) {
             throw agentUnavailable(exception);
         }
     }
 
-    public ChatResponse chat(VaultAgentDtos.ChatRequest request, String userId, String clientIdentifier) {
+    public ChatResponse chat(
+            VaultAgentDtos.ChatRequest request, String userId, String clientIdentifier) {
         String sessionId = normalizeSessionId(request.sessionId());
         String scopeKey = scopeKey(userId, clientIdentifier, sessionId);
         try {
-            var response = stub().chat(ChatRequest.newBuilder()
-                    .setMessage(request.message())
-                    .setActiveFolderName(request.activeFolderName() == null ? "" : request.activeFolderName())
-                    .build());
+            var response =
+                    stub().chat(
+                                    ChatRequest.newBuilder()
+                                            .setMessage(request.message())
+                                            .setActiveFolderName(
+                                                    request.activeFolderName() == null
+                                                            ? ""
+                                                            : request.activeFolderName())
+                                            .build());
 
-            List<AgentStage> stages = response.getStagesList().stream()
-                    .map(stage -> new AgentStage(stage.getName(), stage.getDetail()))
-                    .toList();
-            List<SourceNote> sources = response.getSourcesList().stream()
-                    .map(source -> new SourceNote(
-                            source.getId(),
-                            source.getTitle(),
-                            source.getSlug(),
-                            source.getScore(),
-                            source.getType(),
-                            source.getPath()
-                    ))
-                    .toList();
-            saveMessage(scopeKey, sessionId, userId, clientIdentifier, "user", request.message(), List.of(), List.of());
-            saveMessage(scopeKey, sessionId, userId, clientIdentifier, "assistant", response.getAnswer(), stages, sources);
-
-            return new ChatResponse(
+            List<AgentStage> stages =
+                    response.getStagesList().stream()
+                            .map(stage -> new AgentStage(stage.getName(), stage.getDetail()))
+                            .toList();
+            List<SourceNote> sources =
+                    response.getSourcesList().stream()
+                            .map(
+                                    source ->
+                                            new SourceNote(
+                                                    source.getId(),
+                                                    source.getTitle(),
+                                                    source.getSlug(),
+                                                    source.getScore(),
+                                                    source.getType(),
+                                                    source.getPath()))
+                            .toList();
+            saveMessage(
+                    scopeKey,
                     sessionId,
+                    userId,
+                    clientIdentifier,
+                    "user",
+                    request.message(),
+                    List.of(),
+                    List.of());
+            saveMessage(
+                    scopeKey,
+                    sessionId,
+                    userId,
+                    clientIdentifier,
+                    "assistant",
                     response.getAnswer(),
                     stages,
-                    sources
-            );
+                    sources);
+
+            return new ChatResponse(sessionId, response.getAnswer(), stages, sources);
         } catch (StatusRuntimeException exception) {
             throw agentUnavailable(exception);
         }
     }
 
-    public ChatHistoryResponse history(String requestedSessionId, String userId, String clientIdentifier) {
+    public ChatHistoryResponse history(
+            String requestedSessionId, String userId, String clientIdentifier) {
         String sessionId = normalizeSessionId(requestedSessionId);
         String scopeKey = scopeKey(userId, clientIdentifier, sessionId);
-        Query query = Query.query(Criteria.where("scopeKey").is(scopeKey))
-                .with(Sort.by(Sort.Direction.ASC, "createdAt"))
-                .limit(HISTORY_LIMIT);
-        List<ChatHistoryMessage> messages = mongoTemplate.find(query, Document.class, CHAT_COLLECTION)
-                .stream()
-                .map(this::toHistoryMessage)
-                .toList();
+        Query query =
+                Query.query(Criteria.where("scopeKey").is(scopeKey))
+                        .with(Sort.by(Sort.Direction.ASC, "createdAt"))
+                        .limit(HISTORY_LIMIT);
+        List<ChatHistoryMessage> messages =
+                mongoTemplate.find(query, Document.class, CHAT_COLLECTION).stream()
+                        .map(this::toHistoryMessage)
+                        .toList();
         return new ChatHistoryResponse(sessionId, messages);
     }
 
@@ -120,7 +140,8 @@ public class VaultAgentService {
     }
 
     private VaultAgentServiceGrpc.VaultAgentServiceBlockingStub stub() {
-        return blockingStub.withDeadlineAfter(properties.getDeadlineMillis(), TimeUnit.MILLISECONDS);
+        return blockingStub.withDeadlineAfter(
+                properties.getDeadlineMillis(), TimeUnit.MILLISECONDS);
     }
 
     private String normalizeSessionId(String sessionId) {
@@ -149,54 +170,70 @@ public class VaultAgentService {
             String role,
             String content,
             List<AgentStage> stages,
-            List<SourceNote> sources
-    ) {
-        mongoTemplate.insert(new Document()
-                .append("scopeKey", scopeKey)
-                .append("sessionId", sessionId)
-                .append("userId", userId)
-                .append("clientIdentifier", clientIdentifier)
-                .append("role", role)
-                .append("content", content)
-                .append("stages", stages.stream()
-                        .map(stage -> new Document("name", stage.name()).append("detail", stage.detail()))
-                        .toList())
-                .append("sources", sources.stream()
-                        .map(source -> new Document("id", source.id())
-                                .append("title", source.title())
-                                .append("slug", source.slug())
-                                .append("score", source.score())
-                                .append("type", source.type())
-                                .append("path", source.path()))
-                        .toList())
-                .append("createdAt", Date.from(Instant.now())), CHAT_COLLECTION);
+            List<SourceNote> sources) {
+        mongoTemplate.insert(
+                new Document()
+                        .append("scopeKey", scopeKey)
+                        .append("sessionId", sessionId)
+                        .append("userId", userId)
+                        .append("clientIdentifier", clientIdentifier)
+                        .append("role", role)
+                        .append("content", content)
+                        .append(
+                                "stages",
+                                stages.stream()
+                                        .map(
+                                                stage ->
+                                                        new Document("name", stage.name())
+                                                                .append("detail", stage.detail()))
+                                        .toList())
+                        .append(
+                                "sources",
+                                sources.stream()
+                                        .map(
+                                                source ->
+                                                        new Document("id", source.id())
+                                                                .append("title", source.title())
+                                                                .append("slug", source.slug())
+                                                                .append("score", source.score())
+                                                                .append("type", source.type())
+                                                                .append("path", source.path()))
+                                        .toList())
+                        .append("createdAt", Date.from(Instant.now())),
+                CHAT_COLLECTION);
     }
 
     @SuppressWarnings("unchecked")
     private ChatHistoryMessage toHistoryMessage(Document document) {
-        List<AgentStage> stages = ((List<Document>) document.getOrDefault("stages", List.of()))
-                .stream()
-                .map(stage -> new AgentStage(toStringValue(stage.get("name")), toStringValue(stage.get("detail"))))
-                .toList();
-        List<SourceNote> sources = ((List<Document>) document.getOrDefault("sources", List.of()))
-                .stream()
-                .map(source -> new SourceNote(
-                        toStringValue(source.get("id")),
-                        toStringValue(source.get("title")),
-                        toStringValue(source.get("slug")),
-                        toDouble(source.get("score")),
-                        toStringValue(source.get("type")),
-                        toStringValue(source.get("path"))
-                ))
-                .toList();
+        List<AgentStage> stages =
+                ((List<Document>) document.getOrDefault("stages", List.of()))
+                        .stream()
+                                .map(
+                                        stage ->
+                                                new AgentStage(
+                                                        toStringValue(stage.get("name")),
+                                                        toStringValue(stage.get("detail"))))
+                                .toList();
+        List<SourceNote> sources =
+                ((List<Document>) document.getOrDefault("sources", List.of()))
+                        .stream()
+                                .map(
+                                        source ->
+                                                new SourceNote(
+                                                        toStringValue(source.get("id")),
+                                                        toStringValue(source.get("title")),
+                                                        toStringValue(source.get("slug")),
+                                                        toDouble(source.get("score")),
+                                                        toStringValue(source.get("type")),
+                                                        toStringValue(source.get("path"))))
+                                .toList();
         return new ChatHistoryMessage(
                 toStringValue(document.get("_id")),
                 toStringValue(document.get("role")),
                 toStringValue(document.get("content")),
                 stages,
                 sources,
-                toInstant(document.get("createdAt"))
-        );
+                toInstant(document.get("createdAt")));
     }
 
     private String toStringValue(Object value) {
@@ -232,8 +269,7 @@ public class VaultAgentService {
                 properties.getHost(),
                 properties.getPort(),
                 exception.getStatus(),
-                exception
-        );
+                exception);
         return new BusinessException(ErrorCode.EXTERNAL_API_ERROR, "Vault Agent 서버 응답을 받을 수 없습니다.");
     }
 }

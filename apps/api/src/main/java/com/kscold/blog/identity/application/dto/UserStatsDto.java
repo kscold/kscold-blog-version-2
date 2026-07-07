@@ -8,8 +8,7 @@ public record UserStatsDto(
         long newUsersThisWeek,
         long newUsersThisMonth,
         List<DailySignup> dailySignups,
-        List<RecentUser> recentUsers
-) {
+        List<RecentUser> recentUsers) {
     public record DailySignup(String date, long count) {}
 
     public record RecentUser(
@@ -20,6 +19,5 @@ public record UserStatsDto(
             String avatar,
             String role,
             String createdAt,
-            boolean deleted
-    ) {}
+            boolean deleted) {}
 }

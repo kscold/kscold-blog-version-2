@@ -1,13 +1,12 @@
 package com.kscold.blog.identity.adapter.out.mail;
 
-import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
+import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.identity.application.port.out.RecoveryMailMessage;
 import com.kscold.blog.identity.domain.model.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -19,11 +18,13 @@ public class RecoveryEmailComposer {
         String subject = "[KSCOLD] 가입 아이디 안내";
         String preview = user.getDisplayName() + "님이 가입에 사용한 아이디를 안내드려요.";
         String summary = "가입에 사용한 아이디를 아래에서 바로 확인할 수 있어요.";
-        String body = """
+        String body =
+                """
                 아이디 찾기 요청이 들어와 가입 정보를 확인했습니다.
                 아래 아이디로 다시 로그인하시면 됩니다.
                 """;
-        String details = """
+        String details =
+                """
                 <tr>
                   <td style="padding:0 32px 24px;">
                     <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E2E8F0; border-radius:20px; background-color:#F8FAFC;">
@@ -44,37 +45,50 @@ public class RecoveryEmailComposer {
                     </p>
                   </td>
                 </tr>
-                """.formatted(escapeHtml(user.getUsername()));
+                """
+                        .formatted(escapeHtml(user.getUsername()));
 
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/login/recovery?tab=password");
         String actionLabel = "비밀번호 재설정하기";
-        String plainText = """
+        String plainText =
+                """
                 %s님, 가입 아이디를 안내드립니다.
 
                 아이디: %s
 
                 비밀번호가 기억나지 않는다면 아래 주소에서 재설정할 수 있습니다.
                 %s
-                """.formatted(user.getDisplayName(), user.getUsername(), actionUrl);
+                """
+                        .formatted(user.getDisplayName(), user.getUsername(), actionUrl);
 
         return new RecoveryMailMessage(
                 user.getEmail(),
                 subject,
                 plainText,
-                buildTemplate(preview, "가입 아이디를 확인해 주세요", summary, body, details, actionUrl, actionLabel)
-        );
+                buildTemplate(
+                        preview,
+                        "가입 아이디를 확인해 주세요",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        actionLabel));
     }
 
     public RecoveryMailMessage buildPasswordReset(User user, String resetUrl) {
-        String expiryMinutes = Long.toString(recoveryMailProperties.getPasswordResetExpiryMinutes());
+        String expiryMinutes =
+                Long.toString(recoveryMailProperties.getPasswordResetExpiryMinutes());
         String subject = "[KSCOLD] 비밀번호 재설정 안내";
         String preview = "비밀번호를 다시 설정할 수 있도록 안전한 링크를 보내드려요.";
         String summary = "아래 버튼을 눌러 새 비밀번호를 설정해 주세요.";
-        String body = """
+        String body =
+                """
                 비밀번호 재설정 요청이 확인되어, 한 번만 사용할 수 있는 안전한 링크를 준비했습니다.
                 링크는 너무 길게 열어두지 않고 %s분 동안만 유효하게 동작합니다.
-                """.formatted(expiryMinutes);
-        String details = """
+                """
+                        .formatted(expiryMinutes);
+        String details =
+                """
                 <tr>
                   <td style="padding:0 32px 24px;">
                     <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E2E8F0; border-radius:20px; background-color:#F8FAFC;">
@@ -89,22 +103,31 @@ public class RecoveryEmailComposer {
                     </table>
                   </td>
                 </tr>
-                """.formatted(escapeHtml(user.getDisplayName()), escapeHtml(user.getEmail()));
-        String plainText = """
+                """
+                        .formatted(escapeHtml(user.getDisplayName()), escapeHtml(user.getEmail()));
+        String plainText =
+                """
                 %s님, 비밀번호 재설정 링크를 보내드립니다.
 
                 아래 주소는 %s분 동안만 유효합니다.
                 %s
 
                 본인이 요청하지 않았다면 이 메일은 무시하셔도 괜찮습니다.
-                """.formatted(user.getDisplayName(), expiryMinutes, resetUrl);
+                """
+                        .formatted(user.getDisplayName(), expiryMinutes, resetUrl);
 
         return new RecoveryMailMessage(
                 user.getEmail(),
                 subject,
                 plainText,
-                buildTemplate(preview, "비밀번호를 다시 설정해 주세요", summary, body, details, resetUrl, "비밀번호 다시 설정하기")
-        );
+                buildTemplate(
+                        preview,
+                        "비밀번호를 다시 설정해 주세요",
+                        summary,
+                        body,
+                        details,
+                        resetUrl,
+                        "비밀번호 다시 설정하기"));
     }
 
     public RecoveryMailMessage buildWelcome(User user) {
@@ -112,11 +135,13 @@ public class RecoveryEmailComposer {
         String subject = "[KSCOLD] 가입을 환영합니다";
         String preview = user.getDisplayName() + "님의 가입이 완료되었습니다.";
         String summary = "김승찬의 블로그에서 일상과 기술, 작업 기록을 지금부터 편하게 둘러보세요.";
-        String body = """
+        String body =
+                """
                 가입이 정상적으로 완료되었습니다.
                 이제 블로그 글, 피드, Vault 노트, 방명록, 채팅 기능을 현재 계정으로 바로 이용하실 수 있습니다.
                 """;
-        String details = """
+        String details =
+                """
                 <tr>
                   <td style="padding:0 32px 24px;">
                     <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E2E8F0; border-radius:20px; background-color:#F8FAFC;">
@@ -131,9 +156,11 @@ public class RecoveryEmailComposer {
                     </table>
                   </td>
                 </tr>
-                """.formatted(escapeHtml(user.getEmail()), escapeHtml(user.getUsername()));
+                """
+                        .formatted(escapeHtml(user.getEmail()), escapeHtml(user.getUsername()));
 
-        String plainText = """
+        String plainText =
+                """
                 %s님, 가입을 환영합니다.
 
                 가입한 이메일: %s
@@ -141,31 +168,32 @@ public class RecoveryEmailComposer {
 
                 로그인:
                 %s
-                """.formatted(user.getDisplayName(), user.getEmail(), user.getUsername(), loginUrl);
+                """
+                        .formatted(
+                                user.getDisplayName(),
+                                user.getEmail(),
+                                user.getUsername(),
+                                loginUrl);
 
         return new RecoveryMailMessage(
                 user.getEmail(),
                 subject,
                 plainText,
-                buildTemplate(preview, "가입을 환영합니다", summary, body, details, loginUrl, "로그인 바로가기")
-        );
+                buildTemplate(preview, "가입을 환영합니다", summary, body, details, loginUrl, "로그인 바로가기"));
     }
 
     public RecoveryMailMessage buildUnreadChatReminder(
-            User user,
-            String adminName,
-            String latestContent,
-            long unreadCount,
-            String actionUrl
-    ) {
+            User user, String adminName, String latestContent, long unreadCount, String actionUrl) {
         String subject = "[KSCOLD] 새 답장이 도착했습니다";
         String preview = "관리자가 남긴 답장이 아직 확인되지 않았습니다.";
         String summary = "채팅에 새 답장이 있어요. 아래에서 바로 확인할 수 있습니다.";
-        String body = """
+        String body =
+                """
                 관리자가 남긴 새 답장이 아직 읽히지 않아 한 번 더 알려드립니다.
                 답장이 쌓이기 전에 아래 버튼으로 들어와 이어서 확인해 주세요.
                 """;
-        String details = """
+        String details =
+                """
                 <tr>
                   <td style="padding:0 32px 24px;">
                     <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E2E8F0; border-radius:20px; background-color:#F8FAFC;">
@@ -180,13 +208,14 @@ public class RecoveryEmailComposer {
                     </table>
                   </td>
                 </tr>
-                """.formatted(
-                escapeHtml(adminName),
-                unreadCount,
-                truncateForMail(latestContent, 140)
-        );
+                """
+                        .formatted(
+                                escapeHtml(adminName),
+                                unreadCount,
+                                truncateForMail(latestContent, 140));
 
-        String plainText = """
+        String plainText =
+                """
                 %s님, 관리자가 남긴 새 답장 %d건이 아직 확인되지 않았습니다.
 
                 최근 답장:
@@ -194,14 +223,15 @@ public class RecoveryEmailComposer {
 
                 채팅 열기:
                 %s
-                """.formatted(user.getDisplayName(), unreadCount, latestContent, actionUrl);
+                """
+                        .formatted(user.getDisplayName(), unreadCount, latestContent, actionUrl);
 
         return new RecoveryMailMessage(
                 user.getEmail(),
                 subject,
                 plainText,
-                buildTemplate(preview, "새 답장을 확인해 주세요", summary, body, details, actionUrl, "채팅 확인하기")
-        );
+                buildTemplate(
+                        preview, "새 답장을 확인해 주세요", summary, body, details, actionUrl, "채팅 확인하기"));
     }
 
     public RecoveryMailMessage buildAdminNightRequestConfirmation(AdminNightRequest request) {
@@ -209,18 +239,20 @@ public class RecoveryEmailComposer {
         String subject = "[KSCOLD] Admin Night 신청이 접수되었습니다";
         String preview = request.getRequesterName() + "님의 Admin Night 신청을 잘 받았습니다.";
         String summary = "신청 PR이 도착했습니다. 확인 후 승인되면 merge / meet 일정으로 이어집니다.";
-        String body = """
+        String body =
+                """
                 미뤄둔 일을 끝내기 위한 Admin Night 신청이 접수되었습니다.
                 승인 전까지는 대기 상태로 두고, 확인이 끝나면 일정 슬롯과 함께 실제 만남 안내를 보내드릴게요.
                 """;
-        String details = buildAdminNightDetails(
-                "REQUEST RECEIVED",
-                request.getTaskTitle(),
-                request.getMessage(),
-                request.getParticipationMode(),
-                request.getPreferredSlot()
-        );
-        String plainText = """
+        String details =
+                buildAdminNightDetails(
+                        "REQUEST RECEIVED",
+                        request.getTaskTitle(),
+                        request.getMessage(),
+                        request.getParticipationMode(),
+                        request.getPreferredSlot());
+        String plainText =
+                """
                 %s님, Admin Night 신청이 접수되었습니다.
 
                 실명: %s
@@ -231,54 +263,66 @@ public class RecoveryEmailComposer {
 
                 승인 여부와 일정은 아래 페이지에서 확인할 수 있습니다.
                 %s
-                """.formatted(
-                request.getRequesterName(),
-                request.getRequesterName(),
-                request.getTaskTitle(),
-                describeParticipationMode(request.getParticipationMode()),
-                request.getPreferredSlot().getDate(),
-                request.getPreferredSlot().getWeekday(),
-                request.getPreferredSlot().getTimeLabel(),
-                request.getPreferredSlot().getFocus(),
-                fallbackText(request.getMessage(), "별도 메모 없음"),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                request.getRequesterName(),
+                                request.getRequesterName(),
+                                request.getTaskTitle(),
+                                describeParticipationMode(request.getParticipationMode()),
+                                request.getPreferredSlot().getDate(),
+                                request.getPreferredSlot().getWeekday(),
+                                request.getPreferredSlot().getTimeLabel(),
+                                request.getPreferredSlot().getFocus(),
+                                fallbackText(request.getMessage(), "별도 메모 없음"),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 request.getRequesterEmail(),
                 subject,
                 plainText,
-                buildTemplate(preview, "신청 PR을 잘 받았습니다", summary, body, details, actionUrl, "Admin Night 페이지 보기")
-        );
+                buildTemplate(
+                        preview,
+                        "신청 PR을 잘 받았습니다",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        "Admin Night 페이지 보기"));
     }
 
-    public RecoveryMailMessage buildAdminNightRequestNotification(AdminNightRequest request, String adminEmail) {
+    public RecoveryMailMessage buildAdminNightRequestNotification(
+            AdminNightRequest request, String adminEmail) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin/admin-night");
         String subject = "[KSCOLD] 새로운 Admin Night 신청이 도착했습니다";
         String preview = request.getRequesterName() + "님이 이번 Admin Night에 함께 붙고 싶다는 신청을 보냈습니다.";
         String summary = "새로운 신청이 도착했습니다. 시간과 의지를 리뷰한 뒤 승인하면 일정이 보드에 반영됩니다.";
-        String body = """
+        String body =
+                """
                 새로운 Admin Night 신청이 도착했습니다.
                 신청 내용을 확인하고 승인하면 공개 캘린더와 참가자 메일에 바로 일정이 반영됩니다.
                 """;
-        String details = buildAdminNightDetails(
-                "NEW REQUEST",
-                request.getRequesterName() + " · " + request.getTaskTitle(),
-                request.getMessage(),
-                request.getParticipationMode(),
-                request.getPreferredSlot()
-        ) + """
+        String details =
+                buildAdminNightDetails(
+                                "NEW REQUEST",
+                                request.getRequesterName() + " · " + request.getTaskTitle(),
+                                request.getMessage(),
+                                request.getParticipationMode(),
+                                request.getPreferredSlot())
+                        + """
                 <tr>
                   <td style="padding:0 32px 24px;">
                     <p style="margin:0 0 8px; font-size:14px; line-height:24px; color:#64748B;">신청자 이메일: %s</p>
                     <p style="margin:0; font-size:14px; line-height:24px; color:#64748B;">진행 방식: %s</p>
                   </td>
                 </tr>
-                """.formatted(
-                escapeHtml(request.getRequesterEmail()),
-                escapeHtml(describeParticipationMode(request.getParticipationMode()))
-        );
-        String plainText = """
+                """
+                                .formatted(
+                                        escapeHtml(request.getRequesterEmail()),
+                                        escapeHtml(
+                                                describeParticipationMode(
+                                                        request.getParticipationMode())));
+        String plainText =
+                """
                 새로운 Admin Night 신청이 도착했습니다.
 
                 신청자: %s (%s)
@@ -289,25 +333,31 @@ public class RecoveryEmailComposer {
 
                 관리자 페이지:
                 %s
-                """.formatted(
-                request.getRequesterName(),
-                request.getRequesterEmail(),
-                request.getTaskTitle(),
-                describeParticipationMode(request.getParticipationMode()),
-                request.getPreferredSlot().getDate(),
-                request.getPreferredSlot().getWeekday(),
-                request.getPreferredSlot().getTimeLabel(),
-                request.getPreferredSlot().getFocus(),
-                fallbackText(request.getMessage(), "별도 메모 없음"),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                request.getRequesterName(),
+                                request.getRequesterEmail(),
+                                request.getTaskTitle(),
+                                describeParticipationMode(request.getParticipationMode()),
+                                request.getPreferredSlot().getDate(),
+                                request.getPreferredSlot().getWeekday(),
+                                request.getPreferredSlot().getTimeLabel(),
+                                request.getPreferredSlot().getFocus(),
+                                fallbackText(request.getMessage(), "별도 메모 없음"),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 adminEmail,
                 subject,
                 plainText,
-                buildTemplate(preview, "새로운 신청 PR이 도착했습니다", summary, body, details, actionUrl, "관리자 보드에서 확인하기")
-        );
+                buildTemplate(
+                        preview,
+                        "새로운 신청 PR이 도착했습니다",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        "관리자 보드에서 확인하기"));
     }
 
     public RecoveryMailMessage buildAdminNightApprovedForRequester(AdminNightRequest request) {
@@ -315,18 +365,20 @@ public class RecoveryEmailComposer {
         String subject = "[KSCOLD] Admin Night 일정이 merge 되었습니다";
         String preview = request.getRequesterName() + "님의 Admin Night 신청이 승인되었습니다.";
         String summary = "승인이 완료되어 일정이 공개 보드에 반영되었습니다. 같은 시간대에 조용히 붙어 끝내면 됩니다.";
-        String body = """
+        String body =
+                """
                 Admin Night 신청이 승인되었습니다.
                 공개 보드에도 같은 일정이 반영되었고, 아래 시간대에 맞춰 그대로 merge / meet, 즉 실제 만남 흐름으로 이어가면 됩니다.
                 """;
-        String details = buildAdminNightDetails(
-                "MERGED SLOT",
-                request.getTaskTitle(),
-                request.getMessage(),
-                request.getParticipationMode(),
-                request.getScheduledSlot()
-        );
-        String plainText = """
+        String details =
+                buildAdminNightDetails(
+                        "MERGED SLOT",
+                        request.getTaskTitle(),
+                        request.getMessage(),
+                        request.getParticipationMode(),
+                        request.getScheduledSlot());
+        String plainText =
+                """
                 %s님, Admin Night 신청이 승인되었습니다.
 
                 실명: %s
@@ -337,25 +389,31 @@ public class RecoveryEmailComposer {
 
                 페이지에서 보드와 안내를 다시 확인할 수 있습니다.
                 %s
-                """.formatted(
-                request.getRequesterName(),
-                request.getRequesterName(),
-                request.getTaskTitle(),
-                describeParticipationMode(request.getParticipationMode()),
-                request.getScheduledSlot().getDate(),
-                request.getScheduledSlot().getWeekday(),
-                request.getScheduledSlot().getTimeLabel(),
-                request.getScheduledSlot().getFocus(),
-                fallbackText(request.getMessage(), "별도 메모 없음"),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                request.getRequesterName(),
+                                request.getRequesterName(),
+                                request.getTaskTitle(),
+                                describeParticipationMode(request.getParticipationMode()),
+                                request.getScheduledSlot().getDate(),
+                                request.getScheduledSlot().getWeekday(),
+                                request.getScheduledSlot().getTimeLabel(),
+                                request.getScheduledSlot().getFocus(),
+                                fallbackText(request.getMessage(), "별도 메모 없음"),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 request.getRequesterEmail(),
                 subject,
                 plainText,
-                buildTemplate(preview, "일정이 merge 되었습니다", summary, body, details, actionUrl, "보드에서 일정 확인하기")
-        );
+                buildTemplate(
+                        preview,
+                        "일정이 merge 되었습니다",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        "보드에서 일정 확인하기"));
     }
 
     public RecoveryMailMessage buildAdminNightInfoRequestedForRequester(AdminNightRequest request) {
@@ -363,18 +421,21 @@ public class RecoveryEmailComposer {
         String subject = "[KSCOLD] Admin Night 신청에 추가 정보가 필요합니다";
         String preview = request.getRequesterName() + "님의 신청을 확인했고, 조금 더 알고 싶은 내용이 있습니다.";
         String summary = "관리자 메모를 확인하고 같은 신청을 보완해 다시 보내주세요. 보완본이 도착하면 다시 review 합니다.";
-        String body = """
+        String body =
+                """
                 Admin Night 신청을 잘 확인했습니다.
                 다만 실제 만남으로 이어가기 전에 조금 더 알고 싶은 정보가 있어, 아래 메모를 남겨 두었습니다.
                 """;
-        String details = buildAdminNightDetails(
-                "추가 정보 요청",
-                request.getTaskTitle(),
-                request.getMessage(),
-                request.getParticipationMode(),
-                request.getPreferredSlot()
-        ) + buildAdminNightReviewNote("관리자 메모", request.getReviewNote());
-        String plainText = """
+        String details =
+                buildAdminNightDetails(
+                                "추가 정보 요청",
+                                request.getTaskTitle(),
+                                request.getMessage(),
+                                request.getParticipationMode(),
+                                request.getPreferredSlot())
+                        + buildAdminNightReviewNote("관리자 메모", request.getReviewNote());
+        String plainText =
+                """
                 %s님, Admin Night 신청에 추가 정보가 필요합니다.
 
                 실명: %s
@@ -385,44 +446,47 @@ public class RecoveryEmailComposer {
 
                 아래 페이지에서 내용을 보완해 다시 보내주세요.
                 %s
-                """.formatted(
-                request.getRequesterName(),
-                request.getRequesterName(),
-                request.getTaskTitle(),
-                describeParticipationMode(request.getParticipationMode()),
-                request.getPreferredSlot().getDate(),
-                request.getPreferredSlot().getWeekday(),
-                request.getPreferredSlot().getTimeLabel(),
-                request.getPreferredSlot().getFocus(),
-                fallbackText(request.getReviewNote(), "추가 메모 없음"),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                request.getRequesterName(),
+                                request.getRequesterName(),
+                                request.getTaskTitle(),
+                                describeParticipationMode(request.getParticipationMode()),
+                                request.getPreferredSlot().getDate(),
+                                request.getPreferredSlot().getWeekday(),
+                                request.getPreferredSlot().getTimeLabel(),
+                                request.getPreferredSlot().getFocus(),
+                                fallbackText(request.getReviewNote(), "추가 메모 없음"),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 request.getRequesterEmail(),
                 subject,
                 plainText,
-                buildTemplate(preview, "추가 정보가 필요합니다", summary, body, details, actionUrl, "신청 보완하기")
-        );
+                buildTemplate(
+                        preview, "추가 정보가 필요합니다", summary, body, details, actionUrl, "신청 보완하기"));
     }
 
-    public RecoveryMailMessage buildAdminNightApprovedForAdmin(AdminNightRequest request, String adminEmail) {
+    public RecoveryMailMessage buildAdminNightApprovedForAdmin(
+            AdminNightRequest request, String adminEmail) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin/admin-night");
         String subject = "[KSCOLD] Admin Night 일정 승인이 반영되었습니다";
         String preview = request.getRequesterName() + "님 일정이 보드에 반영되었습니다.";
         String summary = "승인된 신청이 캘린더에 반영되었습니다. 같은 시간대에 실제 만남 흐름으로 이어가면 됩니다.";
-        String body = """
+        String body =
+                """
                 승인한 Admin Night 신청이 일정에 반영되었습니다.
                 공개 캘린더와 참가자 안내 메일까지 함께 반영되었으니, 필요한 경우 여기서 다시 확인해 주세요.
                 """;
-        String details = buildAdminNightDetails(
-                "승인 완료",
-                request.getRequesterName() + " · " + request.getTaskTitle(),
-                request.getMessage(),
-                request.getParticipationMode(),
-                request.getScheduledSlot()
-        );
-        String plainText = """
+        String details =
+                buildAdminNightDetails(
+                        "승인 완료",
+                        request.getRequesterName() + " · " + request.getTaskTitle(),
+                        request.getMessage(),
+                        request.getParticipationMode(),
+                        request.getScheduledSlot());
+        String plainText =
+                """
                 승인 완료된 Admin Night 일정입니다.
 
                 신청자: %s (%s)
@@ -432,24 +496,30 @@ public class RecoveryEmailComposer {
 
                 관리자 페이지:
                 %s
-                """.formatted(
-                request.getRequesterName(),
-                request.getRequesterEmail(),
-                request.getTaskTitle(),
-                describeParticipationMode(request.getParticipationMode()),
-                request.getScheduledSlot().getDate(),
-                request.getScheduledSlot().getWeekday(),
-                request.getScheduledSlot().getTimeLabel(),
-                request.getScheduledSlot().getFocus(),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                request.getRequesterName(),
+                                request.getRequesterEmail(),
+                                request.getTaskTitle(),
+                                describeParticipationMode(request.getParticipationMode()),
+                                request.getScheduledSlot().getDate(),
+                                request.getScheduledSlot().getWeekday(),
+                                request.getScheduledSlot().getTimeLabel(),
+                                request.getScheduledSlot().getFocus(),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 adminEmail,
                 subject,
                 plainText,
-                buildTemplate(preview, "승인한 일정이 보드에 올라갔습니다", summary, body, details, actionUrl, "관리자 보드 다시 보기")
-        );
+                buildTemplate(
+                        preview,
+                        "승인한 일정이 보드에 올라갔습니다",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        "관리자 보드 다시 보기"));
     }
 
     public RecoveryMailMessage buildAdminNightResubmittedConfirmation(AdminNightRequest request) {
@@ -457,18 +527,20 @@ public class RecoveryEmailComposer {
         String subject = "[KSCOLD] Admin Night 신청 보완본이 다시 접수되었습니다";
         String preview = request.getRequesterName() + "님의 보완된 신청을 다시 받았습니다.";
         String summary = "보완한 신청이 다시 접수되었습니다. 확인 후 승인되면 일정이 캘린더에 반영됩니다.";
-        String body = """
+        String body =
+                """
                 관리자 메모를 반영한 보완본이 다시 접수되었습니다.
                 신청 내용과 시간대를 다시 review 한 뒤, 승인되면 실제 만남 일정으로 이어집니다.
                 """;
-        String details = buildAdminNightDetails(
-                "보완본 재접수",
-                request.getTaskTitle(),
-                request.getMessage(),
-                request.getParticipationMode(),
-                request.getPreferredSlot()
-        );
-        String plainText = """
+        String details =
+                buildAdminNightDetails(
+                        "보완본 재접수",
+                        request.getTaskTitle(),
+                        request.getMessage(),
+                        request.getParticipationMode(),
+                        request.getPreferredSlot());
+        String plainText =
+                """
                 %s님, 보완한 Admin Night 신청이 다시 접수되었습니다.
 
                 실명: %s
@@ -479,54 +551,66 @@ public class RecoveryEmailComposer {
 
                 신청 상태는 아래 페이지에서 계속 확인할 수 있습니다.
                 %s
-                """.formatted(
-                request.getRequesterName(),
-                request.getRequesterName(),
-                request.getTaskTitle(),
-                describeParticipationMode(request.getParticipationMode()),
-                request.getPreferredSlot().getDate(),
-                request.getPreferredSlot().getWeekday(),
-                request.getPreferredSlot().getTimeLabel(),
-                request.getPreferredSlot().getFocus(),
-                fallbackText(request.getMessage(), "별도 메모 없음"),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                request.getRequesterName(),
+                                request.getRequesterName(),
+                                request.getTaskTitle(),
+                                describeParticipationMode(request.getParticipationMode()),
+                                request.getPreferredSlot().getDate(),
+                                request.getPreferredSlot().getWeekday(),
+                                request.getPreferredSlot().getTimeLabel(),
+                                request.getPreferredSlot().getFocus(),
+                                fallbackText(request.getMessage(), "별도 메모 없음"),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 request.getRequesterEmail(),
                 subject,
                 plainText,
-                buildTemplate(preview, "보완한 신청을 다시 받았습니다", summary, body, details, actionUrl, "신청 상태 다시 보기")
-        );
+                buildTemplate(
+                        preview,
+                        "보완한 신청을 다시 받았습니다",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        "신청 상태 다시 보기"));
     }
 
-    public RecoveryMailMessage buildAdminNightResubmittedNotification(AdminNightRequest request, String adminEmail) {
+    public RecoveryMailMessage buildAdminNightResubmittedNotification(
+            AdminNightRequest request, String adminEmail) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin/admin-night");
         String subject = "[KSCOLD] Admin Night 신청 보완본이 도착했습니다";
         String preview = request.getRequesterName() + "님이 추가 정보를 반영한 보완본을 다시 보냈습니다.";
         String summary = "보완된 신청이 다시 대기열에 올라왔습니다. 확인 후 승인하거나 필요한 경우 메모를 남겨 다시 요청할 수 있습니다.";
-        String body = """
+        String body =
+                """
                 추가 정보를 요청했던 Admin Night 신청의 보완본이 도착했습니다.
                 관리자 보드에서 내용을 다시 확인하고, 승인하거나 필요한 경우 메모를 남겨 다시 요청할 수 있습니다.
                 """;
-        String details = buildAdminNightDetails(
-                "보완본 재검토",
-                request.getRequesterName() + " · " + request.getTaskTitle(),
-                request.getMessage(),
-                request.getParticipationMode(),
-                request.getPreferredSlot()
-        ) + """
+        String details =
+                buildAdminNightDetails(
+                                "보완본 재검토",
+                                request.getRequesterName() + " · " + request.getTaskTitle(),
+                                request.getMessage(),
+                                request.getParticipationMode(),
+                                request.getPreferredSlot())
+                        + """
                 <tr>
                   <td style="padding:0 32px 24px;">
                     <p style="margin:0 0 8px; font-size:14px; line-height:24px; color:#64748B;">신청자 이메일: %s</p>
                     <p style="margin:0; font-size:14px; line-height:24px; color:#64748B;">진행 방식: %s</p>
                   </td>
                 </tr>
-                """.formatted(
-                escapeHtml(request.getRequesterEmail()),
-                escapeHtml(describeParticipationMode(request.getParticipationMode()))
-        );
-        String plainText = """
+                """
+                                .formatted(
+                                        escapeHtml(request.getRequesterEmail()),
+                                        escapeHtml(
+                                                describeParticipationMode(
+                                                        request.getParticipationMode())));
+        String plainText =
+                """
                 Admin Night 신청 보완본이 도착했습니다.
 
                 신청자: %s (%s)
@@ -537,25 +621,31 @@ public class RecoveryEmailComposer {
 
                 관리자 페이지:
                 %s
-                """.formatted(
-                request.getRequesterName(),
-                request.getRequesterEmail(),
-                request.getTaskTitle(),
-                describeParticipationMode(request.getParticipationMode()),
-                request.getPreferredSlot().getDate(),
-                request.getPreferredSlot().getWeekday(),
-                request.getPreferredSlot().getTimeLabel(),
-                request.getPreferredSlot().getFocus(),
-                fallbackText(request.getMessage(), "별도 메모 없음"),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                request.getRequesterName(),
+                                request.getRequesterEmail(),
+                                request.getTaskTitle(),
+                                describeParticipationMode(request.getParticipationMode()),
+                                request.getPreferredSlot().getDate(),
+                                request.getPreferredSlot().getWeekday(),
+                                request.getPreferredSlot().getTimeLabel(),
+                                request.getPreferredSlot().getFocus(),
+                                fallbackText(request.getMessage(), "별도 메모 없음"),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 adminEmail,
                 subject,
                 plainText,
-                buildTemplate(preview, "보완본이 다시 도착했습니다", summary, body, details, actionUrl, "관리자 보드에서 다시 보기")
-        );
+                buildTemplate(
+                        preview,
+                        "보완본이 다시 도착했습니다",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        "관리자 보드에서 다시 보기"));
     }
 
     public RecoveryMailMessage buildAdminNightRejectedForRequester(AdminNightRequest request) {
@@ -563,18 +653,21 @@ public class RecoveryEmailComposer {
         String subject = "[KSCOLD] Admin Night 신청 상태를 안내드립니다";
         String preview = request.getRequesterName() + "님의 이번 신청은 이번 슬롯에 바로 반영되지 않았습니다.";
         String summary = "이번 신청은 바로 일정으로 연결되지 않았습니다. 다음 슬롯에 맞춰 다시 가볍게 PR을 보내도 괜찮습니다.";
-        String body = """
+        String body =
+                """
                 이번 신청은 현재 일정에 바로 반영되지는 않았습니다.
                 그래도 Admin Night 문화 페이지는 계속 열려 있으니, 다음 시간대에 맞춰 다시 신청해도 괜찮습니다.
                 """;
-        String details = buildAdminNightDetails(
-                "이번 일정 보류",
-                request.getTaskTitle(),
-                request.getMessage(),
-                request.getParticipationMode(),
-                request.getPreferredSlot()
-        ) + buildAdminNightReviewNote("관리자 메모", request.getReviewNote());
-        String plainText = """
+        String details =
+                buildAdminNightDetails(
+                                "이번 일정 보류",
+                                request.getTaskTitle(),
+                                request.getMessage(),
+                                request.getParticipationMode(),
+                                request.getPreferredSlot())
+                        + buildAdminNightReviewNote("관리자 메모", request.getReviewNote());
+        String plainText =
+                """
                 %s님, 이번 Admin Night 신청은 현재 일정에 바로 반영되지 않았습니다.
 
                 실명: %s
@@ -585,25 +678,31 @@ public class RecoveryEmailComposer {
 
                 다음 슬롯에 다시 신청하려면 아래 페이지를 확인해 주세요.
                 %s
-                """.formatted(
-                request.getRequesterName(),
-                request.getRequesterName(),
-                request.getTaskTitle(),
-                describeParticipationMode(request.getParticipationMode()),
-                request.getPreferredSlot().getDate(),
-                request.getPreferredSlot().getWeekday(),
-                request.getPreferredSlot().getTimeLabel(),
-                request.getPreferredSlot().getFocus(),
-                fallbackText(request.getReviewNote(), "별도 메모 없음"),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                request.getRequesterName(),
+                                request.getRequesterName(),
+                                request.getTaskTitle(),
+                                describeParticipationMode(request.getParticipationMode()),
+                                request.getPreferredSlot().getDate(),
+                                request.getPreferredSlot().getWeekday(),
+                                request.getPreferredSlot().getTimeLabel(),
+                                request.getPreferredSlot().getFocus(),
+                                fallbackText(request.getReviewNote(), "별도 메모 없음"),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 request.getRequesterEmail(),
                 subject,
                 plainText,
-                buildTemplate(preview, "이번 신청은 보류되었습니다", summary, body, details, actionUrl, "다음 슬롯 다시 보기")
-        );
+                buildTemplate(
+                        preview,
+                        "이번 신청은 보류되었습니다",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        "다음 슬롯 다시 보기"));
     }
 
     public RecoveryMailMessage buildAdminNightProgramVoteThanks(AdminNightProgramVote vote) {
@@ -611,12 +710,15 @@ public class RecoveryEmailComposer {
         String subject = "[KSCOLD] AI Agent Bloom 관심 투표를 잘 받았습니다";
         String preview = vote.getRequesterName() + "님의 AI Agent Bloom 관심 투표가 저장되었습니다.";
         String summary = "아직 확정 신청은 아니며, 실제 일정이 잡히면 입력해 주신 이메일로 먼저 안내드리겠습니다.";
-        String body = """
+        String body =
+                """
                 AI Agent Bloom에 관심을 남겨주셔서 감사합니다.
                 남겨주신 요일, 진행 방식, 기대하는 내용을 기준으로 실제 강의형/네트워킹형 구성을 잡아볼게요.
                 """;
-        String details = buildAdminNightProgramVoteDetails("BLOOM SIGNAL RECEIVED", "관심 투표 저장 완료", vote);
-        String plainText = """
+        String details =
+                buildAdminNightProgramVoteDetails("BLOOM SIGNAL RECEIVED", "관심 투표 저장 완료", vote);
+        String plainText =
+                """
                 %s님, AI Agent Bloom 관심 투표를 잘 받았습니다.
 
                 본명: %s
@@ -633,45 +735,56 @@ public class RecoveryEmailComposer {
 
                 아직 확정 신청은 아니며, 실제 일정이 잡히면 입력해 주신 이메일로 안내드리겠습니다.
                 %s
-                """.formatted(
-                vote.getRequesterName(),
-                vote.getRequesterName(),
-                resolveProgramVoteContactEmail(vote),
-                fallbackText(vote.getContact(), "별도 연락처 없음"),
-                describeInterestLevel(vote.getInterestLevel()),
-                describePreferredFormat(vote.getPreferredFormat()),
-                describePreferredDays(vote.getPreferredDays()),
-                describePreferredTimes(vote.getPreferredTimes()),
-                describeSessionStyle(vote.getSessionStyle()),
-                describeSessionLength(vote.getSessionLength()),
-                describeFoodPreference(vote.getFoodPreference()),
-                fallbackText(vote.getDesiredTakeaways(), "별도 작성 없음"),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                vote.getRequesterName(),
+                                vote.getRequesterName(),
+                                resolveProgramVoteContactEmail(vote),
+                                fallbackText(vote.getContact(), "별도 연락처 없음"),
+                                describeInterestLevel(vote.getInterestLevel()),
+                                describePreferredFormat(vote.getPreferredFormat()),
+                                describePreferredDays(vote.getPreferredDays()),
+                                describePreferredTimes(vote.getPreferredTimes()),
+                                describeSessionStyle(vote.getSessionStyle()),
+                                describeSessionLength(vote.getSessionLength()),
+                                describeFoodPreference(vote.getFoodPreference()),
+                                fallbackText(vote.getDesiredTakeaways(), "별도 작성 없음"),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 resolveProgramVoteContactEmail(vote),
                 subject,
                 plainText,
-                buildTemplate(preview, "관심 투표를 잘 받았습니다", summary, body, details, actionUrl, "Bloom 페이지 다시 보기")
-        );
+                buildTemplate(
+                        preview,
+                        "관심 투표를 잘 받았습니다",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        "Bloom 페이지 다시 보기"));
     }
 
-    public RecoveryMailMessage buildAdminNightProgramVoteNotification(AdminNightProgramVote vote, String adminEmail) {
+    public RecoveryMailMessage buildAdminNightProgramVoteNotification(
+            AdminNightProgramVote vote, String adminEmail) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin/admin-night");
         String subject = "[KSCOLD] AI Agent Bloom 관심 투표가 도착했습니다";
         String preview = vote.getRequesterName() + "님이 AI Agent Bloom 관심 투표를 남겼습니다.";
         String summary = "새로운 Bloom 수요조사 응답입니다. 요일, 세션 방식, 기대 내용을 확인해 주세요.";
-        String body = """
+        String body =
+                """
                 AI Agent Bloom 관심 투표가 저장되었습니다.
                 실제 일정으로 전환할 때 참고할 수 있도록 본명, 연락처, 이메일, 선호 요일과 기대 내용을 함께 남겼습니다.
                 """;
-        String details = buildAdminNightProgramVoteDetails(
-                "NEW BLOOM SIGNAL",
-                vote.getRequesterName() + " · " + describeInterestLevel(vote.getInterestLevel()),
-                vote
-        );
-        String plainText = """
+        String details =
+                buildAdminNightProgramVoteDetails(
+                        "NEW BLOOM SIGNAL",
+                        vote.getRequesterName()
+                                + " · "
+                                + describeInterestLevel(vote.getInterestLevel()),
+                        vote);
+        String plainText =
+                """
                 AI Agent Bloom 관심 투표가 도착했습니다.
 
                 신청자: %s
@@ -691,30 +804,36 @@ public class RecoveryEmailComposer {
 
                 관리자 페이지:
                 %s
-                """.formatted(
-                vote.getRequesterName(),
-                fallbackText(vote.getRequesterEmail(), "없음"),
-                resolveProgramVoteContactEmail(vote),
-                fallbackText(vote.getContact(), "별도 연락처 없음"),
-                describeInterestLevel(vote.getInterestLevel()),
-                describePreferredFormat(vote.getPreferredFormat()),
-                describePreferredDays(vote.getPreferredDays()),
-                describePreferredTimes(vote.getPreferredTimes()),
-                describeSessionStyle(vote.getSessionStyle()),
-                describeSessionLength(vote.getSessionLength()),
-                describeFoodPreference(vote.getFoodPreference()),
-                describeInterestedTopics(vote.getInterestedTopics()),
-                fallbackText(vote.getDesiredTakeaways(), "별도 작성 없음"),
-                fallbackText(vote.getMessage(), "별도 메모 없음"),
-                actionUrl
-        );
+                """
+                        .formatted(
+                                vote.getRequesterName(),
+                                fallbackText(vote.getRequesterEmail(), "없음"),
+                                resolveProgramVoteContactEmail(vote),
+                                fallbackText(vote.getContact(), "별도 연락처 없음"),
+                                describeInterestLevel(vote.getInterestLevel()),
+                                describePreferredFormat(vote.getPreferredFormat()),
+                                describePreferredDays(vote.getPreferredDays()),
+                                describePreferredTimes(vote.getPreferredTimes()),
+                                describeSessionStyle(vote.getSessionStyle()),
+                                describeSessionLength(vote.getSessionLength()),
+                                describeFoodPreference(vote.getFoodPreference()),
+                                describeInterestedTopics(vote.getInterestedTopics()),
+                                fallbackText(vote.getDesiredTakeaways(), "별도 작성 없음"),
+                                fallbackText(vote.getMessage(), "별도 메모 없음"),
+                                actionUrl);
 
         return new RecoveryMailMessage(
                 adminEmail,
                 subject,
                 plainText,
-                buildTemplate(preview, "Bloom 투표가 도착했습니다", summary, body, details, actionUrl, "관리자 보드에서 확인하기")
-        );
+                buildTemplate(
+                        preview,
+                        "Bloom 투표가 도착했습니다",
+                        summary,
+                        body,
+                        details,
+                        actionUrl,
+                        "관리자 보드에서 확인하기"));
     }
 
     private String buildTemplate(
@@ -724,8 +843,7 @@ public class RecoveryEmailComposer {
             String body,
             String detailsHtml,
             String actionUrl,
-            String actionLabel
-    ) {
+            String actionLabel) {
         String safePreview = escapeHtml(previewText);
         String safeTitle = escapeHtml(title);
         String safeSummary = escapeHtml(summary);
@@ -813,18 +931,18 @@ public class RecoveryEmailComposer {
                     </table>
                   </body>
                 </html>
-                """.formatted(
-                safeTitle,
-                safePreview,
-                safeBrand,
-                safeTitle,
-                safeSummary,
-                safeBody,
-                detailsHtml,
-                safeActionUrl,
-                safeActionLabel,
-                safeActionUrl
-        );
+                """
+                .formatted(
+                        safeTitle,
+                        safePreview,
+                        safeBrand,
+                        safeTitle,
+                        safeSummary,
+                        safeBody,
+                        detailsHtml,
+                        safeActionUrl,
+                        safeActionLabel,
+                        safeActionUrl);
     }
 
     private String paragraphize(String text) {
@@ -833,8 +951,7 @@ public class RecoveryEmailComposer {
     }
 
     private String escapeHtml(String value) {
-        return value
-                .replace("&", "&amp;")
+        return value.replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
@@ -854,8 +971,7 @@ public class RecoveryEmailComposer {
             String headline,
             String message,
             AdminNightRequest.ParticipationMode participationMode,
-            AdminNightRequest.SlotInfo slot
-    ) {
+            AdminNightRequest.SlotInfo slot) {
         return """
                 <tr>
                   <td style="padding:0 32px 24px;">
@@ -872,16 +988,16 @@ public class RecoveryEmailComposer {
                     </table>
                   </td>
                 </tr>
-                """.formatted(
-                escapeHtml(label),
-                escapeHtml(headline),
-                escapeHtml(slot.getDate().toString()),
-                escapeHtml(slot.getWeekday()),
-                escapeHtml(slot.getTimeLabel()),
-                escapeHtml(slot.getFocus()),
-                escapeHtml(describeParticipationMode(participationMode)),
-                escapeHtml(fallbackText(message, "별도 메모 없음"))
-        );
+                """
+                .formatted(
+                        escapeHtml(label),
+                        escapeHtml(headline),
+                        escapeHtml(slot.getDate().toString()),
+                        escapeHtml(slot.getWeekday()),
+                        escapeHtml(slot.getTimeLabel()),
+                        escapeHtml(slot.getFocus()),
+                        escapeHtml(describeParticipationMode(participationMode)),
+                        escapeHtml(fallbackText(message, "별도 메모 없음")));
     }
 
     private String buildAdminNightReviewNote(String label, String reviewNote) {
@@ -902,13 +1018,12 @@ public class RecoveryEmailComposer {
                     </table>
                   </td>
                 </tr>
-                """.formatted(
-                escapeHtml(label),
-                escapeHtml(reviewNote)
-        );
+                """
+                .formatted(escapeHtml(label), escapeHtml(reviewNote));
     }
 
-    private String buildAdminNightProgramVoteDetails(String label, String headline, AdminNightProgramVote vote) {
+    private String buildAdminNightProgramVoteDetails(
+            String label, String headline, AdminNightProgramVote vote) {
         return """
                 <tr>
                   <td style="padding:0 32px 24px;">
@@ -928,19 +1043,19 @@ public class RecoveryEmailComposer {
                     </table>
                   </td>
                 </tr>
-                """.formatted(
-                escapeHtml(label),
-                escapeHtml(headline),
-                escapeHtml(resolveProgramVoteContactEmail(vote)),
-                escapeHtml(fallbackText(vote.getContact(), "별도 연락처 없음")),
-                escapeHtml(describePreferredDays(vote.getPreferredDays())),
-                escapeHtml(describePreferredTimes(vote.getPreferredTimes())),
-                escapeHtml(describeSessionStyle(vote.getSessionStyle())),
-                escapeHtml(describeSessionLength(vote.getSessionLength())),
-                escapeHtml(describeFoodPreference(vote.getFoodPreference())),
-                escapeHtml(describeInterestedTopics(vote.getInterestedTopics())),
-                escapeHtml(fallbackText(vote.getDesiredTakeaways(), "별도 작성 없음"))
-        );
+                """
+                .formatted(
+                        escapeHtml(label),
+                        escapeHtml(headline),
+                        escapeHtml(resolveProgramVoteContactEmail(vote)),
+                        escapeHtml(fallbackText(vote.getContact(), "별도 연락처 없음")),
+                        escapeHtml(describePreferredDays(vote.getPreferredDays())),
+                        escapeHtml(describePreferredTimes(vote.getPreferredTimes())),
+                        escapeHtml(describeSessionStyle(vote.getSessionStyle())),
+                        escapeHtml(describeSessionLength(vote.getSessionLength())),
+                        escapeHtml(describeFoodPreference(vote.getFoodPreference())),
+                        escapeHtml(describeInterestedTopics(vote.getInterestedTopics())),
+                        escapeHtml(fallbackText(vote.getDesiredTakeaways(), "별도 작성 없음")));
     }
 
     private String resolveProgramVoteContactEmail(AdminNightProgramVote vote) {
@@ -1048,7 +1163,8 @@ public class RecoveryEmailComposer {
         if (interestedTopics == null || interestedTopics.isEmpty()) {
             return "미정";
         }
-        return String.join(", ", interestedTopics.stream().map(this::describeInterestedTopic).toList());
+        return String.join(
+                ", ", interestedTopics.stream().map(this::describeInterestedTopic).toList());
     }
 
     private String describeInterestedTopic(String interestedTopic) {
@@ -1065,7 +1181,8 @@ public class RecoveryEmailComposer {
         };
     }
 
-    private String describeParticipationMode(AdminNightRequest.ParticipationMode participationMode) {
+    private String describeParticipationMode(
+            AdminNightRequest.ParticipationMode participationMode) {
         if (participationMode == null) {
             return "미정";
         }

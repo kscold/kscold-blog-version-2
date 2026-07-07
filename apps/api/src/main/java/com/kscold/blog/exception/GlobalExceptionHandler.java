@@ -1,6 +1,7 @@
 package com.kscold.blog.exception;
 
 import com.kscold.blog.shared.web.ApiResponse;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,213 +9,151 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.stream.Collectors;
-
-/**
- * 전역 예외 처리 핸들러
- * 모든 컨트롤러에서 발생하는 예외를 일관된 형식으로 변환하여 응답
- */
+/** 전역 예외 처리 핸들러 모든 컨트롤러에서 발생하는 예외를 일관된 형식으로 변환하여 응답 */
 @Slf4j
 @SuppressWarnings("null")
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * BusinessException 처리
-     * 비즈니스 로직에서 발생하는 모든 커스텀 예외 처리
-     */
+    /** BusinessException 처리 비즈니스 로직에서 발생하는 모든 커스텀 예외 처리 */
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
-        log.warn("BusinessException: code={}, message={}", e.getErrorCode().getCode(), e.getMessage());
+        log.warn(
+                "BusinessException: code={}, message={}",
+                e.getErrorCode().getCode(),
+                e.getMessage());
 
         ErrorCode errorCode = e.getErrorCode();
-        ApiResponse<Void> response = ApiResponse.error(
-            errorCode.getCode(),
-            e.getMessage()
-        );
+        ApiResponse<Void> response = ApiResponse.error(errorCode.getCode(), e.getMessage());
 
         return new ResponseEntity<>(response, errorCode.getStatus());
     }
 
-    /**
-     * DuplicateResourceException 처리
-     * 리소스 중복 시 HTTP 409 Conflict 응답
-     */
+    /** DuplicateResourceException 처리 리소스 중복 시 HTTP 409 Conflict 응답 */
     @ExceptionHandler(DuplicateResourceException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleDuplicateResource(DuplicateResourceException e) {
+    protected ResponseEntity<ApiResponse<Void>> handleDuplicateResource(
+            DuplicateResourceException e) {
         log.warn("DuplicateResourceException: {}", e.getMessage());
-        ApiResponse<Void> response = ApiResponse.error(
-            e.getErrorCode().getCode(),
-            e.getMessage()
-        );
+        ApiResponse<Void> response = ApiResponse.error(e.getErrorCode().getCode(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
-    /**
-     * InvalidRequestException 처리
-     * 잘못된 요청 시 HTTP 400 Bad Request 응답
-     */
+    /** InvalidRequestException 처리 잘못된 요청 시 HTTP 400 Bad Request 응답 */
     @ExceptionHandler(InvalidRequestException.class)
     protected ResponseEntity<ApiResponse<Void>> handleInvalidRequest(InvalidRequestException e) {
         log.warn("InvalidRequestException: {}", e.getMessage());
-        ApiResponse<Void> response = ApiResponse.error(
-            e.getErrorCode().getCode(),
-            e.getMessage()
-        );
+        ApiResponse<Void> response = ApiResponse.error(e.getErrorCode().getCode(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Validation 예외 처리 (@Valid 실패)
-     * DTO 필드 검증 실패 시 발생
-     */
+    /** Validation 예외 처리 (@Valid 실패) DTO 필드 검증 실패 시 발생 */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(
-        MethodArgumentNotValidException e
-    ) {
+            MethodArgumentNotValidException e) {
         log.warn("MethodArgumentNotValidException: {}", e.getMessage());
 
-        String errorMessage = e.getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map(FieldError::getDefaultMessage)
-            .collect(Collectors.joining(", "));
+        String errorMessage =
+                e.getBindingResult().getFieldErrors().stream()
+                        .map(FieldError::getDefaultMessage)
+                        .collect(Collectors.joining(", "));
 
-        ApiResponse<Void> response = ApiResponse.error(
-            ErrorCode.INVALID_INPUT_VALUE.getCode(),
-            errorMessage
-        );
+        ApiResponse<Void> response =
+                ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Bind 예외 처리
-     * 요청 파라미터 바인딩 실패 시 발생
-     */
+    /** Bind 예외 처리 요청 파라미터 바인딩 실패 시 발생 */
     @ExceptionHandler(BindException.class)
     protected ResponseEntity<ApiResponse<Void>> handleBindException(BindException e) {
         log.warn("BindException: {}", e.getMessage());
 
-        String errorMessage = e.getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map(FieldError::getDefaultMessage)
-            .collect(Collectors.joining(", "));
+        String errorMessage =
+                e.getBindingResult().getFieldErrors().stream()
+                        .map(FieldError::getDefaultMessage)
+                        .collect(Collectors.joining(", "));
 
-        ApiResponse<Void> response = ApiResponse.error(
-            ErrorCode.INVALID_INPUT_VALUE.getCode(),
-            errorMessage
-        );
+        ApiResponse<Void> response =
+                ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Type Mismatch 예외 처리
-     * 요청 파라미터 타입 불일치 시 발생
-     */
+    /** Type Mismatch 예외 처리 요청 파라미터 타입 불일치 시 발생 */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ApiResponse<Void>> handleMethodArgumentTypeMismatchException(
-        MethodArgumentTypeMismatchException e
-    ) {
+            MethodArgumentTypeMismatchException e) {
         log.warn("MethodArgumentTypeMismatchException: {}", e.getMessage());
 
         Class<?> requiredType = e.getRequiredType();
-        String errorMessage = String.format(
-            "파라미터 '%s'의 값 '%s'는 타입 '%s'로 변환할 수 없습니다",
-            e.getName(),
-            e.getValue(),
-            requiredType != null ? requiredType.getSimpleName() : "unknown"
-        );
+        String errorMessage =
+                String.format(
+                        "파라미터 '%s'의 값 '%s'는 타입 '%s'로 변환할 수 없습니다",
+                        e.getName(),
+                        e.getValue(),
+                        requiredType != null ? requiredType.getSimpleName() : "unknown");
 
-        ApiResponse<Void> response = ApiResponse.error(
-            ErrorCode.INVALID_TYPE_VALUE.getCode(),
-            errorMessage
-        );
+        ApiResponse<Void> response =
+                ApiResponse.error(ErrorCode.INVALID_TYPE_VALUE.getCode(), errorMessage);
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * 지원하지 않는 HTTP 메서드 예외 처리 (405)
-     * 브라우저나 잘못된 호출이 POST 전용 엔드포인트를 GET으로 두드릴 때 내부 오류처럼 보이지 않게 처리
-     */
+    /** 지원하지 않는 HTTP 메서드 예외 처리 (405) 브라우저나 잘못된 호출이 POST 전용 엔드포인트를 GET으로 두드릴 때 내부 오류처럼 보이지 않게 처리 */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     protected ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupported(
-        HttpRequestMethodNotSupportedException e
-    ) {
+            HttpRequestMethodNotSupportedException e) {
         log.warn("HttpRequestMethodNotSupportedException: {}", e.getMessage());
 
-        ApiResponse<Void> response = ApiResponse.error(
-            ErrorCode.METHOD_NOT_ALLOWED.getCode(),
-            "지원하지 않는 요청 방식입니다."
-        );
+        ApiResponse<Void> response =
+                ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED.getCode(), "지원하지 않는 요청 방식입니다.");
 
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
-    /**
-     * 인증 실패 예외 처리 (401)
-     * JWT 토큰 없음, 만료 등 인증 관련 예외
-     */
+    /** 인증 실패 예외 처리 (401) JWT 토큰 없음, 만료 등 인증 관련 예외 */
     @ExceptionHandler(AuthenticationException.class)
     protected ResponseEntity<ApiResponse<Void>> handleAuthentication(AuthenticationException e) {
         log.warn("AuthenticationException: {}", e.getMessage());
-        ApiResponse<Void> response = ApiResponse.error(
-            ErrorCode.UNAUTHORIZED.getCode(),
-            "인증이 필요합니다. 다시 로그인해주세요."
-        );
+        ApiResponse<Void> response =
+                ApiResponse.error(ErrorCode.UNAUTHORIZED.getCode(), "인증이 필요합니다. 다시 로그인해주세요.");
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    /**
-     * 접근 권한 없음 예외 처리 (403)
-     * @PreAuthorize 등 권한 검사 실패 시 발생
-     */
+    /** 접근 권한 없음 예외 처리 (403) @PreAuthorize 등 권한 검사 실패 시 발생 */
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException e) {
         log.warn("AccessDeniedException: {}", e.getMessage());
-        ApiResponse<Void> response = ApiResponse.error(
-            ErrorCode.FORBIDDEN.getCode(),
-            "접근 권한이 없습니다."
-        );
+        ApiResponse<Void> response =
+                ApiResponse.error(ErrorCode.FORBIDDEN.getCode(), "접근 권한이 없습니다.");
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
-    /**
-     * 존재하지 않는 정적 리소스 요청 처리 (404)
-     * socket.io 등 불필요한 요청에 의한 ERROR 로그 노이즈 방지
-     */
+    /** 존재하지 않는 정적 리소스 요청 처리 (404) socket.io 등 불필요한 요청에 의한 ERROR 로그 노이즈 방지 */
     @ExceptionHandler(NoResourceFoundException.class)
     protected ResponseEntity<ApiResponse<Void>> handleNoResourceFound(NoResourceFoundException e) {
         log.debug("NoResourceFoundException: {}", e.getMessage());
-        ApiResponse<Void> response = ApiResponse.error(
-            ErrorCode.RESOURCE_NOT_FOUND.getCode(),
-            "요청한 리소스를 찾을 수 없습니다."
-        );
+        ApiResponse<Void> response =
+                ApiResponse.error(ErrorCode.RESOURCE_NOT_FOUND.getCode(), "요청한 리소스를 찾을 수 없습니다.");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    /**
-     * 기타 모든 예외 처리
-     * 예상하지 못한 서버 오류
-     */
+    /** 기타 모든 예외 처리 예상하지 못한 서버 오류 */
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
         log.error("Unexpected exception occurred", e);
 
-        ApiResponse<Void> response = ApiResponse.error(
-            ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
-            "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
-        );
+        ApiResponse<Void> response =
+                ApiResponse.error(
+                        ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                        "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }

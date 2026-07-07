@@ -1,8 +1,7 @@
 package com.kscold.blog.adminnight.adapter.in.web;
 
-import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
-
+import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,8 +10,7 @@ import java.util.Objects;
 
 final class AdminNightWebMapper {
 
-    private AdminNightWebMapper() {
-    }
+    private AdminNightWebMapper() {}
 
     static AdminNightRequest.SlotInfo toSlot(SlotBody slot) {
         if (slot == null) {
@@ -44,8 +42,7 @@ final class AdminNightWebMapper {
                 request.getReviewNote(),
                 request.getDecidedByName(),
                 request.getDecidedAt(),
-                request.getCreatedAt()
-        );
+                request.getCreatedAt());
     }
 
     static CalendarEntryResponse toCalendarEntry(AdminNightRequest request) {
@@ -55,8 +52,7 @@ final class AdminNightWebMapper {
                 request.getTaskTitle(),
                 request.getParticipationMode(),
                 toSlotResponse(request.getScheduledSlot()),
-                request.getCreatedAt()
-        );
+                request.getCreatedAt());
     }
 
     static ProgramVoteResponse toProgramVoteResponse(AdminNightProgramVote vote) {
@@ -80,29 +76,72 @@ final class AdminNightWebMapper {
                 vote.getDesiredTakeaways(),
                 vote.getMessage(),
                 vote.getCreatedAt(),
-                vote.getUpdatedAt()
-        );
+                vote.getUpdatedAt());
     }
 
-    static ProgramVoteSummaryResponse toProgramVoteSummary(String programKey, List<AdminNightProgramVote> votes) {
+    static ProgramVoteSummaryResponse toProgramVoteSummary(
+            String programKey, List<AdminNightProgramVote> votes) {
         return new ProgramVoteSummaryResponse(
                 programKey,
                 votes.size(),
-                countEnum(votes.stream().map(AdminNightProgramVote::getInterestLevel).filter(Objects::nonNull).map(Enum::name).toList()),
-                countEnum(votes.stream().map(AdminNightProgramVote::getPreferredFormat).filter(Objects::nonNull).map(Enum::name).toList()),
-                countEnum(votes.stream().map(AdminNightProgramVote::getExperienceLevel).filter(Objects::nonNull).map(Enum::name).toList()),
-                countEnum(votes.stream().map(AdminNightProgramVote::getSessionStyle).filter(Objects::nonNull).map(Enum::name).toList()),
-                countEnum(votes.stream().map(AdminNightProgramVote::getSessionLength).filter(Objects::nonNull).map(Enum::name).toList()),
-                countEnum(votes.stream().map(AdminNightProgramVote::getFoodPreference).filter(Objects::nonNull).map(Enum::name).toList()),
-                countEnum(votes.stream().flatMap(vote -> safeList(vote.getPreferredDays()).stream()).map(Enum::name).toList()),
-                countValues(votes.stream().flatMap(vote -> safeList(vote.getPreferredTimes()).stream()).toList()),
-                countValues(votes.stream().flatMap(vote -> safeList(vote.getInterestedTopics()).stream()).toList()),
+                countEnum(
+                        votes.stream()
+                                .map(AdminNightProgramVote::getInterestLevel)
+                                .filter(Objects::nonNull)
+                                .map(Enum::name)
+                                .toList()),
+                countEnum(
+                        votes.stream()
+                                .map(AdminNightProgramVote::getPreferredFormat)
+                                .filter(Objects::nonNull)
+                                .map(Enum::name)
+                                .toList()),
+                countEnum(
+                        votes.stream()
+                                .map(AdminNightProgramVote::getExperienceLevel)
+                                .filter(Objects::nonNull)
+                                .map(Enum::name)
+                                .toList()),
+                countEnum(
+                        votes.stream()
+                                .map(AdminNightProgramVote::getSessionStyle)
+                                .filter(Objects::nonNull)
+                                .map(Enum::name)
+                                .toList()),
+                countEnum(
+                        votes.stream()
+                                .map(AdminNightProgramVote::getSessionLength)
+                                .filter(Objects::nonNull)
+                                .map(Enum::name)
+                                .toList()),
+                countEnum(
+                        votes.stream()
+                                .map(AdminNightProgramVote::getFoodPreference)
+                                .filter(Objects::nonNull)
+                                .map(Enum::name)
+                                .toList()),
+                countEnum(
+                        votes.stream()
+                                .flatMap(vote -> safeList(vote.getPreferredDays()).stream())
+                                .map(Enum::name)
+                                .toList()),
+                countValues(
+                        votes.stream()
+                                .flatMap(vote -> safeList(vote.getPreferredTimes()).stream())
+                                .toList()),
+                countValues(
+                        votes.stream()
+                                .flatMap(vote -> safeList(vote.getInterestedTopics()).stream())
+                                .toList()),
                 votes.stream()
-                        .map(vote -> vote.getUpdatedAt() != null ? vote.getUpdatedAt() : vote.getCreatedAt())
+                        .map(
+                                vote ->
+                                        vote.getUpdatedAt() != null
+                                                ? vote.getUpdatedAt()
+                                                : vote.getCreatedAt())
                         .filter(Objects::nonNull)
                         .max(LocalDateTime::compareTo)
-                        .orElse(null)
-        );
+                        .orElse(null));
     }
 
     private static SlotResponse toSlotResponse(AdminNightRequest.SlotInfo slot) {
@@ -116,8 +155,7 @@ final class AdminNightWebMapper {
                 slot.getWeekday(),
                 slot.getTimeLabel(),
                 slot.getFocus(),
-                slot.getBadgeLabel()
-        );
+                slot.getBadgeLabel());
     }
 
     private static String maskName(String name) {

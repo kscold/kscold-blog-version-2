@@ -8,5 +8,4 @@ public record UpdateProfileCommand(
         String bio,
         String avatar,
         Map<String, String> socialLinks,
-        List<String> techStack
-) {}
+        List<String> techStack) {}

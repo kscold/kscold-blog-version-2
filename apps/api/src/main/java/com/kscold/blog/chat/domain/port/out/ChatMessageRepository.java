@@ -1,11 +1,10 @@
 package com.kscold.blog.chat.domain.port.out;
 
 import com.kscold.blog.chat.domain.model.ChatMessage;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ChatMessageRepository {
 
@@ -25,13 +24,17 @@ public interface ChatMessageRepository {
 
     void markReminderSent(String roomId, LocalDateTime unreadBefore, LocalDateTime sentAt);
 
-    record ChatRoomSummary(String roomId, String username, String lastMessage, String lastTimestamp, long messageCount) {}
+    record ChatRoomSummary(
+            String roomId,
+            String username,
+            String lastMessage,
+            String lastTimestamp,
+            long messageCount) {}
 
     record PendingAdminReminder(
             String roomId,
             String adminName,
             String latestContent,
             LocalDateTime latestTimestamp,
-            long unreadCount
-    ) {}
+            long unreadCount) {}
 }

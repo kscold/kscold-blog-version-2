@@ -1,17 +1,16 @@
 package com.kscold.blog.social.domain.model;
 
 import com.kscold.blog.identity.domain.model.User;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,11 +20,9 @@ import java.time.LocalDateTime;
 @Document(collection = "feed_comments")
 public class FeedComment {
 
-    @Id
-    private String id;
+    @Id private String id;
 
-    @Indexed
-    private String feedId;
+    @Indexed private String feedId;
 
     private String authorName;
 
@@ -37,6 +34,5 @@ public class FeedComment {
 
     private String content;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 }

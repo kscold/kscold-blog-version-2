@@ -1,14 +1,9 @@
 package com.kscold.blog.shared.analytics;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -17,11 +12,15 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -31,32 +30,38 @@ public class PageVisitService {
     private final MongoTemplate mongoTemplate;
 
     // 실제 서비스 라우트만 허용
-    private static final Pattern ALLOWED_PATH = Pattern.compile(
-            "^/(?:$" +
-                    "|blog(?:/.*)?" +
-                    "|feed(?:/.*)?" +
-                    "|vault(?:/.*)?" +
-                    "|info(?:/.*)?" +
-                    "|guestbook" +
-                    "|admin-night(?:/.*)?" +
-                    "|login(?:/.*)?" +
-                    "|privacy" +
-                    ")$");
+    private static final Pattern ALLOWED_PATH =
+            Pattern.compile(
+                    "^/(?:$"
+                            + "|blog(?:/.*)?"
+                            + "|feed(?:/.*)?"
+                            + "|vault(?:/.*)?"
+                            + "|info(?:/.*)?"
+                            + "|guestbook"
+                            + "|admin-night(?:/.*)?"
+                            + "|login(?:/.*)?"
+                            + "|privacy"
+                            + ")$");
 
-    public void record(String path, @Nullable String clientIp, @Nullable String userId, @Nullable String username) {
+    public void record(
+            String path,
+            @Nullable String clientIp,
+            @Nullable String userId,
+            @Nullable String username) {
         if (!StringUtils.hasText(path)) return;
         String normalized = normalize(path);
         if (!ALLOWED_PATH.matcher(normalized).matches()) {
             log.debug("Rejected page visit: {}", normalized);
             return;
         }
-        PageVisitLog entry = PageVisitLog.builder()
-                .path(normalized)
-                .ipHash(hash(clientIp))
-                .userId(StringUtils.hasText(userId) ? userId : null)
-                .username(StringUtils.hasText(username) ? username : null)
-                .createdAt(Instant.now())
-                .build();
+        PageVisitLog entry =
+                PageVisitLog.builder()
+                        .path(normalized)
+                        .ipHash(hash(clientIp))
+                        .userId(StringUtils.hasText(userId) ? userId : null)
+                        .username(StringUtils.hasText(username) ? username : null)
+                        .createdAt(Instant.now())
+                        .build();
         mongoTemplate.insert(entry);
     }
 
@@ -79,43 +84,52 @@ public class PageVisitService {
     /** 최근 N일 동안 path별 방문수 (내림차순) */
     public List<PathStat> topPaths(int days, int limit) {
         Instant after = Instant.now().minus(days, ChronoUnit.DAYS);
-        Aggregation agg = Aggregation.newAggregation(
-                match(Criteria.where("createdAt").gte(after)),
-                group("path").count().as("visits"),
-                sort(DESC, "visits"),
-                Aggregation.limit(limit)
-        );
-        AggregationResults<RawPathStat> results = mongoTemplate.aggregate(
-                agg, "page_visit_logs", RawPathStat.class);
+        Aggregation agg =
+                Aggregation.newAggregation(
+                        match(Criteria.where("createdAt").gte(after)),
+                        group("path").count().as("visits"),
+                        sort(DESC, "visits"),
+                        Aggregation.limit(limit));
+        AggregationResults<RawPathStat> results =
+                mongoTemplate.aggregate(agg, "page_visit_logs", RawPathStat.class);
         return results.getMappedResults().stream()
-                .map(r -> new PathStat(r.get_id(), r.getVisits(), countUniqueVisitors(r.get_id(), after)))
+                .map(
+                        r ->
+                                new PathStat(
+                                        r.get_id(),
+                                        r.getVisits(),
+                                        countUniqueVisitors(r.get_id(), after)))
                 .toList();
     }
 
     /** 최근 N일 일별 방문수 (전체) */
     public List<DailyStat> dailyVisits(int days) {
         Instant after = Instant.now().minus(days, ChronoUnit.DAYS);
-        Aggregation agg = Aggregation.newAggregation(
-                match(Criteria.where("createdAt").gte(after)),
-                Aggregation.project()
-                        .andExpression("{ $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: 'Asia/Seoul' } }").as("day"),
-                group("day").count().as("visits"),
-                sort(org.springframework.data.domain.Sort.Direction.ASC, "_id")
-        );
-        return mongoTemplate.aggregate(agg, "page_visit_logs", DailyRaw.class)
-                .getMappedResults().stream()
+        Aggregation agg =
+                Aggregation.newAggregation(
+                        match(Criteria.where("createdAt").gte(after)),
+                        Aggregation.project()
+                                .andExpression(
+                                        "{ $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: 'Asia/Seoul' } }")
+                                .as("day"),
+                        group("day").count().as("visits"),
+                        sort(org.springframework.data.domain.Sort.Direction.ASC, "_id"));
+        return mongoTemplate
+                .aggregate(agg, "page_visit_logs", DailyRaw.class)
+                .getMappedResults()
+                .stream()
                 .map(r -> new DailyStat(r.get_id(), r.getVisits()))
                 .toList();
     }
 
     private long countUniqueVisitors(String path, Instant after) {
-        Aggregation agg = Aggregation.newAggregation(
-                match(Criteria.where("path").is(path).and("createdAt").gte(after)),
-                group("ipHash"),
-                Aggregation.count().as("uniques")
-        );
-        AggregationResults<org.bson.Document> out = mongoTemplate.aggregate(
-                agg, "page_visit_logs", org.bson.Document.class);
+        Aggregation agg =
+                Aggregation.newAggregation(
+                        match(Criteria.where("path").is(path).and("createdAt").gte(after)),
+                        group("ipHash"),
+                        Aggregation.count().as("uniques"));
+        AggregationResults<org.bson.Document> out =
+                mongoTemplate.aggregate(agg, "page_visit_logs", org.bson.Document.class);
         List<org.bson.Document> list = out.getMappedResults();
         return list.isEmpty() ? 0 : list.get(0).getInteger("uniques", 0);
     }
@@ -143,6 +157,7 @@ public class PageVisitService {
     }
 
     public record PathStat(String path, long visits, long uniqueVisitors) {}
+
     public record DailyStat(String date, long visits) {}
 
     public record VisitEntry(String path, String userId, String username, String visitedAt) {
@@ -151,8 +166,7 @@ public class PageVisitService {
                     log.getPath(),
                     log.getUserId(),
                     log.getUsername(),
-                    log.getCreatedAt() != null ? log.getCreatedAt().toString() : ""
-            );
+                    log.getCreatedAt() != null ? log.getCreatedAt().toString() : "");
         }
     }
 

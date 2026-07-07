@@ -9,15 +9,14 @@ import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -33,23 +32,27 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
         User user = getAuthenticatedUser(userId);
         claimAnonymousComments(noteId, user);
 
-        VaultNoteComment comment = VaultNoteComment.builder()
-                .noteId(noteId)
-                .authorName(user.getDisplayName())
-                .authorPassword(null)
-                .userId(user.getId())
-                .authorRole(user.getRole())
-                .content(command.getContent())
-                .build();
+        VaultNoteComment comment =
+                VaultNoteComment.builder()
+                        .noteId(noteId)
+                        .authorName(user.getDisplayName())
+                        .authorPassword(null)
+                        .userId(user.getId())
+                        .authorRole(user.getRole())
+                        .content(command.getContent())
+                        .build();
 
         VaultNoteComment saved = commentRepository.save(comment);
         vaultNoteRepository.incrementCommentCount(noteId);
         return saved;
     }
 
-    public Page<VaultNoteComment> getByNoteId(String noteId, Pageable pageable, String currentUserId) {
+    public Page<VaultNoteComment> getByNoteId(
+            String noteId, Pageable pageable, String currentUserId) {
         if (currentUserId != null && !currentUserId.isBlank()) {
-            userRepository.findById(currentUserId).ifPresent(user -> claimAnonymousComments(noteId, user));
+            userRepository
+                    .findById(currentUserId)
+                    .ifPresent(user -> claimAnonymousComments(noteId, user));
         }
         return commentRepository.findByNoteId(noteId, pageable);
     }
@@ -59,10 +62,13 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
         User user = getAuthenticatedUser(currentUserId);
         claimAnonymousComments(noteId, user);
 
-        VaultNoteComment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> ResourceNotFoundException.vaultComment(commentId));
+        VaultNoteComment comment =
+                commentRepository
+                        .findById(commentId)
+                        .orElseThrow(() -> ResourceNotFoundException.vaultComment(commentId));
 
-        boolean canDelete = user.getRole() == User.Role.ADMIN || user.getId().equals(comment.getUserId());
+        boolean canDelete =
+                user.getRole() == User.Role.ADMIN || user.getId().equals(comment.getUserId());
         if (!canDelete) {
             throw InvalidRequestException.invalidInput("본인이 작성한 댓글만 삭제할 수 있습니다");
         }
@@ -76,7 +82,8 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
             throw InvalidRequestException.invalidInput("로그인이 필요합니다");
         }
 
-        return userRepository.findById(userId)
+        return userRepository
+                .findById(userId)
                 .orElseThrow(() -> ResourceNotFoundException.user(userId));
     }
 
@@ -86,23 +93,27 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
             return;
         }
 
-        List<VaultNoteComment> commentsToClaim = commentRepository.findAnonymousByNoteIdAndAuthorNames(noteId, authorNames);
+        List<VaultNoteComment> commentsToClaim =
+                commentRepository.findAnonymousByNoteIdAndAuthorNames(noteId, authorNames);
         if (commentsToClaim.isEmpty()) {
             return;
         }
 
-        commentsToClaim.forEach(comment -> {
-            comment.setUserId(user.getId());
-            comment.setAuthorRole(user.getRole());
-            comment.setAuthorPassword(null);
-            comment.setAuthorName(user.getDisplayName());
-        });
+        commentsToClaim.forEach(
+                comment -> {
+                    comment.setUserId(user.getId());
+                    comment.setAuthorRole(user.getRole());
+                    comment.setAuthorPassword(null);
+                    comment.setAuthorName(user.getDisplayName());
+                });
         commentRepository.saveAll(commentsToClaim);
     }
 
     private List<String> candidateAuthorNames(User user) {
         List<String> names = new ArrayList<>();
-        if (user.getProfile() != null && user.getProfile().getDisplayName() != null && !user.getProfile().getDisplayName().isBlank()) {
+        if (user.getProfile() != null
+                && user.getProfile().getDisplayName() != null
+                && !user.getProfile().getDisplayName().isBlank()) {
             names.add(user.getProfile().getDisplayName().trim());
         }
         if (user.getUsername() != null && !user.getUsername().isBlank()) {

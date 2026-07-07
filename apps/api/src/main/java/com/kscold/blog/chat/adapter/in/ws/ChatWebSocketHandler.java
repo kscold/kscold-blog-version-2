@@ -5,6 +5,11 @@ import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import jakarta.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -13,12 +18,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
@@ -32,32 +31,35 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     @PostConstruct
     void init() {
         // 디스코드에서 관리자 답장 → 블로그 방문자에게 WebSocket 전달
-        discordBridge.setBlogMessageCallback((roomId, adminName, content) -> {
-            Map<String, Object> msg = new LinkedHashMap<>();
-            msg.put("type", "message");
-            msg.put("id", String.valueOf(System.currentTimeMillis()));
-            msg.put("roomId", roomId);
-            msg.put("username", adminName);
-            msg.put("content", content);
-            msg.put("fromAdmin", true);
-            msg.put("timestamp", LocalDateTime.now().toString());
+        discordBridge.setBlogMessageCallback(
+                (roomId, adminName, content) -> {
+                    Map<String, Object> msg = new LinkedHashMap<>();
+                    msg.put("type", "message");
+                    msg.put("id", String.valueOf(System.currentTimeMillis()));
+                    msg.put("roomId", roomId);
+                    msg.put("username", adminName);
+                    msg.put("content", content);
+                    msg.put("fromAdmin", true);
+                    msg.put("timestamp", LocalDateTime.now().toString());
 
-            broadcastToUserSessions(roomId, msg);
-            broadcastToAdmins(msg);
-            if (hasActiveUserSession(roomId)) {
-                chatUseCase.markAdminMessagesRead(roomId);
-            }
-        });
+                    broadcastToUserSessions(roomId, msg);
+                    broadcastToAdmins(msg);
+                    if (hasActiveUserSession(roomId)) {
+                        chatUseCase.markAdminMessagesRead(roomId);
+                    }
+                });
     }
 
     // sessionId → 세션 정보
-    private record SessionInfo(WebSocketSession session, String userId, String username, boolean isAdmin) {}
+    private record SessionInfo(
+            WebSocketSession session, String userId, String username, boolean isAdmin) {}
+
     private final Map<String, SessionInfo> sessions = new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
         String sessionId = session.getId();
-        String userId   = (String) session.getAttributes().get("userId");
+        String userId = (String) session.getAttributes().get("userId");
         String username = (String) session.getAttributes().get("username");
         Boolean isAdmin = (Boolean) session.getAttributes().getOrDefault("isAdmin", false);
 
@@ -71,15 +73,22 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
             chatUseCase.markAdminMessagesRead(userId);
             // 방문자: 자신의 방 히스토리 전송
             List<ChatMessage> history = chatUseCase.getRecentMessagesByRoom(userId, 50);
-            List<Map<String, Object>> historyList = history.stream().map(this::toMessageMap).toList();
+            List<Map<String, Object>> historyList =
+                    history.stream().map(this::toMessageMap).toList();
             sendToSession(session, Map.of("type", "history", "messages", historyList));
 
             // 입장 시스템 메시지
-            chatUseCase.saveMessage(sessionId, "SYSTEM", username + "님이 입장했습니다",
-                    ChatMessage.MessageType.SYSTEM, userId, false);
+            chatUseCase.saveMessage(
+                    sessionId,
+                    "SYSTEM",
+                    username + "님이 입장했습니다",
+                    ChatMessage.MessageType.SYSTEM,
+                    userId,
+                    false);
 
             // 어드민에게 새 방문자 알림
-            broadcastToAdmins(Map.of("type", "room_joined", "userId", userId, "username", username));
+            broadcastToAdmins(
+                    Map.of("type", "room_joined", "userId", userId, "username", username));
 
             // 디스코드에 입장 알림
             discordBridge.sendSystemToDiscord(userId, username + "님이 입장했습니다");
@@ -88,21 +97,27 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void handleTextMessage(@NonNull WebSocketSession session, @NonNull TextMessage message) throws Exception {
+    protected void handleTextMessage(
+            @NonNull WebSocketSession session, @NonNull TextMessage message) throws Exception {
         String sessionId = session.getId();
         SessionInfo info = sessions.get(sessionId);
         if (info == null) return;
 
         Map<String, String> payload = objectMapper.readValue(message.getPayload(), Map.class);
-        String type    = payload.get("type");
+        String type = payload.get("type");
         String content = payload.get("content");
         if (!"message".equals(type) || content == null || content.isBlank()) return;
 
         if (!info.isAdmin()) {
             // 방문자 → 저장 후 자신 + 어드민에게 전송
-            ChatMessage saved = chatUseCase.saveMessage(
-                    sessionId, info.username(), content.trim(),
-                    ChatMessage.MessageType.TEXT, info.userId(), false);
+            ChatMessage saved =
+                    chatUseCase.saveMessage(
+                            sessionId,
+                            info.username(),
+                            content.trim(),
+                            ChatMessage.MessageType.TEXT,
+                            info.userId(),
+                            false);
 
             Map<String, Object> msg = toMessageMap(saved);
             broadcastToUserSessions(info.userId(), msg);
@@ -116,9 +131,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
             if (toUserId == null || toUserId.isBlank()) return;
             if (toUserId.equals(info.userId())) return;
 
-            ChatMessage saved = chatUseCase.saveMessage(
-                    sessionId, info.username(), content.trim(),
-                    ChatMessage.MessageType.TEXT, toUserId, true);
+            ChatMessage saved =
+                    chatUseCase.saveMessage(
+                            sessionId,
+                            info.username(),
+                            content.trim(),
+                            ChatMessage.MessageType.TEXT,
+                            toUserId,
+                            true);
 
             Map<String, Object> msg = toMessageMap(saved);
             broadcastToUserSessions(toUserId, msg);
@@ -133,16 +153,29 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     }
 
     @Override
-    public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) throws Exception {
+    public void afterConnectionClosed(
+            @NonNull WebSocketSession session, @NonNull CloseStatus status) throws Exception {
         SessionInfo info = sessions.remove(session.getId());
         if (info == null) return;
 
         log.info("WebSocket disconnected: {} ({})", session.getId(), info.username());
 
         if (!info.isAdmin()) {
-            chatUseCase.saveMessage(session.getId(), "SYSTEM", info.username() + "님이 퇴장했습니다",
-                    ChatMessage.MessageType.SYSTEM, info.userId(), false);
-            broadcastToAdmins(Map.of("type", "room_left", "userId", info.userId(), "username", info.username()));
+            chatUseCase.saveMessage(
+                    session.getId(),
+                    "SYSTEM",
+                    info.username() + "님이 퇴장했습니다",
+                    ChatMessage.MessageType.SYSTEM,
+                    info.userId(),
+                    false);
+            broadcastToAdmins(
+                    Map.of(
+                            "type",
+                            "room_left",
+                            "userId",
+                            info.userId(),
+                            "username",
+                            info.username()));
 
             // 디스코드에 퇴장 알림
             discordBridge.sendSystemToDiscord(info.userId(), info.username() + "님이 퇴장했습니다");
@@ -150,7 +183,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     }
 
     @Override
-    public void handleTransportError(@NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
+    public void handleTransportError(
+            @NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
         log.error("WebSocket error for session {}: {}", session.getId(), exception.getMessage());
         session.close(CloseStatus.SERVER_ERROR);
     }
@@ -175,17 +209,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     }
 
     private void sendRoomList(WebSocketSession session) {
-        List<Map<String, Object>> rooms = sessions.values().stream()
-                .filter(i -> !i.isAdmin())
-                .map(i -> {
-                    Map<String, Object> room = new LinkedHashMap<>();
-                    room.put("userId", i.userId());
-                    room.put("username", i.username());
-                    room.put("online", true);
-                    return room;
-                })
-                .distinct()
-                .toList();
+        List<Map<String, Object>> rooms =
+                sessions.values().stream()
+                        .filter(i -> !i.isAdmin())
+                        .map(
+                                i -> {
+                                    Map<String, Object> room = new LinkedHashMap<>();
+                                    room.put("userId", i.userId());
+                                    room.put("username", i.username());
+                                    room.put("online", true);
+                                    return room;
+                                })
+                        .distinct()
+                        .toList();
         sendToSession(session, Map.of("type", "room_list", "rooms", rooms));
     }
 
@@ -208,7 +244,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         map.put("username", msg.getUsername() != null ? msg.getUsername() : "");
         map.put("content", msg.getContent() != null ? msg.getContent() : "");
         map.put("fromAdmin", msg.isFromAdmin());
-        map.put("timestamp", msg.getTimestamp() != null ? msg.getTimestamp().toString() : LocalDateTime.now().toString());
+        map.put(
+                "timestamp",
+                msg.getTimestamp() != null
+                        ? msg.getTimestamp().toString()
+                        : LocalDateTime.now().toString());
         return map;
     }
 

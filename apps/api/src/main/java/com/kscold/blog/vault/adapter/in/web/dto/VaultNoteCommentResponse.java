@@ -1,12 +1,11 @@
 package com.kscold.blog.vault.adapter.in.web.dto;
 
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -22,9 +21,11 @@ public class VaultNoteCommentResponse {
     private String content;
     private LocalDateTime createdAt;
 
-    public static VaultNoteCommentResponse from(VaultNoteComment c, String currentUserId, boolean currentUserIsAdmin) {
-        boolean canDelete = currentUserId != null
-                && (currentUserIsAdmin || currentUserId.equals(c.getUserId()));
+    public static VaultNoteCommentResponse from(
+            VaultNoteComment c, String currentUserId, boolean currentUserIsAdmin) {
+        boolean canDelete =
+                currentUserId != null
+                        && (currentUserIsAdmin || currentUserId.equals(c.getUserId()));
 
         return VaultNoteCommentResponse.builder()
                 .id(c.getId())

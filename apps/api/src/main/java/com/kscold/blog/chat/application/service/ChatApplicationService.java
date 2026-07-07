@@ -6,14 +6,13 @@ import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class ChatApplicationService implements ChatUseCase {
@@ -33,25 +32,36 @@ public class ChatApplicationService implements ChatUseCase {
 
     @Override
     @Transactional
-    public ChatMessage saveMessage(String sessionId, String username, String content,
-                                   ChatMessage.MessageType type, String roomId, boolean fromAdmin) {
-        ChatMessage message = ChatMessage.builder()
-                .sessionId(sessionId)
-                .roomId(roomId)
-                .username(username)
-                .content(content)
-                .type(type)
-                .fromAdmin(fromAdmin)
-                .timestamp(LocalDateTime.now())
-                .visitorReadAt(fromAdmin ? null : LocalDateTime.now())
-                .build();
+    public ChatMessage saveMessage(
+            String sessionId,
+            String username,
+            String content,
+            ChatMessage.MessageType type,
+            String roomId,
+            boolean fromAdmin) {
+        ChatMessage message =
+                ChatMessage.builder()
+                        .sessionId(sessionId)
+                        .roomId(roomId)
+                        .username(username)
+                        .content(content)
+                        .type(type)
+                        .fromAdmin(fromAdmin)
+                        .timestamp(LocalDateTime.now())
+                        .visitorReadAt(fromAdmin ? null : LocalDateTime.now())
+                        .build();
         return chatMessageRepository.save(message);
     }
 
     @Override
     @Transactional
-    public ChatMessage saveAndBroadcast(String sessionId, String username, String content,
-                                        ChatMessage.MessageType type, String roomId, boolean fromAdmin) {
+    public ChatMessage saveAndBroadcast(
+            String sessionId,
+            String username,
+            String content,
+            ChatMessage.MessageType type,
+            String roomId,
+            boolean fromAdmin) {
         ChatMessage saved = saveMessage(sessionId, username, content, type, roomId, fromAdmin);
         broadcastPort.broadcast(saved);
         notificationPort.notifyMessage(roomId, username, content, fromAdmin);
@@ -76,9 +86,14 @@ public class ChatApplicationService implements ChatUseCase {
     @Override
     public List<ChatRoomSummaryDto> getAllRooms() {
         return chatMessageRepository.findAllRooms().stream()
-                .map(s -> new ChatRoomSummaryDto(
-                        s.roomId(), s.username(), s.lastMessage(),
-                        s.lastTimestamp(), s.messageCount()))
+                .map(
+                        s ->
+                                new ChatRoomSummaryDto(
+                                        s.roomId(),
+                                        s.username(),
+                                        s.lastMessage(),
+                                        s.lastTimestamp(),
+                                        s.messageCount()))
                 .toList();
     }
 
@@ -89,7 +104,8 @@ public class ChatApplicationService implements ChatUseCase {
     }
 
     @Override
-    public List<ChatMessageRepository.PendingAdminReminder> getPendingAdminReminders(LocalDateTime unreadBefore) {
+    public List<ChatMessageRepository.PendingAdminReminder> getPendingAdminReminders(
+            LocalDateTime unreadBefore) {
         return chatMessageRepository.findPendingAdminReminders(unreadBefore);
     }
 

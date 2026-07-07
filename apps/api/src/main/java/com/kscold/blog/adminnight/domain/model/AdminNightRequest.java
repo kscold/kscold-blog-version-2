@@ -1,5 +1,7 @@
 package com.kscold.blog.adminnight.domain.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,9 +12,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
@@ -21,8 +20,7 @@ import java.time.LocalDateTime;
 @Document(collection = "admin_night_requests")
 public class AdminNightRequest {
 
-    @Id
-    private String id;
+    @Id private String id;
 
     private String userId;
     private String requesterName;
@@ -34,18 +32,15 @@ public class AdminNightRequest {
     private SlotInfo scheduledSlot;
     private String reviewNote;
 
-    @Builder.Default
-    private Status status = Status.PENDING;
+    @Builder.Default private Status status = Status.PENDING;
 
     private String decidedByUserId;
     private String decidedByName;
     private LocalDateTime decidedAt;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    @LastModifiedDate private LocalDateTime updatedAt;
 
     public enum Status {
         PENDING,

@@ -6,6 +6,7 @@ import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,8 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/chat")
@@ -32,12 +31,15 @@ public class ChatAdminController {
 
     @PostMapping("/rooms/{roomId}/messages")
     public ResponseEntity<ApiResponse<ChatMessage>> sendMessage(
-            @PathVariable String roomId,
-            @RequestBody @Valid SendAdminMessageCommand command
-    ) {
-        ChatMessage saved = chatUseCase.saveAndBroadcast(
-                "admin-rest", command.resolvedUsername(), command.content().trim(),
-                ChatMessage.MessageType.TEXT, roomId, true);
+            @PathVariable String roomId, @RequestBody @Valid SendAdminMessageCommand command) {
+        ChatMessage saved =
+                chatUseCase.saveAndBroadcast(
+                        "admin-rest",
+                        command.resolvedUsername(),
+                        command.content().trim(),
+                        ChatMessage.MessageType.TEXT,
+                        roomId,
+                        true);
         return ResponseEntity.ok(ApiResponse.success(saved));
     }
 
@@ -45,17 +47,16 @@ public class ChatAdminController {
     public ResponseEntity<ApiResponse<Page<ChatMessage>>> getRoomMessages(
             @PathVariable String roomId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size
-    ) {
+            @RequestParam(defaultValue = "50") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "timestamp"));
-        return ResponseEntity.ok(ApiResponse.success(chatUseCase.getMessagesByRoom(roomId, pageable)));
+        return ResponseEntity.ok(
+                ApiResponse.success(chatUseCase.getMessagesByRoom(roomId, pageable)));
     }
 
     @GetMapping("/messages")
     public ResponseEntity<ApiResponse<Page<ChatMessage>>> getAllMessages(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size
-    ) {
+            @RequestParam(defaultValue = "50") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
         return ResponseEntity.ok(ApiResponse.success(chatUseCase.getAllMessages(pageable)));
     }

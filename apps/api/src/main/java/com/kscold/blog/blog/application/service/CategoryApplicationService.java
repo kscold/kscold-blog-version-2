@@ -8,13 +8,12 @@ import com.kscold.blog.blog.domain.port.out.CategoryRepository;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.util.SlugUtils;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -24,27 +23,32 @@ public class CategoryApplicationService implements CategoryUseCase {
     private final CategoryRepository categoryRepository;
     private static final int MAX_DEPTH = 4; // 0-4 = 5단계
 
-    /**
-     * 카테고리 생성 (커맨드에서 엔티티 변환 포함)
-     */
+    /** 카테고리 생성 (커맨드에서 엔티티 변환 포함) */
     @Transactional
     public Category create(CategoryCreateCommand command) {
-        String slug = command.getSlug() != null ? command.getSlug() : SlugUtils.generate(command.getName());
+        String slug =
+                command.getSlug() != null
+                        ? command.getSlug()
+                        : SlugUtils.generate(command.getName());
 
-        Category category = Category.builder()
-                .name(command.getName())
-                .slug(slug)
-                .description(command.getDescription())
-                .parent(command.getParent())
-                .order(command.getOrder() != null ? command.getOrder() : 0)
-                .icon(command.getIcon())
-                .color(command.getColor())
-                .build();
+        Category category =
+                Category.builder()
+                        .name(command.getName())
+                        .slug(slug)
+                        .description(command.getDescription())
+                        .parent(command.getParent())
+                        .order(command.getOrder() != null ? command.getOrder() : 0)
+                        .icon(command.getIcon())
+                        .color(command.getColor())
+                        .build();
 
         // 부모가 있는 경우
         if (category.getParent() != null) {
-            Category parent = categoryRepository.findById(category.getParent())
-                    .orElseThrow(() -> ResourceNotFoundException.category(category.getParent()));
+            Category parent =
+                    categoryRepository
+                            .findById(category.getParent())
+                            .orElseThrow(
+                                    () -> ResourceNotFoundException.category(category.getParent()));
 
             if (parent.getDepth() >= MAX_DEPTH) {
                 throw InvalidRequestException.invalidInput("카테고리는 최대 5단계까지만 생성할 수 있습니다");
@@ -62,9 +66,7 @@ public class CategoryApplicationService implements CategoryUseCase {
         return categoryRepository.save(category);
     }
 
-    /**
-     * 전체 카테고리 조회 (flat 리스트 - 트리 구조는 CategoryResponse에서 처리)
-     */
+    /** 전체 카테고리 조회 (flat 리스트 - 트리 구조는 CategoryResponse에서 처리) */
     public List<Category> getAll() {
         return categoryRepository.findAll();
     }
@@ -77,18 +79,18 @@ public class CategoryApplicationService implements CategoryUseCase {
     }
 
     public Category getById(String id) {
-        return categoryRepository.findById(id)
+        return categoryRepository
+                .findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.category(id));
     }
 
     public Category getBySlug(String slug) {
-        return categoryRepository.findBySlug(slug)
+        return categoryRepository
+                .findBySlug(slug)
                 .orElseThrow(() -> ResourceNotFoundException.category(slug));
     }
 
-    /**
-     * 카테고리 수정 (null 필드는 기존 값 유지)
-     */
+    /** 카테고리 수정 (null 필드는 기존 값 유지) */
     @Transactional
     public Category update(String id, CategoryUpdateCommand command) {
         Category category = getById(id);
@@ -157,16 +159,12 @@ public class CategoryApplicationService implements CategoryUseCase {
         return categoryRepository.save(category);
     }
 
-    /**
-     * 카테고리의 postCount 원자적 증가
-     */
+    /** 카테고리의 postCount 원자적 증가 */
     public void incrementPostCount(String categoryId) {
         categoryRepository.incrementPostCount(categoryId);
     }
 
-    /**
-     * 카테고리의 postCount 원자적 감소 (최소 0)
-     */
+    /** 카테고리의 postCount 원자적 감소 (최소 0) */
     public void decrementPostCount(String categoryId) {
         categoryRepository.decrementPostCount(categoryId);
     }

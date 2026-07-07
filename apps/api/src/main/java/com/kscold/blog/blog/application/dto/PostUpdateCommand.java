@@ -1,16 +1,13 @@
 package com.kscold.blog.blog.application.dto;
 
 import com.kscold.blog.blog.domain.model.Post;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-/**
- * 포스트 수정 커맨드 DTO
- */
+/** 포스트 수정 커맨드 DTO */
 @Getter
 @Setter
 @NoArgsConstructor

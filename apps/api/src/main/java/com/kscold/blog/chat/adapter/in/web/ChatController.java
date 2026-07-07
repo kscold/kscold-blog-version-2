@@ -8,12 +8,11 @@ import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/chat")
@@ -27,22 +26,25 @@ public class ChatController {
 
     @GetMapping("/messages")
     public ResponseEntity<ApiResponse<List<ChatMessage>>> getMyMessages(
-            @AuthenticationPrincipal String userId,
-            @RequestParam(defaultValue = "50") int limit
-    ) {
+            @AuthenticationPrincipal String userId, @RequestParam(defaultValue = "50") int limit) {
         chatUseCase.markAdminMessagesRead(userId);
-        return ResponseEntity.ok(ApiResponse.success(chatUseCase.getRecentMessagesByRoom(userId, limit)));
+        return ResponseEntity.ok(
+                ApiResponse.success(chatUseCase.getRecentMessagesByRoom(userId, limit)));
     }
 
     @PostMapping("/messages")
     public ResponseEntity<ApiResponse<ChatMessage>> sendMessage(
             @AuthenticationPrincipal String userId,
-            @RequestBody @Valid SendUserMessageCommand command
-    ) {
+            @RequestBody @Valid SendUserMessageCommand command) {
         String displayName = userQueryPort.getUserById(userId).displayName();
-        ChatMessage saved = chatUseCase.saveMessage(
-                "user-rest", displayName, command.content().trim(),
-                ChatMessage.MessageType.TEXT, userId, false);
+        ChatMessage saved =
+                chatUseCase.saveMessage(
+                        "user-rest",
+                        displayName,
+                        command.content().trim(),
+                        ChatMessage.MessageType.TEXT,
+                        userId,
+                        false);
         chatBroadcastPort.broadcast(saved);
         discordBridgeService.sendToDiscord(userId, displayName, command.content().trim());
         return ResponseEntity.ok(ApiResponse.success(saved));

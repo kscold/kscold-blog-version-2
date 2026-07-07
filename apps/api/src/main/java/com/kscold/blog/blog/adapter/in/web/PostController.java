@@ -1,5 +1,6 @@
 package com.kscold.blog.blog.adapter.in.web;
 
+import com.kscold.blog.blog.adapter.in.web.dto.PostResponse;
 import com.kscold.blog.blog.application.dto.PostCreateCommand;
 import com.kscold.blog.blog.application.dto.PostUpdateCommand;
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
@@ -7,12 +8,12 @@ import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
-import com.kscold.blog.blog.adapter.in.web.dto.PostResponse;
 import com.kscold.blog.shared.analytics.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,11 +28,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-/**
- * 포스트 관련 REST API 컨트롤러
- */
+/** 포스트 관련 REST API 컨트롤러 */
 @Slf4j
 @RestController
 @RequestMapping("/api/posts")
@@ -49,9 +46,9 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "publishedAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDirection
-    ) {
-        Sort.Direction direction = sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+            @RequestParam(defaultValue = "desc") String sortDirection) {
+        Sort.Direction direction =
+                sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         Page<Post> posts = postUseCase.getAll(pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
@@ -59,19 +56,18 @@ public class PostController {
 
     @GetMapping("/featured")
     public ResponseEntity<ApiResponse<List<PostResponse>>> getFeaturedPosts(
-            @RequestParam(defaultValue = "5") int limit
-    ) {
+            @RequestParam(defaultValue = "5") int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "views"));
         List<Post> posts = postUseCase.getFeatured(pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.stream().map(this::toPublicPostResponse).toList()));
+        return ResponseEntity.ok(
+                ApiResponse.success(posts.stream().map(this::toPublicPostResponse).toList()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PostResponse>> getPostById(
             @PathVariable String id,
             @AuthenticationPrincipal String userId,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
         Post post = postUseCase.getById(id);
         recordView(post, request);
         return ResponseEntity.ok(ApiResponse.success(applyRestriction(post, userId)));
@@ -81,8 +77,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<PostResponse>> getPostBySlug(
             @PathVariable String slug,
             @AuthenticationPrincipal String userId,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
         Post post = postUseCase.getBySlug(slug);
         recordView(post, request);
         return ResponseEntity.ok(ApiResponse.success(applyRestriction(post, userId)));
@@ -100,8 +95,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<Page<PostResponse>>> getPostsByCategory(
             @PathVariable String categoryId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByCategory(categoryId, pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
@@ -111,8 +105,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<Page<PostResponse>>> getPostsByTag(
             @PathVariable String tagId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByTag(tagId, pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
@@ -122,8 +115,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<Page<PostResponse>>> searchPosts(
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.search(q, pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
@@ -132,21 +124,16 @@ public class PostController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<PostResponse>> createPost(
-            @Valid @RequestBody PostCreateCommand command,
-            @AuthenticationPrincipal String userId
-    ) {
+            @Valid @RequestBody PostCreateCommand command, @AuthenticationPrincipal String userId) {
         Post post = postUseCase.create(command, userId);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(toFullPostResponse(post), "포스트가 생성되었습니다"));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<PostResponse>> updatePost(
-            @PathVariable String id,
-            @Valid @RequestBody PostUpdateCommand command
-    ) {
+            @PathVariable String id, @Valid @RequestBody PostUpdateCommand command) {
         Post post = postUseCase.update(id, command);
         return ResponseEntity.ok(ApiResponse.success(toFullPostResponse(post), "포스트가 수정되었습니다"));
     }
@@ -162,8 +149,7 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<PostResponse>>> getAdminPosts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Post> posts = postUseCase.getAllAdmin(pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toFullPostResponse)));
@@ -180,7 +166,9 @@ public class PostController {
         if (!restrictedPost) {
             return PostResponse.from(post);
         }
-        if (hasAdminRole() || accessRequestUseCase.hasAccess(userId, post.getId(), post.getCategory().getId())) {
+        if (hasAdminRole()
+                || accessRequestUseCase.hasAccess(
+                        userId, post.getId(), post.getCategory().getId())) {
             return PostResponse.from(post, true);
         }
 
@@ -213,7 +201,8 @@ public class PostController {
 
     private boolean hasAdminRole() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth != null && auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return auth != null
+                && auth.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }

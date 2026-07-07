@@ -50,11 +50,11 @@ public class DiscordMessageListener extends ListenerAdapter {
                 content,
                 ChatMessage.MessageType.TEXT,
                 roomId,
-                true
-        );
+                true);
 
         // WebSocket으로 방문자에게 전달
-        DiscordBridgeService.BlogMessageCallback callback = discordBridgeService.getBlogMessageCallback();
+        DiscordBridgeService.BlogMessageCallback callback =
+                discordBridgeService.getBlogMessageCallback();
         if (callback != null) {
             callback.onAdminMessage(roomId, adminName, content);
         }

@@ -2,17 +2,13 @@ package com.kscold.blog.identity.adapter.out.persistence;
 
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-/**
- * UserRepository 포트 구현체
- * Spring Data MongoDB를 감싸는 어댑터
- */
+/** UserRepository 포트 구현체 Spring Data MongoDB를 감싸는 어댑터 */
 @SuppressWarnings("null")
 @Component
 @RequiredArgsConstructor

@@ -1,6 +1,7 @@
 package com.kscold.blog.guestbook.domain.model;
 
 import com.kscold.blog.identity.domain.model.User;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,8 +11,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
@@ -20,8 +19,7 @@ import java.time.LocalDateTime;
 @Document(collection = "guestbook_entries")
 public class GuestbookEntry {
 
-    @Id
-    private String id;
+    @Id private String id;
 
     private String authorName;
 
@@ -31,6 +29,5 @@ public class GuestbookEntry {
 
     private String content;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 }

@@ -2,57 +2,28 @@ package com.kscold.blog.vault.agent;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-
 import java.time.Instant;
 import java.util.List;
 
 public final class VaultAgentDtos {
 
-    private VaultAgentDtos() {
-    }
+    private VaultAgentDtos() {}
 
     public record ChatRequest(
-            @NotBlank(message = "질문을 입력해주세요.")
-            @Size(max = 1200, message = "질문은 1200자 이하로 입력해주세요.")
-            String message,
-
+            @NotBlank(message = "질문을 입력해주세요.") @Size(max = 1200, message = "질문은 1200자 이하로 입력해주세요.")
+                    String message,
             String activeFolderName,
-
-            @Size(max = 80, message = "세션 값이 너무 깁니다.")
-            String sessionId
-    ) {
-    }
+            @Size(max = 80, message = "세션 값이 너무 깁니다.") String sessionId) {}
 
     public record ChatResponse(
-            String sessionId,
-            String answer,
-            List<AgentStage> stages,
-            List<SourceNote> sources
-    ) {
-    }
+            String sessionId, String answer, List<AgentStage> stages, List<SourceNote> sources) {}
 
-    public record AgentStage(
-            String name,
-            String detail
-    ) {
-    }
+    public record AgentStage(String name, String detail) {}
 
     public record SourceNote(
-            String id,
-            String title,
-            String slug,
-            double score,
-            String type,
-            String path
-    ) {
-    }
+            String id, String title, String slug, double score, String type, String path) {}
 
-    public record ReindexResponse(
-            int totalNotes,
-            int indexedNotes,
-            int skippedNotes
-    ) {
-    }
+    public record ReindexResponse(int totalNotes, int indexedNotes, int skippedNotes) {}
 
     public record AgentRunResponse(
             String id,
@@ -60,15 +31,9 @@ public final class VaultAgentDtos {
             String answerPreview,
             int sourceCount,
             List<SourceNote> sources,
-            Instant createdAt
-    ) {
-    }
+            Instant createdAt) {}
 
-    public record ChatHistoryResponse(
-            String sessionId,
-            List<ChatHistoryMessage> messages
-    ) {
-    }
+    public record ChatHistoryResponse(String sessionId, List<ChatHistoryMessage> messages) {}
 
     public record ChatHistoryMessage(
             String id,
@@ -76,7 +41,5 @@ public final class VaultAgentDtos {
             String content,
             List<AgentStage> stages,
             List<SourceNote> sources,
-            Instant createdAt
-    ) {
-    }
+            Instant createdAt) {}
 }

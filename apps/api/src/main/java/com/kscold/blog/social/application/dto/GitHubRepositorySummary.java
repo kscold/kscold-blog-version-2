@@ -6,6 +6,4 @@ public record GitHubRepositorySummary(
         String description,
         String language,
         int stars,
-        String updatedAt
-) {
-}
+        String updatedAt) {}

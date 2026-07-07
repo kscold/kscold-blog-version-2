@@ -1,9 +1,8 @@
 package com.kscold.blog.blog.application.port.in;
 
 import com.kscold.blog.blog.domain.model.AccessRequest;
-import org.springframework.lang.Nullable;
-
 import java.util.List;
+import org.springframework.lang.Nullable;
 
 public interface AccessRequestUseCase {
 

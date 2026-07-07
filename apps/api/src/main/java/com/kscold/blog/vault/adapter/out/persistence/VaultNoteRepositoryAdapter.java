@@ -2,6 +2,8 @@ package com.kscold.blog.vault.adapter.out.persistence;
 
 import com.kscold.blog.vault.domain.model.VaultNote;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,9 +12,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
 
 @SuppressWarnings("null")
 @Component
@@ -84,8 +83,7 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(noteId)),
                 new Update().inc("commentsCount", 1),
-                VaultNote.class
-        );
+                VaultNote.class);
     }
 
     @Override
@@ -93,7 +91,6 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(noteId).and("commentsCount").gt(0)),
                 new Update().inc("commentsCount", -1),
-                VaultNote.class
-        );
+                VaultNote.class);
     }
 }

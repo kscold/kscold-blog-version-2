@@ -1,16 +1,15 @@
 package com.kscold.blog.blog.domain.model;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,8 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Document(collection = "tags")
 public class Tag {
-    @Id
-    private String id;
+    @Id private String id;
 
     @Indexed(unique = true)
     private String name;
@@ -28,9 +26,7 @@ public class Tag {
     @Indexed(unique = true)
     private String slug;
 
-    @Builder.Default
-    private Integer postCount = 0;
+    @Builder.Default private Integer postCount = 0;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 }

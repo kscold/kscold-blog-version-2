@@ -7,6 +7,4 @@ public record AdminNightCreateCommand(
         String taskTitle,
         String message,
         AdminNightRequest.ParticipationMode participationMode,
-        AdminNightRequest.SlotInfo preferredSlot
-) {
-}
+        AdminNightRequest.SlotInfo preferredSlot) {}

@@ -2,15 +2,14 @@ package com.kscold.blog.vault.adapter.out.persistence;
 
 import com.kscold.blog.vault.domain.model.VaultFolder;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
 
 @SuppressWarnings("null")
 @Component
@@ -55,8 +54,7 @@ public class VaultFolderRepositoryAdapter implements VaultFolderRepository {
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(folderId)),
                 new Update().inc("noteCount", 1),
-                VaultFolder.class
-        );
+                VaultFolder.class);
     }
 
     @Override
@@ -64,7 +62,6 @@ public class VaultFolderRepositoryAdapter implements VaultFolderRepository {
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(folderId).and("noteCount").gt(0)),
                 new Update().inc("noteCount", -1),
-                VaultFolder.class
-        );
+                VaultFolder.class);
     }
 }

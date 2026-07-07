@@ -5,5 +5,4 @@ public record ChatRoomSummaryDto(
         String username,
         String lastMessage,
         String lastTimestamp,
-        long messageCount
-) {}
+        long messageCount) {}

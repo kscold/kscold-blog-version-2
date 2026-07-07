@@ -1,13 +1,12 @@
 package com.kscold.blog.vault.adapter.in.web.dto;
 
 import com.kscold.blog.vault.domain.model.VaultNote;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Builder
@@ -44,10 +43,13 @@ public class VaultNoteResponse {
                 .slug(note.getSlug())
                 .content(note.getContent())
                 .folderId(note.getFolderId())
-                .author(note.getAuthor() != null ? AuthorInfo.builder()
-                        .id(note.getAuthor().getId())
-                        .name(note.getAuthor().getName())
-                        .build() : null)
+                .author(
+                        note.getAuthor() != null
+                                ? AuthorInfo.builder()
+                                        .id(note.getAuthor().getId())
+                                        .name(note.getAuthor().getName())
+                                        .build()
+                                : null)
                 .outgoingLinks(note.getOutgoingLinks())
                 .tags(note.getTags())
                 .views(note.getViews())

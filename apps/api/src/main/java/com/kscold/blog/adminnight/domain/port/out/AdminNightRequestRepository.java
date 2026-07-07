@@ -1,7 +1,6 @@
 package com.kscold.blog.adminnight.domain.port.out;
 
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
-
 import java.util.List;
 import java.util.Optional;
 

@@ -2,6 +2,8 @@ package com.kscold.blog.blog.adapter.out.persistence;
 
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.port.out.CategoryRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -9,13 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
-
-/**
- * CategoryRepository 포트의 영속성 어댑터
- * Spring Data MongoDB를 사용하여 포트 인터페이스를 구현
- */
+/** CategoryRepository 포트의 영속성 어댑터 Spring Data MongoDB를 사용하여 포트 인터페이스를 구현 */
 @SuppressWarnings("null")
 @Component
 @RequiredArgsConstructor
@@ -79,8 +75,7 @@ public class CategoryRepositoryAdapter implements CategoryRepository {
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(categoryId)),
                 new Update().inc("postCount", 1),
-                Category.class
-        );
+                Category.class);
     }
 
     @Override
@@ -88,7 +83,6 @@ public class CategoryRepositoryAdapter implements CategoryRepository {
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(categoryId).and("postCount").gt(0)),
                 new Update().inc("postCount", -1),
-                Category.class
-        );
+                Category.class);
     }
 }

@@ -7,14 +7,13 @@ import com.kscold.blog.vault.application.dto.FolderUpdateCommand;
 import com.kscold.blog.vault.application.port.in.VaultFolderUseCase;
 import com.kscold.blog.vault.domain.model.VaultFolder;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -39,22 +38,19 @@ public class VaultFolderController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<VaultFolderResponse>> createFolder(
-            @Valid @RequestBody FolderCreateCommand command
-    ) {
+            @Valid @RequestBody FolderCreateCommand command) {
         VaultFolder folder = vaultFolderUseCase.create(command);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(VaultFolderResponse.from(folder), "폴더가 생성되었습니다"));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<VaultFolderResponse>> updateFolder(
-            @PathVariable String id,
-            @Valid @RequestBody FolderUpdateCommand command
-    ) {
+            @PathVariable String id, @Valid @RequestBody FolderUpdateCommand command) {
         VaultFolder folder = vaultFolderUseCase.update(id, command);
-        return ResponseEntity.ok(ApiResponse.success(VaultFolderResponse.from(folder), "폴더가 수정되었습니다"));
+        return ResponseEntity.ok(
+                ApiResponse.success(VaultFolderResponse.from(folder), "폴더가 수정되었습니다"));
     }
 
     @DeleteMapping("/{id}")

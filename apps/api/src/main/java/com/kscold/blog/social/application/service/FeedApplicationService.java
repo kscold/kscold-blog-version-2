@@ -1,28 +1,27 @@
 package com.kscold.blog.social.application.service;
 
-import com.kscold.blog.social.application.dto.LinkPreviewResponse;
+import com.kscold.blog.exception.BusinessException;
+import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.application.port.in.UserQueryPort.UserInfo;
 import com.kscold.blog.social.application.dto.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.FeedUpdateCommand;
+import com.kscold.blog.social.application.dto.LinkPreviewResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
 import com.kscold.blog.social.domain.port.out.LinkScrapingPort;
-import com.kscold.blog.exception.BusinessException;
-import com.kscold.blog.exception.ErrorCode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -44,18 +43,26 @@ public class FeedApplicationService implements FeedUseCase {
             linkPreview = toModel(scraped);
         }
 
-        Feed feed = Feed.builder()
-                .content(command.getContent())
-                .images(command.getImages() != null ? command.getImages() : new ArrayList<>())
-                .author(Feed.AuthorInfo.builder()
-                        .id(author.id())
-                        .username(author.username())
-                        .name(author.displayName())
-                        .avatar(author.avatar())
-                        .build())
-                .visibility(command.getVisibility() != null ? command.getVisibility() : Feed.Visibility.PUBLIC)
-                .linkPreview(linkPreview)
-                .build();
+        Feed feed =
+                Feed.builder()
+                        .content(command.getContent())
+                        .images(
+                                command.getImages() != null
+                                        ? command.getImages()
+                                        : new ArrayList<>())
+                        .author(
+                                Feed.AuthorInfo.builder()
+                                        .id(author.id())
+                                        .username(author.username())
+                                        .name(author.displayName())
+                                        .avatar(author.avatar())
+                                        .build())
+                        .visibility(
+                                command.getVisibility() != null
+                                        ? command.getVisibility()
+                                        : Feed.Visibility.PUBLIC)
+                        .linkPreview(linkPreview)
+                        .build();
 
         return feedRepository.save(feed);
     }
@@ -105,7 +112,8 @@ public class FeedApplicationService implements FeedUseCase {
     }
 
     public Page<Feed> getPublicFeedsByAuthorId(String authorId, Pageable pageable) {
-        return feedRepository.findByAuthorIdAndVisibility(authorId, Feed.Visibility.PUBLIC, pageable);
+        return feedRepository.findByAuthorIdAndVisibility(
+                authorId, Feed.Visibility.PUBLIC, pageable);
     }
 
     public Page<Feed> getAllFeeds(Pageable pageable) {
@@ -121,23 +129,17 @@ public class FeedApplicationService implements FeedUseCase {
         return feedRepository.aggregateTags();
     }
 
-    /**
-     * 댓글 수 원자적 증가
-     */
+    /** 댓글 수 원자적 증가 */
     public void incrementCommentCount(String feedId) {
         feedRepository.incrementCommentCount(feedId);
     }
 
-    /**
-     * 댓글 수 원자적 감소 (최소 0)
-     */
+    /** 댓글 수 원자적 감소 (최소 0) */
     public void decrementCommentCount(String feedId) {
         feedRepository.decrementCommentCount(feedId);
     }
 
-    /**
-     * 피드 소유권 검증: 본인 또는 ADMIN만 수정/삭제 가능
-     */
+    /** 피드 소유권 검증: 본인 또는 ADMIN만 수정/삭제 가능 */
     public void validateOwnership(String feedId, String userId, boolean isAdmin) {
         Feed feed = findById(feedId);
         if (feed.getAuthor().getId().equals(userId)) {
@@ -149,8 +151,7 @@ public class FeedApplicationService implements FeedUseCase {
     }
 
     private Feed findById(String id) {
-        return feedRepository.findById(id)
-                .orElseThrow(() -> ResourceNotFoundException.feed(id));
+        return feedRepository.findById(id).orElseThrow(() -> ResourceNotFoundException.feed(id));
     }
 
     private Feed.LinkPreview toModel(LinkPreviewResponse response) {

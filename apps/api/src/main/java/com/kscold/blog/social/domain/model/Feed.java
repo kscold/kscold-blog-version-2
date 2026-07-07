@@ -1,20 +1,19 @@
 package com.kscold.blog.social.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
@@ -24,44 +23,35 @@ import java.util.Set;
 @Document(collection = "feeds")
 public class Feed {
 
-    @Id
-    private String id;
+    @Id private String id;
 
     private String content;
 
-    @Builder.Default
-    private List<String> images = new ArrayList<>();
+    @Builder.Default private List<String> images = new ArrayList<>();
 
     private AuthorInfo author;
 
-    @Builder.Default
-    private Visibility visibility = Visibility.PUBLIC;
+    @Builder.Default private Visibility visibility = Visibility.PUBLIC;
 
     private LinkPreview linkPreview;
 
-    @Builder.Default
-    private List<String> tags = new ArrayList<>();
+    @Builder.Default private List<String> tags = new ArrayList<>();
 
-    @Builder.Default
-    private Set<String> likedBy = new HashSet<>();
+    @Builder.Default private Set<String> likedBy = new HashSet<>();
 
-    @Builder.Default
-    private Integer likesCount = 0;
+    @Builder.Default private Integer likesCount = 0;
 
-    @Builder.Default
-    private Integer commentsCount = 0;
+    @Builder.Default private Integer commentsCount = 0;
 
-    @Builder.Default
-    private Integer views = 0;
+    @Builder.Default private Integer views = 0;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    @LastModifiedDate private LocalDateTime updatedAt;
 
     public enum Visibility {
-        PUBLIC, PRIVATE
+        PUBLIC,
+        PRIVATE
     }
 
     @Getter

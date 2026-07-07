@@ -8,11 +8,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
-/**
- * 서비스 계층 AOP 로깅
- * - 모든 ApplicationService 메서드 실행 시간 측정
- * - 예외 발생 시 상세 로그 기록
- */
+/** 서비스 계층 AOP 로깅 - 모든 ApplicationService 메서드 실행 시간 측정 - 예외 발생 시 상세 로그 기록 */
 @Slf4j
 @Aspect
 @Component
@@ -30,13 +26,21 @@ public class ServiceLoggingAspect {
         try {
             Object result = joinPoint.proceed();
             stopWatch.stop();
-            log.debug("[SERVICE] {}.{}() completed in {}ms", className, methodName, stopWatch.getTotalTimeMillis());
+            log.debug(
+                    "[SERVICE] {}.{}() completed in {}ms",
+                    className,
+                    methodName,
+                    stopWatch.getTotalTimeMillis());
             return result;
         } catch (Exception e) {
             stopWatch.stop();
-            log.warn("[SERVICE] {}.{}() failed after {}ms — {}: {}",
-                    className, methodName, stopWatch.getTotalTimeMillis(),
-                    e.getClass().getSimpleName(), e.getMessage());
+            log.warn(
+                    "[SERVICE] {}.{}() failed after {}ms — {}: {}",
+                    className,
+                    methodName,
+                    stopWatch.getTotalTimeMillis(),
+                    e.getClass().getSimpleName(),
+                    e.getMessage());
             throw e;
         }
     }

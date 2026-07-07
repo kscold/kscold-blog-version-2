@@ -18,30 +18,32 @@ public class DiscordBotConfig {
     private String token;
 
     @Bean
-    public JDA jda(@org.springframework.context.annotation.Lazy DiscordMessageListener messageListener) throws InterruptedException {
+    public JDA jda(
+            @org.springframework.context.annotation.Lazy DiscordMessageListener messageListener)
+            throws InterruptedException {
         if (token == null || token.isBlank()) {
             log.warn("Discord 봇 토큰이 설정되지 않아 비활성화됩니다");
             return null;
         }
 
-        JDA jda = JDABuilder.createDefault(token)
-                .enableIntents(
-                        GatewayIntent.GUILD_MESSAGES,
-                        GatewayIntent.MESSAGE_CONTENT
-                )
-                .addEventListeners(messageListener)
-                .build();
+        JDA jda =
+                JDABuilder.createDefault(token)
+                        .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
+                        .addEventListeners(messageListener)
+                        .build();
 
         // awaitReady를 별도 스레드에서 실행 (Spring Boot 시작 블로킹 방지)
-        Thread.ofVirtual().start(() -> {
-            try {
-                jda.awaitReady();
-                log.info("Discord 봇 연결 완료: {}", jda.getSelfUser().getName());
-            } catch (InterruptedException e) {
-                log.error("Discord 봇 연결 대기 중 인터럽트", e);
-                Thread.currentThread().interrupt();
-            }
-        });
+        Thread.ofVirtual()
+                .start(
+                        () -> {
+                            try {
+                                jda.awaitReady();
+                                log.info("Discord 봇 연결 완료: {}", jda.getSelfUser().getName());
+                            } catch (InterruptedException e) {
+                                log.error("Discord 봇 연결 대기 중 인터럽트", e);
+                                Thread.currentThread().interrupt();
+                            }
+                        });
 
         return jda;
     }

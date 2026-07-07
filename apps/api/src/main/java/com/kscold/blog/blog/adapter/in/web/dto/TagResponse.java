@@ -1,17 +1,14 @@
 package com.kscold.blog.blog.adapter.in.web.dto;
 
 import com.kscold.blog.blog.domain.model.Tag;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-/**
- * 태그 응답 DTO
- */
+/** 태그 응답 DTO */
 @Getter
 @Builder
 @NoArgsConstructor
@@ -24,9 +21,7 @@ public class TagResponse {
     private Integer postCount;
     private LocalDateTime createdAt;
 
-    /**
-     * Tag 엔티티를 TagResponse로 변환
-     */
+    /** Tag 엔티티를 TagResponse로 변환 */
     public static TagResponse from(Tag tag) {
         return TagResponse.builder()
                 .id(tag.getId())
@@ -37,12 +32,8 @@ public class TagResponse {
                 .build();
     }
 
-    /**
-     * Tag 리스트를 TagResponse 리스트로 변환
-     */
+    /** Tag 리스트를 TagResponse 리스트로 변환 */
     public static List<TagResponse> from(List<Tag> tags) {
-        return tags.stream()
-                .map(TagResponse::from)
-                .toList();
+        return tags.stream().map(TagResponse::from).toList();
     }
 }

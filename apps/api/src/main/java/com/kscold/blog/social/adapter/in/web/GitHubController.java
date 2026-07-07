@@ -16,15 +16,15 @@ public class GitHubController {
     private final GitHubUseCase gitHubUseCase;
 
     @GetMapping("/{username}")
-    public ResponseEntity<ApiResponse<GitHubOverviewResponse>> getOverview(@PathVariable String username) {
+    public ResponseEntity<ApiResponse<GitHubOverviewResponse>> getOverview(
+            @PathVariable String username) {
         return ResponseEntity.ok(ApiResponse.success(gitHubUseCase.getOverview(username)));
     }
 
     @GetMapping("/{username}/contributions")
     public ResponseEntity<ApiResponse<GitHubContributionResponse>> getContributions(
-            @PathVariable String username,
-            @RequestParam(required = false) Integer year
-    ) {
-        return ResponseEntity.ok(ApiResponse.success(gitHubUseCase.getContributions(username, year)));
+            @PathVariable String username, @RequestParam(required = false) Integer year) {
+        return ResponseEntity.ok(
+                ApiResponse.success(gitHubUseCase.getContributions(username, year)));
     }
 }

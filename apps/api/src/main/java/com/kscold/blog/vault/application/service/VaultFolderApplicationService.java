@@ -8,13 +8,12 @@ import com.kscold.blog.vault.application.dto.FolderUpdateCommand;
 import com.kscold.blog.vault.application.port.in.VaultFolderUseCase;
 import com.kscold.blog.vault.domain.model.VaultFolder;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -26,14 +25,18 @@ public class VaultFolderApplicationService implements VaultFolderUseCase {
 
     @Transactional
     public VaultFolder create(FolderCreateCommand command) {
-        String slug = command.getSlug() != null ? command.getSlug() : SlugUtils.generate(command.getName());
+        String slug =
+                command.getSlug() != null
+                        ? command.getSlug()
+                        : SlugUtils.generate(command.getName());
 
-        VaultFolder folder = VaultFolder.builder()
-                .name(command.getName())
-                .slug(slug)
-                .parent(command.getParent())
-                .order(command.getOrder() != null ? command.getOrder() : 0)
-                .build();
+        VaultFolder folder =
+                VaultFolder.builder()
+                        .name(command.getName())
+                        .slug(slug)
+                        .parent(command.getParent())
+                        .order(command.getOrder() != null ? command.getOrder() : 0)
+                        .build();
 
         if (folder.getParent() != null) {
             VaultFolder parent = getById(folder.getParent());
@@ -57,12 +60,14 @@ public class VaultFolderApplicationService implements VaultFolderUseCase {
     }
 
     public VaultFolder getById(String id) {
-        return vaultFolderRepository.findById(id)
+        return vaultFolderRepository
+                .findById(id)
                 .orElseThrow(() -> ResourceNotFoundException.vaultFolder(id));
     }
 
     public VaultFolder getBySlug(String slug) {
-        return vaultFolderRepository.findBySlug(slug)
+        return vaultFolderRepository
+                .findBySlug(slug)
                 .orElseThrow(() -> ResourceNotFoundException.vaultFolder(slug));
     }
 
@@ -85,16 +90,12 @@ public class VaultFolderApplicationService implements VaultFolderUseCase {
         vaultFolderRepository.delete(folder);
     }
 
-    /**
-     * 노트 수 원자적 증가
-     */
+    /** 노트 수 원자적 증가 */
     public void incrementNoteCount(String folderId) {
         vaultFolderRepository.incrementNoteCount(folderId);
     }
 
-    /**
-     * 노트 수 원자적 감소 (최소 0)
-     */
+    /** 노트 수 원자적 감소 (최소 0) */
     public void decrementNoteCount(String folderId) {
         vaultFolderRepository.decrementNoteCount(folderId);
     }

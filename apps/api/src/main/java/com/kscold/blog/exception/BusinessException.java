@@ -2,10 +2,7 @@ package com.kscold.blog.exception;
 
 import lombok.Getter;
 
-/**
- * 비즈니스 로직 처리 중 발생하는 예외의 최상위 클래스
- * 모든 커스텀 예외는 이 클래스를 상속받아 구현
- */
+/** 비즈니스 로직 처리 중 발생하는 예외의 최상위 클래스 모든 커스텀 예외는 이 클래스를 상속받아 구현 */
 @Getter
 public class BusinessException extends RuntimeException {
 

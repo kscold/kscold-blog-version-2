@@ -21,8 +21,7 @@ public class LinkScrapingController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<LinkPreviewResponse>> getLinkPreview(
-            @RequestParam String url
-    ) {
+            @RequestParam String url) {
         return ResponseEntity.ok(ApiResponse.success(linkScrapingUseCase.getLinkPreview(url)));
     }
 }

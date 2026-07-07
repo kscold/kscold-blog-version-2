@@ -1,13 +1,12 @@
 package com.kscold.blog.shared.domain.model;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.List;
 
 @Data
 @Builder
@@ -16,8 +15,7 @@ import java.util.List;
 @Document(collection = "team_private_docs")
 public class TeamPrivateDoc {
 
-    @Id
-    private String id;
+    @Id private String id;
 
     private String teamId;
 

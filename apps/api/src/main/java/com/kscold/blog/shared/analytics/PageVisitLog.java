@@ -1,5 +1,6 @@
 package com.kscold.blog.shared.analytics;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,13 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
-
-/**
- * 페이지 방문 로그 (어드민 분석용)
- * - 90일 TTL
- * - path별 일별 집계에 사용
- */
+/** 페이지 방문 로그 (어드민 분석용) - 90일 TTL - path별 일별 집계에 사용 */
 @Getter
 @Builder
 @NoArgsConstructor
@@ -22,11 +17,9 @@ import java.time.Instant;
 @Document(collection = "page_visit_logs")
 public class PageVisitLog {
 
-    @Id
-    private String id;
+    @Id private String id;
 
-    @Indexed
-    private String path;        // 정규화된 경로
+    @Indexed private String path; // 정규화된 경로
 
     private String ipHash;
 

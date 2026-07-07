@@ -23,9 +23,7 @@ public class MediaController {
     @PostMapping("/upload")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<MediaResponse>> upload(
-            @RequestParam("file") MultipartFile file,
-            @AuthenticationPrincipal String userId
-    ) {
+            @RequestParam("file") MultipartFile file, @AuthenticationPrincipal String userId) {
         Media media = mediaUseCase.upload(file, userId, userId);
         return ResponseEntity.ok(ApiResponse.success(MediaResponse.from(media), "파일이 업로드되었습니다"));
     }

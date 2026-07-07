@@ -1,20 +1,19 @@
 package com.kscold.blog.blog.domain.model;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -23,17 +22,14 @@ import java.util.List;
 @AllArgsConstructor
 @Document(collection = "posts")
 public class Post {
-    @Id
-    private String id;
+    @Id private String id;
 
-    @TextIndexed
-    private String title;
+    @TextIndexed private String title;
 
     @Indexed(unique = true)
     private String slug;
 
-    @TextIndexed
-    private String content; // 마크다운 본문
+    @TextIndexed private String content; // 마크다운 본문
 
     private String excerpt; // 발췌문 (200자)
 
@@ -41,47 +37,41 @@ public class Post {
 
     private CategoryInfo category;
 
-    @Builder.Default
-    private List<TagInfo> tags = new ArrayList<>();
+    @Builder.Default private List<TagInfo> tags = new ArrayList<>();
 
     private AuthorInfo author;
 
-    @Builder.Default
-    private Source source = Source.MANUAL;
+    @Builder.Default private Source source = Source.MANUAL;
 
     private String originalFilename;
 
-    @Builder.Default
-    private Status status = Status.DRAFT;
+    @Builder.Default private Status status = Status.DRAFT;
 
-    @Builder.Default
-    private Boolean featured = false;
+    @Builder.Default private Boolean featured = false;
 
-    @Builder.Default
-    private Boolean publicOverride = false;
+    @Builder.Default private Boolean publicOverride = false;
 
-    @Builder.Default
-    private Integer views = 0;
+    @Builder.Default private Integer views = 0;
 
-    @Builder.Default
-    private Integer likes = 0;
+    @Builder.Default private Integer likes = 0;
 
     private SeoInfo seo;
 
     private LocalDateTime publishedAt;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    @LastModifiedDate private LocalDateTime updatedAt;
 
     public enum Status {
-        DRAFT, PUBLISHED, ARCHIVED
+        DRAFT,
+        PUBLISHED,
+        ARCHIVED
     }
 
     public enum Source {
-        MANUAL, MARKDOWN_IMPORT
+        MANUAL,
+        MARKDOWN_IMPORT
     }
 
     @Getter

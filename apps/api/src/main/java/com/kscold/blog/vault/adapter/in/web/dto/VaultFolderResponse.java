@@ -1,17 +1,16 @@
 package com.kscold.blog.vault.adapter.in.web.dto;
 
 import com.kscold.blog.vault.domain.model.VaultFolder;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
@@ -27,8 +26,7 @@ public class VaultFolderResponse {
     private Integer order;
     private Integer noteCount;
 
-    @Builder.Default
-    private List<VaultFolderResponse> children = new ArrayList<>();
+    @Builder.Default private List<VaultFolderResponse> children = new ArrayList<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -49,8 +47,9 @@ public class VaultFolderResponse {
     }
 
     public static List<VaultFolderResponse> buildTree(List<VaultFolder> allFolders) {
-        Map<String, VaultFolderResponse> map = allFolders.stream()
-                .collect(Collectors.toMap(VaultFolder::getId, VaultFolderResponse::from));
+        Map<String, VaultFolderResponse> map =
+                allFolders.stream()
+                        .collect(Collectors.toMap(VaultFolder::getId, VaultFolderResponse::from));
 
         List<VaultFolderResponse> roots = new ArrayList<>();
 

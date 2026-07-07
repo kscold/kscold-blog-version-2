@@ -3,10 +3,9 @@ package com.kscold.blog.blog.application.service;
 import com.kscold.blog.blog.application.dto.PostCreateCommand;
 import com.kscold.blog.blog.application.dto.PostUpdateCommand;
 import com.kscold.blog.blog.domain.model.Post;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PostDraftService {
@@ -16,8 +15,7 @@ public class PostDraftService {
             String slug,
             Post.CategoryInfo categoryInfo,
             List<Post.TagInfo> tagInfos,
-            Post.AuthorInfo authorInfo
-    ) {
+            Post.AuthorInfo authorInfo) {
         String excerpt = resolveExcerpt(command.getExcerpt(), command.getContent());
 
         return Post.builder()
@@ -35,7 +33,8 @@ public class PostDraftService {
                 .featured(command.getFeatured())
                 .publicOverride(command.getPublicOverride())
                 .seo(buildSeoInfo(command, excerpt))
-                .publishedAt(command.getStatus() == Post.Status.PUBLISHED ? LocalDateTime.now() : null)
+                .publishedAt(
+                        command.getStatus() == Post.Status.PUBLISHED ? LocalDateTime.now() : null)
                 .build();
     }
 
@@ -43,20 +42,22 @@ public class PostDraftService {
             Post post,
             PostUpdateCommand command,
             Post.CategoryInfo categoryInfo,
-            List<Post.TagInfo> tagInfos
-    ) {
+            List<Post.TagInfo> tagInfos) {
         if (command.getTitle() != null) post.setTitle(command.getTitle());
         if (command.getContent() != null) post.setContent(command.getContent());
         if (command.getExcerpt() != null) post.setExcerpt(command.getExcerpt());
         if (command.getCoverImage() != null) post.setCoverImage(command.getCoverImage());
         if (command.getFeatured() != null) post.setFeatured(command.getFeatured());
-        if (command.getPublicOverride() != null) post.setPublicOverride(command.getPublicOverride());
+        if (command.getPublicOverride() != null)
+            post.setPublicOverride(command.getPublicOverride());
         if (categoryInfo != null) post.setCategory(categoryInfo);
         if (tagInfos != null) post.setTags(tagInfos);
 
         updatePostStatus(post, command.getStatus());
 
-        if (command.getMetaTitle() != null || command.getMetaDescription() != null || command.getKeywords() != null) {
+        if (command.getMetaTitle() != null
+                || command.getMetaDescription() != null
+                || command.getKeywords() != null) {
             post.setSeo(mergeSeoInfo(command, post.getSeo()));
         }
     }
@@ -69,8 +70,7 @@ public class PostDraftService {
     }
 
     private String stripRichText(String value) {
-        return value
-                .replaceAll("(?s)```.*?```", " ")
+        return value.replaceAll("(?s)```.*?```", " ")
                 .replaceAll("(?s)~~~.*?~~~", " ")
                 .replaceAll("`([^`]+)`", "$1")
                 .replaceAll("!\\[\\[[^\\]]*]?]?", " ")
@@ -92,8 +92,14 @@ public class PostDraftService {
 
     private Post.SeoInfo buildSeoInfo(PostCreateCommand command, String excerpt) {
         return Post.SeoInfo.builder()
-                .metaTitle(command.getMetaTitle() != null ? command.getMetaTitle() : command.getTitle())
-                .metaDescription(command.getMetaDescription() != null ? command.getMetaDescription() : excerpt)
+                .metaTitle(
+                        command.getMetaTitle() != null
+                                ? command.getMetaTitle()
+                                : command.getTitle())
+                .metaDescription(
+                        command.getMetaDescription() != null
+                                ? command.getMetaDescription()
+                                : excerpt)
                 .keywords(command.getKeywords())
                 .build();
     }
@@ -101,9 +107,16 @@ public class PostDraftService {
     private Post.SeoInfo mergeSeoInfo(PostUpdateCommand command, Post.SeoInfo current) {
         Post.SeoInfo base = current != null ? current : new Post.SeoInfo();
         return Post.SeoInfo.builder()
-                .metaTitle(command.getMetaTitle() != null ? command.getMetaTitle() : base.getMetaTitle())
-                .metaDescription(command.getMetaDescription() != null ? command.getMetaDescription() : base.getMetaDescription())
-                .keywords(command.getKeywords() != null ? command.getKeywords() : base.getKeywords())
+                .metaTitle(
+                        command.getMetaTitle() != null
+                                ? command.getMetaTitle()
+                                : base.getMetaTitle())
+                .metaDescription(
+                        command.getMetaDescription() != null
+                                ? command.getMetaDescription()
+                                : base.getMetaDescription())
+                .keywords(
+                        command.getKeywords() != null ? command.getKeywords() : base.getKeywords())
                 .build();
     }
 

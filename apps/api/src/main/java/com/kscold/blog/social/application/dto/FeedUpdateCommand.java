@@ -1,12 +1,11 @@
 package com.kscold.blog.social.application.dto;
 
 import com.kscold.blog.social.domain.model.Feed;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter

@@ -1,5 +1,6 @@
 package com.kscold.blog.payment;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,8 +10,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
-
 @Getter
 @Setter
 @Builder
@@ -19,17 +18,14 @@ import java.time.Instant;
 @Document(collection = "payment_orders")
 public class PaymentOrder {
 
-    @Id
-    private String id;
+    @Id private String id;
 
     @Indexed(unique = true)
     private String paymentId;
 
-    @Indexed
-    private String userId;
+    @Indexed private String userId;
 
-    @Indexed
-    private String paymentAccessToken;
+    @Indexed private String paymentAccessToken;
 
     private String programKey;
     private String orderName;

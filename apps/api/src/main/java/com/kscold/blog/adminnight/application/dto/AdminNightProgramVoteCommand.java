@@ -1,7 +1,6 @@
 package com.kscold.blog.adminnight.application.dto;
 
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
-
 import java.util.List;
 
 public record AdminNightProgramVoteCommand(
@@ -18,5 +17,4 @@ public record AdminNightProgramVoteCommand(
         List<String> preferredTimes,
         List<String> interestedTopics,
         String desiredTakeaways,
-        String message
-) {}
+        String message) {}

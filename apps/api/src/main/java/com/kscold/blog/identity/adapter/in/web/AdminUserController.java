@@ -7,9 +7,10 @@ import com.kscold.blog.identity.application.dto.UserStatsDto;
 import com.kscold.blog.identity.application.port.in.UserManagementUseCase;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.application.service.UserStatsService;
-import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import com.kscold.blog.shared.web.ApiResponse;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,9 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -42,17 +40,16 @@ public class AdminUserController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<AdminUserDto>>> listAllUsers() {
-        List<AdminUserDto> users = userRepository.findAllOrderByCreatedAtDesc().stream()
-                .map(AdminUserDto::from)
-                .collect(Collectors.toList());
+        List<AdminUserDto> users =
+                userRepository.findAllOrderByCreatedAtDesc().stream()
+                        .map(AdminUserDto::from)
+                        .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.success(users));
     }
 
     @PatchMapping("/{userId}/profile")
     public ResponseEntity<ApiResponse<AuthResult.UserInfo>> updateUserProfile(
-            @PathVariable String userId,
-            @RequestBody UpdateProfileCommand command
-    ) {
+            @PathVariable String userId, @RequestBody UpdateProfileCommand command) {
         AuthResult.UserInfo updated = userProfileUseCase.updateUserProfile(userId, command);
         return ResponseEntity.ok(ApiResponse.success(updated, "프로필이 업데이트되었습니다"));
     }

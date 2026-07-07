@@ -2,13 +2,12 @@ package com.kscold.blog.vault.adapter.out.persistence;
 
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
 
 @SuppressWarnings("null")
 @Component
@@ -38,7 +37,8 @@ public class VaultNoteCommentRepositoryAdapter implements VaultNoteCommentReposi
     }
 
     @Override
-    public List<VaultNoteComment> findAnonymousByNoteIdAndAuthorNames(String noteId, List<String> authorNames) {
+    public List<VaultNoteComment> findAnonymousByNoteIdAndAuthorNames(
+            String noteId, List<String> authorNames) {
         return mongoRepository.findByNoteIdAndUserIdIsNullAndAuthorNameIn(noteId, authorNames);
     }
 

@@ -1,7 +1,11 @@
 package com.kscold.blog.vault.domain.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import com.kscold.blog.vault.domain.model.VaultNote;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,16 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class BacklinkParsingServiceTest {
 
-    @Mock
-    private VaultNoteRepository vaultNoteRepository;
+    @Mock private VaultNoteRepository vaultNoteRepository;
 
     private BacklinkParsingService backlinkParsingService;
 
@@ -32,12 +30,12 @@ class BacklinkParsingServiceTest {
     void parseBacklinksWithAliasAndAnchor() {
         when(vaultNoteRepository.findBySlug("ai-agent"))
                 .thenReturn(Optional.of(note("note-ai-agent")));
-        when(vaultNoteRepository.findBySlug("memory"))
-                .thenReturn(Optional.of(note("note-memory")));
-        when(vaultNoteRepository.findBySlug("missing-note"))
-                .thenReturn(Optional.empty());
+        when(vaultNoteRepository.findBySlug("memory")).thenReturn(Optional.of(note("note-memory")));
+        when(vaultNoteRepository.findBySlug("missing-note")).thenReturn(Optional.empty());
 
-        var links = backlinkParsingService.parseBacklinks("""
+        var links =
+                backlinkParsingService.parseBacklinks(
+                        """
                 [[AI Agent|에이전트]]
                 [[Memory#핵심 개념]]
                 [[AI Agent]]
@@ -48,8 +46,6 @@ class BacklinkParsingServiceTest {
     }
 
     private VaultNote note(String id) {
-        return VaultNote.builder()
-                .id(id)
-                .build();
+        return VaultNote.builder().id(id).build();
     }
 }

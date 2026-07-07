@@ -10,7 +10,8 @@ import org.springframework.util.StringUtils;
 @Component
 public class AdminNightRequestDraftService {
 
-    public AdminNightRequest createPendingRequest(String userId, String userEmail, AdminNightCreateCommand command) {
+    public AdminNightRequest createPendingRequest(
+            String userId, String userEmail, AdminNightCreateCommand command) {
         return AdminNightRequest.builder()
                 .userId(userId)
                 .requesterName(normalizeText(command.requesterName(), "실명을 입력해주세요."))
@@ -23,7 +24,8 @@ public class AdminNightRequestDraftService {
                 .build();
     }
 
-    public void applyResubmission(AdminNightRequest request, String userEmail, AdminNightCreateCommand command) {
+    public void applyResubmission(
+            AdminNightRequest request, String userEmail, AdminNightCreateCommand command) {
         request.setRequesterName(normalizeText(command.requesterName(), "실명을 입력해주세요."));
         request.setRequesterEmail(userEmail);
         request.setTaskTitle(normalizeText(command.taskTitle(), "끝낼 일을 적어주세요."));
@@ -44,7 +46,8 @@ public class AdminNightRequestDraftService {
         return normalizeOptionalText(reviewNote);
     }
 
-    private AdminNightRequest.SlotInfo requireSlot(AdminNightRequest.SlotInfo slot, String message) {
+    private AdminNightRequest.SlotInfo requireSlot(
+            AdminNightRequest.SlotInfo slot, String message) {
         if (slot == null) {
             throw InvalidRequestException.invalidInput(message);
         }
@@ -68,7 +71,8 @@ public class AdminNightRequestDraftService {
                 .build();
     }
 
-    private AdminNightRequest.ParticipationMode requireParticipationMode(AdminNightRequest.ParticipationMode participationMode) {
+    private AdminNightRequest.ParticipationMode requireParticipationMode(
+            AdminNightRequest.ParticipationMode participationMode) {
         if (participationMode == null) {
             throw InvalidRequestException.invalidInput("온라인/오프라인 진행 방식을 골라주세요.");
         }

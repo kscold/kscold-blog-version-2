@@ -2,10 +2,9 @@ package com.kscold.blog.shared.application;
 
 import com.kscold.blog.shared.domain.model.TeamPrivateDoc;
 import com.kscold.blog.shared.domain.repository.TeamPrivateDocRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +17,9 @@ public class TeamPrivateService {
     }
 
     public TeamPrivateDoc upsert(String teamId, TeamPrivateDoc doc) {
-        teamPrivateDocRepository.findByTeamId(teamId).ifPresent(existing -> doc.setId(existing.getId()));
+        teamPrivateDocRepository
+                .findByTeamId(teamId)
+                .ifPresent(existing -> doc.setId(existing.getId()));
         doc.setTeamId(teamId);
         return teamPrivateDocRepository.save(doc);
     }

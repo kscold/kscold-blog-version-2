@@ -15,9 +15,10 @@ public class GitHubApplicationService implements GitHubUseCase {
 
     @Override
     public GitHubContributionResponse getContributions(String username, Integer year) {
-        var result = year != null
-                ? gitHubPort.fetchContributionDays(username, year)
-                : gitHubPort.fetchContributionDays(username);
+        var result =
+                year != null
+                        ? gitHubPort.fetchContributionDays(username, year)
+                        : gitHubPort.fetchContributionDays(username);
         return new GitHubContributionResponse(result.total(), result.days());
     }
 
@@ -26,11 +27,16 @@ public class GitHubApplicationService implements GitHubUseCase {
         var profile = gitHubPort.fetchProfile(username);
         var result = gitHubPort.fetchContributionDays(username);
         return new GitHubOverviewResponse(
-                profile.username(), profile.displayName(), profile.avatarUrl(),
-                profile.profileUrl(), profile.bio(), profile.followers(),
-                profile.following(), profile.publicRepos(),
-                result.total(), result.days(),
-                gitHubPort.fetchTopRepositories(username)
-        );
+                profile.username(),
+                profile.displayName(),
+                profile.avatarUrl(),
+                profile.profileUrl(),
+                profile.bio(),
+                profile.followers(),
+                profile.following(),
+                profile.publicRepos(),
+                result.total(),
+                result.days(),
+                gitHubPort.fetchTopRepositories(username));
     }
 }

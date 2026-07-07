@@ -1,8 +1,7 @@
 package com.kscold.blog.adminnight.adapter.in.web;
 
-import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
-
+import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,8 +13,7 @@ record SlotResponse(
         String weekday,
         String timeLabel,
         String focus,
-        String badgeLabel
-) {}
+        String badgeLabel) {}
 
 record RequestResponse(
         String id,
@@ -31,8 +29,7 @@ record RequestResponse(
         String reviewNote,
         String decidedByName,
         LocalDateTime decidedAt,
-        LocalDateTime createdAt
-) {}
+        LocalDateTime createdAt) {}
 
 record CalendarEntryResponse(
         String id,
@@ -40,8 +37,7 @@ record CalendarEntryResponse(
         String taskTitle,
         AdminNightRequest.ParticipationMode participationMode,
         SlotResponse scheduledSlot,
-        LocalDateTime createdAt
-) {}
+        LocalDateTime createdAt) {}
 
 record ProgramVoteResponse(
         String id,
@@ -63,8 +59,7 @@ record ProgramVoteResponse(
         String desiredTakeaways,
         String message,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {}
+        LocalDateTime updatedAt) {}
 
 record ProgramVoteSummaryResponse(
         String programKey,
@@ -78,5 +73,4 @@ record ProgramVoteSummaryResponse(
         Map<String, Long> preferredDayCounts,
         Map<String, Long> preferredTimeCounts,
         Map<String, Long> interestedTopicCounts,
-        LocalDateTime updatedAt
-) {}
+        LocalDateTime updatedAt) {}

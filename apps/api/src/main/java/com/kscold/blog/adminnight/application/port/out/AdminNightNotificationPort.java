@@ -1,7 +1,7 @@
 package com.kscold.blog.adminnight.application.port.out;
 
-import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
+import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 
 public interface AdminNightNotificationPort {
 

@@ -38,37 +38,38 @@ public class GuestbookController {
     public ResponseEntity<ApiResponse<Page<GuestbookEntryResponse>>> getEntries(
             @AuthenticationPrincipal String userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<GuestbookEntry> entries = guestbookUseCase.getEntries(pageable);
         boolean isAdmin = hasAdminRole();
-        return ResponseEntity.ok(ApiResponse.success(entries.map(entry -> GuestbookEntryResponse.from(entry, userId, isAdmin))));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        entries.map(entry -> GuestbookEntryResponse.from(entry, userId, isAdmin))));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<GuestbookEntryResponse>> createEntry(
             @AuthenticationPrincipal String userId,
-            @Valid @RequestBody GuestbookEntryCreateCommand command
-    ) {
+            @Valid @RequestBody GuestbookEntryCreateCommand command) {
         GuestbookEntry entry = guestbookUseCase.create(command, userId);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(GuestbookEntryResponse.from(entry, userId, hasAdminRole()), "방명록이 작성되었습니다"));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.success(
+                                GuestbookEntryResponse.from(entry, userId, hasAdminRole()),
+                                "방명록이 작성되었습니다"));
     }
 
     @DeleteMapping("/{entryId}")
     public ResponseEntity<Void> deleteEntry(
-            @PathVariable String entryId,
-            @AuthenticationPrincipal String userId
-    ) {
+            @PathVariable String entryId, @AuthenticationPrincipal String userId) {
         guestbookUseCase.delete(entryId, userId);
         return ResponseEntity.noContent().build();
     }
 
     private boolean hasAdminRole() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth != null && auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return auth != null
+                && auth.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 }

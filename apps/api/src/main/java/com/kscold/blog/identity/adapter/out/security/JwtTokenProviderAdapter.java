@@ -4,10 +4,7 @@ import com.kscold.blog.identity.application.port.out.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-/**
- * TokenProvider 포트 구현체
- * 기존 JwtTokenProvider를 감싸는 어댑터
- */
+/** TokenProvider 포트 구현체 기존 JwtTokenProvider를 감싸는 어댑터 */
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProviderAdapter implements TokenProvider {

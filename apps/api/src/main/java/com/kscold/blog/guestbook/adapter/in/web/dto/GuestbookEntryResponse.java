@@ -2,12 +2,11 @@ package com.kscold.blog.guestbook.adapter.in.web.dto;
 
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import com.kscold.blog.identity.domain.model.User;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -22,9 +21,11 @@ public class GuestbookEntryResponse {
     private String content;
     private LocalDateTime createdAt;
 
-    public static GuestbookEntryResponse from(GuestbookEntry entry, String currentUserId, boolean currentUserIsAdmin) {
-        boolean canDelete = currentUserId != null
-                && (currentUserIsAdmin || currentUserId.equals(entry.getUserId()));
+    public static GuestbookEntryResponse from(
+            GuestbookEntry entry, String currentUserId, boolean currentUserIsAdmin) {
+        boolean canDelete =
+                currentUserId != null
+                        && (currentUserIsAdmin || currentUserId.equals(entry.getUserId()));
 
         return GuestbookEntryResponse.builder()
                 .id(entry.getId())

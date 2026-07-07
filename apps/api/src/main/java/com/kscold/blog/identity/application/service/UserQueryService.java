@@ -15,12 +15,19 @@ public class UserQueryService implements UserQueryPort {
 
     @Override
     public UserInfo getUserById(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> ResourceNotFoundException.user(userId));
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
         String avatar = user.getProfile() != null ? user.getProfile().getAvatar() : null;
 
-        return new UserInfo(user.getId(), user.getUsername(), user.getDisplayName(), avatar,
-                user.getRole() == User.Role.ADMIN, user.getEmail());
+        return new UserInfo(
+                user.getId(),
+                user.getUsername(),
+                user.getDisplayName(),
+                avatar,
+                user.getRole() == User.Role.ADMIN,
+                user.getEmail());
     }
 }

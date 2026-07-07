@@ -1,9 +1,6 @@
 package com.kscold.blog.exception;
 
-/**
- * 요청한 리소스를 찾을 수 없을 때 발생하는 예외
- * HTTP 404 Not Found 응답
- */
+/** 요청한 리소스를 찾을 수 없을 때 발생하는 예외 HTTP 404 Not Found 응답 */
 public class ResourceNotFoundException extends BusinessException {
 
     public ResourceNotFoundException(ErrorCode errorCode) {
@@ -16,78 +13,61 @@ public class ResourceNotFoundException extends BusinessException {
 
     public static ResourceNotFoundException user(String userId) {
         return new ResourceNotFoundException(
-            ErrorCode.USER_NOT_FOUND,
-            String.format("사용자를 찾을 수 없습니다 (ID: %s)", userId)
-        );
+                ErrorCode.USER_NOT_FOUND, String.format("사용자를 찾을 수 없습니다 (ID: %s)", userId));
     }
 
     public static ResourceNotFoundException post(String postId) {
         return new ResourceNotFoundException(
-            ErrorCode.POST_NOT_FOUND,
-            String.format("포스트를 찾을 수 없습니다 (ID: %s)", postId)
-        );
+                ErrorCode.POST_NOT_FOUND, String.format("포스트를 찾을 수 없습니다 (ID: %s)", postId));
     }
 
     public static ResourceNotFoundException postBySlug(String slug) {
         return new ResourceNotFoundException(
-            ErrorCode.POST_NOT_FOUND,
-            String.format("포스트를 찾을 수 없습니다 (Slug: %s)", slug)
-        );
+                ErrorCode.POST_NOT_FOUND, String.format("포스트를 찾을 수 없습니다 (Slug: %s)", slug));
     }
 
     public static ResourceNotFoundException category(String categoryId) {
         return new ResourceNotFoundException(
-            ErrorCode.CATEGORY_NOT_FOUND,
-            String.format("카테고리를 찾을 수 없습니다 (ID: %s)", categoryId)
-        );
+                ErrorCode.CATEGORY_NOT_FOUND,
+                String.format("카테고리를 찾을 수 없습니다 (ID: %s)", categoryId));
     }
 
     public static ResourceNotFoundException tag(String tagId) {
         return new ResourceNotFoundException(
-            ErrorCode.TAG_NOT_FOUND,
-            String.format("태그를 찾을 수 없습니다 (ID: %s)", tagId)
-        );
+                ErrorCode.TAG_NOT_FOUND, String.format("태그를 찾을 수 없습니다 (ID: %s)", tagId));
     }
 
     public static ResourceNotFoundException feed(String feedId) {
         return new ResourceNotFoundException(
-            ErrorCode.FEED_NOT_FOUND,
-            String.format("피드를 찾을 수 없습니다 (ID: %s)", feedId)
-        );
+                ErrorCode.FEED_NOT_FOUND, String.format("피드를 찾을 수 없습니다 (ID: %s)", feedId));
     }
 
     public static ResourceNotFoundException feedComment(String commentId) {
         return new ResourceNotFoundException(
-            ErrorCode.FEED_COMMENT_NOT_FOUND,
-            String.format("댓글을 찾을 수 없습니다 (ID: %s)", commentId)
-        );
+                ErrorCode.FEED_COMMENT_NOT_FOUND,
+                String.format("댓글을 찾을 수 없습니다 (ID: %s)", commentId));
     }
 
     public static ResourceNotFoundException vaultNote(String noteId) {
         return new ResourceNotFoundException(
-            ErrorCode.VAULT_NOTE_NOT_FOUND,
-            String.format("노트를 찾을 수 없습니다 (ID: %s)", noteId)
-        );
+                ErrorCode.VAULT_NOTE_NOT_FOUND, String.format("노트를 찾을 수 없습니다 (ID: %s)", noteId));
     }
 
     public static ResourceNotFoundException vaultFolder(String folderId) {
         return new ResourceNotFoundException(
-            ErrorCode.VAULT_FOLDER_NOT_FOUND,
-            String.format("폴더를 찾을 수 없습니다 (ID: %s)", folderId)
-        );
+                ErrorCode.VAULT_FOLDER_NOT_FOUND,
+                String.format("폴더를 찾을 수 없습니다 (ID: %s)", folderId));
     }
 
     public static ResourceNotFoundException vaultComment(String commentId) {
         return new ResourceNotFoundException(
-            ErrorCode.VAULT_COMMENT_NOT_FOUND,
-            String.format("댓글을 찾을 수 없습니다 (ID: %s)", commentId)
-        );
+                ErrorCode.VAULT_COMMENT_NOT_FOUND,
+                String.format("댓글을 찾을 수 없습니다 (ID: %s)", commentId));
     }
 
     public static ResourceNotFoundException guestbookEntry(String entryId) {
         return new ResourceNotFoundException(
-            ErrorCode.GUESTBOOK_ENTRY_NOT_FOUND,
-            String.format("방명록을 찾을 수 없습니다 (ID: %s)", entryId)
-        );
+                ErrorCode.GUESTBOOK_ENTRY_NOT_FOUND,
+                String.format("방명록을 찾을 수 없습니다 (ID: %s)", entryId));
     }
 }

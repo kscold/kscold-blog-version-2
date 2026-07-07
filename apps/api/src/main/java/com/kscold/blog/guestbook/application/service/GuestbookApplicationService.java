@@ -34,12 +34,13 @@ public class GuestbookApplicationService implements GuestbookUseCase {
     public GuestbookEntry create(GuestbookEntryCreateCommand command, String userId) {
         User user = getAuthenticatedUser(userId);
 
-        GuestbookEntry entry = GuestbookEntry.builder()
-                .authorName(user.getDisplayName())
-                .userId(user.getId())
-                .authorRole(user.getRole())
-                .content(command.getContent())
-                .build();
+        GuestbookEntry entry =
+                GuestbookEntry.builder()
+                        .authorName(user.getDisplayName())
+                        .userId(user.getId())
+                        .authorRole(user.getRole())
+                        .content(command.getContent())
+                        .build();
 
         return guestbookRepository.save(entry);
     }
@@ -49,10 +50,13 @@ public class GuestbookApplicationService implements GuestbookUseCase {
     public void delete(String entryId, String currentUserId) {
         User user = getAuthenticatedUser(currentUserId);
 
-        GuestbookEntry entry = guestbookRepository.findById(entryId)
-                .orElseThrow(() -> ResourceNotFoundException.guestbookEntry(entryId));
+        GuestbookEntry entry =
+                guestbookRepository
+                        .findById(entryId)
+                        .orElseThrow(() -> ResourceNotFoundException.guestbookEntry(entryId));
 
-        boolean canDelete = user.getRole() == User.Role.ADMIN || user.getId().equals(entry.getUserId());
+        boolean canDelete =
+                user.getRole() == User.Role.ADMIN || user.getId().equals(entry.getUserId());
         if (!canDelete) {
             throw InvalidRequestException.invalidInput("본인이 작성한 방명록만 삭제할 수 있습니다");
         }
@@ -65,7 +69,8 @@ public class GuestbookApplicationService implements GuestbookUseCase {
             throw InvalidRequestException.invalidInput("로그인이 필요합니다");
         }
 
-        return userRepository.findById(userId)
+        return userRepository
+                .findById(userId)
                 .orElseThrow(() -> ResourceNotFoundException.user(userId));
     }
 }

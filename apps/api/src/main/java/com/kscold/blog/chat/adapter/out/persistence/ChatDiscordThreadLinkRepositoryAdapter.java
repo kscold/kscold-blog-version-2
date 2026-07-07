@@ -2,10 +2,9 @@ package com.kscold.blog.chat.adapter.out.persistence;
 
 import com.kscold.blog.chat.domain.model.ChatDiscordThreadLink;
 import com.kscold.blog.chat.domain.port.out.ChatDiscordThreadLinkRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor

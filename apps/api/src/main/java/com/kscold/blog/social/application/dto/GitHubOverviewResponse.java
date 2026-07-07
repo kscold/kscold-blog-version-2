@@ -13,6 +13,4 @@ public record GitHubOverviewResponse(
         int publicRepos,
         int totalContributions,
         List<GitHubContributionDay> days,
-        List<GitHubRepositorySummary> topRepositories
-) {
-}
+        List<GitHubRepositorySummary> topRepositories) {}

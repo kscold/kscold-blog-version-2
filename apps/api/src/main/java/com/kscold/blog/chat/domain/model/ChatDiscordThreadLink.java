@@ -1,5 +1,6 @@
 package com.kscold.blog.chat.domain.model;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,8 +12,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
@@ -21,8 +20,7 @@ import java.time.LocalDateTime;
 @Document(collection = "chat_discord_thread_links")
 public class ChatDiscordThreadLink {
 
-    @Id
-    private String id;
+    @Id private String id;
 
     @Indexed(unique = true)
     private String roomId;
@@ -32,9 +30,7 @@ public class ChatDiscordThreadLink {
 
     private String visitorName;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    @LastModifiedDate private LocalDateTime updatedAt;
 }

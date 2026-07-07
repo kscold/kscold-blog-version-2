@@ -6,11 +6,10 @@ import com.kscold.blog.media.application.dto.AdminStorageListing;
 import com.kscold.blog.media.application.dto.AdminStorageObjectResource;
 import com.kscold.blog.media.application.port.in.AdminStorageUseCase;
 import com.kscold.blog.media.domain.port.out.AdminStoragePort;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +34,10 @@ public class AdminStorageApplicationService implements AdminStorageUseCase {
 
     @Override
     public AdminStorageListing uploadFiles(String prefix, List<MultipartFile> files) {
-        List<MultipartFile> validFiles = files == null
-                ? List.of()
-                : files.stream().filter(file -> file != null && !file.isEmpty()).toList();
+        List<MultipartFile> validFiles =
+                files == null
+                        ? List.of()
+                        : files.stream().filter(file -> file != null && !file.isEmpty()).toList();
 
         if (validFiles.isEmpty()) {
             throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "업로드할 파일을 선택해주세요.");
@@ -54,9 +54,7 @@ public class AdminStorageApplicationService implements AdminStorageUseCase {
         }
 
         int deletedKeys = adminStoragePort.deleteEntry(key);
-        return adminStoragePort.list(prefix).toBuilder()
-                .deletedKeys(deletedKeys)
-                .build();
+        return adminStoragePort.list(prefix).toBuilder().deletedKeys(deletedKeys).build();
     }
 
     @Override

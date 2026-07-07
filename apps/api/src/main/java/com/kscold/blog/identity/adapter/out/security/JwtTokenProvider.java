@@ -7,17 +7,16 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import jakarta.annotation.PostConstruct;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Date;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Date;
 
 @Slf4j
 @Component
@@ -119,11 +118,7 @@ public class JwtTokenProvider {
     }
 
     private Claims parseClaims(String token, SecretKey key) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
     }
 
     private SecretKey toSecretKey(String value) {
@@ -134,9 +129,6 @@ public class JwtTokenProvider {
             keyBytes = value.getBytes(StandardCharsets.UTF_8);
         }
 
-        return new SecretKeySpec(
-                keyBytes,
-                Jwts.SIG.HS256.key().build().getAlgorithm()
-        );
+        return new SecretKeySpec(keyBytes, Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 }

@@ -2,12 +2,11 @@ package com.kscold.blog.guestbook.adapter.out.persistence;
 
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import com.kscold.blog.guestbook.domain.port.out.GuestbookRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @SuppressWarnings("null")
 @Component

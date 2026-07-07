@@ -2,7 +2,6 @@ package com.kscold.blog.social.domain.port.out;
 
 import com.kscold.blog.social.application.dto.GitHubContributionDay;
 import com.kscold.blog.social.application.dto.GitHubRepositorySummary;
-
 import java.util.List;
 
 public interface GitHubPort {
@@ -25,7 +24,5 @@ public interface GitHubPort {
             String bio,
             int followers,
             int following,
-            int publicRepos
-    ) {
-    }
+            int publicRepos) {}
 }

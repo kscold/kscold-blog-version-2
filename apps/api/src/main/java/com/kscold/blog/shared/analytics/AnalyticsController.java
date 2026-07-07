@@ -5,14 +5,13 @@ import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -29,8 +28,7 @@ public class AnalyticsController {
     public ResponseEntity<ApiResponse<Void>> trackPageVisit(
             @RequestBody PageVisitRequest body,
             @AuthenticationPrincipal String userId,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
         String normalized = normalize(body.path());
         if (!pageExistenceChecker.exists(normalized)) {
             return ResponseEntity.ok(ApiResponse.success(null));
@@ -48,8 +46,7 @@ public class AnalyticsController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<PageVisitService.PathStat>>> topPaths(
             @RequestParam(defaultValue = "7") int days,
-            @RequestParam(defaultValue = "20") int limit
-    ) {
+            @RequestParam(defaultValue = "20") int limit) {
         return ResponseEntity.ok(ApiResponse.success(pageVisitService.topPaths(days, limit)));
     }
 
@@ -57,13 +54,13 @@ public class AnalyticsController {
     @GetMapping("/admin/analytics/daily-visits")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<PageVisitService.DailyStat>>> dailyVisits(
-            @RequestParam(defaultValue = "30") int days
-    ) {
+            @RequestParam(defaultValue = "30") int days) {
         return ResponseEntity.ok(ApiResponse.success(pageVisitService.dailyVisits(days)));
     }
 
     /**
      * 어드민: 최근 방문 히스토리.
+     *
      * @param path 선택적 경로 필터
      * @param loggedInOnly 로그인 유저만 필터링 (기본 true)
      */
@@ -72,10 +69,9 @@ public class AnalyticsController {
     public ResponseEntity<ApiResponse<List<PageVisitService.VisitEntry>>> visitHistory(
             @RequestParam(required = false) String path,
             @RequestParam(defaultValue = "true") boolean loggedInOnly,
-            @RequestParam(defaultValue = "50") int limit
-    ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                pageVisitService.recentVisits(path, loggedInOnly, limit)));
+            @RequestParam(defaultValue = "50") int limit) {
+        return ResponseEntity.ok(
+                ApiResponse.success(pageVisitService.recentVisits(path, loggedInOnly, limit)));
     }
 
     private String resolveUserId(String raw) {

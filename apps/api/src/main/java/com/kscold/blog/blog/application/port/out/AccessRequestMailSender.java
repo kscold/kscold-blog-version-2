@@ -7,5 +7,6 @@ public interface AccessRequestMailSender {
 
     boolean isAvailable();
 
-    void sendApproved(@Nullable String toEmail, @Nullable String displayName, AccessRequest request);
+    void sendApproved(
+            @Nullable String toEmail, @Nullable String displayName, AccessRequest request);
 }

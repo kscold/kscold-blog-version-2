@@ -11,15 +11,15 @@ import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,12 +45,12 @@ public class FeedController {
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) String tag,
             @AuthenticationPrincipal String userId,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Feed> feeds = (tag != null && !tag.isBlank())
-                ? feedUseCase.getPublicFeedsByTag(tag, pageable)
-                : feedUseCase.getPublicFeeds(pageable);
+        Page<Feed> feeds =
+                (tag != null && !tag.isBlank())
+                        ? feedUseCase.getPublicFeedsByTag(tag, pageable)
+                        : feedUseCase.getPublicFeeds(pageable);
         String identifier = resolveIdentifier(userId, request);
         return ResponseEntity.ok(ApiResponse.success(toResponsePage(feeds, identifier)));
     }
@@ -64,8 +64,7 @@ public class FeedController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Page<FeedResponse>>> getAllFeeds(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size
-    ) {
+            @RequestParam(defaultValue = "12") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Feed> feeds = feedUseCase.getAllFeeds(pageable);
         return ResponseEntity.ok(ApiResponse.success(toResponsePage(feeds, null)));
@@ -75,8 +74,7 @@ public class FeedController {
     public ResponseEntity<ApiResponse<FeedResponse>> getFeedById(
             @PathVariable String id,
             @AuthenticationPrincipal String userId,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
         Feed feed = feedUseCase.getById(id);
         String identifier = resolveIdentifier(userId, request);
         if (viewCounter.incrementIfUnique("feeds", feed.getId(), "FEED", identifier)) {
@@ -87,12 +85,9 @@ public class FeedController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<FeedResponse>> createFeed(
-            @Valid @RequestBody FeedCreateCommand command,
-            @AuthenticationPrincipal String userId
-    ) {
+            @Valid @RequestBody FeedCreateCommand command, @AuthenticationPrincipal String userId) {
         Feed feed = feedUseCase.create(command, userId);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(toResponse(feed, userId), "피드가 생성되었습니다"));
     }
 
@@ -100,8 +95,7 @@ public class FeedController {
     public ResponseEntity<ApiResponse<FeedResponse>> updateFeed(
             @PathVariable String id,
             @Valid @RequestBody FeedUpdateCommand command,
-            @AuthenticationPrincipal String userId
-    ) {
+            @AuthenticationPrincipal String userId) {
         feedUseCase.validateOwnership(id, userId, hasAdminRole());
         Feed feed = feedUseCase.update(id, command);
         return ResponseEntity.ok(ApiResponse.success(toResponse(feed, userId), "피드가 수정되었습니다"));
@@ -109,9 +103,7 @@ public class FeedController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFeed(
-            @PathVariable String id,
-            @AuthenticationPrincipal String userId
-    ) {
+            @PathVariable String id, @AuthenticationPrincipal String userId) {
         feedUseCase.validateOwnership(id, userId, hasAdminRole());
         feedUseCase.delete(id);
         return ResponseEntity.noContent().build();
@@ -119,16 +111,16 @@ public class FeedController {
 
     private boolean hasAdminRole() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth != null && auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return auth != null
+                && auth.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     @PostMapping("/{id}/like")
     public ResponseEntity<ApiResponse<FeedResponse>> toggleLike(
             @PathVariable String id,
             @AuthenticationPrincipal String userId,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
         String identifier = resolveIdentifier(userId, request);
         Feed feed = feedUseCase.toggleLike(id, identifier);
         return ResponseEntity.ok(ApiResponse.success(toResponse(feed, identifier)));
@@ -164,10 +156,11 @@ public class FeedController {
                 authors.put(authorId, lookupAuthor(authorId));
             }
         }
-        return feeds.map(feed -> {
-            String authorId = feed.getAuthor() != null ? feed.getAuthor().getId() : null;
-            return FeedResponse.from(feed, identifier, authorId != null ? authors.get(authorId) : null);
-        });
+        return feeds.map(
+                feed -> {
+                    String authorId = feed.getAuthor() != null ? feed.getAuthor().getId() : null;
+                    return FeedResponse.from(
+                            feed, identifier, authorId != null ? authors.get(authorId) : null);
+                });
     }
-
 }

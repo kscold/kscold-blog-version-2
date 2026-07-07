@@ -1,5 +1,7 @@
 package com.kscold.blog.vault.agent;
 
+import static com.kscold.blog.vault.agent.VaultAgentDtos.AgentRunResponse;
+
 import com.kscold.blog.shared.web.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.kscold.blog.vault.agent.VaultAgentDtos.AgentRunResponse;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/vault/agent")
@@ -25,13 +25,12 @@ public class VaultAgentGovernanceController {
     @GetMapping("/runs")
     public ResponseEntity<ApiResponse<Page<AgentRunResponse>>> getRuns(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        var pageable = PageRequest.of(
-                Math.max(page, 0),
-                Math.min(Math.max(size, 1), 50),
-                Sort.by(Sort.Direction.DESC, "createdAt")
-        );
+            @RequestParam(defaultValue = "10") int size) {
+        var pageable =
+                PageRequest.of(
+                        Math.max(page, 0),
+                        Math.min(Math.max(size, 1), 50),
+                        Sort.by(Sort.Direction.DESC, "createdAt"));
         return ResponseEntity.ok(ApiResponse.success(governanceService.getRuns(pageable)));
     }
 }

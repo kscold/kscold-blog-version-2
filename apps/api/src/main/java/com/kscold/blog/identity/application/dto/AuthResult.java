@@ -1,13 +1,12 @@
 package com.kscold.blog.identity.application.dto;
 
 import com.kscold.blog.identity.domain.model.User;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Builder

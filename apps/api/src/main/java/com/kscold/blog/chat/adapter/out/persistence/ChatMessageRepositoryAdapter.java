@@ -2,6 +2,15 @@ package com.kscold.blog.chat.adapter.out.persistence;
 
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.domain.Page;
@@ -14,16 +23,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -58,97 +57,124 @@ public class ChatMessageRepositoryAdapter implements ChatMessageRepository {
 
     @Override
     public void markAdminMessagesRead(String roomId, LocalDateTime readAt) {
-        Query query = Query.query(new Criteria().andOperator(
-                Criteria.where("roomId").is(roomId),
-                Criteria.where("type").is("TEXT"),
-                Criteria.where("fromAdmin").is(true),
-                Criteria.where("visitorReadAt").is(null)
-        ));
+        Query query =
+                Query.query(
+                        new Criteria()
+                                .andOperator(
+                                        Criteria.where("roomId").is(roomId),
+                                        Criteria.where("type").is("TEXT"),
+                                        Criteria.where("fromAdmin").is(true),
+                                        Criteria.where("visitorReadAt").is(null)));
 
-        mongoTemplate.updateMulti(query, new Update().set("visitorReadAt", readAt), ChatMessage.class);
+        mongoTemplate.updateMulti(
+                query, new Update().set("visitorReadAt", readAt), ChatMessage.class);
     }
 
     @Override
     public List<PendingAdminReminder> findPendingAdminReminders(LocalDateTime unreadBefore) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(new Criteria().andOperator(
-                        Criteria.where("type").is("TEXT"),
-                        Criteria.where("fromAdmin").is(true),
-                        Criteria.where("visitorReadAt").is(null),
-                        Criteria.where("reminderSentAt").is(null),
-                        Criteria.where("timestamp").lte(unreadBefore)
-                )),
-                Aggregation.sort(Sort.Direction.DESC, "timestamp"),
-                Aggregation.group("roomId")
-                        .first("username").as("adminName")
-                        .first("content").as("latestContent")
-                        .first("timestamp").as("latestTimestamp")
-                        .count().as("unreadCount")
-        );
+        Aggregation aggregation =
+                Aggregation.newAggregation(
+                        Aggregation.match(
+                                new Criteria()
+                                        .andOperator(
+                                                Criteria.where("type").is("TEXT"),
+                                                Criteria.where("fromAdmin").is(true),
+                                                Criteria.where("visitorReadAt").is(null),
+                                                Criteria.where("reminderSentAt").is(null),
+                                                Criteria.where("timestamp").lte(unreadBefore))),
+                        Aggregation.sort(Sort.Direction.DESC, "timestamp"),
+                        Aggregation.group("roomId")
+                                .first("username")
+                                .as("adminName")
+                                .first("content")
+                                .as("latestContent")
+                                .first("timestamp")
+                                .as("latestTimestamp")
+                                .count()
+                                .as("unreadCount"));
 
-        return mongoTemplate.aggregate(aggregation, "chat_messages", Document.class)
-                .getMappedResults().stream()
-                .map(doc -> new PendingAdminReminder(
-                        doc.getString("_id"),
-                        doc.getString("adminName"),
-                        doc.getString("latestContent"),
-                        toLocalDateTime(doc.get("latestTimestamp")),
-                        toLong(doc.get("unreadCount"))
-                ))
+        return mongoTemplate
+                .aggregate(aggregation, "chat_messages", Document.class)
+                .getMappedResults()
+                .stream()
+                .map(
+                        doc ->
+                                new PendingAdminReminder(
+                                        doc.getString("_id"),
+                                        doc.getString("adminName"),
+                                        doc.getString("latestContent"),
+                                        toLocalDateTime(doc.get("latestTimestamp")),
+                                        toLong(doc.get("unreadCount"))))
                 .toList();
     }
 
     @Override
     public void markReminderSent(String roomId, LocalDateTime unreadBefore, LocalDateTime sentAt) {
-        Query query = Query.query(new Criteria().andOperator(
-                Criteria.where("roomId").is(roomId),
-                Criteria.where("type").is("TEXT"),
-                Criteria.where("fromAdmin").is(true),
-                Criteria.where("visitorReadAt").is(null),
-                Criteria.where("reminderSentAt").is(null),
-                Criteria.where("timestamp").lte(unreadBefore)
-        ));
+        Query query =
+                Query.query(
+                        new Criteria()
+                                .andOperator(
+                                        Criteria.where("roomId").is(roomId),
+                                        Criteria.where("type").is("TEXT"),
+                                        Criteria.where("fromAdmin").is(true),
+                                        Criteria.where("visitorReadAt").is(null),
+                                        Criteria.where("reminderSentAt").is(null),
+                                        Criteria.where("timestamp").lte(unreadBefore)));
 
-        mongoTemplate.updateMulti(query, new Update().set("reminderSentAt", sentAt), ChatMessage.class);
+        mongoTemplate.updateMulti(
+                query, new Update().set("reminderSentAt", sentAt), ChatMessage.class);
     }
 
     @Override
     public List<ChatRoomSummary> findAllRooms() {
-        Aggregation roomAgg = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("type").is("TEXT")),
-                Aggregation.sort(Sort.Direction.DESC, "timestamp"),
-                Aggregation.group("roomId")
-                        .first("username").as("latestUsername")
-                        .first("content").as("lastMessage")
-                        .first("timestamp").as("lastTimestamp")
-                        .count().as("messageCount"),
-                Aggregation.sort(Sort.Direction.DESC, "lastTimestamp")
-        );
+        Aggregation roomAgg =
+                Aggregation.newAggregation(
+                        Aggregation.match(Criteria.where("type").is("TEXT")),
+                        Aggregation.sort(Sort.Direction.DESC, "timestamp"),
+                        Aggregation.group("roomId")
+                                .first("username")
+                                .as("latestUsername")
+                                .first("content")
+                                .as("lastMessage")
+                                .first("timestamp")
+                                .as("lastTimestamp")
+                                .count()
+                                .as("messageCount"),
+                        Aggregation.sort(Sort.Direction.DESC, "lastTimestamp"));
 
-        Aggregation visitorAgg = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("type").is("TEXT").and("fromAdmin").is(false)),
-                Aggregation.sort(Sort.Direction.DESC, "timestamp"),
-                Aggregation.group("roomId")
-                        .first("username").as("username")
-        );
+        Aggregation visitorAgg =
+                Aggregation.newAggregation(
+                        Aggregation.match(
+                                Criteria.where("type").is("TEXT").and("fromAdmin").is(false)),
+                        Aggregation.sort(Sort.Direction.DESC, "timestamp"),
+                        Aggregation.group("roomId").first("username").as("username"));
 
         Map<String, String> visitorUsernames = new LinkedHashMap<>();
-        mongoTemplate.aggregate(visitorAgg, "chat_messages", Document.class)
+        mongoTemplate
+                .aggregate(visitorAgg, "chat_messages", Document.class)
                 .getMappedResults()
-                .forEach(doc -> visitorUsernames.put(doc.getString("_id"), doc.getString("username")));
+                .forEach(
+                        doc ->
+                                visitorUsernames.put(
+                                        doc.getString("_id"), doc.getString("username")));
 
-        return mongoTemplate.aggregate(roomAgg, "chat_messages", Document.class)
-                .getMappedResults().stream()
-                .map(doc -> {
-                    String roomId = doc.getString("_id");
-                    return new ChatRoomSummary(
-                            roomId,
-                            visitorUsernames.getOrDefault(roomId, doc.getString("latestUsername")),
-                            doc.getString("lastMessage"),
-                            doc.get("lastTimestamp") != null ? doc.get("lastTimestamp").toString() : "",
-                            doc.getInteger("messageCount", 0)
-                    );
-                })
+        return mongoTemplate
+                .aggregate(roomAgg, "chat_messages", Document.class)
+                .getMappedResults()
+                .stream()
+                .map(
+                        doc -> {
+                            String roomId = doc.getString("_id");
+                            return new ChatRoomSummary(
+                                    roomId,
+                                    visitorUsernames.getOrDefault(
+                                            roomId, doc.getString("latestUsername")),
+                                    doc.getString("lastMessage"),
+                                    doc.get("lastTimestamp") != null
+                                            ? doc.get("lastTimestamp").toString()
+                                            : "",
+                                    doc.getInteger("messageCount", 0));
+                        })
                 .toList();
     }
 

@@ -1,11 +1,11 @@
 package com.kscold.blog.adminnight.adapter.out.persistence;
 
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
+import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
-
-public interface MongoAdminNightRequestRepository extends MongoRepository<AdminNightRequest, String> {
+public interface MongoAdminNightRequestRepository
+        extends MongoRepository<AdminNightRequest, String> {
 
     List<AdminNightRequest> findByUserIdOrderByCreatedAtDesc(String userId);
 

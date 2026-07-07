@@ -1,15 +1,14 @@
 package com.kscold.blog.media.domain.model;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,8 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Document(collection = "media")
 public class Media {
-    @Id
-    private String id;
+    @Id private String id;
 
     private String originalFilename;
     private String savedFilename;
@@ -30,8 +28,7 @@ public class Media {
 
     private UploaderInfo uploader;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 
     @Getter
     @Setter

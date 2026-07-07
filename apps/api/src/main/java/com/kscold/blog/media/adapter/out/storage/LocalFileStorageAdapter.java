@@ -3,17 +3,16 @@ package com.kscold.blog.media.adapter.out.storage;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.media.domain.port.out.FileStoragePort;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Component
@@ -41,9 +40,7 @@ public class LocalFileStorageAdapter implements FileStoragePort {
         } catch (IOException e) {
             log.error("Failed to store file", e);
             throw new InvalidRequestException(
-                    ErrorCode.INVALID_INPUT_VALUE,
-                    "파일 업로드에 실패했습니다: " + e.getMessage()
-            );
+                    ErrorCode.INVALID_INPUT_VALUE, "파일 업로드에 실패했습니다: " + e.getMessage());
         }
     }
 
@@ -66,9 +63,7 @@ public class LocalFileStorageAdapter implements FileStoragePort {
         } catch (IOException e) {
             log.error("Failed to delete file: {}", fileUrl, e);
             throw new InvalidRequestException(
-                    ErrorCode.INVALID_INPUT_VALUE,
-                    "파일 삭제에 실패했습니다: " + e.getMessage()
-            );
+                    ErrorCode.INVALID_INPUT_VALUE, "파일 삭제에 실패했습니다: " + e.getMessage());
         }
     }
 

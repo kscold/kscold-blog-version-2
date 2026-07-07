@@ -3,14 +3,13 @@ package com.kscold.blog.blog.adapter.in.web;
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import com.kscold.blog.shared.web.ApiResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,10 +20,9 @@ public class AccessRequestController {
     // 유저: 접근 요청
     @PostMapping("/api/access-requests")
     public ResponseEntity<ApiResponse<AccessRequest>> requestAccess(
-            @AuthenticationPrincipal String userId,
-            @RequestBody AccessRequestBody body
-    ) {
-        AccessRequest request = accessRequestUseCase.requestAccess(userId, body.postId(), body.message());
+            @AuthenticationPrincipal String userId, @RequestBody AccessRequestBody body) {
+        AccessRequest request =
+                accessRequestUseCase.requestAccess(userId, body.postId(), body.message());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(request, "접근 요청이 등록되었습니다"));
     }
@@ -32,8 +30,7 @@ public class AccessRequestController {
     // 유저: 내 요청 목록
     @GetMapping("/api/access-requests/me")
     public ResponseEntity<ApiResponse<List<AccessRequest>>> getMyRequests(
-            @AuthenticationPrincipal String userId
-    ) {
+            @AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.getMyRequests(userId)));
     }
 
@@ -42,11 +39,11 @@ public class AccessRequestController {
     public ResponseEntity<ApiResponse<Boolean>> checkAccess(
             @AuthenticationPrincipal String userId,
             @PathVariable String categoryId,
-            @RequestParam(required = false) String postId
-    ) {
-        boolean hasAccess = postId != null
-                ? accessRequestUseCase.hasAccess(userId, postId, categoryId)
-                : accessRequestUseCase.hasAccess(userId, categoryId);
+            @RequestParam(required = false) String postId) {
+        boolean hasAccess =
+                postId != null
+                        ? accessRequestUseCase.hasAccess(userId, postId, categoryId)
+                        : accessRequestUseCase.hasAccess(userId, categoryId);
         return ResponseEntity.ok(ApiResponse.success(hasAccess));
     }
 
@@ -61,11 +58,10 @@ public class AccessRequestController {
     @PutMapping("/api/admin/access-requests/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<AccessRequest>> approve(
-            @PathVariable String id,
-            @RequestBody(required = false) ApproveAccessRequestBody body
-    ) {
+            @PathVariable String id, @RequestBody(required = false) ApproveAccessRequestBody body) {
         AccessRequest.GrantScope grantScope = body != null ? body.grantScope() : null;
-        return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.approve(id, grantScope), "승인되었습니다"));
+        return ResponseEntity.ok(
+                ApiResponse.success(accessRequestUseCase.approve(id, grantScope), "승인되었습니다"));
     }
 
     // 어드민: 거절

@@ -18,18 +18,17 @@ import com.kscold.blog.identity.domain.model.PasswordResetToken;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -55,15 +54,20 @@ public class AuthApplicationService implements AuthUseCase {
 
         boolean isFirstUser = userRepository.count() == 0;
 
-        User user = User.builder()
-                .email(command.getEmail())
-                .username(command.getUsername())
-                .password(passwordEncoder.encode(command.getPassword()))
-                .role(isFirstUser ? User.Role.ADMIN : User.Role.USER)
-                .profile(User.Profile.builder()
-                        .displayName(command.getDisplayName() != null ? command.getDisplayName() : command.getUsername())
-                        .build())
-                .build();
+        User user =
+                User.builder()
+                        .email(command.getEmail())
+                        .username(command.getUsername())
+                        .password(passwordEncoder.encode(command.getPassword()))
+                        .role(isFirstUser ? User.Role.ADMIN : User.Role.USER)
+                        .profile(
+                                User.Profile.builder()
+                                        .displayName(
+                                                command.getDisplayName() != null
+                                                        ? command.getDisplayName()
+                                                        : command.getUsername())
+                                        .build())
+                        .build();
 
         user = userRepository.save(user);
         sendWelcomeMailSafely(user);
@@ -75,8 +79,13 @@ public class AuthApplicationService implements AuthUseCase {
     }
 
     public AuthResult login(LoginCommand command) {
-        User user = userRepository.findByEmail(command.getEmail())
-                .orElseThrow(() -> InvalidRequestException.invalidInput("이메일 또는 비밀번호가 올바르지 않습니다"));
+        User user =
+                userRepository
+                        .findByEmail(command.getEmail())
+                        .orElseThrow(
+                                () ->
+                                        InvalidRequestException.invalidInput(
+                                                "이메일 또는 비밀번호가 올바르지 않습니다"));
 
         if (user.isDeleted()) {
             throw InvalidRequestException.invalidInput("비활성화된 계정입니다. 관리자에게 문의하세요");
@@ -99,18 +108,24 @@ public class AuthApplicationService implements AuthUseCase {
 
         String userId = tokenProvider.getUserIdFromRefreshToken(refreshToken);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> ResourceNotFoundException.user(userId));
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
-        String newAccessToken = tokenProvider.createAccessToken(user.getId(), user.getRole().name());
-        String newRefreshToken = tokenProvider.createRefreshToken(user.getId(), user.getRole().name());
+        String newAccessToken =
+                tokenProvider.createAccessToken(user.getId(), user.getRole().name());
+        String newRefreshToken =
+                tokenProvider.createRefreshToken(user.getId(), user.getRole().name());
 
         return buildAuthResult(user, newAccessToken, newRefreshToken);
     }
 
     public AuthResult.UserInfo getMe(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> ResourceNotFoundException.user(userId));
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
         return AuthResult.UserInfo.from(user);
     }
@@ -119,16 +134,22 @@ public class AuthApplicationService implements AuthUseCase {
     public void sendUsernameReminder(String email) {
         ensureRecoveryMailConfigured();
 
-        userRepository.findByEmail(normalizeEmail(email))
-                .ifPresent(user -> recoveryMailSender.send(recoveryEmailComposer.buildUsernameReminder(user)));
+        userRepository
+                .findByEmail(normalizeEmail(email))
+                .ifPresent(
+                        user ->
+                                recoveryMailSender.send(
+                                        recoveryEmailComposer.buildUsernameReminder(user)));
     }
 
     @Override
     public void requestPasswordReset(String email) {
         ensureRecoveryMailConfigured();
 
-        User user = userRepository.findByEmail(normalizeEmail(email))
-                .orElseThrow(() -> InvalidRequestException.invalidInput("가입되지 않은 이메일입니다."));
+        User user =
+                userRepository
+                        .findByEmail(normalizeEmail(email))
+                        .orElseThrow(() -> InvalidRequestException.invalidInput("가입되지 않은 이메일입니다."));
         sendPasswordResetMail(user);
     }
 
@@ -138,10 +159,15 @@ public class AuthApplicationService implements AuthUseCase {
             return new PasswordResetTokenStatus(false, "재설정 링크를 다시 확인해주세요.", null);
         }
 
-        return passwordResetTokenRepository.findByTokenHash(hashToken(token))
+        return passwordResetTokenRepository
+                .findByTokenHash(hashToken(token))
                 .filter(savedToken -> !savedToken.isExpired(Instant.now()))
-                .map(savedToken -> new PasswordResetTokenStatus(true, "유효한 재설정 링크입니다.", savedToken.getExpiresAt()))
-                .orElseGet(() -> new PasswordResetTokenStatus(false, "만료되었거나 유효하지 않은 링크입니다.", null));
+                .map(
+                        savedToken ->
+                                new PasswordResetTokenStatus(
+                                        true, "유효한 재설정 링크입니다.", savedToken.getExpiresAt()))
+                .orElseGet(
+                        () -> new PasswordResetTokenStatus(false, "만료되었거나 유효하지 않은 링크입니다.", null));
     }
 
     @Override
@@ -151,16 +177,23 @@ public class AuthApplicationService implements AuthUseCase {
             throw InvalidRequestException.invalidInput("재설정 링크를 다시 확인해주세요.");
         }
 
-        PasswordResetToken savedToken = passwordResetTokenRepository.findByTokenHash(hashToken(token))
-                .orElseThrow(() -> InvalidRequestException.invalidInput("만료되었거나 유효하지 않은 링크입니다."));
+        PasswordResetToken savedToken =
+                passwordResetTokenRepository
+                        .findByTokenHash(hashToken(token))
+                        .orElseThrow(
+                                () ->
+                                        InvalidRequestException.invalidInput(
+                                                "만료되었거나 유효하지 않은 링크입니다."));
 
         if (savedToken.isExpired(Instant.now())) {
             passwordResetTokenRepository.deleteByUserId(savedToken.getUserId());
             throw InvalidRequestException.invalidInput("만료되었거나 유효하지 않은 링크입니다.");
         }
 
-        User user = userRepository.findById(savedToken.getUserId())
-                .orElseThrow(() -> ResourceNotFoundException.user(savedToken.getUserId()));
+        User user =
+                userRepository
+                        .findById(savedToken.getUserId())
+                        .orElseThrow(() -> ResourceNotFoundException.user(savedToken.getUserId()));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
@@ -180,27 +213,29 @@ public class AuthApplicationService implements AuthUseCase {
         passwordResetTokenRepository.deleteByUserId(user.getId());
 
         String rawToken = generateRawToken();
-        Instant expiresAt = Instant.now().plusSeconds(recoveryMailProperties.getPasswordResetExpiryMinutes() * 60);
-        PasswordResetToken savedToken = PasswordResetToken.builder()
-                .userId(user.getId())
-                .email(user.getEmail())
-                .tokenHash(hashToken(rawToken))
-                .createdAt(Instant.now())
-                .expiresAt(expiresAt)
-                .build();
+        Instant expiresAt =
+                Instant.now()
+                        .plusSeconds(recoveryMailProperties.getPasswordResetExpiryMinutes() * 60);
+        PasswordResetToken savedToken =
+                PasswordResetToken.builder()
+                        .userId(user.getId())
+                        .email(user.getEmail())
+                        .tokenHash(hashToken(rawToken))
+                        .createdAt(Instant.now())
+                        .expiresAt(expiresAt)
+                        .build();
 
         passwordResetTokenRepository.save(savedToken);
 
-        String resetUrl = recoveryMailProperties.resolvePublicUrl("/login/reset-password?token=" + rawToken);
+        String resetUrl =
+                recoveryMailProperties.resolvePublicUrl("/login/reset-password?token=" + rawToken);
         recoveryMailSender.send(recoveryEmailComposer.buildPasswordReset(user, resetUrl));
     }
 
     private void ensureRecoveryMailConfigured() {
         if (!recoveryMailSender.isAvailable()) {
             throw new BusinessException(
-                    ErrorCode.INTERNAL_SERVER_ERROR,
-                    "이메일 발송 설정이 아직 준비되지 않았습니다. SMTP 설정을 확인해주세요."
-            );
+                    ErrorCode.INTERNAL_SERVER_ERROR, "이메일 발송 설정이 아직 준비되지 않았습니다. SMTP 설정을 확인해주세요.");
         }
     }
 

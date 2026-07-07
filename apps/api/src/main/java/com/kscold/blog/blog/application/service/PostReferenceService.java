@@ -7,10 +7,9 @@ import com.kscold.blog.blog.domain.port.out.CategoryRepository;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PostReferenceService {
@@ -22,16 +21,17 @@ public class PostReferenceService {
     public PostReferenceService(
             CategoryRepository categoryRepository,
             TagRepository tagRepository,
-            UserQueryPort userQueryPort
-    ) {
+            UserQueryPort userQueryPort) {
         this.categoryRepository = categoryRepository;
         this.tagRepository = tagRepository;
         this.userQueryPort = userQueryPort;
     }
 
     public Post.CategoryInfo resolveCategory(String categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> ResourceNotFoundException.category(categoryId));
+        Category category =
+                categoryRepository
+                        .findById(categoryId)
+                        .orElseThrow(() -> ResourceNotFoundException.category(categoryId));
         return Post.CategoryInfo.builder()
                 .id(category.getId())
                 .name(category.getName())
@@ -55,10 +55,7 @@ public class PostReferenceService {
 
     public Post.AuthorInfo resolveAuthor(String userId) {
         UserQueryPort.UserInfo userInfo = userQueryPort.getUserById(userId);
-        return Post.AuthorInfo.builder()
-                .id(userInfo.id())
-                .name(userInfo.displayName())
-                .build();
+        return Post.AuthorInfo.builder().id(userInfo.id()).name(userInfo.displayName()).build();
     }
 
     public void incrementPostCounts(Post.CategoryInfo category, List<Post.TagInfo> tags) {

@@ -2,6 +2,8 @@ package com.kscold.blog.blog.adapter.out.persistence;
 
 import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -9,13 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
-
-/**
- * TagRepository 포트의 영속성 어댑터
- * Spring Data MongoDB를 사용하여 포트 인터페이스를 구현
- */
+/** TagRepository 포트의 영속성 어댑터 Spring Data MongoDB를 사용하여 포트 인터페이스를 구현 */
 @SuppressWarnings("null")
 @Component
 @RequiredArgsConstructor
@@ -64,8 +60,7 @@ public class TagRepositoryAdapter implements TagRepository {
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(tagId)),
                 new Update().inc("postCount", 1),
-                Tag.class
-        );
+                Tag.class);
     }
 
     @Override
@@ -73,7 +68,6 @@ public class TagRepositoryAdapter implements TagRepository {
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(tagId).and("postCount").gt(0)),
                 new Update().inc("postCount", -1),
-                Tag.class
-        );
+                Tag.class);
     }
 }

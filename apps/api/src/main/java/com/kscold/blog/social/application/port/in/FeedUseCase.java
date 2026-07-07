@@ -3,10 +3,10 @@ package com.kscold.blog.social.application.port.in;
 import com.kscold.blog.social.application.dto.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.FeedUpdateCommand;
 import com.kscold.blog.social.domain.model.Feed;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface FeedUseCase {
 

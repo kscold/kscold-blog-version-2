@@ -4,10 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-/**
- * API 에러 코드 정의
- * HTTP 상태 코드와 매핑하여 일관된 에러 응답 제공
- */
+/** API 에러 코드 정의 HTTP 상태 코드와 매핑하여 일관된 에러 응답 제공 */
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {

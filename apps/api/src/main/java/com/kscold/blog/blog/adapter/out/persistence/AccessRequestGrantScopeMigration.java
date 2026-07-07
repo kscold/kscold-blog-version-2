@@ -23,28 +23,31 @@ public class AccessRequestGrantScopeMigration implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        UpdateResult postScoped = mongoTemplate.updateMulti(
-                new Query(new Criteria().andOperator(
-                        Criteria.where("grantScope").is(null),
-                        Criteria.where("postId").ne(null),
-                        Criteria.where("postId").ne("")
-                )),
-                new Update().set("grantScope", AccessRequest.GrantScope.POST.name()),
-                COLLECTION_NAME
-        );
+        UpdateResult postScoped =
+                mongoTemplate.updateMulti(
+                        new Query(
+                                new Criteria()
+                                        .andOperator(
+                                                Criteria.where("grantScope").is(null),
+                                                Criteria.where("postId").ne(null),
+                                                Criteria.where("postId").ne(""))),
+                        new Update().set("grantScope", AccessRequest.GrantScope.POST.name()),
+                        COLLECTION_NAME);
 
-        UpdateResult categoryScoped = mongoTemplate.updateMulti(
-                new Query(new Criteria().andOperator(
-                        Criteria.where("grantScope").is(null),
-                        new Criteria().orOperator(
-                                Criteria.where("postId").exists(false),
-                                Criteria.where("postId").is(null),
-                                Criteria.where("postId").is("")
-                        )
-                )),
-                new Update().set("grantScope", AccessRequest.GrantScope.CATEGORY.name()),
-                COLLECTION_NAME
-        );
+        UpdateResult categoryScoped =
+                mongoTemplate.updateMulti(
+                        new Query(
+                                new Criteria()
+                                        .andOperator(
+                                                Criteria.where("grantScope").is(null),
+                                                new Criteria()
+                                                        .orOperator(
+                                                                Criteria.where("postId")
+                                                                        .exists(false),
+                                                                Criteria.where("postId").is(null),
+                                                                Criteria.where("postId").is("")))),
+                        new Update().set("grantScope", AccessRequest.GrantScope.CATEGORY.name()),
+                        COLLECTION_NAME);
 
         long postCount = postScoped.getModifiedCount();
         long categoryCount = categoryScoped.getModifiedCount();
@@ -52,8 +55,7 @@ public class AccessRequestGrantScopeMigration implements ApplicationRunner {
             log.info(
                     "Backfilled legacy access request grantScope records: postScope={}, categoryScope={}",
                     postCount,
-                    categoryCount
-            );
+                    categoryCount);
         }
     }
 }

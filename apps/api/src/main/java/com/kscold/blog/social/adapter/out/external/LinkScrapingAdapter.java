@@ -1,18 +1,17 @@
 package com.kscold.blog.social.adapter.out.external;
 
-import com.kscold.blog.social.application.dto.LinkPreviewResponse;
 import com.kscold.blog.exception.InvalidRequestException;
+import com.kscold.blog.social.application.dto.LinkPreviewResponse;
 import com.kscold.blog.social.domain.port.out.LinkScrapingPort;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.UnknownHostException;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.UnknownHostException;
 
 @Slf4j
 @Component
@@ -25,11 +24,12 @@ public class LinkScrapingAdapter implements LinkScrapingPort {
         validateUrl(url);
 
         try {
-            Document doc = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0 (compatible; KscoldBot/1.0)")
-                    .timeout(TIMEOUT_MS)
-                    .followRedirects(true)
-                    .get();
+            Document doc =
+                    Jsoup.connect(url)
+                            .userAgent("Mozilla/5.0 (compatible; KscoldBot/1.0)")
+                            .timeout(TIMEOUT_MS)
+                            .followRedirects(true)
+                            .get();
 
             String title = getMetaContent(doc, "og:title");
             if (title == null || title.isBlank()) {
@@ -53,14 +53,10 @@ public class LinkScrapingAdapter implements LinkScrapingPort {
                     .build();
         } catch (IOException e) {
             log.warn("링크 스크래핑 실패 (네트워크): {} - {}", url, e.getMessage());
-            return LinkPreviewResponse.builder()
-                    .url(url)
-                    .build();
+            return LinkPreviewResponse.builder().url(url).build();
         } catch (Exception e) {
             log.error("링크 스크래핑 실패 (예상치 못한 오류): {} - {}", url, e.getMessage());
-            return LinkPreviewResponse.builder()
-                    .url(url)
-                    .build();
+            return LinkPreviewResponse.builder().url(url).build();
         }
     }
 
@@ -76,9 +72,7 @@ public class LinkScrapingAdapter implements LinkScrapingPort {
         return null;
     }
 
-    /**
-     * SSRF 방어: URL scheme 검증 + 내부 IP 대역 차단
-     */
+    /** SSRF 방어: URL scheme 검증 + 내부 IP 대역 차단 */
     private void validateUrl(String url) {
         try {
             URI uri = new URI(url);

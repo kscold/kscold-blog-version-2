@@ -5,8 +5,8 @@ import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightProgramVoteCommand;
 import com.kscold.blog.adminnight.application.port.in.AdminNightUseCase;
 import com.kscold.blog.adminnight.application.port.out.AdminNightNotificationPort;
-import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
+import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightProgramVoteRepository;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightRequestRepository;
 import com.kscold.blog.exception.ErrorCode;
@@ -15,17 +15,16 @@ import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +32,10 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
     private static final Pattern PROGRAM_KEY_PATTERN = Pattern.compile("^[a-z0-9][a-z0-9-]{1,80}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
-    private static final Pattern REQUESTER_NAME_PATTERN = Pattern.compile("^[가-힣A-Za-z][가-힣A-Za-z\\s·.-]{1,39}$");
-    private static final Pattern PHONE_DIGITS_PATTERN = Pattern.compile("^(01[016789]\\d{7,8}|02\\d{7,8}|0[3-9]\\d{8,9})$");
+    private static final Pattern REQUESTER_NAME_PATTERN =
+            Pattern.compile("^[가-힣A-Za-z][가-힣A-Za-z\\s·.-]{1,39}$");
+    private static final Pattern PHONE_DIGITS_PATTERN =
+            Pattern.compile("^(01[016789]\\d{7,8}|02\\d{7,8}|0[3-9]\\d{8,9})$");
     private static final String ANONYMOUS_PRINCIPAL = "anonymousUser";
 
     private final AdminNightRequestRepository adminNightRequestRepository;
@@ -48,7 +49,9 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     @Transactional
     public AdminNightRequest createRequest(String userId, AdminNightCreateCommand command) {
         User user = requireUser(userId);
-        AdminNightRequest request = adminNightRequestDraftService.createPendingRequest(user.getId(), user.getEmail(), command);
+        AdminNightRequest request =
+                adminNightRequestDraftService.createPendingRequest(
+                        user.getId(), user.getEmail(), command);
 
         AdminNightRequest saved = adminNightRequestRepository.save(request);
         adminNightNotificationPort.notifyRequestCreated(saved);
@@ -76,8 +79,13 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     @Override
     @Transactional(readOnly = true)
     public List<AdminNightRequest> getApprovedRequests(LocalDate from, LocalDate to) {
-        return adminNightRequestRepository.findByStatusOrderByCreatedAtDesc(AdminNightRequest.Status.APPROVED).stream()
-                .filter(request -> request.getScheduledSlot() != null && request.getScheduledSlot().getDate() != null)
+        return adminNightRequestRepository
+                .findByStatusOrderByCreatedAtDesc(AdminNightRequest.Status.APPROVED)
+                .stream()
+                .filter(
+                        request ->
+                                request.getScheduledSlot() != null
+                                        && request.getScheduledSlot().getDate() != null)
                 .filter(request -> !request.getScheduledSlot().getDate().isBefore(from))
                 .filter(request -> !request.getScheduledSlot().getDate().isAfter(to))
                 .toList();
@@ -85,7 +93,8 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
     @Override
     @Transactional
-    public AdminNightRequest resubmit(String requestId, String userId, AdminNightCreateCommand command) {
+    public AdminNightRequest resubmit(
+            String requestId, String userId, AdminNightCreateCommand command) {
         User user = requireUser(userId);
         AdminNightRequest request = findRequest(requestId);
         validateRequester(user, request);
@@ -109,7 +118,8 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
     @Override
     @Transactional
-    public AdminNightRequest approve(String requestId, String adminUserId, AdminNightDecisionCommand command) {
+    public AdminNightRequest approve(
+            String requestId, String adminUserId, AdminNightDecisionCommand command) {
         UserQueryPort.UserInfo admin = requireAdmin(adminUserId);
         AdminNightRequest request = findRequest(requestId);
 
@@ -131,7 +141,8 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
     @Override
     @Transactional
-    public AdminNightRequest requestMoreInfo(String requestId, String adminUserId, String reviewNote) {
+    public AdminNightRequest requestMoreInfo(
+            String requestId, String adminUserId, String reviewNote) {
         UserQueryPort.UserInfo admin = requireAdmin(adminUserId);
         AdminNightRequest request = findRequest(requestId);
 
@@ -166,7 +177,8 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
         request.setStatus(AdminNightRequest.Status.REJECTED);
         request.setScheduledSlot(null);
-        request.setReviewNote(adminNightRequestDraftService.normalizeOptionalReviewNote(reviewNote));
+        request.setReviewNote(
+                adminNightRequestDraftService.normalizeOptionalReviewNote(reviewNote));
         request.setDecidedAt(LocalDateTime.now());
         request.setDecidedByUserId(admin.id());
         request.setDecidedByName(admin.displayName());
@@ -177,21 +189,29 @@ public class AdminNightApplicationService implements AdminNightUseCase {
 
     @Override
     @Transactional
-    public AdminNightProgramVote upsertProgramVote(String programKey, String userId, AdminNightProgramVoteCommand command) {
+    public AdminNightProgramVote upsertProgramVote(
+            String programKey, String userId, AdminNightProgramVoteCommand command) {
         String normalizedProgramKey = normalizeProgramKey(programKey);
         User user = findAuthenticatedUser(userId).orElse(null);
-        String contactEmail = normalizeEmail(command.contactEmail(), user != null ? user.getEmail() : null);
-        Optional<AdminNightProgramVote> existingVote = user != null
-                ? adminNightProgramVoteRepository.findByProgramKeyAndUserId(normalizedProgramKey, user.getId())
-                : Optional.empty();
+        String contactEmail =
+                normalizeEmail(command.contactEmail(), user != null ? user.getEmail() : null);
+        Optional<AdminNightProgramVote> existingVote =
+                user != null
+                        ? adminNightProgramVoteRepository.findByProgramKeyAndUserId(
+                                normalizedProgramKey, user.getId())
+                        : Optional.empty();
         if (existingVote.isEmpty()) {
-            existingVote = adminNightProgramVoteRepository
-                    .findByProgramKeyAndContactEmail(normalizedProgramKey, contactEmail)
-                    .filter(vote -> user != null || !StringUtils.hasText(vote.getUserId()));
+            existingVote =
+                    adminNightProgramVoteRepository
+                            .findByProgramKeyAndContactEmail(normalizedProgramKey, contactEmail)
+                            .filter(vote -> user != null || !StringUtils.hasText(vote.getUserId()));
         }
-        AdminNightProgramVote vote = existingVote.orElseGet(() -> AdminNightProgramVote.builder()
-                .programKey(normalizedProgramKey)
-                .build());
+        AdminNightProgramVote vote =
+                existingVote.orElseGet(
+                        () ->
+                                AdminNightProgramVote.builder()
+                                        .programKey(normalizedProgramKey)
+                                        .build());
 
         vote.setProgramKey(normalizedProgramKey);
         vote.setUserId(user != null ? user.getId() : vote.getUserId());
@@ -206,8 +226,10 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         vote.setSessionLength(requireSessionLength(command.sessionLength()));
         vote.setFoodPreference(requireFoodPreference(command.foodPreference()));
         vote.setPreferredDays(normalizePreferredDays(command.preferredDays()));
-        vote.setPreferredTimes(normalizeRequiredList(command.preferredTimes(), 8, "가능한 시간대를 하나 이상 골라주세요."));
-        vote.setInterestedTopics(normalizeRequiredList(command.interestedTopics(), 12, "듣고 싶은 주제를 하나 이상 골라주세요."));
+        vote.setPreferredTimes(
+                normalizeRequiredList(command.preferredTimes(), 8, "가능한 시간대를 하나 이상 골라주세요."));
+        vote.setInterestedTopics(
+                normalizeRequiredList(command.interestedTopics(), 12, "듣고 싶은 주제를 하나 이상 골라주세요."));
         vote.setDesiredTakeaways(normalizeOptionalText(command.desiredTakeaways(), 1000));
         vote.setMessage(normalizeOptionalText(command.message(), 1000));
 
@@ -221,13 +243,15 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     public Optional<AdminNightProgramVote> getMyProgramVote(String programKey, String userId) {
         String normalizedProgramKey = normalizeProgramKey(programKey);
         User user = requireUser(userId);
-        return adminNightProgramVoteRepository.findByProgramKeyAndUserId(normalizedProgramKey, user.getId());
+        return adminNightProgramVoteRepository.findByProgramKeyAndUserId(
+                normalizedProgramKey, user.getId());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AdminNightProgramVote> getProgramVotes(String programKey) {
-        return adminNightProgramVoteRepository.findByProgramKeyOrderByCreatedAtDesc(normalizeProgramKey(programKey));
+        return adminNightProgramVoteRepository.findByProgramKeyOrderByCreatedAtDesc(
+                normalizeProgramKey(programKey));
     }
 
     private User requireUser(String userId) {
@@ -267,8 +291,13 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     }
 
     private AdminNightRequest findRequest(String requestId) {
-        return adminNightRequestRepository.findById(requestId)
-                .orElseThrow(() -> new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Admin Night 신청을 찾을 수 없습니다."));
+        return adminNightRequestRepository
+                .findById(requestId)
+                .orElseThrow(
+                        () ->
+                                new InvalidRequestException(
+                                        ErrorCode.RESOURCE_NOT_FOUND,
+                                        "Admin Night 신청을 찾을 수 없습니다."));
     }
 
     private void validateRequester(User user, AdminNightRequest request) {
@@ -278,55 +307,63 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     }
 
     private String normalizeProgramKey(String programKey) {
-        if (!StringUtils.hasText(programKey) || !PROGRAM_KEY_PATTERN.matcher(programKey).matches()) {
+        if (!StringUtils.hasText(programKey)
+                || !PROGRAM_KEY_PATTERN.matcher(programKey).matches()) {
             throw InvalidRequestException.invalidInput("프로그램 키가 올바르지 않습니다.");
         }
         return programKey.trim().toLowerCase();
     }
 
-    private AdminNightProgramVote.InterestLevel requireInterestLevel(AdminNightProgramVote.InterestLevel interestLevel) {
+    private AdminNightProgramVote.InterestLevel requireInterestLevel(
+            AdminNightProgramVote.InterestLevel interestLevel) {
         if (interestLevel == null) {
             throw InvalidRequestException.invalidInput("참여 의향을 골라주세요.");
         }
         return interestLevel;
     }
 
-    private AdminNightProgramVote.PreferredFormat requirePreferredFormat(AdminNightProgramVote.PreferredFormat preferredFormat) {
+    private AdminNightProgramVote.PreferredFormat requirePreferredFormat(
+            AdminNightProgramVote.PreferredFormat preferredFormat) {
         if (preferredFormat == null) {
             throw InvalidRequestException.invalidInput("선호 진행 방식을 골라주세요.");
         }
         return preferredFormat;
     }
 
-    private AdminNightProgramVote.ExperienceLevel requireExperienceLevel(AdminNightProgramVote.ExperienceLevel experienceLevel) {
+    private AdminNightProgramVote.ExperienceLevel requireExperienceLevel(
+            AdminNightProgramVote.ExperienceLevel experienceLevel) {
         if (experienceLevel == null) {
             throw InvalidRequestException.invalidInput("현재 경험 수준을 골라주세요.");
         }
         return experienceLevel;
     }
 
-    private AdminNightProgramVote.SessionStyle requireSessionStyle(AdminNightProgramVote.SessionStyle sessionStyle) {
+    private AdminNightProgramVote.SessionStyle requireSessionStyle(
+            AdminNightProgramVote.SessionStyle sessionStyle) {
         if (sessionStyle == null) {
             throw InvalidRequestException.invalidInput("선호 Bloom 형식을 골라주세요.");
         }
         return sessionStyle;
     }
 
-    private AdminNightProgramVote.SessionLength requireSessionLength(AdminNightProgramVote.SessionLength sessionLength) {
+    private AdminNightProgramVote.SessionLength requireSessionLength(
+            AdminNightProgramVote.SessionLength sessionLength) {
         if (sessionLength == null) {
             throw InvalidRequestException.invalidInput("좋은 Bloom 시간을 골라주세요.");
         }
         return sessionLength;
     }
 
-    private AdminNightProgramVote.FoodPreference requireFoodPreference(AdminNightProgramVote.FoodPreference foodPreference) {
+    private AdminNightProgramVote.FoodPreference requireFoodPreference(
+            AdminNightProgramVote.FoodPreference foodPreference) {
         if (foodPreference == null) {
             throw InvalidRequestException.invalidInput("음식/음료 선호를 골라주세요.");
         }
         return foodPreference;
     }
 
-    private List<AdminNightProgramVote.PreferredDay> normalizePreferredDays(List<AdminNightProgramVote.PreferredDay> values) {
+    private List<AdminNightProgramVote.PreferredDay> normalizePreferredDays(
+            List<AdminNightProgramVote.PreferredDay> values) {
         if (values == null || values.isEmpty()) {
             throw InvalidRequestException.invalidInput("희망 요일을 하나 이상 골라주세요.");
         }
@@ -373,18 +410,31 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     private String formatPhoneNumber(String digits) {
         if (digits.startsWith("02")) {
             if (digits.length() == 9) {
-                return digits.substring(0, 2) + "-" + digits.substring(2, 5) + "-" + digits.substring(5);
+                return digits.substring(0, 2)
+                        + "-"
+                        + digits.substring(2, 5)
+                        + "-"
+                        + digits.substring(5);
             }
-            return digits.substring(0, 2) + "-" + digits.substring(2, 6) + "-" + digits.substring(6);
+            return digits.substring(0, 2)
+                    + "-"
+                    + digits.substring(2, 6)
+                    + "-"
+                    + digits.substring(6);
         }
 
         if (digits.length() == 10) {
-            return digits.substring(0, 3) + "-" + digits.substring(3, 6) + "-" + digits.substring(6);
+            return digits.substring(0, 3)
+                    + "-"
+                    + digits.substring(3, 6)
+                    + "-"
+                    + digits.substring(6);
         }
         return digits.substring(0, 3) + "-" + digits.substring(3, 7) + "-" + digits.substring(7);
     }
 
-    private List<String> normalizeRequiredList(List<String> values, int maxSize, String emptyMessage) {
+    private List<String> normalizeRequiredList(
+            List<String> values, int maxSize, String emptyMessage) {
         if (values == null || values.isEmpty()) {
             throw InvalidRequestException.invalidInput(emptyMessage);
         }

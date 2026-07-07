@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --font-pretendard: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui,
-      Roboto, sans-serif;
+    --font-pretendard:
+      'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     --font-playfair: 'Playfair Display', Georgia, serif;
     --font-jetbrains: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
   }
@@ -30,7 +30,7 @@
   html.custom-cursor-active input,
   html.custom-cursor-active textarea,
   html.custom-cursor-active select,
-  html.custom-cursor-active [role="button"],
+  html.custom-cursor-active [role='button'],
   html.custom-cursor-active .interactive {
     cursor: none !important;
   }
@@ -42,19 +42,19 @@
 
   /* 스크롤바 스타일 */
   ::-webkit-scrollbar {
-    @apply w-1.5;
+    @apply h-1.5 w-1.5;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-background-dark;
+    @apply bg-surface-100 dark:bg-surface-900;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-surface-700 rounded-full;
+    @apply bg-surface-300 dark:bg-surface-700 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-accent-dark;
+    @apply bg-surface-400 dark:bg-surface-600;
   }
 }
 
@@ -91,7 +91,9 @@
 
   /* 청록 계열 글로우 텍스트 */
   .text-glow {
-    text-shadow: 0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.3);
+    text-shadow:
+      0 0 10px rgba(6, 182, 212, 0.5),
+      0 0 20px rgba(6, 182, 212, 0.3);
   }
 
   /* 떠오르는 듯한 호버 효과 */
@@ -221,7 +223,7 @@
   }
 
   .tiptap-editor-surface .selectedCell::after {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
     z-index: 2;
@@ -365,7 +367,10 @@
     width: 100%;
     height: 40px;
     appearance: none;
+    -webkit-appearance: none;
     background: transparent;
+    color: transparent;
+    accent-color: #06b6d4;
     pointer-events: auto;
     cursor: ew-resize;
     touch-action: pan-y;
@@ -375,6 +380,8 @@
   .admin-night-range-slider::-webkit-slider-runnable-track {
     height: 12px;
     background: transparent;
+    border-color: transparent;
+    color: transparent;
   }
 
   .admin-night-range-slider::-webkit-slider-thumb {
@@ -384,15 +391,24 @@
     width: 26px;
     border-radius: 9999px;
     background: #ffffff;
-    border: 2px solid #0f172a;
-    box-shadow: 0 12px 30px -12px rgba(15, 23, 42, 0.45);
+    border: 2px solid #06b6d4;
+    box-shadow: 0 12px 30px -12px rgba(6, 182, 212, 0.5);
     cursor: pointer;
     margin-top: -7px;
-    transition: transform 140ms ease, box-shadow 140ms ease;
+    transition:
+      transform 140ms ease,
+      box-shadow 140ms ease;
   }
 
   .admin-night-range-slider::-moz-range-track {
     height: 12px;
+    background: transparent;
+    border-color: transparent;
+  }
+
+  .admin-night-range-slider::-moz-range-progress {
+    height: 12px;
+    border-radius: 9999px;
     background: transparent;
   }
 
@@ -401,22 +417,24 @@
     width: 26px;
     border-radius: 9999px;
     background: #ffffff;
-    border: 2px solid #0f172a;
-    box-shadow: 0 12px 30px -12px rgba(15, 23, 42, 0.45);
+    border: 2px solid #06b6d4;
+    box-shadow: 0 12px 30px -12px rgba(6, 182, 212, 0.5);
     cursor: pointer;
-    transition: transform 140ms ease, box-shadow 140ms ease;
+    transition:
+      transform 140ms ease,
+      box-shadow 140ms ease;
   }
 
   .admin-night-range-slider:hover::-webkit-slider-thumb,
   .admin-night-range-slider.is-dragging::-webkit-slider-thumb {
     transform: scale(1.06);
-    box-shadow: 0 16px 34px -12px rgba(15, 23, 42, 0.55);
+    box-shadow: 0 16px 34px -12px rgba(6, 182, 212, 0.6);
   }
 
   .admin-night-range-slider:hover::-moz-range-thumb,
   .admin-night-range-slider.is-dragging::-moz-range-thumb {
     transform: scale(1.06);
-    box-shadow: 0 16px 34px -12px rgba(15, 23, 42, 0.55);
+    box-shadow: 0 16px 34px -12px rgba(6, 182, 212, 0.6);
   }
 
   /* 노션식 빈 블록 플레이스홀더 — 현재 빈 블록에만 안내 표시 */
@@ -480,7 +498,6 @@
   }
 }
 
-
 /* ─────────────── 노션식 블록 드래그 핸들 ───────────────
    .drag-handle / .hide 는 tiptap-extension-global-drag-handle 가 런타임에
    DOM 에 붙이는 클래스라 소스 스캔에 안 잡힌다. @layer 안에 두면 Tailwind
@@ -497,7 +514,9 @@
   background-position: center;
   background-size: 1rem;
   opacity: 0.55;
-  transition: opacity 150ms ease, background-color 150ms ease;
+  transition:
+    opacity 150ms ease,
+    background-color 150ms ease;
 }
 
 .drag-handle:hover {

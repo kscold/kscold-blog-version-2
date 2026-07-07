@@ -1,19 +1,18 @@
 package com.kscold.blog.identity.domain.model;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -22,8 +21,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Document(collection = "users")
 public class User {
-    @Id
-    private String id;
+    @Id private String id;
 
     @Indexed(unique = true)
     private String email;
@@ -37,11 +35,9 @@ public class User {
 
     private Profile profile;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    @LastModifiedDate private LocalDateTime updatedAt;
 
     /** 소프트 딜리트 타임스탬프 (null이면 활성 계정) */
     private LocalDateTime deletedAt;
@@ -51,7 +47,8 @@ public class User {
     }
 
     public enum Role {
-        ADMIN, USER
+        ADMIN,
+        USER
     }
 
     @Getter
@@ -67,9 +64,7 @@ public class User {
         private List<String> techStack;
     }
 
-    /**
-     * 표시 이름 반환 (profile.displayName 우선, 없으면 username)
-     */
+    /** 표시 이름 반환 (profile.displayName 우선, 없으면 username) */
     public String getDisplayName() {
         if (profile != null && profile.getDisplayName() != null) {
             return profile.getDisplayName();

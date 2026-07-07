@@ -3,20 +3,17 @@ package com.kscold.blog.shared.analytics;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
- * 실제 존재하는 페이지인지 검증.
- * - 정적 라우트: 고정 세트
- * - 동적 라우트(/blog/{slug}, /feed/{id}, /vault/{slug}): 실존 리소스만 허용
+ * 실제 존재하는 페이지인지 검증. - 정적 라우트: 고정 세트 - 동적 라우트(/blog/{slug}, /feed/{id}, /vault/{slug}): 실존 리소스만 허용
  */
 @Slf4j
 @Component
@@ -27,10 +24,17 @@ public class PageExistenceChecker {
     private final FeedUseCase feedUseCase;
     private final VaultNoteUseCase vaultNoteUseCase;
 
-    private static final Set<String> STATIC_PATHS = Set.of(
-            "/", "/blog", "/feed", "/vault", "/info", "/guestbook",
-            "/admin-night", "/login", "/privacy"
-    );
+    private static final Set<String> STATIC_PATHS =
+            Set.of(
+                    "/",
+                    "/blog",
+                    "/feed",
+                    "/vault",
+                    "/info",
+                    "/guestbook",
+                    "/admin-night",
+                    "/login",
+                    "/privacy");
 
     private static final Pattern LOGIN_SUB = Pattern.compile("^/login/.*$");
     private static final Pattern INFO_SUB = Pattern.compile("^/info/.*$");
@@ -56,19 +60,21 @@ public class PageExistenceChecker {
         Matcher feed = FEED_DETAIL.matcher(path);
         if (feed.matches()) {
             String id = feed.group(1);
-            return callSafely(() -> {
-                feedUseCase.getById(id);
-                return true;
-            });
+            return callSafely(
+                    () -> {
+                        feedUseCase.getById(id);
+                        return true;
+                    });
         }
 
         Matcher vault = VAULT_DETAIL.matcher(path);
         if (vault.matches()) {
             String slug = decode(vault.group(1));
-            return callSafely(() -> {
-                vaultNoteUseCase.getBySlugWithView(slug);
-                return true;
-            });
+            return callSafely(
+                    () -> {
+                        vaultNoteUseCase.getBySlugWithView(slug);
+                        return true;
+                    });
         }
 
         return false;

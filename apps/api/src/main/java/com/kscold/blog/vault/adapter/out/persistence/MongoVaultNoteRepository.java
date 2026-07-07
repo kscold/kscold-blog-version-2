@@ -1,13 +1,12 @@
 package com.kscold.blog.vault.adapter.out.persistence;
 
 import com.kscold.blog.vault.domain.model.VaultNote;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface MongoVaultNoteRepository extends MongoRepository<VaultNote, String> {
 

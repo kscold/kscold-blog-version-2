@@ -2,11 +2,10 @@ package com.kscold.blog.adminnight.adapter.out.persistence;
 
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightRequestRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @SuppressWarnings("null")
 @Component
@@ -31,7 +30,8 @@ public class AdminNightRequestRepositoryAdapter implements AdminNightRequestRepo
     }
 
     @Override
-    public List<AdminNightRequest> findByStatusOrderByCreatedAtDesc(AdminNightRequest.Status status) {
+    public List<AdminNightRequest> findByStatusOrderByCreatedAtDesc(
+            AdminNightRequest.Status status) {
         return mongoAdminNightRequestRepository.findByStatusOrderByCreatedAtDesc(status);
     }
 
