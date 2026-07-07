@@ -117,7 +117,7 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.2 }}
           >
-            실시간 채팅
+            Agent에게 묻기
             <div className="absolute top-full right-6 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white drop-shadow-sm" />
           </motion.div>
         )}

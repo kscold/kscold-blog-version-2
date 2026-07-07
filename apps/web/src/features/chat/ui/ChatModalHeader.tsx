@@ -2,10 +2,17 @@
 
 interface Props {
   isConnected: boolean;
+  title?: string;
+  subtitle?: string;
   onClose: () => void;
 }
 
-export function ChatModalHeader({ isConnected, onClose }: Props) {
+export function ChatModalHeader({
+  isConnected,
+  title = '블로그 주인과 대화',
+  subtitle,
+  onClose,
+}: Props) {
   return (
     <div className="border-b border-surface-200 bg-surface-50 p-4 flex-shrink-0">
       <div className="flex items-center justify-between">
@@ -16,11 +23,11 @@ export function ChatModalHeader({ isConnected, onClose }: Props) {
             </svg>
           </div>
           <div>
-            <h3 className="text-sm font-bold text-surface-900">블로그 주인과 대화</h3>
+            <h3 className="text-sm font-bold text-surface-900">{title}</h3>
             <div className="mt-0.5 flex items-center gap-1.5">
               <div className={`h-1.5 w-1.5 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-surface-300'}`} />
               <span className="text-xs font-medium text-surface-500">
-                {isConnected ? '실시간 연결됨' : '오프라인 전송 모드'}
+                {subtitle || (isConnected ? '실시간 연결됨' : '오프라인 전송 모드')}
               </span>
             </div>
           </div>
