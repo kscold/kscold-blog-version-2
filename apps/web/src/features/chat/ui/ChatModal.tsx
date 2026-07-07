@@ -170,13 +170,13 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
               <>
                 <AgentMessageList messages={agentMessages} isThinking={isAgentThinking} />
                 <div className="border-t border-surface-200 bg-white p-4">
-                  <div className="mb-3 flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                  <div className="mb-3 flex flex-wrap gap-2">
                     {starterPrompts.map(prompt => (
                       <button
                         key={prompt}
                         type="button"
                         onClick={() => setAgentInput(prompt)}
-                        className="shrink-0 rounded-full border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:text-surface-900"
+                        className="rounded-full border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:text-surface-900"
                       >
                         {prompt}
                       </button>

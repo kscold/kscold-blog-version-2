@@ -66,6 +66,38 @@ FOCUS_STOP_TERMS = {
     "에서",
 }
 
+PUBLIC_PROFILE_TEXT = """
+김승찬은 kscold라는 이름으로 활동하는 개발자입니다.
+KSCOLD는 김승찬의 개인 기술 블로그이자, 개발 기록과 실험을 정리하는 공간입니다.
+블로그 주소는 kscold.com이며, 공개 블로그 글, 피드, Vault 노트를 통해 학습 기록을 공유합니다.
+
+김승찬은 Java와 Spring Boot 기반 백엔드, React와 Next.js와 TypeScript 기반 프론트엔드,
+MongoDB, Docker, AWS 운영, 그리고 LangGraph, RAG, AI Agent 개발에 관심을 두고 실험합니다.
+최근에는 Vault 노트를 RAG화하고, Spring API와 Python LangGraph gRPC Agent를 연결하는 구조를 만들고 있습니다.
+
+연락 이메일은 developerkscold@gmail.com입니다.
+GitHub는 https://github.com/kscold 입니다.
+자세한 공개 소개는 /info 페이지에서 확인할 수 있습니다.
+""".strip()
+
+PROFILE_QUERY_TERMS = {
+    "김승찬",
+    "kscold",
+    "KSCOLD",
+    "콜딩",
+    "블로그 주인",
+    "운영자",
+    "개발자",
+    "너",
+    "나",
+    "소개",
+    "프로필",
+    "연락",
+    "이메일",
+    "github",
+    "깃허브",
+}
+
 
 class VaultStore:
     def __init__(self, config: AgentConfig):
@@ -187,6 +219,9 @@ class VaultStore:
         if not folder_ids:
             candidates.extend(self._public_post_candidates(conditions))
             candidates.extend(self._public_feed_candidates(conditions))
+            profile = self._profile_candidate()
+            if self._profile_query_matches(query, terms) or self._note_matches_query_focus(profile, terms):
+                candidates.append(profile)
         scored = [
             SearchHit(
                 note=candidate,
@@ -338,6 +373,24 @@ class VaultStore:
         query_filter = {"$and": [public_filter, {"$or": feed_conditions}]} if feed_conditions else public_filter
         return [self._to_feed(document) for document in self.feeds.find(query_filter).limit(120)]
 
+    def _profile_candidate(self) -> VaultNote:
+        return VaultNote(
+            id="profile:kscold",
+            title="김승찬(kscold) 공개 프로필",
+            slug="info",
+            content=PUBLIC_PROFILE_TEXT,
+            folder_id=None,
+            outgoing_links=[],
+            tags=["김승찬", "kscold", "KSCOLD", "콜딩", "블로그 주인", "운영자", "프로필", "개발자", "AI Agent", "Spring Boot", "Next.js"],
+            content_type="profile",
+            path="/info",
+        )
+
+    def _profile_query_matches(self, query: str, terms: list[str]) -> bool:
+        normalized_query = query.lower()
+        normalized_terms = {term.lower() for term in terms}
+        return any(term.lower() in normalized_query or term.lower() in normalized_terms for term in PROFILE_QUERY_TERMS)
+
     def answer(
         self,
         question: str,
@@ -359,6 +412,7 @@ class VaultStore:
                     "content": (
                         "너는 KSCOLD 블로그 전체 공개 콘텐츠를 읽고 답하는 LangGraph RAG Agent다. "
                         "제공된 공개 context(Vault, Blog, Feed)를 최우선 근거로 사용하고, 한국어로 답한다. "
+                        "김승찬, kscold, KSCOLD, 블로그 주인에 대한 질문은 profile context를 우선 근거로 삼는다. "
                         "질문이 비교형이면 각 대상에 해당하는 콘텐츠를 나누어 근거로 삼고 차이를 표로 정리한다. "
                         "공개 context에 없는 핵심 차이는 일반 LLM 지식으로 보강하되, 반드시 '일반 지식 보강'이라고 표시한다. "
                         "비공개 글이나 제한 카테고리 내용은 context에 없으므로 절대 추측해서 공개하지 않는다. "
