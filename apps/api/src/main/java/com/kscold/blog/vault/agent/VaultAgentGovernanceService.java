@@ -45,7 +45,9 @@ public class VaultAgentGovernanceService {
                         toStringValue(source.get("noteId")),
                         toStringValue(source.get("title")),
                         toStringValue(source.get("slug")),
-                        toDouble(source.get("score"))
+                        toDouble(source.get("score")),
+                        toStringValue(source.get("type")),
+                        toStringValue(source.get("path"))
                 ))
                 .toList();
         return new AgentRunResponse(

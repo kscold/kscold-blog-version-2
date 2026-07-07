@@ -89,10 +89,12 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
       <button
         type="button"
         onClick={() => setIsAgentOpen(true)}
-        className="fixed right-6 top-28 z-40 hidden items-center gap-2 rounded-full border border-cyan-200 bg-white/95 px-5 py-3 text-sm font-black text-surface-900 shadow-lg shadow-cyan-500/10 transition hover:-translate-y-0.5 hover:border-cyan-300 hover:text-cyan-700 hover:shadow-xl dark:border-cyan-400/30 dark:bg-surface-950/95 dark:text-white dark:hover:text-cyan-200 lg:flex"
+        className="group fixed right-6 top-28 z-40 hidden items-center justify-center gap-2 rounded-2xl border border-surface-200 bg-white px-6 py-3 text-sm font-bold text-surface-600 shadow-sm transition-all duration-300 hover:border-surface-900 hover:text-surface-900 hover:shadow-md active:scale-95 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-300 dark:hover:border-white dark:hover:text-white lg:flex"
       >
-        <span aria-hidden>꼬</span>
-        Vault에게 묻기
+        <svg className="h-4 w-4 transition-transform duration-300 group-hover:rotate-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c.251.023.501.05.75.082m-.75-.082a24.301 24.301 0 0 0-4.5 0m4.5 0v.75m4.5-.75v5.714c0 .597.237 1.169.659 1.591L19 14.5m-4.5-11.396c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m-4.5 0v.75M5 14.5h14m-14 0v.75A2.25 2.25 0 0 0 7.25 17.5h9.5A2.25 2.25 0 0 0 19 15.25v-.75" />
+        </svg>
+        Agent에게 묻기
       </button>
 
       {isAgentOpen && (
@@ -106,7 +108,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
       <button
         type="button"
         onClick={() => setIsAgentOpen(open => !open)}
-        className="lg:hidden fixed bottom-24 right-6 z-50 p-4 rounded-full border border-cyan-300 bg-white text-surface-900 shadow-xl shadow-cyan-500/10 hover:scale-105 active:scale-95 transition-all outline-none"
+        className="lg:hidden fixed bottom-24 right-6 z-50 rounded-2xl border border-surface-200 bg-white p-4 text-surface-700 shadow-lg transition-all hover:border-surface-900 hover:text-surface-900 active:scale-95 outline-none"
         aria-label={isAgentOpen ? 'Vault Agent 닫기' : 'Vault Agent 열기'}
       >
         {isAgentOpen ? (

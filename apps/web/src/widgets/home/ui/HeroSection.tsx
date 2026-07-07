@@ -1,11 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
+import { VaultAgentChatPanel } from '@/widgets/vault/ui/VaultAgentChatPanel';
 
 export function HeroSection() {
   const { supportsHover, prefersReducedMotion } = usePerformanceMode();
+  const [isAgentOpen, setIsAgentOpen] = useState(false);
   const animate = !prefersReducedMotion;
 
   return (
@@ -95,7 +98,7 @@ export function HeroSection() {
         />
 
         <motion.div
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-6 sm:pt-12 pb-12 sm:pb-20 w-full max-w-lg mx-auto"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-6 sm:pt-12 pb-12 sm:pb-20 w-full max-w-3xl mx-auto"
           initial={animate ? { opacity: 0, y: 20 } : false}
           animate={animate ? { opacity: 1, y: 0 } : undefined}
           transition={animate ? { duration: 1.2, delay: 0.7, ease: [0.76, 0, 0.24, 1] } : undefined}
@@ -121,6 +124,13 @@ export function HeroSection() {
           >
             <span className="font-bold tracking-wide">피드 보기</span>
           </Link>
+          <button
+            type="button"
+            onClick={() => setIsAgentOpen(true)}
+            className="group flex items-center justify-center w-full sm:w-auto px-10 py-4 text-surface-600 bg-white border border-surface-200 hover:border-surface-900 hover:text-surface-900 transition-all duration-300 rounded-2xl hover:shadow-sm active:scale-95"
+          >
+            <span className="font-bold tracking-wide">Agent에게 묻기</span>
+          </button>
         </motion.div>
 
         {/* 외부 링크 */}
@@ -149,6 +159,15 @@ export function HeroSection() {
           ))}
         </motion.div>
       </motion.div>
+      {isAgentOpen && (
+        <div className="fixed inset-0 z-[80] bg-surface-950/10 backdrop-blur-sm">
+          <VaultAgentChatPanel
+            graphData={null}
+            activeFolderName="KSCOLD 공개 콘텐츠"
+            onClose={() => setIsAgentOpen(false)}
+          />
+        </div>
+      )}
     </section>
   );
 }

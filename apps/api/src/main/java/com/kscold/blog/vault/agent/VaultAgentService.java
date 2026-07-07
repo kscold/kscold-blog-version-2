@@ -65,7 +65,9 @@ public class VaultAgentService {
                                     source.getId(),
                                     source.getTitle(),
                                     source.getSlug(),
-                                    source.getScore()
+                                    source.getScore(),
+                                    source.getType(),
+                                    source.getPath()
                             ))
                             .toList()
             );

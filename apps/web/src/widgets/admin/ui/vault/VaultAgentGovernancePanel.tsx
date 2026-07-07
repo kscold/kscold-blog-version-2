@@ -64,10 +64,10 @@ export function VaultAgentGovernancePanel() {
                 {run.sources.slice(0, 5).map(source => (
                   <Link
                     key={`${run.id}-${source.id}-${source.slug}`}
-                    href={`/vault/${encodeURIComponent(source.slug)}`}
+                    href={source.path || `/vault/${encodeURIComponent(source.slug)}`}
                     className="rounded-full border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-black text-gray-600 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300"
                   >
-                    {source.title || source.slug}
+                    {(source.type ? `${source.type} · ` : '') + (source.title || source.slug)}
                   </Link>
                 ))}
                 {run.sources.length === 0 && (

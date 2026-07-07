@@ -37,7 +37,9 @@ public final class VaultAgentDtos {
             String id,
             String title,
             String slug,
-            double score
+            double score,
+            String type,
+            String path
     ) {
     }
 

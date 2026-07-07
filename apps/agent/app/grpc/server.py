@@ -25,6 +25,8 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
                     title=hit.note.title,
                     slug=hit.note.slug,
                     score=hit.score,
+                    type=hit.note.content_type,
+                    path=hit.note.path or f"/vault/{hit.note.slug}",
                 )
                 for hit in result["context"]
             ],

@@ -25,9 +25,9 @@ interface AgentStage {
 }
 
 const starterPrompts = [
-  '이 주제에서 먼저 볼 노트 알려줘',
-  'Python 관련 노트를 학습 순서로 묶어줘',
-  '지금 노트들이 어떻게 이어지는지 설명해줘',
+  '이 주제에서 먼저 볼 콘텐츠 알려줘',
+  'Java 배열과 JavaScript 배열의 차이를 정리해줘',
+  'AI Agent 관련 글과 노트를 같이 묶어줘',
 ];
 
 export function VaultAgentChatPanel({ graphData, activeFolderName, onClose }: VaultAgentChatPanelProps) {
@@ -36,11 +36,11 @@ export function VaultAgentChatPanel({ graphData, activeFolderName, onClose }: Va
       id: 1,
       role: 'assistant',
       content:
-        '궁금한 걸 물어보면 Vault 안의 노트와 연결 관계를 찾아서 같이 정리해볼게요. 필요한 경우 최신 웹 자료도 보조로 확인할 수 있습니다.',
+        '궁금한 걸 물어보면 공개 블로그 글, 피드, Vault 노트를 함께 찾아서 정리해볼게요. 로그인하지 않은 사용자는 공개된 콘텐츠만 근거로 사용합니다.',
       stages: [
-        { name: '읽기', detail: '질문과 가까운 노트를 먼저 찾습니다.' },
-        { name: '연결', detail: '링크와 백링크로 주변 노트를 넓혀봅니다.' },
-        { name: '정리', detail: '참고한 노트와 함께 답을 정리합니다.' },
+        { name: '검색', detail: '질문과 가까운 공개 콘텐츠를 먼저 찾습니다.' },
+        { name: '연결', detail: 'Vault 링크와 백링크로 주변 맥락을 넓혀봅니다.' },
+        { name: '정리', detail: '참고한 출처와 함께 답을 정리합니다.' },
       ],
     },
   ]);
@@ -166,13 +166,13 @@ export function VaultAgentChatPanel({ graphData, activeFolderName, onClose }: Va
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-cyan-500">
-              Vault Assistant
+              KSCOLD Agent
             </p>
             <h2 className="mt-2 text-xl font-black tracking-tight text-surface-950 dark:text-white">
-              Vault에게 묻기
+              Agent에게 묻기
             </h2>
             <p className="mt-2 text-xs font-medium leading-5 text-surface-500 dark:text-surface-400">
-              노트 본문, 링크, 백링크를 같이 훑어서 읽을 순서와 맥락을 잡아줍니다.
+              공개 블로그, 피드, Vault 노트를 함께 훑어서 답변과 출처를 잡아줍니다.
             </p>
           </div>
           <button
@@ -225,10 +225,15 @@ export function VaultAgentChatPanel({ graphData, activeFolderName, onClose }: Va
                   {message.sources.map(source => (
                     <Link
                       key={source.id}
-                      href={`/vault/${encodeURIComponent(source.slug)}`}
+                      href={source.path || `/vault/${encodeURIComponent(source.slug)}`}
                       className="group flex items-center justify-between gap-3 rounded-2xl border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-bold text-surface-600 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-800 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-300 dark:hover:border-cyan-400/50 dark:hover:bg-cyan-950/30 dark:hover:text-cyan-100"
                     >
-                      <span className="min-w-0 truncate">{source.title}</span>
+                      <span className="min-w-0 truncate">
+                        <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.14em] text-surface-400">
+                          {source.type || 'vault'}
+                        </span>
+                        {source.title}
+                      </span>
                       <span className="shrink-0 font-mono text-[10px] text-cyan-600 opacity-80 group-hover:opacity-100 dark:text-cyan-300">
                         열기 · {(source.score * 100).toFixed(0)}%
                       </span>
@@ -264,7 +269,7 @@ export function VaultAgentChatPanel({ graphData, activeFolderName, onClose }: Va
           <input
             value={input}
             onChange={event => setInput(event.target.value)}
-            placeholder="Vault에 대해 물어보기..."
+            placeholder="KSCOLD 공개 콘텐츠에 대해 물어보기..."
             className="min-w-0 flex-1 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-bold text-surface-900 outline-none transition focus:border-cyan-300 dark:border-surface-800 dark:bg-surface-900 dark:text-white"
           />
           <button

@@ -24,6 +24,8 @@ class VaultNote:
     folder_id: str | None
     outgoing_links: list[str]
     tags: list[str]
+    content_type: str = "vault"
+    path: str = ""
 
 
 @dataclass(frozen=True)
@@ -68,6 +70,9 @@ class VaultStore:
         self.db = self.mongo[config.mongodb_database]
         self.notes = self.db["vault_notes"]
         self.folders = self.db["vault_folders"]
+        self.posts = self.db["posts"]
+        self.categories = self.db["categories"]
+        self.feeds = self.db["feeds"]
         self.runs = self.db["vault_agent_runs"]
         self.qdrant = QdrantClient(url=config.qdrant_url)
         self._ensure_collection()
@@ -120,8 +125,9 @@ class VaultStore:
 
     def search(self, query: str, limit: int, active_folder_name: str = "") -> list[SearchHit]:
         folder_ids = self.resolve_folder_scope(active_folder_name)
+        keyword_hits = self.keyword_search(query, limit * 2, folder_ids)
         if self.qdrant.count(collection_name=self.config.qdrant_collection, exact=True).count == 0:
-            return self.keyword_search(query, limit, folder_ids)
+            return keyword_hits[:limit]
 
         try:
             query_vector = self.embed_text(query)
@@ -132,7 +138,7 @@ class VaultStore:
                 with_payload=True,
             )
         except Exception:
-            return self.keyword_search(query, limit)
+            return keyword_hits[:limit]
 
         note_ids = [str(hit.payload.get("note_id")) for hit in hits if hit.payload]
         notes = {note.id: note for note in self.fetch_notes(note_ids)}
@@ -142,11 +148,12 @@ class VaultStore:
                 for note_id, note in notes.items()
                 if note.folder_id in folder_ids
             }
-        return [
-            SearchHit(note=notes[note_id], score=float(hit.score))
+        vector_hits = [
+            SearchHit(note=notes[note_id], score=float(hit.score) + 1)
             for hit, note_id in zip(hits, note_ids)
             if note_id in notes
-        ] or self.keyword_search(query, limit, folder_ids)
+        ]
+        return self._dedupe_hits([*vector_hits, *keyword_hits], limit)
 
     def keyword_search(self, query: str, limit: int, folder_ids: set[str | ObjectId] | None = None) -> list[SearchHit]:
         terms = self._query_terms(query)
@@ -168,13 +175,16 @@ class VaultStore:
             )
 
         query_filter = {"$and": [folder_filter, {"$or": conditions}]} if folder_filter else {"$or": conditions}
-        candidates = list(self.notes.find(query_filter).limit(240))
+        candidates = [self._to_note(document) for document in self.notes.find(query_filter).limit(180)]
+        if not folder_ids:
+            candidates.extend(self._public_post_candidates(conditions))
+            candidates.extend(self._public_feed_candidates(conditions))
         scored = [
             SearchHit(
-                note=self._to_note(document),
-                score=self._keyword_score(document, terms, language_hints, bool(folder_ids)),
+                note=candidate,
+                score=self._keyword_score(candidate, terms, language_hints, bool(folder_ids)),
             )
-            for document in candidates
+            for candidate in candidates
         ]
         scored.sort(key=lambda hit: hit.score, reverse=True)
         return self._balanced_hits(scored, language_hints, terms, limit)
@@ -269,6 +279,57 @@ class VaultStore:
 
         return len(notes), indexed, skipped
 
+    def _dedupe_hits(self, hits: list[SearchHit], limit: int) -> list[SearchHit]:
+        selected: list[SearchHit] = []
+        seen: set[str] = set()
+        for hit in sorted(hits, key=lambda item: item.score, reverse=True):
+            key = f"{hit.note.content_type}:{hit.note.id}"
+            if key in seen:
+                continue
+            seen.add(key)
+            selected.append(hit)
+            if len(selected) >= limit:
+                break
+        return selected
+
+    def _public_post_candidates(self, conditions: list[dict]) -> list[VaultNote]:
+        post_conditions = []
+        for condition in conditions:
+            if "title" in condition:
+                post_conditions.append({"title": condition["title"]})
+            if "content" in condition:
+                post_conditions.append({"content": condition["content"]})
+                post_conditions.append({"excerpt": condition["content"]})
+            if "tags" in condition:
+                post_conditions.append({"tags.name": condition["tags"]})
+        restricted_category_ids = [
+            str(document.get("_id"))
+            for document in self.categories.find({"restricted": True}, {"_id": 1})
+        ]
+        public_filter = {
+            "status": "PUBLISHED",
+            "$or": [
+                {"publicOverride": True},
+                {"category.id": {"$nin": restricted_category_ids}},
+                {"category.id": {"$exists": False}},
+            ],
+        }
+        query_filter = {"$and": [public_filter, {"$or": post_conditions}]} if post_conditions else public_filter
+        return [self._to_post(document) for document in self.posts.find(query_filter).limit(120)]
+
+    def _public_feed_candidates(self, conditions: list[dict]) -> list[VaultNote]:
+        feed_conditions = []
+        for condition in conditions:
+            if "title" in condition:
+                feed_conditions.append({"linkPreview.title": condition["title"]})
+            if "content" in condition:
+                feed_conditions.append({"content": condition["content"]})
+            if "tags" in condition:
+                feed_conditions.append({"tags": condition["tags"]})
+        public_filter = {"visibility": "PUBLIC"}
+        query_filter = {"$and": [public_filter, {"$or": feed_conditions}]} if feed_conditions else public_filter
+        return [self._to_feed(document) for document in self.feeds.find(query_filter).limit(120)]
+
     def answer(
         self,
         question: str,
@@ -277,7 +338,7 @@ class VaultStore:
         web_results: list[str] | None = None,
     ) -> str:
         context_text = "\n---\n".join(
-            f"title: {hit.note.title}\nslug: /vault/{hit.note.slug}\ntags: {hit.note.tags}\nscore: {hit.score:.4f}\ncontent:\n{hit.note.content[:2400]}"
+            f"type: {hit.note.content_type}\ntitle: {hit.note.title}\npath: {hit.note.path or f'/vault/{hit.note.slug}'}\ntags: {hit.note.tags}\nscore: {hit.score:.4f}\ncontent:\n{hit.note.content[:2400]}"
             for hit in context
         )
         web_context = "\n---\n".join(web_results or [])
@@ -288,20 +349,21 @@ class VaultStore:
                 {
                     "role": "system",
                     "content": (
-                        "너는 KSCOLD Vault를 읽고 답하는 LangGraph RAG Agent다. "
-                        "제공된 Vault context를 최우선 근거로 사용하고, 한국어로 답한다. "
-                        "질문이 비교형이면 각 대상에 해당하는 Vault 노트를 나누어 근거로 삼고 차이를 표로 정리한다. "
-                        "Vault context에 없는 핵심 차이는 일반 LLM 지식으로 보강하되, 반드시 'Vault 밖 일반 지식'이라고 표시한다. "
+                        "너는 KSCOLD 블로그 전체 공개 콘텐츠를 읽고 답하는 LangGraph RAG Agent다. "
+                        "제공된 공개 context(Vault, Blog, Feed)를 최우선 근거로 사용하고, 한국어로 답한다. "
+                        "질문이 비교형이면 각 대상에 해당하는 콘텐츠를 나누어 근거로 삼고 차이를 표로 정리한다. "
+                        "공개 context에 없는 핵심 차이는 일반 LLM 지식으로 보강하되, 반드시 '일반 지식 보강'이라고 표시한다. "
+                        "비공개 글이나 제한 카테고리 내용은 context에 없으므로 절대 추측해서 공개하지 않는다. "
                         "web context는 최신 정보가 필요한 경우에만 보조 근거로 사용한다. "
-                        "확실하지 않은 내용은 추정이라고 말하고, 답변 끝에 참고 Vault 노트를 bullet로 적는다."
+                        "확실하지 않은 내용은 추정이라고 말하고, 답변 끝에 참고한 콘텐츠를 bullet로 적는다."
                     ),
                 },
                 {
                     "role": "user",
                     "content": (
-                        f"active_folder_name: {active_folder_name or '전체 Vault'}\n"
+                        f"active_folder_name: {active_folder_name or '전체 공개 콘텐츠'}\n"
                         f"question: {question}\n\n"
-                        f"vault context:\n{context_text}\n\n"
+                        f"public context:\n{context_text}\n\n"
                         f"web context:\n{web_context}"
                     ),
                 },
@@ -317,7 +379,14 @@ class VaultStore:
                 "sourceCount": len(sources),
                 "createdAt": datetime.now(timezone.utc),
                 "sources": [
-                    {"noteId": hit.note.id, "title": hit.note.title, "slug": hit.note.slug, "score": hit.score}
+                    {
+                        "noteId": hit.note.id,
+                        "title": hit.note.title,
+                        "slug": hit.note.slug,
+                        "score": hit.score,
+                        "type": hit.note.content_type,
+                        "path": hit.note.path or f"/vault/{hit.note.slug}",
+                    }
                     for hit in sources
                 ],
             }
@@ -335,6 +404,41 @@ class VaultStore:
             folder_id=document.get("folderId"),
             outgoing_links=list(document.get("outgoingLinks") or []),
             tags=list(document.get("tags") or []),
+            content_type="vault",
+            path=f"/vault/{document.get('slug') or ''}",
+        )
+
+    def _to_post(self, document: dict) -> VaultNote:
+        category = document.get("category") or {}
+        tags = [tag.get("name", "") for tag in document.get("tags") or [] if isinstance(tag, dict)]
+        slug = document.get("slug") or ""
+        category_slug = category.get("slug") or "blog"
+        return VaultNote(
+            id=str(document.get("_id")),
+            title=document.get("title") or "블로그 글",
+            slug=slug,
+            content="\n".join(part for part in [document.get("excerpt") or "", document.get("content") or ""] if part),
+            folder_id=None,
+            outgoing_links=[],
+            tags=tags,
+            content_type="blog",
+            path=f"/blog/{category_slug}/{slug}",
+        )
+
+    def _to_feed(self, document: dict) -> VaultNote:
+        preview = document.get("linkPreview") or {}
+        title = preview.get("title") or (document.get("content") or "피드")[:48]
+        feed_id = str(document.get("_id"))
+        return VaultNote(
+            id=feed_id,
+            title=title,
+            slug=feed_id,
+            content="\n".join(part for part in [document.get("content") or "", preview.get("description") or ""] if part),
+            folder_id=None,
+            outgoing_links=[],
+            tags=list(document.get("tags") or []),
+            content_type="feed",
+            path=f"/feed/{feed_id}",
         )
 
     def _point_id(self, note_id: str) -> str:
@@ -463,16 +567,16 @@ class VaultStore:
 
     def _keyword_score(
         self,
-        document: dict,
+        note: VaultNote,
         terms: list[str],
         language_hints: set[str],
         scoped: bool,
     ) -> float:
-        title = str(document.get("title") or "")
-        slug = str(document.get("slug") or "")
-        content = str(document.get("content") or "")
-        tags = " ".join(str(tag) for tag in document.get("tags") or [])
-        folder_names = self._folder_names(document.get("folderId"))
+        title = note.title
+        slug = note.slug
+        content = note.content
+        tags = " ".join(note.tags)
+        folder_names = self._folder_names(note.folder_id)
         title_lower = title.lower()
         slug_lower = slug.lower()
         content_lower = content.lower()

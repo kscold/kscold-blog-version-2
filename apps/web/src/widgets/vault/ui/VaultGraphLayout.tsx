@@ -158,19 +158,19 @@ export function VaultGraphLayout() {
               <button
                 type="button"
                 onClick={() => setIsAgentOpen(prev => !prev)}
-                className={`group inline-flex cursor-pointer select-none items-center gap-2 rounded-full border px-5 py-3 text-sm font-black shadow-md outline-none transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-[0.97] focus-visible:ring-4 focus-visible:ring-cyan-200 dark:focus-visible:ring-cyan-900 ${
+                className={`group inline-flex cursor-pointer select-none items-center justify-center gap-2 rounded-2xl border px-6 py-3 text-sm font-bold shadow-sm outline-none transition-all duration-300 hover:shadow-md active:scale-95 ${
                   isAgentOpen
-                    ? 'border-cyan-300 bg-cyan-50 text-cyan-700 ring-2 ring-cyan-100 dark:border-cyan-700 dark:bg-cyan-950 dark:text-cyan-100 dark:ring-cyan-900/60'
+                    ? 'border-surface-900 bg-surface-900 text-white dark:border-white dark:bg-white dark:text-surface-950'
                     : isTouchDevice
-                      ? 'border-cyan-200 bg-white text-surface-900 hover:border-cyan-300 hover:text-cyan-700 dark:border-cyan-800 dark:bg-surface-900 dark:text-surface-100 dark:hover:text-cyan-100'
-                      : 'border-cyan-200 bg-white/90 text-surface-900 backdrop-blur-xl hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 dark:border-cyan-800 dark:bg-surface-900/90 dark:text-surface-100 dark:hover:bg-cyan-950 dark:hover:text-cyan-100'
+                      ? 'border-surface-200 bg-white text-surface-600 hover:border-surface-900 hover:text-surface-900 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-300 dark:hover:border-white dark:hover:text-white'
+                      : 'border-surface-200 bg-white/95 text-surface-600 backdrop-blur-xl hover:border-surface-900 hover:text-surface-900 dark:border-surface-800 dark:bg-surface-950/95 dark:text-surface-300 dark:hover:border-white dark:hover:text-white'
                 }`}
                 aria-pressed={isAgentOpen}
               >
                 <svg className="h-4 w-4 transition-transform duration-200 group-hover:rotate-6 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c.251.023.501.05.75.082m-.75-.082a24.301 24.301 0 0 0-4.5 0m4.5 0v.75m4.5-.75v5.714c0 .597.237 1.169.659 1.591L19 14.5m-4.5-11.396c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m-4.5 0v.75M5 14.5h14m-14 0v.75A2.25 2.25 0 0 0 7.25 17.5h9.5A2.25 2.25 0 0 0 19 15.25v-.75" />
                 </svg>
-                <span>Vault에게 묻기</span>
+                <span>Agent에게 묻기</span>
               </button>
             </div>
             <ClientVaultGraph
