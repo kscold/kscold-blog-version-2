@@ -593,11 +593,16 @@ class VaultStore:
                 terms.extend(QUERY_EXPANSIONS.get(variant, []))
 
         for keyword, expansions in QUERY_EXPANSIONS.items():
-            if keyword in query_lower:
+            if self._query_contains_keyword(query_lower, keyword):
                 terms.append(keyword)
                 terms.extend(expansions)
 
         return list(dict.fromkeys(terms))[:24]
+
+    def _query_contains_keyword(self, query: str, keyword: str) -> bool:
+        if re.fullmatch(r"[a-z0-9.+#-]+", keyword):
+            return re.search(rf"(?<![a-z0-9]){re.escape(keyword)}(?![a-z0-9])", query) is not None
+        return keyword in query
 
     def _strip_korean_particles(self, term: str) -> str:
         for particle in ("에서는", "에게서", "으로부터", "에서", "으로", "로", "과", "와", "은", "는", "이", "가", "을", "를", "의"):
