@@ -63,6 +63,7 @@ FOCUS_STOP_TERMS = {
     "설명",
     "정리",
     "관련",
+    "노트",
     "에서",
 }
 
@@ -730,6 +731,10 @@ class VaultStore:
             if lower in tags_lower:
                 score += 2
             score += min(content_lower.count(lower), 6) * 0.35
+
+        focus_terms = self._content_focus_terms(terms)
+        if focus_terms and all(term in title_lower or term in slug_lower for term in focus_terms):
+            score += 10
 
         if language_hints and folder_names:
             for hint in language_hints:
