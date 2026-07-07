@@ -8,6 +8,7 @@ import { useDeleteVaultNote } from '@/features/vault/api/useVaultNoteMutations';
 import { VaultNote } from '@/types/vault';
 import { VaultNoteList } from './VaultNoteList';
 import { useAlert } from '@/shared/model/alertStore';
+import { VaultAgentGovernancePanel } from './VaultAgentGovernancePanel';
 
 export function AdminVaultContainer() {
   const router = useRouter();
@@ -52,6 +53,8 @@ export function AdminVaultContainer() {
           새 노트 작성
         </button>
       </div>
+
+      <VaultAgentGovernancePanel />
 
       {/* 목록 테이블 */}
       {isLoading ? (

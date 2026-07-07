@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import hashlib
 import re
 import uuid
+from datetime import datetime, timezone
 
 from bson import ObjectId
 from openai import OpenAI
@@ -313,6 +314,8 @@ class VaultStore:
             {
                 "question": question,
                 "answer": answer,
+                "sourceCount": len(sources),
+                "createdAt": datetime.now(timezone.utc),
                 "sources": [
                     {"noteId": hit.note.id, "title": hit.note.title, "slug": hit.note.slug, "score": hit.score}
                     for hit in sources

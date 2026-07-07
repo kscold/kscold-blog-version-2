@@ -42,8 +42,16 @@ class VaultRagGraph:
         self.app = graph.compile()
 
     def retrieve(self, state: AgentState) -> AgentState:
+        scoped_question = " ".join(
+            part
+            for part in [
+                state.get("active_folder_name", ""),
+                state["question"],
+            ]
+            if part
+        )
         hits = self.store.search(
-            state["question"],
+            scoped_question,
             self.config.max_context_notes,
             state.get("active_folder_name", ""),
         )

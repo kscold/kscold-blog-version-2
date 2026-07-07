@@ -3,6 +3,7 @@ package com.kscold.blog.vault.agent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.time.Instant;
 import java.util.List;
 
 public final class VaultAgentDtos {
@@ -44,6 +45,16 @@ public final class VaultAgentDtos {
             int totalNotes,
             int indexedNotes,
             int skippedNotes
+    ) {
+    }
+
+    public record AgentRunResponse(
+            String id,
+            String question,
+            String answerPreview,
+            int sourceCount,
+            List<SourceNote> sources,
+            Instant createdAt
     ) {
     }
 }
