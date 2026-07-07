@@ -16,11 +16,15 @@ public final class VaultAgentDtos {
             @Size(max = 1200, message = "질문은 1200자 이하로 입력해주세요.")
             String message,
 
-            String activeFolderName
+            String activeFolderName,
+
+            @Size(max = 80, message = "세션 값이 너무 깁니다.")
+            String sessionId
     ) {
     }
 
     public record ChatResponse(
+            String sessionId,
             String answer,
             List<AgentStage> stages,
             List<SourceNote> sources
@@ -55,6 +59,22 @@ public final class VaultAgentDtos {
             String question,
             String answerPreview,
             int sourceCount,
+            List<SourceNote> sources,
+            Instant createdAt
+    ) {
+    }
+
+    public record ChatHistoryResponse(
+            String sessionId,
+            List<ChatHistoryMessage> messages
+    ) {
+    }
+
+    public record ChatHistoryMessage(
+            String id,
+            String role,
+            String content,
+            List<AgentStage> stages,
             List<SourceNote> sources,
             Instant createdAt
     ) {

@@ -10,6 +10,7 @@ export default function FloatingChat() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isVaultPage = pathname.startsWith('/vault');
 
   useEffect(() => {
     if (searchParams.get('chat') === 'open') {
@@ -46,8 +47,12 @@ export default function FloatingChat() {
 
   return (
     <>
-      <FloatingChatButton onClick={handleOpen} unreadCount={0} />
-      <ChatModal isOpen={isOpen} onClose={handleClose} />
+      <FloatingChatButton
+        onClick={handleOpen}
+        unreadCount={0}
+        bottomOffset={isVaultPage ? 'calc(env(safe-area-inset-bottom, 0px) + 5.75rem)' : undefined}
+      />
+      <ChatModal isOpen={isOpen} isElevated={isVaultPage} onClose={handleClose} />
     </>
   );
 }

@@ -18,9 +18,24 @@ export interface VaultAgentSource {
 }
 
 export interface VaultAgentChatResponse {
+  sessionId: string;
   answer: string;
   stages: VaultAgentStage[];
   sources: VaultAgentSource[];
+}
+
+export interface VaultAgentHistoryMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  stages: VaultAgentStage[];
+  sources: VaultAgentSource[];
+  createdAt?: string;
+}
+
+export interface VaultAgentHistoryResponse {
+  sessionId: string;
+  messages: VaultAgentHistoryMessage[];
 }
 
 export interface VaultAgentRun {
@@ -32,13 +47,26 @@ export interface VaultAgentRun {
   createdAt?: string;
 }
 
-export function sendVaultAgentMessage(message: string, activeFolderName?: string) {
+export function sendVaultAgentMessage(
+  message: string,
+  activeFolderName?: string,
+  sessionId?: string
+) {
   return apiClient.post<VaultAgentChatResponse>('/vault/agent/chat', {
     message,
     activeFolderName,
+    sessionId,
   });
 }
 
+export function fetchVaultAgentHistory(sessionId: string) {
+  return apiClient.get<VaultAgentHistoryResponse>(
+    `/vault/agent/history?sessionId=${encodeURIComponent(sessionId)}`
+  );
+}
+
 export function fetchVaultAgentRuns(page: number = 0, size: number = 10) {
-  return apiClient.get<PageResponse<VaultAgentRun>>(`/admin/vault/agent/runs?page=${page}&size=${size}`);
+  return apiClient.get<PageResponse<VaultAgentRun>>(
+    `/admin/vault/agent/runs?page=${page}&size=${size}`
+  );
 }

@@ -1,10 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/entities/user/model/authStore';
-import { sendVaultAgentMessage, type VaultAgentSource, type VaultAgentStage } from '@/features/vault/api/vaultAgentApi';
+import {
+  fetchVaultAgentHistory,
+  sendVaultAgentMessage,
+  type VaultAgentSource,
+  type VaultAgentStage,
+} from '@/features/vault/api/vaultAgentApi';
 import { useChatSocket } from '@/features/chat/lib/useChatSocket';
 import ChatMessageList from '@/features/chat/ui/ChatMessageList';
 import { ChatComposer } from './ChatComposer';
@@ -12,18 +18,21 @@ import { ChatModalHeader } from './ChatModalHeader';
 
 interface ChatModalProps {
   isOpen: boolean;
+  isElevated?: boolean;
   onClose: () => void;
 }
 
 type ChatMode = 'agent' | 'owner';
 
 interface AgentMessage {
-  id: number;
+  id: string;
   role: 'user' | 'assistant';
   content: string;
   stages?: VaultAgentStage[];
   sources?: VaultAgentSource[];
 }
+
+const AGENT_SESSION_STORAGE_KEY = 'kscold-agent-chat-session-id';
 
 const starterPrompts = [
   '최근 블로그에서 AI Agent 관련 내용 요약해줘',
@@ -36,15 +45,39 @@ const sourceHref = (source: VaultAgentSource) => {
   return `${path}${path.includes('?') ? '&' : '?'}chat=open`;
 };
 
-export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
+const createSessionId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+};
+
+const getOrCreateAgentSessionId = () => {
+  if (typeof window === 'undefined') {
+    return createSessionId();
+  }
+
+  const savedSessionId = window.localStorage.getItem(AGENT_SESSION_STORAGE_KEY);
+  if (savedSessionId) {
+    return savedSessionId;
+  }
+
+  const nextSessionId = createSessionId();
+  window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, nextSessionId);
+  return nextSessionId;
+};
+
+export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatModalProps) {
   const { user } = useAuthStore();
   const [inputMessage, setInputMessage] = useState('');
   const [agentInput, setAgentInput] = useState('');
+  const [agentSessionId, setAgentSessionId] = useState('');
   const [mode, setMode] = useState<ChatMode>('agent');
   const [isAgentThinking, setIsAgentThinking] = useState(false);
+  const [hasLoadedAgentHistory, setHasLoadedAgentHistory] = useState(false);
   const [agentMessages, setAgentMessages] = useState<AgentMessage[]>([
     {
-      id: 1,
+      id: 'initial-agent-greeting',
       role: 'assistant',
       content:
         '안녕하세요. 승찬님이 공개해둔 블로그 글, 피드, Vault 노트를 찾아 답하는 KSCOLD Agent예요. 비로그인 상태에서는 공개된 콘텐츠만 근거로 사용합니다.',
@@ -61,6 +94,45 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
     isOpen: isOpen && !!user && mode === 'owner',
     username,
   });
+  const modalPositionStyle = {
+    '--chat-modal-bottom': isElevated
+      ? 'calc(env(safe-area-inset-bottom, 0px) + 7.75rem)'
+      : 'calc(env(safe-area-inset-bottom, 0px) + 6rem)',
+    '--chat-modal-max-height': isElevated
+      ? 'calc(100dvh - env(safe-area-inset-bottom, 0px) - 9.25rem)'
+      : 'calc(100dvh - env(safe-area-inset-bottom, 0px) - 7.5rem)',
+  } as CSSProperties;
+
+  useEffect(() => {
+    if (!isOpen || hasLoadedAgentHistory) {
+      return;
+    }
+
+    const sessionId = getOrCreateAgentSessionId();
+    setAgentSessionId(sessionId);
+
+    fetchVaultAgentHistory(sessionId)
+      .then(history => {
+        if (history.sessionId && history.sessionId !== sessionId) {
+          window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, history.sessionId);
+          setAgentSessionId(history.sessionId);
+        }
+
+        if (history.messages.length > 0) {
+          setAgentMessages(
+            history.messages.map(message => ({
+              id: message.id,
+              role: message.role,
+              content: message.content,
+              stages: message.stages,
+              sources: message.sources,
+            }))
+          );
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => setHasLoadedAgentHistory(true));
+  }, [hasLoadedAgentHistory, isOpen]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,11 +145,13 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
     e?.preventDefault();
     const question = agentInput.trim();
     if (!question || isAgentThinking) return;
+    const sessionId = agentSessionId || getOrCreateAgentSessionId();
+    setAgentSessionId(sessionId);
 
     setAgentMessages(prev => [
       ...prev,
       {
-        id: Date.now(),
+        id: `local-user-${Date.now()}`,
         role: 'user',
         content: question,
       },
@@ -86,11 +160,15 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
     setIsAgentThinking(true);
 
     try {
-      const response = await sendVaultAgentMessage(question, 'KSCOLD 공개 콘텐츠');
+      const response = await sendVaultAgentMessage(question, 'KSCOLD 공개 콘텐츠', sessionId);
+      if (response.sessionId && response.sessionId !== sessionId) {
+        window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, response.sessionId);
+        setAgentSessionId(response.sessionId);
+      }
       setAgentMessages(prev => [
         ...prev,
         {
-          id: Date.now() + 1,
+          id: `assistant-${Date.now()}`,
           role: 'assistant',
           content: response.answer,
           stages: response.stages,
@@ -101,7 +179,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
       setAgentMessages(prev => [
         ...prev,
         {
-          id: Date.now() + 1,
+          id: `assistant-error-${Date.now()}`,
           role: 'assistant',
           content:
             '지금 Agent 서버 연결이 잠깐 불안정해요. 잠시 뒤 다시 물어봐 주세요. 공개 콘텐츠 검색 기능은 서버가 회복되면 바로 이어집니다.',
@@ -131,7 +209,8 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
           <motion.div
             className="fixed z-[1400] bg-white border border-surface-200 shadow-2xl overflow-hidden flex flex-col
                        inset-0 h-[100dvh] rounded-none
-                       sm:inset-auto sm:bottom-24 sm:right-6 sm:w-[400px] sm:h-[600px] sm:rounded-[24px]"
+                       sm:inset-auto sm:bottom-[var(--chat-modal-bottom)] sm:right-6 sm:h-[600px] sm:max-h-[var(--chat-modal-max-height)] sm:w-[400px] sm:min-h-[420px] sm:min-w-[360px] sm:max-w-[calc(100vw-3rem)] sm:resize sm:rounded-[24px]"
+            style={modalPositionStyle}
             initial={{ opacity: 0, y: 80 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 80 }}
@@ -201,8 +280,18 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                       disabled={!agentInput.trim() || isAgentThinking}
                       className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-surface-900 text-white transition-all hover:bg-surface-800 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                        />
                       </svg>
                     </button>
                   </form>
@@ -211,7 +300,9 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
             ) : !user ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-surface-50 p-6">
                 <div className="text-center">
-                  <p className="text-sm font-bold text-surface-900">주인에게 메시지를 남기려면 로그인이 필요해요</p>
+                  <p className="text-sm font-bold text-surface-900">
+                    주인에게 메시지를 남기려면 로그인이 필요해요
+                  </p>
                   <p className="mt-1 text-xs leading-5 text-surface-400">
                     로그인 없이 궁금한 내용은 Agent에게 바로 물어볼 수 있습니다.
                   </p>
@@ -238,7 +329,9 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
                 <ChatMessageList messages={messages} currentUsername={username} />
                 <ChatComposer
                   value={inputMessage}
-                  placeholder={isConnected ? '메시지를 입력하세요...' : '네트워크가 불안정해도 전송됩니다'}
+                  placeholder={
+                    isConnected ? '메시지를 입력하세요...' : '네트워크가 불안정해도 전송됩니다'
+                  }
                   disabled={!inputMessage.trim()}
                   onChange={setInputMessage}
                   onSubmit={handleSendMessage}
@@ -274,7 +367,10 @@ function AgentMessageList({
           {message.stages && message.role === 'assistant' && (
             <div className="mt-3 space-y-1.5">
               {message.stages.slice(0, 3).map(stage => (
-                <div key={stage.name} className="rounded-xl bg-surface-50 px-3 py-2 text-xs leading-5 text-surface-600">
+                <div
+                  key={stage.name}
+                  className="rounded-xl bg-surface-50 px-3 py-2 text-xs leading-5 text-surface-600"
+                >
                   <span className="font-black text-cyan-600">{stage.name}</span>
                   <span className="mx-2 text-surface-300">·</span>
                   {stage.detail}

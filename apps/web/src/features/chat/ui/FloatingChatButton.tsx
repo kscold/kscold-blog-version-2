@@ -7,9 +7,14 @@ import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 interface FloatingChatButtonProps {
   onClick: () => void;
   unreadCount?: number;
+  bottomOffset?: string;
 }
 
-export default function FloatingChatButton({ onClick, unreadCount = 0 }: FloatingChatButtonProps) {
+export default function FloatingChatButton({
+  onClick,
+  unreadCount = 0,
+  bottomOffset = 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
+}: FloatingChatButtonProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { allowRichEffects, supportsHover, reduceMotion } = usePerformanceMode();
 
@@ -19,7 +24,7 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
       onHoverStart={supportsHover ? () => setIsHovered(true) : undefined}
       onHoverEnd={supportsHover ? () => setIsHovered(false) : undefined}
       className="fixed right-4 z-[1200] group sm:right-6"
-      style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
+      style={{ bottom: bottomOffset }}
       initial={allowRichEffects ? { scale: 0, opacity: 0 } : false}
       animate={allowRichEffects ? { scale: 1, opacity: 1 } : undefined}
       transition={allowRichEffects ? { type: 'spring', stiffness: 400, damping: 25 } : undefined}
@@ -37,24 +42,24 @@ export default function FloatingChatButton({ onClick, unreadCount = 0 }: Floatin
         {supportsHover && allowRichEffects ? (
           <AnimatePresence mode="wait">
             {!isHovered ? (
-            <motion.svg
-              key="chat"
-              className="h-7 w-7 text-white sm:h-8 sm:w-8"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, rotate: 180 }}
-              transition={{ duration: 0.3 }}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </motion.svg>
+              <motion.svg
+                key="chat"
+                className="h-7 w-7 text-white sm:h-8 sm:w-8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                exit={{ scale: 0, rotate: 180 }}
+                transition={{ duration: 0.3 }}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </motion.svg>
             ) : (
               <motion.svg
                 key="message"
