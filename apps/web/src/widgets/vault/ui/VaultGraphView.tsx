@@ -155,6 +155,11 @@ export function VaultGraphView({
   // 클릭 리플 — 이동/필터 액션의 출발점이 시각적으로 느껴지도록
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const rippleSeq = useRef(0);
+  const nodeDragStateRef = useRef({
+    isDragging: false,
+    didMove: false,
+    suppressClickUntil: 0,
+  });
 
   const spawnRipple = useCallback((node: NodeObject) => {
     const fg = fgRef.current;
@@ -170,6 +175,10 @@ export function VaultGraphView({
   }, [folderColorMap]);
 
   const handleNodeClick = useCallback((node: NodeObject) => {
+    if (nodeDragStateRef.current.isDragging || Date.now() < nodeDragStateRef.current.suppressClickUntil) {
+      return;
+    }
+
     if (!reduceMotion) spawnRipple(node);
     const gn = node as unknown as GraphNode;
     if (gn.isFolder && onFolderClick) {
@@ -182,6 +191,24 @@ export function VaultGraphView({
       }
     }
   }, [onFolderClick, onNodeClick, router, reduceMotion, spawnRipple]);
+
+  const handleNodeDrag = useCallback((_node: NodeObject, translate: { x: number; y: number }) => {
+    nodeDragStateRef.current.isDragging = true;
+    if (Math.abs(translate.x) > 1 || Math.abs(translate.y) > 1) {
+      nodeDragStateRef.current.didMove = true;
+    }
+  }, []);
+
+  const handleNodeDragEnd = useCallback(() => {
+    const didMove = nodeDragStateRef.current.didMove;
+    nodeDragStateRef.current.isDragging = false;
+    nodeDragStateRef.current.didMove = false;
+
+    if (didMove) {
+      nodeDragStateRef.current.suppressClickUntil = Date.now() + 250;
+      fgRef.current?.d3ReheatSimulation();
+    }
+  }, []);
 
   const isLinkHovered = useCallback((link: GraphLink): boolean => {
     if (!hoverNode) return false;
@@ -296,7 +323,7 @@ export function VaultGraphView({
       onMouseEnter={handleGraphMouseEnter}
       onMouseLeave={handleGraphMouseLeave}
       onMouseMove={supportsHover ? handleParallaxMouse : undefined}
-      className={`w-full h-full relative overflow-hidden rounded-xl gallery-card transition-[opacity,transform] duration-700 ease-out ${entered ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.985]'}`}
+      className={`w-full h-full relative overflow-hidden rounded-xl gallery-card select-none touch-none transition-[opacity,transform] duration-700 ease-out ${entered ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.985]'}`}
     >
       {/* ── 화이트 우주 배경 (순수 CSS — 캔버스 성능 영향 없음) ── */}
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
@@ -369,6 +396,11 @@ export function VaultGraphView({
         linkCanvasObjectMode={() => 'replace'}
         linkCanvasObject={linkCanvasObject}
         onNodeClick={handleNodeClick}
+        onNodeDrag={handleNodeDrag}
+        onNodeDragEnd={handleNodeDragEnd}
+        enableNodeDrag
+        enablePanInteraction
+        enableZoomInteraction
         d3AlphaDecay={reducedGraphEffects ? 0.05 : 0.015}
         d3VelocityDecay={reducedGraphEffects ? 0.48 : 0.35}
         warmupTicks={reducedGraphEffects ? 36 : 80}
