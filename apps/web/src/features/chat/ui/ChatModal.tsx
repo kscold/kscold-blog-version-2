@@ -42,7 +42,7 @@ export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
       id: 1,
       role: 'assistant',
       content:
-        '안녕하세요. KSCOLD 공개 블로그 글, 피드, Vault 노트를 함께 찾아 답하는 Agent예요. 비로그인 상태에서는 공개된 콘텐츠만 근거로 사용합니다.',
+        '안녕하세요. 승찬님이 공개해둔 블로그 글, 피드, Vault 노트를 찾아 답하는 KSCOLD Agent예요. 비로그인 상태에서는 공개된 콘텐츠만 근거로 사용합니다.',
       stages: [
         { name: '검색', detail: '공개 콘텐츠에서 질문과 가까운 근거를 찾습니다.' },
         { name: '연결', detail: 'Vault 링크와 백링크로 주변 맥락을 넓힙니다.' },
