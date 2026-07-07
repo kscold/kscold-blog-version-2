@@ -40,9 +40,6 @@ QUERY_EXPANSIONS = {
     "자바스크립트": ["javascript", "js"],
     "javascript": ["자바스크립트", "js"],
     "js": ["javascript", "자바스크립트"],
-    "배열": ["array", "arrays"],
-    "array": ["배열", "arrays"],
-    "arrays": ["array", "배열"],
     "차이": ["비교", "difference"],
     "비교": ["차이", "difference"],
 }
@@ -56,6 +53,17 @@ LANGUAGE_FOLDER_HINTS = {
     "python": "python",
     "파이썬": "python",
     "sql": "sql",
+}
+
+FOCUS_STOP_TERMS = {
+    "차이",
+    "비교",
+    "difference",
+    "알려줘",
+    "설명",
+    "정리",
+    "관련",
+    "에서",
 }
 
 
@@ -475,16 +483,11 @@ class VaultStore:
         return term
 
     def _language_hints(self, terms: list[str]) -> set[str]:
-        hints = {
+        return {
             folder_hint
             for term in terms
             if (folder_hint := LANGUAGE_FOLDER_HINTS.get(term.lower()))
         }
-        lowered_terms = " ".join(term.lower() for term in terms)
-        for keyword, folder_hint in LANGUAGE_FOLDER_HINTS.items():
-            if keyword in lowered_terms:
-                hints.add(folder_hint)
-        return hints
 
     def _folder_name(self, folder_id: object) -> str:
         names = self._folder_names(folder_id)
@@ -540,30 +543,33 @@ class VaultStore:
             selected.append(hit)
             selected_ids.add(hit.note.id)
 
-        selected.sort(key=lambda hit: hit.score, reverse=True)
         return selected[:limit]
 
     def _note_matches_language(self, note: VaultNote, language_hint: str) -> bool:
         folder_names = self._folder_names(note.folder_id)
-        if any(language_hint == name or language_hint in name for name in folder_names):
+        if any(language_hint == name for name in folder_names):
             return True
         combined = f"{note.title} {note.slug} {' '.join(note.tags)}".lower()
+        if re.fullmatch(r"[a-z0-9.+#-]+", language_hint):
+            return re.search(rf"(?<![a-z0-9]){re.escape(language_hint)}(?![a-z0-9])", combined) is not None
         return language_hint in combined
 
     def _note_matches_query_focus(self, note: VaultNote, terms: list[str]) -> bool:
-        title = note.title.lower()
-        slug = note.slug.lower()
-        if "배열" in terms or "array" in terms or "arrays" in terms:
-            return (
-                "array" in title
-                or "배열" in title
-                or "arrays" in title
-                or "arraylist" in title
-                or title in {"list", "toarray()"}
-                or "array" in slug
-                or "배열" in slug
-            )
-        return True
+        focus_terms = self._content_focus_terms(terms)
+        if not focus_terms:
+            return True
+        combined = f"{note.title} {note.slug} {' '.join(note.tags)} {note.content[:1200]}".lower()
+        return any(term in combined for term in focus_terms)
+
+    def _content_focus_terms(self, terms: list[str]) -> list[str]:
+        language_aliases = set(LANGUAGE_FOLDER_HINTS.keys()) | set(LANGUAGE_FOLDER_HINTS.values())
+        return [
+            term.lower()
+            for term in terms
+            if len(term) >= 2
+            and term.lower() not in language_aliases
+            and term.lower() not in FOCUS_STOP_TERMS
+        ][:8]
 
     def _keyword_score(
         self,
@@ -601,27 +607,6 @@ class VaultStore:
             for hint in language_hints:
                 if any(hint == folder_name or hint in folder_name for folder_name in folder_names):
                     score += 5 if not scoped else 2
-
-        array_query = "배열" in terms or "array" in terms or "arrays" in terms
-        if array_query:
-            array_core = (
-                "array" in title_lower
-                or "배열" in title_lower
-                or "arrays" in title_lower
-                or "arraylist" in title_lower
-                or title_lower in {"list", "toarray()"}
-                or "array" in slug_lower
-                or "배열" in slug_lower
-            )
-            array_related = array_core or "배열" in content_lower or "array" in content_lower
-            if "array" in title_lower or "배열" in title_lower:
-                score += 8
-            if "arrays" in title_lower or "arraylist" in title_lower or "list" == title_lower or title_lower == "toarray()":
-                score += 4
-            if "array" in slug_lower or "배열" in slug_lower:
-                score += 3
-            if not array_core:
-                score *= 0.35 if array_related else 0.2
 
         comparison_query = "차이" in terms or "비교" in terms or "difference" in terms
         if comparison_query and len(language_hints) >= 2:
