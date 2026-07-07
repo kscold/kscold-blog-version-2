@@ -90,6 +90,9 @@ PROFILE_QUERY_TERMS = {
     "개발자",
     "너",
     "나",
+    "누구",
+    "누구야",
+    "누구인가",
     "소개",
     "프로필",
     "연락",
@@ -229,6 +232,8 @@ class VaultStore:
             )
             for candidate in candidates
         ]
+        if not folder_ids and self._profile_query_matches(query, terms):
+            scored.append(SearchHit(note=self._profile_candidate(), score=12.0))
         scored.sort(key=lambda hit: hit.score, reverse=True)
         return self._balanced_hits(scored, language_hints, terms, limit)
 
