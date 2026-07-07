@@ -8,7 +8,6 @@ import { ClientVaultGraph } from './ClientVaultGraph';
 import { VaultFolderTree } from './VaultFolderTree';
 import { useVaultGraphData } from '@/features/vault/lib/useVaultGraph';
 import { GraphPanelSkeleton } from '@/shared/ui/RouteSkeletons';
-import { VaultAgentChatPanel } from './VaultAgentChatPanel';
 
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 560;
@@ -22,7 +21,6 @@ export function VaultGraphLayout() {
   const [activeFolderId, setActiveFolderId] = useState<string | null>(initialFolder);
   const [hoverFolderId, setHoverFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isAgentOpen, setIsAgentOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -33,9 +31,6 @@ export function VaultGraphLayout() {
   const { folders, isFoldersLoading, isGraphLoading, filteredGraph, colorMap } =
     useVaultGraphData(activeFolderId);
 
-  const activeFolderName = activeFolderId
-    ? folders.find(folder => folder.id === activeFolderId)?.name
-    : undefined;
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -154,25 +149,6 @@ export function VaultGraphLayout() {
           <GraphPanelSkeleton />
         ) : filteredGraph ? (
           <div className={`w-full h-full flex flex-col overflow-hidden lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 lg:shadow-sm border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-surface-200/50 dark:border-surface-800/50'}`}>
-            <div className="absolute right-4 top-4 z-20 flex flex-col items-end gap-2">
-              <button
-                type="button"
-                onClick={() => setIsAgentOpen(prev => !prev)}
-                className={`group inline-flex cursor-pointer select-none items-center justify-center gap-2 rounded-2xl border px-6 py-3 text-sm font-bold shadow-sm outline-none transition-all duration-300 hover:shadow-md active:scale-95 ${
-                  isAgentOpen
-                    ? 'border-surface-900 bg-surface-900 text-white dark:border-white dark:bg-white dark:text-surface-950'
-                    : isTouchDevice
-                      ? 'border-surface-200 bg-white text-surface-600 hover:border-surface-900 hover:text-surface-900 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-300 dark:hover:border-white dark:hover:text-white'
-                      : 'border-surface-200 bg-white/95 text-surface-600 backdrop-blur-xl hover:border-surface-900 hover:text-surface-900 dark:border-surface-800 dark:bg-surface-950/95 dark:text-surface-300 dark:hover:border-white dark:hover:text-white'
-                }`}
-                aria-pressed={isAgentOpen}
-              >
-                <svg className="h-4 w-4 transition-transform duration-200 group-hover:rotate-6 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c.251.023.501.05.75.082m-.75-.082a24.301 24.301 0 0 0-4.5 0m4.5 0v.75m4.5-.75v5.714c0 .597.237 1.169.659 1.591L19 14.5m-4.5-11.396c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m-4.5 0v.75M5 14.5h14m-14 0v.75A2.25 2.25 0 0 0 7.25 17.5h9.5A2.25 2.25 0 0 0 19 15.25v-.75" />
-                </svg>
-                <span>Agent에게 묻기</span>
-              </button>
-            </div>
             <ClientVaultGraph
               graphData={filteredGraph}
               folderColorMap={colorMap}
@@ -180,13 +156,6 @@ export function VaultGraphLayout() {
               theme={theme}
               highlightFolderId={hoverFolderId}
             />
-            {isAgentOpen && (
-              <VaultAgentChatPanel
-                graphData={filteredGraph}
-                activeFolderName={activeFolderName}
-                onClose={() => setIsAgentOpen(false)}
-              />
-            )}
           </div>
         ) : (
           <div className={`text-surface-500 w-full h-full flex flex-col items-center justify-center lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md border-surface-200/50 dark:border-surface-800/50'}`}>No Data</div>
@@ -195,7 +164,7 @@ export function VaultGraphLayout() {
 
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 p-4 rounded-full bg-surface-900 text-white shadow-xl hover:scale-105 active:scale-95 transition-all outline-none border border-white/10"
+        className="lg:hidden fixed bottom-6 left-6 z-50 p-4 rounded-full bg-surface-900 text-white shadow-xl hover:scale-105 active:scale-95 transition-all outline-none border border-white/10"
       >
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
           {isMobileOpen ? (

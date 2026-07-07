@@ -1,14 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
-import { VaultAgentChatPanel } from '@/widgets/vault/ui/VaultAgentChatPanel';
 
 export function HeroSection() {
   const { supportsHover, prefersReducedMotion } = usePerformanceMode();
-  const [isAgentOpen, setIsAgentOpen] = useState(false);
   const animate = !prefersReducedMotion;
 
   return (
@@ -124,13 +121,12 @@ export function HeroSection() {
           >
             <span className="font-bold tracking-wide">피드 보기</span>
           </Link>
-          <button
-            type="button"
-            onClick={() => setIsAgentOpen(true)}
+          <Link
+            href="/?chat=open"
             className="group flex items-center justify-center w-full sm:w-auto px-10 py-4 text-surface-600 bg-white border border-surface-200 hover:border-surface-900 hover:text-surface-900 transition-all duration-300 rounded-2xl hover:shadow-sm active:scale-95"
           >
             <span className="font-bold tracking-wide">Agent에게 묻기</span>
-          </button>
+          </Link>
         </motion.div>
 
         {/* 외부 링크 */}
@@ -159,15 +155,6 @@ export function HeroSection() {
           ))}
         </motion.div>
       </motion.div>
-      {isAgentOpen && (
-        <div className="fixed inset-0 z-[80] bg-surface-950/10 backdrop-blur-sm">
-          <VaultAgentChatPanel
-            graphData={null}
-            activeFolderName="KSCOLD 공개 콘텐츠"
-            onClose={() => setIsAgentOpen(false)}
-          />
-        </div>
-      )}
     </section>
   );
 }

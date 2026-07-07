@@ -139,6 +139,14 @@ class VaultStore:
     def iter_notes(self) -> list[VaultNote]:
         return [self._to_note(document) for document in self.notes.find({})]
 
+    def iter_index_documents(self) -> list[VaultNote]:
+        return [
+            *self.iter_notes(),
+            *self._public_post_candidates([], limit=1000),
+            *self._public_feed_candidates([], limit=2000),
+            self._profile_candidate(),
+        ]
+
     def fetch_notes(self, note_ids: list[str]) -> list[VaultNote]:
         if not note_ids:
             return []
@@ -183,18 +191,25 @@ class VaultStore:
         except Exception:
             return keyword_hits[:limit]
 
-        note_ids = [str(hit.payload.get("note_id")) for hit in hits if hit.payload]
-        notes = {note.id: note for note in self.fetch_notes(note_ids)}
+        document_refs = [
+            (
+                str(hit.payload.get("content_type") or "vault"),
+                str(hit.payload.get("document_id") or hit.payload.get("note_id")),
+            )
+            for hit in hits
+            if hit.payload and (hit.payload.get("document_id") or hit.payload.get("note_id"))
+        ]
+        notes = self._fetch_index_documents(document_refs)
         if folder_ids:
             notes = {
-                note_id: note
-                for note_id, note in notes.items()
-                if note.folder_id in folder_ids
+                key: note
+                for key, note in notes.items()
+                if note.content_type != "vault" or note.folder_id in folder_ids
             }
         vector_hits = [
-            SearchHit(note=notes[note_id], score=float(hit.score) + 1)
-            for hit, note_id in zip(hits, note_ids)
-            if note_id in notes
+            SearchHit(note=notes[f"{document_type}:{document_id}"], score=float(hit.score) + 1)
+            for hit, (document_type, document_id) in zip(hits, document_refs)
+            if f"{document_type}:{document_id}" in notes
         ]
         return self._dedupe_hits([*vector_hits, *keyword_hits], limit)
 
@@ -288,14 +303,14 @@ class VaultStore:
         return expanded
 
     def reindex(self, force: bool = False) -> tuple[int, int, int]:
-        notes = self.iter_notes()
+        notes = self.iter_index_documents()
         indexed = 0
         skipped = 0
 
         for note in notes:
             text = self._embedding_text(note)
             content_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
-            point_id = self._point_id(note.id)
+            point_id = self._point_id(note)
             if not force:
                 existing = self.qdrant.retrieve(
                     collection_name=self.config.qdrant_collection,
@@ -314,7 +329,10 @@ class VaultStore:
                         id=point_id,
                         vector=self.embed_text(text),
                         payload={
+                            "content_type": note.content_type,
+                            "document_id": note.id,
                             "note_id": note.id,
+                            "path": note.path,
                             "slug": note.slug,
                             "title": note.title,
                             "tags": note.tags,
@@ -340,7 +358,7 @@ class VaultStore:
                 break
         return selected
 
-    def _public_post_candidates(self, conditions: list[dict]) -> list[VaultNote]:
+    def _public_post_candidates(self, conditions: list[dict], limit: int = 120) -> list[VaultNote]:
         post_conditions = []
         for condition in conditions:
             if "title" in condition:
@@ -350,22 +368,11 @@ class VaultStore:
                 post_conditions.append({"excerpt": condition["content"]})
             if "tags" in condition:
                 post_conditions.append({"tags.name": condition["tags"]})
-        restricted_category_ids = [
-            str(document.get("_id"))
-            for document in self.categories.find({"restricted": True}, {"_id": 1})
-        ]
-        public_filter = {
-            "status": "PUBLISHED",
-            "$or": [
-                {"publicOverride": True},
-                {"category.id": {"$nin": restricted_category_ids}},
-                {"category.id": {"$exists": False}},
-            ],
-        }
+        public_filter = self._public_post_filter()
         query_filter = {"$and": [public_filter, {"$or": post_conditions}]} if post_conditions else public_filter
-        return [self._to_post(document) for document in self.posts.find(query_filter).limit(120)]
+        return [self._to_post(document) for document in self.posts.find(query_filter).limit(limit)]
 
-    def _public_feed_candidates(self, conditions: list[dict]) -> list[VaultNote]:
+    def _public_feed_candidates(self, conditions: list[dict], limit: int = 120) -> list[VaultNote]:
         feed_conditions = []
         for condition in conditions:
             if "title" in condition:
@@ -376,7 +383,59 @@ class VaultStore:
                 feed_conditions.append({"tags": condition["tags"]})
         public_filter = {"visibility": "PUBLIC"}
         query_filter = {"$and": [public_filter, {"$or": feed_conditions}]} if feed_conditions else public_filter
-        return [self._to_feed(document) for document in self.feeds.find(query_filter).limit(120)]
+        return [self._to_feed(document) for document in self.feeds.find(query_filter).limit(limit)]
+
+    def _fetch_index_documents(self, refs: list[tuple[str, str]]) -> dict[str, VaultNote]:
+        refs_by_type: dict[str, list[str]] = {}
+        for content_type, document_id in refs:
+            refs_by_type.setdefault(content_type, []).append(document_id)
+
+        documents: dict[str, VaultNote] = {}
+        vault_ids = refs_by_type.get("vault", [])
+        for note in self.fetch_notes(vault_ids):
+            documents[f"vault:{note.id}"] = note
+
+        post_ids = refs_by_type.get("blog", [])
+        if post_ids:
+            public_filter = self._public_post_filter()
+            query_filter = {"$and": [public_filter, {"_id": {"$in": self._mongo_ids(post_ids)}}]}
+            for document in self.posts.find(query_filter):
+                note = self._to_post(document)
+                documents[f"blog:{note.id}"] = note
+
+        feed_ids = refs_by_type.get("feed", [])
+        if feed_ids:
+            for document in self.feeds.find({"visibility": "PUBLIC", "_id": {"$in": self._mongo_ids(feed_ids)}}):
+                note = self._to_feed(document)
+                documents[f"feed:{note.id}"] = note
+
+        if refs_by_type.get("profile"):
+            profile = self._profile_candidate()
+            documents[f"profile:{profile.id}"] = profile
+
+        return documents
+
+    def _public_post_filter(self) -> dict:
+        restricted_category_ids = [
+            str(document.get("_id"))
+            for document in self.categories.find({"restricted": True}, {"_id": 1})
+        ]
+        return {
+            "status": "PUBLISHED",
+            "$or": [
+                {"publicOverride": True},
+                {"category.id": {"$nin": restricted_category_ids}},
+                {"category.id": {"$exists": False}},
+            ],
+        }
+
+    def _mongo_ids(self, ids: list[str]) -> list[object]:
+        values: list[object] = []
+        for value in ids:
+            values.append(value)
+            if ObjectId.is_valid(value):
+                values.append(ObjectId(value))
+        return values
 
     def _profile_candidate(self) -> VaultNote:
         return VaultNote(
@@ -512,8 +571,9 @@ class VaultStore:
             path=f"/feed/{feed_id}",
         )
 
-    def _point_id(self, note_id: str) -> str:
-        return str(uuid.uuid5(uuid.NAMESPACE_URL, f"kscold-vault-note:{note_id}"))
+    def _point_id(self, note: VaultNote) -> str:
+        document_key = note.id if note.content_type == "vault" else f"{note.content_type}:{note.id}"
+        return str(uuid.uuid5(uuid.NAMESPACE_URL, f"kscold-vault-note:{document_key}"))
 
     def _query_terms(self, query: str) -> list[str]:
         query_lower = query.lower()

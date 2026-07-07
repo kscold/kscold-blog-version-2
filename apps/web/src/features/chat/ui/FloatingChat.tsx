@@ -28,6 +28,17 @@ export default function FloatingChat() {
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
 
+  const handleOpen = () => {
+    setIsOpen(true);
+    if (searchParams.get('chat') === 'open') {
+      return;
+    }
+
+    const next = new URLSearchParams(searchParams.toString());
+    next.set('chat', 'open');
+    router.replace(`${pathname}?${next.toString()}`, { scroll: false });
+  };
+
   const handleClose = () => {
     setIsOpen(false);
     clearChatParam();
@@ -35,7 +46,7 @@ export default function FloatingChat() {
 
   return (
     <>
-      <FloatingChatButton onClick={() => setIsOpen(true)} unreadCount={0} />
+      <FloatingChatButton onClick={handleOpen} unreadCount={0} />
       <ChatModal isOpen={isOpen} onClose={handleClose} />
     </>
   );

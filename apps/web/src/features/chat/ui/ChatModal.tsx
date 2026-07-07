@@ -31,6 +31,11 @@ const starterPrompts = [
   'Vault에서 먼저 보면 좋은 노트 알려줘',
 ];
 
+const sourceHref = (source: VaultAgentSource) => {
+  const path = source.path || `/vault/${encodeURIComponent(source.slug)}`;
+  return `${path}${path.includes('?') ? '&' : '?'}chat=open`;
+};
+
 export default function ChatModal({ isOpen, onClose }: ChatModalProps) {
   const { user } = useAuthStore();
   const [inputMessage, setInputMessage] = useState('');
@@ -286,7 +291,7 @@ function AgentMessageList({
                 {message.sources.slice(0, 5).map(source => (
                   <Link
                     key={`${source.type}-${source.id}`}
-                    href={source.path || `/vault/${encodeURIComponent(source.slug)}`}
+                    href={sourceHref(source)}
                     className="flex items-center justify-between gap-2 rounded-xl border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:bg-white hover:text-surface-900"
                   >
                     <span className="min-w-0 truncate">
