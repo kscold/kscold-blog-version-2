@@ -236,7 +236,7 @@ class VaultStore:
             )
 
         query_filter = {"$and": [folder_filter, {"$or": conditions}]} if folder_filter else {"$or": conditions}
-        candidates = [self._to_note(document) for document in self.notes.find(query_filter).limit(180)]
+        candidates = [self._to_note(document) for document in self.notes.find(query_filter).limit(800)]
         if not folder_ids:
             candidates.extend(self._public_post_candidates(conditions))
             candidates.extend(self._public_feed_candidates(conditions))
