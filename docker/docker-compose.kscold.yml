@@ -56,7 +56,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_CHAT_MODEL=${OPENAI_CHAT_MODEL:-gpt-4o-mini}
       - OPENAI_EMBEDDING_MODEL=${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
-      - OPENAI_WEB_SEARCH_MODEL=${OPENAI_WEB_SEARCH_MODEL:-gpt-4o-mini-search-preview}
+      - OPENAI_WEB_SEARCH_MODEL=${OPENAI_WEB_SEARCH_MODEL:-gpt-5-search-api}
       - MONGODB_URI=mongodb://kscold-blog-mongo:27017/kscold-blog
       - MONGODB_DATABASE=kscold-blog
       - QDRANT_URL=http://blog-qdrant:6333

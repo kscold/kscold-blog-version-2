@@ -30,7 +30,7 @@ def load_config() -> AgentConfig:
         grpc_port=int(os.getenv("VAULT_AGENT_GRPC_PORT", "9090")),
         max_context_notes=int(os.getenv("VAULT_AGENT_MAX_CONTEXT_NOTES", "5")),
         web_search_enabled=os.getenv("VAULT_AGENT_WEB_SEARCH_ENABLED", "true").lower() == "true",
-        web_search_model=os.getenv("OPENAI_WEB_SEARCH_MODEL", "gpt-4o-mini-search-preview"),
+        web_search_model=os.getenv("OPENAI_WEB_SEARCH_MODEL", "gpt-5-search-api"),
         index_sync_interval_seconds=int(
             os.getenv("VAULT_AGENT_INDEX_SYNC_INTERVAL_SECONDS", "900")
         ),

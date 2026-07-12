@@ -23,14 +23,31 @@ class WebSearchTool:
         if not self.config.web_search_enabled:
             return []
 
-        response = self.openai.responses.create(
+        response = self.openai.chat.completions.create(
             model=self.config.web_search_model,
-            tools=[{"type": "web_search_preview"}],
-            input=f"KSCOLD Vault 답변 보강용으로 최신 웹 자료를 짧게 찾아줘: {query}",
+            web_search_options={},
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"KSCOLD Vault 답변 보강용으로 최신 웹 자료를 짧게 찾아줘: {query}",
+                }
+            ],
         )
-        text = getattr(response, "output_text", "") or ""
+        message = response.choices[0].message
+        text = message.content or ""
         if not text.strip():
             return []
+
+        citations = []
+        for annotation in getattr(message, "annotations", []) or []:
+            url_citation = getattr(annotation, "url_citation", None)
+            url = getattr(url_citation, "url", "") if url_citation else ""
+            title = getattr(url_citation, "title", "") if url_citation else ""
+            if url:
+                citations.append(f"- {title or '웹 출처'}: {url}")
+
+        if citations:
+            text = f"{text.strip()}\n\n웹 출처:\n" + "\n".join(dict.fromkeys(citations))
 
         return [
             WebSearchResult(
