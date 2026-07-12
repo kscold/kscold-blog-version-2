@@ -417,9 +417,22 @@ class VaultStore:
             reverse=True,
         )
         for language_hint in sorted(language_hints):
-            for hit in candidates:
+            exclusive_candidates = [
+                hit
+                for hit in candidates
+                if self._note_matches_language(hit.note, language_hint)
+                and not any(
+                    other_hint != language_hint
+                    and self._note_matches_language(hit.note, other_hint)
+                    for other_hint in language_hints
+                )
+            ]
+            language_candidates = exclusive_candidates or [
+                hit for hit in candidates if self._note_matches_language(hit.note, language_hint)
+            ]
+            for hit in language_candidates:
                 key = f"{hit.note.content_type}:{hit.note.id}"
-                if key in selected_keys or not self._note_matches_language(hit.note, language_hint):
+                if key in selected_keys:
                     continue
                 selected.append(hit)
                 selected_keys.add(key)
