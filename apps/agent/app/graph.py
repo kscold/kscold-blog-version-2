@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import threading
 from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
@@ -25,6 +26,8 @@ class VaultRagGraph:
     config: AgentConfig
     store: VaultStore = field(init=False)
     web_search: WebSearchTool = field(init=False)
+    _stop_event: threading.Event = field(default_factory=threading.Event, init=False)
+    _sync_thread: threading.Thread | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:
         self.store = VaultStore(self.config)
@@ -40,6 +43,37 @@ class VaultRagGraph:
         graph.add_edge("web_search", "respond")
         graph.add_edge("respond", END)
         self.app = graph.compile()
+
+    def start_index_sync(self) -> None:
+        if self._sync_thread is not None or self.config.index_sync_interval_seconds <= 0:
+            return
+
+        self._sync_thread = threading.Thread(
+            target=self._index_sync_loop,
+            name="vault-agent-index-sync",
+            daemon=True,
+        )
+        self._sync_thread.start()
+
+    def stop_index_sync(self) -> None:
+        self._stop_event.set()
+        if self._sync_thread is not None:
+            self._sync_thread.join(timeout=2)
+
+    def _index_sync_loop(self) -> None:
+        self._sync_once()
+        while not self._stop_event.wait(self.config.index_sync_interval_seconds):
+            self._sync_once()
+
+    def _sync_once(self) -> None:
+        try:
+            total, indexed, skipped = self.reindex()
+            print(
+                f"Vault Agent index sync total={total} indexed={indexed} skipped={skipped}",
+                flush=True,
+            )
+        except Exception as exception:
+            print(f"Vault Agent index sync failed: {exception}", flush=True)
 
     def retrieve(self, state: AgentState) -> AgentState:
         scoped_question = " ".join(
@@ -76,7 +110,7 @@ class VaultRagGraph:
         return state
 
     def search_web(self, state: AgentState) -> AgentState:
-        if not self.config.web_search_enabled:
+        if not self.config.web_search_enabled or not self._needs_web_search(state["question"]):
             state["web_results"] = []
             return state
 
@@ -100,6 +134,21 @@ class VaultRagGraph:
             }
         )
         return state
+
+    def _needs_web_search(self, question: str) -> bool:
+        return any(
+            keyword in question.lower()
+            for keyword in (
+                "최신",
+                "최근",
+                "현재",
+                "오늘",
+                "이번",
+                "뉴스",
+                "공식 문서",
+                "업데이트",
+            )
+        )
 
     def answer(self, state: AgentState) -> AgentState:
         answer = self.store.answer(

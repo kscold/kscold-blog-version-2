@@ -40,11 +40,22 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
             skipped_notes=skipped,
         )
 
+    def start_index_sync(self):
+        self.graph.start_index_sync()
+
+    def stop_index_sync(self):
+        self.graph.stop_index_sync()
+
 
 def serve(config: AgentConfig) -> None:
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
-    vault_agent_pb2_grpc.add_VaultAgentServiceServicer_to_server(VaultAgentServicer(config), server)
+    servicer = VaultAgentServicer(config)
+    vault_agent_pb2_grpc.add_VaultAgentServiceServicer_to_server(servicer, server)
     server.add_insecure_port(f"[::]:{config.grpc_port}")
     server.start()
+    servicer.start_index_sync()
     print(f"Vault Agent gRPC server started on {config.grpc_port}", flush=True)
-    server.wait_for_termination()
+    try:
+        server.wait_for_termination()
+    finally:
+        servicer.stop_index_sync()

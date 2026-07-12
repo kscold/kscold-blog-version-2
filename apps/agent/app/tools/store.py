@@ -140,7 +140,7 @@ class VaultStore:
         return response.data[0].embedding
 
     def iter_notes(self) -> list[VaultNote]:
-        return [self._to_note(document) for document in self.notes.find({})]
+        return [self._to_note(document) for document in self.notes.find(self._public_vault_filter())]
 
     def iter_index_documents(self) -> list[VaultNote]:
         return [
@@ -153,7 +153,14 @@ class VaultStore:
     def fetch_notes(self, note_ids: list[str]) -> list[VaultNote]:
         if not note_ids:
             return []
-        documents = self.notes.find({"_id": {"$in": note_ids}})
+        documents = self.notes.find(
+            {
+                "$and": [
+                    self._public_vault_filter(),
+                    {"_id": {"$in": note_ids}},
+                ]
+            }
+        )
         note_by_id = {str(document["_id"]): self._to_note(document) for document in documents}
         return [note_by_id[note_id] for note_id in note_ids if note_id in note_by_id]
 
@@ -168,10 +175,15 @@ class VaultStore:
 
         documents = self.notes.find(
             {
-                "$or": [
-                    {"_id": {"$in": normalized}},
-                    {"slug": {"$in": normalized}},
-                    {"title": {"$in": normalized}},
+                "$and": [
+                    self._public_vault_filter(),
+                    {
+                        "$or": [
+                            {"_id": {"$in": normalized}},
+                            {"slug": {"$in": normalized}},
+                            {"title": {"$in": normalized}},
+                        ]
+                    },
                 ]
             }
         ).limit(limit)
@@ -214,14 +226,23 @@ class VaultStore:
             for hit, (document_type, document_id) in zip(hits, document_refs)
             if f"{document_type}:{document_id}" in notes
         ]
-        return self._dedupe_hits([*vector_hits, *keyword_hits], limit)
+        return self._merge_search_hits(
+            vector_hits,
+            keyword_hits,
+            limit,
+            self._language_hints(self._query_terms(query)),
+        )
 
     def keyword_search(self, query: str, limit: int, folder_ids: set[str | ObjectId] | None = None) -> list[SearchHit]:
         terms = self._query_terms(query)
         language_hints = self._language_hints(terms)
         folder_filter = {"folderId": {"$in": list(folder_ids)}} if folder_ids else {}
+        vault_filter = self._public_vault_filter()
         if not terms:
-            documents = self.notes.find(folder_filter).limit(limit)
+            query_filter = {
+                "$and": [vault_filter, folder_filter]
+            } if folder_filter else vault_filter
+            documents = self.notes.find(query_filter).limit(limit)
             return [SearchHit(note=self._to_note(document), score=0.35) for document in documents]
 
         conditions = []
@@ -235,7 +256,9 @@ class VaultStore:
                 ]
             )
 
-        query_filter = {"$and": [folder_filter, {"$or": conditions}]} if folder_filter else {"$or": conditions}
+        query_filter = {
+            "$and": [vault_filter, folder_filter, {"$or": conditions}]
+        } if folder_filter else {"$and": [vault_filter, {"$or": conditions}]}
         candidates = [self._to_note(document) for document in self.notes.find(query_filter).limit(800)]
         if not folder_ids:
             candidates.extend(self._public_post_candidates(conditions))
@@ -293,7 +316,14 @@ class VaultStore:
             candidate_refs.extend(link for link in hit.note.outgoing_links if link not in seen)
             candidate_refs.extend(self._extract_wiki_links(hit.note.content))
             backlink_keys = [hit.note.id, hit.note.slug, hit.note.title]
-            backlinks = self.notes.find({"outgoingLinks": {"$in": backlink_keys}}).limit(5)
+            backlinks = self.notes.find(
+                {
+                    "$and": [
+                        self._public_vault_filter(),
+                        {"outgoingLinks": {"$in": backlink_keys}},
+                    ]
+                }
+            ).limit(5)
             candidate_refs.extend(str(document["_id"]) for document in backlinks if str(document["_id"]) not in seen)
 
         for note in self.resolve_link_notes(candidate_refs, limit):
@@ -321,7 +351,14 @@ class VaultStore:
                     with_payload=True,
                     with_vectors=False,
                 )
-                if existing and existing[0].payload and existing[0].payload.get("content_hash") == content_hash:
+                payload = existing[0].payload if existing else None
+                if (
+                    payload
+                    and payload.get("content_hash") == content_hash
+                    and payload.get("content_type") == note.content_type
+                    and payload.get("document_id") == note.id
+                    and payload.get("path") == note.path
+                ):
                     skipped += 1
                     continue
 
@@ -360,6 +397,44 @@ class VaultStore:
             if len(selected) >= limit:
                 break
         return selected
+
+    def _merge_search_hits(
+        self,
+        vector_hits: list[SearchHit],
+        keyword_hits: list[SearchHit],
+        limit: int,
+        language_hints: set[str],
+    ) -> list[SearchHit]:
+        merged = self._dedupe_hits([*vector_hits, *keyword_hits], max(limit * 3, limit))
+        if len(language_hints) < 2:
+            return merged[:limit]
+
+        selected: list[SearchHit] = []
+        selected_keys: set[str] = set()
+        candidates = sorted(
+            [*keyword_hits, *vector_hits],
+            key=lambda hit: hit.score,
+            reverse=True,
+        )
+        for language_hint in sorted(language_hints):
+            for hit in candidates:
+                key = f"{hit.note.content_type}:{hit.note.id}"
+                if key in selected_keys or not self._note_matches_language(hit.note, language_hint):
+                    continue
+                selected.append(hit)
+                selected_keys.add(key)
+                break
+
+        for hit in merged:
+            key = f"{hit.note.content_type}:{hit.note.id}"
+            if key in selected_keys:
+                continue
+            selected.append(hit)
+            selected_keys.add(key)
+            if len(selected) >= limit:
+                break
+
+        return selected[:limit]
 
     def _public_post_candidates(self, conditions: list[dict], limit: int = 120) -> list[VaultNote]:
         post_conditions = []
@@ -430,6 +505,17 @@ class VaultStore:
                 {"category.id": {"$nin": restricted_category_ids}},
                 {"category.id": {"$exists": False}},
             ],
+        }
+
+    def _public_vault_filter(self) -> dict:
+        return {
+            "$or": [
+                {"visibility": {"$exists": False}},
+                {"visibility": None},
+                {"visibility": "PUBLIC"},
+                {"public": True},
+                {"publicOverride": True},
+            ]
         }
 
     def _mongo_ids(self, ids: list[str]) -> list[object]:
@@ -526,7 +612,15 @@ class VaultStore:
         )
 
     def _embedding_text(self, note: VaultNote) -> str:
-        return f"title: {note.title}\nslug: {note.slug}\ntags: {note.tags}\ncontent:\n{note.content}"[:8000]
+        folder_names = self._folder_names(note.folder_id)
+        return (
+            f"type: {note.content_type}\n"
+            f"folder: {' > '.join(folder_names)}\n"
+            f"title: {note.title}\n"
+            f"slug: {note.slug}\n"
+            f"tags: {note.tags}\n"
+            f"content:\n{note.content}"
+        )[:8000]
 
     def _to_note(self, document: dict) -> VaultNote:
         return VaultNote(
