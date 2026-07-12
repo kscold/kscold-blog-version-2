@@ -207,9 +207,9 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
 
           {/* 모달: 모바일 전체화면 / 데스크탑 우하단 고정 */}
           <motion.div
-            className="fixed z-[1400] bg-white border border-surface-200 shadow-2xl overflow-hidden flex flex-col
-                       inset-0 h-[100dvh] rounded-none
-                       sm:inset-auto sm:bottom-[var(--chat-modal-bottom)] sm:right-6 sm:h-[600px] sm:max-h-[var(--chat-modal-max-height)] sm:w-[400px] sm:min-h-[420px] sm:min-w-[360px] sm:max-w-[calc(100vw-3rem)] sm:resize sm:rounded-[24px]"
+            className="fixed z-[1400] flex min-h-0 flex-col overflow-hidden border border-surface-200 bg-white shadow-2xl
+                       inset-x-2 bottom-2 h-[calc(100dvh-0.5rem)] max-h-[calc(100dvh-0.5rem)] rounded-[24px]
+                       sm:inset-x-auto sm:bottom-[var(--chat-modal-bottom)] sm:right-4 sm:h-[600px] sm:max-h-[var(--chat-modal-max-height)] sm:w-[min(420px,calc(100vw-2rem))] sm:min-h-[420px] sm:min-w-[360px] sm:max-w-[calc(100vw-2rem)] sm:resize sm:rounded-[24px]"
             style={modalPositionStyle}
             initial={{ opacity: 0, y: 80 }}
             animate={{ opacity: 1, y: 0 }}
@@ -224,11 +224,11 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
               onClose={onClose}
             />
 
-            <div className="grid grid-cols-2 gap-2 border-b border-surface-200 bg-white px-4 py-3">
+            <div className="grid shrink-0 grid-cols-2 gap-2 border-b border-surface-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3">
               <button
                 type="button"
                 onClick={() => setMode('agent')}
-                className={`rounded-xl px-3 py-2 text-xs font-black transition ${
+                className={`min-w-0 rounded-xl px-2 py-2 text-xs font-black transition sm:px-3 ${
                   mode === 'agent'
                     ? 'bg-surface-900 text-white'
                     : 'bg-surface-50 text-surface-500 hover:bg-surface-100 hover:text-surface-900'
@@ -239,7 +239,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
               <button
                 type="button"
                 onClick={() => setMode('owner')}
-                className={`rounded-xl px-3 py-2 text-xs font-black transition ${
+                className={`min-w-0 rounded-xl px-2 py-2 text-xs font-black transition sm:px-3 ${
                   mode === 'owner'
                     ? 'bg-surface-900 text-white'
                     : 'bg-surface-50 text-surface-500 hover:bg-surface-100 hover:text-surface-900'
@@ -253,27 +253,27 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
             {mode === 'agent' ? (
               <>
                 <AgentMessageList messages={agentMessages} isThinking={isAgentThinking} />
-                <div className="border-t border-surface-200 bg-white p-4">
-                  <div className="mb-3 flex flex-wrap gap-2">
+                <div className="max-h-[42%] shrink-0 overflow-y-auto overscroll-contain border-t border-surface-200 bg-white p-3 sm:p-4">
+                  <div className="mb-3 flex flex-wrap gap-1.5 sm:gap-2">
                     {starterPrompts.map(prompt => (
                       <button
                         key={prompt}
                         type="button"
                         onClick={() => setAgentInput(prompt)}
-                        className="rounded-full border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:text-surface-900"
+                        className="max-w-full rounded-full border border-surface-200 bg-surface-50 px-3 py-2 text-left text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:text-surface-900"
                       >
                         {prompt}
                       </button>
                     ))}
                   </div>
-                  <form onSubmit={handleSendAgentMessage} className="flex gap-2.5">
+                  <form onSubmit={handleSendAgentMessage} className="flex min-w-0 gap-2.5">
                     <input
                       type="text"
                       value={agentInput}
                       onChange={e => setAgentInput(e.target.value)}
                       placeholder="블로그/Vault에 대해 물어보기..."
                       autoComplete="off"
-                      className="flex-1 rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-medium text-surface-900 placeholder:text-surface-400 transition-all focus:border-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
+                      className="min-w-0 flex-1 rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-medium text-surface-900 placeholder:text-surface-400 transition-all focus:border-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
                     />
                     <button
                       type="submit"
@@ -353,17 +353,17 @@ function AgentMessageList({
   isThinking: boolean;
 }) {
   return (
-    <div className="flex-1 space-y-3 overflow-y-auto bg-surface-50 p-4 custom-scrollbar">
+    <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-surface-50 p-3 custom-scrollbar sm:p-4">
       {messages.map(message => (
         <div
           key={message.id}
-          className={`rounded-2xl p-4 text-sm leading-7 shadow-sm ${
+          className={`min-w-0 rounded-2xl p-3 text-sm leading-7 shadow-sm sm:p-4 ${
             message.role === 'user'
               ? 'ml-8 bg-surface-900 text-white'
-              : 'mr-4 border border-surface-200 bg-white text-surface-700'
+              : 'mr-0 border border-surface-200 bg-white text-surface-700 sm:mr-4'
           }`}
         >
-          <p className="whitespace-pre-wrap">{message.content}</p>
+          <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{message.content}</p>
           {message.stages && message.role === 'assistant' && (
             <div className="mt-3 space-y-1.5">
               {message.stages.slice(0, 3).map(stage => (
@@ -388,9 +388,9 @@ function AgentMessageList({
                   <Link
                     key={`${source.type}-${source.id}`}
                     href={sourceHref(source)}
-                    className="flex items-center justify-between gap-2 rounded-xl border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:bg-white hover:text-surface-900"
+                    className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:bg-white hover:text-surface-900"
                   >
-                    <span className="min-w-0 truncate">
+                    <span className="min-w-0 truncate [overflow-wrap:anywhere]">
                       <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.14em] text-surface-400">
                         {source.type || 'vault'}
                       </span>

@@ -11,17 +11,17 @@ interface Props {
 export function ChatComposer({ value, placeholder, disabled, onChange, onSubmit }: Props) {
   return (
     <div
-      className="border-t border-surface-200 bg-white flex-shrink-0 p-4"
+      className="flex-shrink-0 border-t border-surface-200 bg-white p-3 sm:p-4"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}
     >
-      <form onSubmit={onSubmit} className="flex gap-2.5">
+      <form onSubmit={onSubmit} className="flex min-w-0 gap-2.5">
         <input
           type="text"
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
           autoComplete="off"
-          className="flex-1 rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-medium text-surface-900 placeholder:text-surface-400 transition-all focus:border-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
+          className="min-w-0 flex-1 rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-medium text-surface-900 placeholder:text-surface-400 transition-all focus:border-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
         />
         <button
           type="submit"

@@ -308,6 +308,31 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.surface.300') transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+    background-color: theme('colors.surface.300');
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: theme('colors.surface.400');
+  }
+
   /* 볼트 그래프 노드 클릭 리플 */
   @keyframes vault-ripple {
     0% {

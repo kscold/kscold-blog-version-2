@@ -17,7 +17,7 @@ export default function ChatMessageList({ messages, currentUsername }: ChatMessa
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-surface-50">
+    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain bg-surface-50 p-4 custom-scrollbar sm:p-5">
       <AnimatePresence initial={false}>
         {messages.map((message, index) => (
           <motion.div
