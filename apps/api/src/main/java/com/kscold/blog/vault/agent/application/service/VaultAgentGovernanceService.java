@@ -1,8 +1,7 @@
-package com.kscold.blog.vault.agent;
+package com.kscold.blog.vault.agent.application.service;
 
-import static com.kscold.blog.vault.agent.VaultAgentDtos.AgentRunResponse;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.SourceNote;
-
+import com.kscold.blog.vault.agent.application.dto.AgentRunResponse;
+import com.kscold.blog.vault.agent.application.dto.SourceNote;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;

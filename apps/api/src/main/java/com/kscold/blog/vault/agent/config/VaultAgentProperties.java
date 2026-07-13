@@ -1,4 +1,4 @@
-package com.kscold.blog.vault.agent;
+package com.kscold.blog.vault.agent.config;
 
 import lombok.Getter;
 import lombok.Setter;

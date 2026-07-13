@@ -1,12 +1,12 @@
-package com.kscold.blog.vault.agent;
-
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatHistoryResponse;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatRequest;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatResponse;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ReindexResponse;
+package com.kscold.blog.vault.agent.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import com.kscold.blog.vault.agent.application.dto.ChatHistoryResponse;
+import com.kscold.blog.vault.agent.application.dto.ChatRequest;
+import com.kscold.blog.vault.agent.application.dto.ChatResponse;
+import com.kscold.blog.vault.agent.application.dto.ReindexResponse;
+import com.kscold.blog.vault.agent.application.service.VaultAgentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

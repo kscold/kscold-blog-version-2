@@ -1,14 +1,14 @@
-package com.kscold.blog.vault.agent;
-
-import static com.kscold.blog.vault.agent.VaultAgentDtos.AgentStage;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatHistoryMessage;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatHistoryResponse;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ChatResponse;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.ReindexResponse;
-import static com.kscold.blog.vault.agent.VaultAgentDtos.SourceNote;
+package com.kscold.blog.vault.agent.application.service;
 
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
+import com.kscold.blog.vault.agent.application.dto.AgentStage;
+import com.kscold.blog.vault.agent.application.dto.ChatHistoryMessage;
+import com.kscold.blog.vault.agent.application.dto.ChatHistoryResponse;
+import com.kscold.blog.vault.agent.application.dto.ChatResponse;
+import com.kscold.blog.vault.agent.application.dto.ReindexResponse;
+import com.kscold.blog.vault.agent.application.dto.SourceNote;
+import com.kscold.blog.vault.agent.config.VaultAgentProperties;
 import com.kscold.blog.vault.agent.grpc.ChatRequest;
 import com.kscold.blog.vault.agent.grpc.ReindexRequest;
 import com.kscold.blog.vault.agent.grpc.VaultAgentServiceGrpc;
@@ -64,7 +64,9 @@ public class VaultAgentService {
     }
 
     public ChatResponse chat(
-            VaultAgentDtos.ChatRequest request, String userId, String clientIdentifier) {
+            com.kscold.blog.vault.agent.application.dto.ChatRequest request,
+            String userId,
+            String clientIdentifier) {
         String sessionId = normalizeSessionId(request.sessionId());
         String scopeKey = scopeKey(userId, clientIdentifier, sessionId);
         try {
