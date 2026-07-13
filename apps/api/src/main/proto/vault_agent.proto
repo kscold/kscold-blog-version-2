@@ -20,6 +20,7 @@ message ChatResponse {
   string answer = 1;
   repeated AgentStage stages = 2;
   repeated SourceNote sources = 3;
+  repeated string follow_ups = 4;
 }
 
 message AgentStage {

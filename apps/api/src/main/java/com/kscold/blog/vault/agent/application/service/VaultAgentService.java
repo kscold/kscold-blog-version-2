@@ -115,7 +115,9 @@ public class VaultAgentService {
                     stages,
                     sources);
 
-            return new ChatResponse(sessionId, response.getAnswer(), stages, sources);
+            List<String> followUps = List.copyOf(response.getFollowUpsList());
+
+            return new ChatResponse(sessionId, response.getAnswer(), stages, sources, followUps);
         } catch (StatusRuntimeException exception) {
             throw agentUnavailable(exception);
         }
