@@ -445,8 +445,8 @@ export function VaultGraphView({
         {gData.nodes.length} notes · {gData.links.length} links · {zoomPct}%
       </div>
 
-      {/* 줌 컨트롤 — 모바일에선 폴더 FAB와 겹치지 않게 위로 */}
-      <div className="absolute bottom-20 right-3 lg:bottom-4 lg:right-4 z-10 flex flex-col overflow-hidden rounded-2xl border border-surface-200/70 dark:border-surface-700/70 bg-white/80 dark:bg-surface-900/80 shadow-sm backdrop-blur-md">
+      {/* 줌 컨트롤 — 모바일에선 폴더 FAB와 겹치지 않게 위로, 데스크톱에선 챗 버튼 왼쪽에 나란히 */}
+      <div className="absolute bottom-20 right-3 lg:bottom-4 lg:right-24 z-10 flex flex-col overflow-hidden rounded-2xl border border-surface-200/70 dark:border-surface-700/70 bg-white/80 dark:bg-surface-900/80 shadow-sm backdrop-blur-md">
         <button
           type="button"
           onClick={() => zoomBy(1.45)}
