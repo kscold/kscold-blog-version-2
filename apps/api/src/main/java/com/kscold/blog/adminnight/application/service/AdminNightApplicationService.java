@@ -4,7 +4,7 @@ import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightProgramVoteCommand;
 import com.kscold.blog.adminnight.application.port.in.AdminNightUseCase;
-import com.kscold.blog.adminnight.application.port.out.AdminNightNotificationPort;
+import com.kscold.blog.adminnight.domain.port.out.AdminNightNotificationPort;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightProgramVoteRepository;

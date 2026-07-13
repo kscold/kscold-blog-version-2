@@ -1,4 +1,4 @@
-package com.kscold.blog.payment;
+package com.kscold.blog.payment.domain.model;
 
 public enum PaymentOrderStatus {
     READY,

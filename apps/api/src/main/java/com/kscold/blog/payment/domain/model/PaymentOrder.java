@@ -1,4 +1,4 @@
-package com.kscold.blog.payment;
+package com.kscold.blog.payment.domain.model;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;

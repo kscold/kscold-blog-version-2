@@ -2,7 +2,7 @@ package com.kscold.blog.identity.adapter.out.mail;
 
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
-import com.kscold.blog.identity.application.port.out.RecoveryMailMessage;
+import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
 import com.kscold.blog.identity.domain.model.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

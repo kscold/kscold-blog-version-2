@@ -1,4 +1,4 @@
-package com.kscold.blog.identity.application.port.out;
+package com.kscold.blog.identity.domain.port.out;
 
 public interface TokenProvider {
     String createAccessToken(String userId, String role);

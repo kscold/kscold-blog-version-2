@@ -1,4 +1,4 @@
-package com.kscold.blog.adminnight.application.port.out;
+package com.kscold.blog.adminnight.domain.port.out;
 
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;

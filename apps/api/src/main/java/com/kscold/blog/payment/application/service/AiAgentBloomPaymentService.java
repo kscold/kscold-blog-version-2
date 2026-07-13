@@ -1,14 +1,18 @@
-package com.kscold.blog.payment;
-
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.CompletePaymentResponse;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PaymentConfigResponse;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PreparePaymentRequest;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PreparePaymentResponse;
+package com.kscold.blog.payment.application.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
+import com.kscold.blog.payment.application.dto.CompletePaymentResponse;
+import com.kscold.blog.payment.application.dto.PaymentConfigResponse;
+import com.kscold.blog.payment.application.dto.PreparePaymentRequest;
+import com.kscold.blog.payment.application.dto.PreparePaymentResponse;
+import com.kscold.blog.payment.application.port.in.PaymentUseCase;
+import com.kscold.blog.payment.config.PortOnePaymentProperties;
+import com.kscold.blog.payment.domain.model.PaymentOrder;
+import com.kscold.blog.payment.domain.model.PaymentOrderStatus;
+import com.kscold.blog.payment.domain.port.out.PaymentOrderRepository;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +28,7 @@ import org.springframework.web.client.RestClientResponseException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AiAgentBloomPaymentService {
+public class AiAgentBloomPaymentService implements PaymentUseCase {
 
     private static final String PROGRAM_KEY = "ai-agent-bloom";
     private static final String PRODUCT_NAME = "AI Agent Bloom 참가권";

@@ -3,7 +3,7 @@ package com.kscold.blog.adminnight.adapter.out.mail;
 import com.kscold.blog.adminnight.application.event.AdminNightNotificationEvent;
 import com.kscold.blog.adminnight.application.event.AdminNightNotificationType;
 import com.kscold.blog.adminnight.application.event.AdminNightProgramVoteNotificationEvent;
-import com.kscold.blog.adminnight.application.port.out.AdminNightNotificationPort;
+import com.kscold.blog.adminnight.domain.port.out.AdminNightNotificationPort;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import lombok.RequiredArgsConstructor;

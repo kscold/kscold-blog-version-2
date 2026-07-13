@@ -1,11 +1,11 @@
-package com.kscold.blog.payment;
+package com.kscold.blog.payment.adapter.in.web;
 
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.CompletePaymentRequest;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.CompletePaymentResponse;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PaymentConfigResponse;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PreparePaymentRequest;
-import static com.kscold.blog.payment.AiAgentBloomPaymentDtos.PreparePaymentResponse;
-
+import com.kscold.blog.payment.application.dto.CompletePaymentRequest;
+import com.kscold.blog.payment.application.dto.CompletePaymentResponse;
+import com.kscold.blog.payment.application.dto.PaymentConfigResponse;
+import com.kscold.blog.payment.application.dto.PreparePaymentRequest;
+import com.kscold.blog.payment.application.dto.PreparePaymentResponse;
+import com.kscold.blog.payment.application.port.in.PaymentUseCase;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/payments/ai-agent-bloom")
 public class AiAgentBloomPaymentController {
 
-    private final AiAgentBloomPaymentService aiAgentBloomPaymentService;
+    private final PaymentUseCase paymentUseCase;
 
     @GetMapping("/config")
     public ResponseEntity<ApiResponse<PaymentConfigResponse>> getConfig() {
-        return ResponseEntity.ok(ApiResponse.success(aiAgentBloomPaymentService.getConfig()));
+        return ResponseEntity.ok(ApiResponse.success(paymentUseCase.getConfig()));
     }
 
     @PostMapping("/prepare")
@@ -34,7 +34,7 @@ public class AiAgentBloomPaymentController {
             @AuthenticationPrincipal String userId,
             @Valid @RequestBody PreparePaymentRequest request) {
         return ResponseEntity.ok(
-                ApiResponse.success(aiAgentBloomPaymentService.prepare(userId, request)));
+                ApiResponse.success(paymentUseCase.prepare(userId, request)));
     }
 
     @PostMapping("/complete")
@@ -43,7 +43,7 @@ public class AiAgentBloomPaymentController {
             @Valid @RequestBody CompletePaymentRequest request) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        aiAgentBloomPaymentService.complete(
+                        paymentUseCase.complete(
                                 userId, request.paymentId(), request.paymentAccessToken())));
     }
 }

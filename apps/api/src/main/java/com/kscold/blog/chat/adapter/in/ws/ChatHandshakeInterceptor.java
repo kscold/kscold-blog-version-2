@@ -1,7 +1,7 @@
 package com.kscold.blog.chat.adapter.in.ws;
 
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
-import com.kscold.blog.identity.application.port.out.TokenProvider;
+import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

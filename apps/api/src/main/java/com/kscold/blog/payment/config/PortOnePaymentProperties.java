@@ -1,4 +1,4 @@
-package com.kscold.blog.payment;
+package com.kscold.blog.payment.config;
 
 import lombok.Getter;
 import lombok.Setter;
