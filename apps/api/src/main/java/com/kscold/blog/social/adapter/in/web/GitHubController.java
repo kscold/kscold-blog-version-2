@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/github")
+@RequestMapping("/github")
 @RequiredArgsConstructor
 public class GitHubController {
 

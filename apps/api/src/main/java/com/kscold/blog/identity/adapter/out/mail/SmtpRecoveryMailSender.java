@@ -2,8 +2,8 @@ package com.kscold.blog.identity.adapter.out.mail;
 
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
-import com.kscold.blog.identity.application.port.out.RecoveryMailMessage;
-import com.kscold.blog.identity.application.port.out.RecoveryMailSender;
+import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
+import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;

@@ -1,6 +1,6 @@
 package com.kscold.blog.media.adapter.in.web;
 
-import com.kscold.blog.media.adapter.in.web.dto.MediaResponse;
+import com.kscold.blog.media.adapter.in.web.dto.response.MediaResponse;
 import com.kscold.blog.media.application.port.in.MediaUseCase;
 import com.kscold.blog.media.domain.model.Media;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/media")
+@RequestMapping("/media")
 @RequiredArgsConstructor
 public class MediaController {
 

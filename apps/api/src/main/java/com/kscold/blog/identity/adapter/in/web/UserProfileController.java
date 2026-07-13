@@ -7,7 +7,7 @@ import com.kscold.blog.identity.application.port.in.UserManagementUseCase;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.social.adapter.in.web.dto.FeedResponse;
+import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
 import java.util.List;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserProfileController {
 

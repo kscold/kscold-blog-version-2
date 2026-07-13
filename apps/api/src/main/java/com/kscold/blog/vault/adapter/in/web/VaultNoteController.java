@@ -1,9 +1,9 @@
 package com.kscold.blog.vault.adapter.in.web;
 
-import com.kscold.blog.shared.analytics.ViewCounter;
+import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
-import com.kscold.blog.vault.adapter.in.web.dto.VaultNoteResponse;
+import com.kscold.blog.vault.adapter.in.web.dto.response.VaultNoteResponse;
 import com.kscold.blog.vault.application.dto.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.NoteUpdateCommand;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/vault/notes")
+@RequestMapping("/vault/notes")
 @RequiredArgsConstructor
 public class VaultNoteController {
 

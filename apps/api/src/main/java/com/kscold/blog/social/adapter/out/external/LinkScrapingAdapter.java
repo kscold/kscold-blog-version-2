@@ -1,7 +1,7 @@
 package com.kscold.blog.social.adapter.out.external;
 
 import com.kscold.blog.exception.InvalidRequestException;
-import com.kscold.blog.social.application.dto.LinkPreviewResponse;
+import com.kscold.blog.social.domain.model.LinkPreviewResponse;
 import com.kscold.blog.social.domain.port.out.LinkScrapingPort;
 import java.io.IOException;
 import java.net.InetAddress;

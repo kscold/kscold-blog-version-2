@@ -1,7 +1,7 @@
 package com.kscold.blog.social.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.social.adapter.in.web.dto.FeedCommentResponse;
+import com.kscold.blog.social.adapter.in.web.dto.response.FeedCommentResponse;
 import com.kscold.blog.social.application.dto.FeedCommentCreateCommand;
 import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/feeds/{feedId}/comments")
+@RequestMapping("/feeds/{feedId}/comments")
 @RequiredArgsConstructor
 public class FeedCommentController {
 

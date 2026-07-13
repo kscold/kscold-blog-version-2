@@ -7,7 +7,7 @@ import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.port.out.CategoryRepository;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
-import com.kscold.blog.util.SlugUtils;
+import com.kscold.blog.shared.util.SlugUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

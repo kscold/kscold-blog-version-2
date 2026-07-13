@@ -6,7 +6,7 @@ import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ResourceNotFoundException;
-import com.kscold.blog.util.SlugUtils;
+import com.kscold.blog.shared.util.SlugUtils;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,7 +2,7 @@ package com.kscold.blog.vault.application.service;
 
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
-import com.kscold.blog.util.SlugUtils;
+import com.kscold.blog.shared.util.SlugUtils;
 import com.kscold.blog.vault.application.dto.FolderCreateCommand;
 import com.kscold.blog.vault.application.dto.FolderUpdateCommand;
 import com.kscold.blog.vault.application.port.in.VaultFolderUseCase;

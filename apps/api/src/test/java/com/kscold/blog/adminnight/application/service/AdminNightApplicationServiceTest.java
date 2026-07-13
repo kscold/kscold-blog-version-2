@@ -9,9 +9,9 @@ import static org.mockito.Mockito.when;
 import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
 import com.kscold.blog.adminnight.application.dto.AdminNightProgramVoteCommand;
-import com.kscold.blog.adminnight.application.port.out.AdminNightNotificationPort;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
+import com.kscold.blog.adminnight.domain.port.out.AdminNightNotificationPort;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightProgramVoteRepository;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightRequestRepository;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
@@ -44,6 +44,8 @@ class AdminNightApplicationServiceTest {
     @Mock private AdminNightNotificationPort adminNightNotificationPort;
 
     @Spy private AdminNightRequestDraftService adminNightRequestDraftService;
+
+    @Spy private AdminNightProgramVoteNormalizer adminNightProgramVoteNormalizer;
 
     @InjectMocks private AdminNightApplicationService adminNightApplicationService;
 
@@ -218,7 +220,7 @@ class AdminNightApplicationServiceTest {
 
         AdminNightProgramVote saved =
                 adminNightApplicationService.upsertProgramVote(
-                        "AI-Agent-Bloom",
+                        "ai-agent-bloom",
                         "anonymousUser",
                         new AdminNightProgramVoteCommand(
                                 "류태호",

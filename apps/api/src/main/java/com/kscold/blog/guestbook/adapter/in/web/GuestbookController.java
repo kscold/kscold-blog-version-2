@@ -1,6 +1,6 @@
 package com.kscold.blog.guestbook.adapter.in.web;
 
-import com.kscold.blog.guestbook.adapter.in.web.dto.GuestbookEntryResponse;
+import com.kscold.blog.guestbook.adapter.in.web.dto.response.GuestbookEntryResponse;
 import com.kscold.blog.guestbook.application.dto.GuestbookEntryCreateCommand;
 import com.kscold.blog.guestbook.application.port.in.GuestbookUseCase;
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/guestbook")
+@RequestMapping("/guestbook")
 @RequiredArgsConstructor
 public class GuestbookController {
 

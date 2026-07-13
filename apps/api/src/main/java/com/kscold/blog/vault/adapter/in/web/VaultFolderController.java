@@ -1,7 +1,7 @@
 package com.kscold.blog.vault.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.vault.adapter.in.web.dto.VaultFolderResponse;
+import com.kscold.blog.vault.adapter.in.web.dto.response.VaultFolderResponse;
 import com.kscold.blog.vault.application.dto.FolderCreateCommand;
 import com.kscold.blog.vault.application.dto.FolderUpdateCommand;
 import com.kscold.blog.vault.application.port.in.VaultFolderUseCase;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/vault/folders")
+@RequestMapping("/vault/folders")
 @RequiredArgsConstructor
 public class VaultFolderController {
 

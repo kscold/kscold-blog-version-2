@@ -7,8 +7,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.InvalidRequestException;
-import com.kscold.blog.media.application.dto.AdminStorageListing;
-import com.kscold.blog.media.application.dto.AdminStorageObjectResource;
+import com.kscold.blog.media.domain.model.AdminStorageListing;
+import com.kscold.blog.media.domain.model.AdminStorageObjectResource;
 import com.kscold.blog.media.domain.port.out.AdminStoragePort;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

@@ -1,5 +1,8 @@
 package com.kscold.blog.blog.adapter.in.web;
 
+import com.kscold.blog.blog.adapter.in.web.dto.request.ApproveAccessRequest;
+import com.kscold.blog.blog.adapter.in.web.dto.request.CreateAccessRequest;
+import com.kscold.blog.blog.adapter.in.web.dto.response.AccessRequestResponse;
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -18,24 +21,26 @@ public class AccessRequestController {
     private final AccessRequestUseCase accessRequestUseCase;
 
     // 유저: 접근 요청
-    @PostMapping("/api/access-requests")
-    public ResponseEntity<ApiResponse<AccessRequest>> requestAccess(
-            @AuthenticationPrincipal String userId, @RequestBody AccessRequestBody body) {
+    @PostMapping("/access-requests")
+    public ResponseEntity<ApiResponse<AccessRequestResponse>> requestAccess(
+            @AuthenticationPrincipal String userId, @RequestBody CreateAccessRequest body) {
         AccessRequest request =
-                accessRequestUseCase.requestAccess(userId, body.postId(), body.message());
+                accessRequestUseCase.requestAccess(userId, body.getPostId(), body.getMessage());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(request, "접근 요청이 등록되었습니다"));
+                .body(ApiResponse.success(AccessRequestResponse.from(request), "접근 요청이 등록되었습니다"));
     }
 
     // 유저: 내 요청 목록
-    @GetMapping("/api/access-requests/me")
-    public ResponseEntity<ApiResponse<List<AccessRequest>>> getMyRequests(
+    @GetMapping("/access-requests/me")
+    public ResponseEntity<ApiResponse<List<AccessRequestResponse>>> getMyRequests(
             @AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.getMyRequests(userId)));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        AccessRequestResponse.from(accessRequestUseCase.getMyRequests(userId))));
     }
 
     // 유저: 특정 카테고리 접근 권한 확인
-    @GetMapping("/api/access-requests/check/{categoryId}")
+    @GetMapping("/access-requests/check/{categoryId}")
     public ResponseEntity<ApiResponse<Boolean>> checkAccess(
             @AuthenticationPrincipal String userId,
             @PathVariable String categoryId,
@@ -48,30 +53,32 @@ public class AccessRequestController {
     }
 
     // 어드민: 대기 중인 요청 목록
-    @GetMapping("/api/admin/access-requests")
+    @GetMapping("/admin/access-requests")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<List<AccessRequest>>> getPendingRequests() {
-        return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.getPendingRequests()));
+    public ResponseEntity<ApiResponse<List<AccessRequestResponse>>> getPendingRequests() {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        AccessRequestResponse.from(accessRequestUseCase.getPendingRequests())));
     }
 
     // 어드민: 승인
-    @PutMapping("/api/admin/access-requests/{id}/approve")
+    @PutMapping("/admin/access-requests/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<AccessRequest>> approve(
-            @PathVariable String id, @RequestBody(required = false) ApproveAccessRequestBody body) {
-        AccessRequest.GrantScope grantScope = body != null ? body.grantScope() : null;
+    public ResponseEntity<ApiResponse<AccessRequestResponse>> approve(
+            @PathVariable String id, @RequestBody(required = false) ApproveAccessRequest body) {
+        AccessRequest.GrantScope grantScope = body != null ? body.getGrantScope() : null;
         return ResponseEntity.ok(
-                ApiResponse.success(accessRequestUseCase.approve(id, grantScope), "승인되었습니다"));
+                ApiResponse.success(
+                        AccessRequestResponse.from(accessRequestUseCase.approve(id, grantScope)),
+                        "승인되었습니다"));
     }
 
     // 어드민: 거절
-    @PutMapping("/api/admin/access-requests/{id}/reject")
+    @PutMapping("/admin/access-requests/{id}/reject")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<AccessRequest>> reject(@PathVariable String id) {
-        return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.reject(id), "거절되었습니다"));
+    public ResponseEntity<ApiResponse<AccessRequestResponse>> reject(@PathVariable String id) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        AccessRequestResponse.from(accessRequestUseCase.reject(id)), "거절되었습니다"));
     }
-
-    record AccessRequestBody(String postId, String message) {}
-
-    record ApproveAccessRequestBody(AccessRequest.GrantScope grantScope) {}
 }

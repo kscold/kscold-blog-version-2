@@ -1,6 +1,6 @@
 package com.kscold.blog.blog.adapter.in.web;
 
-import com.kscold.blog.blog.adapter.in.web.dto.TagResponse;
+import com.kscold.blog.blog.adapter.in.web.dto.response.TagResponse;
 import com.kscold.blog.blog.application.dto.TagCommand;
 import com.kscold.blog.blog.application.port.in.TagUseCase;
 import com.kscold.blog.blog.domain.model.Tag;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/tags")
+@RequestMapping("/tags")
 @RequiredArgsConstructor
 public class TagController {
 

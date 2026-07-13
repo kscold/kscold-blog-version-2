@@ -1,5 +1,7 @@
 package com.kscold.blog.social.application.dto;
 
+import com.kscold.blog.social.domain.model.GitHubContributionDay;
+import com.kscold.blog.social.domain.model.GitHubRepositorySummary;
 import java.util.List;
 
 public record GitHubOverviewResponse(
