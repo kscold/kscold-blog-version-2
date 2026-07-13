@@ -1,23 +1,19 @@
 package com.kscold.blog.media.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminStorageObjectItem {
-    @lombok.Getter private String name;
-    @lombok.Getter private String key;
-    @lombok.Getter private long size;
-    @lombok.Getter private String lastModified;
+    private String name;
+    private String key;
+    private long size;
+    private String lastModified;
     private boolean image;
-    @lombok.Getter private String publicUrl;
-
-    @JsonProperty("isImage")
-    public boolean isImage() {
-        return image;
-    }
+    private String publicUrl;
 }

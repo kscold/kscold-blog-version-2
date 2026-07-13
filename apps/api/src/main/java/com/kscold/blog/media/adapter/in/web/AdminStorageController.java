@@ -1,8 +1,8 @@
 package com.kscold.blog.media.adapter.in.web;
 
 import com.kscold.blog.media.adapter.in.web.dto.request.CreateFolderRequest;
+import com.kscold.blog.media.adapter.in.web.dto.response.AdminStorageListingResponse;
 import com.kscold.blog.media.application.port.in.AdminStorageUseCase;
-import com.kscold.blog.media.domain.model.AdminStorageListing;
 import com.kscold.blog.media.domain.model.AdminStorageObjectResource;
 import com.kscold.blog.shared.web.ApiResponse;
 import java.nio.charset.StandardCharsets;
@@ -31,35 +31,43 @@ public class AdminStorageController {
     private final AdminStorageUseCase adminStorageUseCase;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<AdminStorageListing>> getListing(
+    public ResponseEntity<ApiResponse<AdminStorageListingResponse>> getListing(
             @RequestParam(defaultValue = "") String prefix) {
-        return ResponseEntity.ok(ApiResponse.success(adminStorageUseCase.getListing(prefix)));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        AdminStorageListingResponse.from(adminStorageUseCase.getListing(prefix))));
     }
 
     @PostMapping("/folders")
-    public ResponseEntity<ApiResponse<AdminStorageListing>> createFolder(
+    public ResponseEntity<ApiResponse<AdminStorageListingResponse>> createFolder(
             @RequestBody CreateFolderRequest request) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        adminStorageUseCase.createFolder(
-                                request.getPrefix(), request.getFolderName()),
+                        AdminStorageListingResponse.from(
+                                adminStorageUseCase.createFolder(
+                                        request.getPrefix(), request.getFolderName())),
                         "폴더를 만들었습니다."));
     }
 
     @PostMapping("/files")
-    public ResponseEntity<ApiResponse<AdminStorageListing>> uploadFiles(
+    public ResponseEntity<ApiResponse<AdminStorageListingResponse>> uploadFiles(
             @RequestParam(defaultValue = "") String prefix,
             @RequestPart("files") List<MultipartFile> files) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        adminStorageUseCase.uploadFiles(prefix, files), "파일을 업로드했습니다."));
+                        AdminStorageListingResponse.from(
+                                adminStorageUseCase.uploadFiles(prefix, files)),
+                        "파일을 업로드했습니다."));
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiResponse<AdminStorageListing>> deleteEntry(
+    public ResponseEntity<ApiResponse<AdminStorageListingResponse>> deleteEntry(
             @RequestParam(defaultValue = "") String prefix, @RequestParam String key) {
         return ResponseEntity.ok(
-                ApiResponse.success(adminStorageUseCase.deleteEntry(prefix, key), "항목을 삭제했습니다."));
+                ApiResponse.success(
+                        AdminStorageListingResponse.from(
+                                adminStorageUseCase.deleteEntry(prefix, key)),
+                        "항목을 삭제했습니다."));
     }
 
     @GetMapping("/object")
