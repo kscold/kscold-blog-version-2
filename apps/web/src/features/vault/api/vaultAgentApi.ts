@@ -22,6 +22,8 @@ export interface VaultAgentChatResponse {
   answer: string;
   stages: VaultAgentStage[];
   sources: VaultAgentSource[];
+  /** 대화 흐름을 이어가는 후속질문 추천 (agent 생성) */
+  followUps: string[];
 }
 
 export interface VaultAgentHistoryMessage {
