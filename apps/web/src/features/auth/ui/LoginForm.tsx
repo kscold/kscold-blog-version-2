@@ -2,21 +2,16 @@
 
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import Input from '@/shared/ui/Input';
 import Button from '@/shared/ui/Button';
 import { AuthToggle } from '@/features/auth/ui/AuthToggle';
+import { LoginBrandHeader } from '@/features/auth/ui/LoginBrandHeader';
+import { LoginErrorMessage } from '@/features/auth/ui/LoginErrorMessage';
+import { RegisterFields } from '@/features/auth/ui/RegisterFields';
+import { LoginRecoveryLinks } from '@/features/auth/ui/LoginRecoveryLinks';
+import { LoginHomeLink } from '@/features/auth/ui/LoginHomeLink';
 import { useLoginForm } from '@/features/auth/model/useLoginForm';
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s_]/g, '')
-    .replace(/\s+/g, '_')
-    .replace(/_{2,}/g, '_')
-    .replace(/^_|_$/g, '')
-    .slice(0, 20);
-}
+import { slugify } from '@/features/auth/lib/slugify';
 
 export function LoginForm() {
   const { error, formData, handleSubmit, isLoading, isLogin, setIsLogin, updateField } = useLoginForm();
@@ -47,23 +42,7 @@ export function LoginForm() {
         transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
       >
         {/* 로고 */}
-        <motion.div
-          className="mb-8 text-center sm:mb-12"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <Link href="/" className="inline-block group">
-            <h1 className="text-5xl font-sans font-black tracking-tighter mb-3 group-hover:scale-105 transition-transform">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 bg-[size:200%_auto] animate-shimmer">
-                KSCOLD
-              </span>
-            </h1>
-            <p className="text-surface-500 text-sm tracking-wide font-medium">
-              김승찬의 블로그, 일상과 기술 기록
-            </p>
-          </Link>
-        </motion.div>
+        <LoginBrandHeader />
 
         {/* 입체 카드 래퍼 */}
         <div className="card-3d">
@@ -77,15 +56,7 @@ export function LoginForm() {
               <AuthToggle isLogin={isLogin} onToggle={setIsLogin} />
 
               {/* 오류 메시지 */}
-              {error && (
-                <motion.div
-                  className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-[8px]"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <p data-cy="auth-form-error" className="text-sm text-red-400 text-center">{error}</p>
-                </motion.div>
-              )}
+              {error && <LoginErrorMessage error={error} />}
 
               {/* 폼 */}
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -100,42 +71,12 @@ export function LoginForm() {
                 />
 
                 {!isLogin && (
-                  <>
-                    <Input
-                      type="text"
-                      placeholder="이름 (예: 홍길동)"
-                      value={formData.displayName}
-                      onChange={e => handleDisplayNameChange(e.target.value)}
-                      helperText="실명 또는 닉네임을 입력해 주세요. 피드·댓글에 표시됩니다."
-                      autoComplete="name"
-                      data-cy="register-display-name-input"
-                      maxLength={30}
-                      required
-                    />
-
-                    <div className="space-y-1">
-                      <Input
-                        type="text"
-                        placeholder="아이디 (예: hong_gildong)"
-                        value={formData.username}
-                        onChange={e => handleUsernameChange(e.target.value)}
-                        helperText="영문 소문자·숫자·밑줄(_) 3-20자 · 프로필 URL에 사용됩니다."
-                        autoComplete="username"
-                        data-cy="register-username-input"
-                        minLength={3}
-                        maxLength={20}
-                        required
-                      />
-                      {formData.username && (
-                        <p className="text-[11px] text-surface-400 px-1">
-                          프로필:{' '}
-                          <span className="text-surface-600 font-medium">
-                            kscold.com/profile/{formData.username}
-                          </span>
-                        </p>
-                      )}
-                    </div>
-                  </>
+                  <RegisterFields
+                    displayName={formData.displayName}
+                    username={formData.username}
+                    onDisplayNameChange={handleDisplayNameChange}
+                    onUsernameChange={handleUsernameChange}
+                  />
                 )}
 
                 <Input
@@ -150,24 +91,7 @@ export function LoginForm() {
                   required
                 />
 
-                {isLogin && (
-                  <div className="flex items-center justify-between gap-3 text-sm">
-                    <Link
-                      href="/login/recovery?tab=username"
-                      data-cy="login-find-username"
-                      className="font-medium text-surface-500 transition hover:text-surface-900"
-                    >
-                      아이디 찾기
-                    </Link>
-                    <Link
-                      href="/login/recovery?tab=password"
-                      data-cy="login-reset-password"
-                      className="font-medium text-surface-500 transition hover:text-surface-900"
-                    >
-                      비밀번호 재설정
-                    </Link>
-                  </div>
-                )}
+                {isLogin && <LoginRecoveryLinks />}
 
                 <Button
                   type="submit"
@@ -182,27 +106,7 @@ export function LoginForm() {
               </form>
 
               {/* 홈 이동 링크 */}
-              <div className="mt-6 text-center">
-                <Link
-                  href="/"
-                  className="text-sm font-medium text-surface-500 hover:text-surface-900 transition-colors inline-flex items-center gap-2 group"
-                >
-                  <svg
-                    className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                    />
-                  </svg>
-                  홈으로 돌아가기
-                </Link>
-              </div>
+              <LoginHomeLink />
             </div>
           </motion.div>
         </div>

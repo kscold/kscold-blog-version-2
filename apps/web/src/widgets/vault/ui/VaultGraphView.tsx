@@ -12,18 +12,11 @@ import {
   renderNode,
   renderNodeHitArea,
 } from '../lib/graphForceConfig';
-import { isDarkGraphTheme } from '../lib/graphForceUtils';
-
-interface ParallaxStar {
-  x: number;
-  y: number;
-  r: number;
-  baseAlpha: number;
-  /** 패럴랙스 팩터 — 작을수록 멀리 있는 별처럼 천천히 움직인다 */
-  p: number;
-  tw: number;
-  ph: number;
-}
+import { createStarfield, renderStarfield, type ParallaxStar } from '../lib/graphStarfield';
+import { VaultGraphBackdrop } from './graph/VaultGraphBackdrop';
+import { VaultGraphRipples, type Ripple } from './graph/VaultGraphRipples';
+import { VaultGraphStatsHud } from './graph/VaultGraphStatsHud';
+import { VaultGraphZoomControls } from './graph/VaultGraphZoomControls';
 
 interface VaultGraphViewProps {
   graphData: GraphData;
@@ -34,13 +27,6 @@ interface VaultGraphViewProps {
   theme?: 'light' | 'dark' | 'system';
   /** 사이드바에서 호버 중인 폴더 — 해당 폴더만 스포트라이트 */
   highlightFolderId?: string | null;
-}
-
-interface Ripple {
-  id: number;
-  x: number;
-  y: number;
-  color: string;
 }
 
 export function VaultGraphView({
@@ -265,54 +251,22 @@ export function VaultGraphView({
   // 팬/줌할 때 별이 천천히 비켜나며 원근감이 생긴다 (배경이 벽지가 아니라 먼 우주가 됨).
   const starsRef = useRef<ParallaxStar[] | null>(null);
 
-  const renderStarfield = useCallback(
+  const handleRenderStarfield = useCallback(
     (ctx: CanvasRenderingContext2D, globalScale: number) => {
       const fg = fgRef.current;
       if (!fg) return;
-
       if (!starsRef.current) {
-        const count = reducedGraphEffects ? 40 : 90;
-        const stars: ParallaxStar[] = [];
-        for (let i = 0; i < count; i++) {
-          const far = i % 3 !== 0; // 2/3 원경 · 1/3 근경, 두 겹의 깊이
-          stars.push({
-            x: (Math.random() - 0.5) * 3200,
-            y: (Math.random() - 0.5) * 3200,
-            r: far ? 0.8 + Math.random() * 0.7 : 1.3 + Math.random() * 1.1,
-            baseAlpha: far ? 0.22 + Math.random() * 0.18 : 0.32 + Math.random() * 0.22,
-            p: far ? 0.08 : 0.35,
-            tw: 0.6 + Math.random() * 1.4,
-            ph: Math.random() * Math.PI * 2,
-          });
-        }
-        starsRef.current = stars;
+        starsRef.current = createStarfield(reducedGraphEffects);
       }
-
-      const center = fg.centerAt() as { x: number; y: number };
-      if (!center || !isFinite(center.x) || !isFinite(center.y)) return;
-
-      const isDark = isDarkGraphTheme(theme);
-      const t = isGraphHovered ? performance.now() / 1000 : 0;
-
-      // 마우스 기울임 시차 — 가까운 별(p 큼)일수록 커서 반대편으로 더 크게 밀린다
-      const tiltX = supportsHover ? mouseRef.current.x : 0;
-      const tiltY = supportsHover ? mouseRef.current.y : 0;
-
-      ctx.save();
-      ctx.fillStyle = isDark ? '#cbd5e1' : '#64748b';
-      for (const star of starsRef.current) {
-        // 카메라 이동량의 (1-p)만큼 별을 따라 보정 → 화면상 p배 속도로만 움직임
-        const tiltShift = (star.p * 26) / globalScale;
-        const wx = star.x + center.x * (1 - star.p) - tiltX * tiltShift;
-        const wy = star.y + center.y * (1 - star.p) - tiltY * tiltShift;
-        const r = star.r / globalScale; // 줌과 무관하게 화면 크기 고정
-        const twinkle = reducedGraphEffects ? 1 : 0.7 + 0.3 * Math.sin(t * star.tw + star.ph);
-        ctx.globalAlpha = star.baseAlpha * twinkle;
-        ctx.beginPath();
-        ctx.arc(wx, wy, r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
+      renderStarfield(ctx, globalScale, {
+        fg,
+        stars: starsRef.current,
+        theme,
+        isGraphHovered,
+        reducedEffects: reducedGraphEffects,
+        mouse: mouseRef.current,
+        supportsHover,
+      });
     },
     [isGraphHovered, reducedGraphEffects, theme, supportsHover]
   );
@@ -325,55 +279,7 @@ export function VaultGraphView({
       onMouseMove={supportsHover ? handleParallaxMouse : undefined}
       className={`w-full h-full relative overflow-hidden rounded-xl gallery-card select-none touch-none transition-[opacity,transform] duration-700 ease-out ${entered ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.985]'}`}
     >
-      {/* ── 화이트 우주 배경 (순수 CSS — 캔버스 성능 영향 없음) ── */}
-      <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
-        {/* 중앙 광원: 종이 위에 빛이 고이는 듯한 깊이감 */}
-        <div
-          className="absolute inset-0 dark:opacity-0"
-          style={{
-            background:
-              'radial-gradient(ellipse 80% 70% at 50% 45%, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.4) 55%, rgba(226,232,240,0.35) 100%)',
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-0 dark:opacity-100"
-          style={{
-            background:
-              'radial-gradient(ellipse 80% 70% at 50% 45%, rgba(30,41,59,0.0) 0%, rgba(2,6,23,0.35) 100%)',
-          }}
-        />
-        {/* 별은 캔버스 패럴랙스 필드(renderStarfield)가 담당 — 팬/줌에 원근으로 반응 */}
-        {/* 은하수 무드의 오로라 — 폴더 컬러 톤과 어울리는 한 줄기 */}
-        {!reducedGraphEffects && (
-          <>
-            <div
-              className="absolute -left-1/4 top-[12%] h-[42%] w-[70%] rounded-full blur-3xl opacity-[0.05] dark:opacity-[0.08] animate-pulse"
-              style={{
-                background: 'linear-gradient(100deg, #6E93C4, transparent 70%)',
-                animationDuration: '7s',
-                animationPlayState: isGraphHovered ? 'running' : 'paused',
-              }}
-            />
-            <div
-              className="absolute -right-1/4 bottom-[10%] h-[38%] w-[64%] rounded-full blur-3xl opacity-[0.04] dark:opacity-[0.07] animate-pulse"
-              style={{
-                background: 'linear-gradient(260deg, #a78bfa, transparent 70%)',
-                animationDuration: '9s',
-                animationDelay: '2.5s',
-                animationPlayState: isGraphHovered ? 'running' : 'paused',
-              }}
-            />
-          </>
-        )}
-        {/* 가장자리 비네트: 시선을 그래프 중심으로 */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(ellipse 120% 110% at 50% 50%, transparent 60%, rgb(100 116 139 / 0.06) 100%)',
-          }}
-        />
-      </div>
+      <VaultGraphBackdrop reducedGraphEffects={reducedGraphEffects} isGraphHovered={isGraphHovered} />
 
       <ForceGraph2D
         ref={fgRef}
@@ -412,78 +318,25 @@ export function VaultGraphView({
           const el = document.querySelector('canvas');
           if (el) el.style.cursor = node ? 'pointer' : 'default';
         }}
-        onRenderFramePre={renderStarfield}
+        onRenderFramePre={handleRenderStarfield}
         onEngineStop={handleEngineStop}
         onZoomEnd={({ k }) => setZoomPct(Math.round(k * 100))}
         backgroundColor="transparent"
       />
 
-      {/* 노드 클릭 리플 — 클릭 지점에서 폴더 컬러 파동이 한 번 퍼진다 */}
-      {ripples.map(ripple => (
-        <span
-          key={ripple.id}
-          aria-hidden="true"
-          className="absolute z-10 pointer-events-none rounded-full animate-vault-ripple"
-          style={{
-            left: ripple.x,
-            top: ripple.y,
-            width: 14,
-            height: 14,
-            marginLeft: -7,
-            marginTop: -7,
-            border: `2px solid ${ripple.color}`,
-            boxShadow: `0 0 18px ${ripple.color}66`,
-          }}
-        />
-      ))}
+      <VaultGraphRipples ripples={ripples} />
 
-      {/* 그래프 통계 HUD */}
-      <div
-        aria-hidden="true"
-        className="absolute bottom-3 left-3 z-10 pointer-events-none select-none rounded-full border border-surface-200/60 dark:border-surface-700/60 bg-white/70 dark:bg-surface-900/70 px-3 py-1.5 font-mono text-[10px] tracking-wider text-surface-400 backdrop-blur-sm"
-      >
-        {gData.nodes.length} notes · {gData.links.length} links · {zoomPct}%
-      </div>
+      <VaultGraphStatsHud
+        nodeCount={gData.nodes.length}
+        linkCount={gData.links.length}
+        zoomPct={zoomPct}
+      />
 
-      {/* 줌 컨트롤 — 모바일에선 폴더 FAB와 겹치지 않게 위로, 데스크톱에선 챗 버튼 왼쪽에 나란히 */}
-      <div className="absolute bottom-20 right-3 lg:bottom-4 lg:right-24 z-10 flex flex-col overflow-hidden rounded-2xl border border-surface-200/70 dark:border-surface-700/70 bg-white/80 dark:bg-surface-900/80 shadow-sm backdrop-blur-md">
-        <button
-          type="button"
-          onClick={() => zoomBy(1.45)}
-          aria-label="확대"
-          className="flex h-10 w-10 items-center justify-center text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white active:bg-surface-200/70"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-        </button>
-        <div className="h-px bg-surface-200/70 dark:bg-surface-700/70" />
-        <button
-          type="button"
-          onClick={() => zoomBy(1 / 1.45)}
-          aria-label="축소"
-          className="flex h-10 w-10 items-center justify-center text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white active:bg-surface-200/70"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15" />
-          </svg>
-        </button>
-        <div className="h-px bg-surface-200/70 dark:bg-surface-700/70" />
-        <button
-          type="button"
-          onClick={zoomToFit}
-          aria-label="전체 보기"
-          className="flex h-10 w-10 items-center justify-center text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white active:bg-surface-200/70"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 9V5.25A1.5 1.5 0 015.25 3.75H9m6 0h3.75a1.5 1.5 0 011.5 1.5V9m0 6v3.75a1.5 1.5 0 01-1.5 1.5H15m-6 0H5.25a1.5 1.5 0 01-1.5-1.5V15"
-            />
-          </svg>
-        </button>
-      </div>
+      <VaultGraphZoomControls
+        onZoomIn={() => zoomBy(1.45)}
+        onZoomOut={() => zoomBy(1 / 1.45)}
+        onZoomToFit={zoomToFit}
+      />
     </div>
   );
 }
