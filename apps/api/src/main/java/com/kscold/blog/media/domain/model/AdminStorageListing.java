@@ -1,4 +1,4 @@
-package com.kscold.blog.media.application.dto;
+package com.kscold.blog.media.domain.model;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

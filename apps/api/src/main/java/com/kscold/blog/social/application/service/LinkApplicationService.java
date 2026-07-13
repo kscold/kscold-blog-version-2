@@ -1,7 +1,7 @@
 package com.kscold.blog.social.application.service;
 
-import com.kscold.blog.social.application.dto.LinkPreviewResponse;
 import com.kscold.blog.social.application.port.in.LinkScrapingUseCase;
+import com.kscold.blog.social.domain.model.LinkPreviewResponse;
 import com.kscold.blog.social.domain.port.out.LinkScrapingPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

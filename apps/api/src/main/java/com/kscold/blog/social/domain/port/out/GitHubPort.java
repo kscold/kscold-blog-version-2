@@ -1,7 +1,7 @@
 package com.kscold.blog.social.domain.port.out;
 
-import com.kscold.blog.social.application.dto.GitHubContributionDay;
-import com.kscold.blog.social.application.dto.GitHubRepositorySummary;
+import com.kscold.blog.social.domain.model.GitHubContributionDay;
+import com.kscold.blog.social.domain.model.GitHubRepositorySummary;
 import java.util.List;
 
 public interface GitHubPort {

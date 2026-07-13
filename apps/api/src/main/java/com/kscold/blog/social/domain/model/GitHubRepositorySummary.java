@@ -1,4 +1,4 @@
-package com.kscold.blog.social.application.dto;
+package com.kscold.blog.social.domain.model;
 
 public record GitHubRepositorySummary(
         String name,
