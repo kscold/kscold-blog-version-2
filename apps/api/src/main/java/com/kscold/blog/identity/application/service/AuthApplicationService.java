@@ -5,8 +5,6 @@ import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryEmailComposer;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryMailProperties;
 import com.kscold.blog.identity.application.dto.AuthResult;
 import com.kscold.blog.identity.application.dto.LoginCommand;
 import com.kscold.blog.identity.application.dto.PasswordResetTokenStatus;
@@ -15,6 +13,8 @@ import com.kscold.blog.identity.application.port.in.AuthUseCase;
 import com.kscold.blog.identity.domain.model.PasswordResetToken;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
+import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
+import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
@@ -40,8 +40,8 @@ public class AuthApplicationService implements AuthUseCase {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final RecoveryMailSender recoveryMailSender;
-    private final RecoveryEmailComposer recoveryEmailComposer;
-    private final RecoveryMailProperties recoveryMailProperties;
+    private final RecoveryMailComposer recoveryEmailComposer;
+    private final PublicUrlResolver recoveryMailProperties;
 
     @Transactional
     public AuthResult register(RegisterCommand command) {

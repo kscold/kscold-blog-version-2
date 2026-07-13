@@ -3,6 +3,7 @@ package com.kscold.blog.identity.adapter.out.mail;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.identity.domain.model.User;
+import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +11,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RecoveryEmailComposer {
+public class RecoveryEmailComposer implements RecoveryMailComposer {
 
     private final RecoveryMailProperties recoveryMailProperties;
 
+    @Override
     public RecoveryMailMessage buildUsernameReminder(User user) {
         String subject = "[KSCOLD] 가입 아이디 안내";
         String preview = user.getDisplayName() + "님이 가입에 사용한 아이디를 안내드려요.";
@@ -75,6 +77,7 @@ public class RecoveryEmailComposer {
                         actionLabel));
     }
 
+    @Override
     public RecoveryMailMessage buildPasswordReset(User user, String resetUrl) {
         String expiryMinutes =
                 Long.toString(recoveryMailProperties.getPasswordResetExpiryMinutes());
@@ -130,6 +133,7 @@ public class RecoveryEmailComposer {
                         "비밀번호 다시 설정하기"));
     }
 
+    @Override
     public RecoveryMailMessage buildWelcome(User user) {
         String loginUrl = recoveryMailProperties.resolvePublicUrl("/login");
         String subject = "[KSCOLD] 가입을 환영합니다";
@@ -182,6 +186,7 @@ public class RecoveryEmailComposer {
                 buildTemplate(preview, "가입을 환영합니다", summary, body, details, loginUrl, "로그인 바로가기"));
     }
 
+    @Override
     public RecoveryMailMessage buildUnreadChatReminder(
             User user, String adminName, String latestContent, long unreadCount, String actionUrl) {
         String subject = "[KSCOLD] 새 답장이 도착했습니다";
@@ -234,6 +239,7 @@ public class RecoveryEmailComposer {
                         preview, "새 답장을 확인해 주세요", summary, body, details, actionUrl, "채팅 확인하기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightRequestConfirmation(AdminNightRequest request) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin-night");
         String subject = "[KSCOLD] Admin Night 신청이 접수되었습니다";
@@ -290,6 +296,7 @@ public class RecoveryEmailComposer {
                         "Admin Night 페이지 보기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightRequestNotification(
             AdminNightRequest request, String adminEmail) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin/admin-night");
@@ -360,6 +367,7 @@ public class RecoveryEmailComposer {
                         "관리자 보드에서 확인하기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightApprovedForRequester(AdminNightRequest request) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin-night");
         String subject = "[KSCOLD] Admin Night 일정이 merge 되었습니다";
@@ -416,6 +424,7 @@ public class RecoveryEmailComposer {
                         "보드에서 일정 확인하기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightInfoRequestedForRequester(AdminNightRequest request) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin-night");
         String subject = "[KSCOLD] Admin Night 신청에 추가 정보가 필요합니다";
@@ -467,6 +476,7 @@ public class RecoveryEmailComposer {
                         preview, "추가 정보가 필요합니다", summary, body, details, actionUrl, "신청 보완하기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightApprovedForAdmin(
             AdminNightRequest request, String adminEmail) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin/admin-night");
@@ -522,6 +532,7 @@ public class RecoveryEmailComposer {
                         "관리자 보드 다시 보기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightResubmittedConfirmation(AdminNightRequest request) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin-night");
         String subject = "[KSCOLD] Admin Night 신청 보완본이 다시 접수되었습니다";
@@ -578,6 +589,7 @@ public class RecoveryEmailComposer {
                         "신청 상태 다시 보기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightResubmittedNotification(
             AdminNightRequest request, String adminEmail) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin/admin-night");
@@ -648,6 +660,7 @@ public class RecoveryEmailComposer {
                         "관리자 보드에서 다시 보기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightRejectedForRequester(AdminNightRequest request) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin-night");
         String subject = "[KSCOLD] Admin Night 신청 상태를 안내드립니다";
@@ -705,6 +718,7 @@ public class RecoveryEmailComposer {
                         "다음 슬롯 다시 보기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightProgramVoteThanks(AdminNightProgramVote vote) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin-night/ai-agent-bloom");
         String subject = "[KSCOLD] AI Agent Bloom 관심 투표를 잘 받았습니다";
@@ -765,6 +779,7 @@ public class RecoveryEmailComposer {
                         "Bloom 페이지 다시 보기"));
     }
 
+    @Override
     public RecoveryMailMessage buildAdminNightProgramVoteNotification(
             AdminNightProgramVote vote, String adminEmail) {
         String actionUrl = recoveryMailProperties.resolvePublicUrl("/admin/admin-night");

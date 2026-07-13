@@ -1,10 +1,10 @@
 package com.kscold.blog.chat.application.service;
 
-import com.kscold.blog.chat.adapter.out.mail.ChatReminderProperties;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryEmailComposer;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryMailProperties;
+import com.kscold.blog.chat.domain.port.out.ChatReminderSettings;
 import com.kscold.blog.identity.domain.model.User;
+import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
+import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import java.time.LocalDateTime;
@@ -21,9 +21,9 @@ public class ChatReminderScheduler {
     private final ChatApplicationService chatApplicationService;
     private final UserRepository userRepository;
     private final RecoveryMailSender recoveryMailSender;
-    private final RecoveryEmailComposer recoveryEmailComposer;
-    private final RecoveryMailProperties recoveryMailProperties;
-    private final ChatReminderProperties chatReminderProperties;
+    private final RecoveryMailComposer recoveryEmailComposer;
+    private final PublicUrlResolver recoveryMailProperties;
+    private final ChatReminderSettings chatReminderProperties;
 
     @Scheduled(fixedDelayString = "${chat.reminder.fixed-delay-ms:300000}")
     public void sendUnreadAdminReplyReminders() {

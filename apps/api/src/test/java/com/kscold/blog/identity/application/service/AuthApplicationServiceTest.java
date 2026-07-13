@@ -10,14 +10,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.BusinessException;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryEmailComposer;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryMailProperties;
 import com.kscold.blog.identity.application.dto.AuthResult;
 import com.kscold.blog.identity.application.dto.PasswordResetTokenStatus;
 import com.kscold.blog.identity.application.dto.RegisterCommand;
 import com.kscold.blog.identity.domain.model.PasswordResetToken;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
+import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
+import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
@@ -50,9 +50,9 @@ class AuthApplicationServiceTest {
 
     @Mock private RecoveryMailSender recoveryMailSender;
 
-    @Mock private RecoveryEmailComposer recoveryEmailComposer;
+    @Mock private RecoveryMailComposer recoveryEmailComposer;
 
-    @Mock private RecoveryMailProperties recoveryMailProperties;
+    @Mock private PublicUrlResolver recoveryMailProperties;
 
     @InjectMocks private AuthApplicationService authApplicationService;
 

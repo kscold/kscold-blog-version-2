@@ -6,11 +6,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.kscold.blog.chat.adapter.out.mail.ChatReminderProperties;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryEmailComposer;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryMailProperties;
+import com.kscold.blog.chat.domain.port.out.ChatReminderSettings;
 import com.kscold.blog.identity.domain.model.User;
+import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
+import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
@@ -34,11 +34,11 @@ class ChatReminderSchedulerTest {
 
     @Mock private RecoveryMailSender recoveryMailSender;
 
-    @Mock private RecoveryEmailComposer recoveryEmailComposer;
+    @Mock private RecoveryMailComposer recoveryEmailComposer;
 
-    @Mock private RecoveryMailProperties recoveryMailProperties;
+    @Mock private PublicUrlResolver recoveryMailProperties;
 
-    @Mock private ChatReminderProperties chatReminderProperties;
+    @Mock private ChatReminderSettings chatReminderProperties;
 
     @InjectMocks private ChatReminderScheduler chatReminderScheduler;
 

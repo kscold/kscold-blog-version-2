@@ -1,5 +1,6 @@
 package com.kscold.blog.identity.adapter.out.mail;
 
+import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,13 +11,14 @@ import org.springframework.util.StringUtils;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "account-recovery")
-public class RecoveryMailProperties {
+public class RecoveryMailProperties implements PublicUrlResolver {
 
     private String publicUrl = "https://kscold.com";
     private String fromAddress = "";
     private String fromName = "KSCOLD";
     private long passwordResetExpiryMinutes = 30;
 
+    @Override
     public String resolvePublicUrl(String path) {
         String base = StringUtils.trimTrailingCharacter(publicUrl.trim(), '/');
         String normalizedPath = path.startsWith("/") ? path : "/" + path;
