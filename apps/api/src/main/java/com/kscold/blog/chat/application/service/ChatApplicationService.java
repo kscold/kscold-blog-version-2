@@ -1,6 +1,6 @@
 package com.kscold.blog.chat.application.service;
 
-import com.kscold.blog.chat.application.dto.ChatRoomSummaryDto;
+import com.kscold.blog.chat.application.dto.response.ChatRoomSummaryResponse;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
@@ -84,11 +84,11 @@ public class ChatApplicationService implements ChatUseCase {
     }
 
     @Override
-    public List<ChatRoomSummaryDto> getAllRooms() {
+    public List<ChatRoomSummaryResponse> getAllRooms() {
         return chatMessageRepository.findAllRooms().stream()
                 .map(
                         s ->
-                                new ChatRoomSummaryDto(
+                                new ChatRoomSummaryResponse(
                                         s.roomId(),
                                         s.username(),
                                         s.lastMessage(),

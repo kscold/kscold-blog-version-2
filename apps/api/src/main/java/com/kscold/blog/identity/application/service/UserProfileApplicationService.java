@@ -1,9 +1,9 @@
 package com.kscold.blog.identity.application.service;
 
 import com.kscold.blog.exception.ResourceNotFoundException;
-import com.kscold.blog.identity.application.dto.AuthResult;
-import com.kscold.blog.identity.application.dto.PublicProfileDto;
-import com.kscold.blog.identity.application.dto.UpdateProfileCommand;
+import com.kscold.blog.identity.application.dto.command.UpdateProfileCommand;
+import com.kscold.blog.identity.application.dto.response.AuthResponse;
+import com.kscold.blog.identity.application.dto.response.PublicProfileResponse;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
@@ -20,12 +20,12 @@ public class UserProfileApplicationService implements UserProfileUseCase {
     private final UserRepository userRepository;
 
     @Override
-    public AuthResult.UserInfo updateMyProfile(String userId, UpdateProfileCommand command) {
+    public AuthResponse.UserInfo updateMyProfile(String userId, UpdateProfileCommand command) {
         return applyProfileUpdate(userId, command);
     }
 
     @Override
-    public AuthResult.UserInfo updateUserProfile(
+    public AuthResponse.UserInfo updateUserProfile(
             String targetUserId, UpdateProfileCommand command) {
         return applyProfileUpdate(targetUserId, command);
     }
@@ -42,15 +42,15 @@ public class UserProfileApplicationService implements UserProfileUseCase {
     }
 
     @Override
-    public PublicProfileDto getPublicProfile(String username) {
+    public PublicProfileResponse getPublicProfile(String username) {
         User user =
                 userRepository
                         .findByUsername(username)
                         .orElseThrow(() -> ResourceNotFoundException.user(username));
-        return PublicProfileDto.from(user);
+        return PublicProfileResponse.from(user);
     }
 
-    private AuthResult.UserInfo applyProfileUpdate(String userId, UpdateProfileCommand command) {
+    private AuthResponse.UserInfo applyProfileUpdate(String userId, UpdateProfileCommand command) {
         User user =
                 userRepository
                         .findById(userId)
@@ -58,8 +58,8 @@ public class UserProfileApplicationService implements UserProfileUseCase {
 
         User.Profile existing = user.getProfile();
         List<String> techStack =
-                command.techStack() != null
-                        ? command.techStack().stream()
+                command.getTechStack() != null
+                        ? command.getTechStack().stream()
                                 .map(String::trim)
                                 .filter(s -> !s.isBlank())
                                 .distinct()
@@ -69,26 +69,26 @@ public class UserProfileApplicationService implements UserProfileUseCase {
         User.Profile updated =
                 User.Profile.builder()
                         .displayName(
-                                command.displayName() != null
-                                        ? command.displayName().trim()
+                                command.getDisplayName() != null
+                                        ? command.getDisplayName().trim()
                                         : (existing != null ? existing.getDisplayName() : null))
                         .bio(
-                                command.bio() != null
-                                        ? command.bio().trim()
+                                command.getBio() != null
+                                        ? command.getBio().trim()
                                         : (existing != null ? existing.getBio() : null))
                         .avatar(
-                                command.avatar() != null
-                                        ? command.avatar()
+                                command.getAvatar() != null
+                                        ? command.getAvatar()
                                         : (existing != null ? existing.getAvatar() : null))
                         .socialLinks(
-                                command.socialLinks() != null
-                                        ? command.socialLinks()
+                                command.getSocialLinks() != null
+                                        ? command.getSocialLinks()
                                         : (existing != null ? existing.getSocialLinks() : null))
                         .techStack(techStack)
                         .build();
 
         user.setProfile(updated);
         userRepository.save(user);
-        return AuthResult.UserInfo.from(user);
+        return AuthResponse.UserInfo.from(user);
     }
 }

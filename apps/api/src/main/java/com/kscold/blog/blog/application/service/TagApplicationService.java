@@ -1,6 +1,6 @@
 package com.kscold.blog.blog.application.service;
 
-import com.kscold.blog.blog.application.dto.TagCommand;
+import com.kscold.blog.blog.application.dto.command.TagCommand;
 import com.kscold.blog.blog.application.port.in.TagUseCase;
 import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.port.out.TagRepository;

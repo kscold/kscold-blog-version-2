@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
-import com.kscold.blog.payment.application.dto.CompletePaymentResponse;
-import com.kscold.blog.payment.application.dto.PaymentConfigResponse;
-import com.kscold.blog.payment.application.dto.PreparePaymentRequest;
-import com.kscold.blog.payment.application.dto.PreparePaymentResponse;
+import com.kscold.blog.payment.application.dto.command.PreparePaymentCommand;
+import com.kscold.blog.payment.application.dto.response.CompletePaymentResponse;
+import com.kscold.blog.payment.application.dto.response.PaymentConfigResponse;
+import com.kscold.blog.payment.application.dto.response.PreparePaymentResponse;
 import com.kscold.blog.payment.application.port.in.PaymentUseCase;
 import com.kscold.blog.payment.config.PortOnePaymentProperties;
 import com.kscold.blog.payment.domain.model.PaymentOrder;
@@ -58,8 +58,8 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     }
 
     @Transactional
-    public PreparePaymentResponse prepare(String userId, PreparePaymentRequest request) {
-        String paymentAccessToken = normalizePaymentAccessToken(request.paymentAccessToken());
+    public PreparePaymentResponse prepare(String userId, PreparePaymentCommand request) {
+        String paymentAccessToken = normalizePaymentAccessToken(request.getPaymentAccessToken());
         if ((userId == null || userId.isBlank()) && paymentAccessToken == null) {
             throw new BusinessException(
                     ErrorCode.UNAUTHORIZED, "로그인하거나 안내받은 결제 링크로 접속해야 결제할 수 있습니다.");
@@ -80,9 +80,9 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
                         .orderName(ORDER_NAME)
                         .totalAmount(TOTAL_AMOUNT)
                         .currency(CURRENCY)
-                        .customerName(request.customerName().trim())
-                        .customerEmail(request.customerEmail().trim())
-                        .customerPhone(request.customerPhone().trim())
+                        .customerName(request.getCustomerName().trim())
+                        .customerEmail(request.getCustomerEmail().trim())
+                        .customerPhone(request.getCustomerPhone().trim())
                         .status(PaymentOrderStatus.READY)
                         .createdAt(now)
                         .updatedAt(now)

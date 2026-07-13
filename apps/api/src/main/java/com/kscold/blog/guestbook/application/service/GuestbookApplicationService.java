@@ -2,7 +2,7 @@ package com.kscold.blog.guestbook.application.service;
 
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
-import com.kscold.blog.guestbook.application.dto.GuestbookEntryCreateCommand;
+import com.kscold.blog.guestbook.application.dto.command.GuestbookEntryCreateCommand;
 import com.kscold.blog.guestbook.application.port.in.GuestbookUseCase;
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import com.kscold.blog.guestbook.domain.port.out.GuestbookRepository;

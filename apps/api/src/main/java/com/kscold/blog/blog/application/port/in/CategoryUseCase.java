@@ -1,7 +1,7 @@
 package com.kscold.blog.blog.application.port.in;
 
-import com.kscold.blog.blog.application.dto.CategoryCreateCommand;
-import com.kscold.blog.blog.application.dto.CategoryUpdateCommand;
+import com.kscold.blog.blog.application.dto.command.CategoryCreateCommand;
+import com.kscold.blog.blog.application.dto.command.CategoryUpdateCommand;
 import com.kscold.blog.blog.domain.model.Category;
 import java.util.List;
 

@@ -2,12 +2,12 @@ package com.kscold.blog.vault.agent.application.service;
 
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
-import com.kscold.blog.vault.agent.application.dto.AgentStage;
-import com.kscold.blog.vault.agent.application.dto.ChatHistoryMessage;
-import com.kscold.blog.vault.agent.application.dto.ChatHistoryResponse;
-import com.kscold.blog.vault.agent.application.dto.ChatResponse;
-import com.kscold.blog.vault.agent.application.dto.ReindexResponse;
-import com.kscold.blog.vault.agent.application.dto.SourceNote;
+import com.kscold.blog.vault.agent.application.dto.response.AgentStage;
+import com.kscold.blog.vault.agent.application.dto.response.ChatHistoryMessage;
+import com.kscold.blog.vault.agent.application.dto.response.ChatHistoryResponse;
+import com.kscold.blog.vault.agent.application.dto.response.ChatResponse;
+import com.kscold.blog.vault.agent.application.dto.response.ReindexResponse;
+import com.kscold.blog.vault.agent.application.dto.response.SourceNote;
 import com.kscold.blog.vault.agent.config.VaultAgentProperties;
 import com.kscold.blog.vault.agent.grpc.ChatRequest;
 import com.kscold.blog.vault.agent.grpc.ReindexRequest;
@@ -64,20 +64,20 @@ public class VaultAgentService {
     }
 
     public ChatResponse chat(
-            com.kscold.blog.vault.agent.application.dto.ChatRequest request,
+            com.kscold.blog.vault.agent.application.dto.command.ChatCommand request,
             String userId,
             String clientIdentifier) {
-        String sessionId = normalizeSessionId(request.sessionId());
+        String sessionId = normalizeSessionId(request.getSessionId());
         String scopeKey = scopeKey(userId, clientIdentifier, sessionId);
         try {
             var response =
                     stub().chat(
                                     ChatRequest.newBuilder()
-                                            .setMessage(request.message())
+                                            .setMessage(request.getMessage())
                                             .setActiveFolderName(
-                                                    request.activeFolderName() == null
+                                                    request.getActiveFolderName() == null
                                                             ? ""
-                                                            : request.activeFolderName())
+                                                            : request.getActiveFolderName())
                                             .build());
 
             List<AgentStage> stages =
@@ -102,7 +102,7 @@ public class VaultAgentService {
                     userId,
                     clientIdentifier,
                     "user",
-                    request.message(),
+                    request.getMessage(),
                     List.of(),
                     List.of());
             saveMessage(
@@ -188,20 +188,20 @@ public class VaultAgentService {
                                 stages.stream()
                                         .map(
                                                 stage ->
-                                                        new Document("name", stage.name())
-                                                                .append("detail", stage.detail()))
+                                                        new Document("name", stage.getName())
+                                                                .append("detail", stage.getDetail()))
                                         .toList())
                         .append(
                                 "sources",
                                 sources.stream()
                                         .map(
                                                 source ->
-                                                        new Document("id", source.id())
-                                                                .append("title", source.title())
-                                                                .append("slug", source.slug())
-                                                                .append("score", source.score())
-                                                                .append("type", source.type())
-                                                                .append("path", source.path()))
+                                                        new Document("id", source.getId())
+                                                                .append("title", source.getTitle())
+                                                                .append("slug", source.getSlug())
+                                                                .append("score", source.getScore())
+                                                                .append("type", source.getType())
+                                                                .append("path", source.getPath()))
                                         .toList())
                         .append("createdAt", Date.from(Instant.now())),
                 CHAT_COLLECTION);

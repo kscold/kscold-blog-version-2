@@ -1,7 +1,7 @@
 package com.kscold.blog.social.application.port.in;
 
-import com.kscold.blog.social.application.dto.FeedCreateCommand;
-import com.kscold.blog.social.application.dto.FeedUpdateCommand;
+import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
+import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
 import com.kscold.blog.social.domain.model.Feed;
 import java.util.List;
 import java.util.Map;

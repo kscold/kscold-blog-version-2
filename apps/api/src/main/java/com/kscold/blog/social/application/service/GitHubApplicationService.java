@@ -1,7 +1,7 @@
 package com.kscold.blog.social.application.service;
 
-import com.kscold.blog.social.application.dto.GitHubContributionResponse;
-import com.kscold.blog.social.application.dto.GitHubOverviewResponse;
+import com.kscold.blog.social.application.dto.response.GitHubContributionResponse;
+import com.kscold.blog.social.application.dto.response.GitHubOverviewResponse;
 import com.kscold.blog.social.application.port.in.GitHubUseCase;
 import com.kscold.blog.social.domain.port.out.GitHubPort;
 import lombok.RequiredArgsConstructor;

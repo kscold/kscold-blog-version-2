@@ -1,7 +1,7 @@
 package com.kscold.blog.adminnight.application.service;
 
-import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
-import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightCreateCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightDecisionCommand;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.exception.InvalidRequestException;
 import org.springframework.stereotype.Component;
@@ -14,28 +14,28 @@ public class AdminNightRequestDraftService {
             String userId, String userEmail, AdminNightCreateCommand command) {
         return AdminNightRequest.builder()
                 .userId(userId)
-                .requesterName(normalizeText(command.requesterName(), "실명을 입력해주세요."))
+                .requesterName(normalizeText(command.getRequesterName(), "실명을 입력해주세요."))
                 .requesterEmail(userEmail)
-                .taskTitle(normalizeText(command.taskTitle(), "끝낼 일을 적어주세요."))
-                .message(normalizeOptionalText(command.message()))
-                .participationMode(requireParticipationMode(command.participationMode()))
-                .preferredSlot(requireSlot(command.preferredSlot(), "만날 시간을 골라주세요."))
+                .taskTitle(normalizeText(command.getTaskTitle(), "끝낼 일을 적어주세요."))
+                .message(normalizeOptionalText(command.getMessage()))
+                .participationMode(requireParticipationMode(command.getParticipationMode()))
+                .preferredSlot(requireSlot(command.getPreferredSlot(), "만날 시간을 골라주세요."))
                 .status(AdminNightRequest.Status.PENDING)
                 .build();
     }
 
     public void applyResubmission(
             AdminNightRequest request, String userEmail, AdminNightCreateCommand command) {
-        request.setRequesterName(normalizeText(command.requesterName(), "실명을 입력해주세요."));
+        request.setRequesterName(normalizeText(command.getRequesterName(), "실명을 입력해주세요."));
         request.setRequesterEmail(userEmail);
-        request.setTaskTitle(normalizeText(command.taskTitle(), "끝낼 일을 적어주세요."));
-        request.setMessage(normalizeOptionalText(command.message()));
-        request.setParticipationMode(requireParticipationMode(command.participationMode()));
-        request.setPreferredSlot(requireSlot(command.preferredSlot(), "만날 시간을 골라주세요."));
+        request.setTaskTitle(normalizeText(command.getTaskTitle(), "끝낼 일을 적어주세요."));
+        request.setMessage(normalizeOptionalText(command.getMessage()));
+        request.setParticipationMode(requireParticipationMode(command.getParticipationMode()));
+        request.setPreferredSlot(requireSlot(command.getPreferredSlot(), "만날 시간을 골라주세요."));
     }
 
     public AdminNightRequest.SlotInfo resolveScheduledSlot(AdminNightDecisionCommand command) {
-        return requireSlot(command.scheduledSlot(), "승인할 시간을 지정해주세요.");
+        return requireSlot(command.getScheduledSlot(), "승인할 시간을 지정해주세요.");
     }
 
     public String requireReviewNote(String reviewNote) {

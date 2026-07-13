@@ -1,6 +1,6 @@
 package com.kscold.blog.vault.application.port.in;
 
-import com.kscold.blog.vault.application.dto.NoteCommentCreateCommand;
+import com.kscold.blog.vault.application.dto.command.NoteCommentCreateCommand;
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

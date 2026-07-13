@@ -2,7 +2,7 @@ package com.kscold.blog.social.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedCommentResponse;
-import com.kscold.blog.social.application.dto.FeedCommentCreateCommand;
+import com.kscold.blog.social.application.dto.command.FeedCommentCreateCommand;
 import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import jakarta.validation.Valid;

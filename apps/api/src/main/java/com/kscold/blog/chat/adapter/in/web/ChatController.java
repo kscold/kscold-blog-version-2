@@ -1,7 +1,7 @@
 package com.kscold.blog.chat.adapter.in.web;
 
 import com.kscold.blog.chat.adapter.in.web.dto.response.ChatMessageResponse;
-import com.kscold.blog.chat.application.dto.SendUserMessageCommand;
+import com.kscold.blog.chat.application.dto.command.SendUserMessageCommand;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
@@ -40,7 +40,7 @@ public class ChatController {
                 chatUseCase.saveAndBroadcast(
                         "user-rest",
                         displayName,
-                        command.content().trim(),
+                        command.getContent().trim(),
                         ChatMessage.MessageType.TEXT,
                         userId,
                         false);

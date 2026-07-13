@@ -1,8 +1,8 @@
 package com.kscold.blog.identity.adapter.in.web;
 
-import com.kscold.blog.identity.application.dto.AuthResult;
-import com.kscold.blog.identity.application.dto.PublicProfileDto;
-import com.kscold.blog.identity.application.dto.UpdateProfileCommand;
+import com.kscold.blog.identity.application.dto.command.UpdateProfileCommand;
+import com.kscold.blog.identity.application.dto.response.AuthResponse;
+import com.kscold.blog.identity.application.dto.response.PublicProfileResponse;
 import com.kscold.blog.identity.application.port.in.UserManagementUseCase;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
@@ -38,9 +38,9 @@ public class UserProfileController {
 
     @PatchMapping("/me/profile")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<AuthResult.UserInfo>> updateMyProfile(
+    public ResponseEntity<ApiResponse<AuthResponse.UserInfo>> updateMyProfile(
             @AuthenticationPrincipal String userId, @RequestBody UpdateProfileCommand command) {
-        AuthResult.UserInfo updated = userProfileUseCase.updateMyProfile(userId, command);
+        AuthResponse.UserInfo updated = userProfileUseCase.updateMyProfile(userId, command);
         return ResponseEntity.ok(ApiResponse.success(updated, "프로필이 업데이트되었습니다"));
     }
 
@@ -58,7 +58,7 @@ public class UserProfileController {
     }
 
     @GetMapping("/profile/{username}")
-    public ResponseEntity<ApiResponse<PublicProfileDto>> getPublicProfile(
+    public ResponseEntity<ApiResponse<PublicProfileResponse>> getPublicProfile(
             @PathVariable String username) {
         return ResponseEntity.ok(
                 ApiResponse.success(userProfileUseCase.getPublicProfile(username)));
@@ -69,18 +69,18 @@ public class UserProfileController {
             @PathVariable String username,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
-        PublicProfileDto profile = userProfileUseCase.getPublicProfile(username);
+        PublicProfileResponse profile = userProfileUseCase.getPublicProfile(username);
         Page<Feed> feeds =
                 feedUseCase.getPublicFeedsByAuthorId(
-                        profile.id(),
+                        profile.getId(),
                         PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
         // 작성자(=프로필 주인)의 최신 프로필로 피드 작성자 정보를 채운다.
         UserQueryPort.UserInfo author =
                 new UserQueryPort.UserInfo(
-                        profile.id(),
-                        profile.username(),
-                        profile.displayName(),
-                        profile.avatar(),
+                        profile.getId(),
+                        profile.getUsername(),
+                        profile.getDisplayName(),
+                        profile.getAvatar(),
                         false,
                         null);
         return ResponseEntity.ok(

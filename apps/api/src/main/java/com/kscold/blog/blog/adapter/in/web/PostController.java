@@ -2,8 +2,8 @@ package com.kscold.blog.blog.adapter.in.web;
 
 import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.blog.adapter.in.web.dto.response.PostResponse;
-import com.kscold.blog.blog.application.dto.PostCreateCommand;
-import com.kscold.blog.blog.application.dto.PostUpdateCommand;
+import com.kscold.blog.blog.application.dto.command.PostCreateCommand;
+import com.kscold.blog.blog.application.dto.command.PostUpdateCommand;
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;

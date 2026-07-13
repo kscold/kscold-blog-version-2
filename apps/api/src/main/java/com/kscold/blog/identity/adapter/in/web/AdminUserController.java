@@ -1,9 +1,9 @@
 package com.kscold.blog.identity.adapter.in.web;
 
-import com.kscold.blog.identity.application.dto.AdminUserDto;
-import com.kscold.blog.identity.application.dto.AuthResult;
-import com.kscold.blog.identity.application.dto.UpdateProfileCommand;
-import com.kscold.blog.identity.application.dto.UserStatsDto;
+import com.kscold.blog.identity.application.dto.command.UpdateProfileCommand;
+import com.kscold.blog.identity.application.dto.response.AdminUserResponse;
+import com.kscold.blog.identity.application.dto.response.AuthResponse;
+import com.kscold.blog.identity.application.dto.response.UserStatsResponse;
 import com.kscold.blog.identity.application.port.in.UserManagementUseCase;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.application.service.UserStatsService;
@@ -34,23 +34,23 @@ public class AdminUserController {
     private final UserRepository userRepository;
 
     @GetMapping("/stats")
-    public ResponseEntity<ApiResponse<UserStatsDto>> getUserStats() {
+    public ResponseEntity<ApiResponse<UserStatsResponse>> getUserStats() {
         return ResponseEntity.ok(ApiResponse.success(userStatsService.getStats()));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<AdminUserDto>>> listAllUsers() {
-        List<AdminUserDto> users =
+    public ResponseEntity<ApiResponse<List<AdminUserResponse>>> listAllUsers() {
+        List<AdminUserResponse> users =
                 userRepository.findAllOrderByCreatedAtDesc().stream()
-                        .map(AdminUserDto::from)
+                        .map(AdminUserResponse::from)
                         .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.success(users));
     }
 
     @PatchMapping("/{userId}/profile")
-    public ResponseEntity<ApiResponse<AuthResult.UserInfo>> updateUserProfile(
+    public ResponseEntity<ApiResponse<AuthResponse.UserInfo>> updateUserProfile(
             @PathVariable String userId, @RequestBody UpdateProfileCommand command) {
-        AuthResult.UserInfo updated = userProfileUseCase.updateUserProfile(userId, command);
+        AuthResponse.UserInfo updated = userProfileUseCase.updateUserProfile(userId, command);
         return ResponseEntity.ok(ApiResponse.success(updated, "프로필이 업데이트되었습니다"));
     }
 

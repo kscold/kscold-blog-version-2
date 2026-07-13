@@ -1,6 +1,6 @@
 package com.kscold.blog.social.application.port.in;
 
-import com.kscold.blog.social.application.dto.FeedCommentCreateCommand;
+import com.kscold.blog.social.application.dto.command.FeedCommentCreateCommand;
 import com.kscold.blog.social.domain.model.FeedComment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

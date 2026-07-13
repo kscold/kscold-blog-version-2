@@ -5,10 +5,10 @@ import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
-import com.kscold.blog.identity.application.dto.AuthResult;
-import com.kscold.blog.identity.application.dto.LoginCommand;
-import com.kscold.blog.identity.application.dto.PasswordResetTokenStatus;
-import com.kscold.blog.identity.application.dto.RegisterCommand;
+import com.kscold.blog.identity.application.dto.command.LoginCommand;
+import com.kscold.blog.identity.application.dto.command.RegisterCommand;
+import com.kscold.blog.identity.application.dto.response.AuthResponse;
+import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.application.port.in.AuthUseCase;
 import com.kscold.blog.identity.domain.model.PasswordResetToken;
 import com.kscold.blog.identity.domain.model.User;
@@ -44,7 +44,7 @@ public class AuthApplicationService implements AuthUseCase {
     private final PublicUrlResolver recoveryMailProperties;
 
     @Transactional
-    public AuthResult register(RegisterCommand command) {
+    public AuthResponse register(RegisterCommand command) {
         if (userRepository.existsByEmail(command.getEmail())) {
             throw DuplicateResourceException.email(command.getEmail());
         }
@@ -78,7 +78,7 @@ public class AuthApplicationService implements AuthUseCase {
         return buildAuthResult(user, accessToken, refreshToken);
     }
 
-    public AuthResult login(LoginCommand command) {
+    public AuthResponse login(LoginCommand command) {
         User user =
                 userRepository
                         .findByEmail(command.getEmail())
@@ -101,7 +101,7 @@ public class AuthApplicationService implements AuthUseCase {
         return buildAuthResult(user, accessToken, refreshToken);
     }
 
-    public AuthResult refresh(String refreshToken) {
+    public AuthResponse refresh(String refreshToken) {
         if (!tokenProvider.validateRefreshToken(refreshToken)) {
             throw InvalidRequestException.invalidInput("유효하지 않은 리프레시 토큰입니다");
         }
@@ -121,13 +121,13 @@ public class AuthApplicationService implements AuthUseCase {
         return buildAuthResult(user, newAccessToken, newRefreshToken);
     }
 
-    public AuthResult.UserInfo getMe(String userId) {
+    public AuthResponse.UserInfo getMe(String userId) {
         User user =
                 userRepository
                         .findById(userId)
                         .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
-        return AuthResult.UserInfo.from(user);
+        return AuthResponse.UserInfo.from(user);
     }
 
     @Override
@@ -154,9 +154,9 @@ public class AuthApplicationService implements AuthUseCase {
     }
 
     @Override
-    public PasswordResetTokenStatus validatePasswordResetToken(String token) {
+    public PasswordResetTokenResponse validatePasswordResetToken(String token) {
         if (token == null || token.isBlank()) {
-            return new PasswordResetTokenStatus(false, "재설정 링크를 다시 확인해주세요.", null);
+            return new PasswordResetTokenResponse(false, "재설정 링크를 다시 확인해주세요.", null);
         }
 
         return passwordResetTokenRepository
@@ -164,10 +164,10 @@ public class AuthApplicationService implements AuthUseCase {
                 .filter(savedToken -> !savedToken.isExpired(Instant.now()))
                 .map(
                         savedToken ->
-                                new PasswordResetTokenStatus(
+                                new PasswordResetTokenResponse(
                                         true, "유효한 재설정 링크입니다.", savedToken.getExpiresAt()))
                 .orElseGet(
-                        () -> new PasswordResetTokenStatus(false, "만료되었거나 유효하지 않은 링크입니다.", null));
+                        () -> new PasswordResetTokenResponse(false, "만료되었거나 유효하지 않은 링크입니다.", null));
     }
 
     @Override
@@ -200,12 +200,12 @@ public class AuthApplicationService implements AuthUseCase {
         passwordResetTokenRepository.deleteByUserId(user.getId());
     }
 
-    private AuthResult buildAuthResult(User user, String accessToken, String refreshToken) {
-        return AuthResult.builder()
+    private AuthResponse buildAuthResult(User user, String accessToken, String refreshToken) {
+        return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .user(AuthResult.UserInfo.from(user))
+                .user(AuthResponse.UserInfo.from(user))
                 .build();
     }
 

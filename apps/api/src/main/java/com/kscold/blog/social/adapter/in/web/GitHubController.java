@@ -1,8 +1,8 @@
 package com.kscold.blog.social.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.social.application.dto.GitHubContributionResponse;
-import com.kscold.blog.social.application.dto.GitHubOverviewResponse;
+import com.kscold.blog.social.application.dto.response.GitHubContributionResponse;
+import com.kscold.blog.social.application.dto.response.GitHubOverviewResponse;
 import com.kscold.blog.social.application.port.in.GitHubUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

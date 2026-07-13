@@ -6,9 +6,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
-import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
-import com.kscold.blog.adminnight.application.dto.AdminNightProgramVoteCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightCreateCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightDecisionCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightProgramVoteCommand;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightNotificationPort;

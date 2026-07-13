@@ -1,8 +1,8 @@
 package com.kscold.blog.adminnight.application.port.in;
 
-import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
-import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
-import com.kscold.blog.adminnight.application.dto.AdminNightProgramVoteCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightCreateCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightDecisionCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightProgramVoteCommand;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import java.time.LocalDate;

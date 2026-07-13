@@ -1,7 +1,7 @@
 package com.kscold.blog.vault.application.port.in;
 
-import com.kscold.blog.vault.application.dto.FolderCreateCommand;
-import com.kscold.blog.vault.application.dto.FolderUpdateCommand;
+import com.kscold.blog.vault.application.dto.command.FolderCreateCommand;
+import com.kscold.blog.vault.application.dto.command.FolderUpdateCommand;
 import com.kscold.blog.vault.domain.model.VaultFolder;
 import java.util.List;
 

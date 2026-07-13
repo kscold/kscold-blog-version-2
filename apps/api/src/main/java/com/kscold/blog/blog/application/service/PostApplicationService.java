@@ -1,7 +1,7 @@
 package com.kscold.blog.blog.application.service;
 
-import com.kscold.blog.blog.application.dto.PostCreateCommand;
-import com.kscold.blog.blog.application.dto.PostUpdateCommand;
+import com.kscold.blog.blog.application.dto.command.PostCreateCommand;
+import com.kscold.blog.blog.application.dto.command.PostUpdateCommand;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.domain.model.Tag;
@@ -81,7 +81,6 @@ public class PostApplicationService implements PostUseCase {
                 // tagIds를 직접 지정하지 않은 경우에만 자동 스왑
                 if (command.getTagIds() == null) {
                     List<Post.TagInfo> swapped = swapVisibilityTag(post.getTags(), nowPublic);
-                    command.setTagIds(null); // tagInfos 경로를 우회
                     tagInfos = swapped;
                 }
             }

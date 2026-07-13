@@ -2,10 +2,10 @@ package com.kscold.blog.vault.agent.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
-import com.kscold.blog.vault.agent.application.dto.ChatHistoryResponse;
-import com.kscold.blog.vault.agent.application.dto.ChatRequest;
-import com.kscold.blog.vault.agent.application.dto.ChatResponse;
-import com.kscold.blog.vault.agent.application.dto.ReindexResponse;
+import com.kscold.blog.vault.agent.application.dto.command.ChatCommand;
+import com.kscold.blog.vault.agent.application.dto.response.ChatHistoryResponse;
+import com.kscold.blog.vault.agent.application.dto.response.ChatResponse;
+import com.kscold.blog.vault.agent.application.dto.response.ReindexResponse;
 import com.kscold.blog.vault.agent.application.service.VaultAgentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -32,7 +32,7 @@ public class VaultAgentController {
     public ResponseEntity<ApiResponse<ChatResponse>> chat(
             @AuthenticationPrincipal String userId,
             HttpServletRequest httpRequest,
-            @Valid @RequestBody ChatRequest request) {
+            @Valid @RequestBody ChatCommand request) {
         String clientIdentifier = clientIdentifierResolver.resolve(httpRequest);
         return ResponseEntity.ok(
                 ApiResponse.success(vaultAgentService.chat(request, userId, clientIdentifier)));

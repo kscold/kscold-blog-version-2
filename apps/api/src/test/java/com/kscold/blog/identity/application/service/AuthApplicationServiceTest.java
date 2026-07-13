@@ -10,9 +10,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.BusinessException;
-import com.kscold.blog.identity.application.dto.AuthResult;
-import com.kscold.blog.identity.application.dto.PasswordResetTokenStatus;
-import com.kscold.blog.identity.application.dto.RegisterCommand;
+import com.kscold.blog.identity.application.dto.command.RegisterCommand;
+import com.kscold.blog.identity.application.dto.response.AuthResponse;
+import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.domain.model.PasswordResetToken;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
@@ -81,7 +81,7 @@ class AuthApplicationServiceTest {
         when(recoveryMailSender.isAvailable()).thenReturn(true);
         when(recoveryEmailComposer.buildWelcome(any(User.class))).thenReturn(welcomeMail);
 
-        AuthResult result = authApplicationService.register(command);
+        AuthResponse result = authApplicationService.register(command);
 
         assertThat(result.getUser().getEmail()).isEqualTo(command.getEmail());
         verify(recoveryMailSender).send(welcomeMail);
@@ -202,7 +202,7 @@ class AuthApplicationServiceTest {
         when(tokenProvider.createRefreshToken("user-1", "USER")).thenReturn("refresh-token");
         when(recoveryMailSender.isAvailable()).thenReturn(false);
 
-        AuthResult result = authApplicationService.register(command);
+        AuthResponse result = authApplicationService.register(command);
 
         assertThat(result.getUser().getUsername()).isEqualTo(command.getUsername());
         verify(recoveryMailSender, never()).send(any());
@@ -223,11 +223,11 @@ class AuthApplicationServiceTest {
         when(passwordResetTokenRepository.findByTokenHash(hash(rawToken)))
                 .thenReturn(Optional.of(savedToken));
 
-        PasswordResetTokenStatus status =
+        PasswordResetTokenResponse status =
                 authApplicationService.validatePasswordResetToken(rawToken);
 
-        assertThat(status.valid()).isFalse();
-        assertThat(status.message()).contains("만료");
+        assertThat(status.isValid()).isFalse();
+        assertThat(status.getMessage()).contains("만료");
     }
 
     private static String hash(String rawToken) {

@@ -1,6 +1,6 @@
 package com.kscold.blog.chat.application.port.in;
 
-import com.kscold.blog.chat.application.dto.ChatRoomSummaryDto;
+import com.kscold.blog.chat.application.dto.response.ChatRoomSummaryResponse;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ public interface ChatUseCase {
 
     Page<ChatMessage> getAllMessages(Pageable pageable);
 
-    List<ChatRoomSummaryDto> getAllRooms();
+    List<ChatRoomSummaryResponse> getAllRooms();
 
     void markAdminMessagesRead(String roomId);
 

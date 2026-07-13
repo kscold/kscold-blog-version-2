@@ -1,8 +1,8 @@
 package com.kscold.blog.chat.adapter.in.web;
 
 import com.kscold.blog.chat.adapter.in.web.dto.response.ChatMessageResponse;
-import com.kscold.blog.chat.application.dto.ChatRoomSummaryDto;
-import com.kscold.blog.chat.application.dto.SendAdminMessageCommand;
+import com.kscold.blog.chat.application.dto.command.SendAdminMessageCommand;
+import com.kscold.blog.chat.application.dto.response.ChatRoomSummaryResponse;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -26,7 +26,7 @@ public class ChatAdminController {
     private final ChatUseCase chatUseCase;
 
     @GetMapping("/rooms")
-    public ResponseEntity<ApiResponse<List<ChatRoomSummaryDto>>> getRooms() {
+    public ResponseEntity<ApiResponse<List<ChatRoomSummaryResponse>>> getRooms() {
         return ResponseEntity.ok(ApiResponse.success(chatUseCase.getAllRooms()));
     }
 
@@ -37,7 +37,7 @@ public class ChatAdminController {
                 chatUseCase.saveAndBroadcast(
                         "admin-rest",
                         command.resolvedUsername(),
-                        command.content().trim(),
+                        command.getContent().trim(),
                         ChatMessage.MessageType.TEXT,
                         roomId,
                         true);

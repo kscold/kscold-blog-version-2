@@ -1,25 +1,25 @@
 package com.kscold.blog.identity.application.port.in;
 
-import com.kscold.blog.identity.application.dto.AuthResult;
-import com.kscold.blog.identity.application.dto.LoginCommand;
-import com.kscold.blog.identity.application.dto.PasswordResetTokenStatus;
-import com.kscold.blog.identity.application.dto.RegisterCommand;
+import com.kscold.blog.identity.application.dto.command.LoginCommand;
+import com.kscold.blog.identity.application.dto.command.RegisterCommand;
+import com.kscold.blog.identity.application.dto.response.AuthResponse;
+import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 
 public interface AuthUseCase {
 
-    AuthResult register(RegisterCommand command);
+    AuthResponse register(RegisterCommand command);
 
-    AuthResult login(LoginCommand command);
+    AuthResponse login(LoginCommand command);
 
-    AuthResult refresh(String refreshToken);
+    AuthResponse refresh(String refreshToken);
 
-    AuthResult.UserInfo getMe(String userId);
+    AuthResponse.UserInfo getMe(String userId);
 
     void sendUsernameReminder(String email);
 
     void requestPasswordReset(String email);
 
-    PasswordResetTokenStatus validatePasswordResetToken(String token);
+    PasswordResetTokenResponse validatePasswordResetToken(String token);
 
     void resetPassword(String token, String newPassword);
 }

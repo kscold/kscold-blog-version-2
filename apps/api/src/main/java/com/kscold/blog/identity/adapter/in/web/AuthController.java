@@ -1,13 +1,13 @@
 package com.kscold.blog.identity.adapter.in.web;
 
-import com.kscold.blog.identity.application.dto.AuthResult;
-import com.kscold.blog.identity.application.dto.LoginCommand;
-import com.kscold.blog.identity.application.dto.PasswordResetTokenStatus;
-import com.kscold.blog.identity.application.dto.RecoverUsernameCommand;
-import com.kscold.blog.identity.application.dto.RefreshTokenCommand;
-import com.kscold.blog.identity.application.dto.RegisterCommand;
-import com.kscold.blog.identity.application.dto.RequestPasswordResetCommand;
-import com.kscold.blog.identity.application.dto.ResetPasswordCommand;
+import com.kscold.blog.identity.application.dto.command.LoginCommand;
+import com.kscold.blog.identity.application.dto.command.RecoverUsernameCommand;
+import com.kscold.blog.identity.application.dto.command.RefreshTokenCommand;
+import com.kscold.blog.identity.application.dto.command.RegisterCommand;
+import com.kscold.blog.identity.application.dto.command.RequestPasswordResetCommand;
+import com.kscold.blog.identity.application.dto.command.ResetPasswordCommand;
+import com.kscold.blog.identity.application.dto.response.AuthResponse;
+import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.application.port.in.AuthUseCase;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.validation.Valid;
@@ -27,30 +27,30 @@ public class AuthController {
     private final AuthUseCase authUseCase;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<AuthResult>> register(
+    public ResponseEntity<ApiResponse<AuthResponse>> register(
             @Valid @RequestBody RegisterCommand command) {
-        AuthResult result = authUseCase.register(command);
+        AuthResponse result = authUseCase.register(command);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(result, "회원가입이 완료되었습니다"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResult>> login(@Valid @RequestBody LoginCommand command) {
-        AuthResult result = authUseCase.login(command);
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginCommand command) {
+        AuthResponse result = authUseCase.login(command);
         return ResponseEntity.ok(ApiResponse.success(result, "로그인에 성공했습니다"));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<AuthResult>> refresh(
+    public ResponseEntity<ApiResponse<AuthResponse>> refresh(
             @Valid @RequestBody RefreshTokenCommand command) {
-        AuthResult result = authUseCase.refresh(command.getRefreshToken());
+        AuthResponse result = authUseCase.refresh(command.getRefreshToken());
         return ResponseEntity.ok(ApiResponse.success(result, "토큰이 갱신되었습니다"));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<AuthResult.UserInfo>> getMe(
+    public ResponseEntity<ApiResponse<AuthResponse.UserInfo>> getMe(
             @AuthenticationPrincipal String userId) {
-        AuthResult.UserInfo userInfo = authUseCase.getMe(userId);
+        AuthResponse.UserInfo userInfo = authUseCase.getMe(userId);
         return ResponseEntity.ok(ApiResponse.success(userInfo));
     }
 
@@ -69,9 +69,9 @@ public class AuthController {
     }
 
     @GetMapping("/password-reset/validate")
-    public ResponseEntity<ApiResponse<PasswordResetTokenStatus>> validatePasswordResetToken(
+    public ResponseEntity<ApiResponse<PasswordResetTokenResponse>> validatePasswordResetToken(
             @RequestParam String token) {
-        PasswordResetTokenStatus status = authUseCase.validatePasswordResetToken(token);
+        PasswordResetTokenResponse status = authUseCase.validatePasswordResetToken(token);
         return ResponseEntity.ok(ApiResponse.success(status));
     }
 

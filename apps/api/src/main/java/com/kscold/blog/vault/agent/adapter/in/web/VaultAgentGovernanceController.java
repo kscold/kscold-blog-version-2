@@ -1,7 +1,7 @@
 package com.kscold.blog.vault.agent.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.vault.agent.application.dto.AgentRunResponse;
+import com.kscold.blog.vault.agent.application.dto.response.AgentRunResponse;
 import com.kscold.blog.vault.agent.application.service.VaultAgentGovernanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

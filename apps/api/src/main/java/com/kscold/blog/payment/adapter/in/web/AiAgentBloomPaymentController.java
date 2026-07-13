@@ -1,10 +1,10 @@
 package com.kscold.blog.payment.adapter.in.web;
 
-import com.kscold.blog.payment.application.dto.CompletePaymentRequest;
-import com.kscold.blog.payment.application.dto.CompletePaymentResponse;
-import com.kscold.blog.payment.application.dto.PaymentConfigResponse;
-import com.kscold.blog.payment.application.dto.PreparePaymentRequest;
-import com.kscold.blog.payment.application.dto.PreparePaymentResponse;
+import com.kscold.blog.payment.application.dto.command.CompletePaymentCommand;
+import com.kscold.blog.payment.application.dto.command.PreparePaymentCommand;
+import com.kscold.blog.payment.application.dto.response.CompletePaymentResponse;
+import com.kscold.blog.payment.application.dto.response.PaymentConfigResponse;
+import com.kscold.blog.payment.application.dto.response.PreparePaymentResponse;
 import com.kscold.blog.payment.application.port.in.PaymentUseCase;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.validation.Valid;
@@ -32,17 +32,17 @@ public class AiAgentBloomPaymentController {
     @PostMapping("/prepare")
     public ResponseEntity<ApiResponse<PreparePaymentResponse>> prepare(
             @AuthenticationPrincipal String userId,
-            @Valid @RequestBody PreparePaymentRequest request) {
+            @Valid @RequestBody PreparePaymentCommand request) {
         return ResponseEntity.ok(ApiResponse.success(paymentUseCase.prepare(userId, request)));
     }
 
     @PostMapping("/complete")
     public ResponseEntity<ApiResponse<CompletePaymentResponse>> complete(
             @AuthenticationPrincipal String userId,
-            @Valid @RequestBody CompletePaymentRequest request) {
+            @Valid @RequestBody CompletePaymentCommand request) {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         paymentUseCase.complete(
-                                userId, request.paymentId(), request.paymentAccessToken())));
+                                userId, request.getPaymentId(), request.getPaymentAccessToken())));
     }
 }

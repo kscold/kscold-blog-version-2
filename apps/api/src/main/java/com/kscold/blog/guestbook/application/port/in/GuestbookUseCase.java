@@ -1,6 +1,6 @@
 package com.kscold.blog.guestbook.application.port.in;
 
-import com.kscold.blog.guestbook.application.dto.GuestbookEntryCreateCommand;
+import com.kscold.blog.guestbook.application.dto.command.GuestbookEntryCreateCommand;
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

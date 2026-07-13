@@ -1,9 +1,9 @@
 package com.kscold.blog.blog.adapter.in.web;
 
 import com.kscold.blog.blog.adapter.in.web.dto.response.CategoryResponse;
-import com.kscold.blog.blog.application.dto.CategoryCreateCommand;
-import com.kscold.blog.blog.application.dto.CategoryMoveCommand;
-import com.kscold.blog.blog.application.dto.CategoryUpdateCommand;
+import com.kscold.blog.blog.application.dto.command.CategoryCreateCommand;
+import com.kscold.blog.blog.application.dto.command.CategoryMoveCommand;
+import com.kscold.blog.blog.application.dto.command.CategoryUpdateCommand;
 import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.shared.web.ApiResponse;

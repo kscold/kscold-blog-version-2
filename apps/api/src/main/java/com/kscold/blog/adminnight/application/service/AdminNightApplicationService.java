@@ -1,8 +1,8 @@
 package com.kscold.blog.adminnight.application.service;
 
-import com.kscold.blog.adminnight.application.dto.AdminNightCreateCommand;
-import com.kscold.blog.adminnight.application.dto.AdminNightDecisionCommand;
-import com.kscold.blog.adminnight.application.dto.AdminNightProgramVoteCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightCreateCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightDecisionCommand;
+import com.kscold.blog.adminnight.application.dto.command.AdminNightProgramVoteCommand;
 import com.kscold.blog.adminnight.application.port.in.AdminNightUseCase;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
@@ -189,7 +189,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         User user = findAuthenticatedUser(userId).orElse(null);
         String contactEmail =
                 adminNightProgramVoteNormalizer.normalizeEmail(
-                        command.contactEmail(), user != null ? user.getEmail() : null);
+                        command.getContactEmail(), user != null ? user.getEmail() : null);
         Optional<AdminNightProgramVote> existingVote =
                 user != null
                         ? adminNightProgramVoteRepository.findByProgramKeyAndUserId(
@@ -212,35 +212,35 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         vote.setUserId(user != null ? user.getId() : vote.getUserId());
         vote.setRequesterName(
                 adminNightProgramVoteNormalizer.normalizeText(
-                        command.requesterName(), "이름을 적어주세요."));
+                        command.getRequesterName(), "이름을 적어주세요."));
         vote.setRequesterEmail(user != null ? user.getEmail() : contactEmail);
         vote.setContactEmail(contactEmail);
-        vote.setContact(adminNightProgramVoteNormalizer.normalizePhoneNumber(command.contact()));
+        vote.setContact(adminNightProgramVoteNormalizer.normalizePhoneNumber(command.getContact()));
         vote.setInterestLevel(
-                adminNightProgramVoteNormalizer.requireInterestLevel(command.interestLevel()));
+                adminNightProgramVoteNormalizer.requireInterestLevel(command.getInterestLevel()));
         vote.setPreferredFormat(
-                adminNightProgramVoteNormalizer.requirePreferredFormat(command.preferredFormat()));
+                adminNightProgramVoteNormalizer.requirePreferredFormat(command.getPreferredFormat()));
         vote.setExperienceLevel(
-                adminNightProgramVoteNormalizer.requireExperienceLevel(command.experienceLevel()));
+                adminNightProgramVoteNormalizer.requireExperienceLevel(command.getExperienceLevel()));
         vote.setSessionStyle(
-                adminNightProgramVoteNormalizer.requireSessionStyle(command.sessionStyle()));
+                adminNightProgramVoteNormalizer.requireSessionStyle(command.getSessionStyle()));
         vote.setSessionLength(
-                adminNightProgramVoteNormalizer.requireSessionLength(command.sessionLength()));
+                adminNightProgramVoteNormalizer.requireSessionLength(command.getSessionLength()));
         vote.setFoodPreference(
-                adminNightProgramVoteNormalizer.requireFoodPreference(command.foodPreference()));
+                adminNightProgramVoteNormalizer.requireFoodPreference(command.getFoodPreference()));
         vote.setPreferredDays(
-                adminNightProgramVoteNormalizer.normalizePreferredDays(command.preferredDays()));
+                adminNightProgramVoteNormalizer.normalizePreferredDays(command.getPreferredDays()));
         vote.setPreferredTimes(
                 adminNightProgramVoteNormalizer.normalizeRequiredList(
-                        command.preferredTimes(), 8, "가능한 시간대를 하나 이상 골라주세요."));
+                        command.getPreferredTimes(), 8, "가능한 시간대를 하나 이상 골라주세요."));
         vote.setInterestedTopics(
                 adminNightProgramVoteNormalizer.normalizeRequiredList(
-                        command.interestedTopics(), 12, "듣고 싶은 주제를 하나 이상 골라주세요."));
+                        command.getInterestedTopics(), 12, "듣고 싶은 주제를 하나 이상 골라주세요."));
         vote.setDesiredTakeaways(
                 adminNightProgramVoteNormalizer.normalizeOptionalText(
-                        command.desiredTakeaways(), 1000));
+                        command.getDesiredTakeaways(), 1000));
         vote.setMessage(
-                adminNightProgramVoteNormalizer.normalizeOptionalText(command.message(), 1000));
+                adminNightProgramVoteNormalizer.normalizeOptionalText(command.getMessage(), 1000));
 
         AdminNightProgramVote saved = adminNightProgramVoteRepository.save(vote);
         adminNightNotificationPort.notifyProgramVoteSubmitted(saved);

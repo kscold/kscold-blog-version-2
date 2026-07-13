@@ -1,8 +1,8 @@
 package com.kscold.blog.vault.application.port.in;
 
-import com.kscold.blog.vault.application.dto.GraphDataResponse;
-import com.kscold.blog.vault.application.dto.NoteCreateCommand;
-import com.kscold.blog.vault.application.dto.NoteUpdateCommand;
+import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
+import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
+import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
 import com.kscold.blog.vault.domain.model.VaultNote;
 import java.util.List;
 import org.springframework.data.domain.Page;

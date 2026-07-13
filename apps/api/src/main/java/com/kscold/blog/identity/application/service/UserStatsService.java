@@ -1,6 +1,6 @@
 package com.kscold.blog.identity.application.service;
 
-import com.kscold.blog.identity.application.dto.UserStatsDto;
+import com.kscold.blog.identity.application.dto.response.UserStatsResponse;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ public class UserStatsService {
 
     private final UserRepository userRepository;
 
-    public UserStatsDto getStats() {
+    public UserStatsResponse getStats() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfToday = now.toLocalDate().atStartOfDay();
         LocalDateTime startOfWeek = now.minusDays(6).toLocalDate().atStartOfDay();
@@ -46,21 +46,21 @@ public class UserStatsService {
                                         Collectors.counting()));
 
         // 최근 7일 날짜 목록 (빈 날짜는 0으로)
-        List<UserStatsDto.DailySignup> dailySignups = new ArrayList<>();
+        List<UserStatsResponse.DailySignup> dailySignups = new ArrayList<>();
         for (int i = 6; i >= 0; i--) {
             String date =
                     now.minusDays(i).toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd"));
             dailySignups.add(
-                    new UserStatsDto.DailySignup(date, countByDate.getOrDefault(date, 0L)));
+                    new UserStatsResponse.DailySignup(date, countByDate.getOrDefault(date, 0L)));
         }
 
         // 최근 10명 가입자
-        List<UserStatsDto.RecentUser> recentUsers =
+        List<UserStatsResponse.RecentUser> recentUsers =
                 userRepository.findAllOrderByCreatedAtDesc().stream()
                         .limit(10)
                         .map(
                                 u ->
-                                        new UserStatsDto.RecentUser(
+                                        new UserStatsResponse.RecentUser(
                                                 u.getId(),
                                                 u.getUsername(),
                                                 u.getDisplayName(),
@@ -78,7 +78,7 @@ public class UserStatsService {
                                                 u.isDeleted()))
                         .toList();
 
-        return new UserStatsDto(
+        return new UserStatsResponse(
                 totalUsers,
                 newUsersToday,
                 newUsersThisWeek,

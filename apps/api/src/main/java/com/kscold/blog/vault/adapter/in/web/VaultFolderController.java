@@ -2,8 +2,8 @@ package com.kscold.blog.vault.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.vault.adapter.in.web.dto.response.VaultFolderResponse;
-import com.kscold.blog.vault.application.dto.FolderCreateCommand;
-import com.kscold.blog.vault.application.dto.FolderUpdateCommand;
+import com.kscold.blog.vault.application.dto.command.FolderCreateCommand;
+import com.kscold.blog.vault.application.dto.command.FolderUpdateCommand;
 import com.kscold.blog.vault.application.port.in.VaultFolderUseCase;
 import com.kscold.blog.vault.domain.model.VaultFolder;
 import jakarta.validation.Valid;

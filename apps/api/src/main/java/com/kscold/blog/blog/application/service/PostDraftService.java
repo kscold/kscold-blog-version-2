@@ -1,7 +1,7 @@
 package com.kscold.blog.blog.application.service;
 
-import com.kscold.blog.blog.application.dto.PostCreateCommand;
-import com.kscold.blog.blog.application.dto.PostUpdateCommand;
+import com.kscold.blog.blog.application.dto.command.PostCreateCommand;
+import com.kscold.blog.blog.application.dto.command.PostUpdateCommand;
 import com.kscold.blog.blog.domain.model.Post;
 import java.time.LocalDateTime;
 import java.util.List;

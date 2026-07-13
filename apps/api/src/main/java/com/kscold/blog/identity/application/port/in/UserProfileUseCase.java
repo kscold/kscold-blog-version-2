@@ -1,17 +1,17 @@
 package com.kscold.blog.identity.application.port.in;
 
-import com.kscold.blog.identity.application.dto.AuthResult;
-import com.kscold.blog.identity.application.dto.PublicProfileDto;
-import com.kscold.blog.identity.application.dto.UpdateProfileCommand;
+import com.kscold.blog.identity.application.dto.command.UpdateProfileCommand;
+import com.kscold.blog.identity.application.dto.response.AuthResponse;
+import com.kscold.blog.identity.application.dto.response.PublicProfileResponse;
 import java.util.List;
 
 public interface UserProfileUseCase {
 
-    AuthResult.UserInfo updateMyProfile(String userId, UpdateProfileCommand command);
+    AuthResponse.UserInfo updateMyProfile(String userId, UpdateProfileCommand command);
 
-    AuthResult.UserInfo updateUserProfile(String targetUserId, UpdateProfileCommand command);
+    AuthResponse.UserInfo updateUserProfile(String targetUserId, UpdateProfileCommand command);
 
     List<String> getAllTechStacks();
 
-    PublicProfileDto getPublicProfile(String username);
+    PublicProfileResponse getPublicProfile(String username);
 }

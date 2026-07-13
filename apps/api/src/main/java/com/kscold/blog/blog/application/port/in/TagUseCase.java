@@ -1,6 +1,6 @@
 package com.kscold.blog.blog.application.port.in;
 
-import com.kscold.blog.blog.application.dto.TagCommand;
+import com.kscold.blog.blog.application.dto.command.TagCommand;
 import com.kscold.blog.blog.domain.model.Tag;
 import java.util.List;
 

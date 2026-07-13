@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.InvalidRequestException;
-import com.kscold.blog.guestbook.application.dto.GuestbookEntryCreateCommand;
+import com.kscold.blog.guestbook.application.dto.command.GuestbookEntryCreateCommand;
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import com.kscold.blog.guestbook.domain.port.out.GuestbookRepository;
 import com.kscold.blog.identity.domain.model.User;

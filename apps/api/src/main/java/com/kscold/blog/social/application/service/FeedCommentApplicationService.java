@@ -4,7 +4,7 @@ import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import com.kscold.blog.social.application.dto.FeedCommentCreateCommand;
+import com.kscold.blog.social.application.dto.command.FeedCommentCreateCommand;
 import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
