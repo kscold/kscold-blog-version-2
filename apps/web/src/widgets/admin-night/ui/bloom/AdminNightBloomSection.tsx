@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   useAdminNightProgramVoteSummary,
   useMyAdminNightProgramVote,
-} from '@/entities/admin-night/api/useAdminNight';
-import type { AdminNightProgramPreferredFormat } from '@/entities/admin-night/model/types';
-import { useViewer } from '@/entities/user/model/useViewer';
-import { useUpsertAdminNightProgramVote } from '@/features/admin-night/api/useAdminNightMutations';
+} from '@/entities/admin-night';
+import type { AdminNightProgramPreferredFormat } from '@/entities/admin-night';
+import { useViewer } from '@/entities/user';
+import { useUpsertAdminNightProgramVote } from '@/features/admin-night';
 import { AI_AGENT_BLOOM_PROGRAM_KEY } from '@/widgets/admin-night/lib/adminNight';
 import {
   firstFormError,

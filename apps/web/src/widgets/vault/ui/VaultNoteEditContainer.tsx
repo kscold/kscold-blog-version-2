@@ -1,7 +1,7 @@
 'use client';
 
 import VaultNoteEditor from './VaultNoteEditor';
-import { useVaultNoteEdit } from '@/features/vault/lib/useVaultNoteEdit';
+import { useVaultNoteEdit } from '@/features/vault';
 import { AdminEditorSkeleton } from '@/shared/ui/RouteSkeletons';
 
 interface VaultNoteEditContainerProps {

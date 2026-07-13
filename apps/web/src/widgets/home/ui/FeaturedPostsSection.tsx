@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useFeaturedPosts } from '@/entities/post/api/usePosts';
-import { PostCard } from '@/entities/post/ui/PostCard';
+import { useFeaturedPosts } from '@/entities/post';
+import { PostCard } from '@/entities/post';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function FeaturedPostsSection() {

@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useFeeds } from '@/entities/feed/api/useFeeds';
-import { FeedCard } from '@/features/feed/ui/FeedCard';
+import { useFeeds } from '@/entities/feed';
+import { FeedCard } from '@/features/feed';
 import { FeedComposer } from '@/features/feed';
 import { useAuth } from '@/features/auth';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';

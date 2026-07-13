@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import apiClient from '@/shared/api/api-client';
 import Link from 'next/link';
-import { useViewer } from '@/entities/user/model/useViewer';
+import { useViewer } from '@/entities/user';
 import { toPreviewText } from '@/shared/lib/seo/text';
 
 interface RestrictedOverlayProps {

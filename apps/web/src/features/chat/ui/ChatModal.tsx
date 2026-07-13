@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuthStore } from '@/entities/user/model/authStore';
+import { useAuthStore } from '@/entities/user';
 import { useChatSocket } from '@/features/chat/lib/useChatSocket';
 import { useAgentChat } from '@/features/chat/model/useAgentChat';
 import ChatMessageList from '@/features/chat/ui/ChatMessageList';

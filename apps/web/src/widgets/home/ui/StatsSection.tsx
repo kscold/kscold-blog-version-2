@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useVaultGraph } from '@/entities/vault/api/useVault';
-import { usePosts } from '@/entities/post/api/usePosts';
+import { useVaultGraph } from '@/entities/vault';
+import { usePosts } from '@/entities/post';
 import { useGitHubOverview } from '@/entities/github';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { GitHubHeatmap } from './GitHubHeatmap';

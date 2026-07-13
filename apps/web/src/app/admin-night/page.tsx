@@ -1,6 +1,6 @@
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
-import { AdminNightPage } from '@/widgets/admin-night/ui/AdminNightPage';
+import { AdminNightPage } from '@/widgets/admin-night';
 
 export const metadata = buildPageMetadata({
   title: 'Admin Night',

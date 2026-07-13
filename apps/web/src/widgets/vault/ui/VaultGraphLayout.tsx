@@ -6,7 +6,7 @@ import { useUiStore } from '@/shared/model/uiStore';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ClientVaultGraph } from './ClientVaultGraph';
 import { VaultFolderTree } from './VaultFolderTree';
-import { useVaultGraphData } from '@/features/vault/lib/useVaultGraph';
+import { useVaultGraphData } from '@/features/vault';
 import { GraphPanelSkeleton } from '@/shared/ui/RouteSkeletons';
 
 const MIN_SIDEBAR_WIDTH = 200;

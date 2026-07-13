@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { PostCard } from '@/entities/post/ui/PostCard';
+import { PostCard } from '@/entities/post';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';

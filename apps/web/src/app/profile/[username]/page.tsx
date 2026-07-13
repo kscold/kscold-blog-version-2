@@ -1,4 +1,4 @@
-import { PublicProfileContainer } from '@/widgets/profile/ui/PublicProfileContainer';
+import { PublicProfileContainer } from '@/widgets/profile';
 
 interface Props {
   params: Promise<{ username: string }>;

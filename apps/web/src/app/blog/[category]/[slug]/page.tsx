@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import { PostDetail } from '@/widgets/post/ui/PostDetail';
+import { PostDetail } from '@/widgets/post';
 import type { Post } from '@/shared/model/types/blog';
 import {
   absoluteUrl,

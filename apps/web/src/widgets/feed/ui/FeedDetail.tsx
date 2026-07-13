@@ -3,10 +3,10 @@
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useFeed } from '@/entities/feed/api/useFeeds';
+import { useFeed } from '@/entities/feed';
 import { FeedDetailPageSkeleton } from '@/shared/ui/RouteSkeletons';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
-import { FeedCard } from '@/features/feed/ui/FeedCard';
+import { FeedCard } from '@/features/feed';
 import { CommentSection } from './CommentSection';
 
 export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {

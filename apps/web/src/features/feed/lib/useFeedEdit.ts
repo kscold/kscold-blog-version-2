@@ -1,4 +1,4 @@
-import { useFeed } from '@/entities/feed/api/useFeeds';
+import { useFeed } from '@/entities/feed';
 
 export function useFeedEdit(id: string) {
   const { data: feed, isLoading } = useFeed(id);

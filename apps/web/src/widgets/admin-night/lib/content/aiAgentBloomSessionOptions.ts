@@ -2,7 +2,7 @@ import type {
   AdminNightProgramFoodPreference,
   AdminNightProgramSessionLength,
   AdminNightProgramSessionStyle,
-} from '@/entities/admin-night/model/types';
+} from '@/entities/admin-night';
 import type { AdminNightOption } from './types';
 
 export const AI_AGENT_BLOOM_SESSION_STYLE_OPTIONS: AdminNightOption<AdminNightProgramSessionStyle>[] = [

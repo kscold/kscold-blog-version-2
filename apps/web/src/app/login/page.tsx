@@ -1,4 +1,4 @@
-import { LoginContainer } from '@/widgets/auth/ui/LoginContainer';
+import { LoginContainer } from '@/widgets/auth';
 import { buildPageMetadata } from '@/shared/lib/seo';
 
 export const metadata = buildPageMetadata({

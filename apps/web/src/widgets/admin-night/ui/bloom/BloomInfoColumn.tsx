@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { AdminNightProgramVoteSummary } from '@/entities/admin-night/model/types';
+import type { AdminNightProgramVoteSummary } from '@/entities/admin-night';
 import {
   AI_AGENT_BLOOM_DETAIL_PATH,
   AI_AGENT_BLOOM_PHASES,

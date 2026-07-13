@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { useCreatePost } from '@/entities/post/api/usePostMutations';
+import { useCreatePost } from '@/entities/post';
 import { useAlert } from '@/shared/model/alertStore';
 import type { PostFormData } from '@/features/editor/model/types';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useCategories } from '@/entities/category/api/useCategories';
+import { useCategories } from '@/entities/category';
 import { usePostAutosave } from '@/features/editor/lib/usePostAutosave';
 import { PostEditorHeader } from '@/features/editor/ui/PostEditorHeader';
 import { PostEditorSidebar } from '@/features/editor/ui/PostEditorSidebar';

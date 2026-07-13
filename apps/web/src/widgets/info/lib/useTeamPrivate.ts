@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { apiClient } from '@/shared/api/api-client';
-import type { PrivateDocs } from '@/entities/profile/model/teamData';
+import type { PrivateDocs } from '@/entities/profile';
 
 export function useTeamPrivate(teamId: string) {
   const [docs, setDocs] = useState<PrivateDocs | null>(null);

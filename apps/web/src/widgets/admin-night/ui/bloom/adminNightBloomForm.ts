@@ -5,7 +5,7 @@ import type {
   AdminNightProgramPreferredDay,
   AdminNightProgramSessionLength,
   AdminNightProgramSessionStyle,
-} from '@/entities/admin-night/model/types';
+} from '@/entities/admin-night';
 import { type AdminNightOption } from '@/widgets/admin-night/lib/adminNight';
 
 export interface BloomVoteFormState {

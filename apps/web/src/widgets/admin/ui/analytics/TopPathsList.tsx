@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import type { PathStat } from '@/entities/analytics/api/useAnalytics';
+import type { PathStat } from '@/entities/analytics';
 
 interface Props {
   topPaths: PathStat[];

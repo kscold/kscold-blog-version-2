@@ -1,5 +1,5 @@
 import type { PaymentResponse } from '@portone/browser-sdk/v2';
-import type { PreparedAiAgentBloomPayment } from '@/features/payment/api/aiAgentBloomPayment';
+import type { PreparedAiAgentBloomPayment } from '@/features/payment';
 
 export async function requestKakaoPay(
   preparedPayment: PreparedAiAgentBloomPayment

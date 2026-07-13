@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { Feed } from '@/shared/model/types/social';
-import { FeedDetail } from '@/widgets/feed/ui/FeedDetail';
+import { FeedDetail } from '@/widgets/feed';
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,

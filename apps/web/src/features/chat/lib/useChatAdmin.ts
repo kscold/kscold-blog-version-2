@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
-import { applyAdminSocketEvent, mergeRestRooms, patchRoom, type Rooms } from '@/entities/chat/lib/adminRoomState';
+import { applyAdminSocketEvent, mergeRestRooms, patchRoom, type Rooms } from '@/entities/chat';
 import type { AdminMessage } from '@/entities/chat';
 import { fetchChatRooms, fetchRoomMessages, sendRestMessage } from '@/entities/chat';
 import { getAccessToken } from '@/shared/lib/authTokenStorage';

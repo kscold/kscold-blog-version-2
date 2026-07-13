@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { Category } from '@/shared/model/types/blog';
-import { CategoryPostContainer } from '@/widgets/blog/ui/CategoryPostContainer';
+import { CategoryPostContainer } from '@/widgets/blog';
 import {
   SITE_URL,
   buildBreadcrumbJsonLd,

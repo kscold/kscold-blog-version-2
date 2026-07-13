@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { HeroSection } from '@/widgets/home/ui/HeroSection';
-import { FeaturedPostsSection } from '@/widgets/home/ui/FeaturedPostsSection';
-import { AdminNightPromoSection } from '@/widgets/home/ui/AdminNightPromoSection';
-import { StatsSection } from '@/widgets/home/ui/StatsSection';
-import { PROFILE } from '@/entities/profile/model/profileData';
+import { HeroSection } from '@/widgets/home';
+import { FeaturedPostsSection } from '@/widgets/home';
+import { AdminNightPromoSection } from '@/widgets/home';
+import { StatsSection } from '@/widgets/home';
+import { PROFILE } from '@/entities/profile';
 import { SITE_NAME, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';

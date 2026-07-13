@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { BacklinkList } from '@/entities/vault/ui/BacklinkList';
-import { VaultNoteContent } from '@/entities/vault/ui/VaultNoteContent';
+import { BacklinkList } from '@/entities/vault';
+import { VaultNoteContent } from '@/entities/vault';
 import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
 import type { GraphLink, GraphNode, VaultNote } from '@/shared/model/types/vault';
 import type { useUiStore } from '@/shared/model/uiStore';

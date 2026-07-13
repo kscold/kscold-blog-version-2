@@ -3,7 +3,7 @@
 import {
   useAdminNightProgramVoteSummary,
   useAdminNightProgramVotes,
-} from '@/entities/admin-night/api/useAdminNight';
+} from '@/entities/admin-night';
 import {
   AI_AGENT_BLOOM_DAY_OPTIONS,
   AI_AGENT_BLOOM_EXPERIENCE_OPTIONS,

@@ -1,4 +1,4 @@
-import AdminChatView from '@/widgets/admin/ui/chat/AdminChatView';
+import { AdminChatView } from '@/widgets/admin';
 
 export default function AdminChatPage() {
   return <AdminChatView />;

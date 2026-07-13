@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { TagManagementContainer } from '@/widgets/admin/ui/tags/TagManagementContainer';
+import { TagManagementContainer } from '@/widgets/admin';
 
 export default function AdminTagsPage() {
   return (

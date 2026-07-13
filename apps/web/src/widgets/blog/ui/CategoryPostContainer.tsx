@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useCategories } from '@/entities/category/api/useCategories';
-import { usePostsByCategory } from '@/entities/post/api/usePosts';
-import { PostCard } from '@/entities/post/ui/PostCard';
+import { useCategories } from '@/entities/category';
+import { usePostsByCategory } from '@/entities/post';
+import { PostCard } from '@/entities/post';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { CategoryHeader } from './CategoryHeader';
 import { Pagination } from '@/shared/ui/Pagination';

@@ -2,11 +2,11 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { useCategories } from '@/entities/category/api/useCategories';
-import { useTags } from '@/entities/tag/api/useTags';
-import { useFeedTags } from '@/entities/feed/api/useFeeds';
+import { useCategories } from '@/entities/category';
+import { useTags } from '@/entities/tag';
+import { useFeedTags } from '@/entities/feed';
 import { useUiStore } from '@/shared/model/uiStore';
-import { useViewer } from '@/entities/user/model/useViewer';
+import { useViewer } from '@/entities/user';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { isSystemTagName } from '@/shared/lib/tags';
 import { SidebarMobileNav } from '@/widgets/sidebar/ui/SidebarMobileNav';

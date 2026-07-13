@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { FeedEditEditor } from '@/widgets/admin/ui/feed/FeedEditEditor';
+import { FeedEditEditor } from '@/widgets/admin';
 
 export default function EditFeedPage() {
   const { id } = useParams<{ id: string }>();

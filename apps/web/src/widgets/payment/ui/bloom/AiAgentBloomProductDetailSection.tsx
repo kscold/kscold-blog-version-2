@@ -1,4 +1,4 @@
-import type { AiAgentBloomPaymentConfig } from '@/features/payment/api/aiAgentBloomPayment';
+import type { AiAgentBloomPaymentConfig } from '@/features/payment';
 import { productHighlights } from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
 import { PaymentInfoRow } from './PaymentInfoRow';
 

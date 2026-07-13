@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { fetchVaultAgentRuns } from '@/features/chat/api/vaultAgentApi';
+import { fetchVaultAgentRuns } from '@/features/chat';
 
 export function VaultAgentGovernancePanel() {
   const { data, isLoading } = useQuery({

@@ -3,7 +3,7 @@ import type {
   AdminNightProgramInterestLevel,
   AdminNightProgramPreferredDay,
   AdminNightProgramPreferredFormat,
-} from '@/entities/admin-night/model/types';
+} from '@/entities/admin-night';
 import type { AdminNightOption, AdminNightProgramPhase } from './types';
 
 export const AI_AGENT_BLOOM_PROGRAM_KEY = 'ai-agent-bloom';

@@ -1,4 +1,4 @@
-import type { AdminNightCalendarEntry } from '@/entities/admin-night/model/types';
+import type { AdminNightCalendarEntry } from '@/entities/admin-night';
 import {
   ADMIN_NIGHT_CALENDAR_DESCRIPTION,
   AdminNightSlot,

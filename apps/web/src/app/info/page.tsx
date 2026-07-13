@@ -1,5 +1,5 @@
-import { InfoContainer } from '@/widgets/info/ui/InfoContainer';
-import { PROFILE, PROFILE_FAQ } from '@/entities/profile/model/profileData';
+import { InfoContainer } from '@/widgets/info';
+import { PROFILE, PROFILE_FAQ } from '@/entities/profile';
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';

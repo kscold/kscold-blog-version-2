@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { useLinkPreview } from '@/entities/feed/api/useFeeds';
+import { useLinkPreview } from '@/entities/feed';
 import { useCreateFeed } from '@/features/feed/api/useFeedMutations';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 import { useAlert } from '@/shared/model/alertStore';

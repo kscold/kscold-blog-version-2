@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useFeedComments } from '@/entities/feed/api/useFeedComments';
+import { useFeedComments } from '@/entities/feed';
 import {
   useCreateFeedComment,
   useDeleteFeedComment,
-} from '@/features/feed/api/useFeedCommentMutations';
+} from '@/features/feed';
 import { useAlert } from '@/shared/model/alertStore';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
 import { Pagination } from '@/shared/ui/Pagination';

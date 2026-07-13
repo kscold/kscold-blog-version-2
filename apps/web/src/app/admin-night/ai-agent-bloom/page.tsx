@@ -1,6 +1,6 @@
 import { buildBreadcrumbJsonLd, buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
-import { AdminNightBloomDetailPage } from '@/widgets/admin-night/ui/bloom/AdminNightBloomDetailPage';
+import { AdminNightBloomDetailPage } from '@/widgets/admin-night';
 
 export const metadata = buildPageMetadata({
   title: 'AI Agent Bloom',

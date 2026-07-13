@@ -1,7 +1,7 @@
 'use client';
 
-import { PostEditor } from '@/features/editor/ui/PostEditor';
-import { usePostCreate } from '@/features/editor/lib/usePostCreate';
+import { PostEditor } from '@/features/editor';
+import { usePostCreate } from '@/features/editor';
 
 export function PostCreateEditor() {
   const { handleSubmit, isSubmitting } = usePostCreate();

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { AdminNightRequest } from '@/entities/admin-night/model/types';
+import type { AdminNightRequest } from '@/entities/admin-night';
 import { ADMIN_NIGHT_PARTICIPATION_OPTIONS, type AdminNightParticipationMode, type AdminNightSlot } from '@/widgets/admin-night/lib/adminNight';
 import { AdminNightTimeRangePicker } from '@/widgets/admin-night/ui/AdminNightTimeRangePicker';
 

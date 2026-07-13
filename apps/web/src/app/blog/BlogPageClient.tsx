@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BlogContainer } from '@/widgets/blog/ui/BlogContainer';
+import { BlogContainer } from '@/widgets/blog';
 
 export function BlogPageClient() {
   return (

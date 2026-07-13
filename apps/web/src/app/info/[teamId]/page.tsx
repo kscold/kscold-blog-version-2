@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { TeamDetailPage } from '@/widgets/info/ui/TeamDetailPage';
-import { BUSINESS_INFO, TEAM_MEMBERS } from '@/entities/profile/model/teamData';
+import { TeamDetailPage } from '@/widgets/info';
+import { BUSINESS_INFO, TEAM_MEMBERS } from '@/entities/profile';
 import { buildBreadcrumbJsonLd, buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';

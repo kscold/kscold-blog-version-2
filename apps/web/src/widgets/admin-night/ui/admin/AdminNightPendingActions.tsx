@@ -1,4 +1,4 @@
-import type { AdminNightRequest } from '@/entities/admin-night/model/types';
+import type { AdminNightRequest } from '@/entities/admin-night';
 import type { AdminNightSlot } from '@/widgets/admin-night/lib/adminNight';
 
 interface AdminNightPendingActionsProps {

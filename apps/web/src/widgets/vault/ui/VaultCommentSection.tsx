@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/features/auth';
-import { useVaultComments } from '@/entities/vault/api/useVaultComments';
+import { useVaultComments } from '@/entities/vault';
 import {
   useCreateVaultComment,
   useDeleteVaultComment,
-} from '@/features/vault/api/useVaultCommentMutations';
+} from '@/features/vault';
 import { VaultCommentItem } from './VaultCommentItem';
 import { VaultCommentForm } from './VaultCommentForm';
 import { useAlert } from '@/shared/model/alertStore';

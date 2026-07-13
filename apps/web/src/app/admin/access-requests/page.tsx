@@ -1,4 +1,4 @@
-import { AdminAccessRequestsSection } from '@/widgets/admin/ui/access-requests/AdminAccessRequestsSection';
+import { AdminAccessRequestsSection } from '@/widgets/admin';
 
 export default function AccessRequestsPage() {
   return <AdminAccessRequestsSection />;

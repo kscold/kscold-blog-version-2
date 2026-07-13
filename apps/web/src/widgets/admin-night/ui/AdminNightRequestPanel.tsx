@@ -1,6 +1,6 @@
 'use client';
 
-import { AdminNightRequest } from '@/entities/admin-night/model/types';
+import { AdminNightRequest } from '@/entities/admin-night';
 import {
   AdminNightParticipationMode,
   AdminNightSlot,

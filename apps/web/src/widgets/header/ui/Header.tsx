@@ -4,9 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useUiStore } from '@/shared/model/uiStore';
-import { useLogout } from '@/entities/user/model/useLogout';
+import { useLogout } from '@/entities/user';
 import { useState, useEffect } from 'react';
-import { useViewer } from '@/entities/user/model/useViewer';
+import { useViewer } from '@/entities/user';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function Header() {

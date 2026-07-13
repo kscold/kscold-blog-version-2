@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { AiAgentBloomPaymentPage } from '@/widgets/payment/ui/AiAgentBloomPaymentPage';
+import { AiAgentBloomPaymentPage } from '@/widgets/payment';
 
 export const metadata: Metadata = {
   title: 'AI Agent Bloom 테스트 결제',

@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useAdminNightCalendar, useMyAdminNightRequests } from '@/entities/admin-night/api/useAdminNight';
-import { useCreateAdminNightRequest, useResubmitAdminNightRequest } from '@/features/admin-night/api/useAdminNightMutations';
-import type { AdminNightRequest } from '@/entities/admin-night/model/types';
-import { useViewer } from '@/entities/user/model/useViewer';
+import { useAdminNightCalendar, useMyAdminNightRequests } from '@/entities/admin-night';
+import { useCreateAdminNightRequest, useResubmitAdminNightRequest } from '@/features/admin-night';
+import type { AdminNightRequest } from '@/entities/admin-night';
+import { useViewer } from '@/entities/user';
 import { buildUpcomingAdminNightSlots, findAdminNightSlot, type AdminNightParticipationMode } from '@/widgets/admin-night/lib/adminNight';
 import { buildAdminNightPreferredSlot, parseAdminNightTimeRange } from '@/widgets/admin-night/lib/adminNightTime';
 

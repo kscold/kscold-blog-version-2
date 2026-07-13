@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AdminNightAdminSection } from '@/widgets/admin-night/ui/admin/AdminNightAdminSection';
+import { AdminNightAdminSection } from '@/widgets/admin-night';
 
 export default function AdminNightAdminPage() {
   return (

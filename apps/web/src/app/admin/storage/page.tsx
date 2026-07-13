@@ -1,4 +1,4 @@
-import { AdminStorageSection } from '@/widgets/admin/ui/storage/AdminStorageSection';
+import { AdminStorageSection } from '@/widgets/admin';
 
 export default function AdminStoragePage() {
   return <AdminStorageSection />;

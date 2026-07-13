@@ -1,4 +1,4 @@
-import { AccountRecoveryContainer } from '@/widgets/auth/ui/AccountRecoveryContainer';
+import { AccountRecoveryContainer } from '@/widgets/auth';
 import { buildPageMetadata } from '@/shared/lib/seo';
 
 export const metadata = buildPageMetadata({

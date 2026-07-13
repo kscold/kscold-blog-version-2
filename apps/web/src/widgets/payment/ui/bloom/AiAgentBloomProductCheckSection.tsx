@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { AiAgentBloomPaymentConfig } from '@/features/payment/api/aiAgentBloomPayment';
+import type { AiAgentBloomPaymentConfig } from '@/features/payment';
 
 export function AiAgentBloomProductCheckSection({
   displayConfig,

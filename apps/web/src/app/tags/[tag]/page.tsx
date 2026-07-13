@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/shared/lib/seo';
-import { UnifiedTagContainer } from '@/widgets/blog/ui/UnifiedTagContainer';
+import { UnifiedTagContainer } from '@/widgets/blog';
 
 export async function generateMetadata({
   params,

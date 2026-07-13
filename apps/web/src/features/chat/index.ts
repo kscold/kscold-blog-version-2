@@ -6,3 +6,7 @@ export * from './ui/ChatComposer';
 export * from './ui/ChatLoginGate';
 export * from './ui/ChatMessageList';
 export * from './ui/ChatModal';
+
+// FSD public API 보강
+export { fetchVaultAgentRuns } from './api/vaultAgentApi';
+export { useChatAdmin } from './lib/useChatAdmin';

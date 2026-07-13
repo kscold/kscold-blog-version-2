@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import apiClient from '@/shared/api/api-client';
-import { useViewer } from '@/entities/user/model/useViewer';
+import { useViewer } from '@/entities/user';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { PostHeader } from './PostHeader';

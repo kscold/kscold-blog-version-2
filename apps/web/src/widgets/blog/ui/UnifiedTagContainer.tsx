@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useTags } from '@/entities/tag/api/useTags';
-import { usePostsByTag } from '@/entities/post/api/usePosts';
-import { useFeeds } from '@/entities/feed/api/useFeeds';
-import { PostCard } from '@/entities/post/ui/PostCard';
-import { FeedCard } from '@/features/feed/ui/FeedCard';
+import { useTags } from '@/entities/tag';
+import { usePostsByTag } from '@/entities/post';
+import { useFeeds } from '@/entities/feed';
+import { PostCard } from '@/entities/post';
+import { FeedCard } from '@/features/feed';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useUiStore } from '@/shared/model/uiStore';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
-import { useVaultNoteData } from '@/features/vault/lib/useVaultNote';
+import { useVaultNoteData } from '@/features/vault';
 import { useVaultNoteLayout } from '@/widgets/vault/model/useVaultNoteLayout';
 import { VaultNoteSidebar } from '@/widgets/vault/ui/layout/VaultNoteSidebar';
 import { VaultNoteMainPanel } from '@/widgets/vault/ui/layout/VaultNoteMainPanel';

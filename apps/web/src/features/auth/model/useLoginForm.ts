@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/api/useAuth';
-import { useAuthStore } from '@/entities/user/model/authStore';
+import { useAuthStore } from '@/entities/user';
 import { apiClient } from '@/shared/api/api-client';
 import type { User } from '@/shared/model/types/user';
 

@@ -14,7 +14,7 @@ import type {
   AdminNightProgramVote,
   AdminNightRequest,
   AdminNightSlotPayload,
-} from '@/entities/admin-night/model/types';
+} from '@/entities/admin-night';
 
 interface CreateAdminNightRequestPayload {
   requesterName: string;

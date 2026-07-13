@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useDailyVisits, useTopPaths, useVisitHistory } from '@/entities/analytics/api/useAnalytics';
+import { useDailyVisits, useTopPaths, useVisitHistory } from '@/entities/analytics';
 import { VisitWindowSelector, type VisitWindow } from './VisitWindowSelector';
 import { DailyVisitsChart } from './DailyVisitsChart';
 import { TopPathsList } from './TopPathsList';

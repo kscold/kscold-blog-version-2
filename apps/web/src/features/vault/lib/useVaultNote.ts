@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { useVaultNote as useVaultNoteQuery, useVaultBacklinks, useVaultFolders, useVaultGraph } from '@/entities/vault/api/useVault';
-import { buildFolderColorMap, getLocalGraph } from '@/entities/vault/lib/vault-utils';
+import { useVaultNote as useVaultNoteQuery, useVaultBacklinks, useVaultFolders, useVaultGraph } from '@/entities/vault';
+import { buildFolderColorMap, getLocalGraph } from '@/entities/vault';
 
 export function useVaultNoteData(slug: string) {
   const { data: note, isLoading: isNoteLoading, isError } = useVaultNoteQuery(slug);

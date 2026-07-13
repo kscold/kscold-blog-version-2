@@ -1,4 +1,4 @@
-import { PasswordResetContainer } from '@/widgets/auth/ui/PasswordResetContainer';
+import { PasswordResetContainer } from '@/widgets/auth';
 import { buildPageMetadata } from '@/shared/lib/seo';
 
 export const metadata = buildPageMetadata({

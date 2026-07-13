@@ -1,11 +1,11 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useViewer } from '@/entities/user/model/useViewer';
+import { useViewer } from '@/entities/user';
 import {
   aiAgentBloomPaymentApi,
   type AiAgentBloomPaymentConfig,
-} from '@/features/payment/api/aiAgentBloomPayment';
+} from '@/features/payment';
 import {
   ORDER_NAME,
   PAYMENT_PATH,

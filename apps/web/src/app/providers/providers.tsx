@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/entities/user/model/authStore';
+import { useAuthStore } from '@/entities/user';
 import { subscribeAuthSessionBridge } from '@/shared/model/authSessionBridge';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 

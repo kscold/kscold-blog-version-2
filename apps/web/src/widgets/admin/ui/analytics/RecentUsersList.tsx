@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import type { RecentUser } from '@/entities/user/api/useUserStats';
-import { useSoftDeleteUser, useHardDeleteUser } from '@/features/user/api/useUserMutations';
+import type { RecentUser } from '@/entities/user';
+import { useSoftDeleteUser, useHardDeleteUser } from '@/features/user';
 import { useAlert } from '@/shared/model/alertStore';
 import { useAuth } from '@/features/auth';
 

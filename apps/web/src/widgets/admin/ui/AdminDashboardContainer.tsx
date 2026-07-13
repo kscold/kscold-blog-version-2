@@ -1,13 +1,13 @@
 'use client';
 
-import { useAdminPosts } from '@/entities/post/api/usePosts';
-import { useCategories } from '@/entities/category/api/useCategories';
-import { useFeeds } from '@/entities/feed/api/useFeeds';
-import { useAllVaultNotes } from '@/entities/vault/api/useVault';
-import { useTags } from '@/entities/tag/api/useTags';
-import { fetchChatRooms } from '@/entities/chat/api/chatAdminApi';
+import { useAdminPosts } from '@/entities/post';
+import { useCategories } from '@/entities/category';
+import { useFeeds } from '@/entities/feed';
+import { useAllVaultNotes } from '@/entities/vault';
+import { useTags } from '@/entities/tag';
+import { fetchChatRooms } from '@/entities/chat';
 import { useQuery } from '@tanstack/react-query';
-import { useViewer } from '@/entities/user/model/useViewer';
+import { useViewer } from '@/entities/user';
 import { DashboardStats } from './analytics/DashboardStats';
 import { AdminUserStatsSection } from './analytics/AdminUserStatsSection';
 import { AdminPageVisitSection } from './analytics/AdminPageVisitSection';

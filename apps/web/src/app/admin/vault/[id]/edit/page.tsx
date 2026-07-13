@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { VaultNoteEditContainer } from '@/widgets/vault/ui/VaultNoteEditContainer';
+import { VaultNoteEditContainer } from '@/widgets/vault';
 
 export default function EditVaultNotePage() {
   const { id } = useParams<{ id: string }>();

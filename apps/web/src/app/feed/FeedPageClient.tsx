@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FeedList } from '@/widgets/feed/ui/FeedList';
+import { FeedList } from '@/widgets/feed';
 
 export function FeedPageClient() {
   return (

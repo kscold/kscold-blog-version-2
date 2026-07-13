@@ -1,10 +1,10 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Header } from '@/widgets/header/ui/Header';
-import { Footer } from '@/widgets/footer/ui/Footer';
-import { Sidebar } from '@/widgets/sidebar/ui/Sidebar';
-import { FloatingChatWidget } from '@/widgets/chat/ui/FloatingChatWidget';
+import { Header } from '@/widgets/header';
+import { Footer } from '@/widgets/footer';
+import { Sidebar } from '@/widgets/sidebar';
+import { FloatingChatWidget } from '@/widgets/chat';
 import { AlertToast } from '@/shared/ui/AlertToast';
 import { CustomCursor } from '@/shared/ui/CustomCursor';
 import { ScrollProgress } from '@/shared/ui/ScrollProgress';

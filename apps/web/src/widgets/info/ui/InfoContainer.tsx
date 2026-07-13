@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PROFILE, PROFILE_FAQ } from '@/entities/profile/model/profileData';
+import { PROFILE, PROFILE_FAQ } from '@/entities/profile';
 import { SkillsSection } from './SkillsSection';
 import { ContactSection } from './ContactSection';
 

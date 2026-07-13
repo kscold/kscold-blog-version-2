@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VaultFolder, VaultNote } from '@/shared/model/types/vault';
-import { useVaultNotes } from '@/entities/vault/api/useVault';
+import { useVaultNotes } from '@/entities/vault';
 
 interface VaultFolderTreeNodeProps {
   folder: VaultFolder;

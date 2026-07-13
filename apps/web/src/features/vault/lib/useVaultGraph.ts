@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { useVaultFolders, useVaultGraph as useVaultGraphQuery } from '@/entities/vault/api/useVault';
-import { buildFolderColorMap, getAggregatedGraph } from '@/entities/vault/lib/vault-utils';
+import { useVaultFolders, useVaultGraph as useVaultGraphQuery } from '@/entities/vault';
+import { buildFolderColorMap, getAggregatedGraph } from '@/entities/vault';
 
 export function useVaultGraphData(activeFolderId: string | null) {
   const { data: folders, isLoading: isFoldersLoading } = useVaultFolders();

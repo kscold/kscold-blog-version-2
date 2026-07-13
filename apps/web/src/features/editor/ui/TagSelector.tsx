@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useTags } from '@/entities/tag/api/useTags';
-import { useCreateTag } from '@/entities/tag/api/useTagMutations';
+import { useTags } from '@/entities/tag';
+import { useCreateTag } from '@/entities/tag';
 import { Tag } from '@/shared/model/types/blog';
 
 interface TagSelectorProps {

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import type { TeamMember } from '@/entities/profile/model/teamData';
+import type { TeamMember } from '@/entities/profile';
 
 const DEPT_STYLES: Record<TeamMember['department'], { accent: string; avatarBg: string }> = {
   product: { accent: '#d97706', avatarBg: '#92400e' },

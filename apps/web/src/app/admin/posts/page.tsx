@@ -1,4 +1,4 @@
-import { AdminPostsSection } from '@/widgets/admin/ui/posts/AdminPostsSection';
+import { AdminPostsSection } from '@/widgets/admin';
 
 export default function AdminPostsPage() {
   return <AdminPostsSection />;

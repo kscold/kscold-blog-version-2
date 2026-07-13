@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { usePosts, usePostsByCategory, useSearchPosts } from '@/entities/post/api/usePosts';
-import { useCategories } from '@/entities/category/api/useCategories';
+import { usePosts, usePostsByCategory, useSearchPosts } from '@/entities/post';
+import { useCategories } from '@/entities/category';
 import BlogPostGrid from './BlogPostGrid';
 
 export function BlogContainer() {

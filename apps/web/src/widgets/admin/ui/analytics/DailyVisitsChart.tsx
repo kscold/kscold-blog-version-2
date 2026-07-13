@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import type { DailyStat } from '@/entities/analytics/api/useAnalytics';
+import type { DailyStat } from '@/entities/analytics';
 
 interface Props {
   daily: DailyStat[];

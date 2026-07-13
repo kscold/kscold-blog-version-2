@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import type { PublicProfile } from '@/features/profile/api/useProfile';
+import type { PublicProfile } from '@/features/profile';
 import { ProfileTechStack } from './ProfileTechStack';
 import { ProfileSocialLinks } from './ProfileSocialLinks';
 

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { VaultNote } from '@/shared/model/types/vault';
-import { VaultNoteLayout } from '@/widgets/vault/ui/VaultNoteLayout';
+import { VaultNoteLayout } from '@/widgets/vault';
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,

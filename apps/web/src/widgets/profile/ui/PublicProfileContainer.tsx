@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePublicProfile, useUserFeeds } from '@/features/profile/api/useProfile';
+import { usePublicProfile, useUserFeeds } from '@/features/profile';
 import { ProfileHeaderCard } from './ProfileHeaderCard';
 import { ProfileFeedList } from './ProfileFeedList';
 

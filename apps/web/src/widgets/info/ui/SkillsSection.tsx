@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { SKILL_CATEGORIES } from '@/entities/profile/model/profileData';
+import { SKILL_CATEGORIES } from '@/entities/profile';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

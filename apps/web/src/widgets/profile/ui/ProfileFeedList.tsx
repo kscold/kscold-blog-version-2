@@ -1,6 +1,6 @@
 'use client';
 
-import { FeedCard } from '@/features/feed/ui/FeedCard';
+import { FeedCard } from '@/features/feed';
 import type { PageResponse } from '@/shared/model/types/api';
 import type { Feed } from '@/shared/model/types/social';
 

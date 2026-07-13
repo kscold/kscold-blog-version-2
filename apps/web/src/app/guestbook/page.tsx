@@ -1,4 +1,4 @@
-import { GuestbookPageClient } from '@/widgets/guestbook/ui/GuestbookPageClient';
+import { GuestbookPageClient } from '@/widgets/guestbook';
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 

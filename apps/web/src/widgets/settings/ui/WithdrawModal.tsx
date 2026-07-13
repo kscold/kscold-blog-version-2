@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWithdrawAccount } from '@/features/profile';
-import { useAuthStore } from '@/entities/user/model/authStore';
+import { useAuthStore } from '@/entities/user';
 import { useAlert } from '@/shared/model/alertStore';
 import { apiClient } from '@/shared/api/api-client';
 

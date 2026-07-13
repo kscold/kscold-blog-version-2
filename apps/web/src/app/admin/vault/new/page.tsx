@@ -1,6 +1,6 @@
 'use client';
 
-import VaultNoteEditor from '@/widgets/vault/ui/VaultNoteEditor';
+import { VaultNoteEditor } from '@/widgets/vault';
 
 const defaultData = {
   title: '',

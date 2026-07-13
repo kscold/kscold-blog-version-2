@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { useVaultNoteById } from '@/entities/vault/api/useVault';
+import { useVaultNoteById } from '@/entities/vault';
 
 export function useVaultNoteEdit(id: string) {
   const router = useRouter();

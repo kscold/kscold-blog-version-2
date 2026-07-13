@@ -1,6 +1,6 @@
 'use client';
 
-import { AdminNightRequest } from '@/entities/admin-night/model/types';
+import { AdminNightRequest } from '@/entities/admin-night';
 import { describeParticipationMode } from '@/widgets/admin-night/lib/adminNight';
 
 interface AdminNightMyRequestsProps {

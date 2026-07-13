@@ -1,6 +1,6 @@
 'use client';
 
-import { ImportContainer } from '@/widgets/admin/ui/import/ImportContainer';
+import { ImportContainer } from '@/widgets/admin';
 
 export default function ImportPage() {
   return <ImportContainer />;

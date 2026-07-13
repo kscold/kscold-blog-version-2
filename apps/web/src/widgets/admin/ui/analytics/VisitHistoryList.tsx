@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import type { VisitEntry } from '@/entities/analytics/api/useAnalytics';
+import type { VisitEntry } from '@/entities/analytics';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
 
 interface Props {

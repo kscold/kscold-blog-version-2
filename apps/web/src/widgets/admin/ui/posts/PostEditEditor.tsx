@@ -1,7 +1,7 @@
 'use client';
 
-import { PostEditor } from '@/features/editor/ui/PostEditor';
-import { usePostEdit } from '@/features/editor/lib/usePostEdit';
+import { PostEditor } from '@/features/editor';
+import { usePostEdit } from '@/features/editor';
 import { AdminEditorSkeleton } from '@/shared/ui/RouteSkeletons';
 
 interface PostEditEditorProps {

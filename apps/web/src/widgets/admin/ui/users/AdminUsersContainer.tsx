@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAdminUsers, AdminUser } from '@/features/profile';
-import { useSoftDeleteUser, useHardDeleteUser } from '@/features/user/api/useUserMutations';
+import { useSoftDeleteUser, useHardDeleteUser } from '@/features/user';
 import { useAlert } from '@/shared/model/alertStore';
 import { UserListHeader } from './UserListHeader';
 import { UserRow } from './UserRow';

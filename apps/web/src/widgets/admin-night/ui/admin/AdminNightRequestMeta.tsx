@@ -1,4 +1,4 @@
-import type { AdminNightRequest } from '@/entities/admin-night/model/types';
+import type { AdminNightRequest } from '@/entities/admin-night';
 import { describeParticipationMode } from '@/widgets/admin-night/lib/adminNight';
 
 export function AdminNightRequestMeta({ request }: { request: AdminNightRequest }) {

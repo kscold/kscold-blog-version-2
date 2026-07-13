@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAdminFeeds } from '@/entities/feed/api/useFeeds';
-import { useDeleteFeed } from '@/features/feed/api/useFeedMutations';
+import { useAdminFeeds } from '@/entities/feed';
+import { useDeleteFeed } from '@/features/feed';
 import { useAlert } from '@/shared/model/alertStore';
 
 export function useAdminFeed() {

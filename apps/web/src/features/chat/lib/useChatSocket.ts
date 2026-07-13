@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
-import type { RawChatPayload } from '@/entities/chat/lib/messageMappers';
-import { toVisitorMessage } from '@/entities/chat/lib/messageMappers';
+import type { RawChatPayload } from '@/entities/chat';
+import { toVisitorMessage } from '@/entities/chat';
 import { fetchMyChatMessages, sendVisitorMessage, type VisitorChatMessage } from '@/entities/chat';
 import { getAccessToken } from '@/shared/lib/authTokenStorage';
 import { resolveChatWsUrl } from '@/shared/lib/runtime-url';

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { TEAM_MEMBERS, BUSINESS_INFO } from '@/entities/profile/model/teamData';
+import { TEAM_MEMBERS, BUSINESS_INFO } from '@/entities/profile';
 import { OrgChart } from './OrgChart';
 import { MemberCard } from './MemberCard';
 import { PrivateDocsSection } from './PrivateDocsSection';

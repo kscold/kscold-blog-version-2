@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/features/auth';
-import { ProfileSettingsForm } from '@/widgets/settings/ui/ProfileSettingsForm';
+import { ProfileSettingsForm } from '@/widgets/settings';
 
 export default function ProfileSettingsPage() {
   const { currentUser, isLoading } = useAuth();

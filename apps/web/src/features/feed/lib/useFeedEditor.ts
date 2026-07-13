@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLinkPreview } from '@/entities/feed/api/useFeeds';
+import { useLinkPreview } from '@/entities/feed';
 import { useCreateFeed, useUpdateFeed } from '@/features/feed/api/useFeedMutations';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 import { useAlert } from '@/shared/model/alertStore';
