@@ -36,6 +36,8 @@ const AGENT_SESSION_STORAGE_KEY = 'kscold-agent-chat-session-id';
 
 const starterPrompts = [
   '최근 블로그에서 AI Agent 관련 내용 요약해줘',
+  '최근 피드에서 눈여겨볼 만한 내용 알려줘',
+  '승찬님은 어떤 개발자야?',
   'JavaScript async await 노트 설명해줘',
   'Vault에서 먼저 보면 좋은 노트 알려줘',
 ];
@@ -80,10 +82,11 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
       id: 'initial-agent-greeting',
       role: 'assistant',
       content:
-        '안녕하세요. 승찬님이 공개해둔 블로그 글, 피드, Vault 노트를 찾아 답하는 KSCOLD Agent예요. 비로그인 상태에서는 공개된 콘텐츠만 근거로 사용합니다.',
-      stages: [
-        { name: '검색', detail: '공개 콘텐츠에서 질문과 가까운 근거를 찾습니다.' },
-        { name: '연결', detail: 'Vault 링크와 백링크로 주변 맥락을 넓힙니다.' },
+        '안녕하세요. 승찬님이 공개해둔 블로그 글, 피드, Vault 노트, Info 프로필을 함께 찾아 답하는 KSCOLD Agent예요. 비로그인 상태에서는 공개된 콘텐츠만 근거로 사용합니다.',
+        stages: [
+        { name: '검색', detail: '블로그·피드·Vault·Info에서 질문과 가까운 근거를 찾습니다.' },
+        { name: '연결', detail: 'Vault 링크와 백링크로 필요한 경우 주변 맥락을 넓힙니다.' },
+        { name: '보강', detail: '최신 정보가 필요한 질문은 웹검색으로 내용을 보강합니다.' },
         { name: '정리', detail: '답변과 함께 바로 열 수 있는 출처를 남깁니다.' },
       ],
     },
@@ -97,10 +100,10 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
   const modalPositionStyle = {
     '--chat-modal-bottom': isElevated
       ? 'calc(env(safe-area-inset-bottom, 0px) + 7.75rem)'
-      : 'calc(env(safe-area-inset-bottom, 0px) + 6rem)',
+      : 'calc(env(safe-area-inset-bottom, 0px) + 2rem)',
     '--chat-modal-max-height': isElevated
       ? 'calc(100dvh - env(safe-area-inset-bottom, 0px) - 9.25rem)'
-      : 'calc(100dvh - env(safe-area-inset-bottom, 0px) - 7.5rem)',
+      : 'calc(100dvh - env(safe-area-inset-bottom, 0px) - 2.5rem)',
   } as CSSProperties;
 
   useEffect(() => {
@@ -209,7 +212,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
           <motion.div
             className="fixed z-[1400] flex min-h-0 flex-col overflow-hidden border border-surface-200 bg-white shadow-2xl
                        inset-x-2 bottom-2 h-[calc(100dvh-0.5rem)] max-h-[calc(100dvh-0.5rem)] rounded-[24px]
-                       sm:inset-x-auto sm:bottom-[var(--chat-modal-bottom)] sm:right-4 sm:h-[600px] sm:max-h-[var(--chat-modal-max-height)] sm:w-[min(420px,calc(100vw-2rem))] sm:min-h-[420px] sm:min-w-[360px] sm:max-w-[calc(100vw-2rem)] sm:resize sm:rounded-[24px]"
+                       sm:inset-x-auto sm:bottom-[var(--chat-modal-bottom)] sm:right-4 sm:h-[720px] sm:max-h-[var(--chat-modal-max-height)] sm:w-[min(440px,calc(100vw-2rem))] sm:min-h-[480px] sm:min-w-[360px] sm:max-w-[calc(100vw-2rem)] sm:resize sm:rounded-[24px]"
             style={modalPositionStyle}
             initial={{ opacity: 0, y: 80 }}
             animate={{ opacity: 1, y: 0 }}
@@ -271,7 +274,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
                       type="text"
                       value={agentInput}
                       onChange={e => setAgentInput(e.target.value)}
-                      placeholder="블로그/Vault에 대해 물어보기..."
+                      placeholder="블로그·피드·Vault·Info에 대해 물어보기..."
                       autoComplete="off"
                       className="min-w-0 flex-1 rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-medium text-surface-900 placeholder:text-surface-400 transition-all focus:border-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
                     />
@@ -366,7 +369,7 @@ function AgentMessageList({
           <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{message.content}</p>
           {message.stages && message.role === 'assistant' && (
             <div className="mt-3 space-y-1.5">
-              {message.stages.slice(0, 3).map(stage => (
+              {message.stages.slice(0, 5).map(stage => (
                 <div
                   key={stage.name}
                   className="rounded-xl bg-surface-50 px-3 py-2 text-xs leading-5 text-surface-600"
