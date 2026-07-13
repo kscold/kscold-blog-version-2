@@ -52,9 +52,7 @@ public class AdminNightController {
                                 body.getParticipationMode(),
                                 AdminNightWebMapper.toSlot(body.getPreferredSlot())));
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(
-                        ApiResponse.success(
-                                AdminNightWebMapper.toResponse(request), "Admin Night 신청을 보냈습니다."));
+                .body(ApiResponse.success(RequestResponse.from(request), "Admin Night 신청을 보냈습니다."));
     }
 
     @PutMapping("/admin-night/requests/{id}/resubmit")
@@ -73,7 +71,7 @@ public class AdminNightController {
                                 body.getParticipationMode(),
                                 AdminNightWebMapper.toSlot(body.getPreferredSlot())));
         return ResponseEntity.ok(
-                ApiResponse.success(AdminNightWebMapper.toResponse(request), "보완한 신청을 다시 보냈습니다."));
+                ApiResponse.success(RequestResponse.from(request), "보완한 신청을 다시 보냈습니다."));
     }
 
     @GetMapping("/admin-night/requests/me")
@@ -82,7 +80,7 @@ public class AdminNightController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         adminNightUseCase.getMyRequests(userId).stream()
-                                .map(AdminNightWebMapper::toResponse)
+                                .map(RequestResponse::from)
                                 .toList()));
     }
 
@@ -93,7 +91,7 @@ public class AdminNightController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         adminNightUseCase.getApprovedRequests(from, to).stream()
-                                .map(AdminNightWebMapper::toCalendarEntry)
+                                .map(CalendarEntryResponse::from)
                                 .toList()));
     }
 
@@ -123,8 +121,7 @@ public class AdminNightController {
                                 body.getMessage()));
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        AdminNightWebMapper.toProgramVoteResponse(vote),
-                        "AI Agent Bloom 관심 투표를 저장했습니다."));
+                        ProgramVoteResponse.from(vote), "AI Agent Bloom 관심 투표를 저장했습니다."));
     }
 
     @GetMapping("/admin-night/programs/{programKey}/votes/me")
@@ -134,7 +131,7 @@ public class AdminNightController {
                 ApiResponse.success(
                         adminNightUseCase
                                 .getMyProgramVote(programKey, userId)
-                                .map(AdminNightWebMapper::toProgramVoteResponse)
+                                .map(ProgramVoteResponse::from)
                                 .orElse(null)));
     }
 
@@ -143,7 +140,7 @@ public class AdminNightController {
             @PathVariable String programKey) {
         List<AdminNightProgramVote> votes = adminNightUseCase.getProgramVotes(programKey);
         return ResponseEntity.ok(
-                ApiResponse.success(AdminNightWebMapper.toProgramVoteSummary(programKey, votes)));
+                ApiResponse.success(ProgramVoteSummaryResponse.from(programKey, votes)));
     }
 
     @GetMapping("/admin/admin-night/requests")
@@ -153,7 +150,7 @@ public class AdminNightController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         adminNightUseCase.getRequests(status).stream()
-                                .map(AdminNightWebMapper::toResponse)
+                                .map(RequestResponse::from)
                                 .toList()));
     }
 
@@ -170,8 +167,7 @@ public class AdminNightController {
                         new AdminNightDecisionCommand(
                                 AdminNightWebMapper.toSlot(body.getScheduledSlot())));
         return ResponseEntity.ok(
-                ApiResponse.success(
-                        AdminNightWebMapper.toResponse(request), "Admin Night 신청을 승인했습니다."));
+                ApiResponse.success(RequestResponse.from(request), "Admin Night 신청을 승인했습니다."));
     }
 
     @PutMapping("/admin/admin-night/requests/{id}/reject")
@@ -183,8 +179,7 @@ public class AdminNightController {
         AdminNightRequest request =
                 adminNightUseCase.reject(id, userId, body != null ? body.getReviewNote() : null);
         return ResponseEntity.ok(
-                ApiResponse.success(
-                        AdminNightWebMapper.toResponse(request), "Admin Night 신청을 거절했습니다."));
+                ApiResponse.success(RequestResponse.from(request), "Admin Night 신청을 거절했습니다."));
     }
 
     @PutMapping("/admin/admin-night/requests/{id}/request-info")
@@ -196,7 +191,7 @@ public class AdminNightController {
         AdminNightRequest request =
                 adminNightUseCase.requestMoreInfo(id, userId, body.getReviewNote());
         return ResponseEntity.ok(
-                ApiResponse.success(AdminNightWebMapper.toResponse(request), "추가 정보 요청을 보냈습니다."));
+                ApiResponse.success(RequestResponse.from(request), "추가 정보 요청을 보냈습니다."));
     }
 
     @GetMapping("/admin/admin-night/programs/{programKey}/votes")
@@ -206,7 +201,7 @@ public class AdminNightController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         adminNightUseCase.getProgramVotes(programKey).stream()
-                                .map(AdminNightWebMapper::toProgramVoteResponse)
+                                .map(ProgramVoteResponse::from)
                                 .toList()));
     }
 }

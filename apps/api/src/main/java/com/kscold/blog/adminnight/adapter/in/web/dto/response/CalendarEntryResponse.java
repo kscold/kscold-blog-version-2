@@ -19,4 +19,28 @@ public class CalendarEntryResponse {
     private AdminNightRequest.ParticipationMode participationMode;
     private SlotResponse scheduledSlot;
     private LocalDateTime createdAt;
+
+    public static CalendarEntryResponse from(AdminNightRequest request) {
+        return CalendarEntryResponse.builder()
+                .id(request.getId())
+                .requesterLabel(maskName(request.getRequesterName()))
+                .taskTitle(request.getTaskTitle())
+                .participationMode(request.getParticipationMode())
+                .scheduledSlot(SlotResponse.from(request.getScheduledSlot()))
+                .createdAt(request.getCreatedAt())
+                .build();
+    }
+
+    private static String maskName(String name) {
+        if (name == null || name.isBlank()) {
+            return "익명";
+        }
+        if (name.length() == 1) {
+            return name + "*";
+        }
+        if (name.length() == 2) {
+            return name.charAt(0) + "*";
+        }
+        return name.charAt(0) + "*" + name.charAt(name.length() - 1);
+    }
 }

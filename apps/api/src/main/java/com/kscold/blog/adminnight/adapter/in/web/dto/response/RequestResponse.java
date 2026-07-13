@@ -27,4 +27,23 @@ public class RequestResponse {
     private String decidedByName;
     private LocalDateTime decidedAt;
     private LocalDateTime createdAt;
+
+    public static RequestResponse from(AdminNightRequest request) {
+        return RequestResponse.builder()
+                .id(request.getId())
+                .userId(request.getUserId())
+                .requesterName(request.getRequesterName())
+                .requesterEmail(request.getRequesterEmail())
+                .taskTitle(request.getTaskTitle())
+                .message(request.getMessage())
+                .participationMode(request.getParticipationMode())
+                .status(request.getStatus())
+                .preferredSlot(SlotResponse.from(request.getPreferredSlot()))
+                .scheduledSlot(SlotResponse.from(request.getScheduledSlot()))
+                .reviewNote(request.getReviewNote())
+                .decidedByName(request.getDecidedByName())
+                .decidedAt(request.getDecidedAt())
+                .createdAt(request.getCreatedAt())
+                .build();
+    }
 }

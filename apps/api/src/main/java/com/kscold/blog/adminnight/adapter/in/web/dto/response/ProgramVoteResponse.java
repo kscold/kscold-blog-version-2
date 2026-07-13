@@ -34,4 +34,33 @@ public class ProgramVoteResponse {
     private String message;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public static ProgramVoteResponse from(AdminNightProgramVote vote) {
+        return ProgramVoteResponse.builder()
+                .id(vote.getId())
+                .programKey(vote.getProgramKey())
+                .userId(vote.getUserId())
+                .requesterName(vote.getRequesterName())
+                .requesterEmail(vote.getRequesterEmail())
+                .contactEmail(vote.getContactEmail())
+                .contact(vote.getContact())
+                .interestLevel(vote.getInterestLevel())
+                .preferredFormat(vote.getPreferredFormat())
+                .experienceLevel(vote.getExperienceLevel())
+                .sessionStyle(vote.getSessionStyle())
+                .sessionLength(vote.getSessionLength())
+                .foodPreference(vote.getFoodPreference())
+                .preferredDays(safeList(vote.getPreferredDays()))
+                .preferredTimes(safeList(vote.getPreferredTimes()))
+                .interestedTopics(safeList(vote.getInterestedTopics()))
+                .desiredTakeaways(vote.getDesiredTakeaways())
+                .message(vote.getMessage())
+                .createdAt(vote.getCreatedAt())
+                .updatedAt(vote.getUpdatedAt())
+                .build();
+    }
+
+    private static <T> List<T> safeList(List<T> values) {
+        return values == null ? List.of() : values;
+    }
 }
