@@ -1,14 +1,11 @@
-package com.kscold.blog.blog.domain.port.out;
+package com.kscold.blog.blog.adapter.out.persistence;
 
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface AccessRequestRepository {
-
-    AccessRequest save(AccessRequest accessRequest);
-
-    Optional<AccessRequest> findById(String id);
+public interface MongoAccessRequestRepository extends MongoRepository<AccessRequest, String> {
 
     Optional<AccessRequest> findByUserIdAndPostId(String userId, String postId);
 
@@ -17,4 +14,6 @@ public interface AccessRequestRepository {
     List<AccessRequest> findByStatusOrderByCreatedAtDesc(AccessRequest.Status status);
 
     List<AccessRequest> findByUserIdOrderByCreatedAtDesc(String userId);
+
+    List<AccessRequest> findByUserIdAndStatus(String userId, AccessRequest.Status status);
 }

@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class AccessRequestServiceTest {
+class AccessRequestApplicationServiceTest {
 
     @Mock private AccessRequestRepository accessRequestRepository;
 
@@ -31,7 +31,7 @@ class AccessRequestServiceTest {
 
     @Mock private UserQueryPort userQueryPort;
 
-    @InjectMocks private AccessRequestService accessRequestService;
+    @InjectMocks private AccessRequestApplicationService accessRequestService;
 
     @Test
     @DisplayName("시나리오: 사용자가 제한 글 열람을 요청하면 포스트와 카테고리 정보가 함께 저장된다")

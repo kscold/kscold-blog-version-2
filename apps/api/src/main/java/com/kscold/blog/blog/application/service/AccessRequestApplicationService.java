@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AccessRequestService implements AccessRequestUseCase {
+public class AccessRequestApplicationService implements AccessRequestUseCase {
 
     private final AccessRequestRepository accessRequestRepository;
     private final PostUseCase postUseCase;
