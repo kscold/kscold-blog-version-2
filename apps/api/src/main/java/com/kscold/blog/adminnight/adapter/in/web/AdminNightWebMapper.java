@@ -1,5 +1,11 @@
 package com.kscold.blog.adminnight.adapter.in.web;
 
+import com.kscold.blog.adminnight.adapter.in.web.dto.request.SlotRequest;
+import com.kscold.blog.adminnight.adapter.in.web.dto.response.CalendarEntryResponse;
+import com.kscold.blog.adminnight.adapter.in.web.dto.response.ProgramVoteResponse;
+import com.kscold.blog.adminnight.adapter.in.web.dto.response.ProgramVoteSummaryResponse;
+import com.kscold.blog.adminnight.adapter.in.web.dto.response.RequestResponse;
+import com.kscold.blog.adminnight.adapter.in.web.dto.response.SlotResponse;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import java.time.LocalDateTime;
@@ -12,18 +18,18 @@ final class AdminNightWebMapper {
 
     private AdminNightWebMapper() {}
 
-    static AdminNightRequest.SlotInfo toSlot(SlotBody slot) {
+    static AdminNightRequest.SlotInfo toSlot(SlotRequest slot) {
         if (slot == null) {
             return null;
         }
 
         return AdminNightRequest.SlotInfo.builder()
-                .slotKey(slot.slotKey())
-                .date(slot.date())
-                .weekday(slot.weekday())
-                .timeLabel(slot.timeLabel())
-                .focus(slot.focus())
-                .badgeLabel(slot.badgeLabel())
+                .slotKey(slot.getSlotKey())
+                .date(slot.getDate())
+                .weekday(slot.getWeekday())
+                .timeLabel(slot.getTimeLabel())
+                .focus(slot.getFocus())
+                .badgeLabel(slot.getBadgeLabel())
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package com.kscold.blog.vault.adapter.in.web.dto;
+package com.kscold.blog.vault.adapter.in.web.dto.response;
 
 import com.kscold.blog.vault.domain.model.VaultFolder;
 import java.time.LocalDateTime;

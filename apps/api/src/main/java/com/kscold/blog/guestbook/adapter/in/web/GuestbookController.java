@@ -1,6 +1,6 @@
 package com.kscold.blog.guestbook.adapter.in.web;
 
-import com.kscold.blog.guestbook.adapter.in.web.dto.GuestbookEntryResponse;
+import com.kscold.blog.guestbook.adapter.in.web.dto.response.GuestbookEntryResponse;
 import com.kscold.blog.guestbook.application.dto.GuestbookEntryCreateCommand;
 import com.kscold.blog.guestbook.application.port.in.GuestbookUseCase;
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;

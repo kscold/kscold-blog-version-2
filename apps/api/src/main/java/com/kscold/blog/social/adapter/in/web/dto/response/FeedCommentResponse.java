@@ -1,4 +1,4 @@
-package com.kscold.blog.social.adapter.in.web.dto;
+package com.kscold.blog.social.adapter.in.web.dto.response;
 
 import com.kscold.blog.social.domain.model.FeedComment;
 import java.time.LocalDateTime;

@@ -1,12 +1,12 @@
 package com.kscold.blog.analytics.adapter.in.web;
-import com.kscold.blog.analytics.application.service.PageVisitService;
-import com.kscold.blog.analytics.application.service.PageExistenceChecker;
 
+import com.kscold.blog.analytics.adapter.in.web.dto.request.PageVisitRequest;
+import com.kscold.blog.analytics.application.service.PageExistenceChecker;
+import com.kscold.blog.analytics.application.service.PageVisitService;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +31,7 @@ public class AnalyticsController {
             @RequestBody PageVisitRequest body,
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
-        String normalized = normalize(body.path());
+        String normalized = normalize(body.getPath());
         if (!pageExistenceChecker.exists(normalized)) {
             return ResponseEntity.ok(ApiResponse.success(null));
         }
@@ -39,7 +39,7 @@ public class AnalyticsController {
         String ip = clientIdentifierResolver.resolve(request);
         String resolvedUserId = resolveUserId(userId);
         String username = resolveUsername(resolvedUserId);
-        pageVisitService.record(body.path(), ip, resolvedUserId, username);
+        pageVisitService.record(body.getPath(), ip, resolvedUserId, username);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -96,6 +96,4 @@ public class AnalyticsController {
         String p = q >= 0 ? path.substring(0, q) : path;
         return p.isEmpty() ? "/" : p;
     }
-
-    public record PageVisitRequest(@NotBlank String path) {}
 }

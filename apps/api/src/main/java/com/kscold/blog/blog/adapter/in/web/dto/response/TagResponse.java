@@ -1,4 +1,4 @@
-package com.kscold.blog.blog.adapter.in.web.dto;
+package com.kscold.blog.blog.adapter.in.web.dto.response;
 
 import com.kscold.blog.blog.domain.model.Tag;
 import java.time.LocalDateTime;

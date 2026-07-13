@@ -33,8 +33,7 @@ public class AiAgentBloomPaymentController {
     public ResponseEntity<ApiResponse<PreparePaymentResponse>> prepare(
             @AuthenticationPrincipal String userId,
             @Valid @RequestBody PreparePaymentRequest request) {
-        return ResponseEntity.ok(
-                ApiResponse.success(paymentUseCase.prepare(userId, request)));
+        return ResponseEntity.ok(ApiResponse.success(paymentUseCase.prepare(userId, request)));
     }
 
     @PostMapping("/complete")

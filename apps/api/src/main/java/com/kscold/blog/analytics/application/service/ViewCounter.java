@@ -1,6 +1,6 @@
 package com.kscold.blog.analytics.application.service;
-import com.kscold.blog.analytics.domain.model.ViewLog;
 
+import com.kscold.blog.analytics.domain.model.ViewLog;
 import com.mongodb.DuplicateKeyException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

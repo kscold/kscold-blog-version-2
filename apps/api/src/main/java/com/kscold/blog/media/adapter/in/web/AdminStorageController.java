@@ -1,5 +1,6 @@
 package com.kscold.blog.media.adapter.in.web;
 
+import com.kscold.blog.media.adapter.in.web.dto.request.CreateFolderRequest;
 import com.kscold.blog.media.application.dto.AdminStorageListing;
 import com.kscold.blog.media.application.dto.AdminStorageObjectResource;
 import com.kscold.blog.media.application.port.in.AdminStorageUseCase;
@@ -40,7 +41,8 @@ public class AdminStorageController {
             @RequestBody CreateFolderRequest request) {
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        adminStorageUseCase.createFolder(request.prefix(), request.folderName()),
+                        adminStorageUseCase.createFolder(
+                                request.getPrefix(), request.getFolderName()),
                         "폴더를 만들었습니다."));
     }
 
@@ -77,6 +79,4 @@ public class AdminStorageController {
                 .contentLength(object.getContentLength())
                 .body(object.getBuffer());
     }
-
-    private record CreateFolderRequest(String prefix, String folderName) {}
 }

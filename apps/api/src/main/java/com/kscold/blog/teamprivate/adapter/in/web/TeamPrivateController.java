@@ -1,12 +1,12 @@
 package com.kscold.blog.teamprivate.adapter.in.web;
-import com.kscold.blog.shared.web.ApiResponse;
 
+import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.teamprivate.adapter.in.web.dto.request.PasswordRequest;
 import com.kscold.blog.teamprivate.application.service.TeamPrivateService;
 import com.kscold.blog.teamprivate.domain.model.TeamPrivateDoc;
 import jakarta.validation.Valid;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -52,11 +52,5 @@ public class TeamPrivateController {
             @PathVariable String teamId, @Valid @RequestBody TeamPrivateDoc doc) {
         return ResponseEntity.ok(
                 ApiResponse.success(teamPrivateService.upsert(teamId, doc), "저장되었습니다"));
-    }
-
-    @Data
-    static class PasswordRequest {
-        private String password;
-        private String teamId;
     }
 }

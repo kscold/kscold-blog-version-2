@@ -1,6 +1,6 @@
 package com.kscold.blog.blog.adapter.in.web;
 
-import com.kscold.blog.blog.adapter.in.web.dto.CategoryResponse;
+import com.kscold.blog.blog.adapter.in.web.dto.response.CategoryResponse;
 import com.kscold.blog.blog.application.dto.CategoryCreateCommand;
 import com.kscold.blog.blog.application.dto.CategoryMoveCommand;
 import com.kscold.blog.blog.application.dto.CategoryUpdateCommand;

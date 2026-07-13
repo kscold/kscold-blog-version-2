@@ -1,7 +1,7 @@
 package com.kscold.blog.vault.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.vault.adapter.in.web.dto.VaultNoteCommentResponse;
+import com.kscold.blog.vault.adapter.in.web.dto.response.VaultNoteCommentResponse;
 import com.kscold.blog.vault.application.dto.NoteCommentCreateCommand;
 import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
 import com.kscold.blog.vault.domain.model.VaultNoteComment;

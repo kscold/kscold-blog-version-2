@@ -1,5 +1,7 @@
 package com.kscold.blog.blog.adapter.in.web;
 
+import com.kscold.blog.blog.adapter.in.web.dto.request.ApproveAccessRequest;
+import com.kscold.blog.blog.adapter.in.web.dto.request.CreateAccessRequest;
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -20,9 +22,9 @@ public class AccessRequestController {
     // 유저: 접근 요청
     @PostMapping("/api/access-requests")
     public ResponseEntity<ApiResponse<AccessRequest>> requestAccess(
-            @AuthenticationPrincipal String userId, @RequestBody AccessRequestBody body) {
+            @AuthenticationPrincipal String userId, @RequestBody CreateAccessRequest body) {
         AccessRequest request =
-                accessRequestUseCase.requestAccess(userId, body.postId(), body.message());
+                accessRequestUseCase.requestAccess(userId, body.getPostId(), body.getMessage());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(request, "접근 요청이 등록되었습니다"));
     }
@@ -58,8 +60,8 @@ public class AccessRequestController {
     @PutMapping("/api/admin/access-requests/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<AccessRequest>> approve(
-            @PathVariable String id, @RequestBody(required = false) ApproveAccessRequestBody body) {
-        AccessRequest.GrantScope grantScope = body != null ? body.grantScope() : null;
+            @PathVariable String id, @RequestBody(required = false) ApproveAccessRequest body) {
+        AccessRequest.GrantScope grantScope = body != null ? body.getGrantScope() : null;
         return ResponseEntity.ok(
                 ApiResponse.success(accessRequestUseCase.approve(id, grantScope), "승인되었습니다"));
     }
@@ -70,8 +72,4 @@ public class AccessRequestController {
     public ResponseEntity<ApiResponse<AccessRequest>> reject(@PathVariable String id) {
         return ResponseEntity.ok(ApiResponse.success(accessRequestUseCase.reject(id), "거절되었습니다"));
     }
-
-    record AccessRequestBody(String postId, String message) {}
-
-    record ApproveAccessRequestBody(AccessRequest.GrantScope grantScope) {}
 }

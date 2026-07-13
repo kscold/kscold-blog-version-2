@@ -2,9 +2,9 @@ package com.kscold.blog.blog.application.service;
 
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
-import com.kscold.blog.blog.domain.port.out.AccessRequestMailSender;
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import com.kscold.blog.blog.domain.model.Post;
+import com.kscold.blog.blog.domain.port.out.AccessRequestMailSender;
 import com.kscold.blog.blog.domain.port.out.AccessRequestRepository;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;

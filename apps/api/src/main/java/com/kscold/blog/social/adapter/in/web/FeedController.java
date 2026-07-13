@@ -1,10 +1,10 @@
 package com.kscold.blog.social.adapter.in.web;
 
-import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.analytics.application.service.ViewCounter;
+import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
-import com.kscold.blog.social.adapter.in.web.dto.FeedResponse;
+import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.dto.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.FeedUpdateCommand;
 import com.kscold.blog.social.application.port.in.FeedUseCase;

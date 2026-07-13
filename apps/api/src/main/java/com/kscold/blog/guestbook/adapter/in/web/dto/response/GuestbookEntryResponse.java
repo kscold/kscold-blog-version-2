@@ -1,4 +1,4 @@
-package com.kscold.blog.guestbook.adapter.in.web.dto;
+package com.kscold.blog.guestbook.adapter.in.web.dto.response;
 
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import com.kscold.blog.identity.domain.model.User;

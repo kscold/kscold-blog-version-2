@@ -1,4 +1,4 @@
-package com.kscold.blog.media.adapter.in.web.dto;
+package com.kscold.blog.media.adapter.in.web.dto.response;
 
 import com.kscold.blog.media.domain.model.Media;
 import java.time.LocalDateTime;
