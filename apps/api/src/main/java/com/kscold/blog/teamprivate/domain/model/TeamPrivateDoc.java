@@ -3,12 +3,14 @@ package com.kscold.blog.teamprivate.domain.model;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,7 +27,7 @@ public class TeamPrivateDoc {
     private List<String> notes;
     private String businessRegistrationPdfUrl;
 
-    @Data
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -35,7 +37,7 @@ public class TeamPrivateDoc {
         private String password;
     }
 
-    @Data
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -46,7 +48,7 @@ public class TeamPrivateDoc {
         private String password;
     }
 
-    @Data
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
