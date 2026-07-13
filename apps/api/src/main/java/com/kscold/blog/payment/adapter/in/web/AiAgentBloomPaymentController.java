@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/payments/ai-agent-bloom")
+@RequestMapping("/payments/ai-agent-bloom")
 public class AiAgentBloomPaymentController {
 
     private final PaymentUseCase paymentUseCase;

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/vault/agent")
+@RequestMapping("/vault/agent")
 public class VaultAgentController {
 
     private final VaultAgentService vaultAgentService;

@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/media")
+@RequestMapping("/media")
 @RequiredArgsConstructor
 public class MediaController {
 

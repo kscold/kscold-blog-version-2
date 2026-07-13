@@ -62,58 +62,55 @@ public class SecurityConfig {
                         auth ->
                                 auth
                                         // 공개 엔드포인트
-                                        .requestMatchers(HttpMethod.GET, "/api/posts/**")
+                                        .requestMatchers(HttpMethod.GET, "/posts/**")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/categories/**")
+                                        .requestMatchers(HttpMethod.GET, "/categories/**")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/tags/**")
+                                        .requestMatchers(HttpMethod.GET, "/tags/**")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/search/**")
+                                        .requestMatchers(HttpMethod.GET, "/search/**")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/github/**")
+                                        .requestMatchers(HttpMethod.GET, "/github/**")
                                         .permitAll()
                                         // 피드 공개 엔드포인트
-                                        .requestMatchers(HttpMethod.GET, "/api/feeds/**")
+                                        .requestMatchers(HttpMethod.GET, "/feeds/**")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/api/feeds/*/like")
+                                        .requestMatchers(HttpMethod.POST, "/feeds/*/like")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/feeds/*/comments")
+                                        .requestMatchers(HttpMethod.GET, "/feeds/*/comments")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/link-preview")
+                                        .requestMatchers(HttpMethod.GET, "/link-preview")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/guestbook/**")
+                                        .requestMatchers(HttpMethod.GET, "/guestbook/**")
                                         .permitAll()
-                                        .requestMatchers(
-                                                HttpMethod.GET, "/api/admin-night/calendar")
-                                        .permitAll()
-                                        .requestMatchers(
-                                                HttpMethod.GET,
-                                                "/api/admin-night/programs/*/summary")
+                                        .requestMatchers(HttpMethod.GET, "/admin-night/calendar")
                                         .permitAll()
                                         .requestMatchers(
-                                                HttpMethod.POST,
-                                                "/api/admin-night/programs/*/votes")
+                                                HttpMethod.GET, "/admin-night/programs/*/summary")
                                         .permitAll()
-                                        .requestMatchers("/api/payments/ai-agent-bloom/**")
+                                        .requestMatchers(
+                                                HttpMethod.POST, "/admin-night/programs/*/votes")
+                                        .permitAll()
+                                        .requestMatchers("/payments/ai-agent-bloom/**")
                                         .permitAll()
                                         // Vault 공개 엔드포인트
-                                        .requestMatchers(HttpMethod.GET, "/api/vault/**")
+                                        .requestMatchers(HttpMethod.GET, "/vault/**")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/api/vault/agent/chat")
+                                        .requestMatchers(HttpMethod.POST, "/vault/agent/chat")
                                         .permitAll()
                                         .requestMatchers(
-                                                "/api/auth/login",
-                                                "/api/auth/register",
-                                                "/api/auth/refresh",
-                                                "/api/auth/recover-username",
-                                                "/api/auth/request-password-reset",
-                                                "/api/auth/reset-password",
-                                                "/api/auth/password-reset/validate")
+                                                "/auth/login",
+                                                "/auth/register",
+                                                "/auth/refresh",
+                                                "/auth/recover-username",
+                                                "/auth/request-password-reset",
+                                                "/auth/reset-password",
+                                                "/auth/password-reset/validate")
                                         .permitAll()
-                                        .requestMatchers("/api/health")
+                                        .requestMatchers("/health")
                                         .permitAll()
                                         // 팀 내부 문서 (자체 비밀번호 검증)
-                                        .requestMatchers(HttpMethod.POST, "/api/team/private")
+                                        .requestMatchers(HttpMethod.POST, "/team/private")
                                         .permitAll()
                                         // 정적 리소스
                                         .requestMatchers("/uploads/**")
@@ -123,14 +120,13 @@ public class SecurityConfig {
                                         .permitAll()
                                         // 접근 요청 확인 (비로그인도 가능하게 - 필터에서 null userId 처리)
                                         .requestMatchers(
-                                                HttpMethod.GET, "/api/access-requests/check/**")
+                                                HttpMethod.GET, "/access-requests/check/**")
                                         .permitAll()
                                         // 페이지 방문 트래킹 (비로그인 허용)
-                                        .requestMatchers(
-                                                HttpMethod.POST, "/api/analytics/page-visit")
+                                        .requestMatchers(HttpMethod.POST, "/analytics/page-visit")
                                         .permitAll()
                                         // 관리자 엔드포인트
-                                        .requestMatchers("/api/admin/**")
+                                        .requestMatchers("/admin/**")
                                         .hasRole("ADMIN")
                                         // 그 외 모든 요청은 인증 필요
                                         .anyRequest()

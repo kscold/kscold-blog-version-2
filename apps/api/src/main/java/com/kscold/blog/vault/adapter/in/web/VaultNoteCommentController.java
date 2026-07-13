@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/vault/notes/{noteId}/comments")
+@RequestMapping("/vault/notes/{noteId}/comments")
 @RequiredArgsConstructor
 public class VaultNoteCommentController {
 

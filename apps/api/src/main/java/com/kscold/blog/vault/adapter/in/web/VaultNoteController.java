@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/vault/notes")
+@RequestMapping("/vault/notes")
 @RequiredArgsConstructor
 public class VaultNoteController {
 

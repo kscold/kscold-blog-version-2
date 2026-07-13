@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/vault/folders")
+@RequestMapping("/vault/folders")
 @RequiredArgsConstructor
 public class VaultFolderController {
 

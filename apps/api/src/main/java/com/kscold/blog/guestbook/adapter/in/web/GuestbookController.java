@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/guestbook")
+@RequestMapping("/guestbook")
 @RequiredArgsConstructor
 public class GuestbookController {
 

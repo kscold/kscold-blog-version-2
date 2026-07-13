@@ -21,7 +21,7 @@ public class AccessRequestController {
     private final AccessRequestUseCase accessRequestUseCase;
 
     // 유저: 접근 요청
-    @PostMapping("/api/access-requests")
+    @PostMapping("/access-requests")
     public ResponseEntity<ApiResponse<AccessRequestResponse>> requestAccess(
             @AuthenticationPrincipal String userId, @RequestBody CreateAccessRequest body) {
         AccessRequest request =
@@ -31,7 +31,7 @@ public class AccessRequestController {
     }
 
     // 유저: 내 요청 목록
-    @GetMapping("/api/access-requests/me")
+    @GetMapping("/access-requests/me")
     public ResponseEntity<ApiResponse<List<AccessRequestResponse>>> getMyRequests(
             @AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(
@@ -40,7 +40,7 @@ public class AccessRequestController {
     }
 
     // 유저: 특정 카테고리 접근 권한 확인
-    @GetMapping("/api/access-requests/check/{categoryId}")
+    @GetMapping("/access-requests/check/{categoryId}")
     public ResponseEntity<ApiResponse<Boolean>> checkAccess(
             @AuthenticationPrincipal String userId,
             @PathVariable String categoryId,
@@ -53,7 +53,7 @@ public class AccessRequestController {
     }
 
     // 어드민: 대기 중인 요청 목록
-    @GetMapping("/api/admin/access-requests")
+    @GetMapping("/admin/access-requests")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<AccessRequestResponse>>> getPendingRequests() {
         return ResponseEntity.ok(
@@ -62,7 +62,7 @@ public class AccessRequestController {
     }
 
     // 어드민: 승인
-    @PutMapping("/api/admin/access-requests/{id}/approve")
+    @PutMapping("/admin/access-requests/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<AccessRequestResponse>> approve(
             @PathVariable String id, @RequestBody(required = false) ApproveAccessRequest body) {
@@ -74,7 +74,7 @@ public class AccessRequestController {
     }
 
     // 어드민: 거절
-    @PutMapping("/api/admin/access-requests/{id}/reject")
+    @PutMapping("/admin/access-requests/{id}/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<AccessRequestResponse>> reject(@PathVariable String id) {
         return ResponseEntity.ok(

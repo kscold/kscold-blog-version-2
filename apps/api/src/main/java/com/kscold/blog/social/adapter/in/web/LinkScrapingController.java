@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/link-preview")
+@RequestMapping("/link-preview")
 @RequiredArgsConstructor
 public class LinkScrapingController {
 

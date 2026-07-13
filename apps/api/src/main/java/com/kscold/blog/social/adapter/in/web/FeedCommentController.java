@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/feeds/{feedId}/comments")
+@RequestMapping("/feeds/{feedId}/comments")
 @RequiredArgsConstructor
 public class FeedCommentController {
 

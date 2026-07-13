@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 /** 포스트 관련 REST API 컨트롤러 */
 @Slf4j
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/posts")
 @RequiredArgsConstructor
 public class PostController {
 

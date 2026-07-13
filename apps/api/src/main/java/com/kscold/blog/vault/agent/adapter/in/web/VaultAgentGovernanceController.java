@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/vault/agent")
+@RequestMapping("/admin/vault/agent")
 @PreAuthorize("hasRole('ADMIN')")
 public class VaultAgentGovernanceController {
 
