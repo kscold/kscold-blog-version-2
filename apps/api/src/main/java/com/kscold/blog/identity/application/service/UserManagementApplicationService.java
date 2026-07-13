@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserManagementService implements UserManagementUseCase {
+public class UserManagementApplicationService implements UserManagementUseCase {
 
     private final UserRepository userRepository;
 

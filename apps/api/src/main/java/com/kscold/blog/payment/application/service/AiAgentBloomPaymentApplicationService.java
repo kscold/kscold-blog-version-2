@@ -28,7 +28,7 @@ import org.springframework.web.client.RestClientResponseException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AiAgentBloomPaymentService implements PaymentUseCase {
+public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
 
     private static final String PROGRAM_KEY = "ai-agent-bloom";
     private static final String PRODUCT_NAME = "AI Agent Bloom 참가권";

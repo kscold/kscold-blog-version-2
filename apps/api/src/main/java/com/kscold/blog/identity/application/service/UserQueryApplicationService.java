@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserQueryService implements UserQueryPort {
+public class UserQueryApplicationService implements UserQueryPort {
 
     private final UserRepository userRepository;
 
