@@ -84,3 +84,8 @@ CLAUDE.md
 
 # Local scripts (personal utility scripts, not for repo)
 scripts/
+
+# 민감·배포 파일 (git 히스토리에서 제외됨, 로컬 전용)
+docker/nginx/
+DEPLOY-LIVE-CONTAINER.md
+AGENTS.md
