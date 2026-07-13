@@ -1,5 +1,6 @@
 package com.kscold.blog.chat.adapter.in.web;
 
+import com.kscold.blog.chat.adapter.in.web.dto.response.ChatMessageResponse;
 import com.kscold.blog.chat.application.dto.ChatRoomSummaryDto;
 import com.kscold.blog.chat.application.dto.SendAdminMessageCommand;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
@@ -30,7 +31,7 @@ public class ChatAdminController {
     }
 
     @PostMapping("/rooms/{roomId}/messages")
-    public ResponseEntity<ApiResponse<ChatMessage>> sendMessage(
+    public ResponseEntity<ApiResponse<ChatMessageResponse>> sendMessage(
             @PathVariable String roomId, @RequestBody @Valid SendAdminMessageCommand command) {
         ChatMessage saved =
                 chatUseCase.saveAndBroadcast(
@@ -40,24 +41,29 @@ public class ChatAdminController {
                         ChatMessage.MessageType.TEXT,
                         roomId,
                         true);
-        return ResponseEntity.ok(ApiResponse.success(saved));
+        return ResponseEntity.ok(ApiResponse.success(ChatMessageResponse.from(saved)));
     }
 
     @GetMapping("/rooms/{roomId}/messages")
-    public ResponseEntity<ApiResponse<Page<ChatMessage>>> getRoomMessages(
+    public ResponseEntity<ApiResponse<Page<ChatMessageResponse>>> getRoomMessages(
             @PathVariable String roomId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "timestamp"));
         return ResponseEntity.ok(
-                ApiResponse.success(chatUseCase.getMessagesByRoom(roomId, pageable)));
+                ApiResponse.success(
+                        chatUseCase
+                                .getMessagesByRoom(roomId, pageable)
+                                .map(ChatMessageResponse::from)));
     }
 
     @GetMapping("/messages")
-    public ResponseEntity<ApiResponse<Page<ChatMessage>>> getAllMessages(
+    public ResponseEntity<ApiResponse<Page<ChatMessageResponse>>> getAllMessages(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
-        return ResponseEntity.ok(ApiResponse.success(chatUseCase.getAllMessages(pageable)));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        chatUseCase.getAllMessages(pageable).map(ChatMessageResponse::from)));
     }
 }
