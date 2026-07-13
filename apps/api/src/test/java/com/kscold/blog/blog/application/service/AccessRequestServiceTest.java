@@ -39,7 +39,8 @@ class AccessRequestServiceTest {
         Post post = post("post-1", "권한 모델", "access-model", "cat-1", "개발 이야기");
         when(postUseCase.getById("post-1")).thenReturn(post);
         when(userQueryPort.getUserById("user-1"))
-                .thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
+                .thenReturn(
+                        new UserQueryPort.UserInfo("user-1", "kscold", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1"))
                 .thenReturn(List.of());
         when(accessRequestRepository.findByUserIdAndPostId("user-1", "post-1"))
@@ -74,7 +75,8 @@ class AccessRequestServiceTest {
                         .build();
 
         when(userQueryPort.getUserById("user-1"))
-                .thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
+                .thenReturn(
+                        new UserQueryPort.UserInfo("user-1", "kscold", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1"))
                 .thenReturn(List.of(approvedPostGrant));
         when(accessRequestRepository.findByUserIdAndPostId("user-1", "post-1"))
@@ -99,7 +101,8 @@ class AccessRequestServiceTest {
                         .build();
 
         when(userQueryPort.getUserById("user-1"))
-                .thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
+                .thenReturn(
+                        new UserQueryPort.UserInfo("user-1", "kscold", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1"))
                 .thenReturn(List.of(approvedCategoryGrant));
 
@@ -119,7 +122,8 @@ class AccessRequestServiceTest {
                         .build();
 
         when(userQueryPort.getUserById("user-1"))
-                .thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
+                .thenReturn(
+                        new UserQueryPort.UserInfo("user-1", "kscold", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1"))
                 .thenReturn(List.of(categoryApprovedRequest));
 
@@ -147,7 +151,8 @@ class AccessRequestServiceTest {
 
         when(postUseCase.getById("post-1")).thenReturn(post);
         when(userQueryPort.getUserById("user-1"))
-                .thenReturn(new UserQueryPort.UserInfo("user-1", "김승찬", null, false, null));
+                .thenReturn(
+                        new UserQueryPort.UserInfo("user-1", "kscold", "김승찬", null, false, null));
         when(accessRequestRepository.findAllByUserIdAndCategoryId("user-1", "cat-1"))
                 .thenReturn(List.of(rejectedPostRequest));
         when(accessRequestRepository.findByUserIdAndPostId("user-1", "post-1"))
