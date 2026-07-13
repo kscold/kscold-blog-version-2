@@ -45,6 +45,8 @@ class AdminNightApplicationServiceTest {
 
     @Spy private AdminNightRequestDraftService adminNightRequestDraftService;
 
+    @Spy private AdminNightProgramVoteNormalizer adminNightProgramVoteNormalizer;
+
     @InjectMocks private AdminNightApplicationService adminNightApplicationService;
 
     @Test
