@@ -1,8 +1,11 @@
 package com.kscold.blog.analytics.adapter.in.web;
 
 import com.kscold.blog.analytics.adapter.in.web.dto.request.PageVisitRequest;
+import com.kscold.blog.analytics.application.port.in.PageVisitUseCase;
 import com.kscold.blog.analytics.application.service.PageExistenceChecker;
-import com.kscold.blog.analytics.application.service.PageVisitService;
+import com.kscold.blog.analytics.domain.model.DailyStat;
+import com.kscold.blog.analytics.domain.model.PathStat;
+import com.kscold.blog.analytics.domain.model.VisitEntry;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
@@ -20,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AnalyticsController {
 
-    private final PageVisitService pageVisitService;
+    private final PageVisitUseCase pageVisitService;
     private final PageExistenceChecker pageExistenceChecker;
     private final ClientIdentifierResolver clientIdentifierResolver;
     private final UserQueryPort userQueryPort;
@@ -46,7 +49,7 @@ public class AnalyticsController {
     /** 어드민: path별 TOP 방문 */
     @GetMapping("/admin/analytics/top-paths")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<List<PageVisitService.PathStat>>> topPaths(
+    public ResponseEntity<ApiResponse<List<PathStat>>> topPaths(
             @RequestParam(defaultValue = "7") int days,
             @RequestParam(defaultValue = "20") int limit) {
         return ResponseEntity.ok(ApiResponse.success(pageVisitService.topPaths(days, limit)));
@@ -55,7 +58,7 @@ public class AnalyticsController {
     /** 어드민: 일별 방문 추이 */
     @GetMapping("/admin/analytics/daily-visits")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<List<PageVisitService.DailyStat>>> dailyVisits(
+    public ResponseEntity<ApiResponse<List<DailyStat>>> dailyVisits(
             @RequestParam(defaultValue = "30") int days) {
         return ResponseEntity.ok(ApiResponse.success(pageVisitService.dailyVisits(days)));
     }
@@ -68,7 +71,7 @@ public class AnalyticsController {
      */
     @GetMapping("/admin/analytics/visit-history")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<List<PageVisitService.VisitEntry>>> visitHistory(
+    public ResponseEntity<ApiResponse<List<VisitEntry>>> visitHistory(
             @RequestParam(required = false) String path,
             @RequestParam(defaultValue = "true") boolean loggedInOnly,
             @RequestParam(defaultValue = "50") int limit) {

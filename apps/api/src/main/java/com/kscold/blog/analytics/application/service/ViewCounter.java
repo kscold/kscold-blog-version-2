@@ -1,18 +1,13 @@
 package com.kscold.blog.analytics.application.service;
 
 import com.kscold.blog.analytics.domain.model.ViewLog;
-import com.mongodb.DuplicateKeyException;
+import com.kscold.blog.analytics.domain.port.out.ViewLogRepository;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -25,7 +20,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class ViewCounter {
 
-    private final MongoTemplate mongoTemplate;
+    private final ViewLogRepository viewLogRepository;
 
     /**
      * entity의 views 필드를 1 증가시킴. 중복 IP면 false 반환.
@@ -44,33 +39,20 @@ public class ViewCounter {
 
         String ipHash = hash(clientIp);
 
-        try {
-            ViewLog viewLog =
-                    ViewLog.builder()
-                            .entityType(entityType)
-                            .entityId(entityId)
-                            .ipHash(ipHash)
-                            .createdAt(Instant.now())
-                            .build();
-            mongoTemplate.insert(viewLog);
-        } catch (org.springframework.dao.DuplicateKeyException | DuplicateKeyException e) {
+        ViewLog viewLog =
+                ViewLog.builder()
+                        .entityType(entityType)
+                        .entityId(entityId)
+                        .ipHash(ipHash)
+                        .createdAt(Instant.now())
+                        .build();
+        if (!viewLogRepository.insertViewLogIfUnique(viewLog)) {
             // 이미 1시간 내 조회 → 증가 skip
             return false;
         }
 
-        // atomic $inc
-        Query query = Query.query(Criteria.where("_id").is(toObjectIdOrRaw(entityId)));
-        Update update = new Update().inc("views", 1);
-        mongoTemplate.updateFirst(query, update, collectionName);
+        viewLogRepository.incrementViews(collectionName, entityId);
         return true;
-    }
-
-    private Object toObjectIdOrRaw(String id) {
-        try {
-            return new ObjectId(id);
-        } catch (IllegalArgumentException e) {
-            return id;
-        }
     }
 
     private String hash(String raw) {
