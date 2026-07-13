@@ -8,7 +8,7 @@ import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
-import com.kscold.blog.shared.analytics.ViewCounter;
+import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import jakarta.servlet.http.HttpServletRequest;

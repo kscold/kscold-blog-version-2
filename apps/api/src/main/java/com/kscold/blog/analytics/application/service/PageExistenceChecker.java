@@ -1,4 +1,4 @@
-package com.kscold.blog.shared.analytics;
+package com.kscold.blog.analytics.application.service;
 
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.social.application.port.in.FeedUseCase;

@@ -1,6 +1,6 @@
-package com.kscold.blog.shared.domain.repository;
+package com.kscold.blog.teamprivate.domain.port.out;
 
-import com.kscold.blog.shared.domain.model.TeamPrivateDoc;
+import com.kscold.blog.teamprivate.domain.model.TeamPrivateDoc;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

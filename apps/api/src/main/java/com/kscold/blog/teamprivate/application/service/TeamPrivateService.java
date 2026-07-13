@@ -1,7 +1,7 @@
-package com.kscold.blog.shared.application;
+package com.kscold.blog.teamprivate.application.service;
 
-import com.kscold.blog.shared.domain.model.TeamPrivateDoc;
-import com.kscold.blog.shared.domain.repository.TeamPrivateDocRepository;
+import com.kscold.blog.teamprivate.domain.model.TeamPrivateDoc;
+import com.kscold.blog.teamprivate.domain.port.out.TeamPrivateDocRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

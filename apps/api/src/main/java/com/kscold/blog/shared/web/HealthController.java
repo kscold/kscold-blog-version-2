@@ -1,4 +1,4 @@
-package com.kscold.blog.controller;
+package com.kscold.blog.shared.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
 import java.util.Map;

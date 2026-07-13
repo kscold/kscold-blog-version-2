@@ -9,7 +9,7 @@ import com.kscold.blog.blog.domain.port.out.PostRepository;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ResourceNotFoundException;
-import com.kscold.blog.util.SlugUtils;
+import com.kscold.blog.shared.util.SlugUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

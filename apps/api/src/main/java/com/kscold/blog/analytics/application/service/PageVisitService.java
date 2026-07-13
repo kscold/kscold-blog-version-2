@@ -1,4 +1,5 @@
-package com.kscold.blog.shared.analytics;
+package com.kscold.blog.analytics.application.service;
+import com.kscold.blog.analytics.domain.model.PageVisitLog;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;

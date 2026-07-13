@@ -1,4 +1,4 @@
-package com.kscold.blog.shared.domain.model;
+package com.kscold.blog.teamprivate.domain.model;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

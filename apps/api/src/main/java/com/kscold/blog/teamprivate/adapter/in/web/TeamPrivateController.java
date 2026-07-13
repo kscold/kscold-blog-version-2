@@ -1,7 +1,8 @@
-package com.kscold.blog.shared.web;
+package com.kscold.blog.teamprivate.adapter.in.web;
+import com.kscold.blog.shared.web.ApiResponse;
 
-import com.kscold.blog.shared.application.TeamPrivateService;
-import com.kscold.blog.shared.domain.model.TeamPrivateDoc;
+import com.kscold.blog.teamprivate.application.service.TeamPrivateService;
+import com.kscold.blog.teamprivate.domain.model.TeamPrivateDoc;
 import jakarta.validation.Valid;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

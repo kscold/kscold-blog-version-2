@@ -1,6 +1,6 @@
 package com.kscold.blog.vault.adapter.in.web;
 
-import com.kscold.blog.shared.analytics.ViewCounter;
+import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.vault.adapter.in.web.dto.VaultNoteResponse;

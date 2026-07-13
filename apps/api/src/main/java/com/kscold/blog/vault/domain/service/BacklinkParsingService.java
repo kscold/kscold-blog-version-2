@@ -1,6 +1,6 @@
 package com.kscold.blog.vault.domain.service;
 
-import com.kscold.blog.util.SlugUtils;
+import com.kscold.blog.shared.util.SlugUtils;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
 import java.util.ArrayList;
 import java.util.List;

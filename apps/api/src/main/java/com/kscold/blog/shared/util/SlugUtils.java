@@ -1,4 +1,4 @@
-package com.kscold.blog.util;
+package com.kscold.blog.shared.util;
 
 /** 슬러그 생성 유틸리티 Post, Category, Tag에서 공통으로 사용 */
 public final class SlugUtils {

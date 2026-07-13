@@ -1,4 +1,6 @@
-package com.kscold.blog.shared.analytics;
+package com.kscold.blog.analytics.adapter.in.web;
+import com.kscold.blog.analytics.application.service.PageVisitService;
+import com.kscold.blog.analytics.application.service.PageExistenceChecker;
 
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;

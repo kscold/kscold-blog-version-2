@@ -1,4 +1,4 @@
-package com.kscold.blog.shared.analytics;
+package com.kscold.blog.analytics.domain.model;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;
