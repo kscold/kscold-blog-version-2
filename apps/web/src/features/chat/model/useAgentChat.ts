@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import {
   fetchVaultAgentHistory,
   sendVaultAgentMessage,
-} from '@/features/vault/api/vaultAgentApi';
+} from '@/features/chat/api/vaultAgentApi';
 import {
   AGENT_SESSION_STORAGE_KEY,
   getOrCreateAgentSessionId,

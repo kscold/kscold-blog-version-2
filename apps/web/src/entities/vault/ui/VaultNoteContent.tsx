@@ -1,4 +1,4 @@
-import { VaultNote } from '@/types/vault';
+import { VaultNote } from '@/shared/model/types/vault';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 
 interface VaultNoteContentProps {

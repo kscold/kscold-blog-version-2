@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Feed } from '@/types/social';
+import { Feed } from '@/shared/model/types/social';
 import { useToggleLike } from '@/features/feed/api/useFeedMutations';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';

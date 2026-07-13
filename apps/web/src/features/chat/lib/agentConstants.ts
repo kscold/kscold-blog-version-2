@@ -1,4 +1,4 @@
-import type { VaultAgentSource, VaultAgentStage } from '@/features/vault/api/vaultAgentApi';
+import type { VaultAgentSource, VaultAgentStage } from '@/features/chat/api/vaultAgentApi';
 
 export interface AgentMessage {
   id: string;

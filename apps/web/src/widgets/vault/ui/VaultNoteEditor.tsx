@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useVaultFolders } from '@/entities/vault/api/useVault';
 import { useCreateVaultNote, useUpdateVaultNote } from '@/features/vault/api/useVaultNoteMutations';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
-import { VaultFolder } from '@/types/vault';
+import { VaultFolder } from '@/shared/model/types/vault';
 import VaultEditorSidebar from './VaultEditorSidebar';
 import { useAlert } from '@/shared/model/alertStore';
 

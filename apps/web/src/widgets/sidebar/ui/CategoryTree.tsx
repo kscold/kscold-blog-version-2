@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Category } from '@/types/blog';
+import { Category } from '@/shared/model/types/blog';
 
 export function CategoryTree({ categories, depth = 0, onNavigate }: { categories: Category[]; depth?: number; onNavigate?: () => void }) {
   const rootCategories = categories.filter(cat => cat.depth === depth);

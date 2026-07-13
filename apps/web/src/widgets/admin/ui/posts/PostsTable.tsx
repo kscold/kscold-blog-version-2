@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Post } from '@/types/blog';
+import { Post } from '@/shared/model/types/blog';
 
 interface PostsTableProps {
   posts: Post[];

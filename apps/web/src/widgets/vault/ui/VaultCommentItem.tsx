@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { VaultNoteComment } from '@/types/vault';
+import { VaultNoteComment } from '@/shared/model/types/vault';
 
 interface VaultCommentItemProps {
   comment: VaultNoteComment;

@@ -1,4 +1,4 @@
-import type { Tag } from '@/types/blog';
+import type { Tag } from '@/shared/model/types/blog';
 import {
   formatTagDate,
   type TagManagementActions,

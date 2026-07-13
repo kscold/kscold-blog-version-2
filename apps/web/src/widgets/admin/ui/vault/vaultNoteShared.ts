@@ -1,4 +1,4 @@
-import type { VaultNote } from '@/types/vault';
+import type { VaultNote } from '@/shared/model/types/vault';
 
 export interface VaultNoteListBaseProps {
   notes: VaultNote[];

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Category } from '@/types/blog';
+import { Category } from '@/shared/model/types/blog';
 
 interface CategoryFilterProps {
   categories: Category[];

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { filterVisibleTagInfos } from '@/shared/lib/tags';
 import { toPreviewText } from '@/shared/lib/seo/text';
-import { Post } from '@/types/blog';
+import { Post } from '@/shared/model/types/blog';
 
 interface PostCardProps {
   post: Post;

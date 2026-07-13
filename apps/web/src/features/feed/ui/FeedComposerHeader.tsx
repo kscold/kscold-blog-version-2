@@ -1,4 +1,4 @@
-import type { User } from '@/types/user';
+import type { User } from '@/shared/model/types/user';
 
 export function FeedComposerHeader({
   currentUser,

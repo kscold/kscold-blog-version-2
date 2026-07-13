@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import type { VaultNote } from '@/types/vault';
+import type { VaultNote } from '@/shared/model/types/vault';
 import { VaultNoteLayout } from '@/widgets/vault/ui/VaultNoteLayout';
 import {
   absoluteUrl,

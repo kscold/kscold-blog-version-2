@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { FeedComment } from '@/types/social';
-import { PageResponse } from '@/types/api';
+import { FeedComment } from '@/shared/model/types/social';
+import { PageResponse } from '@/shared/model/types/api';
 
 export function useFeedComments(feedId: string, page: number = 0, size: number = 20) {
   return useQuery({

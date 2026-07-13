@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/api/useAuth';
 import { useAuthStore } from '@/entities/user/model/authStore';
 import { apiClient } from '@/shared/api/api-client';
-import type { User } from '@/types/user';
+import type { User } from '@/shared/model/types/user';
 
 interface LoginFormData {
   email: string;

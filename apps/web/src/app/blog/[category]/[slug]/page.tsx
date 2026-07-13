@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { PostDetail } from '@/widgets/post/ui/PostDetail';
-import type { Post } from '@/types/blog';
+import type { Post } from '@/shared/model/types/blog';
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,

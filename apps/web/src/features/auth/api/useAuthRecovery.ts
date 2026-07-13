@@ -6,7 +6,7 @@ import type {
   EmailRecoveryRequest,
   PasswordResetTokenStatus,
   ResetPasswordRequest,
-} from '@/types/auth-recovery';
+} from '@/shared/model/types/auth-recovery';
 
 export function useUsernameRecovery() {
   return useMutation({

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { Post } from '@/types/blog';
-import { PageResponse } from '@/types/api';
+import { Post } from '@/shared/model/types/blog';
+import { PageResponse } from '@/shared/model/types/api';
 
 interface UsePostsOptions {
   page?: number;

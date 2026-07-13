@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import type { Feed } from '@/types/social';
+import type { Feed } from '@/shared/model/types/social';
 import { FeedDetail } from '@/widgets/feed/ui/FeedDetail';
 import {
   absoluteUrl,

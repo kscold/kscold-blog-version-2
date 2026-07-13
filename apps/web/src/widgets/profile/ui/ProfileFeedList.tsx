@@ -1,8 +1,8 @@
 'use client';
 
 import { FeedCard } from '@/features/feed/ui/FeedCard';
-import type { PageResponse } from '@/types/api';
-import type { Feed } from '@/types/social';
+import type { PageResponse } from '@/shared/model/types/api';
+import type { Feed } from '@/shared/model/types/social';
 
 interface Props {
   feedsData?: PageResponse<Feed>;

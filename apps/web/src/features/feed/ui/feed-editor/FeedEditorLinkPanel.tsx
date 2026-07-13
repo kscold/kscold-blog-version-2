@@ -1,4 +1,4 @@
-import type { LinkPreview } from '@/types/social';
+import type { LinkPreview } from '@/shared/model/types/social';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 
 interface FeedEditorLinkPanelProps {

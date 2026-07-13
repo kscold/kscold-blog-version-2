@@ -6,7 +6,7 @@ import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 import { CategoryFilter } from './CategoryFilter';
-import { Post, Category } from '@/types/blog';
+import { Post, Category } from '@/shared/model/types/blog';
 
 interface BlogPostGridProps {
   posts: Post[];

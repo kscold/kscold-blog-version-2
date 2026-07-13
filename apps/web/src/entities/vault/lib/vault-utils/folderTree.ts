@@ -1,4 +1,4 @@
-import { VaultFolder } from '@/types/vault';
+import { VaultFolder } from '@/shared/model/types/vault';
 
 /**
  * 뮤트 톤으로 큐레이션한 폴더 팔레트.

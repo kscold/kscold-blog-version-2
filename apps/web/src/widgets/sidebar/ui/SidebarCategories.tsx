@@ -1,7 +1,7 @@
 'use client';
 
 import { Skeleton } from '@/shared/ui/Skeleton';
-import { Category } from '@/types/blog';
+import { Category } from '@/shared/model/types/blog';
 import { CategoryTree } from '@/widgets/sidebar/ui/CategoryTree';
 
 interface SidebarCategoriesProps {

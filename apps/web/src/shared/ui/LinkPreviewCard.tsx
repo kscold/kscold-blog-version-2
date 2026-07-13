@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { LinkPreview } from '@/types/social';
+import { LinkPreview } from '@/shared/model/types/social';
 
 interface LinkPreviewCardProps {
   preview: LinkPreview;

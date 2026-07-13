@@ -4,7 +4,7 @@ import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMeasure } from 'react-use';
 import ForceGraph2D, { ForceGraphMethods, NodeObject } from 'react-force-graph-2d';
-import { GraphNode, GraphData, GraphLink } from '@/types/vault';
+import { GraphNode, GraphData, GraphLink } from '@/shared/model/types/vault';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { renderGraphLink, resolveLinkParticleColor } from '../lib/graphLinkRenderer';
 import {

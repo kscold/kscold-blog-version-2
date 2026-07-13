@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { VaultNote } from '@/types/vault';
+import { VaultNote } from '@/shared/model/types/vault';
 import { VaultNoteDesktopTable } from './VaultNoteDesktopTable';
 import { VaultNoteEmptyState } from './VaultNoteEmptyState';
 import { VaultNoteMobileList } from './VaultNoteMobileList';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Category } from '@/types/blog';
+import { Category } from '@/shared/model/types/blog';
 
 interface CategoryTreeProps {
   categories: Category[];

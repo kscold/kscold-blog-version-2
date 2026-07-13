@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
 import { getAccessToken } from '@/shared/lib/authTokenStorage';
-import { AuthResponse, LoginRequest, RegisterRequest, User } from '@/types/user';
+import { AuthResponse, LoginRequest, RegisterRequest, User } from '@/shared/model/types/user';
 import { useAuthStore } from '@/entities/user/model/authStore';
 
 export function useAuth() {

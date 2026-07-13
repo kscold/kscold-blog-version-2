@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { VaultNoteComment } from '@/types/vault';
-import { PageResponse } from '@/types/api';
+import { VaultNoteComment } from '@/shared/model/types/vault';
+import { PageResponse } from '@/shared/model/types/api';
 
 export function useVaultComments(noteId: string, page: number = 0, size: number = 20) {
   return useQuery({

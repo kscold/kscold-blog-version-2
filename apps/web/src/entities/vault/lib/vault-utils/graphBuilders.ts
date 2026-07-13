@@ -1,4 +1,4 @@
-import { GraphData, GraphLink, GraphNode, VaultFolder, VaultNote } from '@/types/vault';
+import { GraphData, GraphLink, GraphNode, VaultFolder, VaultNote } from '@/shared/model/types/vault';
 import { findFolderById, getSubfolderIds } from './folderTree';
 
 export function getLocalGraph(

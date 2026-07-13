@@ -9,7 +9,7 @@ import { Skeleton } from '@/shared/ui/Skeleton';
 import { PostHeader } from './PostHeader';
 import { PostCommentSection } from './PostCommentSection';
 import { RestrictedOverlay } from './RestrictedOverlay';
-import type { Post } from '@/types/blog';
+import type { Post } from '@/shared/model/types/blog';
 
 interface PostDetailProps {
   post: Post;

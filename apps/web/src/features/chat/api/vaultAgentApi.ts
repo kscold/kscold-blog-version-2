@@ -1,7 +1,7 @@
 'use client';
 
 import apiClient from '@/shared/api/api-client';
-import type { PageResponse } from '@/types/api';
+import type { PageResponse } from '@/shared/model/types/api';
 
 export interface VaultAgentStage {
   name: string;

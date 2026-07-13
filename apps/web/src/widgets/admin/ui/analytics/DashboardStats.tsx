@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Post } from '@/types/blog';
+import { Post } from '@/shared/model/types/blog';
 
 interface StatItem {
   name: string;

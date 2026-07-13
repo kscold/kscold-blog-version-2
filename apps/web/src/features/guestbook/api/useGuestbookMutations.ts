@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { GuestbookEntry, GuestbookEntryCreateRequest } from '@/types/guestbook';
+import { GuestbookEntry, GuestbookEntryCreateRequest } from '@/shared/model/types/guestbook';
 
 export function useCreateGuestbookEntry() {
   const queryClient = useQueryClient();

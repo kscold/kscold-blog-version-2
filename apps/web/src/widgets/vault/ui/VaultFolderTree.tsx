@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { VaultFolder } from '@/types/vault';
+import { VaultFolder } from '@/shared/model/types/vault';
 import { VaultFolderTreeNode } from './VaultFolderTreeNode';
 
 interface VaultFolderTreeProps {

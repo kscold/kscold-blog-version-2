@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useTags } from '@/entities/tag/api/useTags';
-import { useCreateTag, useUpdateTag, useDeleteTag } from '@/features/tag/api/useTagMutations';
-import { Tag } from '@/types/blog';
+import { useCreateTag, useUpdateTag, useDeleteTag } from '@/entities/tag/api/useTagMutations';
+import { Tag } from '@/shared/model/types/blog';
 import { TagManagementTable } from './TagManagementTable';
 
 export function TagManagementContainer() {

@@ -1,6 +1,6 @@
 'use client';
 
-import { VaultFolder } from '@/types/vault';
+import { VaultFolder } from '@/shared/model/types/vault';
 
 interface FlatFolder {
   folder: VaultFolder;

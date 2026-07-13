@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { GraphData } from '@/types/vault';
+import { GraphData } from '@/shared/model/types/vault';
 import { GraphPanelSkeleton } from '@/shared/ui/RouteSkeletons';
 
 interface ClientVaultGraphProps {

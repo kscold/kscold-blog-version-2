@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/shared/api/api-client';
-import { User } from '@/types/user';
-import { Feed } from '@/types/social';
-import { PageResponse } from '@/types/api';
+import { User } from '@/shared/model/types/user';
+import { Feed } from '@/shared/model/types/social';
+import { PageResponse } from '@/shared/model/types/api';
 
 export interface PublicProfile {
   id: string;

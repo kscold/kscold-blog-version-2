@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { Category, CategoryCreateRequest, CategoryUpdateRequest } from '@/types/blog';
+import { Category, CategoryCreateRequest, CategoryUpdateRequest } from '@/shared/model/types/blog';
 
 export function useCreateCategory() {
   const queryClient = useQueryClient();

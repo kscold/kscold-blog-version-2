@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { User } from '@/types/user';
+import type { User } from '@/shared/model/types/user';
 
 interface GuestbookComposerCardProps {
   content: string;

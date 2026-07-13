@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { BacklinkList } from '@/entities/vault/ui/BacklinkList';
 import { VaultNoteContent } from '@/entities/vault/ui/VaultNoteContent';
 import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
-import type { GraphLink, GraphNode, VaultNote } from '@/types/vault';
+import type { GraphLink, GraphNode, VaultNote } from '@/shared/model/types/vault';
 import type { useUiStore } from '@/shared/model/uiStore';
 
 type ThemeMode = ReturnType<typeof useUiStore.getState>['theme'];

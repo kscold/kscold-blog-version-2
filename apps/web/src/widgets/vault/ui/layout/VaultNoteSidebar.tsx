@@ -1,7 +1,7 @@
 'use client';
 
 import { VaultFolderTree } from '@/widgets/vault/ui/VaultFolderTree';
-import { VaultFolder } from '@/types/vault';
+import { VaultFolder } from '@/shared/model/types/vault';
 
 interface VaultNoteSidebarProps {
   activeFolderId: string | null;

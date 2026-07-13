@@ -1,5 +1,5 @@
 import matter from 'gray-matter';
-import { ParsedMarkdownFile } from '@/types/import';
+import { ParsedMarkdownFile } from '@/shared/model/types/import';
 import { toPreviewText } from '@/shared/lib/seo/text';
 
 /**

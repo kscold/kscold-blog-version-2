@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { Tag } from '@/types/blog';
+import { Tag } from '@/shared/model/types/blog';
 
 export function useTags() {
   return useQuery({

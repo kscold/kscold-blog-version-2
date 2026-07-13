@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import type { Tag } from '@/types/blog';
+import type { Tag } from '@/shared/model/types/blog';
 import { TagPostContainer } from '@/widgets/blog/ui/TagPostContainer';
 import {
   SITE_URL,

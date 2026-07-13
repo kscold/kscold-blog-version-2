@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useTags } from '@/entities/tag/api/useTags';
-import { useCreateTag } from '@/features/tag/api/useTagMutations';
-import { Tag } from '@/types/blog';
+import { useCreateTag } from '@/entities/tag/api/useTagMutations';
+import { Tag } from '@/shared/model/types/blog';
 
 interface TagSelectorProps {
   selectedTagIds: string[];

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Tag } from '@/types/blog';
+import { Tag } from '@/shared/model/types/blog';
 import { TagManagementDesktopTable } from './TagManagementDesktopTable';
 import { TagManagementMobileList } from './TagManagementMobileList';
 import { TagManagementSkeleton } from './TagManagementSkeleton';

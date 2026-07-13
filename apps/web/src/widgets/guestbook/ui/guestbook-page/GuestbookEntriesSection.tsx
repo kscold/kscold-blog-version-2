@@ -1,6 +1,6 @@
 import { Pagination } from '@/shared/ui/Pagination';
 import { formatDateTime, formatRelativeTime } from '@/shared/lib/format-utils';
-import type { GuestbookEntry } from '@/types/guestbook';
+import type { GuestbookEntry } from '@/shared/model/types/guestbook';
 
 interface GuestbookEntriesSectionProps {
   entries: GuestbookEntry[];

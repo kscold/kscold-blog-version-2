@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { Feed, LinkPreview } from '@/types/social';
-import { PageResponse } from '@/types/api';
+import { Feed, LinkPreview } from '@/shared/model/types/social';
+import { PageResponse } from '@/shared/model/types/api';
 
 interface UseFeedsOptions {
   page?: number;

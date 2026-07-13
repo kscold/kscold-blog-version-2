@@ -5,7 +5,7 @@ import { useLinkPreview } from '@/entities/feed/api/useFeeds';
 import { useCreateFeed } from '@/features/feed/api/useFeedMutations';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 import { useAlert } from '@/shared/model/alertStore';
-import type { User } from '@/types/user';
+import type { User } from '@/shared/model/types/user';
 
 export function useFeedComposer(currentUser: User | null) {
   const createFeed = useCreateFeed();

@@ -1,4 +1,4 @@
-import type { GraphLink, GraphNode } from '@/types/vault';
+import type { GraphLink, GraphNode } from '@/shared/model/types/vault';
 
 interface RenderGraphLinkOptions {
   hoverNode: GraphNode | null;

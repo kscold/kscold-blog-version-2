@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import type { User } from '@/types/user';
+import type { User } from '@/shared/model/types/user';
 import { useFeedComposer } from '@/features/feed/lib/useFeedComposer';
 import { FeedComposerActions } from './FeedComposerActions';
 import { FeedComposerEditorCard } from './FeedComposerEditorCard';

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { PostDetail } from '@/widgets/post/ui/PostDetail';
-import type { Post } from '@/types/blog';
+import type { Post } from '@/shared/model/types/blog';
 
 export const dynamic = 'force-dynamic';
 

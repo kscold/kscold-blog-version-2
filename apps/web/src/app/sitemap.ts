@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
-import type { PageResponse } from '@/types/api';
-import type { Category, Post, Tag } from '@/types/blog';
-import type { Feed } from '@/types/social';
+import type { PageResponse } from '@/shared/model/types/api';
+import type { Category, Post, Tag } from '@/shared/model/types/blog';
+import type { Feed } from '@/shared/model/types/social';
 import { SITE_URL, fetchPublicApi, flattenCategories } from '@/shared/lib/seo';
 
 const toDate = (date: Date | string | undefined): string =>

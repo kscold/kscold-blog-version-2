@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { VaultNote, VaultFolder, GraphData } from '@/types/vault';
-import { PageResponse } from '@/types/api';
+import { VaultNote, VaultFolder, GraphData } from '@/shared/model/types/vault';
+import { PageResponse } from '@/shared/model/types/api';
 
 export function useVaultFolders() {
   return useQuery({

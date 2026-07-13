@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { Post, Tag, PostCreateRequest } from '@/types/blog';
+import { Post, Tag, PostCreateRequest } from '@/shared/model/types/blog';
 
 export function useResolveTag() {
   return useMutation({

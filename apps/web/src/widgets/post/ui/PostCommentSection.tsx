@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 import { filterVisibleTagInfos } from '@/shared/lib/tags';
-import type { Tag } from '@/types/blog';
+import type { Tag } from '@/shared/model/types/blog';
 
 type PostTagInfo = Pick<Tag, 'id' | 'name'>;
 

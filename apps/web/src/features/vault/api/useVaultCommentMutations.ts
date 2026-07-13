@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { VaultNoteComment, VaultNoteCommentCreateRequest } from '@/types/vault';
+import { VaultNoteComment, VaultNoteCommentCreateRequest } from '@/shared/model/types/vault';
 
 export function useCreateVaultComment(noteId: string) {
   const queryClient = useQueryClient();

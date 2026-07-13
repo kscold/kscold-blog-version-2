@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import type { LinkPreview } from '@/types/social';
+import type { LinkPreview } from '@/shared/model/types/social';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import { ImagePreviewScroll } from './ImagePreviewScroll';
 

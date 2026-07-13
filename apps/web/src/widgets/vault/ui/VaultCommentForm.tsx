@@ -4,9 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { UseMutationResult } from '@tanstack/react-query';
-import { VaultNoteComment } from '@/types/vault';
+import { VaultNoteComment } from '@/shared/model/types/vault';
 import { useAlert } from '@/shared/model/alertStore';
-import { User } from '@/types/user';
+import { User } from '@/shared/model/types/user';
 
 interface VaultCommentFormProps {
   currentUser: User | null;

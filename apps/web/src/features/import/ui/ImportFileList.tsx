@@ -1,7 +1,7 @@
 'use client';
 
 import { useCategories } from '@/entities/category/api/useCategories';
-import type { ParsedMarkdownFile } from '@/types/import';
+import type { ParsedMarkdownFile } from '@/shared/model/types/import';
 
 interface ImportFileListProps {
   files: ParsedMarkdownFile[];
