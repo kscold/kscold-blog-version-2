@@ -89,3 +89,7 @@ scripts/
 docker/nginx/
 DEPLOY-LIVE-CONTAINER.md
 AGENTS.md
+
+# Python
+__pycache__/
+*.pyc

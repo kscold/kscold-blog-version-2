@@ -603,6 +603,53 @@ class VaultStore:
         )
         return response.choices[0].message.content or ""
 
+    def follow_ups(
+        self,
+        question: str,
+        answer: str,
+        context: list[SearchHit],
+    ) -> list[str]:
+        try:
+            context_text = "\n---\n".join(
+                f"type: {hit.note.content_type}\ntitle: {hit.note.title}\ntags: {hit.note.tags}"
+                for hit in context
+            )
+            response = self.openai.chat.completions.create(
+                model=self.config.openai_chat_model,
+                temperature=0.5,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "너는 KSCOLD 블로그 공개 콘텐츠(Vault/Blog/Feed/Info) 대화의 흐름을 이어가는 도우미다. "
+                            "블로그 주인 김승찬은 '승찬님'이라고 자연스럽게 지칭한다. "
+                            "방금 나온 답변에서 더 깊이 파고들거나 인접 주제로 확장하는, "
+                            "사용자가 실제로 궁금해할 법한 한국어 후속질문 3개를 생성한다. "
+                            "각 질문은 25자 내외로 짧고 구체적으로 만든다. "
+                            "이미 답한 내용을 그대로 반복하는 질문은 금지한다. "
+                            "출력은 한 줄에 하나씩, 번호나 불릿 기호 없이 질문 문장만 3줄로 적는다."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            f"직전 질문: {question}\n\n"
+                            f"방금 생성한 답변:\n{answer}\n\n"
+                            f"참고한 공개 콘텐츠:\n{context_text}"
+                        ),
+                    },
+                ],
+            )
+            raw = response.choices[0].message.content or ""
+            questions: list[str] = []
+            for line in raw.splitlines():
+                cleaned = line.strip().lstrip("-•*0123456789.)· ").strip()
+                if cleaned:
+                    questions.append(cleaned)
+            return questions[:3]
+        except Exception:
+            return []
+
     def log_run(self, question: str, answer: str, sources: list[SearchHit]) -> None:
         self.runs.insert_one(
             {

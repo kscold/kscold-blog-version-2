@@ -18,6 +18,7 @@ class AgentState(TypedDict):
     context: list[SearchHit]
     web_results: list[str]
     answer: str
+    follow_ups: list[str]
     stages: list[dict[str, str]]
 
 
@@ -158,6 +159,11 @@ class VaultRagGraph:
             state.get("web_results", []),
         )
         state["answer"] = answer
+        state["follow_ups"] = self.store.follow_ups(
+            state["question"],
+            answer,
+            state["context"],
+        )
         state["stages"].append(
             {
                 "name": "Respond",
@@ -176,6 +182,7 @@ class VaultRagGraph:
                 "context": [],
                 "web_results": [],
                 "answer": "",
+                "follow_ups": [],
                 "stages": [
                     {
                         "name": "Plan",

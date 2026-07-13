@@ -30,6 +30,7 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
                 )
                 for hit in result["context"]
             ],
+            follow_ups=result.get("follow_ups", []),
         )
 
     def Reindex(self, request, context):
