@@ -16,6 +16,9 @@
 
   html {
     @apply scroll-smooth;
+    /* 스크롤 유무와 무관하게 스크롤바 공간을 항상 예약 → 페이지마다 뷰포트 폭이
+       달라져 fixed 요소(챗 버튼 등)의 가로 위치가 어긋나는 것을 방지 */
+    scrollbar-gutter: stable;
   }
 
   body {
