@@ -1,5 +1,5 @@
 const LOCAL_API_URL = 'http://localhost:8081/api';
-const LOCAL_WS_URL = 'ws://localhost:8081/ws/chat';
+const LOCAL_WS_URL = 'ws://localhost:8081/api/ws/chat';
 
 export function resolveApiBaseUrl() {
   if (typeof window === 'undefined') {
@@ -16,5 +16,5 @@ export function resolveChatWsUrl() {
     return process.env.NEXT_PUBLIC_WS_URL;
   }
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${protocol}//${window.location.host}/ws/chat`;
+  return `${protocol}//${window.location.host}/api/ws/chat`;
 }
