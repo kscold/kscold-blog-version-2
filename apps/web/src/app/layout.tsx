@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
-import { Providers } from '@/app/providers/providers';
-import { ClientLayout } from '@/app/providers/ClientLayout';
+import { Providers } from './providers/providers';
+import { ClientLayout } from './providers/ClientLayout';
 import { PROFILE } from '@/entities/profile';
 import { BUSINESS_INFO } from '@/entities/profile';
 import { resolveInitialViewer } from '@/shared/lib/initialViewer';
