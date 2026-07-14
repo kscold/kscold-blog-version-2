@@ -46,7 +46,7 @@ export function ClientLayout({ children, initialViewer }: ClientLayoutProps) {
         </div>
         <FloatingChatWidget />
         <AlertToast />
-        <CustomCursor hideNativeCursor={pathname !== '/'} />
+        <CustomCursor useHomeContrast={pathname === '/'} />
       </div>
     </ViewerProvider>
   );

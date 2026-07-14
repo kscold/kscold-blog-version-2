@@ -6,10 +6,10 @@ import { motion, useMotionValue } from 'framer-motion';
 const ACTIVE_CURSOR_CLASS = 'custom-cursor-active';
 
 interface CustomCursorProps {
-  hideNativeCursor?: boolean;
+  useHomeContrast?: boolean;
 }
 
-export function CustomCursor({ hideNativeCursor = true }: CustomCursorProps) {
+export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
 
@@ -59,7 +59,7 @@ export function CustomCursor({ hideNativeCursor = true }: CustomCursorProps) {
     const syncCursorMode = () => {
       const isEnabled = shouldUseCustomCursor();
 
-      html.classList.toggle(ACTIVE_CURSOR_CLASS, isEnabled && hideNativeCursor);
+      html.classList.toggle(ACTIVE_CURSOR_CLASS, isEnabled);
       setIsVisible(isEnabled);
 
       if (!isEnabled) {
@@ -85,13 +85,15 @@ export function CustomCursor({ hideNativeCursor = true }: CustomCursorProps) {
       html.removeEventListener('mouseenter', handleMouseEnter);
       mediaQuery.removeEventListener('change', syncCursorMode);
     };
-  }, [cursorX, cursorY, hideNativeCursor]);
+  }, [cursorX, cursorY]);
 
   if (!isVisible) return null;
 
   return (
     <motion.div
-      className="fixed top-0 left-0 z-[9999] h-[80px] w-[80px] rounded-full pointer-events-none mix-blend-difference"
+      className={`fixed top-0 left-0 z-[9999] h-[80px] w-[80px] rounded-full pointer-events-none ${
+        useHomeContrast ? 'mix-blend-normal' : 'mix-blend-difference'
+      }`}
       style={{
         x: cursorX,
         y: cursorY,
@@ -105,7 +107,13 @@ export function CustomCursor({ hideNativeCursor = true }: CustomCursorProps) {
       }}
       animate={{
         scale: isHovering ? 1 : 0.4,
-        backgroundColor: isHovering ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.4)',
+        backgroundColor: useHomeContrast
+          ? isHovering
+            ? 'rgba(71, 71, 71, 0.72)'
+            : 'rgba(71, 71, 71, 0.46)'
+          : isHovering
+            ? 'rgba(255, 255, 255, 1)'
+            : 'rgba(255, 255, 255, 0.4)',
       }}
       transition={{
         scale: { type: 'spring', stiffness: 300, damping: 20 },
