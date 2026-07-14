@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import FloatingChatButton from './FloatingChatButton';
 import ChatModal from './ChatModal';
@@ -29,7 +29,7 @@ export default function FloatingChat() {
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
 
-  const handleOpen = () => {
+  const handleOpen = useCallback(() => {
     setIsOpen(true);
     if (searchParams.get('chat') === 'open') {
       return;
@@ -38,7 +38,12 @@ export default function FloatingChat() {
     const next = new URLSearchParams(searchParams.toString());
     next.set('chat', 'open');
     router.replace(`${pathname}?${next.toString()}`, { scroll: false });
-  };
+  }, [pathname, router, searchParams]);
+
+  useEffect(() => {
+    window.addEventListener('kscold-agent-chat:open', handleOpen);
+    return () => window.removeEventListener('kscold-agent-chat:open', handleOpen);
+  }, [handleOpen]);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -47,7 +52,9 @@ export default function FloatingChat() {
 
   return (
     <>
-      <FloatingChatButton onClick={handleOpen} unreadCount={0} />
+      <div className={isVaultPage ? 'lg:block max-lg:hidden' : undefined}>
+        <FloatingChatButton onClick={handleOpen} unreadCount={0} />
+      </div>
       <ChatModal isOpen={isOpen} isElevated={isVaultPage} onClose={handleClose} />
     </>
   );

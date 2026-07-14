@@ -62,6 +62,9 @@ export function useVaultNoteLayout(initialSlug?: string) {
 
   const handleFolderSelect = (folderId: string | null) => {
     setActiveFolderId(folderId);
+    if (!isDesktop) {
+      setIsMobileOpen(false);
+    }
     router.push(folderId ? `/vault?folder=${folderId}` : '/vault');
   };
 

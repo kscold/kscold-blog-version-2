@@ -13,6 +13,7 @@ interface VaultNoteSidebarProps {
   isTouchDevice: boolean;
   sidebarWidth: number;
   onFolderSelect: (folderId: string | null) => void;
+  onClose: () => void;
   onResizeStart: (event: React.MouseEvent) => void;
 }
 
@@ -25,19 +26,39 @@ export function VaultNoteSidebar({
   isMobileOpen,
   isTouchDevice,
   onFolderSelect,
+  onClose,
   onResizeStart,
   sidebarWidth,
 }: VaultNoteSidebarProps) {
   return (
     <aside
-      className={`fixed lg:relative top-0 lg:top-0 left-0 z-50 lg:z-10 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${isTouchDevice ? 'bg-white dark:bg-surface-900 border-r border-surface-200 dark:border-surface-800 shadow-xl' : 'bg-white/90 dark:bg-surface-900/90 backdrop-blur-3xl border-r lg:border border-surface-200/50 dark:border-surface-800 shadow-2xl lg:shadow-sm'} lg:rounded-3xl custom-scrollbar w-80 h-full shrink-0 flex flex-col`}
+      className={`fixed inset-x-0 bottom-0 z-50 h-[min(78dvh,640px)] w-full shrink-0 transform overflow-y-auto rounded-t-[28px] border-t transition-transform duration-300 lg:relative lg:inset-auto lg:z-10 lg:h-full lg:w-80 lg:translate-y-0 lg:rounded-3xl lg:border-r lg:border-t-0 ${isMobileOpen ? 'translate-y-0' : 'translate-y-full'} ${isTouchDevice ? 'border-surface-200 bg-white shadow-xl dark:border-surface-800 dark:bg-surface-900' : 'border-surface-200/50 bg-white/95 shadow-2xl backdrop-blur-3xl dark:border-surface-800 dark:bg-surface-900/95 lg:shadow-sm'} custom-scrollbar flex flex-col`}
       style={isDesktop ? { width: `${sidebarWidth}px` } : undefined}
     >
-      <div className="p-6 flex-1 space-y-8 relative">
+      <div className="flex-1 space-y-6 p-5 pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] lg:p-6 lg:pb-6">
+        <div className="lg:hidden mx-auto h-1.5 w-10 rounded-full bg-surface-200 dark:bg-surface-700" />
         <div>
-          <h2 className="text-[10px] font-black text-surface-400 mb-6 tracking-[0.25em] uppercase">
-            Core Database
-          </h2>
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-[10px] font-black text-surface-400 tracking-[0.25em] uppercase">
+              Vault 목록
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="목록 닫기"
+              className="lg:hidden flex h-9 w-9 items-center justify-center rounded-xl text-surface-400 transition hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
           {isFoldersLoading ? (
             <div className="space-y-4 animate-pulse">
               <div className="h-4 bg-surface-200/50 rounded-full w-2/3" />
