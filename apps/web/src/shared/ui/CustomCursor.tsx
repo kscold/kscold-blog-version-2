@@ -1,112 +1,149 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion, useMotionValue } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
-const ACTIVE_CURSOR_CLASS = 'custom-cursor-active';
+const CURSOR_MEDIA_QUERY =
+  '(hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference)';
+const INTERACTIVE_SELECTOR =
+  'a, button, summary, label, [role="button"], [data-cursor="interactive"], .interactive';
+const FORM_SELECTOR = 'input, textarea, select, [contenteditable="true"]';
+
+type CursorMode = 'default' | 'interactive' | 'hidden';
 
 export function CustomCursor() {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
+  const smoothX = useSpring(cursorX, { stiffness: 640, damping: 42, mass: 0.16 });
+  const smoothY = useSpring(cursorY, { stiffness: 640, damping: 42, mass: 0.16 });
 
-  const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+  const [mode, setMode] = useState<CursorMode>('default');
+  const visibleRef = useRef(false);
+  const modeRef = useRef<CursorMode>('default');
 
   useEffect(() => {
-    const html = document.documentElement;
-    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)');
-    const shouldUseCustomCursor = () => mediaQuery.matches;
+    const mediaQuery = window.matchMedia(CURSOR_MEDIA_QUERY);
+    let animationFrame: number | null = null;
+    let pointerX = -100;
+    let pointerY = -100;
 
-    const updatePosition = (e: MouseEvent) => {
-      if (!shouldUseCustomCursor()) return;
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
+    const updateVisibility = (visible: boolean) => {
+      if (visibleRef.current === visible) return;
+      visibleRef.current = visible;
+      setIsVisible(visible);
     };
 
-    const updateHoverState = (e: MouseEvent) => {
-      if (!shouldUseCustomCursor()) {
-        setIsHovering(false);
+    const updateMode = (nextMode: CursorMode) => {
+      if (modeRef.current === nextMode) return;
+      modeRef.current = nextMode;
+      setMode(nextMode);
+    };
+
+    const flushPointerPosition = () => {
+      cursorX.set(pointerX);
+      cursorY.set(pointerY);
+      animationFrame = null;
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (!mediaQuery.matches || event.pointerType === 'touch') return;
+
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      updateVisibility(true);
+
+      if (animationFrame === null) {
+        animationFrame = window.requestAnimationFrame(flushPointerPosition);
+      }
+    };
+
+    const handlePointerOver = (event: PointerEvent) => {
+      if (!mediaQuery.matches) return;
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      if (target.closest(FORM_SELECTOR)) {
+        updateMode('hidden');
         return;
       }
 
-      const target = e.target as HTMLElement;
-      if (
-        target.closest('a') ||
-        target.closest('button') ||
-        target.closest('input') ||
-        target.closest('textarea') ||
-        target.closest('[role="button"]') ||
-        target.closest('.interactive')
-      ) {
-        setIsHovering(true);
-      } else {
-        setIsHovering(false);
-      }
+      updateMode(target.closest(INTERACTIVE_SELECTOR) ? 'interactive' : 'default');
     };
 
-    const handleMouseLeave = () => {
-      setIsVisible(false);
+    const handlePointerDown = () => {
+      if (mediaQuery.matches && modeRef.current !== 'hidden') setIsPressed(true);
     };
 
-    const handleMouseEnter = () => {
-      setIsVisible(shouldUseCustomCursor());
+    const handlePointerUp = () => setIsPressed(false);
+
+    const handlePointerLeave = () => {
+      updateVisibility(false);
+      setIsPressed(false);
     };
 
     const syncCursorMode = () => {
-      const isEnabled = shouldUseCustomCursor();
+      if (mediaQuery.matches) return;
 
-      html.classList.toggle(ACTIVE_CURSOR_CLASS, isEnabled);
-      setIsVisible(isEnabled);
-
-      if (!isEnabled) {
-        setIsHovering(false);
-        cursorX.set(-100);
-        cursorY.set(-100);
-      }
+      updateVisibility(false);
+      updateMode('default');
+      setIsPressed(false);
+      cursorX.set(-100);
+      cursorY.set(-100);
     };
 
-    syncCursorMode();
-
-    window.addEventListener('mousemove', updatePosition);
-    window.addEventListener('mouseover', updateHoverState);
-    html.addEventListener('mouseleave', handleMouseLeave);
-    html.addEventListener('mouseenter', handleMouseEnter);
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerover', handlePointerOver, { passive: true });
+    window.addEventListener('pointerdown', handlePointerDown, { passive: true });
+    window.addEventListener('pointerup', handlePointerUp, { passive: true });
+    window.addEventListener('blur', handlePointerLeave);
+    document.documentElement.addEventListener('mouseleave', handlePointerLeave);
     mediaQuery.addEventListener('change', syncCursorMode);
 
     return () => {
-      html.classList.remove(ACTIVE_CURSOR_CLASS);
-      window.removeEventListener('mousemove', updatePosition);
-      window.removeEventListener('mouseover', updateHoverState);
-      html.removeEventListener('mouseleave', handleMouseLeave);
-      html.removeEventListener('mouseenter', handleMouseEnter);
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerover', handlePointerOver);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('blur', handlePointerLeave);
+      document.documentElement.removeEventListener('mouseleave', handlePointerLeave);
       mediaQuery.removeEventListener('change', syncCursorMode);
     };
   }, [cursorX, cursorY]);
 
-  if (!isVisible) return null;
+  if (!isVisible || mode === 'hidden') return null;
+
+  const isInteractive = mode === 'interactive';
 
   return (
     <motion.div
-      className="fixed top-0 left-0 z-[9999] h-[80px] w-[80px] rounded-full pointer-events-none mix-blend-difference"
+      aria-hidden="true"
+      className={`pointer-events-none fixed left-0 top-0 z-[9999] h-6 w-6 rounded-full border transform-gpu will-change-transform [contain:strict] ${
+        isInteractive
+          ? 'border-surface-900/60 bg-surface-900/[0.045] shadow-[0_5px_20px_-12px_rgba(15,23,42,0.8)] dark:border-white/60 dark:bg-white/[0.06]'
+          : 'border-surface-500/45 bg-white/[0.03] shadow-[0_4px_16px_-12px_rgba(15,23,42,0.7)] dark:border-white/40 dark:bg-surface-950/[0.03]'
+      }`}
       style={{
-        x: cursorX,
-        y: cursorY,
+        x: smoothX,
+        y: smoothY,
         translateX: '-50%',
         translateY: '-50%',
-        // 하드웨어 가속과 안티앨리어싱을 강제로 유지
-        WebkitBackfaceVisibility: 'hidden',
-        backfaceVisibility: 'hidden',
-        WebkitTransform: 'translateZ(0)',
-        outline: '1px solid transparent',
       }}
+      initial={false}
       animate={{
-        scale: isHovering ? 1 : 0.4,
-        backgroundColor: isHovering ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.4)',
+        opacity: 1,
+        scale: isPressed ? 0.82 : isInteractive ? 1.5 : 1,
       }}
-      transition={{
-        scale: { type: 'spring', stiffness: 300, damping: 20 },
-        backgroundColor: { duration: 0.2 },
-      }}
-    />
+      transition={{ type: 'spring', stiffness: 520, damping: 34, mass: 0.18 }}
+    >
+      <span
+        className={`absolute -right-[2px] top-1/2 h-1 w-1 -translate-y-1/2 rounded-full transition-colors duration-200 ${
+          isInteractive ? 'bg-surface-900 dark:bg-white' : 'bg-surface-500 dark:bg-surface-300'
+        }`}
+      />
+    </motion.div>
   );
 }
