@@ -1,127 +1,116 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useMotionValue } from 'framer-motion';
 
-const CURSOR_MEDIA_QUERY =
-  '(hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference)';
-const INTERACTIVE_SELECTOR =
-  'a, button, summary, label, [role="button"], [data-cursor="interactive"], .interactive';
-const FORM_SELECTOR = 'input, textarea, select, [contenteditable="true"]';
+const ACTIVE_CURSOR_CLASS = 'custom-cursor-active';
 
-type CursorMode = 'default' | 'interactive' | 'hidden';
+interface CustomCursorProps {
+  hideNativeCursor?: boolean;
+}
 
-export function CustomCursor() {
+export function CustomCursor({ hideNativeCursor = true }: CustomCursorProps) {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
 
+  const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [isPressed, setIsPressed] = useState(false);
-  const [mode, setMode] = useState<CursorMode>('default');
-  const visibleRef = useRef(false);
-  const modeRef = useRef<CursorMode>('default');
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(CURSOR_MEDIA_QUERY);
+    const html = document.documentElement;
+    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)');
+    const shouldUseCustomCursor = () => mediaQuery.matches;
 
-    const updateVisibility = (visible: boolean) => {
-      if (visibleRef.current === visible) return;
-      visibleRef.current = visible;
-      setIsVisible(visible);
+    const updatePosition = (e: MouseEvent) => {
+      if (!shouldUseCustomCursor()) return;
+      cursorX.set(e.clientX);
+      cursorY.set(e.clientY);
     };
 
-    const updateMode = (nextMode: CursorMode) => {
-      if (modeRef.current === nextMode) return;
-      modeRef.current = nextMode;
-      setMode(nextMode);
-    };
-
-    const handlePointerMove = (event: PointerEvent) => {
-      if (!mediaQuery.matches || event.pointerType === 'touch') return;
-
-      cursorX.set(event.clientX);
-      cursorY.set(event.clientY);
-      updateVisibility(true);
-    };
-
-    const handlePointerOver = (event: PointerEvent) => {
-      if (!mediaQuery.matches) return;
-
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-
-      if (target.closest(FORM_SELECTOR)) {
-        updateMode('hidden');
+    const updateHoverState = (e: MouseEvent) => {
+      if (!shouldUseCustomCursor()) {
+        setIsHovering(false);
         return;
       }
 
-      updateMode(target.closest(INTERACTIVE_SELECTOR) ? 'interactive' : 'default');
+      const target = e.target as HTMLElement;
+      if (
+        target.closest('a') ||
+        target.closest('button') ||
+        target.closest('input') ||
+        target.closest('textarea') ||
+        target.closest('[role="button"]') ||
+        target.closest('.interactive')
+      ) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
     };
 
-    const handlePointerDown = () => {
-      if (mediaQuery.matches && modeRef.current !== 'hidden') setIsPressed(true);
+    const handleMouseLeave = () => {
+      setIsVisible(false);
     };
 
-    const handlePointerUp = () => setIsPressed(false);
-
-    const handlePointerLeave = () => {
-      updateVisibility(false);
-      setIsPressed(false);
+    const handleMouseEnter = () => {
+      setIsVisible(shouldUseCustomCursor());
     };
 
     const syncCursorMode = () => {
-      if (mediaQuery.matches) return;
+      const isEnabled = shouldUseCustomCursor();
 
-      updateVisibility(false);
-      updateMode('default');
-      setIsPressed(false);
-      cursorX.set(-100);
-      cursorY.set(-100);
+      html.classList.toggle(ACTIVE_CURSOR_CLASS, isEnabled && hideNativeCursor);
+      setIsVisible(isEnabled);
+
+      if (!isEnabled) {
+        setIsHovering(false);
+        cursorX.set(-100);
+        cursorY.set(-100);
+      }
     };
 
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
-    window.addEventListener('pointerover', handlePointerOver, { passive: true });
-    window.addEventListener('pointerdown', handlePointerDown, { passive: true });
-    window.addEventListener('pointerup', handlePointerUp, { passive: true });
-    window.addEventListener('blur', handlePointerLeave);
-    document.documentElement.addEventListener('mouseleave', handlePointerLeave);
+    syncCursorMode();
+
+    window.addEventListener('mousemove', updatePosition);
+    window.addEventListener('mouseover', updateHoverState);
+    html.addEventListener('mouseleave', handleMouseLeave);
+    html.addEventListener('mouseenter', handleMouseEnter);
     mediaQuery.addEventListener('change', syncCursorMode);
 
     return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerover', handlePointerOver);
-      window.removeEventListener('pointerdown', handlePointerDown);
-      window.removeEventListener('pointerup', handlePointerUp);
-      window.removeEventListener('blur', handlePointerLeave);
-      document.documentElement.removeEventListener('mouseleave', handlePointerLeave);
+      html.classList.remove(ACTIVE_CURSOR_CLASS);
+      window.removeEventListener('mousemove', updatePosition);
+      window.removeEventListener('mouseover', updateHoverState);
+      html.removeEventListener('mouseleave', handleMouseLeave);
+      html.removeEventListener('mouseenter', handleMouseEnter);
       mediaQuery.removeEventListener('change', syncCursorMode);
     };
-  }, [cursorX, cursorY]);
+  }, [cursorX, cursorY, hideNativeCursor]);
 
-  if (!isVisible || mode === 'hidden') return null;
-
-  const isInteractive = mode === 'interactive';
+  if (!isVisible) return null;
 
   return (
     <motion.div
-      aria-hidden="true"
-      className={`pointer-events-none fixed left-0 top-0 z-[9999] h-2.5 w-2.5 rounded-full transform-gpu will-change-transform [contain:strict] ${
-        isInteractive
-          ? 'bg-surface-900/65 ring-1 ring-white/80 shadow-[0_3px_12px_-5px_rgba(15,23,42,0.7)] dark:bg-white/70 dark:ring-surface-950/70'
-          : 'bg-surface-900/75 ring-1 ring-white/90 shadow-[0_2px_8px_-4px_rgba(15,23,42,0.65)] dark:bg-white/80 dark:ring-surface-950/80'
-      }`}
+      className="fixed top-0 left-0 z-[9999] h-[80px] w-[80px] rounded-full pointer-events-none mix-blend-difference"
       style={{
         x: cursorX,
         y: cursorY,
         translateX: '-50%',
         translateY: '-50%',
+        // 하드웨어 가속과 안티앨리어싱을 강제로 유지
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
+        WebkitTransform: 'translateZ(0)',
+        outline: '1px solid transparent',
       }}
-      initial={false}
       animate={{
-        opacity: 1,
-        scale: isPressed ? 0.8 : isInteractive ? 1.65 : 1,
+        scale: isHovering ? 1 : 0.4,
+        backgroundColor: isHovering ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.4)',
       }}
-      transition={{ duration: 0.12, ease: 'easeOut' }}
+      transition={{
+        scale: { type: 'spring', stiffness: 300, damping: 20 },
+        backgroundColor: { duration: 0.2 },
+      }}
     />
   );
 }

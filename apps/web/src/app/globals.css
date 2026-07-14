@@ -27,6 +27,17 @@
     @apply transition-colors duration-300;
   }
 
+  html.custom-cursor-active body,
+  html.custom-cursor-active a,
+  html.custom-cursor-active button,
+  html.custom-cursor-active input,
+  html.custom-cursor-active textarea,
+  html.custom-cursor-active select,
+  html.custom-cursor-active [role='button'],
+  html.custom-cursor-active .interactive {
+    cursor: none !important;
+  }
+
   /* 선택 영역 스타일 */
   ::selection {
     @apply bg-surface-900 text-white;
