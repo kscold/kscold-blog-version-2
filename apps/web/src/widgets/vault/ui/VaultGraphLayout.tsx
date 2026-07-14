@@ -6,6 +6,7 @@ import { useUiStore } from '@/shared/model/uiStore';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ClientVaultGraph } from './ClientVaultGraph';
 import { VaultFolderTree } from './VaultFolderTree';
+import { VaultMobileListButton } from './VaultMobileListButton';
 import { VaultMobileToolbar } from './VaultMobileToolbar';
 import { useVaultGraphData } from '@/features/vault';
 import { GraphPanelSkeleton } from '@/shared/ui/RouteSkeletons';
@@ -87,11 +88,10 @@ export function VaultGraphLayout() {
       )}
 
       <aside
-        className={`fixed inset-x-0 bottom-0 z-50 h-[min(78dvh,640px)] w-full shrink-0 transform overflow-y-auto rounded-t-[28px] border-t transition-transform duration-300 lg:relative lg:inset-auto lg:z-10 lg:h-full lg:w-80 lg:translate-y-0 lg:rounded-3xl lg:border-r lg:border-t-0 ${isMobileOpen ? 'translate-y-0' : 'translate-y-full'} ${isTouchDevice ? 'border-surface-200 bg-white shadow-xl dark:border-surface-800 dark:bg-surface-900' : 'border-surface-200/50 bg-white/95 shadow-2xl backdrop-blur-3xl dark:border-surface-800 dark:bg-surface-900/95 lg:shadow-sm'} custom-scrollbar flex flex-col`}
+        className={`fixed bottom-0 left-0 top-0 z-50 h-full w-[min(86vw,340px)] shrink-0 transform overflow-y-auto rounded-r-[28px] border-r transition-transform duration-300 lg:relative lg:inset-auto lg:z-10 lg:h-full lg:w-80 lg:translate-x-0 lg:rounded-3xl ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} ${isTouchDevice ? 'border-surface-200 bg-white shadow-xl dark:border-surface-800 dark:bg-surface-900' : 'border-surface-200/50 bg-white/95 shadow-2xl backdrop-blur-3xl dark:border-surface-800 dark:bg-surface-900/95 lg:shadow-sm'} custom-scrollbar flex flex-col`}
         style={isDesktop ? { width: `${sidebarWidth}px` } : undefined}
       >
         <div className="flex-1 space-y-6 p-5 pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] lg:p-6 lg:pb-6">
-          <div className="lg:hidden mx-auto h-1.5 w-10 rounded-full bg-surface-200 dark:bg-surface-700" />
           {activeFolderId && (
             <div className="lg:hidden">
               <button
@@ -173,6 +173,7 @@ export function VaultGraphLayout() {
               : '전체 Vault'
           }
           meta={`${filteredGraph?.nodes.length ?? 0}개 노트 · ${filteredGraph?.links.length ?? 0}개 연결`}
+          showFolderButton={false}
           onOpenFolders={() => setIsMobileOpen(true)}
           onOpenChat={openAgentChat}
         />
@@ -228,6 +229,7 @@ export function VaultGraphLayout() {
           )}
         </div>
       </main>
+      <VaultMobileListButton onClick={() => setIsMobileOpen(true)} />
     </div>
   );
 }

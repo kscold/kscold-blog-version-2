@@ -47,6 +47,7 @@ export function VaultNoteMainPanel({
         label={note?.title ?? 'Vault 노트'}
         meta={note?.tags.length ? note.tags.join(' · ') : '연결된 노트와 함께 읽기'}
         flush
+        showFolderButton={false}
         onOpenFolders={onOpenFolders}
         onOpenChat={onOpenChat}
       />

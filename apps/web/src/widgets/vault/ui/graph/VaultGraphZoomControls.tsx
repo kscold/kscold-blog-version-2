@@ -7,16 +7,26 @@ interface VaultGraphZoomControlsProps {
 }
 
 // 줌 컨트롤 — 모바일에선 폴더 FAB와 겹치지 않게 위로, 데스크톱에선 챗 버튼 왼쪽에 나란히
-export function VaultGraphZoomControls({ onZoomIn, onZoomOut, onZoomToFit }: VaultGraphZoomControlsProps) {
+export function VaultGraphZoomControls({
+  onZoomIn,
+  onZoomOut,
+  onZoomToFit,
+}: VaultGraphZoomControlsProps) {
   return (
-    <div className="absolute bottom-4 left-4 lg:bottom-4 lg:left-auto lg:right-24 z-10 flex flex-col overflow-hidden rounded-2xl border border-surface-200/70 dark:border-surface-700/70 bg-white/80 dark:bg-surface-900/80 shadow-sm backdrop-blur-md">
+    <div className="absolute bottom-[5.5rem] left-4 lg:bottom-4 lg:left-auto lg:right-24 z-10 flex flex-col overflow-hidden rounded-2xl border border-surface-200/70 dark:border-surface-700/70 bg-white/80 dark:bg-surface-900/80 shadow-sm backdrop-blur-md">
       <button
         type="button"
         onClick={onZoomIn}
         aria-label="확대"
         className="flex h-10 w-10 items-center justify-center text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white active:bg-surface-200/70"
       >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2.2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
       </button>
@@ -27,7 +37,13 @@ export function VaultGraphZoomControls({ onZoomIn, onZoomOut, onZoomToFit }: Vau
         aria-label="축소"
         className="flex h-10 w-10 items-center justify-center text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white active:bg-surface-200/70"
       >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2.2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15" />
         </svg>
       </button>
@@ -38,7 +54,13 @@ export function VaultGraphZoomControls({ onZoomIn, onZoomOut, onZoomToFit }: Vau
         aria-label="전체 보기"
         className="flex h-10 w-10 items-center justify-center text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:hover:bg-surface-800 dark:hover:text-white active:bg-surface-200/70"
       >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"

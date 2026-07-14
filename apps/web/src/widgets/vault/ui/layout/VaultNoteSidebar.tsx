@@ -32,11 +32,10 @@ export function VaultNoteSidebar({
 }: VaultNoteSidebarProps) {
   return (
     <aside
-      className={`fixed inset-x-0 bottom-0 z-50 h-[min(78dvh,640px)] w-full shrink-0 transform overflow-y-auto rounded-t-[28px] border-t transition-transform duration-300 lg:relative lg:inset-auto lg:z-10 lg:h-full lg:w-80 lg:translate-y-0 lg:rounded-3xl lg:border-r lg:border-t-0 ${isMobileOpen ? 'translate-y-0' : 'translate-y-full'} ${isTouchDevice ? 'border-surface-200 bg-white shadow-xl dark:border-surface-800 dark:bg-surface-900' : 'border-surface-200/50 bg-white/95 shadow-2xl backdrop-blur-3xl dark:border-surface-800 dark:bg-surface-900/95 lg:shadow-sm'} custom-scrollbar flex flex-col`}
+      className={`fixed bottom-0 left-0 top-0 z-50 h-full w-[min(86vw,340px)] shrink-0 transform overflow-y-auto rounded-r-[28px] border-r transition-transform duration-300 lg:relative lg:inset-auto lg:z-10 lg:h-full lg:w-80 lg:translate-x-0 lg:rounded-3xl ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} ${isTouchDevice ? 'border-surface-200 bg-white shadow-xl dark:border-surface-800 dark:bg-surface-900' : 'border-surface-200/50 bg-white/95 shadow-2xl backdrop-blur-3xl dark:border-surface-800 dark:bg-surface-900/95 lg:shadow-sm'} custom-scrollbar flex flex-col`}
       style={isDesktop ? { width: `${sidebarWidth}px` } : undefined}
     >
       <div className="flex-1 space-y-6 p-5 pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] lg:p-6 lg:pb-6">
-        <div className="lg:hidden mx-auto h-1.5 w-10 rounded-full bg-surface-200 dark:bg-surface-700" />
         <div>
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-[10px] font-black text-surface-400 tracking-[0.25em] uppercase">

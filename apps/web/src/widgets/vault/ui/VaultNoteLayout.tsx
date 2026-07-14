@@ -7,6 +7,7 @@ import { useVaultNoteData } from '@/features/vault';
 import { useVaultNoteLayout } from '@/widgets/vault/model/useVaultNoteLayout';
 import { VaultNoteSidebar } from '@/widgets/vault/ui/layout/VaultNoteSidebar';
 import { VaultNoteMainPanel } from '@/widgets/vault/ui/layout/VaultNoteMainPanel';
+import { VaultMobileListButton } from '@/widgets/vault/ui/VaultMobileListButton';
 
 export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
   const { theme } = useUiStore();
@@ -91,24 +92,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
         titleSlugMap={titleSlugMap}
       />
 
-      <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed bottom-6 left-6 z-50 p-4 rounded-full bg-surface-900 text-white shadow-xl hover:scale-105 active:scale-95 transition-all outline-none border border-white/10"
-      >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          {isMobileOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          )}
-        </svg>
-      </button>
+      <VaultMobileListButton onClick={() => setIsMobileOpen(true)} />
     </div>
   );
 }
