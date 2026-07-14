@@ -9,6 +9,7 @@ import { VaultFolderTree } from './VaultFolderTree';
 import { VaultMobileListButton } from './VaultMobileListButton';
 import { VaultMobileToolbar } from './VaultMobileToolbar';
 import { useVaultGraphData } from '@/features/vault';
+import { findFolderById } from '@/entities/vault';
 import { GraphPanelSkeleton } from '@/shared/ui/RouteSkeletons';
 
 const MIN_SIDEBAR_WIDTH = 200;
@@ -32,6 +33,7 @@ export function VaultGraphLayout() {
 
   const { folders, isFoldersLoading, isGraphLoading, filteredGraph, colorMap } =
     useVaultGraphData(activeFolderId);
+  const activeFolder = activeFolderId ? findFolderById(folders, activeFolderId) : null;
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -40,6 +42,12 @@ export function VaultGraphLayout() {
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
+
+  useEffect(() => {
+    if (!isFoldersLoading && activeFolderId && !activeFolder) {
+      setActiveFolderId(null);
+    }
+  }, [activeFolder, activeFolderId, isFoldersLoading]);
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -96,8 +104,7 @@ export function VaultGraphLayout() {
             <div className="lg:hidden">
               <button
                 onClick={() => {
-                  const parent = folders.find(f => f.id === activeFolderId)?.parent;
-                  setActiveFolderId(parent ?? null);
+                  setActiveFolderId(activeFolder?.parent ?? null);
                 }}
                 className={`w-full px-4 py-2 rounded-full border text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 shadow-sm transition-all ${isTouchDevice ? 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-800' : 'bg-surface-50/80 dark:bg-surface-900/80 border-surface-200 dark:border-surface-800 backdrop-blur-xl hover:scale-105'}`}
               >
@@ -169,7 +176,7 @@ export function VaultGraphLayout() {
         <VaultMobileToolbar
           label={
             activeFolderId
-              ? (folders.find(folder => folder.id === activeFolderId)?.name ?? '폴더')
+              ? (activeFolder?.name ?? '폴더')
               : '전체 Vault'
           }
           meta={`${filteredGraph?.nodes.length ?? 0}개 노트 · ${filteredGraph?.links.length ?? 0}개 연결`}
@@ -182,8 +189,7 @@ export function VaultGraphLayout() {
           <div className="absolute top-4 left-4 z-10 hidden lg:block">
             <button
               onClick={() => {
-                const parent = folders.find(f => f.id === activeFolderId)?.parent;
-                setActiveFolderId(parent ?? null);
+                setActiveFolderId(activeFolder?.parent ?? null);
               }}
               className={`px-4 py-2 rounded-full border text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 shadow-sm transition-all ${isTouchDevice ? 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-800' : 'bg-surface-50/80 dark:bg-surface-900/80 border-surface-200 dark:border-surface-800 backdrop-blur-xl hover:scale-105'}`}
             >
@@ -208,7 +214,7 @@ export function VaultGraphLayout() {
         <div className="relative min-h-0 flex-1">
           {isGraphLoading || isFoldersLoading ? (
             <GraphPanelSkeleton />
-          ) : filteredGraph ? (
+          ) : filteredGraph && filteredGraph.nodes.length > 0 ? (
             <div
               className={`w-full h-full flex flex-col overflow-hidden lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 lg:shadow-sm border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-surface-200/50 dark:border-surface-800/50'}`}
             >
@@ -224,7 +230,12 @@ export function VaultGraphLayout() {
             <div
               className={`text-surface-500 w-full h-full flex flex-col items-center justify-center lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md border-surface-200/50 dark:border-surface-800/50'}`}
             >
-              No Data
+              <p className="text-sm font-semibold text-surface-700 dark:text-surface-200">
+                표시할 노트가 없습니다.
+              </p>
+              <p className="mt-2 text-center text-xs leading-5 text-surface-400">
+                상위 폴더에서 다른 Vault 노트를 선택해 주세요.
+              </p>
             </div>
           )}
         </div>

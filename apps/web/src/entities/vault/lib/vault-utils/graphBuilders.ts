@@ -66,7 +66,7 @@ function buildRootAggregatedGraph(
       node => node.folderId && rootDescendantIds.includes(node.folderId)
     );
 
-    if (notesInRoot.length === 0 && !(root.children && root.children.length > 0)) {
+    if (notesInRoot.length === 0) {
       continue;
     }
 
@@ -78,7 +78,7 @@ function buildRootAggregatedGraph(
         node => node.folderId && childDescendantIds.includes(node.folderId)
       );
 
-      if (notesInChild.length === 0 && !(child.children && child.children.length > 0)) {
+      if (notesInChild.length === 0) {
         continue;
       }
 
@@ -101,14 +101,20 @@ function buildFolderAggregatedGraph(
   const directChildren = currentFolder?.children || [];
   const addedNodeIds = new Set<string>([activeFolderId]);
 
-  if (currentFolder) {
-    const descendantIds = getSubfolderIds(folders, activeFolderId);
-    const totalNotes = rawGraph.nodes.filter(
-      node => node.folderId && descendantIds.includes(node.folderId)
-    ).length;
-
-    nodes.push(createFolderNode(activeFolderId, currentFolder.name, activeFolderId, totalNotes, 20, 50, 7, 5));
+  if (!currentFolder) {
+    return { nodes, links };
   }
+
+  const descendantIds = getSubfolderIds(folders, activeFolderId);
+  const totalNotes = rawGraph.nodes.filter(
+    node => node.folderId && descendantIds.includes(node.folderId)
+  ).length;
+
+  if (totalNotes === 0) {
+    return { nodes, links };
+  }
+
+  nodes.push(createFolderNode(activeFolderId, currentFolder.name, activeFolderId, totalNotes, 20, 50, 7, 5));
 
   for (const child of directChildren) {
     const childDescendantIds = getSubfolderIds(folders, child.id);
@@ -116,7 +122,7 @@ function buildFolderAggregatedGraph(
       node => node.folderId && childDescendantIds.includes(node.folderId)
     );
 
-    if (notesInChild.length === 0 && !(child.children && child.children.length > 0)) {
+    if (notesInChild.length === 0) {
       continue;
     }
 

@@ -33,9 +33,29 @@ export function useChatSocket({ isOpen, username: _username }: UseChatSocketOpti
 
   useEffect(() => {
     if (!isOpen) return;
-    fetchMyChatMessages().then(setMessages).catch(() => {});
-    connect();
+    let isActive = true;
+
+    const initializeChat = async () => {
+      try {
+        const chatMessages = await fetchMyChatMessages();
+        if (isActive) {
+          setMessages(chatMessages);
+        }
+      } catch {
+        if (isActive) {
+          setMessages([]);
+        }
+      }
+
+      if (isActive) {
+        connect();
+      }
+    };
+
+    void initializeChat();
+
     return () => {
+      isActive = false;
       if (reconnectRef.current) clearTimeout(reconnectRef.current);
       if (wsRef.current) {
         wsRef.current.onclose = null;

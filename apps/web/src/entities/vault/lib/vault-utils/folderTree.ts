@@ -1,4 +1,4 @@
-import { VaultFolder } from '@/shared/model/types/vault';
+import { GraphNode, VaultFolder } from '@/shared/model/types/vault';
 
 /**
  * 뮤트 톤으로 큐레이션한 폴더 팔레트.
@@ -69,4 +69,32 @@ export function getSubfolderIds(folders: VaultFolder[], targetId: string): strin
 
   collectIds(folders, false);
   return ids;
+}
+
+export function filterPopulatedFolders(
+  folders: VaultFolder[],
+  graphNodes: GraphNode[]
+): VaultFolder[] {
+  const noteFolderIds = new Set(
+    graphNodes.flatMap(node => (node.folderId ? [node.folderId] : []))
+  );
+
+  const filterFolder = (folder: VaultFolder): VaultFolder | null => {
+    const children = (folder.children || [])
+      .map(filterFolder)
+      .filter((child): child is VaultFolder => child !== null);
+
+    if (!noteFolderIds.has(folder.id) && children.length === 0) {
+      return null;
+    }
+
+    return {
+      ...folder,
+      children,
+    };
+  };
+
+  return folders
+    .map(filterFolder)
+    .filter((folder): folder is VaultFolder => folder !== null);
 }
