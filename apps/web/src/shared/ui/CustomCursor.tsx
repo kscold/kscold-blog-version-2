@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 
 const CURSOR_MEDIA_QUERY =
   '(hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference)';
@@ -14,8 +14,6 @@ type CursorMode = 'default' | 'interactive' | 'hidden';
 export function CustomCursor() {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
-  const smoothX = useSpring(cursorX, { stiffness: 640, damping: 42, mass: 0.16 });
-  const smoothY = useSpring(cursorY, { stiffness: 640, damping: 42, mass: 0.16 });
 
   const [isVisible, setIsVisible] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
@@ -25,9 +23,6 @@ export function CustomCursor() {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(CURSOR_MEDIA_QUERY);
-    let animationFrame: number | null = null;
-    let pointerX = -100;
-    let pointerY = -100;
 
     const updateVisibility = (visible: boolean) => {
       if (visibleRef.current === visible) return;
@@ -41,22 +36,12 @@ export function CustomCursor() {
       setMode(nextMode);
     };
 
-    const flushPointerPosition = () => {
-      cursorX.set(pointerX);
-      cursorY.set(pointerY);
-      animationFrame = null;
-    };
-
     const handlePointerMove = (event: PointerEvent) => {
       if (!mediaQuery.matches || event.pointerType === 'touch') return;
 
-      pointerX = event.clientX;
-      pointerY = event.clientY;
+      cursorX.set(event.clientX);
+      cursorY.set(event.clientY);
       updateVisibility(true);
-
-      if (animationFrame === null) {
-        animationFrame = window.requestAnimationFrame(flushPointerPosition);
-      }
     };
 
     const handlePointerOver = (event: PointerEvent) => {
@@ -103,7 +88,6 @@ export function CustomCursor() {
     mediaQuery.addEventListener('change', syncCursorMode);
 
     return () => {
-      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerover', handlePointerOver);
       window.removeEventListener('pointerdown', handlePointerDown);
@@ -121,29 +105,23 @@ export function CustomCursor() {
   return (
     <motion.div
       aria-hidden="true"
-      className={`pointer-events-none fixed left-0 top-0 z-[9999] h-6 w-6 rounded-full border transform-gpu will-change-transform [contain:strict] ${
+      className={`pointer-events-none fixed left-0 top-0 z-[9999] h-2.5 w-2.5 rounded-full transform-gpu will-change-transform [contain:strict] ${
         isInteractive
-          ? 'border-surface-900/60 bg-surface-900/[0.045] shadow-[0_5px_20px_-12px_rgba(15,23,42,0.8)] dark:border-white/60 dark:bg-white/[0.06]'
-          : 'border-surface-500/45 bg-white/[0.03] shadow-[0_4px_16px_-12px_rgba(15,23,42,0.7)] dark:border-white/40 dark:bg-surface-950/[0.03]'
+          ? 'bg-surface-900/65 ring-1 ring-white/80 shadow-[0_3px_12px_-5px_rgba(15,23,42,0.7)] dark:bg-white/70 dark:ring-surface-950/70'
+          : 'bg-surface-900/75 ring-1 ring-white/90 shadow-[0_2px_8px_-4px_rgba(15,23,42,0.65)] dark:bg-white/80 dark:ring-surface-950/80'
       }`}
       style={{
-        x: smoothX,
-        y: smoothY,
+        x: cursorX,
+        y: cursorY,
         translateX: '-50%',
         translateY: '-50%',
       }}
       initial={false}
       animate={{
         opacity: 1,
-        scale: isPressed ? 0.82 : isInteractive ? 1.5 : 1,
+        scale: isPressed ? 0.8 : isInteractive ? 1.65 : 1,
       }}
-      transition={{ type: 'spring', stiffness: 520, damping: 34, mass: 0.18 }}
-    >
-      <span
-        className={`absolute -right-[2px] top-1/2 h-1 w-1 -translate-y-1/2 rounded-full transition-colors duration-200 ${
-          isInteractive ? 'bg-surface-900 dark:bg-white' : 'bg-surface-500 dark:bg-surface-300'
-        }`}
-      />
-    </motion.div>
+      transition={{ duration: 0.12, ease: 'easeOut' }}
+    />
   );
 }
