@@ -101,9 +101,20 @@ export function VaultGraphLayout() {
             </div>
           )}
           <div>
-            <h2 className="text-[10px] font-black text-surface-400 mb-6 tracking-[0.25em] uppercase">
-              Core Database
-            </h2>
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-[10px] font-black text-surface-400 tracking-[0.25em] uppercase">
+                Core Database
+              </h2>
+              <button
+                onClick={() => setIsMobileOpen(false)}
+                aria-label="폴더 닫기"
+                className="lg:hidden flex h-8 w-8 items-center justify-center rounded-lg text-surface-400 transition hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-900 dark:hover:text-white"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
             {isFoldersLoading ? (
               <div className="space-y-4 animate-pulse">
                 <div className="h-4 bg-surface-200/50 rounded-full w-2/3" />
@@ -114,7 +125,10 @@ export function VaultGraphLayout() {
               <VaultFolderTree
                 folders={folders}
                 activeFolderId={activeFolderId}
-                onFolderSelect={setActiveFolderId}
+                onFolderSelect={id => {
+                  setActiveFolderId(id);
+                  if (!isDesktop) setIsMobileOpen(false);
+                }}
                 onFolderHover={isTouchDevice ? undefined : setHoverFolderId}
               />
             )}
@@ -128,6 +142,38 @@ export function VaultGraphLayout() {
       </aside>
 
       <main className="flex-1 relative w-full h-full min-w-0 flex flex-col">
+        {/* 모바일 상단 툴바 — 폴더 이동·현재 폴더·통계 (좌하단 FAB 대체, 상단 공백 활용) */}
+        <div className="lg:hidden flex items-center gap-2 px-3 pt-2 pb-1">
+          <button
+            onClick={() => setIsMobileOpen(true)}
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-surface-200 dark:border-surface-800 bg-white/90 dark:bg-surface-900/90 px-3 py-1.5 text-xs font-bold text-surface-700 dark:text-surface-200 shadow-sm backdrop-blur-xl transition active:scale-95"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h3.6a2 2 0 011.4.6L12 7h5a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+            </svg>
+            폴더
+          </button>
+          {activeFolderId && (
+            <button
+              onClick={() =>
+                setActiveFolderId(folders.find(f => f.id === activeFolderId)?.parent ?? null)
+              }
+              className="flex shrink-0 items-center gap-1 rounded-full border border-surface-200 dark:border-surface-800 bg-white/90 dark:bg-surface-900/90 px-2.5 py-1.5 text-xs font-bold text-surface-500 shadow-sm backdrop-blur-xl transition active:scale-95"
+              aria-label="상위 폴더로"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </button>
+          )}
+          <span className="min-w-0 flex-1 truncate text-sm font-bold text-surface-800 dark:text-surface-100">
+            {activeFolderId ? (folders.find(f => f.id === activeFolderId)?.name ?? '폴더') : '전체'}
+          </span>
+          <span className="shrink-0 font-mono text-[10px] tracking-wider text-surface-400">
+            {filteredGraph?.nodes.length ?? 0}·{filteredGraph?.links.length ?? 0}
+          </span>
+        </div>
+
         {activeFolderId && (
           <div className="absolute top-4 left-4 z-10 hidden lg:block">
             <button
@@ -145,35 +191,24 @@ export function VaultGraphLayout() {
           </div>
         )}
 
-        {(isGraphLoading || isFoldersLoading) ? (
-          <GraphPanelSkeleton />
-        ) : filteredGraph ? (
-          <div className={`w-full h-full flex flex-col overflow-hidden lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 lg:shadow-sm border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-surface-200/50 dark:border-surface-800/50'}`}>
-            <ClientVaultGraph
-              graphData={filteredGraph}
-              folderColorMap={colorMap}
-              onFolderClick={setActiveFolderId}
-              theme={theme}
-              highlightFolderId={hoverFolderId}
-            />
-          </div>
-        ) : (
-          <div className={`text-surface-500 w-full h-full flex flex-col items-center justify-center lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md border-surface-200/50 dark:border-surface-800/50'}`}>No Data</div>
-        )}
-      </main>
-
-      <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed bottom-6 left-6 z-50 p-4 rounded-full bg-surface-900 text-white shadow-xl hover:scale-105 active:scale-95 transition-all outline-none border border-white/10"
-      >
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-          {isMobileOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        <div className="relative min-h-0 flex-1">
+          {(isGraphLoading || isFoldersLoading) ? (
+            <GraphPanelSkeleton />
+          ) : filteredGraph ? (
+            <div className={`w-full h-full flex flex-col overflow-hidden lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 lg:shadow-sm border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-surface-200/50 dark:border-surface-800/50'}`}>
+              <ClientVaultGraph
+                graphData={filteredGraph}
+                folderColorMap={colorMap}
+                onFolderClick={setActiveFolderId}
+                theme={theme}
+                highlightFolderId={hoverFolderId}
+              />
+            </div>
           ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            <div className={`text-surface-500 w-full h-full flex flex-col items-center justify-center lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md border-surface-200/50 dark:border-surface-800/50'}`}>No Data</div>
           )}
-        </svg>
-      </button>
+        </div>
+      </main>
     </div>
   );
 }

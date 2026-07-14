@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useMedia } from 'react-use';
 import FloatingChatButton from './FloatingChatButton';
 import ChatModal from './ChatModal';
 
@@ -12,9 +11,6 @@ export default function FloatingChat() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isVaultPage = pathname.startsWith('/vault');
-  // 데스크톱(lg+)에서는 홈과 동일한 기본 위치. 모바일 Vault에서만 폴더 FAB·줌 컨트롤과
-  // 겹치지 않도록 위로 올린다.
-  const isDesktop = useMedia('(min-width: 1024px)', false);
 
   useEffect(() => {
     if (searchParams.get('chat') === 'open') {
@@ -51,15 +47,7 @@ export default function FloatingChat() {
 
   return (
     <>
-      <FloatingChatButton
-        onClick={handleOpen}
-        unreadCount={0}
-        bottomOffset={
-          isVaultPage && !isDesktop
-            ? 'calc(env(safe-area-inset-bottom, 0px) + 5.75rem)'
-            : undefined
-        }
-      />
+      <FloatingChatButton onClick={handleOpen} unreadCount={0} />
       <ChatModal isOpen={isOpen} isElevated={isVaultPage} onClose={handleClose} />
     </>
   );

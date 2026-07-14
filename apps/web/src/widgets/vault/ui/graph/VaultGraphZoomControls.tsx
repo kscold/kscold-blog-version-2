@@ -9,7 +9,7 @@ interface VaultGraphZoomControlsProps {
 // 줌 컨트롤 — 모바일에선 폴더 FAB와 겹치지 않게 위로, 데스크톱에선 챗 버튼 왼쪽에 나란히
 export function VaultGraphZoomControls({ onZoomIn, onZoomOut, onZoomToFit }: VaultGraphZoomControlsProps) {
   return (
-    <div className="absolute bottom-20 right-3 lg:bottom-4 lg:right-24 z-10 flex flex-col overflow-hidden rounded-2xl border border-surface-200/70 dark:border-surface-700/70 bg-white/80 dark:bg-surface-900/80 shadow-sm backdrop-blur-md">
+    <div className="absolute bottom-4 left-4 lg:bottom-4 lg:left-auto lg:right-24 z-10 flex flex-col overflow-hidden rounded-2xl border border-surface-200/70 dark:border-surface-700/70 bg-white/80 dark:bg-surface-900/80 shadow-sm backdrop-blur-md">
       <button
         type="button"
         onClick={onZoomIn}
