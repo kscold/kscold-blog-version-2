@@ -36,6 +36,8 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
     isFollowUp,
     isSuggestionsOpen,
     setIsSuggestionsOpen,
+    startNewChat,
+    canStartNewChat,
   } = useAgentChat(isOpen);
 
   const username = user?.displayName || user?.username || '';
@@ -95,6 +97,8 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
               title={mode === 'agent' ? 'KSCOLD Agent와 대화' : '블로그 주인과 대화'}
               subtitle={mode === 'agent' ? '공개 콘텐츠 RAG 모드' : undefined}
               onClose={onClose}
+              onNewChat={mode === 'agent' ? startNewChat : undefined}
+              canNewChat={canStartNewChat && !isAgentThinking}
             />
 
             <div className="grid shrink-0 grid-cols-2 gap-2 border-b border-surface-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3">

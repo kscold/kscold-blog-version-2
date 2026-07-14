@@ -8,8 +8,13 @@ import {
 import {
   AGENT_SESSION_STORAGE_KEY,
   getOrCreateAgentSessionId,
+  resetAgentSessionId,
 } from '@/features/chat/lib/agentSession';
-import { starterPrompts, type AgentMessage } from '@/features/chat/lib/agentConstants';
+import {
+  INITIAL_AGENT_MESSAGES,
+  starterPrompts,
+  type AgentMessage,
+} from '@/features/chat/lib/agentConstants';
 
 export function useAgentChat(isOpen: boolean) {
   const [agentInput, setAgentInput] = useState('');
@@ -17,20 +22,7 @@ export function useAgentChat(isOpen: boolean) {
   const [isAgentThinking, setIsAgentThinking] = useState(false);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(true);
   const [hasLoadedAgentHistory, setHasLoadedAgentHistory] = useState(false);
-  const [agentMessages, setAgentMessages] = useState<AgentMessage[]>([
-    {
-      id: 'initial-agent-greeting',
-      role: 'assistant',
-      content:
-        '안녕하세요. 승찬님이 공개해둔 블로그 글, 피드, Vault 노트, Info 프로필을 함께 찾아 답하는 KSCOLD Agent예요. 비로그인 상태에서는 공개된 콘텐츠만 근거로 사용합니다.',
-        stages: [
-        { name: '검색', detail: '블로그·피드·Vault·Info에서 질문과 가까운 근거를 찾습니다.' },
-        { name: '연결', detail: 'Vault 링크와 백링크로 필요한 경우 주변 맥락을 넓힙니다.' },
-        { name: '보강', detail: '최신 정보가 필요한 질문은 웹검색으로 내용을 보강합니다.' },
-        { name: '정리', detail: '답변과 함께 바로 열 수 있는 출처를 남깁니다.' },
-      ],
-    },
-  ]);
+  const [agentMessages, setAgentMessages] = useState<AgentMessage[]>(INITIAL_AGENT_MESSAGES);
 
   // 대화 전에는 온보딩용 기본 추천질문, 대화 후에는 직전 답변 기반 후속질문(연속성)을 노출한다.
   const lastAgentMessage = agentMessages[agentMessages.length - 1];
@@ -124,6 +116,18 @@ export function useAgentChat(isOpen: boolean) {
     }
   };
 
+  const startNewChat = () => {
+    if (isAgentThinking) return;
+    const newSessionId = resetAgentSessionId();
+    setAgentSessionId(newSessionId);
+    setAgentMessages(INITIAL_AGENT_MESSAGES);
+    setAgentInput('');
+    setIsSuggestionsOpen(true);
+    setHasLoadedAgentHistory(true);
+  };
+
+  const canStartNewChat = agentMessages.some(message => message.role === 'user');
+
   return {
     agentMessages,
     isAgentThinking,
@@ -134,5 +138,7 @@ export function useAgentChat(isOpen: boolean) {
     isFollowUp,
     isSuggestionsOpen,
     setIsSuggestionsOpen,
+    startNewChat,
+    canStartNewChat,
   };
 }

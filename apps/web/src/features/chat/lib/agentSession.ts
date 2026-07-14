@@ -7,6 +7,14 @@ export const createSessionId = () => {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 };
 
+export const resetAgentSessionId = () => {
+  const nextSessionId = createSessionId();
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, nextSessionId);
+  }
+  return nextSessionId;
+};
+
 export const getOrCreateAgentSessionId = () => {
   if (typeof window === 'undefined') {
     return createSessionId();

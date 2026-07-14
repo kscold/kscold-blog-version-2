@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import { sourceHref, type AgentMessage } from '@/features/chat/lib/agentConstants';
 
 export function AgentMessageList({
@@ -21,7 +22,13 @@ export function AgentMessageList({
               : 'mr-0 border border-surface-200 bg-white text-surface-700 sm:mr-4'
           }`}
         >
-          <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{message.content}</p>
+          {message.role === 'assistant' ? (
+            <MarkdownContent content={message.content} theme="light" size="sm" />
+          ) : (
+            <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+              {message.content}
+            </p>
+          )}
           {message.stages && message.role === 'assistant' && (
             <div className="mt-3 space-y-1.5">
               {message.stages.slice(0, 5).map(stage => (

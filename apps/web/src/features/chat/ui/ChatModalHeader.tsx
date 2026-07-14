@@ -5,6 +5,8 @@ interface Props {
   title?: string;
   subtitle?: string;
   onClose: () => void;
+  onNewChat?: () => void;
+  canNewChat?: boolean;
 }
 
 export function ChatModalHeader({
@@ -12,6 +14,8 @@ export function ChatModalHeader({
   title = '블로그 주인과 대화',
   subtitle,
   onClose,
+  onNewChat,
+  canNewChat = false,
 }: Props) {
   return (
     <div className="flex-shrink-0 border-b border-surface-200 bg-surface-50 p-3 sm:p-4">
@@ -32,15 +36,31 @@ export function ChatModalHeader({
             </div>
           </div>
         </div>
-        <button
-          onClick={onClose}
-          aria-label="채팅 닫기"
-          className="ml-2 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-surface-400 transition-colors hover:bg-surface-200 hover:text-surface-900"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <div className="ml-2 flex flex-shrink-0 items-center gap-1">
+          {onNewChat && (
+            <button
+              onClick={onNewChat}
+              disabled={!canNewChat}
+              aria-label="새 채팅 시작"
+              title="새 채팅"
+              className="flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-surface-500 transition-colors hover:bg-surface-200 hover:text-surface-900 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="hidden text-xs font-bold sm:inline">새 채팅</span>
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            aria-label="채팅 닫기"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-surface-400 transition-colors hover:bg-surface-200 hover:text-surface-900"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );
