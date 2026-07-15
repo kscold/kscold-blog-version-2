@@ -101,3 +101,9 @@ protobuf {
         }
     }
 }
+
+tasks.register('prepareIde') {
+    group = 'IDE'
+    description = 'IDE에서 gRPC 생성 소스와 Java 컴파일 정보를 최신화합니다.'
+    dependsOn tasks.named('compileJava')
+}

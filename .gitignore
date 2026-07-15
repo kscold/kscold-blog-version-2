@@ -35,7 +35,10 @@ apps/api/src/main/resources/application-production.yml
 apps/api/src/main/resources/application-secret*.yml
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
 .idea/
 *.swp
 *.swo
@@ -55,6 +58,7 @@ Thumbs.db
 .vercel
 
 # Spring Boot build output
+.gradle/
 apps/api/target/
 apps/api/.gradle/
 apps/api/build/

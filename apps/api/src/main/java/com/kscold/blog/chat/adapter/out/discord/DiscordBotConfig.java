@@ -54,10 +54,9 @@ public class DiscordBotConfig {
     /**
      * 메시지 리스너는 컨텍스트가 완성된 뒤에 등록한다.
      *
-     * <p>JDABuilder에 리스너를 직접 등록하면 JDA 로그인 직후(컨텍스트 초기화 중) 이벤트가
-     * 도착했을 때 {@code JDA → listener → DiscordBridgeService → JDA} 순환 프록시가 아직
-     * 생성 중인 빈을 요청해 {@code BeanCurrentlyInCreationException}이 발생한다.
-     * ApplicationReadyEvent 시점 등록으로 순환 자체를 제거한다.
+     * <p>JDABuilder에 리스너를 직접 등록하면 JDA 로그인 직후(컨텍스트 초기화 중) 이벤트가 도착했을 때 {@code JDA → listener →
+     * DiscordBridgeService → JDA} 순환 프록시가 아직 생성 중인 빈을 요청해 {@code BeanCurrentlyInCreationException}이
+     * 발생한다. ApplicationReadyEvent 시점 등록으로 순환 자체를 제거한다.
      */
     @Bean
     ApplicationListener<ApplicationReadyEvent> discordListenerRegistrar(

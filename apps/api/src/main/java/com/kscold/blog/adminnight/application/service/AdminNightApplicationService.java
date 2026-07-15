@@ -219,9 +219,11 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         vote.setInterestLevel(
                 adminNightProgramVoteNormalizer.requireInterestLevel(command.getInterestLevel()));
         vote.setPreferredFormat(
-                adminNightProgramVoteNormalizer.requirePreferredFormat(command.getPreferredFormat()));
+                adminNightProgramVoteNormalizer.requirePreferredFormat(
+                        command.getPreferredFormat()));
         vote.setExperienceLevel(
-                adminNightProgramVoteNormalizer.requireExperienceLevel(command.getExperienceLevel()));
+                adminNightProgramVoteNormalizer.requireExperienceLevel(
+                        command.getExperienceLevel()));
         vote.setSessionStyle(
                 adminNightProgramVoteNormalizer.requireSessionStyle(command.getSessionStyle()));
         vote.setSessionLength(

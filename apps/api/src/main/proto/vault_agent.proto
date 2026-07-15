@@ -8,12 +8,20 @@ option java_outer_classname = "VaultAgentProto";
 
 service VaultAgentService {
   rpc Chat(ChatRequest) returns (ChatResponse);
+  rpc ChatStream(ChatRequest) returns (stream ChatStreamEvent);
   rpc Reindex(ReindexRequest) returns (ReindexResponse);
 }
 
 message ChatRequest {
   string message = 1;
   string active_folder_name = 2;
+  ContentAccessScope content_access_scope = 3;
+}
+
+message ContentAccessScope {
+  bool full_content_access = 1;
+  repeated string allowed_post_ids = 2;
+  repeated string allowed_category_ids = 3;
 }
 
 message ChatResponse {
@@ -21,6 +29,20 @@ message ChatResponse {
   repeated AgentStage stages = 2;
   repeated SourceNote sources = 3;
   repeated string follow_ups = 4;
+}
+
+message ChatStreamEvent {
+  oneof event {
+    AgentStage stage = 1;
+    string delta = 2;
+    ChatCompleted completed = 3;
+  }
+}
+
+message ChatCompleted {
+  string answer = 1;
+  repeated SourceNote sources = 2;
+  repeated string follow_ups = 3;
 }
 
 message AgentStage {

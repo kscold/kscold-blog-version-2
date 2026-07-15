@@ -1,9 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  fetchVaultAgentContentScope,
   fetchVaultAgentHistory,
-  sendVaultAgentMessage,
+  streamVaultAgentMessage,
+  type VaultAgentChatResponse,
+  type VaultAgentContentScope,
+  type VaultAgentStage,
 } from '@/features/chat/api/vaultAgentApi';
 import {
   AGENT_SESSION_STORAGE_KEY,
@@ -11,10 +15,15 @@ import {
   resetAgentSessionId,
 } from '@/features/chat/lib/agentSession';
 import {
-  INITIAL_AGENT_MESSAGES,
+  createInitialAgentMessages,
   starterPrompts,
   type AgentMessage,
 } from '@/features/chat/lib/agentConstants';
+
+const INITIAL_STREAM_STAGE: VaultAgentStage = {
+  name: '질문 정리',
+  detail: '질문의 핵심과 필요한 기록 범위를 정리하고 있습니다.',
+};
 
 export function useAgentChat(isOpen: boolean) {
   const [agentInput, setAgentInput] = useState('');
@@ -22,9 +31,14 @@ export function useAgentChat(isOpen: boolean) {
   const [isAgentThinking, setIsAgentThinking] = useState(false);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(true);
   const [hasLoadedAgentHistory, setHasLoadedAgentHistory] = useState(false);
-  const [agentMessages, setAgentMessages] = useState<AgentMessage[]>(INITIAL_AGENT_MESSAGES);
+  const [agentContentScope, setAgentContentScope] = useState<VaultAgentContentScope>();
+  const [agentMessages, setAgentMessages] = useState<AgentMessage[]>(() =>
+    createInitialAgentMessages()
+  );
+  const streamAbortControllerRef = useRef<AbortController | undefined>(undefined);
+  const pendingDeltaRef = useRef<{ messageId: string; value: string } | undefined>(undefined);
+  const streamFrameRef = useRef<{ messageId: string; frameId: number } | undefined>(undefined);
 
-  // 대화 전에는 온보딩용 기본 추천질문, 대화 후에는 직전 답변 기반 후속질문(연속성)을 노출한다.
   const lastAgentMessage = agentMessages[agentMessages.length - 1];
   const dynamicFollowUps =
     lastAgentMessage?.role === 'assistant' && lastAgentMessage.followUps?.length
@@ -35,6 +49,31 @@ export function useAgentChat(isOpen: boolean) {
   const suggestions = isFollowUp ? dynamicFollowUps : hasUserAsked ? [] : starterPrompts;
 
   useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    let isCurrent = true;
+    void fetchVaultAgentContentScope()
+      .then(scope => {
+        if (!isCurrent) {
+          return;
+        }
+        setAgentContentScope(scope);
+        setAgentMessages(previous =>
+          previous.some(message => message.role === 'user')
+            ? previous
+            : createInitialAgentMessages(scope)
+        );
+      })
+      .catch(() => undefined);
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!isOpen || hasLoadedAgentHistory) {
       return;
     }
@@ -42,7 +81,7 @@ export function useAgentChat(isOpen: boolean) {
     const sessionId = getOrCreateAgentSessionId();
     setAgentSessionId(sessionId);
 
-    fetchVaultAgentHistory(sessionId)
+    void fetchVaultAgentHistory(sessionId)
       .then(history => {
         if (history.sessionId && history.sessionId !== sessionId) {
           window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, history.sessionId);
@@ -65,18 +104,92 @@ export function useAgentChat(isOpen: boolean) {
       .finally(() => setHasLoadedAgentHistory(true));
   }, [hasLoadedAgentHistory, isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      return;
+    }
+    streamAbortControllerRef.current?.abort();
+  }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      streamAbortControllerRef.current?.abort();
+      if (streamFrameRef.current) {
+        window.cancelAnimationFrame(streamFrameRef.current.frameId);
+      }
+    };
+  }, []);
+
+  const flushPendingDelta = (assistantMessageId: string) => {
+    if (streamFrameRef.current?.messageId === assistantMessageId) {
+      streamFrameRef.current = undefined;
+    }
+    const pendingDelta = pendingDeltaRef.current;
+    if (!pendingDelta || pendingDelta.messageId !== assistantMessageId) {
+      return;
+    }
+    const delta = pendingDelta.value;
+    pendingDeltaRef.current = undefined;
+    if (!delta) {
+      return;
+    }
+    setAgentMessages(previous =>
+      previous.map(message =>
+        message.id === assistantMessageId
+          ? { ...message, content: `${message.content}${delta}` }
+          : message
+      )
+    );
+  };
+
+  const queueDelta = (assistantMessageId: string, delta: string) => {
+    const pendingDelta = pendingDeltaRef.current;
+    pendingDeltaRef.current =
+      pendingDelta?.messageId === assistantMessageId
+        ? { ...pendingDelta, value: `${pendingDelta.value}${delta}` }
+        : { messageId: assistantMessageId, value: delta };
+    if (streamFrameRef.current?.messageId === assistantMessageId) {
+      return;
+    }
+    if (streamFrameRef.current) {
+      window.cancelAnimationFrame(streamFrameRef.current.frameId);
+    }
+    const frameId = window.requestAnimationFrame(() => flushPendingDelta(assistantMessageId));
+    streamFrameRef.current = { messageId: assistantMessageId, frameId };
+  };
+
   const submitAgentQuestion = async (rawQuestion: string) => {
     const question = rawQuestion.trim();
-    if (!question || isAgentThinking) return;
-    const sessionId = agentSessionId || getOrCreateAgentSessionId();
-    setAgentSessionId(sessionId);
+    if (!question || isAgentThinking) {
+      return;
+    }
 
-    setAgentMessages(prev => [
-      ...prev,
+    const sessionId = agentSessionId || getOrCreateAgentSessionId();
+    const assistantMessageId = `assistant-stream-${Date.now()}`;
+    const abortController = new AbortController();
+    let completedResponse: VaultAgentChatResponse | undefined;
+
+    streamAbortControllerRef.current?.abort();
+    if (streamFrameRef.current) {
+      window.cancelAnimationFrame(streamFrameRef.current.frameId);
+      streamFrameRef.current = undefined;
+    }
+    streamAbortControllerRef.current = abortController;
+    pendingDeltaRef.current = undefined;
+    setAgentSessionId(sessionId);
+    setAgentMessages(previous => [
+      ...previous,
       {
         id: `local-user-${Date.now()}`,
         role: 'user',
         content: question,
+      },
+      {
+        id: assistantMessageId,
+        role: 'assistant',
+        content: '',
+        stages: [INITIAL_STREAM_STAGE],
+        isStreaming: true,
       },
     ]);
     setAgentInput('');
@@ -84,43 +197,107 @@ export function useAgentChat(isOpen: boolean) {
     setIsAgentThinking(true);
 
     try {
-      const response = await sendVaultAgentMessage(question, 'KSCOLD 공개 콘텐츠', sessionId);
-      if (response.sessionId && response.sessionId !== sessionId) {
-        window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, response.sessionId);
-        setAgentSessionId(response.sessionId);
+      await streamVaultAgentMessage(
+        question,
+        undefined,
+        sessionId,
+        event => {
+          if (event.type === 'stage') {
+            setAgentMessages(previous =>
+              previous.map(message => {
+                if (message.id !== assistantMessageId) {
+                  return message;
+                }
+                const stages = message.stages || [];
+                const alreadyAdded = stages.some(
+                  stage =>
+                    stage.name === event.stage.name && stage.detail === event.stage.detail
+                );
+                return alreadyAdded ? message : { ...message, stages: [...stages, event.stage] };
+              })
+            );
+            return;
+          }
+
+          if (event.type === 'delta') {
+            queueDelta(assistantMessageId, event.delta);
+            return;
+          }
+
+          if (event.type === 'complete') {
+            completedResponse = event.response;
+            flushPendingDelta(assistantMessageId);
+            if (event.response.sessionId && event.response.sessionId !== sessionId) {
+              window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, event.response.sessionId);
+              setAgentSessionId(event.response.sessionId);
+            }
+            setAgentMessages(previous =>
+              previous.map(message =>
+                message.id === assistantMessageId
+                  ? {
+                      ...message,
+                      content: event.response.answer || message.content,
+                      stages: event.response.stages,
+                      sources: event.response.sources,
+                      followUps: event.response.followUps,
+                      isStreaming: false,
+                    }
+                  : message
+              )
+            );
+            return;
+          }
+
+          if (event.type === 'error') {
+            throw new Error(event.message);
+          }
+        },
+        abortController.signal
+      );
+
+      if (!completedResponse && !abortController.signal.aborted) {
+        throw new Error('Agent 응답이 끝까지 전달되지 않았습니다.');
       }
-      setAgentMessages(prev => [
-        ...prev,
-        {
-          id: `assistant-${Date.now()}`,
-          role: 'assistant',
-          content: response.answer,
-          stages: response.stages,
-          sources: response.sources,
-          followUps: response.followUps,
-        },
-      ]);
-    } catch {
-      setAgentMessages(prev => [
-        ...prev,
-        {
-          id: `assistant-error-${Date.now()}`,
-          role: 'assistant',
-          content:
-            '지금 Agent 서버 연결이 잠깐 불안정해요. 잠시 뒤 다시 물어봐 주세요. 공개 콘텐츠 검색 기능은 서버가 회복되면 바로 이어집니다.',
-          stages: [{ name: '연결 실패', detail: 'Agent gRPC 서버 응답을 받지 못했습니다.' }],
-        },
-      ]);
+    } catch (error) {
+      if (!abortController.signal.aborted) {
+        setAgentMessages(previous =>
+          previous.map(message =>
+            message.id === assistantMessageId
+              ? {
+                  ...message,
+                  content:
+                    '지금은 답변을 이어갈 수 없어요. 잠시 뒤 다시 물어봐 주세요.',
+                  stages: [
+                    {
+                      name: '연결 확인',
+                      detail:
+                        error instanceof Error
+                          ? error.message
+                          : 'Agent 서버 응답을 받지 못했습니다.',
+                    },
+                  ],
+                  isStreaming: false,
+                }
+              : message
+          )
+        );
+      }
     } finally {
-      setIsAgentThinking(false);
+      flushPendingDelta(assistantMessageId);
+      if (streamAbortControllerRef.current === abortController) {
+        streamAbortControllerRef.current = undefined;
+        setIsAgentThinking(false);
+      }
     }
   };
 
   const startNewChat = () => {
-    if (isAgentThinking) return;
+    if (isAgentThinking) {
+      return;
+    }
     const newSessionId = resetAgentSessionId();
     setAgentSessionId(newSessionId);
-    setAgentMessages(INITIAL_AGENT_MESSAGES);
+    setAgentMessages(createInitialAgentMessages(agentContentScope));
     setAgentInput('');
     setIsSuggestionsOpen(true);
     setHasLoadedAgentHistory(true);
@@ -130,6 +307,7 @@ export function useAgentChat(isOpen: boolean) {
 
   return {
     agentMessages,
+    agentContentScope,
     isAgentThinking,
     agentInput,
     setAgentInput,

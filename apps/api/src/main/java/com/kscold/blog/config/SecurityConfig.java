@@ -99,6 +99,9 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.POST, "/vault/agent/chat")
                                         .permitAll()
                                         .requestMatchers(
+                                                HttpMethod.POST, "/vault/agent/chat/stream")
+                                        .permitAll()
+                                        .requestMatchers(
                                                 "/auth/login",
                                                 "/auth/register",
                                                 "/auth/refresh",

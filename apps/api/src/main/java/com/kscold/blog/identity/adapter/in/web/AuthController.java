@@ -35,7 +35,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginCommand command) {
+    public ResponseEntity<ApiResponse<AuthResponse>> login(
+            @Valid @RequestBody LoginCommand command) {
         AuthResponse result = authUseCase.login(command);
         return ResponseEntity.ok(ApiResponse.success(result, "로그인에 성공했습니다"));
     }

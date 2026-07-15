@@ -28,6 +28,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
   const [mode, setMode] = useState<ChatMode>('agent');
   const {
     agentMessages,
+    agentContentScope,
     isAgentThinking,
     agentInput,
     setAgentInput,
@@ -95,7 +96,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
             <ChatModalHeader
               isConnected={mode === 'agent' || isConnected}
               title={mode === 'agent' ? 'KSCOLD Agent와 대화' : '블로그 주인과 대화'}
-              subtitle={mode === 'agent' ? '공개 콘텐츠 RAG 모드' : undefined}
+              subtitle={mode === 'agent' ? agentContentScope?.label || '기록을 찾아 답합니다' : undefined}
               onClose={onClose}
               onNewChat={mode === 'agent' ? startNewChat : undefined}
               canNewChat={canStartNewChat && !isAgentThinking}
@@ -129,7 +130,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
             {/* 본문 */}
             {mode === 'agent' ? (
               <>
-                <AgentMessageList messages={agentMessages} isThinking={isAgentThinking} />
+                <AgentMessageList messages={agentMessages} />
                 <div className="shrink-0 border-t border-surface-200 bg-white p-3 sm:p-4">
                   <AgentSuggestions
                     suggestions={suggestions}

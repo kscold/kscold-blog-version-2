@@ -2,18 +2,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import threading
-from typing import TypedDict
+from typing import Iterator, TypedDict
 
 from langgraph.graph import END, StateGraph
 
 from app.config import AgentConfig
-from app.tools.store import SearchHit, VaultStore
+from app.tools.store import ContentAccessScope, SearchHit, VaultStore
 from app.tools.web_search import WebSearchTool
 
 
 class AgentState(TypedDict):
     question: str
     active_folder_name: str
+    content_access_scope: ContentAccessScope
     hits: list[SearchHit]
     context: list[SearchHit]
     web_results: list[str]
@@ -70,42 +71,44 @@ class VaultRagGraph:
         try:
             total, indexed, skipped = self.reindex()
             print(
-                f"Vault Agent index sync total={total} indexed={indexed} skipped={skipped}",
+                f"Vault Agent 색인 동기화 완료: 전체={total}, 신규={indexed}, 유지={skipped}",
                 flush=True,
             )
         except Exception as exception:
-            print(f"Vault Agent index sync failed: {exception}", flush=True)
+            print(f"Vault Agent 색인 동기화 실패: {exception}", flush=True)
 
     def retrieve(self, state: AgentState) -> AgentState:
         scoped_question = " ".join(
             part
-            for part in [
-                state.get("active_folder_name", ""),
-                state["question"],
-            ]
+            for part in [state.get("active_folder_name", ""), state["question"]]
             if part
         )
         hits = self.store.search(
             scoped_question,
             self.config.max_context_notes,
             state.get("active_folder_name", ""),
+            state["content_access_scope"],
         )
         state["hits"] = hits
         state["stages"].append(
             {
-                "name": "Retrieve",
-                "detail": f"질문과 가까운 Vault 후보 노트 {len(hits)}개를 찾았습니다.",
+                "name": "기록 찾기",
+                "detail": f"질문과 가까운 기록 {len(hits)}개를 찾았습니다.",
             }
         )
         return state
 
     def expand(self, state: AgentState) -> AgentState:
-        context = self.store.expand_graph(state["hits"], self.config.max_context_notes + 3)
+        context = self.store.expand_graph(
+            state["hits"],
+            self.config.max_context_notes + 3,
+            state["content_access_scope"],
+        )
         state["context"] = context
         state["stages"].append(
             {
-                "name": "Graph Expand",
-                "detail": "outgoingLinks/backlinks 주변 노트를 확장 컨텍스트로 더했습니다.",
+                "name": "맥락 연결",
+                "detail": "링크와 백링크를 따라 필요한 주변 기록을 함께 확인했습니다.",
             }
         )
         return state
@@ -113,6 +116,12 @@ class VaultRagGraph:
     def search_web(self, state: AgentState) -> AgentState:
         if not self.config.web_search_enabled or not self._needs_web_search(state["question"]):
             state["web_results"] = []
+            state["stages"].append(
+                {
+                    "name": "최신 정보 확인",
+                    "detail": "이번 질문은 내부 기록을 우선 확인해 답할 수 있습니다.",
+                }
+            )
             return state
 
         try:
@@ -121,8 +130,8 @@ class VaultRagGraph:
             state["web_results"] = []
             state["stages"].append(
                 {
-                    "name": "Web Search",
-                    "detail": "웹검색 도구 호출에 실패해 Vault 노트만으로 답변합니다.",
+                    "name": "최신 정보 확인",
+                    "detail": "웹 확인은 건너뛰고 찾은 기록을 바탕으로 답합니다.",
                 }
             )
             return state
@@ -130,8 +139,8 @@ class VaultRagGraph:
         state["web_results"] = [result.snippet for result in results]
         state["stages"].append(
             {
-                "name": "Web Search",
-                "detail": f"최신 정보 보강용 웹검색 결과 {len(results)}개를 확인했습니다.",
+                "name": "최신 정보 확인",
+                "detail": f"최신성 확인을 위해 웹 자료 {len(results)}건을 함께 살폈습니다.",
             }
         )
         return state
@@ -152,45 +161,108 @@ class VaultRagGraph:
         )
 
     def answer(self, state: AgentState) -> AgentState:
-        answer = self.store.answer(
+        state["answer"] = self.store.answer(
             state["question"],
             state["active_folder_name"],
             state["context"],
             state.get("web_results", []),
+            state["content_access_scope"],
         )
-        state["answer"] = answer
+        return self._finish_answer(state)
+
+    def chat(
+        self,
+        question: str,
+        active_folder_name: str,
+        content_access_scope: ContentAccessScope | None = None,
+    ) -> AgentState:
+        return self.app.invoke(
+            self._initial_state(question, active_folder_name, content_access_scope)
+        )
+
+    def stream_chat(
+        self,
+        question: str,
+        active_folder_name: str,
+        content_access_scope: ContentAccessScope | None = None,
+    ) -> Iterator[tuple[str, dict[str, str] | str | AgentState]]:
+        state = self._initial_state(question, active_folder_name, content_access_scope)
+        yield "stage", state["stages"][-1]
+
+        self.retrieve(state)
+        yield "stage", state["stages"][-1]
+
+        self.expand(state)
+        yield "stage", state["stages"][-1]
+
+        self.search_web(state)
+        yield "stage", state["stages"][-1]
+
+        state["stages"].append(
+            {
+                "name": "답변 작성",
+                "detail": "찾은 기록을 바탕으로 답변을 정리하고 있습니다.",
+            }
+        )
+        yield "stage", state["stages"][-1]
+
+        chunks: list[str] = []
+        for delta in self.store.answer_stream(
+            state["question"],
+            state["active_folder_name"],
+            state["context"],
+            state.get("web_results", []),
+            state["content_access_scope"],
+        ):
+            chunks.append(delta)
+            yield "delta", delta
+
+        state["answer"] = "".join(chunks).strip()
+        self._finish_answer(state)
+        yield "completed", state
+
+    def _initial_state(
+        self,
+        question: str,
+        active_folder_name: str,
+        content_access_scope: ContentAccessScope | None,
+    ) -> AgentState:
+        return {
+            "question": question,
+            "active_folder_name": active_folder_name,
+            "content_access_scope": content_access_scope or ContentAccessScope(),
+            "hits": [],
+            "context": [],
+            "web_results": [],
+            "answer": "",
+            "follow_ups": [],
+            "stages": [
+                {
+                    "name": "질문 정리",
+                    "detail": "질문의 핵심과 필요한 기록 범위를 정리했습니다.",
+                }
+            ],
+        }
+
+    def _finish_answer(self, state: AgentState) -> AgentState:
         state["follow_ups"] = self.store.follow_ups(
             state["question"],
-            answer,
+            state["answer"],
             state["context"],
         )
         state["stages"].append(
             {
-                "name": "Respond",
-                "detail": f"{self.config.openai_chat_model}로 근거 노트를 반영해 답변했습니다.",
+                "name": "답변 완료",
+                "detail": "참고한 기록과 함께 답변을 정리했습니다.",
             }
         )
-        self.store.log_run(state["question"], answer, state["context"])
+        self.store.log_run(
+            state["question"],
+            state["answer"],
+            state["context"],
+            state["content_access_scope"],
+        )
         return state
-
-    def chat(self, question: str, active_folder_name: str) -> AgentState:
-        return self.app.invoke(
-            {
-                "question": question,
-                "active_folder_name": active_folder_name,
-                "hits": [],
-                "context": [],
-                "web_results": [],
-                "answer": "",
-                "follow_ups": [],
-                "stages": [
-                    {
-                        "name": "Plan",
-                        "detail": "질문을 임베딩하고 Vault RAG 그래프 실행 계획을 세웠습니다.",
-                    }
-                ],
-            }
-        )
 
     def reindex(self, force: bool = False) -> tuple[int, int, int]:
         return self.store.reindex(force=force)
