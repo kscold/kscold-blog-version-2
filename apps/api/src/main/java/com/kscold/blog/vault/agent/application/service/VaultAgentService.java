@@ -178,7 +178,8 @@ public class VaultAgentService implements VaultAgentUseCase {
                 source.slug(),
                 source.score(),
                 source.type(),
-                source.path());
+                source.path(),
+                source.excerpt());
     }
 
     private void saveUserMessage(

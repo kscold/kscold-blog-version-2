@@ -46,3 +46,21 @@ export const sourceHref = (source: VaultAgentSource) => {
   const path = source.path || `/vault/${encodeURIComponent(source.slug)}`;
   return `${path}${path.includes('?') ? '&' : '?'}chat=open`;
 };
+
+/** Agent가 남긴 근거 번호를 현재 대화를 유지하는 내부 링크로 바꾼다. */
+export function linkAgentSourceCitations(
+  content: string,
+  sources: VaultAgentSource[] | undefined
+) {
+  if (!sources?.length) {
+    return content;
+  }
+
+  return content.replace(/【S(\d+)】/g, (citation, sourceIndex: string) => {
+    const source = sources[Number(sourceIndex) - 1];
+    if (!source) {
+      return citation;
+    }
+    return `[출처 ${sourceIndex}](${sourceHref(source)})`;
+  });
+}

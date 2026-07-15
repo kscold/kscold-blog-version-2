@@ -47,7 +47,8 @@ public class VaultAgentGovernanceService {
                                                         toStringValue(source.get("slug")),
                                                         toDouble(source.get("score")),
                                                         toStringValue(source.get("type")),
-                                                        toStringValue(source.get("path"))))
+                                                        toStringValue(source.get("path")),
+                                                        toStringValue(source.get("excerpt"))))
                                 .toList();
         return new AgentRunResponse(
                 toStringValue(document.get("_id")),

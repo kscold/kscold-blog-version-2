@@ -15,4 +15,5 @@ public class SourceNote {
     private double score;
     private String type;
     private String path;
+    private String excerpt;
 }

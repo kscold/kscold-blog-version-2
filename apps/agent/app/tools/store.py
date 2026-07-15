@@ -733,8 +733,14 @@ class VaultStore:
         content_access_scope: ContentAccessScope,
     ) -> list[dict[str, str]]:
         context_text = "\n---\n".join(
-            f"type: {hit.note.content_type}\ntitle: {hit.note.title}\npath: {hit.note.path or f'/vault/{hit.note.slug}'}\ntags: {hit.note.tags}\nscore: {hit.score:.4f}\ncontent:\n{hit.note.content[:2400]}"
-            for hit in context
+            f"[S{index}]\n"
+            f"type: {hit.note.content_type}\n"
+            f"title: {hit.note.title}\n"
+            f"path: {hit.note.path or f'/vault/{hit.note.slug}'}\n"
+            f"tags: {hit.note.tags}\n"
+            f"score: {hit.score:.4f}\n"
+            f"content:\n{hit.note.content[:2400]}"
+            for index, hit in enumerate(context, start=1)
         )
         web_context = "\n---\n".join(web_results or [])
         access_description = {
@@ -753,9 +759,12 @@ class VaultStore:
                     "승찬님을 설명할 때는 친근하고 존중하는 어조를 쓰되 과장된 아부나 역할극은 피한다. "
                     "김승찬, kscold, KSCOLD, 블로그 주인 관련 질문은 제공된 프로필 기록을 우선 참고한다. "
                     "비교 질문은 각 대상을 구분해 설명하고, 근거가 충분하면 읽기 쉬운 표를 사용한다. "
+                    "검색된 기록을 근거로 한 문장 뒤에는 해당 기록 번호를 `【S1】` 형식으로 붙인다. "
+                    "여러 기록을 함께 근거로 쓰면 `【S1】【S2】`처럼 각각 붙인다. "
+                    "기록 번호는 제공된 검색 결과의 [S번호]만 사용하고, 근거가 없는 번호를 만들지 않는다. "
                     "검색 결과에 없는 핵심 설명은 모델의 일반 지식으로 보강할 수 있지만, 해당 문단 첫머리에 '일반 지식 보강:'을 명시한다. "
                     "웹 검색 결과는 최신성 확인이 필요할 때만 보조 근거로 사용한다. "
-                    "한국어로 자연스럽고 간결하게 답하며, 마지막에는 실제로 참고한 기록을 짧은 목록으로 정리한다."
+                    "한국어로 자연스럽고 간결하게 답한다."
                 ),
             },
             {
@@ -840,11 +849,43 @@ class VaultStore:
                         "score": hit.score,
                         "type": hit.note.content_type,
                         "path": hit.note.path or f"/vault/{hit.note.slug}",
+                        "excerpt": self.source_excerpt(hit, question),
                     }
                     for hit in sources
                 ],
             }
         )
+
+    def source_excerpt(self, hit: SearchHit, question: str, limit: int = 220) -> str:
+        """질문과 가장 가까운 기록 구간을 출처 카드에 표시할 짧은 문장으로 만든다."""
+        content = re.sub(r"\s+", " ", hit.note.content).strip()
+        if not content:
+            return ""
+
+        focus_terms = self._content_focus_terms(self._query_terms(question))
+        positions = [
+            content.lower().find(term)
+            for term in focus_terms
+            if content.lower().find(term) >= 0
+        ]
+        if not positions:
+            return self._truncate_excerpt(content, 0, limit)
+
+        position = min(positions)
+        start = max(0, position - max(48, limit // 3))
+        if start:
+            next_boundary = content.find(" ", start)
+            start = next_boundary + 1 if next_boundary >= 0 else start
+        return self._truncate_excerpt(content, start, limit)
+
+    def _truncate_excerpt(self, content: str, start: int, limit: int) -> str:
+        end = min(len(content), start + limit)
+        excerpt = content[start:end].strip()
+        if start > 0:
+            excerpt = f"…{excerpt}"
+        if end < len(content):
+            excerpt = f"{excerpt}…"
+        return excerpt
 
     def _embedding_text(self, note: VaultNote) -> str:
         folder_names = self._folder_names(note.folder_id)

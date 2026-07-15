@@ -2,7 +2,11 @@
 
 import Link from 'next/link';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
-import { sourceHref, type AgentMessage } from '@/features/chat/lib/agentConstants';
+import {
+  linkAgentSourceCitations,
+  sourceHref,
+  type AgentMessage,
+} from '@/features/chat/lib/agentConstants';
 
 export function AgentMessageList({
   messages,
@@ -14,6 +18,7 @@ export function AgentMessageList({
       {messages.map(message => {
         const currentStage = message.stages?.at(-1);
         const visibleStages = message.isStreaming ? [] : message.stages?.slice(0, 5) || [];
+        const linkedContent = linkAgentSourceCitations(message.content, message.sources);
 
         return (
           <div
@@ -46,7 +51,7 @@ export function AgentMessageList({
                   </div>
                 )}
                 {message.content ? (
-                  <MarkdownContent content={message.content} theme="light" size="sm" />
+                  <MarkdownContent content={linkedContent} theme="light" size="sm" />
                 ) : (
                   <div className="flex h-8 items-center gap-1.5 px-1" aria-label="답변을 준비하고 있습니다">
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-surface-300 [animation-delay:-0.2s]" />
@@ -84,15 +89,24 @@ export function AgentMessageList({
                     <Link
                       key={`${source.type}-${source.id}`}
                       href={sourceHref(source)}
-                      className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-surface-200 bg-surface-50 px-3 py-2 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:bg-white hover:text-surface-900"
+                      className="group block min-w-0 rounded-xl border border-surface-200 bg-surface-50 px-3 py-2.5 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:bg-white hover:text-surface-900"
                     >
-                      <span className="min-w-0 truncate [overflow-wrap:anywhere]">
-                        <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.14em] text-surface-400">
-                          {source.type || 'vault'}
+                      <span className="flex min-w-0 items-center justify-between gap-2">
+                        <span className="min-w-0 truncate [overflow-wrap:anywhere]">
+                          <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.14em] text-surface-400">
+                            {source.type || 'vault'}
+                          </span>
+                          {source.title || source.slug}
                         </span>
-                        {source.title || source.slug}
+                        <span className="shrink-0 text-surface-400 transition group-hover:text-surface-700">
+                          열기
+                        </span>
                       </span>
-                      <span className="shrink-0 text-surface-400">열기</span>
+                      {source.excerpt && (
+                        <span className="mt-1.5 block line-clamp-2 break-words text-[11px] font-normal leading-5 text-surface-500 [overflow-wrap:anywhere]">
+                          {source.excerpt}
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>

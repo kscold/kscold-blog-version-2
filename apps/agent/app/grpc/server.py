@@ -32,6 +32,7 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
                     score=hit.score,
                     type=hit.note.content_type,
                     path=hit.note.path or f"/vault/{hit.note.slug}",
+                    excerpt=self.graph.store.source_excerpt(hit, request.message),
                 )
                 for hit in result["context"]
             ],
@@ -69,6 +70,9 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
                                 score=hit.score,
                                 type=hit.note.content_type,
                                 path=hit.note.path or f"/vault/{hit.note.slug}",
+                                excerpt=self.graph.store.source_excerpt(
+                                    hit, payload["question"]
+                                ),
                             )
                             for hit in payload["context"]
                         ],

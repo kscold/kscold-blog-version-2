@@ -121,7 +121,19 @@ export function createMarkdownComponents(isDark: boolean): Components {
     a: ({ href, children }) => {
       const isInternal = href && (href.startsWith('/') || href.startsWith('#'));
       if (isInternal) {
-        return <Link href={href}>{children}</Link>;
+        const isAgentSourceLink = href.includes('chat=open');
+        return (
+          <Link
+            href={href}
+            className={
+              isAgentSourceLink
+                ? 'mx-0.5 inline-flex items-center rounded-md border border-cyan-200 bg-cyan-50 px-1.5 py-0.5 text-[0.72em] font-black no-underline transition hover:border-cyan-500 hover:bg-cyan-100'
+                : undefined
+            }
+          >
+            {children}
+          </Link>
+        );
       }
       return (
         <a href={href} target="_blank" rel="noopener noreferrer">

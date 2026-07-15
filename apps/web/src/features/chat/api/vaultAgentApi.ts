@@ -16,6 +16,7 @@ export interface VaultAgentSource {
   score: number;
   type?: string;
   path?: string;
+  excerpt?: string;
 }
 
 export interface VaultAgentChatResponse {

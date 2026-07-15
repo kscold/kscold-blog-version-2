@@ -145,7 +145,8 @@ public class GrpcVaultAgentClient implements VaultAgentClientPort {
                 source.getSlug(),
                 source.getScore(),
                 source.getType(),
-                source.getPath());
+                source.getPath(),
+                source.getExcerpt());
     }
 
     private AgentClientUnavailableException unavailable(StatusRuntimeException exception) {

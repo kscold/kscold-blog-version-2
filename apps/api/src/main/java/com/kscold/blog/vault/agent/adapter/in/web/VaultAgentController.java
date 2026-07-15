@@ -149,7 +149,8 @@ public class VaultAgentController {
                                                             source.slug(),
                                                             source.score(),
                                                             source.type(),
-                                                            source.path()))
+                                                            source.path(),
+                                                            source.excerpt()))
                                     .toList(),
                             result.followUps()));
         }

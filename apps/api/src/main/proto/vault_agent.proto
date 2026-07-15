@@ -57,6 +57,7 @@ message SourceNote {
   double score = 4;
   string type = 5;
   string path = 6;
+  string excerpt = 7;
 }
 
 message ReindexRequest {

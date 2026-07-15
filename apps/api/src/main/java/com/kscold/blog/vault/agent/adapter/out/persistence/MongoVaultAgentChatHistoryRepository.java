@@ -52,7 +52,10 @@ public class MongoVaultAgentChatHistoryRepository implements VaultAgentChatHisto
                                                                 .append("slug", source.slug())
                                                                 .append("score", source.score())
                                                                 .append("type", source.type())
-                                                                .append("path", source.path()))
+                                                                .append("path", source.path())
+                                                                .append(
+                                                                        "excerpt",
+                                                                        source.excerpt()))
                                         .toList())
                         .append("createdAt", Date.from(message.createdAt())),
                 COLLECTION);
@@ -91,7 +94,8 @@ public class MongoVaultAgentChatHistoryRepository implements VaultAgentChatHisto
                                                         stringValue(source.get("slug")),
                                                         doubleValue(source.get("score")),
                                                         stringValue(source.get("type")),
-                                                        stringValue(source.get("path"))))
+                                                        stringValue(source.get("path")),
+                                                        stringValue(source.get("excerpt"))))
                                 .toList();
         return new AgentChatMessage(
                 stringValue(document.get("_id")),
