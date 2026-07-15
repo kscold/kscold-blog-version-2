@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
+import { FeedCopilotPanel } from '@/features/feed-copilot';
 import type { User } from '@/shared/model/types/user';
 import { useFeedComposer } from '@/features/feed/lib/useFeedComposer';
 import { FeedComposerActions } from './FeedComposerActions';
@@ -37,6 +39,40 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
     handlePaste,
     handleDrop,
   } = useFeedComposer(currentUser);
+  const restoredCopilotDraft = useRef(false);
+
+  useEffect(() => {
+    if (!currentUser || restoredCopilotDraft.current || typeof window === 'undefined') {
+      return;
+    }
+    restoredCopilotDraft.current = true;
+    const storedDraft = window.sessionStorage.getItem('kscold-feed-copilot-draft');
+    if (!storedDraft) {
+      return;
+    }
+
+    try {
+      const draft = JSON.parse(storedDraft) as {
+        title?: string;
+        content?: string;
+        tags?: string[];
+        sourceUrl?: string;
+      };
+      const tags = Array.isArray(draft.tags) ? draft.tags.map(tag => `#${tag}`).join(' ') : '';
+      const nextContent = [draft.title, draft.content, tags].filter(Boolean).join('\n\n');
+      if (nextContent) {
+        setContent(nextContent);
+      }
+      if (draft.sourceUrl) {
+        setLinkUrl(draft.sourceUrl);
+      }
+      setIsExpanded(true);
+    } catch {
+      // 브라우저에 남은 오래된 임시 초안은 무시하고 작성 화면을 유지합니다.
+    } finally {
+      window.sessionStorage.removeItem('kscold-feed-copilot-draft');
+    }
+  }, [currentUser, setContent, setIsExpanded, setLinkUrl]);
 
   if (!currentUser) {
     return (
@@ -91,6 +127,17 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
           onExpand={() => setIsExpanded(true)}
           onPaste={handlePaste}
           onDrop={handleDrop}
+        />
+        <FeedCopilotPanel
+          memo={content}
+          sourceUrl={linkUrl}
+          onSourceUrlChange={setLinkUrl}
+          onExpandComposer={() => setIsExpanded(true)}
+          onApplyDraft={draft => {
+            const tags = draft.tags.map(tag => `#${tag}`).join(' ');
+            setContent([draft.title, draft.content, tags].filter(Boolean).join('\n\n'));
+            setIsExpanded(true);
+          }}
         />
         <FeedComposerExpandedPanels
           shouldShowExpanded={shouldShowExpanded}

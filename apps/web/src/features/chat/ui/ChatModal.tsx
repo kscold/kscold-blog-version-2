@@ -3,8 +3,10 @@
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/entities/user';
+import { FeedCopilotPanel, type FeedCopilotDraft } from '@/features/feed-copilot';
 import { useChatSocket } from '@/features/chat/lib/useChatSocket';
 import { useAgentChat } from '@/features/chat/model/useAgentChat';
 import ChatMessageList from '@/features/chat/ui/ChatMessageList';
@@ -20,12 +22,15 @@ interface ChatModalProps {
   onClose: () => void;
 }
 
-type ChatMode = 'agent' | 'owner';
+type ChatMode = 'agent' | 'feed' | 'owner';
 
 export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatModalProps) {
   const { user } = useAuthStore();
+  const router = useRouter();
   const [inputMessage, setInputMessage] = useState('');
   const [mode, setMode] = useState<ChatMode>('agent');
+  const [feedMemo, setFeedMemo] = useState('');
+  const [feedSourceUrl, setFeedSourceUrl] = useState('');
   const {
     agentMessages,
     agentContentScope,
@@ -67,6 +72,33 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
     void submitAgentQuestion(agentInput);
   };
 
+  const handleApplyFeedDraft = (draft: FeedCopilotDraft) => {
+    window.sessionStorage.setItem(
+      'kscold-feed-copilot-draft',
+      JSON.stringify({
+        title: draft.title,
+        content: draft.content,
+        tags: draft.tags,
+        sourceUrl: feedSourceUrl,
+      })
+    );
+    onClose();
+    router.push('/feed');
+  };
+
+  const title =
+    mode === 'agent'
+      ? 'KSCOLD Agent와 대화'
+      : mode === 'feed'
+        ? '피드 초안 같이 만들기'
+        : '블로그 주인과 대화';
+  const subtitle =
+    mode === 'agent'
+      ? agentContentScope?.label || '기록을 찾아 답합니다'
+      : mode === 'feed'
+        ? '계획을 확인한 뒤 초안으로 가져갑니다'
+        : undefined;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -94,15 +126,15 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
             onClick={e => e.stopPropagation()}
           >
             <ChatModalHeader
-              isConnected={mode === 'agent' || isConnected}
-              title={mode === 'agent' ? 'KSCOLD Agent와 대화' : '블로그 주인과 대화'}
-              subtitle={mode === 'agent' ? agentContentScope?.label || '기록을 찾아 답합니다' : undefined}
+              isConnected={mode !== 'owner' || isConnected}
+              title={title}
+              subtitle={subtitle}
               onClose={onClose}
               onNewChat={mode === 'agent' ? startNewChat : undefined}
               canNewChat={canStartNewChat && !isAgentThinking}
             />
 
-            <div className="grid shrink-0 grid-cols-2 gap-2 border-b border-surface-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3">
+            <div className="grid shrink-0 grid-cols-3 gap-2 border-b border-surface-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3">
               <button
                 type="button"
                 onClick={() => setMode('agent')}
@@ -113,6 +145,17 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
                 }`}
               >
                 Agent에게 묻기
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('feed')}
+                className={`min-w-0 rounded-xl px-2 py-2 text-[11px] font-black transition sm:px-3 sm:text-xs ${
+                  mode === 'feed'
+                    ? 'bg-surface-900 text-white'
+                    : 'bg-surface-50 text-surface-500 hover:bg-surface-100 hover:text-surface-900'
+                }`}
+              >
+                피드 초안
               </button>
               <button
                 type="button"
@@ -148,6 +191,45 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
                   />
                 </div>
               </>
+            ) : mode === 'feed' && !user ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-surface-50 p-6">
+                <div className="text-center">
+                  <p className="text-sm font-bold text-surface-900">
+                    피드 초안 기능은 로그인 후 사용할 수 있어요
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-surface-400">
+                    내 기록을 참고한 초안은 작성자 확인 후에만 피드에 적용됩니다.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setMode('agent')}
+                    className="rounded-xl border border-surface-200 bg-white px-4 py-2.5 text-sm font-semibold text-surface-700 transition hover:border-surface-900 hover:text-surface-900"
+                  >
+                    Agent로 묻기
+                  </button>
+                  <Link
+                    href="/login"
+                    onClick={onClose}
+                    className="rounded-xl bg-surface-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-surface-800"
+                  >
+                    로그인
+                  </Link>
+                </div>
+              </div>
+            ) : mode === 'feed' ? (
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-surface-50 p-3 custom-scrollbar sm:p-4">
+                <FeedCopilotPanel
+                  variant="chat"
+                  defaultOpen
+                  memo={feedMemo}
+                  onMemoChange={setFeedMemo}
+                  sourceUrl={feedSourceUrl}
+                  onSourceUrlChange={setFeedSourceUrl}
+                  onApplyDraft={handleApplyFeedDraft}
+                />
+              </div>
             ) : !user ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-surface-50 p-6">
                 <div className="text-center">

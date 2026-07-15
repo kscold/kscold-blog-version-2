@@ -10,9 +10,9 @@ const highlights = [
     description: '붙여넣기나 드래그만으로 작업 화면을 바로 올릴 수 있습니다.',
   },
   {
-    label: 'LINK',
-    title: '링크 함께 정리',
-    description: '공유할 자료가 있으면 미리보기 카드까지 함께 붙일 수 있습니다.',
+    label: 'COPILOT',
+    title: '계획부터 함께 정리',
+    description: '메모와 링크를 바탕으로 내 기록을 참고한 초안을 제안합니다.',
   },
 ];
 
