@@ -65,12 +65,13 @@ class FeedCopilotGraph:
         )
 
     def _build_graph(self, action: str):
+        node_name = f"generate_{action}"
         graph = StateGraph(FeedCopilotState)
         graph.add_node("retrieve", self.nodes.retrieve)
-        graph.add_node(action, getattr(self.nodes, action))
+        graph.add_node(node_name, getattr(self.nodes, action))
         graph.set_entry_point("retrieve")
-        graph.add_edge("retrieve", action)
-        graph.add_edge(action, END)
+        graph.add_edge("retrieve", node_name)
+        graph.add_edge(node_name, END)
         return graph.compile()
 
     @staticmethod
