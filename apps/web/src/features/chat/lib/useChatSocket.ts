@@ -1,8 +1,15 @@
-import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import type { RawChatPayload } from '@/entities/chat';
 import { toVisitorMessage } from '@/entities/chat';
 import { fetchMyChatMessages, sendVisitorMessage, type VisitorChatMessage } from '@/entities/chat';
-import { getAccessToken } from '@/shared/lib/authTokenStorage';
+import apiClient from '@/shared/api/api-client';
 import { resolveChatWsUrl } from '@/shared/lib/runtime-url';
 
 interface UseChatSocketOptions {
@@ -15,10 +22,14 @@ export function useChatSocket({ isOpen, username: _username }: UseChatSocketOpti
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shouldReconnectRef = useRef(false);
 
-  const connect = useCallback(() => {
-    const token = getAccessToken();
-    if (!token) return;
+  const connect = useCallback(async () => {
+    if (!shouldReconnectRef.current || wsRef.current) return;
+
+    const token = await apiClient.getValidToken();
+    if (!token || !shouldReconnectRef.current || wsRef.current) return;
+
     const ws = new WebSocket(`${resolveChatWsUrl()}?token=${encodeURIComponent(token)}`);
     wsRef.current = ws;
     ws.onopen = () => setIsConnected(true);
@@ -26,7 +37,9 @@ export function useChatSocket({ isOpen, username: _username }: UseChatSocketOpti
     ws.onclose = () => {
       setIsConnected(false);
       wsRef.current = null;
-      reconnectRef.current = setTimeout(() => !wsRef.current && connect(), 3000);
+      if (shouldReconnectRef.current) {
+        reconnectRef.current = setTimeout(() => void connect(), 3000);
+      }
     };
     ws.onerror = () => ws.close();
   }, []);
@@ -34,6 +47,7 @@ export function useChatSocket({ isOpen, username: _username }: UseChatSocketOpti
   useEffect(() => {
     if (!isOpen) return;
     let isActive = true;
+    shouldReconnectRef.current = true;
 
     const initializeChat = async () => {
       try {
@@ -48,7 +62,7 @@ export function useChatSocket({ isOpen, username: _username }: UseChatSocketOpti
       }
 
       if (isActive) {
-        connect();
+        void connect();
       }
     };
 
@@ -56,6 +70,7 @@ export function useChatSocket({ isOpen, username: _username }: UseChatSocketOpti
 
     return () => {
       isActive = false;
+      shouldReconnectRef.current = false;
       if (reconnectRef.current) clearTimeout(reconnectRef.current);
       if (wsRef.current) {
         wsRef.current.onclose = null;
@@ -85,7 +100,9 @@ function handleSocketMessage(
   setMessages: Dispatch<SetStateAction<VisitorChatMessage[]>>
 ) {
   try {
-    const data = JSON.parse(event.data as string) as RawChatPayload & { messages?: RawChatPayload[] };
+    const data = JSON.parse(event.data as string) as RawChatPayload & {
+      messages?: RawChatPayload[];
+    };
     if (data.type === 'history') {
       setMessages((data.messages || []).map(toVisitorMessage));
       return;

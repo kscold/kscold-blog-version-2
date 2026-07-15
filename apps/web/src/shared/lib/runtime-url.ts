@@ -10,11 +10,23 @@ export function resolveApiBaseUrl() {
 
 export function resolveChatWsUrl() {
   if (typeof window === 'undefined') {
-    return process.env.NEXT_PUBLIC_WS_URL || LOCAL_WS_URL;
+    return normalizeChatWsUrl(process.env.NEXT_PUBLIC_WS_URL || LOCAL_WS_URL);
   }
   if (process.env.NEXT_PUBLIC_WS_URL) {
-    return process.env.NEXT_PUBLIC_WS_URL;
+    return normalizeChatWsUrl(process.env.NEXT_PUBLIC_WS_URL);
   }
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${protocol}//${window.location.host}/api/ws/chat`;
+}
+
+function normalizeChatWsUrl(rawUrl: string) {
+  try {
+    const url = new URL(rawUrl);
+    if (url.pathname === '/ws/chat') {
+      url.pathname = '/api/ws/chat';
+    }
+    return url.toString();
+  } catch {
+    return rawUrl;
+  }
 }

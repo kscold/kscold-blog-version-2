@@ -54,11 +54,15 @@ export function sendVaultAgentMessage(
   activeFolderName?: string,
   sessionId?: string
 ) {
-  return apiClient.post<VaultAgentChatResponse>('/vault/agent/chat', {
-    message,
-    activeFolderName,
-    sessionId,
-  });
+  return apiClient.post<VaultAgentChatResponse>(
+    '/vault/agent/chat',
+    {
+      message,
+      activeFolderName,
+      sessionId,
+    },
+    { timeout: 65_000 }
+  );
 }
 
 export function fetchVaultAgentHistory(sessionId: string) {

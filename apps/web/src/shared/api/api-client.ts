@@ -1,4 +1,9 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosError,
+  InternalAxiosRequestConfig,
+  AxiosRequestConfig,
+} from 'axios';
 import { resolveApiBaseUrl } from '@/shared/lib/runtime-url';
 import {
   extractRequestPath,
@@ -49,7 +54,12 @@ class ApiClient {
         const status = error.response?.status;
         const requestPath = extractRequestPath(originalRequest?.url);
 
-        if (originalRequest && status === 401 && !originalRequest._retry && shouldAttemptRefresh(requestPath)) {
+        if (
+          originalRequest &&
+          status === 401 &&
+          !originalRequest._retry &&
+          shouldAttemptRefresh(requestPath)
+        ) {
           originalRequest._retry = true;
 
           const newToken = await this.session.refreshAccessToken();
@@ -124,6 +134,12 @@ class ApiClient {
 
   public getToken(): string | null {
     return this.session.getAccessToken();
+  }
+
+  public async getValidToken(): Promise<string | null> {
+    const accessToken = await this.session.getValidAccessToken();
+    this.session.applyAccessToken(this.client);
+    return accessToken;
   }
 
   public hasRefreshToken(): boolean {

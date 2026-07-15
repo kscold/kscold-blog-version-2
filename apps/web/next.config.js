@@ -21,12 +21,6 @@ const nextConfig = {
     optimizePackageImports: ['framer-motion', '@tanstack/react-query'],
   },
 
-  // 환경 변수
-  env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081/api',
-    NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8081/ws/chat',
-  },
-
   // 깨진 hex slug → 정상 영문 slug 301 리다이렉트 (기존 색인·외부 링크 보존)
   async redirects() {
     return [

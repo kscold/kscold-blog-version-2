@@ -41,6 +41,19 @@ export class ApiClientSession {
     return getAccessToken();
   }
 
+  async getValidAccessToken() {
+    const currentAccessToken = getAccessToken();
+    if (currentAccessToken && !isTokenExpiring(currentAccessToken)) {
+      return currentAccessToken;
+    }
+
+    if (!hasRefreshToken()) {
+      return null;
+    }
+
+    return this.refreshAccessToken();
+  }
+
   hasRefreshToken() {
     return hasRefreshToken();
   }
@@ -59,12 +72,29 @@ export class ApiClientSession {
       return null;
     }
 
-    this.refreshPromise = performTokenRefresh(this.apiUrl, currentRefreshToken)
-      .finally(() => {
-        this.refreshPromise = null;
-      });
+    this.refreshPromise = performTokenRefresh(this.apiUrl, currentRefreshToken).finally(() => {
+      this.refreshPromise = null;
+    });
 
     return this.refreshPromise;
   }
 }
 
+function isTokenExpiring(token: string) {
+  try {
+    const encodedPayload = token.split('.')[1];
+    if (!encodedPayload || typeof window === 'undefined') {
+      return false;
+    }
+
+    const normalizedPayload = encodedPayload.replace(/-/g, '+').replace(/_/g, '/');
+    const paddedPayload = normalizedPayload.padEnd(
+      normalizedPayload.length + ((4 - (normalizedPayload.length % 4)) % 4),
+      '='
+    );
+    const payload = JSON.parse(window.atob(paddedPayload)) as { exp?: number };
+    return typeof payload.exp === 'number' && payload.exp * 1000 <= Date.now() + 30_000;
+  } catch {
+    return false;
+  }
+}
