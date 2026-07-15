@@ -1,0 +1,22 @@
+package com.kscold.blog.social.application.dto.command;
+
+import jakarta.validation.constraints.Size;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+@AllArgsConstructor
+public class FeedCopilotPlanCommand {
+
+    @Size(max = 4000, message = "메모는 4,000자 이내로 입력해주세요")
+    private String memo;
+
+    @Size(max = 2048, message = "URL은 2,048자 이내로 입력해주세요")
+    private String sourceUrl;
+
+    @Size(max = 5, message = "문체는 최대 5개까지 선택할 수 있습니다")
+    private List<@Size(max = 24, message = "문체 값이 너무 깁니다") String> styles;
+}
