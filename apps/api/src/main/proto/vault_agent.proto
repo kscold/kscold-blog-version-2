@@ -9,6 +9,8 @@ option java_outer_classname = "VaultAgentProto";
 service VaultAgentService {
   rpc Chat(ChatRequest) returns (ChatResponse);
   rpc ChatStream(ChatRequest) returns (stream ChatStreamEvent);
+  rpc CreateFeedPlan(FeedCopilotPlanRequest) returns (FeedCopilotPlanResponse);
+  rpc CreateFeedDraft(FeedCopilotDraftRequest) returns (FeedCopilotDraftResponse);
   rpc Reindex(ReindexRequest) returns (ReindexResponse);
 }
 
@@ -68,4 +70,44 @@ message ReindexResponse {
   int32 total_notes = 1;
   int32 indexed_notes = 2;
   int32 skipped_notes = 3;
+}
+
+message ExternalSource {
+  string url = 1;
+  string title = 2;
+  string description = 3;
+  string site_name = 4;
+  string content = 5;
+}
+
+message FeedCopilotPlanRequest {
+  string memo = 1;
+  ExternalSource external_source = 2;
+  repeated string styles = 3;
+  ContentAccessScope content_access_scope = 4;
+}
+
+message FeedCopilotPlanResponse {
+  string title = 1;
+  string angle = 2;
+  repeated string key_points = 3;
+  string source_summary = 4;
+  repeated SourceNote sources = 5;
+}
+
+message FeedCopilotDraftRequest {
+  string memo = 1;
+  ExternalSource external_source = 2;
+  repeated string styles = 3;
+  string plan_title = 4;
+  string plan_angle = 5;
+  repeated string plan_key_points = 6;
+  ContentAccessScope content_access_scope = 7;
+}
+
+message FeedCopilotDraftResponse {
+  string title = 1;
+  string content = 2;
+  repeated string tags = 3;
+  repeated SourceNote sources = 4;
 }

@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 
-from app.config import load_config
-from app.grpc.server import serve
+from agent.config import load_config
+from agent.server.grpc_server import serve
 
 
 def main() -> None:
