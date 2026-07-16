@@ -11,10 +11,12 @@ interface LinkifiedTextProps {
   className?: string;
   /** inline 자식 요소 (예: 작성자 이름) */
   prefix?: React.ReactNode;
+  /** displayName → username. @displayName 을 멘션 링크로 렌더링한다. */
+  mentions?: Record<string, string>;
 }
 
-export function LinkifiedText({ text, className, prefix }: LinkifiedTextProps) {
-  const segments = linkify(text);
+export function LinkifiedText({ text, className, prefix, mentions }: LinkifiedTextProps) {
+  const segments = linkify(text, { mentions });
   return (
     <p className={className}>
       {prefix}
@@ -29,13 +31,28 @@ function renderSegment(seg: LinkifySegment) {
   if (seg.kind === 'text') return seg.value;
   if (seg.kind === 'blog-post') return <BlogPostLink href={seg.href} slug={seg.slug} />;
   if (seg.kind === 'feed') return <FeedLink href={seg.href} feedId={seg.feedId} />;
+  if (seg.kind === 'hashtag')
+    return (
+      <Link
+        href={`/tags/${encodeURIComponent(seg.tag)}`}
+        className={HASHTAG_CLASS}
+        onClick={e => e.stopPropagation()}
+      >
+        #{seg.tag}
+      </Link>
+    );
+  if (seg.kind === 'mention')
+    return (
+      <Link
+        href={`/profile/${encodeURIComponent(seg.username)}`}
+        className={MENTION_CLASS}
+        onClick={e => e.stopPropagation()}
+      >
+        @{seg.name}
+      </Link>
+    );
   return (
-    <a
-      href={seg.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={EXTERNAL_LINK_CLASS}
-    >
+    <a href={seg.href} target="_blank" rel="noopener noreferrer" className={EXTERNAL_LINK_CLASS}>
       <LinkIcon />
       <span className="truncate max-w-[28rem]">{stripProtocol(seg.label)}</span>
     </a>
@@ -73,7 +90,10 @@ function FeedLink({ href, feedId }: { href: string; feedId: string }) {
   );
 }
 
-function buildFeedLabel(data?: { content?: string; author?: { name?: string } }): string | undefined {
+function buildFeedLabel(data?: {
+  content?: string;
+  author?: { name?: string };
+}): string | undefined {
   if (!data) return undefined;
   const trimmed = (data.content ?? '').split('\n')[0].trim();
   if (trimmed) return trimmed.length > 40 ? `${trimmed.slice(0, 40)}…` : trimmed;
@@ -90,8 +110,18 @@ function SkeletonLabel() {
 
 function LinkIcon() {
   return (
-    <svg className="w-3 h-3 shrink-0 text-surface-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 015.656 5.656l-3 3a4 4 0 01-5.656-5.656m1.414-3.414a4 4 0 00-5.656-5.656l-3 3a4 4 0 005.656 5.656" />
+    <svg
+      className="w-3 h-3 shrink-0 text-surface-500"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M13.828 10.172a4 4 0 015.656 5.656l-3 3a4 4 0 01-5.656-5.656m1.414-3.414a4 4 0 00-5.656-5.656l-3 3a4 4 0 005.656 5.656"
+      />
     </svg>
   );
 }
@@ -101,3 +131,9 @@ const INTERNAL_LINK_CLASS =
 
 const EXTERNAL_LINK_CLASS =
   'inline-flex items-center gap-1 px-1.5 py-0.5 mx-0.5 rounded-md bg-surface-50 hover:bg-surface-100 border border-surface-200 text-surface-700 text-[0.95em] transition-colors align-baseline break-all';
+
+const HASHTAG_CLASS =
+  'font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-2 transition-colors';
+
+const MENTION_CLASS =
+  'font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded px-1 py-0.5 transition-colors';

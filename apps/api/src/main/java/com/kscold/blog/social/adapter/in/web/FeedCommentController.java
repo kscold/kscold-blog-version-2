@@ -2,10 +2,12 @@ package com.kscold.blog.social.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedCommentResponse;
+import com.kscold.blog.social.adapter.in.web.dto.response.MentionableUserResponse;
 import com.kscold.blog.social.application.dto.command.FeedCommentCreateCommand;
 import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -53,6 +55,16 @@ public class FeedCommentController {
                         ApiResponse.success(
                                 FeedCommentResponse.from(comment, userId, hasAdminRole()),
                                 "댓글이 작성되었습니다"));
+    }
+
+    @GetMapping("/mentionable")
+    public ResponseEntity<ApiResponse<List<MentionableUserResponse>>> getMentionableUsers(
+            @PathVariable String feedId) {
+        List<MentionableUserResponse> users =
+                feedCommentUseCase.getMentionableUsers(feedId).stream()
+                        .map(MentionableUserResponse::from)
+                        .toList();
+        return ResponseEntity.ok(ApiResponse.success(users));
     }
 
     @DeleteMapping("/{commentId}")

@@ -5,6 +5,7 @@ import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import com.kscold.blog.social.application.dto.command.FeedCommentCreateCommand;
+import com.kscold.blog.social.application.event.FeedCommentCreatedEvent;
 import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
     private final FeedCommentRepository feedCommentRepository;
     private final FeedRepository feedRepository;
     private final UserRepository userRepository;
+    private final FeedMentionResolver mentionResolver;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public FeedComment create(String feedId, FeedCommentCreateCommand command, String userId) {
@@ -44,7 +48,23 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
 
         FeedComment saved = feedCommentRepository.save(comment);
         feedRepository.incrementCommentCount(feedId);
+
+        // 커밋 이후 알림 메일 발송(주인 알림 + @언급 알림)
+        eventPublisher.publishEvent(
+                new FeedCommentCreatedEvent(
+                        feedId,
+                        saved.getId(),
+                        user.getId(),
+                        user.getDisplayName(),
+                        user.getRole() == User.Role.ADMIN,
+                        saved.getContent()));
+
         return saved;
+    }
+
+    @Override
+    public List<User> getMentionableUsers(String feedId) {
+        return mentionResolver.mentionableUsers(feedId);
     }
 
     public Page<FeedComment> getByFeedId(String feedId, Pageable pageable, String currentUserId) {

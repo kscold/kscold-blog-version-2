@@ -14,6 +14,7 @@ import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import com.kscold.blog.social.application.dto.command.FeedCommentCreateCommand;
+import com.kscold.blog.social.application.event.FeedCommentCreatedEvent;
 import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
@@ -27,6 +28,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
@@ -38,6 +40,10 @@ class FeedCommentApplicationServiceTest {
     @Mock private FeedRepository feedRepository;
 
     @Mock private UserRepository userRepository;
+
+    @Mock private FeedMentionResolver mentionResolver;
+
+    @Mock private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks private FeedCommentApplicationService feedCommentApplicationService;
 
@@ -78,6 +84,15 @@ class FeedCommentApplicationServiceTest {
         assertThat(saved.getUserId()).isEqualTo("user-1");
         assertThat(saved.getContent()).isEqualTo("새 댓글");
         verify(feedRepository).incrementCommentCount("feed-1");
+
+        ArgumentCaptor<FeedCommentCreatedEvent> eventCaptor = ArgumentCaptor.captor();
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        FeedCommentCreatedEvent event = eventCaptor.getValue();
+        assertThat(event.feedId()).isEqualTo("feed-1");
+        assertThat(event.authorUserId()).isEqualTo("user-1");
+        assertThat(event.authorName()).isEqualTo("김승찬");
+        assertThat(event.authorIsAdmin()).isFalse();
+        assertThat(event.content()).isEqualTo("새 댓글");
     }
 
     @Test

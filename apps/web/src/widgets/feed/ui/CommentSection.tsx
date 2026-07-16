@@ -1,18 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useFeedComments } from '@/entities/feed';
-import {
-  useCreateFeedComment,
-  useDeleteFeedComment,
-} from '@/features/feed';
+import { useQueryClient } from '@tanstack/react-query';
+import { useFeedComments, useMentionableUsers } from '@/entities/feed';
+import { useCreateFeedComment, useDeleteFeedComment } from '@/features/feed';
 import { useAlert } from '@/shared/model/alertStore';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
 import { Pagination } from '@/shared/ui/Pagination';
 import { LinkifiedText } from '@/shared/ui/LinkifiedText';
 import { useAuth } from '@/features/auth';
+import { CommentComposer } from './CommentComposer';
 
 interface CommentSectionProps {
   feedId: string;
@@ -22,7 +21,9 @@ export function CommentSection({ feedId }: CommentSectionProps) {
   const [page, setPage] = useState(0);
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const { data: commentsData, isLoading } = useFeedComments(feedId, page);
+  const { data: mentionable } = useMentionableUsers(feedId);
   const createComment = useCreateFeedComment(feedId);
   const deleteComment = useDeleteFeedComment(feedId);
   const { currentUser, isAuthenticated } = useAuth();
@@ -33,13 +34,26 @@ export function CommentSection({ feedId }: CommentSectionProps) {
   const totalPages = commentsData?.totalPages || 0;
   const redirect = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // 렌더링용 멘션 맵: 표시 이름과 아이디 모두 프로필 주소로 연결한다.
+  const mentionMap = useMemo(
+    () =>
+      Object.fromEntries(
+        (mentionable ?? []).flatMap(user => [
+          [user.displayName, user.username],
+          [user.username, user.username],
+        ])
+      ),
+    [mentionable]
+  );
+
+  const handleSubmit = async () => {
     if (!content.trim()) return;
 
     try {
       await createComment.mutateAsync({ content });
       setContent('');
+      // 새 댓글 작성자가 이후 멘션 대상에 포함되도록 갱신
+      queryClient.invalidateQueries({ queryKey: ['feed-mentionable-users', feedId] });
     } catch (err) {
       const message = err instanceof Error ? err.message : '댓글 작성에 실패했습니다';
       alert.error(message);
@@ -75,13 +89,15 @@ export function CommentSection({ feedId }: CommentSectionProps) {
                       ADMIN
                     </span>
                   )}
-                  <span className="text-xs text-surface-400">{formatRelativeTime(comment.createdAt)}</span>
+                  <span className="text-xs text-surface-400">
+                    {formatRelativeTime(comment.createdAt)}
+                  </span>
                 </div>
                 <LinkifiedText
                   text={comment.content}
+                  mentions={mentionMap}
                   className="text-sm text-surface-700 mt-0.5 whitespace-pre-wrap break-words"
                 />
-
               </div>
 
               {comment.canDelete && (
@@ -103,31 +119,17 @@ export function CommentSection({ feedId }: CommentSectionProps) {
         <p className="text-sm text-surface-400 text-center py-4">아직 댓글이 없습니다</p>
       )}
 
-      <form onSubmit={handleSubmit} className="border-t border-surface-100 pt-4">
+      <div className="border-t border-surface-100 pt-4">
         {isAuthenticated && currentUser ? (
-          <>
-            <p className="mb-2 text-xs text-surface-500">
-              <span className="font-semibold text-surface-700">{currentUser.displayName}</span> 계정으로 댓글을 남깁니다.
-            </p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={content}
-                onChange={e => setContent(e.target.value)}
-                placeholder="댓글을 입력하세요..."
-                maxLength={500}
-                className="flex-1 px-3 py-2 text-sm border border-surface-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-surface-400 bg-white"
-                required
-              />
-              <button
-                type="submit"
-                disabled={createComment.isPending}
-                className="px-4 py-2 bg-surface-900 text-white text-sm font-bold rounded-lg hover:bg-surface-800 disabled:opacity-50 transition-colors"
-              >
-                {createComment.isPending ? '...' : '게시'}
-              </button>
-            </div>
-          </>
+          <CommentComposer
+            value={content}
+            onChange={setContent}
+            onSubmit={handleSubmit}
+            isPending={createComment.isPending}
+            currentUserName={currentUser.displayName}
+            currentUsername={currentUser.username}
+            mentionable={mentionable ?? []}
+          />
         ) : (
           <div className="rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-600">
             댓글은 로그인 후 작성할 수 있습니다.
@@ -139,7 +141,7 @@ export function CommentSection({ feedId }: CommentSectionProps) {
             </Link>
           </div>
         )}
-      </form>
+      </div>
     </div>
   );
 }

@@ -54,3 +54,11 @@ export interface FeedUpdateRequest {
 export interface FeedCommentCreateRequest {
   content: string;
 }
+
+/** 댓글 @언급 자동완성 대상(주인 + 해당 글 댓글 참여자) */
+export interface MentionableUser {
+  username: string;
+  displayName: string;
+  avatar?: string | null;
+  isAdmin: boolean;
+}
