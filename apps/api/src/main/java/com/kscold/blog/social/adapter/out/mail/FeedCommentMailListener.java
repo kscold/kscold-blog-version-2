@@ -9,9 +9,11 @@ import com.kscold.blog.social.domain.port.out.FeedRepository;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
+import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -26,7 +28,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class FeedCommentMailListener {
 
     private final RecoveryMailSender recoveryMailSender;
@@ -34,11 +35,36 @@ public class FeedCommentMailListener {
     private final FeedMentionResolver mentionResolver;
     private final FeedRepository feedRepository;
 
+    private final Executor feedCommentMailExecutor;
+
     @Value("${admin-night.admin-email:developerkscold@gmail.com}")
     private String adminEmail;
 
+    public FeedCommentMailListener(
+            RecoveryMailSender recoveryMailSender,
+            FeedCommentEmailComposer composer,
+            FeedMentionResolver mentionResolver,
+            FeedRepository feedRepository,
+            @Qualifier("feedCommentMailExecutor") Executor feedCommentMailExecutor) {
+        this.recoveryMailSender = recoveryMailSender;
+        this.composer = composer;
+        this.mentionResolver = mentionResolver;
+        this.feedRepository = feedRepository;
+        this.feedCommentMailExecutor = feedCommentMailExecutor;
+    }
+
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(FeedCommentCreatedEvent event) {
+        try {
+            // 댓글 저장 요청은 기다리지 않고, 커밋이 끝난 뒤 메일 작업만 전용 큐에 등록한다.
+            feedCommentMailExecutor.execute(() -> sendNotifications(event));
+        } catch (TaskRejectedException exception) {
+            // 혼잡할 때 요청 스레드에서 메일을 대신 보내면 댓글 UX가 다시 느려지므로 기록만 남긴다.
+            log.warn("피드 댓글 알림 작업 큐가 가득 차 전송을 건너뜁니다. feedId={}", event.feedId(), exception);
+        }
+    }
+
+    private void sendNotifications(FeedCommentCreatedEvent event) {
         if (!recoveryMailSender.isAvailable()) {
             return;
         }
