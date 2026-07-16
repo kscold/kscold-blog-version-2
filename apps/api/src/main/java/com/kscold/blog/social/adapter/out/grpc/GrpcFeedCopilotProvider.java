@@ -74,6 +74,7 @@ public class GrpcFeedCopilotProvider implements FeedCopilotProvider {
             ExternalArticle externalArticle,
             List<String> styles,
             FeedCopilotPlan plan,
+            List<String> styleReferenceKeys,
             String userId) {
         try {
             var response =
@@ -85,6 +86,7 @@ public class GrpcFeedCopilotProvider implements FeedCopilotProvider {
                                             .setPlanTitle(plan.title())
                                             .setPlanAngle(plan.angle())
                                             .addAllPlanKeyPoints(plan.keyPoints())
+                                            .addAllStyleReferenceKeys(styleReferenceKeys)
                                             .setContentAccessScope(toScope(userId))
                                             .build());
             return new FeedCopilotDraft(

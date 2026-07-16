@@ -5,7 +5,8 @@ from typing import Iterator
 from agent.config import AgentConfig
 from agent.graph.state.vault_chat_state import AgentStage, AgentState
 from agent.graph.workflow.vault_rag_workflow import VaultRagGraph
-from agent.skills.feed_writing import ExternalSource, FeedCopilotDraft, FeedCopilotGraph, FeedCopilotPlan
+from agent.skills.feed_writing.models import ExternalSource, FeedCopilotDraft, FeedCopilotPlan
+from agent.skills.feed_writing.workflow import FeedCopilotGraph
 from agent.tools.models import ContentAccessScope, SearchHit
 
 
@@ -49,6 +50,7 @@ class VaultAgentApplication:
         plan_title: str,
         plan_angle: str,
         plan_key_points: list[str],
+        style_reference_keys: list[str],
         scope: ContentAccessScope,
     ) -> FeedCopilotDraft:
         return self.feed_writing.create_draft(
@@ -58,6 +60,7 @@ class VaultAgentApplication:
             plan_title,
             plan_angle,
             plan_key_points,
+            style_reference_keys,
             scope,
         )
 

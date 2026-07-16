@@ -38,6 +38,12 @@ class FeedCopilotNodes:
             self.config.max_context_notes + 2,
             state["content_access_scope"],
         )
+        state["style_references"] = [
+            SearchHit(note=note, score=1.0)
+            for note in self.store.fetch_index_documents_by_keys(
+                state["style_reference_keys"], state["content_access_scope"]
+            )
+        ]
         return state
 
     def plan(self, state: FeedCopilotState) -> FeedCopilotState:

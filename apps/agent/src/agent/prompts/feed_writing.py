@@ -39,6 +39,7 @@ def draft_messages(state: FeedCopilotState) -> list[dict[str, str]]:
                 "피드는 읽기 쉬운 3~6개의 짧은 문단으로 쓰고, 제목·소제목·마크다운·출처 표기·해시태그를 본문에 넣지 않는다. "
                 "외부 글의 문장을 길게 복사하지 않고, 사실은 제공된 자료에서만 사용한다. "
                 "메모에 없는 개인 경험이나 성과를 만들어내지 않는다. "
+                "선택한 말투 참고 기록은 문장 길이, 문단 리듬, 직접성만 참고하고 원문 표현이나 그 기록의 사건을 가져오지 않는다. "
                 "반드시 JSON 객체만 반환한다. 형식은 "
                 '{"title":"첫 문장 제안","content":"본문","tags":["태그1","태그2","태그3"]} 이다. 태그에는 #을 붙이지 않는다.'
             ),
@@ -71,6 +72,22 @@ def text(value: object, fallback: str) -> str:
     return cleaned[:240] or fallback
 
 
+def body_text(value: object, fallback: str) -> str:
+    """피드 본문은 문단 구조를 보존하고 지나치게 긴 응답만 안전하게 제한합니다."""
+
+    if not isinstance(value, str):
+        return fallback
+
+    paragraphs = []
+    for paragraph in re.split(r"\n\s*\n", value.replace("\r\n", "\n")):
+        cleaned = re.sub(r"[ \t]+", " ", paragraph).strip()
+        if cleaned:
+            paragraphs.append(cleaned)
+
+    normalized = "\n\n".join(paragraphs).strip()
+    return normalized[:4000].rstrip() or fallback
+
+
 def text_list(value: object, limit: int) -> list[str]:
     if not isinstance(value, list):
         return []
@@ -98,6 +115,7 @@ def plan_prompt(state: FeedCopilotState) -> str:
         [
             f"작성 메모:\n{state['memo'] or '없음'}",
             f"선택한 문체:\n{style_text(state['styles'])}",
+            f"선택한 말투 참고 기록:\n{style_reference_text(state['style_references'])}",
             f"외부 자료:\n{source_text(state['source'])}",
             f"KSCOLD 관련 기록:\n{context_text(state['context'])}",
         ]
@@ -117,6 +135,7 @@ def draft_prompt(state: FeedCopilotState) -> str:
             f"작성 메모:\n{state['memo'] or '없음'}",
             f"사용자가 확인한 계획:\n{plan}",
             f"선택한 문체:\n{style_text(state['styles'])}",
+            f"선택한 말투 참고 기록:\n{style_reference_text(state['style_references'])}",
             f"외부 자료:\n{source_text(state['source'])}",
             f"KSCOLD 관련 기록:\n{context_text(state['context'])}",
         ]
@@ -126,6 +145,17 @@ def draft_prompt(state: FeedCopilotState) -> str:
 def style_text(styles: list[str]) -> str:
     instructions = [STYLE_INSTRUCTIONS[style] for style in styles if style in STYLE_INSTRUCTIONS]
     return " ".join(instructions) or "담백하고 읽기 쉽게 쓴다."
+
+
+def style_reference_text(references: list[SearchHit]) -> str:
+    if not references:
+        return "선택하지 않음"
+    return "\n---\n".join(
+        f"기록 {index}: {hit.note.title}\n"
+        f"유형: {hit.note.content_type}\n"
+        f"말투 참고용 본문: {hit.note.content[:1400]}"
+        for index, hit in enumerate(references[:2], start=1)
+    )
 
 
 def source_text(source: ExternalSource) -> str:

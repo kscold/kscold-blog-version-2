@@ -5,7 +5,7 @@ import re
 from langgraph.graph import END, StateGraph
 
 from agent.config import AgentConfig
-from agent.prompts.feed_writing import tags, text, text_list
+from agent.prompts.feed_writing import body_text, tags, text, text_list
 from agent.skills.feed_writing.models import ExternalSource, FeedCopilotDraft, FeedCopilotPlan
 from agent.skills.feed_writing.nodes import FeedCopilotNodes
 from agent.skills.feed_writing.state import FeedCopilotState, initial_state
@@ -49,9 +49,16 @@ class FeedCopilotGraph:
         plan_title: str,
         plan_angle: str,
         plan_key_points: list[str],
+        style_reference_keys: list[str],
         content_access_scope: ContentAccessScope,
     ) -> FeedCopilotDraft:
-        state = initial_state(memo, source, styles, content_access_scope)
+        state = initial_state(
+            memo,
+            source,
+            styles,
+            content_access_scope,
+            style_reference_keys,
+        )
         state["plan_title"] = plan_title
         state["plan_angle"] = plan_angle
         state["plan_key_points"] = plan_key_points
@@ -59,9 +66,9 @@ class FeedCopilotGraph:
         draft = result["draft"]
         return FeedCopilotDraft(
             title=text(draft.get("title"), plan_title or self._fallback_title(memo, source)),
-            content=text(draft.get("content"), self._fallback_draft(memo, source)),
+            content=body_text(draft.get("content"), self._fallback_draft(memo, source)),
             tags=tags(draft.get("tags")),
-            sources=result["context"][:4],
+            sources=self._sources(result["style_references"], result["context"]),
         )
 
     def _build_graph(self, action: str):
@@ -73,6 +80,22 @@ class FeedCopilotGraph:
         graph.add_edge("retrieve", node_name)
         graph.add_edge(node_name, END)
         return graph.compile()
+
+    @staticmethod
+    def _sources(
+        style_references: list[SearchHit], context: list[SearchHit]
+    ) -> list[SearchHit]:
+        sources: list[SearchHit] = []
+        seen: set[tuple[str, str]] = set()
+        for hit in [*style_references, *context]:
+            key = (hit.note.content_type, hit.note.id)
+            if key in seen:
+                continue
+            seen.add(key)
+            sources.append(hit)
+            if len(sources) == 4:
+                break
+        return sources
 
     @staticmethod
     def _fallback_title(memo: str, source: ExternalSource) -> str:

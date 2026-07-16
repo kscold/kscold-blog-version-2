@@ -16,5 +16,6 @@ public interface FeedCopilotProvider {
             ExternalArticle externalArticle,
             List<String> styles,
             FeedCopilotPlan plan,
+            List<String> styleReferenceKeys,
             String userId);
 }

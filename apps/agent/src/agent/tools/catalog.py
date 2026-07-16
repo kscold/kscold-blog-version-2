@@ -40,6 +40,28 @@ class VaultCatalogMixin:
         note_by_id = {str(document["_id"]): self._to_note(document) for document in documents}
         return [note_by_id[note_id] for note_id in note_ids if note_id in note_by_id]
 
+    def fetch_index_documents_by_keys(
+        self, document_keys: list[str], scope: ContentAccessScope | None = None
+    ) -> list[VaultNote]:
+        """선택한 출처 키를 권한 필터로 다시 검증해 말투 참고 기록으로 돌려줍니다."""
+
+        access_scope = scope or ContentAccessScope()
+        references: list[tuple[str, str]] = []
+        for key in document_keys:
+            content_type, separator, document_id = key.partition(":")
+            if not separator or not document_id:
+                continue
+            if content_type not in {"vault", "blog", "feed", "profile"}:
+                continue
+            references.append((content_type, document_id))
+
+        documents = self._fetch_index_documents(references, access_scope)
+        return [
+            documents[f"{content_type}:{document_id}"]
+            for content_type, document_id in references
+            if f"{content_type}:{document_id}" in documents
+        ]
+
     def resolve_link_notes(
         self,
         references: list[str],

@@ -3,7 +3,7 @@ from __future__ import annotations
 from agent.application import VaultAgentApplication
 from agent.config import AgentConfig
 from agent.grpc import vault_agent_pb2, vault_agent_pb2_grpc
-from agent.skills.feed_writing import ExternalSource
+from agent.skills.feed_writing.models import ExternalSource
 from agent.tools.models import ContentAccessScope, SearchHit
 
 
@@ -82,6 +82,7 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
             request.plan_title,
             request.plan_angle,
             list(request.plan_key_points),
+            list(request.style_reference_keys),
             self._content_access_scope(request),
         )
         source_question = request.memo or source.title or source.url

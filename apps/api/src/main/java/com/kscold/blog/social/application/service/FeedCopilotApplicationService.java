@@ -25,6 +25,8 @@ public class FeedCopilotApplicationService implements FeedCopilotUseCase {
 
     private static final Set<String> AVAILABLE_STYLES =
             Set.of("short", "developer", "candid", "calm", "warm");
+    private static final Set<String> AVAILABLE_STYLE_REFERENCE_TYPES =
+            Set.of("vault", "blog", "feed", "profile");
 
     private final LinkScrapingPort linkScrapingPort;
     private final FeedCopilotProvider feedCopilotProvider;
@@ -65,6 +67,7 @@ public class FeedCopilotApplicationService implements FeedCopilotUseCase {
                             article,
                             normalizeStyles(command.getStyles()),
                             plan,
+                            normalizeStyleReferenceKeys(command.getStyleReferenceKeys()),
                             userId));
         } catch (FeedCopilotUnavailableException exception) {
             throw unavailable(exception);
@@ -101,6 +104,26 @@ public class FeedCopilotApplicationService implements FeedCopilotUseCase {
             return List.of();
         }
         return values.stream().filter(StringUtils::hasText).map(String::trim).distinct().toList();
+    }
+
+    private List<String> normalizeStyleReferenceKeys(List<String> values) {
+        if (values == null) {
+            return List.of();
+        }
+        return values.stream()
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .filter(this::isSupportedStyleReferenceKey)
+                .distinct()
+                .limit(2)
+                .toList();
+    }
+
+    private boolean isSupportedStyleReferenceKey(String value) {
+        String[] parts = value.split(":", 2);
+        return parts.length == 2
+                && AVAILABLE_STYLE_REFERENCE_TYPES.contains(parts[0])
+                && StringUtils.hasText(parts[1]);
     }
 
     private String normalizeText(String value) {

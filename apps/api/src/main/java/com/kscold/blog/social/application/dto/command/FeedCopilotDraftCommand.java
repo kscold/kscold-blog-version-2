@@ -28,4 +28,7 @@ public class FeedCopilotDraftCommand {
 
     @Size(max = 4, message = "핵심 흐름은 최대 4개까지 입력할 수 있습니다")
     private List<@Size(max = 180, message = "핵심 흐름 항목이 너무 깁니다") String> planKeyPoints;
+
+    @Size(max = 2, message = "말투 참고 기록은 최대 2개까지 선택할 수 있습니다")
+    private List<@Size(max = 160, message = "말투 참고 기록 값이 너무 깁니다") String> styleReferenceKeys;
 }

@@ -114,7 +114,7 @@ class FeedCopilotApplicationServiceTest {
     @Test
     @DisplayName("시나리오: 검토한 계획을 전달하면 자동 게시 없이 피드 초안을 반환한다")
     void createDraftPassesReviewedPlanToProvider() {
-        when(feedCopilotProvider.createDraft(any(), any(), any(), any(), eq("user-1")))
+        when(feedCopilotProvider.createDraft(any(), any(), any(), any(), any(), eq("user-1")))
                 .thenReturn(new FeedCopilotDraft("초안 제목", "초안 본문", List.of("AI", "회고"), List.of()));
 
         FeedCopilotDraftResponse response =
@@ -125,20 +125,25 @@ class FeedCopilotApplicationServiceTest {
                                 .planTitle("시작 문장")
                                 .planAngle("현실적인 관점")
                                 .planKeyPoints(List.of("문제를 먼저 설명", "시도와 결과를 나눠 기록"))
+                                .styleReferenceKeys(
+                                        List.of("blog:post-1", "invalid", "blog:post-1"))
                                 .build(),
                         "user-1");
 
         ArgumentCaptor<FeedCopilotPlan> planCaptor = ArgumentCaptor.captor();
         ArgumentCaptor<List<String>> stylesCaptor = ArgumentCaptor.captor();
+        ArgumentCaptor<List<String>> styleReferencesCaptor = ArgumentCaptor.captor();
         verify(feedCopilotProvider)
                 .createDraft(
                         eq("초안에 넣을 메모"),
                         eq(ExternalArticle.empty()),
                         stylesCaptor.capture(),
                         planCaptor.capture(),
+                        styleReferencesCaptor.capture(),
                         eq("user-1"));
 
         assertThat(stylesCaptor.getValue()).containsExactly("candid");
+        assertThat(styleReferencesCaptor.getValue()).containsExactly("blog:post-1");
         assertThat(planCaptor.getValue().title()).isEqualTo("시작 문장");
         assertThat(planCaptor.getValue().keyPoints()).containsExactly("문제를 먼저 설명", "시도와 결과를 나눠 기록");
         assertThat(response.title()).isEqualTo("초안 제목");

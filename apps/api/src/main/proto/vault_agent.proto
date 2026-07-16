@@ -103,6 +103,7 @@ message FeedCopilotDraftRequest {
   string plan_angle = 5;
   repeated string plan_key_points = 6;
   ContentAccessScope content_access_scope = 7;
+  repeated string style_reference_keys = 8;
 }
 
 message FeedCopilotDraftResponse {
