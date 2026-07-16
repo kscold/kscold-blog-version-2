@@ -11,22 +11,28 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
+/**
+ * roomId ↔ Discord 스레드 매핑을 관리하는 공유 컴포넌트. 아웃바운드 어댑터({@link DiscordBridgeService})와 인바운드 리스너({@link
+ * DiscordMessageListener}) 양쪽에서 사용한다.
+ */
 @Slf4j
-final class DiscordThreadLinkService {
+@Component
+public class DiscordThreadLinkService {
 
     private final ConcurrentHashMap<String, String> roomToThread = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, String> threadToRoom = new ConcurrentHashMap<>();
     private final ChatDiscordThreadLinkRepository linkRepository;
     private final UserRepository userRepository;
 
-    DiscordThreadLinkService(
+    public DiscordThreadLinkService(
             ChatDiscordThreadLinkRepository linkRepository, UserRepository userRepository) {
         this.linkRepository = linkRepository;
         this.userRepository = userRepository;
     }
 
-    Optional<String> findThreadIdByRoomId(String roomId) {
+    public Optional<String> findThreadIdByRoomId(String roomId) {
         if (roomId == null || roomId.isBlank()) {
             return Optional.empty();
         }
@@ -46,7 +52,7 @@ final class DiscordThreadLinkService {
     }
 
     @Nullable
-    String getRoomIdByThread(String threadId, @Nullable JDA jda) {
+    public String getRoomIdByThread(String threadId, @Nullable JDA jda) {
         if (threadId == null || threadId.isBlank()) {
             return null;
         }
@@ -81,7 +87,7 @@ final class DiscordThreadLinkService {
                 .orElse(null);
     }
 
-    void persistLink(String roomId, String threadId, String visitorName) {
+    public void persistLink(String roomId, String threadId, String visitorName) {
         String existingId =
                 linkRepository
                         .findByRoomId(roomId)
@@ -103,7 +109,7 @@ final class DiscordThreadLinkService {
         cacheLink(roomId, threadId);
     }
 
-    String extractVisitorName(String threadName) {
+    public String extractVisitorName(String threadName) {
         if (threadName == null || threadName.isBlank()) {
             return "";
         }

@@ -69,6 +69,25 @@ public class ChatApplicationService implements ChatUseCase {
     }
 
     @Override
+    @Transactional
+    public ChatMessage receiveOwnerReply(
+            String sessionId, String ownerName, String content, String roomId) {
+        // 디스코드에서 온 주인 답장 — 저장 후 방문자 WebSocket으로만 전달(디스코드 재전송 없음)
+        ChatMessage saved =
+                saveMessage(
+                        sessionId, ownerName, content, ChatMessage.MessageType.TEXT, roomId, true);
+        broadcastPort.broadcast(saved);
+        return saved;
+    }
+
+    @Override
+    @Transactional
+    public void recordSystemEvent(String roomId, String content) {
+        saveMessage(roomId, "SYSTEM", content, ChatMessage.MessageType.SYSTEM, roomId, false);
+        notificationPort.notifySystem(roomId, content);
+    }
+
+    @Override
     public List<ChatMessage> getRecentMessagesByRoom(String roomId, int limit) {
         return chatMessageRepository.findRecentByRoomId(roomId, limit);
     }

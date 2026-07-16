@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DiscordBridgeServiceTest {
+class DiscordThreadLinkServiceTest {
 
     @Mock private JDA jda;
 
@@ -33,11 +33,11 @@ class DiscordBridgeServiceTest {
 
     @Mock private ThreadChannel threadChannel;
 
-    private DiscordBridgeService discordBridgeService;
+    private DiscordThreadLinkService threadLinkService;
 
     @BeforeEach
     void setUp() {
-        discordBridgeService = new DiscordBridgeService(jda, linkRepository, userRepository);
+        threadLinkService = new DiscordThreadLinkService(linkRepository, userRepository);
     }
 
     @Test
@@ -53,7 +53,7 @@ class DiscordBridgeServiceTest {
                                         .visitorName("test")
                                         .build()));
 
-        String roomId = discordBridgeService.getRoomIdByThread("thread-1");
+        String roomId = threadLinkService.getRoomIdByThread("thread-1", jda);
 
         assertThat(roomId).isEqualTo("room-1");
         verifyNoInteractions(jda);
@@ -71,7 +71,7 @@ class DiscordBridgeServiceTest {
         when(userRepository.findAllOrderByCreatedAtDesc()).thenReturn(List.of(visitor));
         when(linkRepository.findByRoomId("room-2")).thenReturn(Optional.empty());
 
-        String roomId = discordBridgeService.getRoomIdByThread("thread-2");
+        String roomId = threadLinkService.getRoomIdByThread("thread-2", jda);
 
         assertThat(roomId).isEqualTo("room-2");
         verify(linkRepository)

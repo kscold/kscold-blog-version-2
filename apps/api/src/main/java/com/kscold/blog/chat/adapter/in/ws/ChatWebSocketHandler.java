@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
-import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,6 +18,10 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+/**
+ * 방문자·관리자 WebSocket 어댑터. 외부 알림(디스코드)은 직접 호출하지 않고 {@link ChatUseCase}를 통해서만 흐른다(인바운드 어댑터가 아웃바운드 어댑터를
+ * 직접 호출하지 않도록). 이 핸들러는 {@link ChatBroadcastPort} 구현으로서 브로드캐스트만 담당한다.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -26,29 +29,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
 
     private final ChatUseCase chatUseCase;
     private final ObjectMapper objectMapper;
-    private final com.kscold.blog.chat.adapter.out.discord.DiscordBridgeService discordBridge;
-
-    @PostConstruct
-    void init() {
-        // 디스코드에서 관리자 답장 → 블로그 방문자에게 WebSocket 전달
-        discordBridge.setBlogMessageCallback(
-                (roomId, adminName, content) -> {
-                    Map<String, Object> msg = new LinkedHashMap<>();
-                    msg.put("type", "message");
-                    msg.put("id", String.valueOf(System.currentTimeMillis()));
-                    msg.put("roomId", roomId);
-                    msg.put("username", adminName);
-                    msg.put("content", content);
-                    msg.put("fromAdmin", true);
-                    msg.put("timestamp", LocalDateTime.now().toString());
-
-                    broadcastToUserSessions(roomId, msg);
-                    broadcastToAdmins(msg);
-                    if (hasActiveUserSession(roomId)) {
-                        chatUseCase.markAdminMessagesRead(roomId);
-                    }
-                });
-    }
 
     // sessionId → 세션 정보
     private record SessionInfo(
@@ -77,21 +57,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
                     history.stream().map(this::toMessageMap).toList();
             sendToSession(session, Map.of("type", "history", "messages", historyList));
 
-            // 입장 시스템 메시지
-            chatUseCase.saveMessage(
-                    sessionId,
-                    "SYSTEM",
-                    username + "님이 입장했습니다",
-                    ChatMessage.MessageType.SYSTEM,
-                    userId,
-                    false);
+            // 입장 시스템 메시지 저장 + 디스코드 알림 (application 경유)
+            chatUseCase.recordSystemEvent(userId, username + "님이 입장했습니다");
 
             // 어드민에게 새 방문자 알림
             broadcastToAdmins(
                     Map.of("type", "room_joined", "userId", userId, "username", username));
-
-            // 디스코드에 입장 알림
-            discordBridge.sendSystemToDiscord(userId, username + "님이 입장했습니다");
         }
     }
 
@@ -109,46 +80,28 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         if (!"message".equals(type) || content == null || content.isBlank()) return;
 
         if (!info.isAdmin()) {
-            // 방문자 → 저장 후 자신 + 어드민에게 전송
-            ChatMessage saved =
-                    chatUseCase.saveMessage(
-                            sessionId,
-                            info.username(),
-                            content.trim(),
-                            ChatMessage.MessageType.TEXT,
-                            info.userId(),
-                            false);
-
-            Map<String, Object> msg = toMessageMap(saved);
-            broadcastToUserSessions(info.userId(), msg);
-            broadcastToAdmins(msg);
-
-            // 디스코드로 전달
-            discordBridge.sendToDiscord(info.userId(), info.username(), content.trim());
+            // 방문자 → 저장 + 브로드캐스트 + 디스코드 알림 (application 이 오케스트레이션)
+            chatUseCase.saveAndBroadcast(
+                    sessionId,
+                    info.username(),
+                    content.trim(),
+                    ChatMessage.MessageType.TEXT,
+                    info.userId(),
+                    false);
         } else {
             // 어드민 → toUserId 지정 방문자에게 전송 (자기 자신에게는 불가)
             String toUserId = payload.get("toUserId");
             if (toUserId == null || toUserId.isBlank()) return;
             if (toUserId.equals(info.userId())) return;
 
-            ChatMessage saved =
-                    chatUseCase.saveMessage(
-                            sessionId,
-                            info.username(),
-                            content.trim(),
-                            ChatMessage.MessageType.TEXT,
-                            toUserId,
-                            true);
-
-            Map<String, Object> msg = toMessageMap(saved);
-            broadcastToUserSessions(toUserId, msg);
-            broadcastToAdmins(msg);
-            if (hasActiveUserSession(toUserId)) {
-                chatUseCase.markAdminMessagesRead(toUserId);
-            }
-
-            // 웹 어드민 답장도 디스코드에 로깅
-            discordBridge.sendAdminReplyToDiscord(toUserId, info.username(), content.trim());
+            // 웹 어드민 답장 → 저장 + 브로드캐스트 + 디스코드 로깅 (application 경유)
+            chatUseCase.saveAndBroadcast(
+                    sessionId,
+                    info.username(),
+                    content.trim(),
+                    ChatMessage.MessageType.TEXT,
+                    toUserId,
+                    true);
         }
     }
 
@@ -161,13 +114,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         log.info("WebSocket disconnected: {} ({})", session.getId(), info.username());
 
         if (!info.isAdmin()) {
-            chatUseCase.saveMessage(
-                    session.getId(),
-                    "SYSTEM",
-                    info.username() + "님이 퇴장했습니다",
-                    ChatMessage.MessageType.SYSTEM,
-                    info.userId(),
-                    false);
+            // 퇴장 시스템 메시지 저장 + 디스코드 알림 (application 경유)
+            chatUseCase.recordSystemEvent(info.userId(), info.username() + "님이 퇴장했습니다");
             broadcastToAdmins(
                     Map.of(
                             "type",
@@ -176,9 +124,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
                             info.userId(),
                             "username",
                             info.username()));
-
-            // 디스코드에 퇴장 알림
-            discordBridge.sendSystemToDiscord(info.userId(), info.username() + "님이 퇴장했습니다");
         }
     }
 
@@ -189,7 +134,22 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         session.close(CloseStatus.SERVER_ERROR);
     }
 
-    // --- helpers ---
+    // ChatBroadcastPort 구현
+
+    @Override
+    public void broadcast(ChatMessage message) {
+        Map<String, Object> payload = toMessageMap(message);
+        broadcastToAdmins(payload);
+        if (message.getRoomId() != null) {
+            broadcastToUserSessions(message.getRoomId(), payload);
+            // 관리자 답장이 온라인 방문자에게 전달되면 읽음 처리(웹·디스코드 답장 공통)
+            if (message.isFromAdmin() && hasActiveUserSession(message.getRoomId())) {
+                chatUseCase.markAdminMessagesRead(message.getRoomId());
+            }
+        }
+    }
+
+    // 내부 보조 메서드
 
     private void broadcastToAdmins(Map<String, Object> payload) {
         sessions.values().stream()
@@ -250,14 +210,5 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
                         ? msg.getTimestamp().toString()
                         : LocalDateTime.now().toString());
         return map;
-    }
-
-    @Override
-    public void broadcast(ChatMessage message) {
-        Map<String, Object> payload = toMessageMap(message);
-        broadcastToAdmins(payload);
-        if (message.getRoomId() != null) {
-            broadcastToUserSessions(message.getRoomId(), payload);
-        }
     }
 }

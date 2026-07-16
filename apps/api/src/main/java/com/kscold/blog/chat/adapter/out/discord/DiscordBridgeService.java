@@ -1,8 +1,6 @@
 package com.kscold.blog.chat.adapter.out.discord;
 
-import com.kscold.blog.chat.domain.port.out.ChatDiscordThreadLinkRepository;
 import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
-import com.kscold.blog.identity.domain.port.out.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,16 +22,40 @@ public class DiscordBridgeService implements ChatNotificationPort {
 
     private final DiscordThreadLinkService threadLinkService;
 
-    public DiscordBridgeService(
-            @Nullable JDA jda,
-            ChatDiscordThreadLinkRepository linkRepository,
-            UserRepository userRepository) {
+    public DiscordBridgeService(@Nullable JDA jda, DiscordThreadLinkService threadLinkService) {
         this.jda = jda;
-        this.threadLinkService = new DiscordThreadLinkService(linkRepository, userRepository);
+        this.threadLinkService = threadLinkService;
+    }
+
+    @Override
+    public void notifyMessage(String roomId, String username, String content, boolean fromAdmin) {
+        if (fromAdmin) {
+            sendAdminReplyToDiscord(roomId, username, content);
+        } else {
+            sendVisitorMessageToDiscord(roomId, username, content);
+        }
+    }
+
+    @Override
+    public void notifySystem(String roomId, String content) {
+        if (jda == null || channelId.isBlank()) return;
+
+        String threadId = threadLinkService.findThreadIdByRoomId(roomId).orElse(null);
+        if (threadId == null) return;
+
+        try {
+            ThreadChannel thread = jda.getThreadChannelById(threadId);
+            if (thread != null && !thread.isArchived()) {
+                thread.sendMessage("📋 " + content)
+                        .queue(ok -> {}, err -> log.error("Discord 시스템 메시지 전송 실패", err));
+            }
+        } catch (Exception e) {
+            log.error("Discord 시스템 메시지 전송 실패: {}", e.getMessage());
+        }
     }
 
     /** 블로그 방문자 메시지 → 디스코드 스레드로 전송 */
-    public void sendToDiscord(String roomId, String username, String content) {
+    private void sendVisitorMessageToDiscord(String roomId, String username, String content) {
         if (jda == null || channelId.isBlank()) return;
 
         try {
@@ -51,7 +73,7 @@ public class DiscordBridgeService implements ChatNotificationPort {
             }
 
             thread.sendMessageEmbeds(DiscordMessageEmbeds.visitorMessage(username, content).build())
-                    .queue();
+                    .queue(ok -> {}, err -> log.error("Discord 방문자 메시지 전송 실패", err));
 
         } catch (Exception e) {
             log.error("Discord 메시지 전송 실패: {}", e.getMessage());
@@ -59,7 +81,7 @@ public class DiscordBridgeService implements ChatNotificationPort {
     }
 
     /** 웹 어드민 답장 → 디스코드 스레드에 로깅 */
-    public void sendAdminReplyToDiscord(String roomId, String adminName, String content) {
+    private void sendAdminReplyToDiscord(String roomId, String adminName, String content) {
         if (jda == null || channelId.isBlank()) return;
 
         String threadId = threadLinkService.findThreadIdByRoomId(roomId).orElse(null);
@@ -70,42 +92,11 @@ public class DiscordBridgeService implements ChatNotificationPort {
             if (thread != null && !thread.isArchived()) {
                 thread.sendMessageEmbeds(
                                 DiscordMessageEmbeds.adminReply(adminName, content).build())
-                        .queue();
+                        .queue(ok -> {}, err -> log.error("Discord 어드민 답장 로깅 실패", err));
             }
         } catch (Exception e) {
             log.error("Discord 어드민 답장 로깅 실패: {}", e.getMessage());
         }
-    }
-
-    @Override
-    public void notifyMessage(String roomId, String username, String content, boolean fromAdmin) {
-        if (fromAdmin) {
-            sendAdminReplyToDiscord(roomId, username, content);
-        } else {
-            sendToDiscord(roomId, username, content);
-        }
-    }
-
-    /** 방문자 입장/퇴장 시스템 메시지 디스코드 전달 */
-    public void sendSystemToDiscord(String roomId, String message) {
-        if (jda == null || channelId.isBlank()) return;
-
-        String threadId = threadLinkService.findThreadIdByRoomId(roomId).orElse(null);
-        if (threadId == null) return;
-
-        try {
-            ThreadChannel thread = jda.getThreadChannelById(threadId);
-            if (thread != null && !thread.isArchived()) {
-                thread.sendMessage("📋 " + message).queue();
-            }
-        } catch (Exception e) {
-            log.error("Discord 시스템 메시지 전송 실패: {}", e.getMessage());
-        }
-    }
-
-    /** 스레드 ID → roomId 매핑 확인 (DiscordMessageListener에서 사용) */
-    public String getRoomIdByThread(String threadId) {
-        return threadLinkService.getRoomIdByThread(threadId, jda);
     }
 
     private ThreadChannel resolveThreadForRoom(
@@ -147,23 +138,8 @@ public class DiscordBridgeService implements ChatNotificationPort {
 
         createdThread
                 .sendMessageEmbeds(DiscordMessageEmbeds.threadOpened(username, roomId).build())
-                .queue();
+                .queue(ok -> {}, err -> log.error("Discord 스레드 오픈 안내 전송 실패", err));
 
         return createdThread;
-    }
-
-    // 콜백 인터페이스 (ChatWebSocketHandler가 등록)
-    public interface BlogMessageCallback {
-        void onAdminMessage(String roomId, String adminName, String content);
-    }
-
-    private BlogMessageCallback blogMessageCallback;
-
-    public void setBlogMessageCallback(BlogMessageCallback callback) {
-        this.blogMessageCallback = callback;
-    }
-
-    public BlogMessageCallback getBlogMessageCallback() {
-        return blogMessageCallback;
     }
 }

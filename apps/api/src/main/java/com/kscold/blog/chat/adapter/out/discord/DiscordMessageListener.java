@@ -1,7 +1,6 @@
 package com.kscold.blog.chat.adapter.out.discord;
 
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
-import com.kscold.blog.chat.domain.model.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -10,12 +9,16 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * 디스코드 스레드에서 주인이 남긴 답장을 수신하는 인바운드 어댑터. 스레드→roomId 매핑은 {@link DiscordThreadLinkService}로 조회하고,
+ * 저장·방문자 전달은 {@link ChatUseCase#receiveOwnerReply}로 위임한다(어댑터끼리 직접 호출하지 않음).
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class DiscordMessageListener extends ListenerAdapter {
 
-    private final DiscordBridgeService discordBridgeService;
+    private final DiscordThreadLinkService threadLinkService;
     private final ChatUseCase chatUseCase;
 
     @Value("${discord.channel-id:}")
@@ -30,33 +33,20 @@ public class DiscordMessageListener extends ListenerAdapter {
         if (!parentId.equals(supportChannelId)) return;
 
         String threadId = event.getChannel().getId();
-        String adminName = event.getAuthor().getEffectiveName();
+        String ownerName = event.getAuthor().getEffectiveName();
         String content = event.getMessage().getContentDisplay();
 
         if (content.isBlank()) return;
 
-        String roomId = discordBridgeService.getRoomIdByThread(threadId);
+        String roomId = threadLinkService.getRoomIdByThread(threadId, event.getJDA());
         if (roomId == null) {
             log.warn("Discord → Blog: 스레드 매핑 없음 ({})", threadId);
             return;
         }
 
-        log.info("Discord → Blog: {} in thread {}: {}", adminName, threadId, content);
+        log.info("Discord → Blog: {} in thread {}: {}", ownerName, threadId, content);
 
-        // MongoDB에 저장
-        chatUseCase.saveMessage(
-                "discord-" + threadId,
-                adminName,
-                content,
-                ChatMessage.MessageType.TEXT,
-                roomId,
-                true);
-
-        // WebSocket으로 방문자에게 전달
-        DiscordBridgeService.BlogMessageCallback callback =
-                discordBridgeService.getBlogMessageCallback();
-        if (callback != null) {
-            callback.onAdminMessage(roomId, adminName, content);
-        }
+        // 저장 + 방문자 WebSocket 전달 (application 이 오케스트레이션)
+        chatUseCase.receiveOwnerReply("discord-" + threadId, ownerName, content, roomId);
     }
 }
