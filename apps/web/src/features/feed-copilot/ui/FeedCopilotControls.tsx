@@ -39,7 +39,7 @@ export function FeedCopilotControls({
             onChange={event => onMemoChange(event.target.value)}
             placeholder="예: 이 글을 보고 지금 만드는 Agent의 검색 흐름을 다시 생각하게 됐어요."
             rows={isChat ? 5 : 4}
-            className="mt-3 w-full resize-y rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm leading-6 text-surface-700 placeholder:text-surface-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-50"
+            className="mt-3 w-full resize-y rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm leading-6 text-surface-700 placeholder:text-surface-400 outline-none transition focus:border-surface-400 focus:ring-4 focus:ring-surface-100"
           />
         </label>
       ) : null}
@@ -58,7 +58,7 @@ export function FeedCopilotControls({
               onExpandComposer?.();
             }}
             placeholder="https://example.com/article"
-            className="mt-3 w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-50"
+            className="mt-3 w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 outline-none transition focus:border-surface-400 focus:ring-4 focus:ring-surface-100"
           />
         </label>
         <button
@@ -72,7 +72,10 @@ export function FeedCopilotControls({
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-surface-900">어떤 톤으로 쓸까요?</p>
+        <p className="text-sm font-semibold text-surface-900">어떤 결로 쓸까요?</p>
+        <p className="mt-1 text-sm leading-6 text-surface-500">
+          원하는 표현의 방향을 고르면 초안에만 반영합니다.
+        </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {feedCopilotStyleOptions.map(option => {
             const selected = styles.includes(option.id);
@@ -84,7 +87,7 @@ export function FeedCopilotControls({
                 aria-pressed={selected}
                 className={`rounded-2xl border px-3 py-2 text-left transition ${
                   selected
-                    ? 'border-sky-300 bg-sky-50 text-sky-800 shadow-sm'
+                    ? 'border-surface-900 bg-surface-900 text-white shadow-sm'
                     : 'border-surface-200 bg-white text-surface-500 hover:border-surface-300 hover:text-surface-700'
                 }`}
               >

@@ -2,8 +2,13 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
-import { FeedCopilotPanel } from '@/features/feed-copilot';
+import { useCallback, useEffect } from 'react';
+import {
+  FEED_COPILOT_DRAFT_EVENT,
+  FeedCopilotPanel,
+  takeFeedCopilotDraft,
+  type FeedCopilotTransferDraft,
+} from '@/features/feed-copilot';
 import type { User } from '@/shared/model/types/user';
 import { useFeedComposer } from '@/features/feed/lib/useFeedComposer';
 import { FeedComposerActions } from './FeedComposerActions';
@@ -39,26 +44,9 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
     handlePaste,
     handleDrop,
   } = useFeedComposer(currentUser);
-  const restoredCopilotDraft = useRef(false);
-
-  useEffect(() => {
-    if (!currentUser || restoredCopilotDraft.current || typeof window === 'undefined') {
-      return;
-    }
-    restoredCopilotDraft.current = true;
-    const storedDraft = window.sessionStorage.getItem('kscold-feed-copilot-draft');
-    if (!storedDraft) {
-      return;
-    }
-
-    try {
-      const draft = JSON.parse(storedDraft) as {
-        title?: string;
-        content?: string;
-        tags?: string[];
-        sourceUrl?: string;
-      };
-      const tags = Array.isArray(draft.tags) ? draft.tags.map(tag => `#${tag}`).join(' ') : '';
+  const applyCopilotDraft = useCallback(
+    (draft: FeedCopilotTransferDraft) => {
+      const tags = draft.tags.map(tag => `#${tag}`).join(' ');
       const nextContent = [draft.title, draft.content, tags].filter(Boolean).join('\n\n');
       if (nextContent) {
         setContent(nextContent);
@@ -67,12 +55,26 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
         setLinkUrl(draft.sourceUrl);
       }
       setIsExpanded(true);
-    } catch {
-      // 브라우저에 남은 오래된 임시 초안은 무시하고 작성 화면을 유지합니다.
-    } finally {
-      window.sessionStorage.removeItem('kscold-feed-copilot-draft');
+    },
+    [setContent, setIsExpanded, setLinkUrl]
+  );
+
+  useEffect(() => {
+    if (!currentUser || typeof window === 'undefined') {
+      return;
     }
-  }, [currentUser, setContent, setIsExpanded, setLinkUrl]);
+
+    const restoreCopilotDraft = () => {
+      const draft = takeFeedCopilotDraft();
+      if (draft) {
+        applyCopilotDraft(draft);
+      }
+    };
+
+    restoreCopilotDraft();
+    window.addEventListener(FEED_COPILOT_DRAFT_EVENT, restoreCopilotDraft);
+    return () => window.removeEventListener(FEED_COPILOT_DRAFT_EVENT, restoreCopilotDraft);
+  }, [applyCopilotDraft, currentUser]);
 
   if (!currentUser) {
     return (
@@ -84,8 +86,18 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
       >
         <div className="flex items-center gap-3 border-b border-surface-100 px-5 py-4 sm:px-6">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-100">
-            <svg className="h-4 w-4 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            <svg
+              className="h-4 w-4 text-surface-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+              />
             </svg>
           </div>
           <p className="flex-1 text-sm text-surface-400">오늘 어떤 생각을 하셨나요?</p>
@@ -98,8 +110,18 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
             href="/login"
             className="inline-flex items-center gap-2 rounded-xl bg-surface-900 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-surface-700"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
+              />
             </svg>
             로그인하고 글 쓰기
           </Link>
@@ -134,9 +156,7 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
           onSourceUrlChange={setLinkUrl}
           onExpandComposer={() => setIsExpanded(true)}
           onApplyDraft={draft => {
-            const tags = draft.tags.map(tag => `#${tag}`).join(' ');
-            setContent([draft.title, draft.content, tags].filter(Boolean).join('\n\n'));
-            setIsExpanded(true);
+            applyCopilotDraft({ ...draft, sourceUrl: linkUrl });
           }}
         />
         <FeedComposerExpandedPanels

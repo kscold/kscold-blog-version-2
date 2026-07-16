@@ -37,6 +37,7 @@ export interface FeedCopilotDraftInput extends FeedCopilotPlanInput {
   planTitle: string;
   planAngle: string;
   planKeyPoints: string[];
+  styleReferenceKeys: string[];
 }
 
 export function createFeedCopilotPlan(input: FeedCopilotPlanInput) {

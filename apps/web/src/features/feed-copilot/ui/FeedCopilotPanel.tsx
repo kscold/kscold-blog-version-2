@@ -5,9 +5,13 @@ import { useMemo, useState } from 'react';
 import {
   type FeedCopilotDraft,
   type FeedCopilotPlan,
+  type FeedCopilotReference,
   type FeedCopilotStyle,
 } from '@/features/feed-copilot/api/feedCopilotApi';
-import { useFeedCopilotDraft, useFeedCopilotPlan } from '@/features/feed-copilot/api/useFeedCopilot';
+import {
+  useFeedCopilotDraft,
+  useFeedCopilotPlan,
+} from '@/features/feed-copilot/api/useFeedCopilot';
 import { useAlert } from '@/shared/model/alertStore';
 import { FeedCopilotControls } from './FeedCopilotControls';
 import { FeedCopilotDraftCard } from './FeedCopilotDraftCard';
@@ -42,6 +46,7 @@ export function FeedCopilotPanel({
   const [plan, setPlan] = useState<FeedCopilotPlan | null>(null);
   const [draft, setDraft] = useState<FeedCopilotDraft | null>(null);
   const [planInputKey, setPlanInputKey] = useState('');
+  const [styleReferenceKeys, setStyleReferenceKeys] = useState<string[]>([]);
 
   const currentInputKey = useMemo(
     () => JSON.stringify({ memo: memo.trim(), sourceUrl: sourceUrl.trim(), styles }),
@@ -53,6 +58,20 @@ export function FeedCopilotPanel({
     setStyles(current =>
       current.includes(style) ? current.filter(item => item !== style) : [...current, style]
     );
+  }
+
+  function toggleStyleReference(reference: FeedCopilotReference) {
+    const referenceKey = `${reference.type}:${reference.id}`;
+    setStyleReferenceKeys(current => {
+      if (current.includes(referenceKey)) {
+        return current.filter(key => key !== referenceKey);
+      }
+      if (current.length >= 2) {
+        alert.warning('말투 참고 기록은 최대 두 개까지 고를 수 있어요');
+        return current;
+      }
+      return [...current, referenceKey];
+    });
   }
 
   async function createPlan() {
@@ -70,6 +89,7 @@ export function FeedCopilotPanel({
       setPlan(nextPlan);
       setDraft(null);
       setPlanInputKey(currentInputKey);
+      setStyleReferenceKeys([]);
     } catch (error) {
       alert.error(error instanceof Error ? error.message : '작성 계획을 만들지 못했습니다');
     }
@@ -93,6 +113,7 @@ export function FeedCopilotPanel({
         planTitle: plan.title,
         planAngle: plan.angle,
         planKeyPoints: plan.keyPoints,
+        styleReferenceKeys,
       });
       setDraft(nextDraft);
     } catch (error) {
@@ -112,34 +133,48 @@ export function FeedCopilotPanel({
 
   return (
     <section
-      className={`overflow-hidden rounded-[28px] border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-surface-50 ${
-        isChat ? 'shadow-sm' : ''
+      className={`overflow-hidden rounded-[28px] border border-surface-200 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.05)] ${
+        isChat ? 'shadow-none' : ''
       }`}
     >
       <button
         type="button"
         onClick={() => setIsOpen(current => !current)}
-        className={`flex w-full items-start gap-4 text-left transition-colors hover:bg-white/70 ${
+        className={`flex w-full items-start gap-4 text-left transition-colors hover:bg-surface-50 ${
           isChat ? 'px-4 py-4' : 'px-5 py-5 sm:px-6'
         }`}
         aria-expanded={isOpen}
       >
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-sky-100 bg-white text-sky-600 shadow-sm">
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-900 text-white shadow-sm">
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.8}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v18m9-9H3" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 7.5h.01M16.5 7.5h.01M7.5 16.5h.01M16.5 16.5h.01" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M7.5 7.5h.01M16.5 7.5h.01M7.5 16.5h.01M16.5 16.5h.01"
+            />
           </svg>
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-[0.18em] text-sky-600">Feed Copilot</span>
-            <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-surface-400 shadow-sm">
-              계획부터
+            <span className="text-xs font-bold uppercase tracking-[0.18em] text-surface-500">
+              Feed Copilot
+            </span>
+            <span className="rounded-full border border-surface-200 bg-surface-50 px-2 py-0.5 text-[11px] font-semibold text-surface-500">
+              초안 도우미
             </span>
           </span>
-          <span className="mt-1 block text-base font-bold text-surface-900">메모와 링크로 피드의 방향을 먼저 잡아보세요</span>
+          <span className="mt-1 block text-base font-bold text-surface-900">
+            메모와 링크를 내 글의 결로 정리해보세요
+          </span>
           <span className="mt-1 block text-sm leading-6 text-surface-500">
-            외부 글과 내 기록을 함께 살펴본 뒤, 검토 가능한 초안만 만듭니다.
+            외부 글과 이전 기록을 함께 살펴본 뒤, 게시 전에 직접 다듬을 수 있는 초안만 만듭니다.
           </span>
         </span>
         <svg
@@ -163,7 +198,7 @@ export function FeedCopilotPanel({
             className="overflow-hidden"
           >
             <div
-              className={`space-y-5 border-t border-sky-100 bg-white/70 ${
+              className={`space-y-5 border-t border-surface-100 bg-surface-50/60 ${
                 isChat ? 'px-4 py-4' : 'px-5 py-5 sm:px-6 sm:py-6'
               }`}
             >
@@ -185,13 +220,13 @@ export function FeedCopilotPanel({
                   plan={plan}
                   needsRefresh={planNeedsRefresh}
                   isDrafting={draftMutation.isPending}
+                  styleReferenceKeys={styleReferenceKeys}
+                  onToggleStyleReference={toggleStyleReference}
                   onCreateDraft={() => void createDraft()}
                 />
               ) : null}
 
-              {draft ? (
-                <FeedCopilotDraftCard draft={draft} onApply={applyDraft} />
-              ) : null}
+              {draft ? <FeedCopilotDraftCard draft={draft} onApply={applyDraft} /> : null}
             </div>
           </motion.div>
         ) : null}

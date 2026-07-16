@@ -1,3 +1,5 @@
+import { useLayoutEffect, useRef } from 'react';
+
 interface FeedComposerEditorCardProps {
   content: string;
   shouldShowExpanded: boolean;
@@ -15,6 +17,17 @@ export function FeedComposerEditorCard({
   onPaste,
   onDrop,
 }: FeedComposerEditorCardProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useLayoutEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      return;
+    }
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.max(textarea.scrollHeight, 180)}px`;
+  }, [content, shouldShowExpanded]);
+
   return (
     <div
       className="rounded-[28px] border border-surface-200 bg-white p-5 sm:p-6"
@@ -26,7 +39,9 @@ export function FeedComposerEditorCard({
     >
       <div className="mb-4 flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-surface-900">피드 본문 또는 Agent에게 건넬 메모</p>
+          <p className="text-sm font-semibold text-surface-900">
+            피드 본문 또는 Agent에게 건넬 메모
+          </p>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-surface-500">
             지금 만들고 있는 것, 막 배운 점, 링크를 보고 든 생각을 편하게 적어 주세요.
           </p>
@@ -37,6 +52,7 @@ export function FeedComposerEditorCard({
       </div>
 
       <textarea
+        ref={textareaRef}
         value={content}
         onChange={event => {
           onContentChange(event.target.value);
@@ -47,7 +63,8 @@ export function FeedComposerEditorCard({
         placeholder="지금 하고 있는 작업, 막 떠오른 생각, 링크를 보고 든 생각을 편하게 남겨보세요."
         rows={shouldShowExpanded ? 8 : 3}
         data-cy="feed-composer-content"
-        className="min-h-[140px] w-full resize-none border-0 bg-transparent p-0 text-base leading-8 text-surface-900 placeholder:text-surface-300 focus:outline-none sm:min-h-[180px] sm:text-[1.05rem]"
+        aria-label="피드 본문"
+        className="min-h-[140px] w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-base leading-8 text-surface-900 placeholder:text-surface-300 focus:outline-none sm:min-h-[180px] sm:text-[1.05rem]"
       />
 
       <p className="mt-4 text-sm leading-6 text-surface-400">

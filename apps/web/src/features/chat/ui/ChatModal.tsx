@@ -6,7 +6,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/entities/user';
-import { FeedCopilotPanel, type FeedCopilotDraft } from '@/features/feed-copilot';
+import {
+  FeedCopilotPanel,
+  stageFeedCopilotDraft,
+  type FeedCopilotDraft,
+} from '@/features/feed-copilot';
 import { useChatSocket } from '@/features/chat/lib/useChatSocket';
 import { useAgentChat } from '@/features/chat/model/useAgentChat';
 import ChatMessageList from '@/features/chat/ui/ChatMessageList';
@@ -73,17 +77,9 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
   };
 
   const handleApplyFeedDraft = (draft: FeedCopilotDraft) => {
-    window.sessionStorage.setItem(
-      'kscold-feed-copilot-draft',
-      JSON.stringify({
-        title: draft.title,
-        content: draft.content,
-        tags: draft.tags,
-        sourceUrl: feedSourceUrl,
-      })
-    );
-    onClose();
+    stageFeedCopilotDraft(draft, feedSourceUrl);
     router.push('/feed');
+    onClose();
   };
 
   const title =

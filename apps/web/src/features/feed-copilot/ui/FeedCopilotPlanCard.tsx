@@ -1,10 +1,12 @@
-import type { FeedCopilotPlan } from '../api/feedCopilotApi';
+import type { FeedCopilotPlan, FeedCopilotReference } from '../api/feedCopilotApi';
 import { FeedCopilotReferences } from './FeedCopilotReferences';
 
 interface FeedCopilotPlanCardProps {
   plan: FeedCopilotPlan;
   needsRefresh: boolean;
   isDrafting: boolean;
+  styleReferenceKeys: string[];
+  onToggleStyleReference: (reference: FeedCopilotReference) => void;
   onCreateDraft: () => void;
 }
 
@@ -12,13 +14,17 @@ export function FeedCopilotPlanCard({
   plan,
   needsRefresh,
   isDrafting,
+  styleReferenceKeys,
+  onToggleStyleReference,
   onCreateDraft,
 }: FeedCopilotPlanCardProps) {
   return (
-    <div className="rounded-[24px] border border-surface-200 bg-white p-4 sm:p-5">
+    <div className="rounded-[24px] border border-surface-200 bg-white p-4 shadow-[0_10px_30px_rgba(15,23,42,0.035)] sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-sky-600">Plan</p>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-surface-500">
+            작성 방향
+          </p>
           <h3 className="mt-2 text-lg font-bold text-surface-900">{plan.title}</h3>
           <p className="mt-2 text-sm leading-6 text-surface-600">{plan.angle}</p>
         </div>
@@ -36,7 +42,7 @@ export function FeedCopilotPlanCard({
               key={`${point}-${index}`}
               className="flex gap-3 rounded-2xl bg-surface-50 px-3 py-3 text-sm leading-6 text-surface-600"
             >
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-sky-600 shadow-sm">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-surface-700 shadow-sm">
                 {index + 1}
               </span>
               {point}
@@ -46,12 +52,16 @@ export function FeedCopilotPlanCard({
       ) : null}
 
       {plan.sourceSummary ? (
-        <p className="mt-4 rounded-2xl border border-sky-100 bg-sky-50/70 px-4 py-3 text-sm leading-6 text-sky-800">
+        <p className="mt-4 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-6 text-surface-600">
           {plan.sourceSummary}
         </p>
       ) : null}
 
-      <FeedCopilotReferences references={plan.references} />
+      <FeedCopilotReferences
+        references={plan.references}
+        styleReferenceKeys={styleReferenceKeys}
+        onToggleStyleReference={onToggleStyleReference}
+      />
 
       <button
         type="button"
