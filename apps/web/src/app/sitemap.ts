@@ -29,8 +29,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const feeds = (feedsPage?.content || []).filter(feed => feed.visibility === 'PUBLIC');
   // 분량이 적은 노트(용어 스텁 등)는 색인 대상에서 제외한다.
   // 얇은 페이지가 대량으로 색인되면 사이트 전체 품질 평가에 불리하고, 애드센스 정책상으로도 문제가 된다.
-  const vaultNotes = (vaultNoteGraph?.nodes || []).filter(
-    note => !!note.slug && (note.contentLength ?? 0) >= MIN_INDEXABLE_CONTENT_LENGTH
+  //
+  // 다만 응답에 contentLength 가 아예 없으면(구버전 API 응답이 캐시된 경우 등) 길이를 알 수 없을 뿐이므로,
+  // 전량을 제외해 사이트맵에서 노트가 통째로 사라지는 일이 없도록 이때는 필터를 적용하지 않는다.
+  const graphNodes = vaultNoteGraph?.nodes || [];
+  const hasContentLength = graphNodes.some(note => typeof note.contentLength === 'number');
+  const vaultNotes = graphNodes.filter(
+    note =>
+      !!note.slug &&
+      (!hasContentLength || (note.contentLength ?? 0) >= MIN_INDEXABLE_CONTENT_LENGTH)
   );
 
   return [
