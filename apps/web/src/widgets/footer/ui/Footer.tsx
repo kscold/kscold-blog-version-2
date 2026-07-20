@@ -15,7 +15,7 @@ export function Footer() {
     quick: [
       { label: 'Blog', href: '/blog' },
       { label: 'Feed', href: '/feed' },
-      { label: '판매 상품', href: '/product' },
+      { label: 'Product', href: '/product' },
       { label: 'Admin Night', href: '/admin-night' },
       { label: 'Vault', href: '/vault' },
       { label: 'Guestbook', href: '/guestbook' },

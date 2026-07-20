@@ -29,6 +29,7 @@ export function Header() {
   const navItems = [
     { label: 'Blog', href: '/blog' },
     { label: 'Feed', href: '/feed' },
+    { label: 'Product', href: '/product' },
     { label: 'Admin Night', href: '/admin-night' },
     { label: 'Vault', href: '/vault' },
     { label: 'Guestbook', href: '/guestbook' },
