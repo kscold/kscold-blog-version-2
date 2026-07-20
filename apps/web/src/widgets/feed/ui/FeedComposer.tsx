@@ -10,7 +10,7 @@ import {
   type FeedCopilotTransferDraft,
 } from '@/features/feed-copilot';
 import type { User } from '@/shared/model/types/user';
-import { useFeedComposer } from '@/features/feed/lib/useFeedComposer';
+import { useFeedComposer } from '@/features/feed';
 import { FeedComposerActions } from './FeedComposerActions';
 import { FeedComposerEditorCard } from './FeedComposerEditorCard';
 import { FeedComposerExpandedPanels } from './FeedComposerExpandedPanels';

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useFeeds } from '@/entities/feed';
 import { FeedCard } from '@/features/feed';
-import { FeedComposer } from '@/features/feed';
+import { FeedComposer } from './FeedComposer';
 import { useAuth } from '@/features/auth';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';

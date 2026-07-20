@@ -2,7 +2,6 @@
 export * from './lib/useFeedComposer';
 export * from './lib/useFeedEdit';
 export * from './lib/useFeedEditor';
-export * from './ui/FeedComposer';
 export { default as FeedEditor } from './ui/FeedEditor';
 
 // FSD public API 보강
@@ -10,4 +9,3 @@ export { useCreateFeedComment, useDeleteFeedComment } from './api/useFeedComment
 export { useDeleteFeed } from './api/useFeedMutations';
 export { useFeedEdit } from './lib/useFeedEdit';
 export { FeedCard } from './ui/FeedCard';
-export { FeedComposer } from './ui/FeedComposer';
