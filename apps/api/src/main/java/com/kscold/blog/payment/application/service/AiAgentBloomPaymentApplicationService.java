@@ -35,7 +35,8 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     private static final String ORDER_NAME = "AI Agent, 같이 만들고 피워보는 Bloom 참가권";
     private static final int TOTAL_AMOUNT = 30_000;
     private static final String CURRENCY = "KRW";
-    private static final String PAY_METHOD = "EASY_PAY";
+    private static final String PAY_METHOD_EASY_PAY = "EASY_PAY";
+    private static final String PAY_METHOD_CARD = "CARD";
     private static final String EASY_PAY_PROVIDER = "KAKAOPAY";
     private static final String SERVICE_PERIOD = "결제 완료 즉시 참가권 확정, 상세 안내 1일 이내 이메일 제공";
     private static final DateTimeFormatter PAYMENT_ID_DATE =
@@ -48,6 +49,7 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     public PaymentConfigResponse getConfig() {
         return new PaymentConfigResponse(
                 portOnePaymentProperties.isClientConfigured(),
+                portOnePaymentProperties.isCardConfigured(),
                 portOnePaymentProperties.getStoreId(),
                 portOnePaymentProperties.getKakaoPayChannelKey(),
                 PRODUCT_NAME,
@@ -60,11 +62,18 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     @Transactional
     public PreparePaymentResponse prepare(String userId, PreparePaymentCommand request) {
         String paymentAccessToken = normalizePaymentAccessToken(request.getPaymentAccessToken());
-        if ((userId == null || userId.isBlank()) && paymentAccessToken == null) {
+        boolean cardPayment = PAY_METHOD_CARD.equals(request.getPayMethod());
+
+        // 신용카드(KG이니시스) 경로는 비회원 구매를 허용함. 카드 결제창까지 로그인 없이 도달할 수 있어야 하기 때문.
+        if (!cardPayment && (userId == null || userId.isBlank()) && paymentAccessToken == null) {
             throw new BusinessException(
                     ErrorCode.UNAUTHORIZED, "로그인하거나 안내받은 결제 링크로 접속해야 결제할 수 있습니다.");
         }
-        if (!portOnePaymentProperties.isClientConfigured()) {
+        if (cardPayment && !portOnePaymentProperties.isCardConfigured()) {
+            throw InvalidRequestException.invalidInput(
+                    "PORTONE_STORE_ID와 PORTONE_INICIS_CHANNEL_KEY 설정 후 신용카드 결제창을 열 수 있습니다.");
+        }
+        if (!cardPayment && !portOnePaymentProperties.isClientConfigured()) {
             throw InvalidRequestException.invalidInput(
                     "PORTONE_STORE_ID와 PORTONE_KAKAOPAY_CHANNEL_KEY 설정 후 결제창을 열 수 있습니다.");
         }
@@ -93,14 +102,16 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
         return new PreparePaymentResponse(
                 paymentId,
                 portOnePaymentProperties.getStoreId(),
-                portOnePaymentProperties.getKakaoPayChannelKey(),
+                cardPayment
+                        ? portOnePaymentProperties.getInicisChannelKey()
+                        : portOnePaymentProperties.getKakaoPayChannelKey(),
                 PROGRAM_KEY,
                 PRODUCT_NAME,
                 ORDER_NAME,
                 TOTAL_AMOUNT,
                 CURRENCY,
-                PAY_METHOD,
-                EASY_PAY_PROVIDER,
+                cardPayment ? PAY_METHOD_CARD : PAY_METHOD_EASY_PAY,
+                cardPayment ? null : EASY_PAY_PROVIDER,
                 SERVICE_PERIOD,
                 order.getCustomerName(),
                 order.getCustomerEmail(),
@@ -212,8 +223,19 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
         if (userId != null && !userId.isBlank() && userId.equals(order.getUserId())) {
             return true;
         }
-        return paymentAccessToken != null
-                && paymentAccessToken.equals(order.getPaymentAccessToken());
+        if (paymentAccessToken != null
+                && paymentAccessToken.equals(order.getPaymentAccessToken())) {
+            return true;
+        }
+        // 비회원 주문(소유자·토큰 없음)은 추측 불가능한 서버 발급 paymentId 로만 접근하고,
+        // 실제 결제 여부는 포트원 조회로 재검증하므로 결제 확인을 허용함.
+        return isGuestOrder(order);
+    }
+
+    private boolean isGuestOrder(PaymentOrder order) {
+        return (order.getUserId() == null || order.getUserId().isBlank())
+                && (order.getPaymentAccessToken() == null
+                        || order.getPaymentAccessToken().isBlank());
     }
 
     private String normalizePaymentAccessToken(String paymentAccessToken) {

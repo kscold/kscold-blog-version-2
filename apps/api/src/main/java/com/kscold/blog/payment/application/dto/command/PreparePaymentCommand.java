@@ -29,4 +29,8 @@ public class PreparePaymentCommand {
     @Size(max = 120, message = "결제 링크 토큰은 120자 이하로 입력해주세요.")
     @Pattern(regexp = "^[A-Za-z0-9._-]*$", message = "결제 링크 토큰 형식이 올바르지 않습니다.")
     private String paymentAccessToken;
+
+    /** CARD(KG이니시스 신용카드) 또는 EASY_PAY(카카오페이). 비우면 EASY_PAY 로 처리함. */
+    @Pattern(regexp = "^(CARD|EASY_PAY)?$", message = "지원하지 않는 결제수단입니다.")
+    private String payMethod;
 }

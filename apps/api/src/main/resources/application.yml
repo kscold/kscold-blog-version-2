@@ -92,6 +92,8 @@ admin-night:
 portone:
   store-id: ${PORTONE_STORE_ID:}
   kakao-pay-channel-key: ${PORTONE_KAKAOPAY_CHANNEL_KEY:}
+  # KG이니시스 신용카드 채널키. 비우면 카드 결제 경로가 전체 비활성화됨(심사 종료 후 제거용)
+  inicis-channel-key: ${PORTONE_INICIS_CHANNEL_KEY:}
   api-secret: ${PORTONE_API_SECRET:}
   api-base-url: ${PORTONE_API_BASE_URL:https://api.portone.io}
 
