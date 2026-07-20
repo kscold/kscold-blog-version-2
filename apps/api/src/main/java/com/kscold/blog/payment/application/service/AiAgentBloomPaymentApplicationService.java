@@ -42,6 +42,12 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     private static final DateTimeFormatter PAYMENT_ID_DATE =
             DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
+    /**
+     * paymentId 접두어. KG이니시스는 주문번호(oid)를 최대 40자까지만 허용하는데, PROGRAM_KEY(ai-agent-bloom)를 그대로 쓰면 42자가
+     * 되어 결제창이 열리지 않으므로 짧은 접두어를 따로 둔다.
+     */
+    private static final String PAYMENT_ID_PREFIX = "bloom";
+
     private final PaymentOrderRepository paymentOrderRepository;
     private final PortOnePaymentProperties portOnePaymentProperties;
     private final RestClient.Builder restClientBuilder;
@@ -248,6 +254,7 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     private String createPaymentId() {
         String timestamp = LocalDateTime.now().format(PAYMENT_ID_DATE);
         String suffix = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
-        return PROGRAM_KEY + "-" + timestamp + "-" + suffix;
+        // bloom(5) + -(1) + 타임스탬프(14) + -(1) + 랜덤(12) = 33자로 이니시스 제한(40자) 안에 들어감
+        return PAYMENT_ID_PREFIX + "-" + timestamp + "-" + suffix;
     }
 }
