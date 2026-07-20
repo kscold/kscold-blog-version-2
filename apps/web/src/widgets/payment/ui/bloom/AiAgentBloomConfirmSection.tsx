@@ -93,7 +93,7 @@ export function AiAgentBloomConfirmSection({
               {canPay
                 ? isPreparing
                   ? '결제 확인 중...'
-                  : `${formattedAmount}원 ${methodLabel} 결제하기`
+                  : `${formattedAmount}원 ${methodLabel} 테스트 결제하기`
                 : '로그인 또는 안내받은 결제 링크가 필요합니다'}
             </button>
           </div>
