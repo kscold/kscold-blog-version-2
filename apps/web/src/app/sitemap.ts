@@ -9,16 +9,20 @@ const toDate = (date: Date | string | undefined): string =>
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const [postsPage, categoryTree, tags, feedsPage] = await Promise.all([
+  const [postsPage, categoryTree, tags, feedsPage, vaultNoteGraph] = await Promise.all([
     fetchPublicApi<PageResponse<Post>>('/posts?size=1000'),
     fetchPublicApi<Category[]>('/categories'),
     fetchPublicApi<Tag[]>('/tags'),
     fetchPublicApi<PageResponse<Feed>>('/feeds?page=0&size=2000'),
+    // 목록 API 는 노트 본문까지 실려 3.8MB 라 캐시 한도를 넘고 일부만 조회된다.
+    // 그래프 API 는 slug 만 담아 675KB 로 전체 노트를 한 번에 가져올 수 있어 사이트맵에 적합하다.
+    fetchPublicApi<{ nodes: { slug: string }[] }>('/vault/notes/graph'),
   ]);
 
   const categories = flattenCategories(categoryTree || []);
   const posts = (postsPage?.content || []).filter(post => post.status === 'PUBLISHED');
   const feeds = (feedsPage?.content || []).filter(feed => feed.visibility === 'PUBLIC');
+  const vaultNotes = (vaultNoteGraph?.nodes || []).filter(note => !!note.slug);
 
   return [
     {
@@ -38,6 +42,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: toDate(now),
       changeFrequency: 'daily',
       priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/product`,
+      lastModified: toDate(now),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/vault`,
+      lastModified: toDate(now),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/admin-night`,
+      lastModified: toDate(now),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/admin-night/ai-agent-bloom`,
+      lastModified: toDate(now),
+      changeFrequency: 'monthly',
+      priority: 0.7,
     },
     {
       url: `${SITE_URL}/guestbook`,
@@ -81,5 +109,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.55,
     })),
+    // 그래프 API 에는 수정일이 없어 lastModified 를 생략한다(부정확한 날짜를 넣는 것보다 낫다).
+    ...vaultNotes.map(note => ({
+      url: `${SITE_URL}/vault/${encodeURIComponent(note.slug)}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })),
+    {
+      url: `${SITE_URL}/privacy`,
+      lastModified: toDate(now),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
   ];
 }
