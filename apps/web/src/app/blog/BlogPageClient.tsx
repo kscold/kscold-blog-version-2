@@ -17,7 +17,7 @@ export function BlogPageClient() {
             Archive.
           </h1>
           <p className="text-lg text-surface-500 font-medium">
-            개발하면서 배우고 느낀 것들을 기록합니다.
+            개발자 김승찬의 기술 블로그입니다. 개발하면서 배우고 느낀 것들을 기록합니다.
           </p>
         </motion.div>
 

@@ -2,7 +2,12 @@ import type { MetadataRoute } from 'next';
 import type { PageResponse } from '@/shared/model/types/api';
 import type { Category, Post, Tag } from '@/shared/model/types/blog';
 import type { Feed } from '@/shared/model/types/social';
-import { SITE_URL, fetchPublicApi, flattenCategories } from '@/shared/lib/seo';
+import {
+  MIN_INDEXABLE_CONTENT_LENGTH,
+  SITE_URL,
+  fetchPublicApi,
+  flattenCategories,
+} from '@/shared/lib/seo';
 
 const toDate = (date: Date | string | undefined): string =>
   new Date(date || Date.now()).toISOString().split('T')[0];
@@ -15,14 +20,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchPublicApi<Tag[]>('/tags'),
     fetchPublicApi<PageResponse<Feed>>('/feeds?page=0&size=2000'),
     // 목록 API 는 노트 본문까지 실려 3.8MB 라 캐시 한도를 넘고 일부만 조회된다.
-    // 그래프 API 는 slug 만 담아 675KB 로 전체 노트를 한 번에 가져올 수 있어 사이트맵에 적합하다.
-    fetchPublicApi<{ nodes: { slug: string }[] }>('/vault/notes/graph'),
+    // 그래프 API 는 slug 와 본문 길이만 담아 전체 노트를 한 번에 가져올 수 있어 사이트맵에 적합하다.
+    fetchPublicApi<{ nodes: { slug: string; contentLength?: number }[] }>('/vault/notes/graph'),
   ]);
 
   const categories = flattenCategories(categoryTree || []);
   const posts = (postsPage?.content || []).filter(post => post.status === 'PUBLISHED');
   const feeds = (feedsPage?.content || []).filter(feed => feed.visibility === 'PUBLIC');
-  const vaultNotes = (vaultNoteGraph?.nodes || []).filter(note => !!note.slug);
+  // 분량이 적은 노트(용어 스텁 등)는 색인 대상에서 제외한다.
+  // 얇은 페이지가 대량으로 색인되면 사이트 전체 품질 평가에 불리하고, 애드센스 정책상으로도 문제가 된다.
+  const vaultNotes = (vaultNoteGraph?.nodes || []).filter(
+    note => !!note.slug && (note.contentLength ?? 0) >= MIN_INDEXABLE_CONTENT_LENGTH
+  );
 
   return [
     {

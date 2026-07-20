@@ -23,6 +23,12 @@ export const metadata: Metadata = {
     '김승찬',
     '김승찬 개발자',
     '김승찬 블로그',
+    '김승찬의 블로그',
+    '김승찬 기술블로그',
+    '김승찬의 기술블로그',
+    '기술 블로그',
+    '기술블로그',
+    '콜딩 블로그',
     '김승찬 풀스택',
     '김승찬 프로덕트 엔지니어',
     '개발자 김승찬',
@@ -104,7 +110,9 @@ const siteJsonLd = {
       '@id': `${SITE_URL}/#website`,
       url: SITE_URL,
       name: SITE_NAME,
-      alternateName: ['김승찬', '김승찬 블로그', 'kscold', 'KSCOLD', 'kscold.com'],
+      // alternateName 은 사이트를 부르는 다른 이름만 담는다. 노리는 검색어를 나열하면
+      // 구글이 사이트 이름 후보 판정을 아예 포기해 오히려 손해다. name(김승찬 블로그)과 중복도 제거.
+      alternateName: ['KSCOLD', 'kscold.com'],
       inLanguage: 'ko-KR',
       description: SITE_DESCRIPTION,
       about: { '@id': `${SITE_URL}/#person` },
@@ -116,7 +124,8 @@ const siteJsonLd = {
       '@type': 'Person',
       '@id': `${SITE_URL}/#person`,
       name: PROFILE.name,
-      alternateName: ['김승찬', 'kscold', 'KSCOLD', '콜딩', 'Colding', 'Kim Seung Chan'],
+      // 콜딩/Colding 은 사람이 아니라 사업자명이라 Organization 쪽에 둔다(worksFor 로 이미 연결됨).
+      alternateName: ['kscold', 'KSCOLD', 'Kim Seung Chan'],
       url: SITE_URL,
       mainEntityOfPage: SITE_URL,
       description:
@@ -156,6 +165,7 @@ const siteJsonLd = {
       '@type': 'Organization',
       '@id': `${SITE_URL}/#organization`,
       name: BUSINESS_INFO.companyName,
+      alternateName: ['콜딩', 'Colding'],
       url: SITE_URL,
       founder: PROFILE.name,
       email: BUSINESS_INFO.email,
