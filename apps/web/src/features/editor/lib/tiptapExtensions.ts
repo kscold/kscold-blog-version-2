@@ -53,7 +53,7 @@ export function buildEditorExtensions(placeholder: string, slashActions?: SlashC
     }),
     // 노션식 블록 드래그 핸들 — hover 시 블록 왼쪽 ⠿ 핸들로 순서 변경
     GlobalDragHandle.configure({ dragHandleWidth: 24 }),
-    // html: true 로 둬야 전처리한 <video> 태그가 Video 노드로 파싱된다
+    // html: true 로 둬야 전처리한 <video> 태그가 Video 노드로 파싱됨
     Markdown.configure({ transformPastedText: true, html: true }),
   ];
 }

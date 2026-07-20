@@ -10,7 +10,7 @@ const PADDING = 32; // px-4 sm:px-6 가로 패딩 근사치
 
 /**
  * Mermaid 다이어그램의 휠 줌(커서 중심) · 드래그/핀치 패닝 · 컨테이너 폭 자동 피팅을 담당.
- * renderState가 'rendered'가 될 때 컨테이너 폭에 맞춰 초기 스케일을 잡고, 'loading'이면 리셋한다.
+ * renderState가 'rendered'가 될 때 컨테이너 폭에 맞춰 초기 스케일을 잡고, 'loading'이면 리셋함.
  */
 export function useMermaidInteraction(renderState: MermaidRenderState) {
   const [dragging, setDragging] = useState(false);

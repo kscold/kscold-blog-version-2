@@ -6,14 +6,14 @@ export interface ParallaxStar {
   y: number;
   r: number;
   baseAlpha: number;
-  /** 패럴랙스 팩터 — 작을수록 멀리 있는 별처럼 천천히 움직인다 */
+  /** 패럴랙스 팩터 — 작을수록 멀리 있는 별처럼 천천히 움직임 */
   p: number;
   tw: number;
   ph: number;
 }
 
 // ── 패럴랙스 별 필드 ──
-// 그래프와 같은 캔버스에서, 카메라 이동에 노드보다 "느리게" 반응하는 별을 그린다.
+// 그래프와 같은 캔버스에서, 카메라 이동에 노드보다 "느리게" 반응하는 별을 그림.
 // 팬/줌할 때 별이 천천히 비켜나며 원근감이 생긴다 (배경이 벽지가 아니라 먼 우주가 됨).
 export function createStarfield(reducedEffects: boolean): ParallaxStar[] {
   const count = reducedEffects ? 40 : 90;
@@ -54,7 +54,7 @@ export function renderStarfield(
   const isDark = isDarkGraphTheme(theme);
   const t = isGraphHovered ? performance.now() / 1000 : 0;
 
-  // 마우스 기울임 시차 — 가까운 별(p 큼)일수록 커서 반대편으로 더 크게 밀린다
+  // 마우스 기울임 시차 — 가까운 별(p 큼)일수록 커서 반대편으로 더 크게 밀림
   const tiltX = supportsHover ? mouse.x : 0;
   const tiltY = supportsHover ? mouse.y : 0;
 

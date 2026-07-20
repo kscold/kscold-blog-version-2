@@ -17,7 +17,7 @@ export type LinkifySegment =
   | { kind: 'mention'; name: string; username: string };
 
 export interface LinkifyOptions {
-  /** displayName → username. @displayName 토큰을 멘션 링크로 렌더링한다. */
+  /** displayName → username. @displayName 토큰을 멘션 링크로 렌더링함. */
   mentions?: Record<string, string>;
 }
 
@@ -45,7 +45,7 @@ export function linkify(text: string, options?: LinkifyOptions): LinkifySegment[
   return segments;
 }
 
-/** URL 이 아닌 텍스트 구간에서 #해시태그·@멘션을 추가로 분리한다. */
+/** URL 이 아닌 텍스트 구간에서 #해시태그·@멘션을 추가로 분리함. */
 function tokenizeText(text: string, options?: LinkifyOptions): LinkifySegment[] {
   if (!text) return [];
   const mentions = options?.mentions ?? {};

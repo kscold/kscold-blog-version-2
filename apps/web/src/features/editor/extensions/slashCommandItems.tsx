@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import type { Editor } from '@tiptap/react';
 
-/** 슬래시 메뉴에서 실행되는 블록 삽입 액션 — 미디어류는 TiptapEditor가 주입한다 */
+/** 슬래시 메뉴에서 실행되는 블록 삽입 액션 — 미디어류는 TiptapEditor가 주입함 */
 export interface SlashCommandActions {
   insertImage?: (editor: Editor) => void;
   insertImageRow?: (editor: Editor) => void;
@@ -13,7 +13,7 @@ export interface SlashCommandActions {
 /**
  * 슬래시 메뉴 블록 명령 체인.
  * 모듈 증강(ChainedCommands)이 이 파일에서 안정적으로 로드되지 않아,
- * 런타임에 존재하는 메서드와 동일한 시그니처를 명시해 사용한다.
+ * 런타임에 존재하는 메서드와 동일한 시그니처를 명시해 사용함.
  */
 interface BlockChain {
   setParagraph(): BlockChain;

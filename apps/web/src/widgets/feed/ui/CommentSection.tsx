@@ -34,7 +34,7 @@ export function CommentSection({ feedId }: CommentSectionProps) {
   const totalPages = commentsData?.totalPages || 0;
   const redirect = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`;
 
-  // 렌더링용 멘션 맵: 표시 이름과 아이디 모두 프로필 주소로 연결한다.
+  // 렌더링용 멘션 맵: 표시 이름과 아이디 모두 프로필 주소로 연결함.
   const mentionMap = useMemo(
     () =>
       Object.fromEntries(

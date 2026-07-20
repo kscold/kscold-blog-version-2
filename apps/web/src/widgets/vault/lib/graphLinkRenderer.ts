@@ -23,7 +23,7 @@ export function renderGraphLink(
   const srcNode = src as GraphNode;
   const tgtNode = tgt as GraphNode;
   const isHovered = Boolean(hoverNode && (srcNode.id === hoverNode.id || tgtNode.id === hoverNode.id));
-  // 호버 포커스 모드: 호버 노드와 무관한 링크는 배경으로 가라앉힌다
+  // 호버 포커스 모드: 호버 노드와 무관한 링크는 배경으로 가라앉힘
   // 폴더 하이라이트 모드: 해당 폴더와 무관한 링크도 동일하게 처리
   const touchesHighlightFolder = Boolean(
     highlightFolderId &&

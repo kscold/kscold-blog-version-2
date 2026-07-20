@@ -70,7 +70,7 @@ export function useVaultForceGraph({
     return adjacency.get(String(hoverNode.id)) ?? new Set<string>();
   }, [hoverNode, adjacency]);
 
-  // 진입 페이드 — 시뮬레이션 워밍업 동안의 어수선한 첫 프레임을 가린다
+  // 진입 페이드 — 시뮬레이션 워밍업 동안의 어수선한 첫 프레임을 가림
   const [entered, setEntered] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 80);
@@ -242,7 +242,7 @@ export function useVaultForceGraph({
   const [zoomPct, setZoomPct] = useState(100);
 
   // ── 패럴랙스 별 필드 ──
-  // 그래프와 같은 캔버스에서, 카메라 이동에 노드보다 "느리게" 반응하는 별을 그린다.
+  // 그래프와 같은 캔버스에서, 카메라 이동에 노드보다 "느리게" 반응하는 별을 그림.
   // 팬/줌할 때 별이 천천히 비켜나며 원근감이 생긴다 (배경이 벽지가 아니라 먼 우주가 됨).
   const starsRef = useRef<ParallaxStar[] | null>(null);
 

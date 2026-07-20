@@ -3,7 +3,7 @@ import { GraphNode, VaultFolder } from '@/shared/model/types/vault';
 /**
  * 뮤트 톤으로 큐레이션한 폴더 팔레트.
  * 명도를 비슷하게 맞춘 dusty 계열이라 흰 배경 위에서 서로 조화롭고,
- * 글로우·그라디언트(알파 suffix 결합)에서도 차분하게 빛난다.
+ * 글로우·그라디언트(알파 suffix 결합)에서도 차분하게 빛남.
  */
 const CATEGORY_COLORS = [
   '#6E93C4', // dusty blue

@@ -47,7 +47,7 @@ export const sourceHref = (source: VaultAgentSource) => {
   return `${path}${path.includes('?') ? '&' : '?'}chat=open`;
 };
 
-/** Agent가 남긴 근거 번호를 현재 대화를 유지하는 내부 링크로 바꾼다. */
+/** Agent가 남긴 근거 번호를 현재 대화를 유지하는 내부 링크로 바꿈. */
 export function linkAgentSourceCitations(
   content: string,
   sources: VaultAgentSource[] | undefined

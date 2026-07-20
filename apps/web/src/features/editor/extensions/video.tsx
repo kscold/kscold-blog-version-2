@@ -5,7 +5,7 @@ import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
 
 /**
  * 에디터 안에서 mp4/webm/mov 동영상을 미리보기로 보여주는 노드 뷰.
- * 삭제 버튼으로 노드를 제거할 수 있다.
+ * 삭제 버튼으로 노드를 제거할 수 있음.
  */
 function VideoView({ node, deleteNode }: NodeViewProps) {
   const src: string = node.attrs.src || '';
@@ -67,7 +67,7 @@ export const VideoExtension = Node.create({
   addStorage() {
     return {
       markdown: {
-        // 동영상은 단독 URL 한 줄로 직렬화한다.
+        // 동영상은 단독 URL 한 줄로 직렬화함.
         // (프론트 마크다운 렌더러가 단독 동영상 URL을 VideoPlayer로 렌더)
         serialize(state: any, node: any) {
           if (node.attrs.src) {

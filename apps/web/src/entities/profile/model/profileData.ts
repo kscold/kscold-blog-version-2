@@ -14,7 +14,7 @@ export const PROFILE = {
 
 /**
  * 검색·생성형 AI(GEO)가 "김승찬"을 명확한 인물로 인식하도록 하는 FAQ.
- * info 페이지에 화면으로 노출되며 동일 내용이 FAQPage 구조화 데이터로도 제공된다.
+ * info 페이지에 화면으로 노출되며 동일 내용이 FAQPage 구조화 데이터로도 제공됨.
  */
 export const PROFILE_FAQ = [
   {

@@ -44,7 +44,7 @@ export function useMediaUpload() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      // 동영상은 용량이 커서 업로드 시간이 길 수 있어 타임아웃을 넉넉히 둔다
+      // 동영상은 용량이 커서 업로드 시간이 길 수 있어 타임아웃을 넉넉히 둠
       const result = await apiClient.upload<UploadResponse>('/media/upload', formData, {
         timeout: 120000,
       });

@@ -11,7 +11,7 @@ interface LinkifiedTextProps {
   className?: string;
   /** inline 자식 요소 (예: 작성자 이름) */
   prefix?: React.ReactNode;
-  /** displayName → username. @displayName 을 멘션 링크로 렌더링한다. */
+  /** displayName → username. @displayName 을 멘션 링크로 렌더링함. */
   mentions?: Record<string, string>;
 }
 

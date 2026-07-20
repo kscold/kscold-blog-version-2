@@ -11,7 +11,7 @@ interface VaultGraphRipplesProps {
   ripples: Ripple[];
 }
 
-// 노드 클릭 리플 — 클릭 지점에서 폴더 컬러 파동이 한 번 퍼진다
+// 노드 클릭 리플 — 클릭 지점에서 폴더 컬러 파동이 한 번 퍼짐
 export function VaultGraphRipples({ ripples }: VaultGraphRipplesProps) {
   return (
     <>

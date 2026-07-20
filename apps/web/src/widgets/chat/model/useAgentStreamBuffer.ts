@@ -5,7 +5,7 @@ import type { AgentMessage } from '@/features/chat';
 
 /**
  * 스트리밍 델타(부분 응답)를 requestAnimationFrame 단위로 모아서 한 번에 반영하는 버퍼.
- * 매 델타마다 setState하면 렌더가 과하게 튀므로, 프레임마다 누적분을 flush한다.
+ * 매 델타마다 setState하면 렌더가 과하게 튀므로, 프레임마다 누적분을 flush함.
  */
 export function useAgentStreamBuffer(
   setAgentMessages: Dispatch<SetStateAction<AgentMessage[]>>
@@ -13,7 +13,7 @@ export function useAgentStreamBuffer(
   const pendingDeltaRef = useRef<{ messageId: string; value: string } | undefined>(undefined);
   const streamFrameRef = useRef<{ messageId: string; frameId: number } | undefined>(undefined);
 
-  /** 누적된 델타를 해당 메시지에 즉시 반영한다. */
+  /** 누적된 델타를 해당 메시지에 즉시 반영함. */
   const flushPendingDelta = (assistantMessageId: string) => {
     if (streamFrameRef.current?.messageId === assistantMessageId) {
       streamFrameRef.current = undefined;
@@ -36,7 +36,7 @@ export function useAgentStreamBuffer(
     );
   };
 
-  /** 델타를 버퍼에 쌓고, 다음 프레임에 flush를 예약한다. */
+  /** 델타를 버퍼에 쌓고, 다음 프레임에 flush를 예약함. */
   const queueDelta = (assistantMessageId: string, delta: string) => {
     const pendingDelta = pendingDeltaRef.current;
     pendingDeltaRef.current =

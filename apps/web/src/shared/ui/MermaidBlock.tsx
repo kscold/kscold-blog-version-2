@@ -40,7 +40,7 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
       try {
         const mermaid = await loadMermaid(theme);
 
-        // 폰트가 로드된 뒤 렌더해야 Mermaid가 노드 크기를 정확히 측정한다.
+        // 폰트가 로드된 뒤 렌더해야 Mermaid가 노드 크기를 정확히 측정함.
         // (폴백 폰트로 측정하면 텍스트가 박스를 넘어 잘릴 수 있음)
         await ensureMermaidFonts();
         if (!active) return;

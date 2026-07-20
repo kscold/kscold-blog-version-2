@@ -54,7 +54,7 @@ export function promptVideoUrl(editor: Editor | null) {
   insertVideoOrEmbed(editor, url.trim());
 }
 
-/** mp4/webm/mov 파일을 업로드해 Video 노드로 삽입한다. */
+/** mp4/webm/mov 파일을 업로드해 Video 노드로 삽입함. */
 export async function promptVideoUpload(editor: Editor | null, uploadFile: UploadImage) {
   if (!editor) return;
 

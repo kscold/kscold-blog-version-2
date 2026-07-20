@@ -28,7 +28,7 @@ function ImageRowView({ node, updateAttributes, deleteNode }: NodeViewProps) {
         const url = await uploadFile(file);
         updateAttributes({ srcs: [...srcs, url] });
       } catch {
-        // silently skip failed uploads
+        // 업로드 실패는 조용히 건너뜀
       }
     };
     input.click();

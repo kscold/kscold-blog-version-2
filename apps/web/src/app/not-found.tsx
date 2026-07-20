@@ -4,11 +4,11 @@ import Link from 'next/link';
 /**
  * 전역 404 화면.
  *
- * 모든 notFound() 호출(없는 글·피드·카테고리·태그·팀)이 이 화면으로 모인다.
+ * 모든 notFound() 호출(없는 글·피드·카테고리·태그·팀)이 이 화면으로 모임.
  * 애드센스 정책상 "게시자 콘텐츠가 없는 화면"이므로 광고(AdSenseScript)를
  * 절대 렌더하지 않으며, 검색엔진 색인도 막는다(noindex).
  *
- * 헤더·사이드바·푸터는 ClientLayout 이 감싸주므로 본문만 구성한다.
+ * 헤더·사이드바·푸터는 ClientLayout 이 감싸주므로 본문만 구성함.
  */
 export const metadata: Metadata = {
   title: '페이지를 찾을 수 없습니다',
