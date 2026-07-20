@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { AiAgentBloomPaymentPage } from '@/widgets/payment';
 
 export const metadata: Metadata = {
-  title: 'AI Agent Bloom 테스트 결제',
-  description: 'AI Agent Bloom 참가권 테스트 결제와 카카오페이 결제창 직전 확인 화면',
+  title: 'AI Agent Bloom 결제 미리보기',
+  description: 'AI Agent Bloom 참가권 결제 화면 미리보기(관리자 전용)',
 };
 
 export default function AdminPaymentPreviewPage() {

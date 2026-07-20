@@ -8,6 +8,7 @@ export function AiAgentBloomOrdererInfoSection({
   isPreparing,
   paymentAccessToken,
   updateField,
+  isCardPayment = false,
 }: {
   form: FormState;
   errors: FormErrors;
@@ -15,6 +16,7 @@ export function AiAgentBloomOrdererInfoSection({
   isPreparing: boolean;
   paymentAccessToken: string | undefined;
   updateField: (field: keyof FormState, value: string) => void;
+  isCardPayment?: boolean;
 }) {
   return (
     <section
@@ -28,8 +30,8 @@ export function AiAgentBloomOrdererInfoSection({
           </div>
           <h2 className="text-3xl font-black tracking-tight">주문자 정보 입력</h2>
           <p className="text-sm leading-7 text-surface-600">
-            임의의 주문자 정보를 입력한 뒤 결제수단 선택 단계로 넘어가는 흐름입니다.
-            심사 화면에서 이름, 이메일, 연락처 입력란이 확인됩니다.
+            참가권 발송과 안내를 위해 주문자 정보를 입력해주세요. 입력하신 이메일로 결제 내역과 상세
+            안내를 보내드립니다.
           </p>
           {!canPay && (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold leading-6 text-amber-900">
@@ -76,14 +78,26 @@ export function AiAgentBloomOrdererInfoSection({
           <div>
             <div className="text-sm font-black text-surface-900">결제수단 선택</div>
             <div className="mt-3">
-              <div className="rounded-2xl border-2 border-surface-950 bg-white p-4 text-sm font-black text-surface-900">
-                카카오페이
-                <p className="mt-1 text-xs font-bold text-surface-500">
-                  테스트 결제는 카카오페이 단독 결제창으로만 진행합니다.
-                </p>
+              <div className="flex items-center gap-3 rounded-2xl border-2 border-surface-950 bg-white p-4">
+                <span
+                  aria-hidden="true"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-surface-950"
+                >
+                  <span className="h-2.5 w-2.5 rounded-full bg-surface-950" />
+                </span>
+                <span className="text-sm font-black text-surface-900">
+                  {isCardPayment ? '신용카드' : '카카오페이'}
+                  <p className="mt-1 text-xs font-bold text-surface-500">
+                    {isCardPayment
+                      ? 'KG이니시스 신용카드 결제창이 열립니다.'
+                      : '카카오페이 결제창이 열립니다.'}
+                  </p>
+                </span>
               </div>
             </div>
-            <p className="mt-2 text-xs font-bold text-surface-500">현재 결제수단: 카카오페이 고정</p>
+            <p className="mt-2 text-xs font-bold text-surface-500">
+              선택한 결제수단: {isCardPayment ? '신용카드 (KG이니시스)' : '카카오페이'}
+            </p>
           </div>
         </div>
       </div>

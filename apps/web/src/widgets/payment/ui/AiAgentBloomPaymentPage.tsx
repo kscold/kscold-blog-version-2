@@ -1,5 +1,6 @@
 'use client';
 
+import type { AiAgentBloomPayMethod } from '@/features/payment';
 import { useAiAgentBloomPayment } from '@/widgets/payment/model/useAiAgentBloomPayment';
 import { AiAgentBloomHeroSection } from './bloom/AiAgentBloomHeroSection';
 import { AiAgentBloomProductDetailSection } from './bloom/AiAgentBloomProductDetailSection';
@@ -7,7 +8,12 @@ import { AiAgentBloomProductCheckSection } from './bloom/AiAgentBloomProductChec
 import { AiAgentBloomOrdererInfoSection } from './bloom/AiAgentBloomOrdererInfoSection';
 import { AiAgentBloomConfirmSection } from './bloom/AiAgentBloomConfirmSection';
 
-export function AiAgentBloomPaymentPage() {
+interface AiAgentBloomPaymentPageProps {
+  /** CARD 를 주면 KG이니시스 신용카드 결제 경로로 동작함 */
+  payMethod?: AiAgentBloomPayMethod;
+}
+
+export function AiAgentBloomPaymentPage({ payMethod = 'EASY_PAY' }: AiAgentBloomPaymentPageProps) {
   const {
     form,
     errors,
@@ -19,14 +25,15 @@ export function AiAgentBloomPaymentPage() {
     loginPath,
     displayConfig,
     formattedAmount,
+    isCardPayment,
     updateField,
     handleSubmit,
-  } = useAiAgentBloomPayment();
+  } = useAiAgentBloomPayment(payMethod);
 
   return (
     <main className="min-h-screen bg-surface-50 px-4 py-8 text-surface-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-8">
-        <AiAgentBloomHeroSection />
+        <AiAgentBloomHeroSection isCardPayment={isCardPayment} />
 
         <AiAgentBloomProductDetailSection
           displayConfig={displayConfig}
@@ -48,6 +55,7 @@ export function AiAgentBloomPaymentPage() {
             isPreparing={isPreparing}
             paymentAccessToken={paymentAccessToken}
             updateField={updateField}
+            isCardPayment={isCardPayment}
           />
 
           <AiAgentBloomConfirmSection
@@ -58,6 +66,7 @@ export function AiAgentBloomPaymentPage() {
             formattedAmount={formattedAmount}
             isPreparing={isPreparing}
             canPay={canPay}
+            isCardPayment={isCardPayment}
           />
         </form>
       </div>

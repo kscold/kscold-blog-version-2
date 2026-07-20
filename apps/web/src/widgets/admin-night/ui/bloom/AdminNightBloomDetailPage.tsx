@@ -7,6 +7,7 @@ import {
   AI_AGENT_BLOOM_TIMELINE,
 } from '@/widgets/admin-night/lib/adminNight';
 import { AdminNightBloomSection } from './AdminNightBloomSection';
+import { BloomPurchaseCta } from './BloomPurchaseCta';
 
 export function AdminNightBloomDetailPage() {
   return (
@@ -37,14 +38,14 @@ export function AdminNightBloomDetailPage() {
                   </p>
                   <p>
                     바이브코딩을 적극 활용해 실제 구현 흐름을 함께 따라가고, 각자 떠올린 아이디어도 가볍게 나눠보는 자리로 준비하고 있습니다.
-                    지금은 확정 신청이 아니라 수요조사 단계이며, 예상 참가비는 2만~3만 원 사이입니다.
+                    참가비는 30,000원이며, 결제 완료 즉시 참가권이 확정됩니다.
                   </p>
                 </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <InfoPill label="진행 방식" value="오프라인 고정" />
                 <InfoPill label="강의 방식" value="바이브코딩 적극 활용" />
-                <InfoPill label="예상 참가비" value="2만~3만 원" />
+                <InfoPill label="참가비" value="30,000원" />
                 <InfoPill label="제공 기간" value="결제 즉시 확정·1일 이내 안내" />
               </div>
               <div className="rounded-3xl border border-cyan-100 bg-cyan-50 px-5 py-4 text-sm leading-7 text-cyan-900">
@@ -54,10 +55,12 @@ export function AdminNightBloomDetailPage() {
                   오프라인 세션은 공지된 일정에 현장에서 제공됩니다.
                 </p>
               </div>
+              <BloomPurchaseCta />
+
               <div className="flex flex-wrap gap-3">
                 <a
                   href="#ai-agent-bloom-vote"
-                  className="inline-flex rounded-2xl bg-surface-900 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-surface-800"
+                  className="inline-flex rounded-2xl border border-surface-200 bg-white px-5 py-3 text-sm font-black text-surface-900 transition-colors hover:bg-surface-50"
                 >
                   관심 투표하기
                 </a>

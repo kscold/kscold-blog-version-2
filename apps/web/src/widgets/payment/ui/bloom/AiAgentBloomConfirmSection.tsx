@@ -10,6 +10,7 @@ export function AiAgentBloomConfirmSection({
   formattedAmount,
   isPreparing,
   canPay,
+  isCardPayment = false,
 }: {
   config: AiAgentBloomPaymentConfig | null;
   paymentStatus: string | null;
@@ -18,7 +19,14 @@ export function AiAgentBloomConfirmSection({
   formattedAmount: string;
   isPreparing: boolean;
   canPay: boolean;
+  isCardPayment?: boolean;
 }) {
+  const methodLabel = isCardPayment ? '신용카드' : '카카오페이';
+  const unavailable = config
+    ? isCardPayment
+      ? !config.cardConfigured
+      : !config.configured
+    : false;
   return (
     <section
       id="before-payment-window"
@@ -31,14 +39,12 @@ export function AiAgentBloomConfirmSection({
           </div>
           <h2 className="text-3xl font-black tracking-tight">결제창 직전 화면</h2>
           <p className="text-sm leading-7 text-surface-600">
-            일반 PG 결제창 대신 카카오페이 단독연동 결제창으로 이동하기 직전 화면입니다.
-            상품명, 판매자, 결제수단, 금액을 최종 확인할 수 있습니다.
+            {methodLabel} 결제창으로 이동하기 직전 화면입니다. 상품명, 판매자, 결제수단, 금액을 최종
+            확인할 수 있습니다.
           </p>
-          {config && !config.configured && (
+          {unavailable && (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold leading-6 text-amber-950">
-              카카오페이 테스트 계정은 카카오페이 화면이 아니라 포트원 관리자 콘솔에서 준비합니다.
-              V2 테스트 상점의 Store ID와 카카오페이 테스트 채널키를 서버 환경변수
-              PORTONE_STORE_ID, PORTONE_KAKAOPAY_CHANNEL_KEY에 넣어주세요.
+              현재 {methodLabel} 결제를 이용할 수 없습니다. 잠시 후 다시 시도해주세요.
             </div>
           )}
           {paymentStatus && (
@@ -54,7 +60,9 @@ export function AiAgentBloomConfirmSection({
               <span className="rounded-full bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.3em] text-cyan-100">
                 Confirm
               </span>
-              <span className="text-sm font-black text-cyan-100">KakaoPay</span>
+              <span className="text-sm font-black text-cyan-100">
+                {isCardPayment ? 'KG이니시스' : 'KakaoPay'}
+              </span>
             </div>
             <h3 className="mt-5 text-2xl font-black">결제 정보 확인</h3>
             <div className="mt-5 space-y-3 text-sm">
@@ -65,7 +73,11 @@ export function AiAgentBloomConfirmSection({
                 value={`${form.customerName || '홍길동'} · ${form.customerEmail || 'buyer@example.com'}`}
                 dark
               />
-              <PaymentInfoRow label="결제수단" value="카카오페이" dark />
+              <PaymentInfoRow
+                label="결제수단"
+                value={isCardPayment ? '신용카드 (KG이니시스)' : '카카오페이'}
+                dark
+              />
               <PaymentInfoRow label="결제금액" value={`${formattedAmount}원`} dark />
               <PaymentInfoRow label="서비스 제공 기간" value={displayConfig.servicePeriod} dark />
             </div>
@@ -81,8 +93,8 @@ export function AiAgentBloomConfirmSection({
               {canPay
                 ? isPreparing
                   ? '결제 확인 중...'
-                  : '카카오페이 테스트 결제창으로 이동'
-                : '로그인 또는 특별 링크가 필요합니다'}
+                  : `${formattedAmount}원 ${methodLabel} 결제하기`
+                : '로그인 또는 안내받은 결제 링크가 필요합니다'}
             </button>
           </div>
         </div>

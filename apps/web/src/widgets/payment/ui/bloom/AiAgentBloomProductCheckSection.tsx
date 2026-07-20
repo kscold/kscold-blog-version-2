@@ -49,7 +49,7 @@ export function AiAgentBloomProductCheckSection({
               </Link>
             )}
             <p className="mt-3 text-xs font-bold text-surface-500">
-              테스트 결제는 주문자 정보 입력 후 카카오페이 단독 결제창으로 이어집니다.
+              주문자 정보를 입력하면 결제수단 확인 후 결제창으로 이어집니다.
             </p>
           </div>
         </div>
