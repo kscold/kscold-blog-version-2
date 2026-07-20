@@ -29,6 +29,15 @@ public interface VaultNoteRepository {
 
     List<VaultNote> findAllForGraph();
 
+    /**
+     * 노트별 본문 글자 수만 조회함. 본문 자체는 전송하지 않고 DB에서 길이만 계산하므로, 전체 노트를 훑어도 응답이 가볍다. 사이트맵이 분량 미달 노트를 색인 대상에서
+     * 제외하는 데 사용함.
+     */
+    List<NoteContentLength> findAllContentLengths();
+
+    /** 노트 id 와 본문 글자 수 */
+    record NoteContentLength(String id, int contentLength) {}
+
     void incrementCommentCount(String noteId);
 
     void decrementCommentCount(String noteId);

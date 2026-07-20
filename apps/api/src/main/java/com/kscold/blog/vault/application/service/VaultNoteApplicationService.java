@@ -15,6 +15,8 @@ import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
 import com.kscold.blog.vault.domain.service.BacklinkParsingService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -154,6 +156,15 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     public GraphDataResponse getGraphData() {
         List<VaultNote> allNotes = vaultNoteRepository.findAllForGraph();
 
+        // 그래프 조회는 본문을 제외한 프로젝션이라 길이를 알 수 없으므로, DB 에서 길이만 따로 계산해 합친다.
+        Map<String, Integer> contentLengthById =
+                vaultNoteRepository.findAllContentLengths().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        VaultNoteRepository.NoteContentLength::id,
+                                        VaultNoteRepository.NoteContentLength::contentLength,
+                                        (first, second) -> first));
+
         List<GraphDataResponse.GraphNode> nodes =
                 allNotes.stream()
                         .map(
@@ -162,11 +173,14 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
                                             note.getOutgoingLinks() != null
                                                     ? note.getOutgoingLinks().size() + 1
                                                     : 1;
+                                    int contentLength =
+                                            contentLengthById.getOrDefault(note.getId(), 0);
                                     return GraphDataResponse.GraphNode.builder()
                                             .id(note.getId())
                                             .name(note.getTitle())
                                             .slug(note.getSlug())
                                             .size(size)
+                                            .contentLength(contentLength)
                                             .folderId(note.getFolderId())
                                             .build();
                                 })
