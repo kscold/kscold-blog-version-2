@@ -19,6 +19,7 @@ import {
   starterPrompts,
   type AgentMessage,
 } from '@/features/chat/lib/agentConstants';
+import { useAgentStreamBuffer } from '@/features/chat/model/useAgentStreamBuffer';
 
 const INITIAL_STREAM_STAGE: VaultAgentStage = {
   name: '질문 정리',
@@ -36,8 +37,7 @@ export function useAgentChat(isOpen: boolean) {
     createInitialAgentMessages()
   );
   const streamAbortControllerRef = useRef<AbortController | undefined>(undefined);
-  const pendingDeltaRef = useRef<{ messageId: string; value: string } | undefined>(undefined);
-  const streamFrameRef = useRef<{ messageId: string; frameId: number } | undefined>(undefined);
+  const { flushPendingDelta, queueDelta, resetBuffer } = useAgentStreamBuffer(setAgentMessages);
 
   const lastAgentMessage = agentMessages[agentMessages.length - 1];
   const dynamicFollowUps =
@@ -114,49 +114,8 @@ export function useAgentChat(isOpen: boolean) {
   useEffect(() => {
     return () => {
       streamAbortControllerRef.current?.abort();
-      if (streamFrameRef.current) {
-        window.cancelAnimationFrame(streamFrameRef.current.frameId);
-      }
     };
   }, []);
-
-  const flushPendingDelta = (assistantMessageId: string) => {
-    if (streamFrameRef.current?.messageId === assistantMessageId) {
-      streamFrameRef.current = undefined;
-    }
-    const pendingDelta = pendingDeltaRef.current;
-    if (!pendingDelta || pendingDelta.messageId !== assistantMessageId) {
-      return;
-    }
-    const delta = pendingDelta.value;
-    pendingDeltaRef.current = undefined;
-    if (!delta) {
-      return;
-    }
-    setAgentMessages(previous =>
-      previous.map(message =>
-        message.id === assistantMessageId
-          ? { ...message, content: `${message.content}${delta}` }
-          : message
-      )
-    );
-  };
-
-  const queueDelta = (assistantMessageId: string, delta: string) => {
-    const pendingDelta = pendingDeltaRef.current;
-    pendingDeltaRef.current =
-      pendingDelta?.messageId === assistantMessageId
-        ? { ...pendingDelta, value: `${pendingDelta.value}${delta}` }
-        : { messageId: assistantMessageId, value: delta };
-    if (streamFrameRef.current?.messageId === assistantMessageId) {
-      return;
-    }
-    if (streamFrameRef.current) {
-      window.cancelAnimationFrame(streamFrameRef.current.frameId);
-    }
-    const frameId = window.requestAnimationFrame(() => flushPendingDelta(assistantMessageId));
-    streamFrameRef.current = { messageId: assistantMessageId, frameId };
-  };
 
   const submitAgentQuestion = async (rawQuestion: string) => {
     const question = rawQuestion.trim();
@@ -170,12 +129,8 @@ export function useAgentChat(isOpen: boolean) {
     let completedResponse: VaultAgentChatResponse | undefined;
 
     streamAbortControllerRef.current?.abort();
-    if (streamFrameRef.current) {
-      window.cancelAnimationFrame(streamFrameRef.current.frameId);
-      streamFrameRef.current = undefined;
-    }
+    resetBuffer();
     streamAbortControllerRef.current = abortController;
-    pendingDeltaRef.current = undefined;
     setAgentSessionId(sessionId);
     setAgentMessages(previous => [
       ...previous,
