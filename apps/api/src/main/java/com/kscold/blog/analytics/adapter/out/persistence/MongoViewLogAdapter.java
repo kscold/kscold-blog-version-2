@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-/** ViewLogRepository 포트 구현체 — MongoTemplate으로 조회 로그 저장 및 views atomic $inc를 수행한다. */
+/** ViewLogRepository 포트 구현체 — MongoTemplate으로 조회 로그 저장 및 views 원자적 $inc를 수행함. */
 @Component
 @RequiredArgsConstructor
 public class MongoViewLogAdapter implements ViewLogRepository {
@@ -31,7 +31,7 @@ public class MongoViewLogAdapter implements ViewLogRepository {
 
     @Override
     public void incrementViews(String collectionName, String entityId) {
-        // atomic $inc
+        // 원자적 증가 연산
         Query query = Query.query(Criteria.where("_id").is(toObjectIdOrRaw(entityId)));
         Update update = new Update().inc("views", 1);
         mongoTemplate.updateFirst(query, update, collectionName);

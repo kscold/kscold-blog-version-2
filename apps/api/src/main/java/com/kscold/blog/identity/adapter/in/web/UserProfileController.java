@@ -74,7 +74,7 @@ public class UserProfileController {
                 feedUseCase.getPublicFeedsByAuthorId(
                         profile.getId(),
                         PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
-        // 작성자(=프로필 주인)의 최신 프로필로 피드 작성자 정보를 채운다.
+        // 작성자(=프로필 주인)의 최신 프로필로 피드 작성자 정보를 채움.
         UserQueryPort.UserInfo author =
                 new UserQueryPort.UserInfo(
                         profile.getId(),

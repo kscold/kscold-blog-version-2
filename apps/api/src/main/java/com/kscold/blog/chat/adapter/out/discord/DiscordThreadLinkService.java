@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * roomId ↔ Discord 스레드 매핑을 관리하는 공유 컴포넌트. 아웃바운드 어댑터({@link DiscordBridgeService})와 인바운드 리스너({@link
- * DiscordMessageListener}) 양쪽에서 사용한다.
+ * DiscordMessageListener}) 양쪽에서 사용함.
  */
 @Slf4j
 @Component

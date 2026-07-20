@@ -19,7 +19,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
- * 피드 댓글 작성 후(커밋 이후) 알림 메일을 보낸다.
+ * 피드 댓글 작성 후(커밋 이후) 알림 메일을 보냄.
  *
  * <ul>
  *   <li>블로그 주인(admin)에게: 새 댓글 알림 — 단, 주인 본인이 단 댓글은 제외
@@ -56,10 +56,10 @@ public class FeedCommentMailListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(FeedCommentCreatedEvent event) {
         try {
-            // 댓글 저장 요청은 기다리지 않고, 커밋이 끝난 뒤 메일 작업만 전용 큐에 등록한다.
+            // 댓글 저장 요청은 기다리지 않고, 커밋이 끝난 뒤 메일 작업만 전용 큐에 등록함.
             feedCommentMailExecutor.execute(() -> sendNotifications(event));
         } catch (TaskRejectedException exception) {
-            // 혼잡할 때 요청 스레드에서 메일을 대신 보내면 댓글 UX가 다시 느려지므로 기록만 남긴다.
+            // 혼잡할 때 요청 스레드에서 메일을 대신 보내면 댓글 UX가 다시 느려지므로 기록만 남김.
             log.warn("피드 댓글 알림 작업 큐가 가득 차 전송을 건너뜁니다. feedId={}", event.feedId(), exception);
         }
     }

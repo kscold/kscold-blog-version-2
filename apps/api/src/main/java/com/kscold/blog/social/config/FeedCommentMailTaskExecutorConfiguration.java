@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-/** 피드 댓글 알림을 요청 처리와 분리해 전송하는 전용 작업 실행기 설정이다. */
+/** 피드 댓글 알림을 요청 처리와 분리해 전송하는 전용 작업 실행기 설정. */
 @Configuration
 public class FeedCommentMailTaskExecutorConfiguration {
 

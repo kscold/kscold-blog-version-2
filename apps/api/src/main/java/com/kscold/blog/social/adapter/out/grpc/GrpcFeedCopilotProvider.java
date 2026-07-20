@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-/** 피드 초안 생성 요청을 Vault Agent gRPC 서비스로 전달하는 어댑터입니다. */
+/** 피드 초안 생성 요청을 Vault Agent gRPC 서비스로 전달하는 어댑터. */
 @Slf4j
 @Component
 public class GrpcFeedCopilotProvider implements FeedCopilotProvider {

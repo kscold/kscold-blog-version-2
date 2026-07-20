@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 특정 피드에서 언급(@mention)할 수 있는 사용자와, 댓글 본문에서 실제로 언급된 사용자를 계산한다. 언급 대상 = 블로그 주인(관리자) + 해당 글에 댓글을 단
- * 참여자. 자동완성 엔드포인트와 알림 메일 리스너가 공유한다.
+ * 참여자. 자동완성 엔드포인트와 알림 메일 리스너가 공유함.
  */
 @Component
 @RequiredArgsConstructor

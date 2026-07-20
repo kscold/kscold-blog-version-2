@@ -5,14 +5,14 @@ import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-/** 피드 댓글 알림 메일(주인 알림 / 언급 알림) HTML·본문을 조립한다. */
+/** 피드 댓글 알림 메일(주인 알림 / 언급 알림) HTML·본문을 조립함. */
 @Component
 @RequiredArgsConstructor
 public class FeedCommentEmailComposer {
 
     private final PublicUrlResolver urlResolver;
 
-    /** 새 댓글이 달렸음을 블로그 주인(admin)에게 알린다. */
+    /** 새 댓글이 달렸음을 블로그 주인(admin)에게 알림. */
     public RecoveryMailMessage adminNewComment(
             String toEmail, String authorName, String content, String feedId, String postPreview) {
         String url = urlResolver.resolvePublicUrl("/feed/" + feedId);
@@ -27,7 +27,7 @@ public class FeedCommentEmailComposer {
                 "댓글 보러 가기");
     }
 
-    /** 댓글에서 언급된 사용자에게 알린다. */
+    /** 댓글에서 언급된 사용자에게 알림. */
     public RecoveryMailMessage mention(
             String toEmail, String authorName, String content, String feedId, String postPreview) {
         String url = urlResolver.resolvePublicUrl("/feed/" + feedId);

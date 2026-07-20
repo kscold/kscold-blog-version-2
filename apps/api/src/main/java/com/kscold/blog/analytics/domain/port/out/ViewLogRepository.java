@@ -6,12 +6,12 @@ import com.kscold.blog.analytics.domain.model.ViewLog;
 public interface ViewLogRepository {
 
     /**
-     * ViewLog를 저장한다. composite unique index 충돌(1시간 내 동일 IP·엔티티 중복 조회)이면 저장하지 않고 false를 반환한다.
+     * ViewLog를 저장함. composite unique index 충돌(1시간 내 동일 IP·엔티티 중복 조회)이면 저장하지 않고 false를 반환함.
      *
      * @return 실제로 저장됐으면 true, 중복이면 false
      */
     boolean insertViewLogIfUnique(ViewLog viewLog);
 
-    /** collectionName 컬렉션에서 entityId 문서의 views 필드를 atomic $inc(+1) 한다. */
+    /** collectionName 컬렉션에서 entityId 문서의 views 필드를 원자적으로 $inc(+1) 함. */
     void incrementViews(String collectionName, String entityId);
 }

@@ -21,7 +21,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-/** PageVisitLogRepository 포트 구현체 — MongoTemplate으로 page_visit_logs 집계/저장을 수행한다. */
+/** PageVisitLogRepository 포트 구현체 — MongoTemplate으로 page_visit_logs 집계/저장을 수행함. */
 @Component
 @RequiredArgsConstructor
 public class MongoPageVisitLogAdapter implements PageVisitLogRepository {

@@ -72,7 +72,7 @@ public class GrpcVaultAgentClient implements VaultAgentClientPort {
                             eventConsumer.accept(
                                     AgentStreamEvent.completed(toCompleted(event.getCompleted())));
                     case EVENT_NOT_SET -> {
-                        // 아직 전달할 이벤트가 없는 경우는 건너뜁니다.
+                        // 아직 전달할 이벤트가 없는 경우는 건너뜀.
                     }
                 }
             }

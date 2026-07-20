@@ -88,7 +88,7 @@ public class LinkScrapingAdapter implements LinkScrapingPort {
                 .build();
     }
 
-    /** 광고와 탐색 요소를 제거한 뒤 피드 초안에 필요한 본문 텍스트만 제한해서 전달합니다. */
+    /** 광고와 탐색 요소를 제거한 뒤 피드 초안에 필요한 본문 텍스트만 제한해서 전달함. */
     private String extractReadableText(Document document) {
         Element content =
                 document.selectFirst(

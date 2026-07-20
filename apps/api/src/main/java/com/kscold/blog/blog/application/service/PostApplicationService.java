@@ -91,7 +91,7 @@ public class PostApplicationService implements PostUseCase {
         return postRepository.save(post);
     }
 
-    /** 태그 목록에서 공개↔비공개 태그를 스왑하고 카운트를 보정한다. */
+    /** 태그 목록에서 공개↔비공개 태그를 스왑하고 카운트를 보정함. */
     private List<Post.TagInfo> swapVisibilityTag(List<Post.TagInfo> current, boolean nowPublic) {
         String addName = nowPublic ? TAG_PUBLIC : TAG_PRIVATE;
         String removeName = nowPublic ? TAG_PRIVATE : TAG_PUBLIC;

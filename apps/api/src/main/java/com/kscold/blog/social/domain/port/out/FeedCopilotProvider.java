@@ -5,7 +5,7 @@ import com.kscold.blog.social.domain.model.FeedCopilotDraft;
 import com.kscold.blog.social.domain.model.FeedCopilotPlan;
 import java.util.List;
 
-/** 피드 작성용 계획과 초안을 생성하는 외부 Agent 포트입니다. */
+/** 피드 작성용 계획과 초안을 생성하는 외부 Agent 포트. */
 public interface FeedCopilotProvider {
 
     FeedCopilotPlan createPlan(

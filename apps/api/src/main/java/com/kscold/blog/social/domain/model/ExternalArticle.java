@@ -2,7 +2,7 @@ package com.kscold.blog.social.domain.model;
 
 import org.springframework.util.StringUtils;
 
-/** 외부 링크에서 피드 초안 작성에 필요한 최소 텍스트만 정리한 값 객체입니다. */
+/** 외부 링크에서 피드 초안 작성에 필요한 최소 텍스트만 정리한 값 객체. */
 public record ExternalArticle(
         String url, String title, String description, String siteName, String content) {
 

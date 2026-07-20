@@ -31,7 +31,7 @@ public interface ChatUseCase {
     ChatMessage receiveOwnerReply(
             String sessionId, String ownerName, String content, String roomId);
 
-    /** 방문자 입장/퇴장 등 시스템 이벤트를 저장하고 외부 채널에 알린다. */
+    /** 방문자 입장/퇴장 등 시스템 이벤트를 저장하고 외부 채널에 알림. */
     void recordSystemEvent(String roomId, String content);
 
     List<ChatMessage> getRecentMessagesByRoom(String roomId, int limit);

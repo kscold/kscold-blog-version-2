@@ -20,7 +20,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 /**
  * 방문자·관리자 WebSocket 어댑터. 외부 알림(디스코드)은 직접 호출하지 않고 {@link ChatUseCase}를 통해서만 흐른다(인바운드 어댑터가 아웃바운드 어댑터를
- * 직접 호출하지 않도록). 이 핸들러는 {@link ChatBroadcastPort} 구현으로서 브로드캐스트만 담당한다.
+ * 직접 호출하지 않도록). 이 핸들러는 {@link ChatBroadcastPort} 구현으로서 브로드캐스트만 담당함.
  */
 @Slf4j
 @Component

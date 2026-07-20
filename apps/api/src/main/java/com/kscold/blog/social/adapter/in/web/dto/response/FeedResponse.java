@@ -95,7 +95,7 @@ public class FeedResponse {
 
     /**
      * 작성자 최신 프로필(avatar·표시 이름)을 실시간으로 채워서 응답을 만든다. feed.author 는 작성 시점 스냅샷({id, name})이라 프로필 이미지가
-     * 빠져 있으므로, 조회 시점에 사용자 정보를 주입해 항상 최신 프로필이 보이도록 한다.
+     * 빠져 있으므로, 조회 시점에 사용자 정보를 주입해 항상 최신 프로필이 보이도록 함.
      */
     public static FeedResponse from(
             Feed feed, String requestIdentifier, UserQueryPort.UserInfo authorInfo) {

@@ -160,7 +160,7 @@ public class VaultAgentController {
         try {
             send(emitter, "error", Map.of("message", message == null ? "응답을 만들지 못했습니다." : message));
         } catch (RuntimeException ignored) {
-            // 연결이 끊긴 경우에는 별도 응답을 보낼 수 없습니다.
+            // 연결이 끊긴 경우에는 별도 응답을 보낼 수 없음.
         }
     }
 
