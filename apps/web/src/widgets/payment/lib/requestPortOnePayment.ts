@@ -51,9 +51,10 @@ export async function requestPortOnePayment(
     ],
     productType: 'DIGITAL',
     redirectUrl: redirectUrl.toString(),
+    // KG이니시스는 merchantData 에 한글을 허용하지 않아(V023) ASCII 값만 담는다.
+    // 서비스 제공 기간 등 한글 정보는 주문 레코드에 이미 저장돼 있어 여기서 뺀다.
     customData: {
       programKey: preparedPayment.programKey,
-      servicePeriod: preparedPayment.servicePeriod,
     },
   });
 }
