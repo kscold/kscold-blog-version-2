@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react';
-import type { AgentMessage } from '@/features/chat/lib/agentConstants';
+import type { AgentMessage } from '@/features/chat';
 
 /**
  * 스트리밍 델타(부분 응답)를 requestAnimationFrame 단위로 모아서 한 번에 반영하는 버퍼.

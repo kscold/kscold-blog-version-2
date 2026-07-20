@@ -1,6 +1,6 @@
 'use client';
 
-import { FloatingChat } from '@/features/chat';
+import FloatingChat from './FloatingChat';
 
 export function FloatingChatWidget() {
   return <FloatingChat />;

@@ -2,24 +2,20 @@
 
 import { useEffect, useRef, useState } from 'react';
 import {
+  AGENT_SESSION_STORAGE_KEY,
+  createInitialAgentMessages,
   fetchVaultAgentContentScope,
   fetchVaultAgentHistory,
+  getOrCreateAgentSessionId,
+  resetAgentSessionId,
+  starterPrompts,
   streamVaultAgentMessage,
+  type AgentMessage,
   type VaultAgentChatResponse,
   type VaultAgentContentScope,
   type VaultAgentStage,
-} from '@/features/chat/api/vaultAgentApi';
-import {
-  AGENT_SESSION_STORAGE_KEY,
-  getOrCreateAgentSessionId,
-  resetAgentSessionId,
-} from '@/features/chat/lib/agentSession';
-import {
-  createInitialAgentMessages,
-  starterPrompts,
-  type AgentMessage,
-} from '@/features/chat/lib/agentConstants';
-import { useAgentStreamBuffer } from '@/features/chat/model/useAgentStreamBuffer';
+} from '@/features/chat';
+import { useAgentStreamBuffer } from './useAgentStreamBuffer';
 
 const INITIAL_STREAM_STAGE: VaultAgentStage = {
   name: '질문 정리',

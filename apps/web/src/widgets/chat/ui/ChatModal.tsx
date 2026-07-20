@@ -11,9 +11,9 @@ import {
   stageFeedCopilotDraft,
   type FeedCopilotDraft,
 } from '@/features/feed-copilot';
-import { useChatSocket } from '@/features/chat/lib/useChatSocket';
-import { useAgentChat } from '@/features/chat/model/useAgentChat';
-import ChatMessageList from '@/features/chat/ui/ChatMessageList';
+import { useChatSocket } from '@/features/chat';
+import { useAgentChat } from '../model/useAgentChat';
+import ChatMessageList from './ChatMessageList';
 import { ChatComposer } from './ChatComposer';
 import { ChatModalHeader } from './ChatModalHeader';
 import { AgentMessageList } from './AgentMessageList';
