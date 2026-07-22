@@ -1,5 +1,6 @@
 package com.kscold.blog.notification.config;
 
+import com.kscold.blog.notification.domain.model.NotificationChannel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,4 +32,27 @@ public class NotificationProperties {
 
     /** 봇이 만드는 웹훅 이름 */
     private String webhookName = "kscold-blog-notifier";
+
+    /** 회원가입 알림이 표시될 봇 이름 */
+    private String signupBotName = "회원가입 알림";
+
+    /** 회원가입 알림 봇 아바타 URL(비우면 기본 웹훅 아바타) */
+    private String signupBotAvatarUrl = "";
+
+    /** 오류 알림이 표시될 봇 이름 */
+    private String errorBotName = "오류 알림";
+
+    /** 오류 알림 봇 아바타 URL(비우면 기본 웹훅 아바타) */
+    private String errorBotAvatarUrl = "";
+
+    /** 채널별로 표시할 봇 이름 */
+    public String botName(NotificationChannel channel) {
+        return channel == NotificationChannel.SIGNUP ? signupBotName : errorBotName;
+    }
+
+    /** 채널별 봇 아바타 URL. 비어 있으면 null 을 돌려 웹훅 기본 아바타를 쓰게 함. */
+    public String botAvatarUrl(NotificationChannel channel) {
+        String url = channel == NotificationChannel.SIGNUP ? signupBotAvatarUrl : errorBotAvatarUrl;
+        return url == null || url.isBlank() ? null : url;
+    }
 }

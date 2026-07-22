@@ -97,6 +97,11 @@ notification:
     signup-channel-name: ${NOTIFICATION_DISCORD_SIGNUP_CHANNEL:회원가입}
     error-channel-name: ${NOTIFICATION_DISCORD_ERROR_CHANNEL:오류알림}
     webhook-name: ${NOTIFICATION_DISCORD_WEBHOOK_NAME:kscold-blog-notifier}
+    # 알림마다 표시될 봇 이름·아바타(채팅봇 이름으로 뜨지 않도록 역할별로 분리)
+    signup-bot-name: ${NOTIFICATION_DISCORD_SIGNUP_BOT_NAME:회원가입 알림}
+    signup-bot-avatar-url: ${NOTIFICATION_DISCORD_SIGNUP_BOT_AVATAR:}
+    error-bot-name: ${NOTIFICATION_DISCORD_ERROR_BOT_NAME:오류 알림}
+    error-bot-avatar-url: ${NOTIFICATION_DISCORD_ERROR_BOT_AVATAR:}
 
 portone:
   store-id: ${PORTONE_STORE_ID:}

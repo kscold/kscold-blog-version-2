@@ -33,13 +33,19 @@ public class GlobalExceptionHandler {
 
     /** BusinessException 처리 비즈니스 로직에서 발생하는 모든 커스텀 예외 처리 */
     @ExceptionHandler(BusinessException.class)
-    protected ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
+    protected ResponseEntity<ApiResponse<Void>> handleBusinessException(
+            BusinessException e, HttpServletRequest request) {
         log.warn(
                 "BusinessException: code={}, message={}",
                 e.getErrorCode().getCode(),
                 e.getMessage());
 
         ErrorCode errorCode = e.getErrorCode();
+        // DB·외부 API 실패처럼 5xx 로 나가는 건 실제 장애이므로 알림 대상에 포함한다.
+        if (errorCode.getStatus().is5xxServerError()) {
+            notifyError(e, request);
+        }
+
         ApiResponse<Void> response = ApiResponse.error(errorCode.getCode(), e.getMessage());
 
         return new ResponseEntity<>(response, errorCode.getStatus());

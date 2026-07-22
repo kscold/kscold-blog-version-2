@@ -1,8 +1,11 @@
 package com.kscold.blog.notification.adapter.out.discord;
 
+import com.kscold.blog.notification.config.NotificationProperties;
+import com.kscold.blog.notification.domain.model.NotificationChannel;
 import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.notification.domain.port.out.NotificationSenderPort;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -19,15 +22,22 @@ import org.springframework.web.client.RestClient;
 @Component
 public class DiscordWebhookSender implements NotificationSenderPort {
 
-    /** 임베드 좌측 색상(청록) */
-    private static final int EMBED_COLOR = 0x06B6D4;
+    /** 회원가입 알림 색상(청록) */
+    private static final int SIGNUP_COLOR = 0x06B6D4;
+
+    /** 오류 알림 색상(빨강) */
+    private static final int ERROR_COLOR = 0xEF4444;
 
     private final DiscordWebhookProvisioner provisioner;
+    private final NotificationProperties properties;
     private final RestClient restClient;
 
     public DiscordWebhookSender(
-            DiscordWebhookProvisioner provisioner, RestClient.Builder restClientBuilder) {
+            DiscordWebhookProvisioner provisioner,
+            NotificationProperties properties,
+            RestClient.Builder restClientBuilder) {
         this.provisioner = provisioner;
+        this.properties = properties;
         this.restClient = restClientBuilder.build();
     }
 
@@ -65,10 +75,19 @@ public class DiscordWebhookSender implements NotificationSenderPort {
                         "description",
                         message.description(),
                         "color",
-                        EMBED_COLOR,
+                        message.channel() == NotificationChannel.ERROR ? ERROR_COLOR : SIGNUP_COLOR,
                         "fields",
                         fields);
 
-        return Map.of("embeds", List.of(embed));
+        // 웹훅은 메시지마다 표시 이름·아바타를 바꿀 수 있어, 채널마다 다른 봇처럼 보이게 한다.
+        // (채팅 브릿지 봇 이름으로 뜨지 않도록 하는 것이 목적)
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("username", properties.botName(message.channel()));
+        String avatarUrl = properties.botAvatarUrl(message.channel());
+        if (avatarUrl != null) {
+            payload.put("avatar_url", avatarUrl);
+        }
+        payload.put("embeds", List.of(embed));
+        return payload;
     }
 }
