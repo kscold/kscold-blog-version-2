@@ -1,7 +1,13 @@
 package com.kscold.blog.exception;
 
+import com.kscold.blog.notification.application.port.in.NotificationUseCase;
+import com.kscold.blog.notification.domain.model.NotificationChannel;
+import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.shared.web.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +26,10 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @Slf4j
 @SuppressWarnings("null")
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final NotificationUseCase notificationUseCase;
 
     /** BusinessException 처리 비즈니스 로직에서 발생하는 모든 커스텀 예외 처리 */
     @ExceptionHandler(BusinessException.class)
@@ -147,8 +156,10 @@ public class GlobalExceptionHandler {
 
     /** 기타 모든 예외 처리 예상하지 못한 서버 오류 */
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
+    protected ResponseEntity<ApiResponse<Void>> handleException(
+            Exception e, HttpServletRequest request) {
         log.error("Unexpected exception occurred", e);
+        notifyError(e, request);
 
         ApiResponse<Void> response =
                 ApiResponse.error(
@@ -156,5 +167,28 @@ public class GlobalExceptionHandler {
                         "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /** 예상치 못한 서버 오류를 디스코드 알림 채널로 알림. 알림 실패가 응답을 방해하지 않도록 예외를 삼킨다. */
+    private void notifyError(Exception exception, HttpServletRequest request) {
+        try {
+            String where =
+                    request != null ? request.getMethod() + " " + request.getRequestURI() : "-";
+            String detail = exception.getClass().getSimpleName();
+            String message = exception.getMessage();
+            if (message != null && !message.isBlank()) {
+                detail +=
+                        ": " + (message.length() > 300 ? message.substring(0, 300) + "…" : message);
+            }
+
+            notificationUseCase.notify(
+                    new NotificationMessage(
+                            NotificationChannel.ERROR,
+                            "서버 오류가 발생했어요",
+                            detail,
+                            List.of(new NotificationMessage.Field("요청", where))));
+        } catch (Exception notifyFailure) {
+            log.warn("오류 알림 전송을 건너뜁니다", notifyFailure);
+        }
     }
 }

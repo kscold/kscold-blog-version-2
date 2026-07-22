@@ -89,6 +89,15 @@ admin-night:
   admin-email: ${ADMIN_NIGHT_ADMIN_EMAIL:developerkscold@gmail.com}
   admin-name: ${ADMIN_NIGHT_ADMIN_NAME:김승찬}
 
+# 디스코드 단방향 알림(회원가입·오류). 채널 ID 대신 채널 '이름'으로 찾고 없으면 봇이 생성함.
+notification:
+  discord:
+    enabled: ${NOTIFICATION_DISCORD_ENABLED:true}
+    auto-create-channel: ${NOTIFICATION_DISCORD_AUTO_CREATE:true}
+    signup-channel-name: ${NOTIFICATION_DISCORD_SIGNUP_CHANNEL:회원가입}
+    error-channel-name: ${NOTIFICATION_DISCORD_ERROR_CHANNEL:오류알림}
+    webhook-name: ${NOTIFICATION_DISCORD_WEBHOOK_NAME:kscold-blog-notifier}
+
 portone:
   store-id: ${PORTONE_STORE_ID:}
   kakao-pay-channel-key: ${PORTONE_KAKAOPAY_CHANNEL_KEY:}

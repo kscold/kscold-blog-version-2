@@ -18,12 +18,16 @@ import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.notification.application.port.in.NotificationUseCase;
+import com.kscold.blog.notification.domain.model.NotificationChannel;
+import com.kscold.blog.notification.domain.model.NotificationMessage;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,6 +46,7 @@ public class AuthApplicationService implements AuthUseCase {
     private final RecoveryMailSender recoveryMailSender;
     private final RecoveryMailComposer recoveryEmailComposer;
     private final PublicUrlResolver recoveryMailProperties;
+    private final NotificationUseCase notificationUseCase;
 
     @Transactional
     public AuthResponse register(RegisterCommand command) {
@@ -71,6 +76,7 @@ public class AuthApplicationService implements AuthUseCase {
 
         user = userRepository.save(user);
         sendWelcomeMailSafely(user);
+        notifySignup(user);
 
         String accessToken = tokenProvider.createAccessToken(user.getId(), user.getRole().name());
         String refreshToken = tokenProvider.createRefreshToken(user.getId(), user.getRole().name());
@@ -248,6 +254,22 @@ public class AuthApplicationService implements AuthUseCase {
             recoveryMailSender.send(recoveryEmailComposer.buildWelcome(user));
         } catch (Exception exception) {
             log.warn("Welcome email delivery skipped for {}", user.getEmail(), exception);
+        }
+    }
+
+    /** 신규 가입을 디스코드 알림 채널로 알림. 실패해도 가입 자체는 성공해야 하므로 예외를 삼킨다. */
+    private void notifySignup(User user) {
+        try {
+            notificationUseCase.notify(
+                    new NotificationMessage(
+                            NotificationChannel.SIGNUP,
+                            "새 회원이 가입했어요",
+                            user.getDisplayName() + "님이 블로그에 가입했습니다.",
+                            List.of(
+                                    new NotificationMessage.Field("아이디", user.getUsername()),
+                                    new NotificationMessage.Field("권한", user.getRole().name()))));
+        } catch (Exception exception) {
+            log.warn("회원가입 알림 전송을 건너뜁니다. username={}", user.getUsername(), exception);
         }
     }
 
