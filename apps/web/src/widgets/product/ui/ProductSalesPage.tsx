@@ -3,6 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { aiAgentBloomPaymentApi, type AiAgentBloomPaymentConfig } from '@/features/payment';
+import {
+  SERVICE_PERIOD,
+  SERVICE_PERIOD_NOTICE,
+} from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
 
 const HIGHLIGHTS = [
   '오프라인 고정 진행 (장소 대관 포함)',
@@ -30,14 +34,15 @@ export function ProductSalesPage() {
 
   const productName = config?.productName ?? 'AI Agent Bloom 참가권';
   const amount = (config?.totalAmount ?? 30_000).toLocaleString('ko-KR');
-  const servicePeriod =
-    config?.servicePeriod ?? '결제 완료 즉시 참가권 확정, 상세 안내 1일 이내 이메일 제공';
+  const servicePeriod = config?.servicePeriod ?? SERVICE_PERIOD;
 
   return (
     <main className="min-h-screen bg-surface-50 px-4 py-10 text-surface-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl space-y-6">
         <header className="space-y-2">
-          <p className="text-[11px] font-black uppercase tracking-[0.28em] text-cyan-600">Product</p>
+          <p className="text-[11px] font-black uppercase tracking-[0.28em] text-cyan-600">
+            Product
+          </p>
           <h1 className="text-3xl font-black tracking-tight sm:text-4xl">판매 상품</h1>
           <p className="text-sm leading-7 text-surface-600">
             콜딩(Colding)에서 판매하는 상품입니다. 상품을 선택하면 결제 화면으로 이동합니다.
@@ -94,6 +99,9 @@ export function ProductSalesPage() {
               <div>
                 <dt className="text-xs font-black text-surface-400">서비스 제공 기간</dt>
                 <dd className="mt-1 font-bold text-surface-800">{servicePeriod}</dd>
+                <dd className="mt-2 text-xs font-medium leading-5 text-surface-500">
+                  {SERVICE_PERIOD_NOTICE}
+                </dd>
               </div>
               <div>
                 <dt className="text-xs font-black text-surface-400">취소·환불</dt>
@@ -129,8 +137,8 @@ export function ProductSalesPage() {
             </div>
 
             <p className="text-xs leading-6 text-surface-500">
-              결제는 신용카드(KG이니시스) 또는 카카오페이로 진행되며, 회원가입 없이 결제할 수 있습니다.
-              결제 정보는 결제대행사를 통해 안전하게 처리됩니다.
+              결제는 신용카드(KG이니시스) 또는 카카오페이로 진행되며, 회원가입 없이 결제할 수
+              있습니다. 결제 정보는 결제대행사를 통해 안전하게 처리됩니다.
             </p>
           </div>
         </article>

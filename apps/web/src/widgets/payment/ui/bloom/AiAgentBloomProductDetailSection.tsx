@@ -1,5 +1,8 @@
 import type { AiAgentBloomPaymentConfig } from '@/features/payment';
-import { productHighlights } from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
+import {
+  SERVICE_PERIOD_NOTICE,
+  productHighlights,
+} from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
 import { PaymentInfoRow } from './PaymentInfoRow';
 
 export function AiAgentBloomProductDetailSection({
@@ -25,13 +28,13 @@ export function AiAgentBloomProductDetailSection({
               AI Agent, 같이 만들고 피워보는 Bloom 참가권
             </h2>
             <p className="text-base leading-8 text-surface-600">
-              LLM 호출부터 LCEL, Memory, LangGraph MAS, RAG fallback, 평가와 관측까지 이어지는
-              AI Agent 구현 흐름을 바이브코딩을 적극 활용해 함께 따라갑니다.
+              LLM 호출부터 LCEL, Memory, LangGraph MAS, RAG fallback, 평가와 관측까지 이어지는 AI
+              Agent 구현 흐름을 바이브코딩을 적극 활용해 함께 따라갑니다.
             </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {productHighlights.map((highlight) => (
+            {productHighlights.map(highlight => (
               <div
                 key={highlight}
                 className="rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-bold text-surface-700"
@@ -57,8 +60,11 @@ export function AiAgentBloomProductDetailSection({
               <PaymentInfoRow label="진행 방식" value="오프라인 고정" dark />
               <PaymentInfoRow label="예상 범위" value="2만~3만 원" dark />
               <PaymentInfoRow label="포함 항목" value="장소·음식·강의 준비" dark />
-              <PaymentInfoRow label="서비스 제공 기간" value="결제 즉시 확정·1일 이내 안내" dark />
+              <PaymentInfoRow label="서비스 제공 기간" value={displayConfig.servicePeriod} dark />
             </div>
+            <p className="mt-5 rounded-2xl border border-cyan-200/20 bg-cyan-300/10 px-4 py-3 text-sm font-bold leading-6 text-cyan-50">
+              {SERVICE_PERIOD_NOTICE}
+            </p>
           </div>
         </aside>
       </div>

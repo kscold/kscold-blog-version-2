@@ -11,6 +11,7 @@ import {
   ORDER_NAME,
   PAYMENT_PATH,
   PRODUCT_NAME,
+  SERVICE_PERIOD,
   TOTAL_AMOUNT,
   initialForm,
   type FormErrors,
@@ -52,7 +53,7 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
     orderName: ORDER_NAME,
     totalAmount: TOTAL_AMOUNT,
     currency: 'KRW' as const,
-    servicePeriod: '결제 완료 즉시 참가권 확정, 상세 안내 1일 이내 이메일 제공',
+    servicePeriod: SERVICE_PERIOD,
   };
 
   const formattedAmount = useMemo(
@@ -64,14 +65,14 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
     let mounted = true;
     aiAgentBloomPaymentApi
       .getConfig()
-      .then((nextConfig) => {
+      .then(nextConfig => {
         if (!mounted) {
           return;
         }
         setConfig(nextConfig);
         setConfigError(null);
       })
-      .catch((error) => {
+      .catch(error => {
         if (!mounted) {
           return;
         }
@@ -96,25 +97,28 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
       return;
     }
 
-    setForm((prev) => ({
+    setForm(prev => ({
       customerName: prev.customerName || user.displayName || user.username || '',
       customerEmail: prev.customerEmail || user.email || '',
       customerPhone: prev.customerPhone,
     }));
   }, [user]);
 
-  const completePayment = useCallback(async (paymentId: string) => {
-    try {
-      setIsPreparing(true);
-      setPaymentStatus('결제 결과를 확인하고 있습니다.');
-      const completed = await aiAgentBloomPaymentApi.complete(paymentId, paymentAccessToken);
-      setPaymentStatus(completed.message || '결제가 확인되었습니다.');
-    } catch (error) {
-      setPaymentStatus(resolveErrorMessage(error, '결제 결과 확인 중 오류가 발생했습니다.'));
-    } finally {
-      setIsPreparing(false);
-    }
-  }, [paymentAccessToken]);
+  const completePayment = useCallback(
+    async (paymentId: string) => {
+      try {
+        setIsPreparing(true);
+        setPaymentStatus('결제 결과를 확인하고 있습니다.');
+        const completed = await aiAgentBloomPaymentApi.complete(paymentId, paymentAccessToken);
+        setPaymentStatus(completed.message || '결제가 확인되었습니다.');
+      } catch (error) {
+        setPaymentStatus(resolveErrorMessage(error, '결제 결과 확인 중 오류가 발생했습니다.'));
+      } finally {
+        setIsPreparing(false);
+      }
+    },
+    [paymentAccessToken]
+  );
 
   useEffect(() => {
     if (!canPay) {
@@ -127,7 +131,9 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
     const message = searchParams.get('message');
 
     if (code) {
-      setPaymentStatus(message ? `결제가 완료되지 않았습니다. ${message}` : '결제가 완료되지 않았습니다.');
+      setPaymentStatus(
+        message ? `결제가 완료되지 않았습니다. ${message}` : '결제가 완료되지 않았습니다.'
+      );
       return;
     }
     if (!paymentId || handledRedirectPaymentId.current === paymentId) {
@@ -140,8 +146,8 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
 
   const updateField = (field: keyof FormState, value: string) => {
     const nextValue = field === 'customerPhone' ? formatPhoneNumber(value) : value;
-    setForm((prev) => ({ ...prev, [field]: nextValue }));
-    setErrors((prev) => {
+    setForm(prev => ({ ...prev, [field]: nextValue }));
+    setErrors(prev => {
       const nextErrors = { ...prev };
       delete nextErrors[field];
       return nextErrors;
@@ -176,7 +182,9 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
 
     setIsPreparing(true);
     setPaymentStatus(
-      isCardPayment ? '신용카드 결제창을 준비하고 있습니다.' : '카카오페이 결제창을 준비하고 있습니다.'
+      isCardPayment
+        ? '신용카드 결제창을 준비하고 있습니다.'
+        : '카카오페이 결제창을 준비하고 있습니다.'
     );
 
     try {
@@ -194,7 +202,9 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
         return;
       }
       if (paymentResponse.code) {
-        setPaymentStatus(paymentResponse.message || `결제가 완료되지 않았습니다. (${paymentResponse.code})`);
+        setPaymentStatus(
+          paymentResponse.message || `결제가 완료되지 않았습니다. (${paymentResponse.code})`
+        );
         return;
       }
 

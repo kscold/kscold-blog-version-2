@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { aiAgentBloomPaymentApi, type AiAgentBloomPaymentConfig } from '@/features/payment';
+import { SERVICE_PERIOD } from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
 
 /**
  * 상품 상세의 구매 영역. 결제수단은 서버 설정에 따라 노출되며, 신용카드(KG이니시스) 채널키가 없으면
@@ -38,7 +39,7 @@ export function BloomPurchaseCta() {
           </p>
           <p className="mt-2 text-3xl font-black tracking-tight text-surface-950">{amount}원</p>
           <p className="mt-1 text-xs font-bold text-surface-500">
-            결제 완료 즉시 참가권 확정 · 상세 안내 1일 이내 이메일 제공
+            서비스 제공 기간: {config?.servicePeriod ?? SERVICE_PERIOD}
           </p>
         </div>
 

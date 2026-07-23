@@ -1,5 +1,8 @@
 import type { AiAgentBloomPaymentConfig } from '@/features/payment';
-import type { FormState } from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
+import {
+  SERVICE_PERIOD_NOTICE,
+  type FormState,
+} from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
 import { PaymentInfoRow } from './PaymentInfoRow';
 
 export function AiAgentBloomConfirmSection({
@@ -82,8 +85,8 @@ export function AiAgentBloomConfirmSection({
               <PaymentInfoRow label="서비스 제공 기간" value={displayConfig.servicePeriod} dark />
             </div>
             <p className="mt-5 text-sm leading-7 text-surface-300">
-              결제 완료 즉시 참가권이 확정되며, 최종 장소와 시간 등 상세 안내는 1일 이내 이메일로 제공합니다.
-              오프라인 세션은 공지된 일정에 현장에서 제공됩니다.
+              {SERVICE_PERIOD_NOTICE} 결제 완료 후 참가권이 확정되며, 상세 안내는 1일 이내 이메일로
+              제공합니다.
             </p>
             <button
               type="submit"

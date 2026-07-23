@@ -38,7 +38,7 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     private static final String PAY_METHOD_EASY_PAY = "EASY_PAY";
     private static final String PAY_METHOD_CARD = "CARD";
     private static final String EASY_PAY_PROVIDER = "KAKAOPAY";
-    private static final String SERVICE_PERIOD = "결제 완료 즉시 참가권 확정, 상세 안내 1일 이내 이메일 제공";
+    private static final String SERVICE_PERIOD = "결제 완료 직후부터 해당 오프라인 모임 종료 시까지 (결제일로부터 1년 이내 제공)";
     private static final DateTimeFormatter PAYMENT_ID_DATE =
             DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
