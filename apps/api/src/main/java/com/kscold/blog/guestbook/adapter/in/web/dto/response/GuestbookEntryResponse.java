@@ -20,6 +20,7 @@ public class GuestbookEntryResponse {
     private Boolean canDelete;
     private String content;
     private LocalDateTime createdAt;
+    private ReplyResponse reply;
 
     public static GuestbookEntryResponse from(
             GuestbookEntry entry, String currentUserId, boolean currentUserIsAdmin) {
@@ -34,6 +35,23 @@ public class GuestbookEntryResponse {
                 .canDelete(canDelete)
                 .content(entry.getContent())
                 .createdAt(entry.getCreatedAt())
+                .reply(entry.getReply() != null ? ReplyResponse.from(entry.getReply()) : null)
                 .build();
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReplyResponse {
+        private String content;
+        private LocalDateTime repliedAt;
+
+        public static ReplyResponse from(GuestbookEntry.GuestbookReply reply) {
+            return ReplyResponse.builder()
+                    .content(reply.getContent())
+                    .repliedAt(reply.getRepliedAt())
+                    .build();
+        }
     }
 }

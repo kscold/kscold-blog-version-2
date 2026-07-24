@@ -11,5 +11,8 @@ public enum NotificationChannel {
     SIGNUP,
 
     /** 서버 오류 알림 */
-    ERROR
+    ERROR,
+
+    /** 방명록 작성 알림 */
+    GUESTBOOK
 }

@@ -56,6 +56,7 @@ public class DiscordWebhookProvisioner {
         for (Guild guild : jda.getGuilds()) {
             provision(guild, NotificationChannel.SIGNUP, properties.getSignupChannelName());
             provision(guild, NotificationChannel.ERROR, properties.getErrorChannelName());
+            provision(guild, NotificationChannel.GUESTBOOK, properties.getGuestbookChannelName());
         }
     }
 

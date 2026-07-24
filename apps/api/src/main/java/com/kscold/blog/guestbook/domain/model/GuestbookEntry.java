@@ -29,5 +29,18 @@ public class GuestbookEntry {
 
     private String content;
 
+    /** 블로그 주인(admin)이 남긴 답글. 아직 답글이 없으면 null. */
+    private GuestbookReply reply;
+
     @CreatedDate private LocalDateTime createdAt;
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GuestbookReply {
+        private String content;
+        private LocalDateTime repliedAt;
+    }
 }

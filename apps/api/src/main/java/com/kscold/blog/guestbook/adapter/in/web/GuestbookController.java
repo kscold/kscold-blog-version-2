@@ -2,6 +2,7 @@ package com.kscold.blog.guestbook.adapter.in.web;
 
 import com.kscold.blog.guestbook.adapter.in.web.dto.response.GuestbookEntryResponse;
 import com.kscold.blog.guestbook.application.dto.command.GuestbookEntryCreateCommand;
+import com.kscold.blog.guestbook.application.dto.command.GuestbookReplyCommand;
 import com.kscold.blog.guestbook.application.port.in.GuestbookUseCase;
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -64,6 +65,17 @@ public class GuestbookController {
             @PathVariable String entryId, @AuthenticationPrincipal String userId) {
         guestbookUseCase.delete(entryId, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{entryId}/reply")
+    public ResponseEntity<ApiResponse<GuestbookEntryResponse>> replyToEntry(
+            @PathVariable String entryId,
+            @AuthenticationPrincipal String userId,
+            @Valid @RequestBody GuestbookReplyCommand command) {
+        GuestbookEntry entry = guestbookUseCase.reply(entryId, command, userId);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        GuestbookEntryResponse.from(entry, userId, hasAdminRole()), "답글을 남겼습니다"));
     }
 
     private boolean hasAdminRole() {

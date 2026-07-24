@@ -1,7 +1,6 @@
 package com.kscold.blog.notification.adapter.out.discord;
 
 import com.kscold.blog.notification.config.NotificationProperties;
-import com.kscold.blog.notification.domain.model.NotificationChannel;
 import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.notification.domain.port.out.NotificationSenderPort;
 import java.util.ArrayList;
@@ -27,6 +26,9 @@ public class DiscordWebhookSender implements NotificationSenderPort {
 
     /** 오류 알림 색상(빨강) */
     private static final int ERROR_COLOR = 0xEF4444;
+
+    /** 방명록 알림 색상(호박) */
+    private static final int GUESTBOOK_COLOR = 0xF59E0B;
 
     private final DiscordWebhookProvisioner provisioner;
     private final NotificationProperties properties;
@@ -68,6 +70,13 @@ public class DiscordWebhookSender implements NotificationSenderPort {
             fields.add(Map.of("name", field.name(), "value", field.value(), "inline", true));
         }
 
+        int color =
+                switch (message.channel()) {
+                    case SIGNUP -> SIGNUP_COLOR;
+                    case ERROR -> ERROR_COLOR;
+                    case GUESTBOOK -> GUESTBOOK_COLOR;
+                };
+
         Map<String, Object> embed =
                 Map.of(
                         "title",
@@ -75,7 +84,7 @@ public class DiscordWebhookSender implements NotificationSenderPort {
                         "description",
                         message.description(),
                         "color",
-                        message.channel() == NotificationChannel.ERROR ? ERROR_COLOR : SIGNUP_COLOR,
+                        color,
                         "fields",
                         fields);
 
