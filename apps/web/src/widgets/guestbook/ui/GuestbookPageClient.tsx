@@ -6,6 +6,7 @@ import { useGuestbookEntries } from '@/entities/guestbook';
 import {
   useCreateGuestbookEntry,
   useDeleteGuestbookEntry,
+  useReplyGuestbookEntry,
 } from '@/features/guestbook';
 import { useAuth } from '@/features/auth';
 import { useAlert } from '@/shared/model/alertStore';
@@ -20,8 +21,10 @@ export function GuestbookPageClient() {
   const { data, isLoading } = useGuestbookEntries(page, 12);
   const createEntry = useCreateGuestbookEntry();
   const deleteEntry = useDeleteGuestbookEntry();
+  const replyEntry = useReplyGuestbookEntry();
   const alert = useAlert();
 
+  const isAdmin = currentUser?.role === 'ADMIN';
   const entries = data?.content || [];
   const totalPages = data?.totalPages || 0;
   const remainingCharacters = useMemo(() => 500 - content.length, [content.length]);
@@ -47,6 +50,16 @@ export function GuestbookPageClient() {
       alert.success('방명록을 삭제했습니다');
     } catch (err) {
       const message = err instanceof Error ? err.message : '방명록 삭제에 실패했습니다';
+      alert.error(message);
+    }
+  };
+
+  const handleReply = async (entryId: string, replyContent: string) => {
+    try {
+      await replyEntry.mutateAsync({ entryId, content: replyContent });
+      alert.success('답글을 남겼습니다');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '답글 작성에 실패했습니다';
       alert.error(message);
     }
   };
@@ -82,7 +95,10 @@ export function GuestbookPageClient() {
                 isLoading={isLoading}
                 page={page}
                 totalPages={totalPages}
+                isAdmin={isAdmin}
+                isReplying={replyEntry.isPending}
                 onDelete={handleDelete}
+                onReply={handleReply}
                 onPageChange={setPage}
               />
             </div>

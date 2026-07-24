@@ -1,13 +1,16 @@
 import { Pagination } from '@/shared/ui/Pagination';
-import { formatDateTime, formatRelativeTime } from '@/shared/lib/format-utils';
 import type { GuestbookEntry } from '@/shared/model/types/guestbook';
+import { GuestbookEntryCard } from './GuestbookEntryCard';
 
 interface GuestbookEntriesSectionProps {
   entries: GuestbookEntry[];
   isLoading: boolean;
   page: number;
   totalPages: number;
+  isAdmin: boolean;
+  isReplying: boolean;
   onDelete: (entryId: string) => void;
+  onReply: (entryId: string, content: string) => Promise<void>;
   onPageChange: (page: number) => void;
 }
 
@@ -16,7 +19,10 @@ export function GuestbookEntriesSection({
   isLoading,
   page,
   totalPages,
+  isAdmin,
+  isReplying,
   onDelete,
+  onReply,
   onPageChange,
 }: GuestbookEntriesSectionProps) {
   if (isLoading) {
@@ -46,44 +52,14 @@ export function GuestbookEntriesSection({
     <>
       <div className="space-y-3">
         {entries.map(entry => (
-          <article
+          <GuestbookEntryCard
             key={entry.id}
-            data-cy="guestbook-entry"
-            className="rounded-3xl border border-surface-200 bg-surface-50 px-5 py-4 shadow-[0_8px_30px_-24px_rgba(15,23,42,0.45)]"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-bold text-surface-900">{entry.authorName}</span>
-                  {entry.isAdmin && (
-                    <span className="rounded-full bg-surface-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
-                      Admin
-                    </span>
-                  )}
-                </div>
-                <p
-                  className="mt-1 text-xs text-surface-400"
-                  title={formatDateTime(entry.createdAt)}
-                >
-                  {formatRelativeTime(entry.createdAt)}
-                </p>
-              </div>
-
-              {entry.canDelete && (
-                <button
-                  onClick={() => onDelete(entry.id)}
-                  data-cy="guestbook-delete"
-                  className="rounded-full border border-surface-200 px-3 py-1.5 text-xs font-semibold text-surface-500 transition-colors hover:border-red-200 hover:text-red-500"
-                >
-                  삭제
-                </button>
-              )}
-            </div>
-
-            <p className="mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-surface-700">
-              {entry.content}
-            </p>
-          </article>
+            entry={entry}
+            isAdmin={isAdmin}
+            isReplying={isReplying}
+            onDelete={onDelete}
+            onReply={onReply}
+          />
         ))}
       </div>
 
