@@ -177,6 +177,11 @@ public class GlobalExceptionHandler {
 
     /** 예상치 못한 서버 오류를 디스코드 알림 채널로 알림. 알림 실패가 응답을 방해하지 않도록 예외를 삼킨다. */
     private void notifyError(Exception exception, HttpServletRequest request) {
+        if (!ErrorAlertPolicy.shouldNotify(exception)) {
+            log.debug("클라이언트 연결 종료 예외는 오류 알림에서 제외합니다.");
+            return;
+        }
+
         try {
             String where =
                     request != null ? request.getMethod() + " " + request.getRequestURI() : "-";
