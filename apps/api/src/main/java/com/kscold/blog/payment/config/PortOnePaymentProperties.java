@@ -13,6 +13,7 @@ public class PortOnePaymentProperties {
 
     private String storeId = "";
     private String kakaoPayChannelKey = "";
+    private boolean kakaoPayLiveEnabled;
     private String inicisChannelKey = "";
     private String apiSecret = "";
     private String apiBaseUrl = "https://api.portone.io";

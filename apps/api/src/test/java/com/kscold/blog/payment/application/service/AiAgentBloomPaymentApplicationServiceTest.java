@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.payment.application.dto.command.PreparePaymentCommand;
+import com.kscold.blog.payment.application.dto.response.PaymentConfigResponse;
 import com.kscold.blog.payment.application.dto.response.PreparePaymentResponse;
 import com.kscold.blog.payment.config.PortOnePaymentProperties;
 import com.kscold.blog.payment.domain.model.PaymentOrder;
@@ -94,5 +95,22 @@ class AiAgentBloomPaymentApplicationServiceTest {
         assertThat(response.getChannelKey()).isEqualTo("channel-key-kakao");
         assertThat(response.getPayMethod()).isEqualTo("EASY_PAY");
         assertThat(response.getEasyPayProvider()).isEqualTo("KAKAOPAY");
+    }
+
+    @Test
+    @DisplayName("시나리오: 실결제 모드는 서버 설정값을 결제 화면에 전달한다")
+    void livePaymentModeIsExposed() {
+        PortOnePaymentProperties properties = new PortOnePaymentProperties();
+        properties.setStoreId("store-live");
+        properties.setKakaoPayChannelKey("channel-key-live");
+        properties.setKakaoPayLiveEnabled(true);
+        AiAgentBloomPaymentApplicationService liveService =
+                new AiAgentBloomPaymentApplicationService(
+                        paymentOrderRepository, properties, restClientBuilder);
+
+        PaymentConfigResponse response = liveService.getConfig();
+
+        assertThat(response.isConfigured()).isTrue();
+        assertThat(response.isLivePayment()).isTrue();
     }
 }

@@ -55,6 +55,7 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     public PaymentConfigResponse getConfig() {
         return new PaymentConfigResponse(
                 portOnePaymentProperties.isClientConfigured(),
+                portOnePaymentProperties.isKakaoPayLiveEnabled(),
                 portOnePaymentProperties.isCardConfigured(),
                 portOnePaymentProperties.getStoreId(),
                 portOnePaymentProperties.getKakaoPayChannelKey(),
@@ -169,6 +170,7 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
             paymentOrderRepository.save(order);
             throw InvalidRequestException.invalidInput(message);
         }
+        validateLiveChannel(payment, portOneStatus, order);
 
         order.markPaid(portOneStatus);
         paymentOrderRepository.save(order);
@@ -223,6 +225,33 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
             return totalAmount;
         }
         return amount.asLong(-1);
+    }
+
+    /**
+     * 실결제 모드에서는 포트원이 실제 운영 채널로 승인한 결제만 최종 완료 처리한다.
+     *
+     * <p>브라우저가 전달하는 성공 응답은 위변조될 수 있으므로 서버가 조회한 결제의 채널 유형과 채널 키를 함께 확인한다. 이 검증으로 운영 화면에서 테스트 채널 결제가
+     * 실결제로 기록되는 상황과 다른 상점 채널의 결제가 섞이는 상황을 막는다.
+     */
+    private void validateLiveChannel(JsonNode payment, String portOneStatus, PaymentOrder order) {
+        if (!portOnePaymentProperties.isKakaoPayLiveEnabled()) {
+            return;
+        }
+
+        JsonNode selectedChannel = payment.path("selectedChannel");
+        String channelType = selectedChannel.path("type").asText("");
+        String channelKey = selectedChannel.path("key").asText("");
+        boolean liveKakaoPayChannel =
+                "LIVE".equals(channelType)
+                        && portOnePaymentProperties.getKakaoPayChannelKey().equals(channelKey);
+        if (liveKakaoPayChannel) {
+            return;
+        }
+
+        String message = "카카오페이 실연동 채널로 승인된 결제가 아닙니다.";
+        order.markFailed(portOneStatus, message);
+        paymentOrderRepository.save(order);
+        throw InvalidRequestException.invalidInput(message);
     }
 
     private boolean canAccessOrder(String userId, String paymentAccessToken, PaymentOrder order) {
