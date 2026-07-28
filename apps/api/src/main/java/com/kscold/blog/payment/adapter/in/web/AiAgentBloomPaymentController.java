@@ -10,6 +10,7 @@ import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +39,32 @@ public class AiAgentBloomPaymentController {
 
     @PostMapping("/complete")
     public ResponseEntity<ApiResponse<CompletePaymentResponse>> complete(
+            @AuthenticationPrincipal String userId,
+            @Valid @RequestBody CompletePaymentCommand request) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        paymentUseCase.complete(
+                                userId, request.getPaymentId(), request.getPaymentAccessToken())));
+    }
+
+    @GetMapping("/live-test/config")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<PaymentConfigResponse>> getLiveTestConfig() {
+        return ResponseEntity.ok(ApiResponse.success(paymentUseCase.getLiveTestConfig()));
+    }
+
+    @PostMapping("/live-test/prepare")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<PreparePaymentResponse>> prepareLiveTest(
+            @AuthenticationPrincipal String userId,
+            @Valid @RequestBody PreparePaymentCommand request) {
+        return ResponseEntity.ok(
+                ApiResponse.success(paymentUseCase.prepareLiveTest(userId, request)));
+    }
+
+    @PostMapping("/live-test/complete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<CompletePaymentResponse>> completeLiveTest(
             @AuthenticationPrincipal String userId,
             @Valid @RequestBody CompletePaymentCommand request) {
         return ResponseEntity.ok(

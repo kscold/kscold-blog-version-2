@@ -31,6 +31,8 @@ public class PaymentOrder {
     private String orderName;
     private int totalAmount;
     private String currency;
+    private String payMethod;
+    private String expectedChannelKey;
     private String customerName;
     private String customerEmail;
     private String customerPhone;

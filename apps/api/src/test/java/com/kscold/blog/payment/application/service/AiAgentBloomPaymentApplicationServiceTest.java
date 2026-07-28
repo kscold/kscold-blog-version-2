@@ -10,6 +10,7 @@ import com.kscold.blog.payment.application.dto.response.PreparePaymentResponse;
 import com.kscold.blog.payment.config.PortOnePaymentProperties;
 import com.kscold.blog.payment.domain.model.PaymentOrder;
 import com.kscold.blog.payment.domain.port.out.PaymentOrderRepository;
+import com.kscold.blog.payment.domain.port.out.PortOnePaymentProvider;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.web.client.RestClient;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -30,7 +30,7 @@ class AiAgentBloomPaymentApplicationServiceTest {
     private static final int INICIS_OID_MAX_LENGTH = 40;
 
     @Mock private PaymentOrderRepository paymentOrderRepository;
-    @Mock private RestClient.Builder restClientBuilder;
+    @Mock private PortOnePaymentProvider portOnePaymentProvider;
 
     private AiAgentBloomPaymentApplicationService service;
 
@@ -43,7 +43,7 @@ class AiAgentBloomPaymentApplicationServiceTest {
 
         service =
                 new AiAgentBloomPaymentApplicationService(
-                        paymentOrderRepository, properties, restClientBuilder);
+                        paymentOrderRepository, properties, portOnePaymentProvider);
 
         when(paymentOrderRepository.save(any(PaymentOrder.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -106,11 +106,22 @@ class AiAgentBloomPaymentApplicationServiceTest {
         properties.setKakaoPayLiveEnabled(true);
         AiAgentBloomPaymentApplicationService liveService =
                 new AiAgentBloomPaymentApplicationService(
-                        paymentOrderRepository, properties, restClientBuilder);
+                        paymentOrderRepository, properties, portOnePaymentProvider);
 
         PaymentConfigResponse response = liveService.getConfig();
 
         assertThat(response.isConfigured()).isTrue();
         assertThat(response.isLivePayment()).isTrue();
+    }
+
+    @Test
+    @DisplayName("시나리오: 실결제 확인 상품은 1,000원 카카오페이 주문으로 준비된다")
+    void liveTestPaymentUsesOneThousandWon() {
+        PreparePaymentResponse response = service.prepareLiveTest("admin-1", command("EASY_PAY"));
+
+        assertThat(response.getProgramKey()).isEqualTo("kakaopay-live-test");
+        assertThat(response.getTotalAmount()).isEqualTo(1_000);
+        assertThat(response.getPayMethod()).isEqualTo("EASY_PAY");
+        assertThat(response.getEasyPayProvider()).isEqualTo("KAKAOPAY");
     }
 }

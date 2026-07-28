@@ -10,7 +10,11 @@ public interface PaymentUseCase {
 
     PaymentConfigResponse getConfig();
 
+    PaymentConfigResponse getLiveTestConfig();
+
     PreparePaymentResponse prepare(String userId, PreparePaymentCommand request);
+
+    PreparePaymentResponse prepareLiveTest(String userId, PreparePaymentCommand request);
 
     CompletePaymentResponse complete(String userId, String paymentId, String paymentAccessToken);
 }
