@@ -1,5 +1,5 @@
 // FSD public API (배럴)
-export { aiAgentBloomPaymentApi } from './api/aiAgentBloomPayment';
+export { aiAgentBloomPaymentApi, kakaoPayLiveTestApi } from './api/aiAgentBloomPayment';
 export type {
   AiAgentBloomPayMethod,
   AiAgentBloomPaymentConfig,

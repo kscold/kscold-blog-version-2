@@ -3,6 +3,7 @@
 import apiClient from '@/shared/api/api-client';
 
 const BASE_PATH = '/payments/ai-agent-bloom';
+const LIVE_TEST_PATH = `${BASE_PATH}/live-test`;
 
 /** 결제수단 — CARD 는 KG이니시스 신용카드, EASY_PAY 는 카카오페이 */
 export type AiAgentBloomPayMethod = 'CARD' | 'EASY_PAY';
@@ -62,5 +63,18 @@ export const aiAgentBloomPaymentApi = {
     apiClient.post<CompleteAiAgentBloomPaymentResponse>(`${BASE_PATH}/complete`, {
       paymentId,
       paymentAccessToken,
+    }),
+};
+
+export const kakaoPayLiveTestApi = {
+  getConfig: () => apiClient.get<AiAgentBloomPaymentConfig>(`${LIVE_TEST_PATH}/config`),
+  prepare: (payload: PrepareAiAgentBloomPaymentPayload) =>
+    apiClient.post<PreparedAiAgentBloomPayment>(`${LIVE_TEST_PATH}/prepare`, {
+      ...payload,
+      payMethod: 'EASY_PAY',
+    }),
+  complete: (paymentId: string) =>
+    apiClient.post<CompleteAiAgentBloomPaymentResponse>(`${LIVE_TEST_PATH}/complete`, {
+      paymentId,
     }),
 };

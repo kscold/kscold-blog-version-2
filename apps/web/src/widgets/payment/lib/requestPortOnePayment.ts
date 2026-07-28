@@ -40,12 +40,12 @@ export async function requestPortOnePayment(
     },
     products: [
       {
-        id: 'ai-agent-bloom-ticket',
+        id: `${preparedPayment.programKey}-product`,
         name: preparedPayment.productName,
         amount: preparedPayment.totalAmount,
         quantity: 1,
-        tag: 'offline-session',
-        link: `${window.location.origin}/admin-night/ai-agent-bloom`,
+        tag: preparedPayment.programKey,
+        link: `${window.location.origin}${window.location.pathname}`,
         description: preparedPayment.servicePeriod,
       },
     ],
