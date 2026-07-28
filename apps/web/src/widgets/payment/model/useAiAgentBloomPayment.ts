@@ -46,6 +46,7 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
 
   const displayConfig = config ?? {
     configured: false,
+    livePayment: false,
     cardConfigured: false,
     storeId: '',
     channelKey: '',

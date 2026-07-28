@@ -9,6 +9,8 @@ export type AiAgentBloomPayMethod = 'CARD' | 'EASY_PAY';
 
 export interface AiAgentBloomPaymentConfig {
   configured: boolean;
+  /** 카카오페이 실연동 채널 사용 여부 */
+  livePayment: boolean;
   /** KG이니시스 신용카드 사용 가능 여부. false 면 카드 결제 진입 버튼을 숨김 */
   cardConfigured: boolean;
   storeId: string;
@@ -57,5 +59,8 @@ export const aiAgentBloomPaymentApi = {
   prepare: (payload: PrepareAiAgentBloomPaymentPayload) =>
     apiClient.post<PreparedAiAgentBloomPayment>(`${BASE_PATH}/prepare`, payload),
   complete: (paymentId: string, paymentAccessToken?: string) =>
-    apiClient.post<CompleteAiAgentBloomPaymentResponse>(`${BASE_PATH}/complete`, { paymentId, paymentAccessToken }),
+    apiClient.post<CompleteAiAgentBloomPaymentResponse>(`${BASE_PATH}/complete`, {
+      paymentId,
+      paymentAccessToken,
+    }),
 };

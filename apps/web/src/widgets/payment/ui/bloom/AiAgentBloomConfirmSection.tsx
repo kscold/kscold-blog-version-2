@@ -14,6 +14,7 @@ export function AiAgentBloomConfirmSection({
   isPreparing,
   canPay,
   isCardPayment = false,
+  livePayment = false,
 }: {
   config: AiAgentBloomPaymentConfig | null;
   paymentStatus: string | null;
@@ -23,8 +24,10 @@ export function AiAgentBloomConfirmSection({
   isPreparing: boolean;
   canPay: boolean;
   isCardPayment?: boolean;
+  livePayment?: boolean;
 }) {
   const methodLabel = isCardPayment ? '신용카드' : '카카오페이';
+  const isLiveKakaoPay = !isCardPayment && livePayment;
   const unavailable = config
     ? isCardPayment
       ? !config.cardConfigured
@@ -96,7 +99,7 @@ export function AiAgentBloomConfirmSection({
               {canPay
                 ? isPreparing
                   ? '결제 확인 중...'
-                  : `${formattedAmount}원 ${methodLabel} 테스트 결제하기`
+                  : `${formattedAmount}원 ${methodLabel}${isLiveKakaoPay ? '로 결제하기' : ' 테스트 결제하기'}`
                 : '로그인 또는 안내받은 결제 링크가 필요합니다'}
             </button>
           </div>

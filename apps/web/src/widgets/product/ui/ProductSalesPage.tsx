@@ -35,6 +35,7 @@ export function ProductSalesPage() {
   const productName = config?.productName ?? 'AI Agent Bloom 참가권';
   const amount = (config?.totalAmount ?? 30_000).toLocaleString('ko-KR');
   const servicePeriod = config?.servicePeriod ?? SERVICE_PERIOD;
+  const livePayment = config?.livePayment ?? false;
 
   return (
     <main className="min-h-screen bg-surface-50 px-4 py-10 text-surface-900 sm:px-6 lg:px-8">
@@ -49,13 +50,15 @@ export function ProductSalesPage() {
           </p>
         </header>
 
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
-          <p className="text-sm font-black text-amber-900">테스트 결제 안내</p>
-          <p className="mt-1 text-sm leading-6 text-amber-800">
-            현재 결제 연동을 점검하는 테스트 결제 단계입니다. 결제대행사 테스트 모드로 동작하므로
-            실제 카드 승인이나 청구는 발생하지 않습니다.
-          </p>
-        </div>
+        {!livePayment && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
+            <p className="text-sm font-black text-amber-900">테스트 결제 안내</p>
+            <p className="mt-1 text-sm leading-6 text-amber-800">
+              현재 결제 연동을 점검하는 테스트 결제 단계입니다. 결제대행사 테스트 모드로 동작하므로
+              실제 카드 승인이나 청구는 발생하지 않습니다.
+            </p>
+          </div>
+        )}
 
         <article className="overflow-hidden rounded-[28px] border border-surface-200 bg-white shadow-sm">
           <div className="border-b border-surface-100 p-6 sm:p-8">
@@ -65,8 +68,12 @@ export function ProductSalesPage() {
                   <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">
                     판매중
                   </span>
-                  <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-800">
-                    테스트 결제
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-black ${
+                      livePayment ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-100 text-amber-800'
+                    }`}
+                  >
+                    {livePayment ? '카카오페이 결제' : '테스트 결제'}
                   </span>
                   <span className="rounded-full bg-surface-100 px-3 py-1 text-xs font-black text-surface-500">
                     디지털 · 오프라인 세션
@@ -125,7 +132,7 @@ export function ProductSalesPage() {
                   href="/kakaopay/payment-path"
                   className="inline-flex rounded-2xl border border-surface-200 bg-white px-6 py-4 text-sm font-black text-surface-900 transition-colors hover:bg-surface-50"
                 >
-                  카카오페이로 테스트 결제하기
+                  카카오페이로 {livePayment ? '결제하기' : '테스트 결제하기'}
                 </Link>
               )}
               <Link

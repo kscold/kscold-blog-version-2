@@ -33,7 +33,10 @@ export function AiAgentBloomPaymentPage({ payMethod = 'EASY_PAY' }: AiAgentBloom
   return (
     <main className="min-h-screen bg-surface-50 px-4 py-8 text-surface-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-8">
-        <AiAgentBloomHeroSection isCardPayment={isCardPayment} />
+        <AiAgentBloomHeroSection
+          isCardPayment={isCardPayment}
+          livePayment={displayConfig.livePayment}
+        />
 
         <AiAgentBloomProductDetailSection
           displayConfig={displayConfig}
@@ -67,6 +70,7 @@ export function AiAgentBloomPaymentPage({ payMethod = 'EASY_PAY' }: AiAgentBloom
             isPreparing={isPreparing}
             canPay={canPay}
             isCardPayment={isCardPayment}
+            livePayment={displayConfig.livePayment}
           />
         </form>
       </div>
