@@ -9,10 +9,13 @@ import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.guestbook.application.dto.command.GuestbookEntryCreateCommand;
+import com.kscold.blog.guestbook.application.dto.command.GuestbookReplyCommand;
+import com.kscold.blog.guestbook.application.event.GuestbookReplyCreatedEvent;
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import com.kscold.blog.guestbook.domain.port.out.GuestbookRepository;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import com.kscold.blog.support.UserFixtures;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class GuestbookApplicationServiceTest {
@@ -28,6 +32,10 @@ class GuestbookApplicationServiceTest {
     @Mock private GuestbookRepository guestbookRepository;
 
     @Mock private UserRepository userRepository;
+
+    @Mock private NotificationUseCase notificationUseCase;
+
+    @Mock private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks private GuestbookApplicationService guestbookApplicationService;
 
@@ -47,6 +55,40 @@ class GuestbookApplicationServiceTest {
         assertThat(saved.getUserId()).isEqualTo("user-1");
         assertThat(saved.getAuthorRole()).isEqualTo(User.Role.USER);
         assertThat(saved.getContent()).isEqualTo("반갑습니다. 잘 보고 갑니다.");
+    }
+
+    @Test
+    @DisplayName("시나리오: 관리자가 답글을 남기면 작성자 이메일로 보낼 이벤트가 등록된다")
+    void replyPublishesMailEventForEntryAuthor() {
+        User admin = UserFixtures.user("admin-1", User.Role.ADMIN, "admin", "관리자");
+        User author = UserFixtures.user("user-1", User.Role.USER, "visitor", "방문자");
+        author.setEmail("visitor@example.com");
+        GuestbookEntry entry =
+                GuestbookEntry.builder()
+                        .id("entry-1")
+                        .userId("user-1")
+                        .authorName("방문자")
+                        .authorRole(User.Role.USER)
+                        .content("잘 보고 갑니다.")
+                        .build();
+        when(userRepository.findById("admin-1")).thenReturn(Optional.of(admin));
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(author));
+        when(guestbookRepository.findById("entry-1")).thenReturn(Optional.of(entry));
+        when(guestbookRepository.save(entry)).thenReturn(entry);
+
+        GuestbookEntry saved =
+                guestbookApplicationService.reply(
+                        "entry-1", new GuestbookReplyCommand("방문해주셔서 감사합니다."), "admin-1");
+
+        assertThat(saved.getReply().getContent()).isEqualTo("방문해주셔서 감사합니다.");
+        verify(eventPublisher)
+                .publishEvent(
+                        new GuestbookReplyCreatedEvent(
+                                "entry-1",
+                                "visitor@example.com",
+                                "방문자",
+                                "잘 보고 갑니다.",
+                                "방문해주셔서 감사합니다."));
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.guestbook.application.dto.command.GuestbookEntryCreateCommand;
 import com.kscold.blog.guestbook.application.dto.command.GuestbookReplyCommand;
+import com.kscold.blog.guestbook.application.event.GuestbookReplyCreatedEvent;
 import com.kscold.blog.guestbook.application.port.in.GuestbookUseCase;
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import com.kscold.blog.guestbook.domain.port.out.GuestbookRepository;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class GuestbookApplicationService implements GuestbookUseCase {
     private final GuestbookRepository guestbookRepository;
     private final UserRepository userRepository;
     private final NotificationUseCase notificationUseCase;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional(readOnly = true)
@@ -69,13 +72,16 @@ public class GuestbookApplicationService implements GuestbookUseCase {
                         .findById(entryId)
                         .orElseThrow(() -> ResourceNotFoundException.guestbookEntry(entryId));
 
-        entry.setReply(
+        GuestbookEntry.GuestbookReply reply =
                 GuestbookEntry.GuestbookReply.builder()
                         .content(command.getContent())
                         .repliedAt(LocalDateTime.now())
-                        .build());
+                        .build();
+        entry.setReply(reply);
 
-        return guestbookRepository.save(entry);
+        GuestbookEntry saved = guestbookRepository.save(entry);
+        publishReplyEvent(saved, reply);
+        return saved;
     }
 
     /** 새 방명록 작성을 디스코드 알림 채널로 알림. 실패해도 작성 자체는 성공해야 하므로 예외를 삼킨다. */
@@ -119,5 +125,25 @@ public class GuestbookApplicationService implements GuestbookUseCase {
         return userRepository
                 .findById(userId)
                 .orElseThrow(() -> ResourceNotFoundException.user(userId));
+    }
+
+    /** 작성자 계정에 이메일이 있을 때만 커밋 이후 발송할 답글 이벤트를 등록한다. */
+    private void publishReplyEvent(GuestbookEntry entry, GuestbookEntry.GuestbookReply reply) {
+        if (entry.getUserId() == null || entry.getUserId().isBlank()) {
+            return;
+        }
+
+        userRepository
+                .findById(entry.getUserId())
+                .filter(user -> user.getEmail() != null && !user.getEmail().isBlank())
+                .ifPresent(
+                        user ->
+                                eventPublisher.publishEvent(
+                                        new GuestbookReplyCreatedEvent(
+                                                entry.getId(),
+                                                user.getEmail(),
+                                                entry.getAuthorName(),
+                                                entry.getContent(),
+                                                reply.getContent())));
     }
 }
