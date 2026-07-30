@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, useMotionValue } from 'framer-motion';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 const ACTIVE_CURSOR_CLASS = 'custom-cursor-active';
 
@@ -12,19 +13,32 @@ interface CustomCursorProps {
 export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
+  const { allowRichEffects } = usePerformanceMode();
 
   const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const html = document.documentElement;
-    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)');
-    const shouldUseCustomCursor = () => mediaQuery.matches;
+    const mediaQuery = window.matchMedia(
+      '(hover: hover) and (pointer: fine) and (min-width: 768px)'
+    );
+    const shouldUseCustomCursor = () => allowRichEffects && mediaQuery.matches;
+    let animationFrame: number | null = null;
+    let nextPosition = { x: -100, y: -100 };
+
+    const flushPosition = () => {
+      cursorX.set(nextPosition.x);
+      cursorY.set(nextPosition.y);
+      animationFrame = null;
+    };
 
     const updatePosition = (e: MouseEvent) => {
       if (!shouldUseCustomCursor()) return;
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
+      nextPosition = { x: e.clientX, y: e.clientY };
+      if (animationFrame === null) {
+        animationFrame = window.requestAnimationFrame(flushPosition);
+      }
     };
 
     const updateHoverState = (e: MouseEvent) => {
@@ -78,6 +92,9 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
     mediaQuery.addEventListener('change', syncCursorMode);
 
     return () => {
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+      }
       html.classList.remove(ACTIVE_CURSOR_CLASS);
       window.removeEventListener('mousemove', updatePosition);
       window.removeEventListener('mouseover', updateHoverState);
@@ -85,7 +102,7 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
       html.removeEventListener('mouseenter', handleMouseEnter);
       mediaQuery.removeEventListener('change', syncCursorMode);
     };
-  }, [cursorX, cursorY]);
+  }, [allowRichEffects, cursorX, cursorY]);
 
   if (!isVisible) return null;
 
@@ -99,7 +116,7 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
         y: cursorY,
         translateX: '-50%',
         translateY: '-50%',
-        // 하드웨어 가속과 안티앨리어싱을 강제로 유지
+        // 일반 GPU 환경에서 기존 커서의 가장자리 품질을 유지한다.
         WebkitBackfaceVisibility: 'hidden',
         backfaceVisibility: 'hidden',
         WebkitTransform: 'translateZ(0)',

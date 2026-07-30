@@ -8,6 +8,7 @@ type PerformanceSnapshot = {
   isMobileViewport: boolean;
   supportsHover: boolean;
   prefersReducedMotion: boolean;
+  usesSoftwareRendering: boolean;
 };
 
 const initialSnapshot: PerformanceSnapshot = {
@@ -16,7 +17,15 @@ const initialSnapshot: PerformanceSnapshot = {
   isMobileViewport: true,
   supportsHover: false,
   prefersReducedMotion: false,
+  usesSoftwareRendering: false,
 };
+
+const SOFTWARE_RENDERER_MARKERS = [
+  'swiftshader',
+  'llvmpipe',
+  'software rasterizer',
+  'microsoft basic render driver',
+];
 
 let snapshot = initialSnapshot;
 let isStoreInitialized = false;
@@ -32,13 +41,37 @@ function updateSnapshot(nextSnapshot: PerformanceSnapshot) {
     snapshot.isTouchDevice === nextSnapshot.isTouchDevice &&
     snapshot.isMobileViewport === nextSnapshot.isMobileViewport &&
     snapshot.supportsHover === nextSnapshot.supportsHover &&
-    snapshot.prefersReducedMotion === nextSnapshot.prefersReducedMotion
+    snapshot.prefersReducedMotion === nextSnapshot.prefersReducedMotion &&
+    snapshot.usesSoftwareRendering === nextSnapshot.usesSoftwareRendering
   ) {
     return;
   }
 
   snapshot = nextSnapshot;
   emitChange();
+}
+
+function detectSoftwareRendering() {
+  try {
+    const canvas = document.createElement('canvas');
+    const context = (canvas.getContext('webgl2') ??
+      canvas.getContext('webgl') ??
+      canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+
+    if (!context) return false;
+
+    const rendererInfo = context.getExtension('WEBGL_debug_renderer_info');
+    if (!rendererInfo) return false;
+
+    const renderer = String(
+      context.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL)
+    ).toLowerCase();
+
+    return SOFTWARE_RENDERER_MARKERS.some(marker => renderer.includes(marker));
+  } catch {
+    // 렌더러 정보를 숨기는 브라우저에서는 기존 시각 효과를 유지한다.
+    return false;
+  }
 }
 
 function ensureStore() {
@@ -52,6 +85,7 @@ function ensureStore() {
   const mobileQuery = window.matchMedia('(max-width: 768px)');
   const hoverQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
   const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const usesSoftwareRendering = detectSoftwareRendering();
 
   const syncSnapshot = () => {
     updateSnapshot({
@@ -60,6 +94,7 @@ function ensureStore() {
       isMobileViewport: mobileQuery.matches,
       supportsHover: hoverQuery.matches,
       prefersReducedMotion: motionQuery.matches,
+      usesSoftwareRendering,
     });
   };
 
@@ -95,17 +130,21 @@ export function usePerformanceMode() {
     isMobileViewport,
     supportsHover,
     prefersReducedMotion,
+    usesSoftwareRendering,
   } = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const reduceMotion = !hasResolved || prefersReducedMotion;
-  const allowRichEffects = hasResolved && !prefersReducedMotion;
+  const reduceVisualEffects = reduceMotion || usesSoftwareRendering;
+  const allowRichEffects = hasResolved && !reduceVisualEffects;
 
   return {
     reduceMotion,
+    reduceVisualEffects,
     allowRichEffects,
     isTouchDevice,
     isMobileViewport,
     supportsHover,
     prefersReducedMotion,
+    usesSoftwareRendering,
   };
 }

@@ -18,7 +18,8 @@ const DEFAULT_SIDEBAR_WIDTH = 320;
 
 export function VaultGraphLayout() {
   const { theme } = useUiStore();
-  const { isTouchDevice } = usePerformanceMode();
+  const { isTouchDevice, allowRichEffects } = usePerformanceMode();
+  const useSolidSurface = isTouchDevice || !allowRichEffects;
   const searchParams = useSearchParams();
   const initialFolder = searchParams.get('folder');
   const [activeFolderId, setActiveFolderId] = useState<string | null>(initialFolder);
@@ -90,7 +91,7 @@ export function VaultGraphLayout() {
     <div className="absolute inset-0 flex overflow-hidden bg-transparent lg:p-4 lg:gap-4">
       {isMobileOpen && (
         <div
-          className={`fixed inset-0 z-[45] lg:hidden ${isTouchDevice ? 'bg-surface-900/25' : 'bg-surface-900/20 backdrop-blur-sm'}`}
+          className={`fixed inset-0 z-[45] lg:hidden ${useSolidSurface ? 'bg-surface-900/25' : 'bg-surface-900/20 backdrop-blur-sm'}`}
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -98,7 +99,7 @@ export function VaultGraphLayout() {
       <VaultGraphSidebar
         isMobileOpen={isMobileOpen}
         isDesktop={isDesktop}
-        isTouchDevice={isTouchDevice}
+        isTouchDevice={useSolidSurface}
         sidebarWidth={sidebarWidth}
         folders={folders}
         isFoldersLoading={isFoldersLoading}
@@ -115,11 +116,7 @@ export function VaultGraphLayout() {
 
       <main className="flex-1 relative w-full h-full min-w-0 flex flex-col">
         <VaultMobileToolbar
-          label={
-            activeFolderId
-              ? (activeFolder?.name ?? '폴더')
-              : '전체 Vault'
-          }
+          label={activeFolderId ? (activeFolder?.name ?? '폴더') : '전체 Vault'}
           meta={`${filteredGraph?.nodes.length ?? 0}개 노트 · ${filteredGraph?.links.length ?? 0}개 연결`}
           showFolderButton={false}
           onOpenFolders={() => setIsMobileOpen(true)}
@@ -132,7 +129,7 @@ export function VaultGraphLayout() {
               onClick={() => {
                 setActiveFolderId(activeFolder?.parent ?? null);
               }}
-              className={`px-4 py-2 rounded-full border text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 shadow-sm transition-all ${isTouchDevice ? 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-800' : 'bg-surface-50/80 dark:bg-surface-900/80 border-surface-200 dark:border-surface-800 backdrop-blur-xl hover:scale-105'}`}
+              className={`px-4 py-2 rounded-full border text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 shadow-sm transition-all ${useSolidSurface ? 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-800' : 'bg-surface-50/80 dark:bg-surface-900/80 border-surface-200 dark:border-surface-800 backdrop-blur-xl hover:scale-105'}`}
             >
               <svg
                 className="w-4 h-4"
@@ -157,7 +154,7 @@ export function VaultGraphLayout() {
             <GraphPanelSkeleton />
           ) : filteredGraph && filteredGraph.nodes.length > 0 ? (
             <div
-              className={`w-full h-full flex flex-col overflow-hidden lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 lg:shadow-sm border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-surface-200/50 dark:border-surface-800/50'}`}
+              className={`w-full h-full flex flex-col overflow-hidden lg:rounded-3xl border-0 lg:border ${useSolidSurface ? 'bg-white dark:bg-surface-950 lg:shadow-sm border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-surface-200/50 dark:border-surface-800/50'}`}
             >
               <ClientVaultGraph
                 graphData={filteredGraph}
@@ -169,7 +166,7 @@ export function VaultGraphLayout() {
             </div>
           ) : (
             <div
-              className={`text-surface-500 w-full h-full flex flex-col items-center justify-center lg:rounded-3xl border-0 lg:border ${isTouchDevice ? 'bg-white dark:bg-surface-950 border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md border-surface-200/50 dark:border-surface-800/50'}`}
+              className={`text-surface-500 w-full h-full flex flex-col items-center justify-center lg:rounded-3xl border-0 lg:border ${useSolidSurface ? 'bg-white dark:bg-surface-950 border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md border-surface-200/50 dark:border-surface-800/50'}`}
             >
               <p className="text-sm font-semibold text-surface-700 dark:text-surface-200">
                 표시할 노트가 없습니다.

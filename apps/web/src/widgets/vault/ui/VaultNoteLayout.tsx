@@ -11,7 +11,8 @@ import { VaultMobileListButton } from '@/widgets/vault/ui/VaultMobileListButton'
 
 export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
   const { theme } = useUiStore();
-  const { isTouchDevice } = usePerformanceMode();
+  const { isTouchDevice, allowRichEffects } = usePerformanceMode();
+  const useSolidSurface = isTouchDevice || !allowRichEffects;
   const {
     activeFolderId,
     handleFolderSelect,
@@ -60,7 +61,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
     <div className="absolute inset-0 flex overflow-hidden bg-transparent lg:p-4 lg:gap-4">
       {isMobileOpen && (
         <div
-          className={`fixed inset-0 z-[45] lg:hidden ${isTouchDevice ? 'bg-surface-900/25' : 'bg-surface-900/20 backdrop-blur-sm'}`}
+          className={`fixed inset-0 z-[45] lg:hidden ${useSolidSurface ? 'bg-surface-900/25' : 'bg-surface-900/20 backdrop-blur-sm'}`}
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -71,7 +72,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
         isDesktop={isDesktop}
         isFoldersLoading={isFoldersLoading}
         isMobileOpen={isMobileOpen}
-        isTouchDevice={isTouchDevice}
+        isTouchDevice={useSolidSurface}
         activeNoteSlug={note?.slug}
         onFolderSelect={handleFolderSelect}
         onClose={() => setIsMobileOpen(false)}
@@ -82,7 +83,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
         backlinks={backlinks}
         colorMap={colorMap}
         isNoteLoading={isNoteLoading}
-        isTouchDevice={isTouchDevice}
+        isTouchDevice={useSolidSurface}
         localGraph={localGraph}
         note={note}
         onOpenChat={openAgentChat}

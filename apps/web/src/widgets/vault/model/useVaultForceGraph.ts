@@ -5,11 +5,7 @@ import { ForceGraphMethods, NodeObject } from 'react-force-graph-2d';
 import { GraphNode, GraphData, GraphLink } from '@/shared/model/types/vault';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { renderGraphLink } from '../lib/graphLinkRenderer';
-import {
-  configureForces,
-  renderNode,
-  renderNodeHitArea,
-} from '../lib/graphForceConfig';
+import { configureForces, renderNode, renderNodeHitArea } from '../lib/graphForceConfig';
 import { createStarfield, renderStarfield, type ParallaxStar } from '../lib/graphStarfield';
 import { type Ripple } from '../ui/graph/VaultGraphRipples';
 
@@ -38,8 +34,8 @@ export function useVaultForceGraph({
   const [containerRef, { width, height }] = useMeasure<HTMLDivElement>();
   const [hoverNode, setHoverNode] = useState<GraphNode | null>(null);
   const [isGraphHovered, setIsGraphHovered] = useState(false);
-  const { reduceMotion, isTouchDevice, supportsHover } = usePerformanceMode();
-  const reducedGraphEffects = reduceMotion || isTouchDevice;
+  const { reduceVisualEffects, isTouchDevice, supportsHover } = usePerformanceMode();
+  const reducedGraphEffects = reduceVisualEffects || isTouchDevice;
 
   const gData = useMemo(() => {
     return {
@@ -156,11 +152,14 @@ export function useVaultForceGraph({
   }, [folderColorMap]);
 
   const handleNodeClick = useCallback((node: NodeObject) => {
-    if (nodeDragStateRef.current.isDragging || Date.now() < nodeDragStateRef.current.suppressClickUntil) {
+    if (
+      nodeDragStateRef.current.isDragging ||
+      Date.now() < nodeDragStateRef.current.suppressClickUntil
+    ) {
       return;
     }
 
-    if (!reduceMotion) spawnRipple(node);
+    if (!reducedGraphEffects) spawnRipple(node);
     const gn = node as unknown as GraphNode;
     if (gn.isFolder && onFolderClick) {
       onFolderClick(gn.id);
@@ -171,7 +170,7 @@ export function useVaultForceGraph({
         router.push(`/vault/${gn.slug}`);
       }
     }
-  }, [onFolderClick, onNodeClick, router, reduceMotion, spawnRipple]);
+  }, [onFolderClick, onNodeClick, reducedGraphEffects, router, spawnRipple]);
 
   const handleNodeDrag = useCallback((_node: NodeObject, translate: { x: number; y: number }) => {
     nodeDragStateRef.current.isDragging = true;
@@ -198,35 +197,52 @@ export function useVaultForceGraph({
     return srcId === hoverNode.id || tgtId === hoverNode.id;
   }, [hoverNode]);
 
-  const getHoveredLinkParticleCount = useCallback((link: GraphLink): number => {
-    if (reducedGraphEffects || !isGraphHovered || !hoverNode || !isLinkHovered(link)) return 0;
-    const degree = connectedIds?.size ?? 0;
-    if (degree > 80) return 0;
-    if (degree > 40) return 1;
-    if (degree > 16) return 2;
-    return 4;
-  }, [connectedIds?.size, hoverNode, isGraphHovered, isLinkHovered, reducedGraphEffects]);
+  const getHoveredLinkParticleCount = useCallback(
+    (link: GraphLink): number => {
+      if (reducedGraphEffects || !isGraphHovered || !hoverNode || !isLinkHovered(link)) return 0;
+      const degree = connectedIds?.size ?? 0;
+      if (degree > 80) return 0;
+      if (degree > 40) return 1;
+      if (degree > 16) return 2;
+      return 4;
+    },
+    [connectedIds?.size, hoverNode, isGraphHovered, isLinkHovered, reducedGraphEffects]
+  );
 
-  const nodeCanvasObject = useCallback((node: NodeObject, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    renderNode(node, ctx, globalScale, {
+  const nodeCanvasObject = useCallback(
+    (node: NodeObject, ctx: CanvasRenderingContext2D, globalScale: number) => {
+      renderNode(node, ctx, globalScale, {
+        activeNodeSlug,
+        hoverNodeId: hoverNode?.id,
+        connectedIds,
+        highlightFolderId,
+        folderColorMap,
+        theme,
+        reducedEffects: reducedGraphEffects,
+      });
+    },
+    [
       activeNodeSlug,
-      hoverNodeId: hoverNode?.id,
+      hoverNode?.id,
       connectedIds,
       highlightFolderId,
       folderColorMap,
       theme,
-      reducedEffects: reducedGraphEffects,
-    });
-  }, [activeNodeSlug, hoverNode?.id, connectedIds, highlightFolderId, folderColorMap, theme, reducedGraphEffects]);
+      reducedGraphEffects,
+    ]
+  );
 
-  const linkCanvasObject = useCallback((link: GraphLink, ctx: CanvasRenderingContext2D) => {
-    renderGraphLink(link, ctx, {
-      hoverNode,
-      highlightFolderId,
-      folderColorMap,
-      reducedEffects: reducedGraphEffects,
-    });
-  }, [hoverNode, highlightFolderId, folderColorMap, reducedGraphEffects]);
+  const linkCanvasObject = useCallback(
+    (link: GraphLink, ctx: CanvasRenderingContext2D) => {
+      renderGraphLink(link, ctx, {
+        hoverNode,
+        highlightFolderId,
+        folderColorMap,
+        reducedEffects: reducedGraphEffects,
+      });
+    },
+    [hoverNode, highlightFolderId, folderColorMap, reducedGraphEffects]
+  );
 
   const zoomBy = useCallback((factor: number) => {
     const fg = fgRef.current;

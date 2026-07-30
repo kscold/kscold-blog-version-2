@@ -38,7 +38,8 @@ export function Sidebar() {
 
   const isTagsLoading = !blogTags && !feedTagsRaw;
   const { role } = useViewer();
-  const { isTouchDevice } = usePerformanceMode();
+  const { isTouchDevice, allowRichEffects } = usePerformanceMode();
+  const useSolidSurface = isTouchDevice || !allowRichEffects;
   const closeSidebar = () => setSidebarOpen(false);
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
@@ -56,7 +57,7 @@ export function Sidebar() {
   ];
 
   const asideBaseClass = `fixed top-[88px] left-4 bottom-4 w-56 z-40 overflow-y-auto ${
-    isTouchDevice
+    useSolidSurface
       ? 'bg-white border border-surface-200 rounded-2xl shadow-md'
       : 'bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm'
   }`;
@@ -78,7 +79,7 @@ export function Sidebar() {
       <AnimatePresence>
         {sidebarOpen && (
           <motion.div
-            className={`fixed inset-0 z-40 lg:hidden ${isTouchDevice ? 'bg-surface-900/20' : 'bg-surface-900/10 backdrop-blur-sm'}`}
+            className={`fixed inset-0 z-40 lg:hidden ${useSolidSurface ? 'bg-surface-900/20' : 'bg-surface-900/10 backdrop-blur-sm'}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -105,9 +106,7 @@ export function Sidebar() {
 
       {/* 데스크탑 사이드바: 항상 렌더링, Vault 페이지에서는 숨김 */}
       {!isVaultPage && (
-        <aside className={`${asideBaseClass} hidden lg:block`}>
-          {innerContent}
-        </aside>
+        <aside className={`${asideBaseClass} hidden lg:block`}>{innerContent}</aside>
       )}
     </>
   );
