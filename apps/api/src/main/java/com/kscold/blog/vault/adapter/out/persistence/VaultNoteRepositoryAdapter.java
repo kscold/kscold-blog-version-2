@@ -75,20 +75,17 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
     }
 
     @Override
-    public List<VaultNote> findAllForGraph() {
-        Query query = new Query();
-        query.fields().include("id", "title", "slug", "outgoingLinks", "folderId");
-        return mongoTemplate.find(query, VaultNote.class);
-    }
-
-    @Override
-    public List<NoteContentLength> findAllContentLengths() {
-        // $strLenCP 로 DB 에서 길이만 계산해 본문 전송을 피함. content 가 없으면 빈 문자열로 처리.
+    public List<GraphNote> findAllForGraph() {
+        // 그래프 필드와 본문 길이를 한 번에 계산해 전체 컬렉션을 두 번 조회하지 않는다.
         AggregationOperation project =
                 context ->
                         new Document(
                                 "$project",
                                 new Document("_id", 1)
+                                        .append("title", 1)
+                                        .append("slug", 1)
+                                        .append("outgoingLinks", 1)
+                                        .append("folderId", 1)
                                         .append(
                                                 "contentLength",
                                                 new Document(
@@ -103,12 +100,25 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
                 .stream()
                 .map(
                         doc ->
-                                new NoteContentLength(
+                                new GraphNote(
                                         String.valueOf(doc.get("_id")),
+                                        doc.getString("title"),
+                                        doc.getString("slug"),
+                                        readStringList(doc, "outgoingLinks"),
+                                        doc.getString("folderId"),
                                         doc.get("contentLength") instanceof Number number
                                                 ? number.intValue()
                                                 : 0))
                 .toList();
+    }
+
+    private List<String> readStringList(Document document, String fieldName) {
+        Object value = document.get(fieldName);
+        if (!(value instanceof List<?> values)) {
+            return List.of();
+        }
+
+        return values.stream().filter(String.class::isInstance).map(String.class::cast).toList();
     }
 
     @Override

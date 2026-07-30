@@ -27,16 +27,17 @@ public interface VaultNoteRepository {
 
     List<VaultNote> findByOutgoingLinksContaining(String noteId);
 
-    List<VaultNote> findAllForGraph();
+    /** 그래프 렌더링에 필요한 필드와 본문 길이만 조회한다. 본문 원문을 애플리케이션으로 옮기지 않고 DB에서 길이를 계산해 응답 크기와 메모리 사용량을 줄인다. */
+    List<GraphNote> findAllForGraph();
 
-    /**
-     * 노트별 본문 글자 수만 조회함. 본문 자체는 전송하지 않고 DB에서 길이만 계산하므로, 전체 노트를 훑어도 응답이 가볍다. 사이트맵이 분량 미달 노트를 색인 대상에서
-     * 제외하는 데 사용함.
-     */
-    List<NoteContentLength> findAllContentLengths();
-
-    /** 노트 id 와 본문 글자 수 */
-    record NoteContentLength(String id, int contentLength) {}
+    /** Vault 그래프 전용 읽기 모델 */
+    record GraphNote(
+            String id,
+            String title,
+            String slug,
+            List<String> outgoingLinks,
+            String folderId,
+            int contentLength) {}
 
     void incrementCommentCount(String noteId);
 

@@ -15,8 +15,6 @@ import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
 import com.kscold.blog.vault.domain.service.BacklinkParsingService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -154,45 +152,34 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
 
     /** 전체 노트의 그래프 데이터 (노드 + 링크) Projection 쿼리로 필요한 필드만 조회하여 메모리 최적화 */
     public GraphDataResponse getGraphData() {
-        List<VaultNote> allNotes = vaultNoteRepository.findAllForGraph();
-
-        // 그래프 조회는 본문을 제외한 프로젝션이라 길이를 알 수 없으므로, DB 에서 길이만 따로 계산해 합친다.
-        Map<String, Integer> contentLengthById =
-                vaultNoteRepository.findAllContentLengths().stream()
-                        .collect(
-                                Collectors.toMap(
-                                        VaultNoteRepository.NoteContentLength::id,
-                                        VaultNoteRepository.NoteContentLength::contentLength,
-                                        (first, second) -> first));
+        List<VaultNoteRepository.GraphNote> allNotes = vaultNoteRepository.findAllForGraph();
 
         List<GraphDataResponse.GraphNode> nodes =
                 allNotes.stream()
                         .map(
                                 note -> {
                                     int size =
-                                            note.getOutgoingLinks() != null
-                                                    ? note.getOutgoingLinks().size() + 1
+                                            note.outgoingLinks() != null
+                                                    ? note.outgoingLinks().size() + 1
                                                     : 1;
-                                    int contentLength =
-                                            contentLengthById.getOrDefault(note.getId(), 0);
                                     return GraphDataResponse.GraphNode.builder()
-                                            .id(note.getId())
-                                            .name(note.getTitle())
-                                            .slug(note.getSlug())
+                                            .id(note.id())
+                                            .name(note.title())
+                                            .slug(note.slug())
                                             .size(size)
-                                            .contentLength(contentLength)
-                                            .folderId(note.getFolderId())
+                                            .contentLength(note.contentLength())
+                                            .folderId(note.folderId())
                                             .build();
                                 })
                         .toList();
 
         List<GraphDataResponse.GraphLink> links = new ArrayList<>();
-        for (VaultNote note : allNotes) {
-            if (note.getOutgoingLinks() != null) {
-                for (String targetId : note.getOutgoingLinks()) {
+        for (VaultNoteRepository.GraphNote note : allNotes) {
+            if (note.outgoingLinks() != null) {
+                for (String targetId : note.outgoingLinks()) {
                     links.add(
                             GraphDataResponse.GraphLink.builder()
-                                    .source(note.getId())
+                                    .source(note.id())
                                     .target(targetId)
                                     .build());
                 }
