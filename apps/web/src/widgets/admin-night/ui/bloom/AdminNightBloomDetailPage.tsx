@@ -9,7 +9,7 @@ import {
 import {
   SERVICE_PERIOD,
   SERVICE_PERIOD_NOTICE,
-} from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
+} from '@/shared/model/aiAgentBloomContent';
 import { AdminNightBloomSection } from './AdminNightBloomSection';
 import { BloomPurchaseCta } from './BloomPurchaseCta';
 

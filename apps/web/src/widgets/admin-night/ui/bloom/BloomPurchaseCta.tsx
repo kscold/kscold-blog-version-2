@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { aiAgentBloomPaymentApi, type AiAgentBloomPaymentConfig } from '@/features/payment';
-import { SERVICE_PERIOD } from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
+import { SERVICE_PERIOD } from '@/shared/model/aiAgentBloomContent';
 
 /**
  * 상품 상세의 구매 영역. 결제수단은 서버 설정에 따라 노출되며, 신용카드(KG이니시스) 채널키가 없으면

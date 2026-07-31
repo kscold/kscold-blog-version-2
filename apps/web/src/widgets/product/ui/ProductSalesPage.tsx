@@ -6,7 +6,7 @@ import { aiAgentBloomPaymentApi, type AiAgentBloomPaymentConfig } from '@/featur
 import {
   SERVICE_PERIOD,
   SERVICE_PERIOD_NOTICE,
-} from '@/widgets/payment/lib/aiAgentBloomPaymentContent';
+} from '@/shared/model/aiAgentBloomContent';
 
 const HIGHLIGHTS = [
   '오프라인 고정 진행 (장소 대관 포함)',
