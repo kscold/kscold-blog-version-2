@@ -29,9 +29,8 @@ export async function generateMetadata({
   params: Promise<{ category: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const [post, admin] = await Promise.all([getPost(slug), isAdmin()]);
 
-  const admin = await isAdmin();
   if (!post || (post.status !== 'PUBLISHED' && !admin)) {
     return buildPageMetadata({
       title: '포스트를 찾을 수 없습니다',
@@ -65,9 +64,8 @@ export default async function PostPage({
   params: Promise<{ category: string; slug: string }>;
 }) {
   const { category, slug } = await params;
-  const post = await getPost(slug);
+  const [post, admin] = await Promise.all([getPost(slug), isAdmin()]);
 
-  const admin = await isAdmin();
   if (!post || (post.status !== 'PUBLISHED' && !admin)) {
     notFound();
   }
