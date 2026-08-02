@@ -1,8 +1,15 @@
 'use client';
 
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import dynamic from 'next/dynamic';
 import { MermaidBlock } from '@/shared/ui/MermaidBlock';
+
+// react-syntax-highlighter는 무겁고(테마 포함) 코드 블록이 있는 글에서만 필요하므로
+// 별도 청크로 분리해 코드 블록이 없는 마크다운 페이지의 번들에서 제외한다.
+const CodeHighlighter = dynamic(() => import('./CodeHighlighter'), {
+  loading: () => (
+    <div className="h-40 animate-pulse rounded-xl bg-surface-100 dark:bg-surface-800" />
+  ),
+});
 
 const LANGUAGE_ALIASES: Record<string, string> = {
   ts: 'typescript',
@@ -135,20 +142,7 @@ export function MarkdownCodeBlock({
         <MarkdownCopyButton codeText={codeText} isDark={isDark} variant="inline" />
       </div>
       <div className="overflow-x-auto">
-        <SyntaxHighlighter
-          style={isDark ? vscDarkPlus : oneLight}
-          language={language}
-          PreTag="div"
-          className="!my-0 !border-0 !bg-transparent"
-          customStyle={{
-            margin: 0,
-            padding: '1.25rem',
-            minWidth: 'max-content',
-            background: 'transparent',
-          }}
-        >
-          {codeText}
-        </SyntaxHighlighter>
+        <CodeHighlighter codeText={codeText} language={language} isDark={isDark} />
       </div>
     </div>
   );
