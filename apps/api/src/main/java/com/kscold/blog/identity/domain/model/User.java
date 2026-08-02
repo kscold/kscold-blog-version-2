@@ -31,7 +31,8 @@ public class User {
 
     private String password;
 
-    private Role role;
+    // findByRole(ADMIN) 이 관리자 1명을 찾자고 전체 컬렉션을 훑지 않도록 인덱스를 둔다.
+    @Indexed private Role role;
 
     private Profile profile;
 

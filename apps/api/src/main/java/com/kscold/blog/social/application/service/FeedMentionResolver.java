@@ -27,22 +27,22 @@ public class FeedMentionResolver {
     public List<User> mentionableUsers(String feedId) {
         LinkedHashMap<String, User> byId = new LinkedHashMap<>();
 
-        // 주인(관리자) — 아직 댓글을 안 달았어도 항상 포함
-        userRepository.findAllOrderByCreatedAtDesc().stream()
-                .filter(user -> user.getRole() == User.Role.ADMIN && !user.isDeleted())
+        // 주인(관리자) — 아직 댓글을 안 달았어도 항상 포함. 전체 컬렉션이 아니라 role 인덱스로 바로 조회함.
+        userRepository.findByRole(User.Role.ADMIN).stream()
+                .filter(user -> !user.isDeleted())
                 .forEach(user -> byId.put(user.getId(), user));
 
-        // 해당 글 댓글 참여자
-        feedCommentRepository.findByFeedId(feedId, Pageable.unpaged()).getContent().stream()
-                .map(FeedComment::getUserId)
-                .filter(Objects::nonNull)
-                .distinct()
-                .forEach(
-                        userId ->
-                                userRepository
-                                        .findById(userId)
-                                        .filter(user -> !user.isDeleted())
-                                        .ifPresent(user -> byId.putIfAbsent(user.getId(), user)));
+        // 해당 글 댓글 참여자 — userId 를 모아 한 번에 배치 조회함(댓글마다 findById 하지 않음).
+        List<String> commenterIds =
+                feedCommentRepository.findByFeedId(feedId, Pageable.unpaged()).getContent().stream()
+                        .map(FeedComment::getUserId)
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .toList();
+
+        userRepository.findAllById(commenterIds).stream()
+                .filter(user -> !user.isDeleted())
+                .forEach(user -> byId.putIfAbsent(user.getId(), user));
 
         return new ArrayList<>(byId.values());
     }

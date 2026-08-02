@@ -2,11 +2,18 @@ package com.kscold.blog.identity.domain.port.out;
 
 import com.kscold.blog.identity.domain.model.User;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
     Optional<User> findById(String id);
+
+    /** 주어진 id 들을 한 번에 조회함(반복 findById 로 인한 N+1 방지용). */
+    List<User> findAllById(Collection<String> ids);
+
+    /** 특정 권한(예: ADMIN)의 사용자만 조회함. 전체 컬렉션을 훑어 필터링하지 않도록 인덱스 쿼리로 처리함. */
+    List<User> findByRole(User.Role role);
 
     Optional<User> findByEmail(String email);
 

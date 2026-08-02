@@ -3,6 +3,7 @@ package com.kscold.blog.identity.adapter.out.persistence;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,16 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public Optional<User> findById(String id) {
         return mongoUserRepository.findById(id);
+    }
+
+    @Override
+    public List<User> findAllById(Collection<String> ids) {
+        return mongoUserRepository.findAllById(ids).stream().toList();
+    }
+
+    @Override
+    public List<User> findByRole(User.Role role) {
+        return mongoUserRepository.findByRole(role);
     }
 
     @Override

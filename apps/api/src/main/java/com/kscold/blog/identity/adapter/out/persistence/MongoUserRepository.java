@@ -18,6 +18,8 @@ public interface MongoUserRepository extends MongoRepository<User, String> {
 
     List<User> findAllByOrderByCreatedAtDesc();
 
+    List<User> findByRole(User.Role role);
+
     long countByCreatedAtAfter(LocalDateTime after);
 
     List<User> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime after);
