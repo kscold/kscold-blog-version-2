@@ -6,41 +6,28 @@ import Link from 'next/link';
 import { useCategories } from '@/entities/category';
 import { usePostsByCategory } from '@/entities/post';
 import { PostCard } from '@/entities/post';
+import type { Category } from '@/shared/model/types/blog';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { CategoryHeader } from './CategoryHeader';
 import { Pagination } from '@/shared/ui/Pagination';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 interface CategoryPostContainerProps {
-  categorySlug: string;
+  category: Category;
 }
 
-export function CategoryPostContainer({ categorySlug }: CategoryPostContainerProps) {
+export function CategoryPostContainer({ category }: CategoryPostContainerProps) {
   const [page, setPage] = useState(0);
   const { allowRichEffects } = usePerformanceMode();
 
+  // 서버에서 이미 category(id 포함)를 받아왔으므로, 클라이언트에서 전체 카테고리 목록이
+  // 내려올 때까지 기다리지 않고 바로 게시글을 조회한다. useCategories는 하위 카테고리
+  // 표시용으로만 병렬로 쓰인다.
+  const { data: postsData, isLoading } = usePostsByCategory(category.id, page, 12);
   const { data: categories } = useCategories();
-  const category = categories?.find(cat => cat.slug === categorySlug);
-
-  const { data: postsData, isLoading } = usePostsByCategory(category?.id || '', page, 12);
 
   const posts = postsData?.content || [];
   const totalPages = postsData?.totalPages || 0;
-
-  if (!category) {
-    return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-black text-surface-900 mb-2">
-            카테고리를 찾을 수 없습니다
-          </h1>
-          <Link href="/blog" className="text-sm text-surface-500 hover:text-surface-900 transition-colors">
-            블로그로 돌아가기
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   const subcategories = categories?.filter(cat => cat.parent === category.id) || [];
 

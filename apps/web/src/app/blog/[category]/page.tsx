@@ -76,7 +76,7 @@ export default async function CategoryPage({
   return (
     <>
       <JsonLd id={`category-${categoryData.id}`} data={jsonLd} />
-      <CategoryPostContainer categorySlug={categoryData.slug} />
+      <CategoryPostContainer category={categoryData} />
     </>
   );
 }
