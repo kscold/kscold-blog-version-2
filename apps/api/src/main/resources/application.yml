@@ -106,6 +106,15 @@ notification:
     guestbook-bot-name: ${NOTIFICATION_DISCORD_GUESTBOOK_BOT_NAME:방명록 알림}
     guestbook-bot-avatar-url: ${NOTIFICATION_DISCORD_GUESTBOOK_BOT_AVATAR:}
 
+# SOLAPI 알림톡. 승인된 카카오 채널과 템플릿 식별자는 운영 환경에서만 주입함.
+solapi:
+  enabled: ${SOLAPI_ENABLED:false}
+  api-key: ${SOLAPI_API_KEY:${COOLSMS_API_KEY:}}
+  api-secret: ${SOLAPI_API_SECRET:${COOLSMS_API_SECRET:}}
+  sender-phone: ${SOLAPI_SENDER_PHONE:${COOLSMS_SENDER_PHONE:}}
+  kakao-pf-id: ${SOLAPI_KAKAO_PF_ID:${KAKAO_CHANNEL_ID:}}
+  api-base-url: ${SOLAPI_API_BASE_URL:https://api.solapi.com}
+
 portone:
   store-id: ${PORTONE_STORE_ID:}
   kakao-pay-channel-key: ${PORTONE_KAKAOPAY_CHANNEL_KEY:}
