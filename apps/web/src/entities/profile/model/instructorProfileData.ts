@@ -1,7 +1,7 @@
 export const INSTRUCTOR_PROFILE = {
   name: '김승찬',
   handle: 'kscold',
-  headline: 'AI를 업무에 붙이고, 사람이 다시 써먹을 수 있게 설명하는 개발자',
+  headline: 'AI Agent, 저와 함께 직접 써보시죠.',
   role: '씨에스리 AI기술연구소 연구원 · 풀스택 개발자',
   company: '콜딩(Colding) 대표 · Pawpong 운영',
   introduction: [
