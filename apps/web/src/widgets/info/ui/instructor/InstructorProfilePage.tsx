@@ -56,7 +56,7 @@ export function InstructorProfilePage() {
             </div>
           </div>
           <div>
-            <SectionLabel>AI 활용 하이라이트</SectionLabel>
+            <SectionLabel>AI-Driven Highlights</SectionLabel>
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
               {profile.highlights.map(item => (
                 <div key={item.label} className="rounded-2xl border-l-2 border-primary-500 bg-surface-50 p-5 ring-1 ring-inset ring-surface-200">
