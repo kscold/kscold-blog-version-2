@@ -26,8 +26,8 @@ export const INSTRUCTOR_PROFILE = {
   axCases: [
     {
       category: '현업 AI Agent',
-      title: 'B2B 워크플로우 자동화',
-      description: 'LangGraph, RAG, LLM 연동을 활용해 조직의 업무 흐름을 실행 가능한 Agent로 연결합니다.',
+      title: '빅데이터 솔루션 AI Agent 개발',
+      description: 'LangGraph, RAG, LLM 연동을 활용해 빅데이터 솔루션의 AI Agent를 개발하고, 사용자가 데이터를 자연어로 탐색하는 바이브 분석 경험을 제공하고 있습니다.',
     },
     {
       category: '국책 연구개발',
