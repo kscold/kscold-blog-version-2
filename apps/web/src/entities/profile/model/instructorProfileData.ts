@@ -3,7 +3,7 @@ export const INSTRUCTOR_PROFILE = {
   handle: 'kscold',
   headline: 'AI를 업무에 붙이고, 사람이 다시 써먹을 수 있게 설명하는 개발자',
   role: '씨에스리 AI기술연구소 연구원 · 풀스택 개발자',
-  company: '콜딩(Colding) 대표',
+  company: '콜딩(Colding) 대표 · Pawpong 운영',
   introduction: [
     'B2B 워크플로우 자동화와 AI Agent를 실무에서 개발하고 있습니다. Codex와 생성형 AI를 단순 시연 도구가 아니라 기획, 개발, 검증, 운영까지 이어지는 업무 도구로 사용합니다.',
     '커머스 전환, SKT 연계 이벤트, 외부 서비스 납품, 기술 커뮤니티 운영까지 서로 다른 환경의 일을 해왔습니다. 모든 과정에서 AI를 빠르게 만드는 도구에 그치지 않고 요구사항을 정리하고 결과를 검증하는 협업 도구로 활용했습니다.',
@@ -36,13 +36,18 @@ export const INSTRUCTOR_PROFILE = {
     },
     {
       category: '서비스 전환',
-      title: '대규모 레거시 마이그레이션',
-      description: 'AI 코딩 도구를 활용해 커머스 백엔드와 프런트엔드를 단계적으로 전환하고 운영 안정성과 개발 속도를 함께 개선했습니다.',
+      title: '식후경 Eatbuy 2.0 전환',
+      description: 'Strapi CMS의 약 400개 테이블을 NestJS 약 45개 도메인 모듈로 재설계하고, 프런트엔드 API의 90% 이상을 단계적으로 전환했습니다.',
     },
     {
-      category: '납품 프로젝트',
-      title: '외부 서비스 풀스택 구축',
-      description: '다국어 웹 서비스와 데이터 수집·정제 백엔드를 기획부터 배포까지 구현하며 AI를 실제 납품 과정에 활용했습니다.',
+      category: '외주 프로젝트',
+      title: '바람부는날에도 성형외과 사이트 리뉴얼',
+      description: 'Next.js와 MongoDB Atlas로 어드민을 포함한 풀스택 사이트를 개발하고 한국어·일본어 지원과 운영 설명서, 프로젝트 이관까지 맡았습니다.',
+    },
+    {
+      category: '외주 프로젝트',
+      title: '한국기타가와 한국지사 사이트 리뉴얼',
+      description: 'NestJS와 MongoDB Atlas로 백엔드를 구축하고 일본 본사 사이트의 데이터를 수집·정제해 GCP Cloud Run 환경에 배포했습니다.',
     },
     {
       category: '서비스 운영',
@@ -83,7 +88,7 @@ export const INSTRUCTOR_PROFILE = {
       period: '2024.08 — 2026.01',
       organization: '푼타컴퍼니',
       role: '백엔드 개발 리드',
-      description: '커머스 서비스 도메인 재설계, 프런트엔드 전환, 무중단 배포 구축',
+      description: '식후경 Eatbuy 2.0 초기 설계와 개발 리드, 커머스 도메인 재설계, API 90% 이상 전환, 무중단 배포와 업무 자동화 구축',
     },
     {
       period: '개인사업',
