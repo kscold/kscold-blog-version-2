@@ -51,13 +51,16 @@ export function InstructorProfilePage() {
               {profile.introduction.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
             </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            {profile.highlights.map(item => (
-              <div key={item.label} className="rounded-2xl bg-surface-50 p-5 ring-1 ring-inset ring-surface-200">
-                <strong className="block text-xl font-black tracking-tight text-surface-900">{item.value}</strong>
-                <span className="mt-1 block text-xs leading-5 text-surface-500">{item.label}</span>
-              </div>
-            ))}
+          <div>
+            <SectionLabel>AI 활용 하이라이트</SectionLabel>
+            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+              {profile.highlights.map(item => (
+                <div key={item.label} className="rounded-2xl border-l-2 border-primary-500 bg-surface-50 p-5 ring-1 ring-inset ring-surface-200">
+                  <strong className="block break-keep text-xl font-black tracking-tight text-surface-900">{item.value}</strong>
+                  <span className="mt-1 block text-xs leading-5 text-surface-500">{item.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 

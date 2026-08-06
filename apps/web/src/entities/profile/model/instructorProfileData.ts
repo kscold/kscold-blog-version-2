@@ -11,7 +11,7 @@ export const INSTRUCTOR_PROFILE = {
   ],
   highlights: [
     {
-      value: '3,295명 → 30팀',
+      value: '총 3,295명 · 본선 30팀',
       label: 'OpenAI × 조코딩 × 프라이머 AI 해커톤 본선 진출',
     },
     {
@@ -19,8 +19,8 @@ export const INSTRUCTOR_PROFILE = {
       label: '레거시 CMS 테이블을 도메인 모듈로 재설계',
     },
     {
-      value: '대규모 리팩토링',
-      label: 'Payment 도메인 4,552줄을 540줄로 정리해 코드 규모 88% 감소',
+      value: '88% 감소',
+      label: 'Payment 도메인 4,552줄을 540줄로 정리',
     },
   ],
   axCases: [

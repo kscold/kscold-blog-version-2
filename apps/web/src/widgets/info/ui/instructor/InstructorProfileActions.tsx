@@ -20,13 +20,6 @@ export function InstructorProfileActions() {
       >
         {isCopied ? '링크를 복사했습니다' : '프로필 링크 복사'}
       </button>
-      <button
-        type="button"
-        onClick={() => window.print()}
-        className="rounded-full bg-surface-900 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-surface-800"
-      >
-        PDF로 저장
-      </button>
     </div>
   );
 }
