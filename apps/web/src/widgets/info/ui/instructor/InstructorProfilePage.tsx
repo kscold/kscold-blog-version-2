@@ -21,8 +21,12 @@ export function InstructorProfilePage() {
             <p className="mb-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-primary-600">
               Instructor Profile · AX &amp; Codex
             </p>
-            <h1 className="max-w-3xl break-keep text-3xl font-black leading-[1.16] tracking-tight sm:text-4xl lg:text-5xl">
-              {profile.headline}
+            <h1 className="max-w-3xl break-keep text-[1.75rem] font-black leading-[1.18] tracking-tight sm:text-4xl lg:text-5xl">
+              {profile.headline.map((line, index) => (
+                <span key={line} className={`block ${index > 0 ? 'mt-1 sm:mt-2' : ''}`}>
+                  {line}
+                </span>
+              ))}
             </h1>
             <div className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-surface-500">
               <strong className="text-base text-surface-900">{profile.name}</strong>

@@ -1,7 +1,7 @@
 export const INSTRUCTOR_PROFILE = {
   name: '김승찬',
   handle: 'kscold',
-  headline: 'AI Agent, 저와 함께 직접 써보시죠.',
+  headline: ['AI Agent,', '저와 함께 직접 써보시죠.'],
   role: '씨에스리 AI기술연구소 연구원 · 풀스택 개발자',
   company: '콜딩(Colding) 대표 · Pawpong 운영',
   introduction: [
@@ -11,16 +11,16 @@ export const INSTRUCTOR_PROFILE = {
   ],
   highlights: [
     {
-      value: '총 3,295명 · 본선 30팀',
-      label: 'OpenAI × 조코딩 × 프라이머 AI 해커톤 본선 진출',
+      value: '3,295명 지원 → 최종 30팀',
+      label: '개인 15명·팀 15개 · OpenAI × 조코딩 × 프라이머 AI 해커톤 본선 진출',
     },
     {
       value: '400개 → 45개',
       label: '레거시 CMS 테이블을 도메인 모듈로 재설계',
     },
     {
-      value: '88% 감소',
-      label: 'Payment 도메인 4,552줄을 540줄로 정리',
+      value: 'AI 기반 대규모 리팩토링',
+      label: 'Payment 도메인 4,552줄을 540줄로 줄인 사례처럼 복잡한 레거시 코드를 AI와 함께 분석·재설계·검증',
     },
   ],
   axCases: [
