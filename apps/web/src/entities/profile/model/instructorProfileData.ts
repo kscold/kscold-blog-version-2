@@ -19,8 +19,8 @@ export const INSTRUCTOR_PROFILE = {
       label: '레거시 CMS 테이블을 도메인 모듈로 재설계',
     },
     {
-      value: '88% 감소',
-      label: 'Payment 도메인 4,552줄을 540줄로 정리',
+      value: '대규모 리팩토링',
+      label: 'Payment 도메인 4,552줄을 540줄로 정리해 코드 규모 88% 감소',
     },
   ],
   axCases: [
@@ -72,9 +72,8 @@ export const INSTRUCTOR_PROFILE = {
     ['운영·CS', 'FAQ 검색, 답변 초안, 알림과 후속 업무 연결'],
   ],
   teaching: [
-    'PPT를 읽는 방식보다 실제 화면과 참가자의 업무 사례를 중심으로 진행합니다.',
+    'PPT를 읽는 발표형 강의가 아니라 실제 화면에서 직접 만들고 수정하는 실습을 중심으로 진행합니다.',
     '좋은 요청 작성법뿐 아니라 틀린 결과를 발견하고 고치는 검증 습관까지 함께 다룹니다.',
-    '10명 안팎의 소규모에서는 각자 자동화하고 싶은 업무를 직접 가져와 실습할 수 있습니다.',
     '사내 데이터와 개인정보를 어디까지 넣어도 되는지 현실적인 보안 기준을 함께 설명합니다.',
   ],
   experience: [
@@ -115,7 +114,6 @@ export const INSTRUCTOR_PROFILE = {
   contacts: {
     email: 'coldingcontact@gmail.com',
     website: 'https://kscold.com',
-    pawpong: 'https://pawpong.kr',
     github: 'https://github.com/kscold',
   },
 };

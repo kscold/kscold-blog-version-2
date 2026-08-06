@@ -25,7 +25,7 @@ const instructorJsonLd = {
   jobTitle: INSTRUCTOR_PROFILE.role,
   description: INSTRUCTOR_PROFILE.introduction.join(' '),
   url: `${SITE_URL}/info/instructor`,
-  sameAs: [INSTRUCTOR_PROFILE.contacts.website, INSTRUCTOR_PROFILE.contacts.pawpong, INSTRUCTOR_PROFILE.contacts.github],
+  sameAs: [INSTRUCTOR_PROFILE.contacts.website, INSTRUCTOR_PROFILE.contacts.github],
   alumniOf: {
     '@type': 'CollegeOrUniversity',
     name: '상명대학교',
