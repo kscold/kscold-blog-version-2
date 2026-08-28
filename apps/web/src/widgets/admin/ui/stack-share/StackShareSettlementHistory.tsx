@@ -34,6 +34,7 @@ export function StackShareSettlementHistory() {
               <p className="mt-4 border-t border-surface-100 pt-4 text-xs text-surface-500">
                 안내한 계좌: <strong className="text-surface-800">{settlement.accountText}</strong>
                 {settlement.dueDate && <> · 입금 기한: {settlement.dueDate}</>}
+                {settlement.contactText && <> · 문의: {settlement.contactText}</>}
               </p>
             )}
             <div className="mt-4 grid gap-2 border-t border-surface-100 pt-4 sm:grid-cols-2">

@@ -116,6 +116,9 @@ export function StackShareSettlementComposer() {
               입금 계좌를 먼저 등록해주세요. 등록 전에는 발송할 수 없습니다.
             </p>
           )}
+          {accountReady && account.data?.contactText && (
+            <p className="mt-1 text-surface-300">문의: {account.data.contactText}</p>
+          )}
           <p className="mt-2 text-surface-400">입금 기한: {dueDate.trim() || '협의'}</p>
         </div>
 

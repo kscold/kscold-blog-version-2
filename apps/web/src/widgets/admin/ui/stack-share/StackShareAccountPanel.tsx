@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSaveStackShareAccount, useStackShareAccount } from '@/features/stack-share';
+import {
+  BANK_OPTIONS,
+  formatPhoneNumber,
+  useSaveStackShareAccount,
+  useStackShareAccount,
+} from '@/features/stack-share';
 import Button from '@/shared/ui/Button';
 import Input from '@/shared/ui/Input';
 import { useAlert } from '@/shared/model/alertStore';
@@ -18,6 +23,7 @@ export function StackShareAccountPanel() {
   const [bankName, setBankName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
 
   // 서버 값이 도착하면 입력창을 채운다. 사용자가 편집 중인 값을 덮지 않도록 최초 로드에만 반응한다.
   useEffect(() => {
@@ -25,16 +31,23 @@ export function StackShareAccountPanel() {
     setBankName(account.data.bankName ?? '');
     setAccountNumber(account.data.accountNumber ?? '');
     setAccountHolder(account.data.accountHolder ?? '');
+    setContactPhone(formatPhoneNumber(account.data.contactPhone ?? ''));
   }, [account.data]);
+
+  // 서버가 휴대전화 형식을 요구하므로 저장 전에 자릿수를 확인한다.
+  const phoneDigits = contactPhone.replace(/[^0-9]/g, '');
+  const phoneValid = /^01[016789]\d{7,8}$/.test(phoneDigits);
 
   const canSave =
     bankName.trim().length > 0 &&
     accountNumber.trim().length > 0 &&
-    accountHolder.trim().length > 0;
+    accountHolder.trim().length > 0 &&
+    phoneValid;
 
-  const preview = canSave
-    ? `${bankName.trim()} ${accountNumber.trim()} (${accountHolder.trim()})`
-    : '';
+  const preview =
+    bankName.trim() && accountNumber.trim() && accountHolder.trim()
+      ? `${bankName.trim()} ${accountNumber.trim()} (${accountHolder.trim()})`
+      : '';
 
   const handleSave = async () => {
     if (!canSave) return;
@@ -43,6 +56,7 @@ export function StackShareAccountPanel() {
         bankName: bankName.trim(),
         accountNumber: accountNumber.trim(),
         accountHolder: accountHolder.trim(),
+        contactPhone: phoneDigits,
       });
       alerts.success('입금 계좌를 저장했습니다.');
     } catch (error) {
@@ -73,18 +87,25 @@ export function StackShareAccountPanel() {
         </span>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Input
           label="은행명"
+          list="stack-share-bank-options"
           value={bankName}
           onChange={event => setBankName(event.target.value)}
-          placeholder="예: 카카오뱅크"
+          placeholder="예: 토스뱅크"
+          helperText="목록에 없으면 직접 입력"
         />
+        <datalist id="stack-share-bank-options">
+          {BANK_OPTIONS.map(bank => (
+            <option key={bank} value={bank} />
+          ))}
+        </datalist>
         <Input
           label="계좌번호"
           value={accountNumber}
           onChange={event => setAccountNumber(event.target.value)}
-          placeholder="예: 3333-01-1234567"
+          placeholder="예: 1000-1234-5678"
         />
         <Input
           label="예금주"
@@ -92,12 +113,31 @@ export function StackShareAccountPanel() {
           onChange={event => setAccountHolder(event.target.value)}
           placeholder="예: 김승찬"
         />
+        <Input
+          label="문의 연락처"
+          inputMode="numeric"
+          value={contactPhone}
+          onChange={event => setContactPhone(formatPhoneNumber(event.target.value))}
+          placeholder="010-1234-5678"
+          helperText={
+            contactPhone.length > 0 && !phoneValid
+              ? '휴대전화 번호 형식으로 입력해주세요'
+              : '알림톡에 문의처로 함께 안내됩니다'
+          }
+        />
       </div>
 
       {preview && (
-        <p className="mt-4 rounded-2xl bg-surface-50 px-4 py-3 text-sm text-surface-600">
-          알림톡 표기 미리보기: <strong className="text-surface-900">{preview}</strong>
-        </p>
+        <div className="mt-4 space-y-1 rounded-2xl bg-surface-50 px-4 py-3 text-sm text-surface-600">
+          <p>
+            입금 계좌 표기: <strong className="text-surface-900">{preview}</strong>
+          </p>
+          {phoneValid && (
+            <p>
+              문의 연락처 표기: <strong className="text-surface-900">{contactPhone}</strong>
+            </p>
+          )}
+        </div>
       )}
 
       <Button
