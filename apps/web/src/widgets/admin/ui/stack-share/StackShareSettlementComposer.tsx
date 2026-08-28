@@ -5,6 +5,7 @@ import {
   formatWon,
   parseAmount,
   useSendStackShareSettlement,
+  useStackShareAccount,
   useStackShareParticipants,
 } from '@/features/stack-share';
 import Button from '@/shared/ui/Button';
@@ -14,12 +15,15 @@ import { useAlert } from '@/shared/model/alertStore';
 export function StackShareSettlementComposer() {
   const alerts = useAlert();
   const participants = useStackShareParticipants();
+  const account = useStackShareAccount();
   const sendSettlement = useSendStackShareSettlement();
   const [toolName, setToolName] = useState('');
   const [billingPeriod, setBillingPeriod] = useState('이번 달');
   const [totalAmount, setTotalAmount] = useState('');
+  const [dueDate, setDueDate] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const amount = parseAmount(totalAmount);
+  const accountReady = account.data?.configured ?? false;
 
   const selected = useMemo(
     () => participants.data?.filter(participant => selectedIds.includes(participant.id)) ?? [],
@@ -34,7 +38,12 @@ export function StackShareSettlementComposer() {
       amount: base + (index < remainder ? 1 : 0),
     }));
   }, [amount, selected]);
-  const canSend = toolName.trim().length > 0 && billingPeriod.trim().length > 0 && shares.length > 0;
+  // 계좌가 없으면 서버가 발송을 거부하므로 버튼 단계에서 미리 막는다.
+  const canSend =
+    toolName.trim().length > 0 &&
+    billingPeriod.trim().length > 0 &&
+    shares.length > 0 &&
+    accountReady;
 
   const toggleParticipant = (id: string) => {
     setSelectedIds(current =>
@@ -49,6 +58,7 @@ export function StackShareSettlementComposer() {
         toolName: toolName.trim(),
         billingPeriod: billingPeriod.trim(),
         totalAmount: amount,
+        dueDate: dueDate.trim(),
         recipients: shares.map(({ name, phoneNumber, email }) => ({ name, phoneNumber, email })),
       });
       alerts.success(`${result.acceptedCount}명의 발송 요청을 접수했습니다.`);
@@ -66,6 +76,7 @@ export function StackShareSettlementComposer() {
           <Input label="툴 또는 구독 이름" value={toolName} onChange={event => setToolName(event.target.value)} placeholder="예: Claude Team" />
           <Input label="정산 기간" value={billingPeriod} onChange={event => setBillingPeriod(event.target.value)} />
           <Input label="총 결제 금액" inputMode="numeric" value={totalAmount} onChange={event => setTotalAmount(event.target.value.replace(/[^0-9]/g, ''))} helperText={amount ? formatWon(amount) : '원화 기준'} />
+          <Input label="입금 기한" value={dueDate} onChange={event => setDueDate(event.target.value)} placeholder="예: 9월 5일" helperText="비우면 '협의'로 안내됩니다" />
         </div>
         <div className="mt-6">
           <p className="mb-3 text-sm font-bold text-surface-900">참여자 선택</p>
@@ -95,6 +106,19 @@ export function StackShareSettlementComposer() {
           ))}
           {shares.length === 0 && <p className="py-16 text-center text-sm text-surface-400">참여자와 금액을 선택해주세요.</p>}
         </div>
+
+        <div className="mb-4 rounded-2xl bg-white/5 px-4 py-3 text-xs">
+          <p className="text-surface-400">받는 사람에게 안내될 입금 계좌</p>
+          {accountReady ? (
+            <p className="mt-1 font-bold text-white">{account.data?.displayText}</p>
+          ) : (
+            <p className="mt-1 font-bold text-amber-300">
+              입금 계좌를 먼저 등록해주세요. 등록 전에는 발송할 수 없습니다.
+            </p>
+          )}
+          <p className="mt-2 text-surface-400">입금 기한: {dueDate.trim() || '협의'}</p>
+        </div>
+
         <Button variant="secondary" className="w-full" disabled={!canSend} isLoading={sendSettlement.isPending} onClick={handleSend}>
           정산 저장하고 알림톡 보내기
         </Button>

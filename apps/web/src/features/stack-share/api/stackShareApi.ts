@@ -1,5 +1,7 @@
 import { apiClient } from '@/shared/api/api-client';
 import type {
+  StackShareAccount,
+  StackShareAccountInput,
   StackShareParticipant,
   StackShareParticipantInput,
   StackShareSendResult,
@@ -8,6 +10,9 @@ import type {
 } from '../model/types';
 
 export const stackShareApi = {
+  getAccount: () => apiClient.get<StackShareAccount>('/admin/stack-share/account'),
+  saveAccount: (input: StackShareAccountInput) =>
+    apiClient.post<StackShareAccount>('/admin/stack-share/account', input),
   getParticipants: () =>
     apiClient.get<StackShareParticipant[]>('/admin/stack-share/participants'),
   saveParticipant: (input: StackShareParticipantInput) =>

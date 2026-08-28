@@ -1,4 +1,5 @@
 import { AlimtalkTemplateManager } from './AlimtalkTemplateManager';
+import { StackShareAccountPanel } from './StackShareAccountPanel';
 import { StackShareParticipantPanel } from './StackShareParticipantPanel';
 import { StackShareSettlementComposer } from './StackShareSettlementComposer';
 import { StackShareSettlementHistory } from './StackShareSettlementHistory';
@@ -18,6 +19,7 @@ export function AdminStackShareNotificationSection() {
             함께 결제하는 툴의 분담금을 자동 계산하고, 참여자와 발송 기록을 관리자 전용으로 관리합니다.
           </p>
         </header>
+        <StackShareAccountPanel />
         <StackShareParticipantPanel />
         <StackShareSettlementComposer />
         <StackShareSettlementHistory />
