@@ -1,11 +1,14 @@
 package com.kscold.blog.stackshare.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.stackshare.adapter.in.web.dto.request.SaveStackShareAccountRequest;
 import com.kscold.blog.stackshare.adapter.in.web.dto.request.SaveStackShareParticipantRequest;
 import com.kscold.blog.stackshare.adapter.in.web.dto.request.SendStackShareNotificationsRequest;
+import com.kscold.blog.stackshare.adapter.in.web.dto.response.StackShareAccountResponse;
 import com.kscold.blog.stackshare.adapter.in.web.dto.response.StackShareNotificationResponse;
 import com.kscold.blog.stackshare.adapter.in.web.dto.response.StackShareParticipantResponse;
 import com.kscold.blog.stackshare.adapter.in.web.dto.response.StackShareSettlementResponse;
+import com.kscold.blog.stackshare.application.dto.SaveStackShareAccountCommand;
 import com.kscold.blog.stackshare.application.dto.SaveStackShareParticipantCommand;
 import com.kscold.blog.stackshare.application.dto.SendStackShareNotificationsCommand;
 import com.kscold.blog.stackshare.application.dto.StackShareRecipientCommand;
@@ -31,6 +34,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminStackShareController {
 
     private final StackShareManagementUseCase useCase;
+
+    @GetMapping("/account")
+    public ResponseEntity<ApiResponse<StackShareAccountResponse>> getAccount() {
+        return ResponseEntity.ok(
+                ApiResponse.success(StackShareAccountResponse.from(useCase.getAccount())));
+    }
+
+    @PostMapping("/account")
+    public ResponseEntity<ApiResponse<StackShareAccountResponse>> saveAccount(
+            @Valid @RequestBody SaveStackShareAccountRequest request) {
+        var command =
+                new SaveStackShareAccountCommand(
+                        request.getBankName(),
+                        request.getAccountNumber(),
+                        request.getAccountHolder());
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        StackShareAccountResponse.from(useCase.saveAccount(command)),
+                        "입금 계좌를 저장했습니다."));
+    }
 
     @GetMapping("/participants")
     public ResponseEntity<ApiResponse<List<StackShareParticipantResponse>>> getParticipants() {
@@ -77,7 +100,8 @@ public class AdminStackShareController {
                 new StackShareSettlementCommand(
                         request.getToolName(),
                         request.getBillingPeriod(),
-                        request.getTotalAmount());
+                        request.getTotalAmount(),
+                        request.getDueDate());
         var recipients =
                 request.getRecipients().stream()
                         .map(

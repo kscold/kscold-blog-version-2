@@ -18,6 +18,11 @@ public class StackShareSettlementResponse {
     private String toolName;
     private String billingPeriod;
     private long totalAmount;
+    private String dueDate;
+
+    /** 발송 당시 안내한 입금 계좌. 이후 계좌를 바꿔도 보낸 내용 그대로 남는다. */
+    private String accountText;
+
     private StackShareSettlement.Status status;
     private LocalDateTime sentAt;
     private LocalDateTime createdAt;
@@ -29,6 +34,8 @@ public class StackShareSettlementResponse {
                 .toolName(settlement.getToolName())
                 .billingPeriod(settlement.getBillingPeriod())
                 .totalAmount(settlement.getTotalAmount())
+                .dueDate(settlement.getDueDate())
+                .accountText(settlement.getAccountText())
                 .status(settlement.getStatus())
                 .sentAt(settlement.getSentAt())
                 .createdAt(settlement.getCreatedAt())

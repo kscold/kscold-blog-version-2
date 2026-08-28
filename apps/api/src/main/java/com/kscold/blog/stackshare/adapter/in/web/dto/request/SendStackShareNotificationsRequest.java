@@ -19,6 +19,10 @@ public class SendStackShareNotificationsRequest {
     @NotBlank private String billingPeriod;
     @Positive private long totalAmount;
 
+    /** 입금 기한 표기(예 "9월 5일"). 비워 보내면 알림톡에 "협의" 로 나간다. */
+    @Size(max = 30)
+    private String dueDate;
+
     @Valid
     @NotEmpty
     @Size(max = 100)

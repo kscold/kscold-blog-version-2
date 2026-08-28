@@ -4,15 +4,18 @@ import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.notification.application.port.in.AlimtalkTemplateUseCase;
 import com.kscold.blog.notification.domain.model.AlimtalkTemplate;
+import com.kscold.blog.stackshare.application.dto.SaveStackShareAccountCommand;
 import com.kscold.blog.stackshare.application.dto.SaveStackShareParticipantCommand;
 import com.kscold.blog.stackshare.application.dto.SendStackShareNotificationsCommand;
 import com.kscold.blog.stackshare.application.dto.StackShareRecipientCommand;
 import com.kscold.blog.stackshare.application.dto.StackShareSettlementCommand;
 import com.kscold.blog.stackshare.application.port.in.StackShareManagementUseCase;
+import com.kscold.blog.stackshare.domain.model.StackShareAccount;
 import com.kscold.blog.stackshare.domain.model.StackShareMessage;
 import com.kscold.blog.stackshare.domain.model.StackShareParticipant;
 import com.kscold.blog.stackshare.domain.model.StackShareSendResult;
 import com.kscold.blog.stackshare.domain.model.StackShareSettlement;
+import com.kscold.blog.stackshare.domain.port.out.StackShareAccountRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareNotificationSender;
 import com.kscold.blog.stackshare.domain.port.out.StackShareParticipantRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareSettlementRepository;
@@ -33,10 +36,34 @@ public class StackShareManagementApplicationService implements StackShareManagem
     private static final String TEMPLATE_KEY = "STACK_SHARE_SETTLEMENT";
     private static final Pattern MOBILE_PATTERN = Pattern.compile("01[016789]\\d{7,8}");
 
+    /** 입금 기한을 비워둔 경우 알림톡에 대신 넣을 문구. 변수는 비워 보낼 수 없어 기본값이 필요함. */
+    private static final String DUE_DATE_FALLBACK = "협의";
+
     private final StackShareParticipantRepository participantRepository;
     private final StackShareSettlementRepository settlementRepository;
+    private final StackShareAccountRepository accountRepository;
     private final StackShareNotificationSender notificationSender;
     private final AlimtalkTemplateUseCase templateUseCase;
+
+    @Override
+    public StackShareAccount getAccount() {
+        return accountRepository.find().orElseGet(StackShareAccount::new);
+    }
+
+    @Override
+    public StackShareAccount saveAccount(SaveStackShareAccountCommand command) {
+        String bankName = normalizeText(command.bankName());
+        String accountNumber = normalizeText(command.accountNumber());
+        String accountHolder = normalizeText(command.accountHolder());
+        if (bankName.isBlank() || accountNumber.isBlank() || accountHolder.isBlank()) {
+            throw invalidInput("은행명, 계좌번호, 예금주를 모두 입력해주세요.");
+        }
+        StackShareAccount account = getAccount();
+        account.setBankName(bankName);
+        account.setAccountNumber(accountNumber);
+        account.setAccountHolder(accountHolder);
+        return accountRepository.save(account);
+    }
 
     @Override
     public List<StackShareParticipant> getParticipants() {
@@ -73,8 +100,13 @@ public class StackShareManagementApplicationService implements StackShareManagem
         if (!template.isSendable()) {
             throw invalidInput("승인된 KSCOLD 정산 알림톡 템플릿 ID를 먼저 등록해주세요.");
         }
+        // 계좌가 없으면 받는 사람이 입금할 곳을 알 수 없으므로 발송 자체를 막는다.
+        StackShareAccount account = getAccount();
+        if (!account.isConfigured()) {
+            throw invalidInput("입금 계좌를 먼저 등록해주세요. 계좌 없이는 정산 알림톡을 보낼 수 없습니다.");
+        }
 
-        StackShareSettlement settlement = createSettlement(command);
+        StackShareSettlement settlement = createSettlement(command, account);
         settlementRepository.save(settlement);
         try {
             StackShareSendResult result = send(settlement, template.getExternalTemplateId());
@@ -99,7 +131,8 @@ public class StackShareManagementApplicationService implements StackShareManagem
                 .orElseGet(StackShareParticipant::new);
     }
 
-    private StackShareSettlement createSettlement(SendStackShareNotificationsCommand command) {
+    private StackShareSettlement createSettlement(
+            SendStackShareNotificationsCommand command, StackShareAccount account) {
         StackShareSettlementCommand source = command.settlement();
         int count = command.recipients().size();
         long baseAmount = source.totalAmount() / count;
@@ -124,10 +157,13 @@ public class StackShareManagementApplicationService implements StackShareManagem
                             .amount(baseAmount + (index < remainder ? 1 : 0))
                             .build());
         }
+        String dueDate = normalizeText(source.dueDate());
         return StackShareSettlement.builder()
                 .toolName(source.toolName().trim())
                 .billingPeriod(source.billingPeriod().trim())
                 .totalAmount(source.totalAmount())
+                .dueDate(dueDate.isBlank() ? DUE_DATE_FALLBACK : dueDate)
+                .accountText(account.toDisplayText())
                 .recipients(recipients)
                 .status(StackShareSettlement.Status.DRAFT)
                 .build();
@@ -153,7 +189,9 @@ public class StackShareManagementApplicationService implements StackShareManagem
                         "#{서비스명}", settlement.getToolName(),
                         "#{총금액}", formatWon(settlement.getTotalAmount()),
                         "#{참여인원}", String.valueOf(context.participantCount()),
-                        "#{분담금}", formatWon(recipient.getAmount()));
+                        "#{분담금}", formatWon(recipient.getAmount()),
+                        "#{입금계좌}", settlement.getAccountText(),
+                        "#{입금기한}", settlement.getDueDate());
         return new StackShareMessage(recipient.getPhoneNumber(), context.templateId(), variables);
     }
 

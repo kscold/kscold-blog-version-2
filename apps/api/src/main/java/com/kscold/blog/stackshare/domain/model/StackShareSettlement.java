@@ -25,6 +25,12 @@ public class StackShareSettlement {
     private String billingPeriod;
     private long totalAmount;
 
+    /** 입금 기한 표기. 알림톡에 그대로 나가며, 비어 있으면 발송 시 "협의" 로 대체한다. */
+    private String dueDate;
+
+    /** 발송 시점의 입금 계좌 표기. 계좌가 바뀌어도 보낸 내용을 그대로 남기기 위해 스냅샷으로 저장한다. */
+    private String accountText;
+
     @Builder.Default private List<Recipient> recipients = new ArrayList<>();
 
     private Status status;
