@@ -55,13 +55,18 @@ public class StackShareManagementApplicationService implements StackShareManagem
         String bankName = normalizeText(command.bankName());
         String accountNumber = normalizeText(command.accountNumber());
         String accountHolder = normalizeText(command.accountHolder());
+        String contactPhone = normalizePhone(command.contactPhone());
         if (bankName.isBlank() || accountNumber.isBlank() || accountHolder.isBlank()) {
             throw invalidInput("은행명, 계좌번호, 예금주를 모두 입력해주세요.");
+        }
+        if (!MOBILE_PATTERN.matcher(contactPhone).matches()) {
+            throw invalidInput("연락처를 휴대전화 번호 형식으로 입력해주세요.");
         }
         StackShareAccount account = getAccount();
         account.setBankName(bankName);
         account.setAccountNumber(accountNumber);
         account.setAccountHolder(accountHolder);
+        account.setContactPhone(contactPhone);
         return accountRepository.save(account);
     }
 
@@ -164,6 +169,7 @@ public class StackShareManagementApplicationService implements StackShareManagem
                 .totalAmount(source.totalAmount())
                 .dueDate(dueDate.isBlank() ? DUE_DATE_FALLBACK : dueDate)
                 .accountText(account.toDisplayText())
+                .contactText(account.toContactText())
                 .recipients(recipients)
                 .status(StackShareSettlement.Status.DRAFT)
                 .build();
@@ -182,6 +188,7 @@ public class StackShareManagementApplicationService implements StackShareManagem
     private StackShareMessage toMessage(
             MessageContext context, StackShareSettlement.Recipient recipient) {
         StackShareSettlement settlement = context.settlement();
+        // Map.of 는 10쌍까지만 받으므로 변수를 더 늘릴 때는 형태를 바꿔야 함.
         Map<String, String> variables =
                 Map.of(
                         "#{이름}", recipient.getName(),
@@ -191,7 +198,8 @@ public class StackShareManagementApplicationService implements StackShareManagem
                         "#{참여인원}", String.valueOf(context.participantCount()),
                         "#{분담금}", formatWon(recipient.getAmount()),
                         "#{입금계좌}", settlement.getAccountText(),
-                        "#{입금기한}", settlement.getDueDate());
+                        "#{입금기한}", settlement.getDueDate(),
+                        "#{연락처}", settlement.getContactText());
         return new StackShareMessage(recipient.getPhoneNumber(), context.templateId(), variables);
     }
 

@@ -32,18 +32,52 @@ public class StackShareAccount {
     private String accountNumber;
     private String accountHolder;
 
+    /** 송금 확인·문의용 연락처. 숫자만 저장하고 표기할 때 하이픈을 넣는다. */
+    private String contactPhone;
+
     @LastModifiedDate private LocalDateTime updatedAt;
 
     public boolean isConfigured() {
-        return hasText(bankName) && hasText(accountNumber) && hasText(accountHolder);
+        return hasText(bankName)
+                && hasText(accountNumber)
+                && hasText(accountHolder)
+                && hasText(contactPhone);
     }
 
-    /** 알림톡 #{입금계좌} 변수에 들어갈 표기. 예) "카카오뱅크 3333-01-1234567 (김승찬)" */
+    /** 알림톡 #{입금계좌} 변수에 들어갈 표기. 예) "토스뱅크 1000-1234-5678 (김승찬)" */
     public String toDisplayText() {
         if (!isConfigured()) {
             return "";
         }
         return bankName.trim() + " " + accountNumber.trim() + " (" + accountHolder.trim() + ")";
+    }
+
+    /** 알림톡 #{연락처} 변수에 들어갈 표기. 예) "010-1234-5678" */
+    public String toContactText() {
+        return formatPhone(contactPhone);
+    }
+
+    /** 01012345678 → 010-1234-5678. 형식을 모르는 값은 그대로 둔다. */
+    private String formatPhone(String value) {
+        if (!hasText(value)) {
+            return "";
+        }
+        String digits = value.replaceAll("[^0-9]", "");
+        if (digits.length() == 11) {
+            return digits.substring(0, 3)
+                    + "-"
+                    + digits.substring(3, 7)
+                    + "-"
+                    + digits.substring(7);
+        }
+        if (digits.length() == 10) {
+            return digits.substring(0, 3)
+                    + "-"
+                    + digits.substring(3, 6)
+                    + "-"
+                    + digits.substring(6);
+        }
+        return value.trim();
     }
 
     private boolean hasText(String value) {

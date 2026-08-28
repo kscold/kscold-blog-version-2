@@ -22,4 +22,9 @@ public class SaveStackShareAccountRequest {
     @NotBlank
     @Size(max = 30)
     private String accountHolder;
+
+    /** 송금 확인·문의용 휴대전화 번호. 알림톡 #{연락처} 로 나간다. */
+    @NotBlank
+    @Size(max = 20)
+    private String contactPhone;
 }

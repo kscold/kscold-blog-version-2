@@ -31,6 +31,9 @@ public class StackShareSettlement {
     /** 발송 시점의 입금 계좌 표기. 계좌가 바뀌어도 보낸 내용을 그대로 남기기 위해 스냅샷으로 저장한다. */
     private String accountText;
 
+    /** 발송 시점의 문의 연락처 표기. 계좌와 같은 이유로 스냅샷으로 남긴다. */
+    private String contactText;
+
     @Builder.Default private List<Recipient> recipients = new ArrayList<>();
 
     private Status status;

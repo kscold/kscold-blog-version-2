@@ -58,9 +58,10 @@ class StackShareManagementApplicationServiceTest {
 
     private StackShareAccount registeredAccount() {
         return StackShareAccount.builder()
-                .bankName("카카오뱅크")
-                .accountNumber("3333-01-1234567")
+                .bankName("토스뱅크")
+                .accountNumber("1000-1234-5678")
                 .accountHolder("김승찬")
+                .contactPhone("01012345678")
                 .build();
     }
 
@@ -97,8 +98,9 @@ class StackShareManagementApplicationServiceTest {
         ArgumentCaptor<List<StackShareMessage>> captor = ArgumentCaptor.forClass(List.class);
         verify(notificationSender).send(captor.capture());
         assertThat(captor.getValue().get(0).variables())
-                .containsEntry("#{입금계좌}", "카카오뱅크 3333-01-1234567 (김승찬)")
-                .containsEntry("#{입금기한}", "9월 5일");
+                .containsEntry("#{입금계좌}", "토스뱅크 1000-1234-5678 (김승찬)")
+                .containsEntry("#{입금기한}", "9월 5일")
+                .containsEntry("#{연락처}", "010-1234-5678");
     }
 
     @Test

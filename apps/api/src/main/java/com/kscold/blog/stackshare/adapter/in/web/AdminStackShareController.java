@@ -48,7 +48,8 @@ public class AdminStackShareController {
                 new SaveStackShareAccountCommand(
                         request.getBankName(),
                         request.getAccountNumber(),
-                        request.getAccountHolder());
+                        request.getAccountHolder(),
+                        request.getContactPhone());
         return ResponseEntity.ok(
                 ApiResponse.success(
                         StackShareAccountResponse.from(useCase.saveAccount(command)),
