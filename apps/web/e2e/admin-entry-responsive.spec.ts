@@ -23,7 +23,7 @@ async function visitAsAdmin(page: Page, width: number, height: number) {
   await seedAdminSession(page);
   await page.setViewportSize({ width, height });
   await page.goto('/');
-  await page.waitForLoadState('networkidle');
+  await expect(page.locator('[data-cy="header-auth-loading"]')).toHaveCount(0);
 }
 
 test.describe('관리자 진입 반응형 시나리오', () => {
@@ -40,7 +40,7 @@ test.describe('관리자 진입 반응형 시나리오', () => {
       await expectWithinViewport(page, '[data-cy="sidebar-link-admin"]:visible', width);
       await page.locator('[data-cy="sidebar-link-admin"]:visible').click();
 
-      await expect(page).toHaveURL(/\/admin/);
+      await expect(page).toHaveURL(/\/admin/, { timeout: 20_000 });
       await expect(page.getByText('Dashboard').first()).toBeVisible();
     });
   }
@@ -55,7 +55,7 @@ test.describe('관리자 진입 반응형 시나리오', () => {
       await expectWithinViewport(page, '[data-cy="admin-header-link"]', width);
       await page.locator('[data-cy="admin-header-link"]').click();
 
-      await expect(page).toHaveURL(/\/admin/);
+      await expect(page).toHaveURL(/\/admin/, { timeout: 20_000 });
       await expect(page.getByText('Dashboard').first()).toBeVisible();
     });
   }

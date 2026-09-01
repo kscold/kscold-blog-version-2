@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 import { useCategories } from '@/entities/category';
 import { useTags } from '@/entities/tag';
 import { useFeedTags } from '@/entities/feed';
@@ -44,6 +45,10 @@ export function Sidebar() {
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
 
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname, setSidebarOpen]);
+
   const mobileLinks = [
     ...(role === 'ADMIN' ? [{ label: 'Admin', href: '/admin', highlighted: true }] : []),
     { label: 'Home', href: '/' },
@@ -65,11 +70,11 @@ export function Sidebar() {
   const innerContent = (
     <div className="p-6 space-y-8 relative">
       {/* 모바일 네비게이션 링크 */}
-      <SidebarMobileNav links={mobileLinks} onNavigate={closeSidebar} />
+      <SidebarMobileNav links={mobileLinks} />
 
-      <SidebarCategories categories={categories} onNavigate={closeSidebar} />
+      <SidebarCategories categories={categories} />
 
-      <SidebarTags tags={tags} isLoading={isTagsLoading} onNavigate={closeSidebar} />
+      <SidebarTags tags={tags} isLoading={isTagsLoading} />
     </div>
   );
 

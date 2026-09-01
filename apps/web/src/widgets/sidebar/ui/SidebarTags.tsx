@@ -12,10 +12,9 @@ interface SidebarTag {
 interface SidebarTagsProps {
   tags: SidebarTag[];
   isLoading: boolean;
-  onNavigate: () => void;
 }
 
-export function SidebarTags({ tags, isLoading, onNavigate }: SidebarTagsProps) {
+export function SidebarTags({ tags, isLoading }: SidebarTagsProps) {
   return (
     <div>
       <h2 className="text-xs font-bold text-surface-400 mb-4 tracking-[0.2em] uppercase">
@@ -28,7 +27,6 @@ export function SidebarTags({ tags, isLoading, onNavigate }: SidebarTagsProps) {
               <Link
                 key={tag.name}
                 href={`/tags/${encodeURIComponent(tag.name)}`}
-                onClick={onNavigate}
                 className="group relative px-3 py-1.5 text-xs font-bold text-surface-500 bg-white border border-surface-200 rounded-lg overflow-hidden transition-all hover:text-surface-900 hover:border-surface-900"
               >
                 <div className="absolute inset-0 bg-surface-50 opacity-0 group-hover:opacity-100 transition-opacity" />

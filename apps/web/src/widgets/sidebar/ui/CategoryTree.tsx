@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Category } from '@/shared/model/types/blog';
 
-export function CategoryTree({ categories, depth = 0, onNavigate }: { categories: Category[]; depth?: number; onNavigate?: () => void }) {
+export function CategoryTree({ categories, depth = 0 }: { categories: Category[]; depth?: number }) {
   const rootCategories = categories.filter(cat => cat.depth === depth);
 
   return (
@@ -17,7 +17,6 @@ export function CategoryTree({ categories, depth = 0, onNavigate }: { categories
           <li key={category.id}>
             <Link
               href={`/blog/${category.slug}`}
-              onClick={onNavigate}
               className="group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 hover:bg-white/5 hover:shadow-[inset_0_0_20px_rgba(6,182,212,0.1)] relative overflow-hidden"
             >
               <div className="absolute left-0 w-1 h-0 bg-surface-900 group-hover:h-full transition-all duration-300 top-1/2 -translate-y-1/2 rounded-full opacity-0 group-hover:opacity-100" />
@@ -33,7 +32,7 @@ export function CategoryTree({ categories, depth = 0, onNavigate }: { categories
                 {category.postCount}
               </span>
             </Link>
-            {children.length > 0 && <CategoryTree categories={categories} depth={depth + 1} onNavigate={onNavigate} />}
+            {children.length > 0 && <CategoryTree categories={categories} depth={depth + 1} />}
           </li>
         );
       })}
