@@ -2,6 +2,7 @@ package com.kscold.blog.social.application.service;
 
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
+import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.application.port.in.UserQueryPort.UserInfo;
@@ -35,6 +36,9 @@ public class FeedApplicationService implements FeedUseCase {
 
     @Transactional
     public Feed create(FeedCreateCommand command, String userId) {
+        String content = normalizeContent(command.getContent());
+        List<String> images = normalizeImages(command.getImages());
+        validateCreateContent(content, images);
         UserInfo author = userQueryPort.getUserById(userId);
 
         Feed.LinkPreview linkPreview = null;
@@ -45,11 +49,8 @@ public class FeedApplicationService implements FeedUseCase {
 
         Feed feed =
                 Feed.builder()
-                        .content(command.getContent())
-                        .images(
-                                command.getImages() != null
-                                        ? command.getImages()
-                                        : new ArrayList<>())
+                        .content(content)
+                        .images(new ArrayList<>(images))
                         .author(
                                 Feed.AuthorInfo.builder()
                                         .id(author.id())
@@ -152,6 +153,23 @@ public class FeedApplicationService implements FeedUseCase {
 
     private Feed findById(String id) {
         return feedRepository.findById(id).orElseThrow(() -> ResourceNotFoundException.feed(id));
+    }
+
+    private String normalizeContent(String content) {
+        return content == null || content.isBlank() ? "" : content;
+    }
+
+    private List<String> normalizeImages(List<String> images) {
+        if (images == null) {
+            return List.of();
+        }
+        return images.stream().filter(image -> image != null && !image.isBlank()).toList();
+    }
+
+    private void validateCreateContent(String content, List<String> images) {
+        if (content.isBlank() && images.isEmpty()) {
+            throw InvalidRequestException.invalidInput("내용 또는 이미지를 입력해주세요");
+        }
     }
 
     private Feed.LinkPreview toModel(LinkPreviewResponse response) {
