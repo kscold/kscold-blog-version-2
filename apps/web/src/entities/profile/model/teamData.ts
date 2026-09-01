@@ -7,7 +7,23 @@ export interface TeamMember {
   department: 'product' | 'engineering' | 'design';
 }
 
-export const TEAM_MEMBERS: TeamMember[] = [
+export interface TeamProfile {
+  id: string;
+  name: string;
+  shortName: string;
+  description: string;
+  summary: string;
+  externalUrl: string;
+  keywords: string[];
+  badge: {
+    mark: string;
+    backgroundColor: string;
+    textColor: string;
+  };
+  members: TeamMember[];
+}
+
+const PAWPONG_TEAM_MEMBERS: TeamMember[] = [
   {
     name: '김승찬',
     position: 'CTO / Tech Lead',
@@ -57,6 +73,62 @@ export const TEAM_MEMBERS: TeamMember[] = [
     department: 'design',
   },
 ];
+
+const GOLE_TEAM_MEMBERS: TeamMember[] = [
+  {
+    name: '김수민',
+    position: 'Full-stack Engineer',
+    role: '백엔드·프론트엔드 풀스택 기능 개발',
+    skills: ['Spring Boot', 'Next.js', 'TypeScript', 'MongoDB'],
+    scope: '도메인 API, 사용자 화면, 데이터 연동, 테스트와 운영 개선',
+    department: 'engineering',
+  },
+  {
+    name: '김가원',
+    position: 'Full-stack Engineer',
+    role: '백엔드·프론트엔드 풀스택 기능 개발',
+    skills: ['Spring Boot', 'Next.js', 'TypeScript', 'MongoDB'],
+    scope: '도메인 API, 사용자 화면, 데이터 연동, 배포와 품질 개선',
+    department: 'engineering',
+  },
+];
+
+export const TEAM_PROFILES: TeamProfile[] = [
+  {
+    id: 'pawpong',
+    name: 'Pawpong Team',
+    shortName: 'pawpong',
+    description: '반려동물 플랫폼 Pawpong 팀과 콜딩의 협업 구조, 팀 구성, 사업 정보를 소개합니다.',
+    summary: '반려동물 플랫폼 · 6명',
+    externalUrl: 'https://pawpong.kr',
+    keywords: ['Pawpong', 'Colding', '팀 소개', '반려동물 플랫폼'],
+    badge: {
+      mark: 'P',
+      backgroundColor: '#6B5744',
+      textColor: '#A8C8E8',
+    },
+    members: PAWPONG_TEAM_MEMBERS,
+  },
+  {
+    id: 'gole',
+    name: 'GoLe Team',
+    shortName: 'GoLe',
+    description: '레고 중고거래 플랫폼 GoLe를 함께 만드는 풀스택 개발팀을 소개합니다.',
+    summary: '레고 중고거래 플랫폼 · 2명',
+    externalUrl: 'https://gole.co.kr',
+    keywords: ['GoLe', 'Colding', '팀 소개', '레고 중고거래', '풀스택 개발'],
+    badge: {
+      mark: 'G',
+      backgroundColor: '#123B66',
+      textColor: '#FFD43B',
+    },
+    members: GOLE_TEAM_MEMBERS,
+  },
+];
+
+export function getTeamProfile(teamId: string) {
+  return TEAM_PROFILES.find(team => team.id === teamId);
+}
 
 export const BUSINESS_INFO = {
   companyName: '콜딩(Colding)',

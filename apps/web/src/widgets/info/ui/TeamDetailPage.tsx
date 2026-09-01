@@ -2,14 +2,15 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { TEAM_MEMBERS, BUSINESS_INFO } from '@/entities/profile';
+import { BUSINESS_INFO } from '@/entities/profile';
+import type { TeamProfile } from '@/entities/profile';
 import { OrgChart } from './OrgChart';
 import { MemberCard } from './MemberCard';
 import { PrivateDocsSection } from './PrivateDocsSection';
 
-export function TeamDetailPage({ teamId }: { teamId: string }) {
-  const leader = TEAM_MEMBERS[0];
-  const others = TEAM_MEMBERS.slice(1);
+export function TeamDetailPage({ team }: { team: TeamProfile }) {
+  const [leader, ...others] = team.members;
+  const hasTeamLeader = team.id === 'pawpong';
 
   return (
     <div className="min-h-screen bg-surface-50">
@@ -22,16 +23,16 @@ export function TeamDetailPage({ teamId }: { teamId: string }) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </Link>
-          <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full shadow-md" style={{ background: '#6B5744' }}>
-            <span className="text-lg">🐾</span>
-            <span className="font-black text-base tracking-tight" style={{ color: '#A8C8E8' }}>pawpong</span>
+          <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full shadow-md" style={{ background: team.badge.backgroundColor }}>
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white/20 text-xs font-black text-white/80">{team.badge.mark}</span>
+            <span className="font-black text-base tracking-tight" style={{ color: team.badge.textColor }}>{team.shortName}</span>
           </div>
           <div className="flex-1">
-            <h1 className="text-xl font-black text-surface-900">Pawpong Team</h1>
-            <p className="text-xs text-surface-400">반려동물 플랫폼 · 6명</p>
+            <h1 className="text-xl font-black text-surface-900">{team.name}</h1>
+            <p className="text-xs text-surface-400">{team.summary}</p>
           </div>
-          <a href="https://pawpong.kr" target="_blank" rel="noopener noreferrer" className="text-xs text-surface-400 hover:text-surface-700 transition-colors underline">
-            pawpong.kr →
+          <a href={team.externalUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-surface-400 hover:text-surface-700 transition-colors underline">
+            {team.externalUrl.replace('https://', '')} →
           </a>
         </div>
 
@@ -43,13 +44,15 @@ export function TeamDetailPage({ teamId }: { teamId: string }) {
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-xs font-bold text-surface-400 uppercase tracking-wider mb-4">Organization</h2>
-          <OrgChart />
+          <OrgChart team={team} />
         </motion.div>
 
         {/* 리더 카드 */}
-        <div className="mb-6">
-          <MemberCard member={leader} index={0} isLeader />
-        </div>
+        {leader && (
+          <div className="mb-6">
+            <MemberCard member={leader} index={0} isLeader={hasTeamLeader} />
+          </div>
+        )}
 
         {/* 팀원 카드 */}
         <div className="space-y-4 mb-8">
@@ -75,7 +78,7 @@ export function TeamDetailPage({ teamId }: { teamId: string }) {
         </motion.div>
 
         {/* 팀 내부 문서 */}
-        <PrivateDocsSection teamId={teamId} />
+        <PrivateDocsSection teamId={team.id} />
       </div>
     </div>
   );

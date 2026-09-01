@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PROFILE, PROFILE_FAQ } from '@/entities/profile';
+import { PROFILE, PROFILE_FAQ, TEAM_PROFILES } from '@/entities/profile';
 import { SkillsSection } from './SkillsSection';
 import { ContactSection } from './ContactSection';
 
@@ -69,15 +69,18 @@ export function InfoContainer() {
         >
           <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">Teams</h2>
           <div className="space-y-3">
-            <TeamBadgeLink
-              teamId="pawpong"
-              name="Pawpong Team"
-              desc="반려동물 플랫폼 · 6명"
-              badgeColor="#6B5744"
-              badgeTextColor="#A8C8E8"
-              emoji="🐾"
-              externalUrl="https://pawpong.kr"
-            />
+            {TEAM_PROFILES.map(team => (
+              <TeamBadgeLink
+                key={team.id}
+                teamId={team.id}
+                name={team.name}
+                desc={team.summary}
+                badgeColor={team.badge.backgroundColor}
+                badgeTextColor={team.badge.textColor}
+                mark={team.badge.mark}
+                externalUrl={team.externalUrl}
+              />
+            ))}
           </div>
         </motion.section>
 
@@ -119,8 +122,8 @@ export function InfoContainer() {
   );
 }
 
-function TeamBadgeLink({ teamId, name, desc, badgeColor, badgeTextColor, emoji, externalUrl }: {
-  teamId: string; name: string; desc: string; badgeColor: string; badgeTextColor: string; emoji: string; externalUrl: string;
+function TeamBadgeLink({ teamId, name, desc, badgeColor, badgeTextColor, mark, externalUrl }: {
+  teamId: string; name: string; desc: string; badgeColor: string; badgeTextColor: string; mark: string; externalUrl: string;
 }) {
   return (
     <Link
@@ -131,7 +134,7 @@ function TeamBadgeLink({ teamId, name, desc, badgeColor, badgeTextColor, emoji, 
         className="flex items-center gap-2 px-4 py-2 rounded-full shadow-sm flex-shrink-0"
         style={{ background: badgeColor }}
       >
-        <span className="text-base">{emoji}</span>
+        <span className="flex h-5 w-5 items-center justify-center rounded-full border border-white/20 text-[10px] font-black text-white/80">{mark}</span>
         <span className="font-black text-sm tracking-tight" style={{ color: badgeTextColor }}>{teamId}</span>
       </div>
       <div className="flex-1 min-w-0">

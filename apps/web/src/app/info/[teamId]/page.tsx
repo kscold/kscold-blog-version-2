@@ -1,23 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { TeamDetailPage } from '@/widgets/info';
-import { BUSINESS_INFO, TEAM_MEMBERS } from '@/entities/profile';
+import { BUSINESS_INFO, getTeamProfile } from '@/entities/profile';
 import { buildBreadcrumbJsonLd, buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
-
-function getTeamPageData(teamId: string) {
-  if (teamId !== 'pawpong') {
-    return null;
-  }
-
-  return {
-    id: 'pawpong',
-    name: 'Pawpong Team',
-    description: '반려동물 플랫폼 Pawpong 팀과 콜딩의 협업 구조, 팀 구성, 사업 정보를 소개합니다.',
-    externalUrl: 'https://pawpong.kr',
-  };
-}
 
 export async function generateMetadata({
   params,
@@ -25,7 +12,7 @@ export async function generateMetadata({
   params: Promise<{ teamId: string }>;
 }): Promise<Metadata> {
   const { teamId } = await params;
-  const team = getTeamPageData(teamId);
+  const team = getTeamProfile(teamId);
 
   if (!team) {
     return buildPageMetadata({
@@ -40,13 +27,13 @@ export async function generateMetadata({
     title: team.name,
     description: team.description,
     path: `/info/${team.id}`,
-    keywords: ['Pawpong', 'Colding', '팀 소개', '반려동물 플랫폼'],
+    keywords: team.keywords,
   });
 }
 
 export default async function Page({ params }: { params: Promise<{ teamId: string }> }) {
   const { teamId } = await params;
-  const team = getTeamPageData(teamId);
+  const team = getTeamProfile(teamId);
 
   if (!team) {
     notFound();
@@ -73,7 +60,7 @@ export default async function Page({ params }: { params: Promise<{ teamId: strin
         parentOrganization: {
           '@id': `${SITE_URL}/#organization`,
         },
-        member: TEAM_MEMBERS.map(member => ({
+        member: team.members.map(member => ({
           '@type': 'Person',
           name: member.name,
           jobTitle: member.position,
@@ -103,7 +90,7 @@ export default async function Page({ params }: { params: Promise<{ teamId: strin
     <>
       <JsonLd id={`team-${team.id}`} data={jsonLd} />
       <AdSenseScript />
-      <TeamDetailPage teamId={team.id} />
+      <TeamDetailPage team={team} />
     </>
   );
 }

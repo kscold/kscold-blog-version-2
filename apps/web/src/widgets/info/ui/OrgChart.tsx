@@ -34,7 +34,26 @@ const EDGES: [string, string][] = [
 const NODE_MAP = Object.fromEntries(NODES.map(n => [n.id, n]));
 const SVG_W = TOTAL_ROW2_W + 20;
 
-export function OrgChart() {
+export function OrgChart({ team }: { team: TeamProfile }) {
+  if (team.id !== 'pawpong') {
+    return (
+      <div className="flex flex-col items-center">
+        <div className="rounded-xl bg-surface-900 px-6 py-3 text-center text-sm font-black text-white">
+          {team.shortName}
+        </div>
+        <div className="h-6 w-px bg-surface-300" />
+        <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
+          {team.members.map(member => (
+            <div key={member.name} className="rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-center">
+              <p className="text-sm font-black text-surface-900">{member.name}</p>
+              <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-primary-600">Full-stack</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <svg viewBox={`-10 0 ${SVG_W} 225`} className="w-full" preserveAspectRatio="xMidYMid meet">
       {EDGES.map(([from, to]) => {
@@ -71,3 +90,4 @@ export function OrgChart() {
     </svg>
   );
 }
+import type { TeamProfile } from '@/entities/profile';
