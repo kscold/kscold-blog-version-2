@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function HeroSection() {
-  const { supportsHover, prefersReducedMotion } = usePerformanceMode();
-  const animate = !prefersReducedMotion;
+  const { allowRichEffects, supportsHover } = usePerformanceMode();
+  const animate = allowRichEffects;
 
   return (
     <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
@@ -31,7 +31,11 @@ export function HeroSection() {
           className="inline-block"
         >
           <span className="px-5 py-2.5 rounded-full border border-surface-200/60 bg-white/60 backdrop-blur-md shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] text-surface-900 text-xs font-bold tracking-[0.2em] flex items-center gap-2 cursor-default">
-            <span className="w-1.5 h-1.5 rounded-full bg-surface-900 animate-pulse shadow-[0_0_8px_rgba(15,23,42,0.4)]" />
+            <span
+              className={`w-1.5 h-1.5 rounded-full bg-surface-900 shadow-[0_0_8px_rgba(15,23,42,0.4)] ${
+                allowRichEffects ? 'animate-pulse' : ''
+              }`}
+            />
             FULL STACK PRODUCT ENGINEER
           </span>
         </motion.div>
@@ -46,12 +50,14 @@ export function HeroSection() {
             </span>
             <span
               aria-hidden="true"
-              className="bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] bg-[size:200%_auto] animate-shimmer"
+              className={`bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] bg-[size:200%_auto] ${
+                allowRichEffects ? 'animate-shimmer' : ''
+              }`}
             >
               KSCOLD
             </span>
           </h1>
-          {supportsHover && (
+          {supportsHover && allowRichEffects && (
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-full bg-surface-200 blur-[60px] z-0 opacity-0 group-hover:opacity-30 transition-opacity duration-1000 pointer-events-none" />
           )}
         </div>

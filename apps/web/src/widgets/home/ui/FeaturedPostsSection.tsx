@@ -36,7 +36,7 @@ export function FeaturedPostsSection() {
             aria-label="블로그 전체 글 보기"
             className="group inline-flex shrink-0 items-center gap-1.5 text-surface-500 hover:text-surface-900 transition-colors uppercase text-xs sm:text-sm tracking-widest font-bold"
           >
-            전체 보기
+            블로그 전체 글 보기
             <svg
               className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
               fill="none"
