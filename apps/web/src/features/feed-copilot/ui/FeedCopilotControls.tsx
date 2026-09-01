@@ -35,6 +35,7 @@ export function FeedCopilotControls({
             생각의 조각만 적어도 됩니다. 초안은 직접 확인한 뒤에만 피드로 가져갑니다.
           </span>
           <textarea
+            data-cy="feed-copilot-memo"
             value={memo}
             onChange={event => onMemoChange(event.target.value)}
             placeholder="예: 이 글을 보고 지금 만드는 Agent의 검색 흐름을 다시 생각하게 됐어요."
@@ -52,6 +53,7 @@ export function FeedCopilotControls({
           </span>
           <input
             type="url"
+            data-cy="feed-copilot-source-url"
             value={sourceUrl}
             onChange={event => {
               onSourceUrlChange(event.target.value);

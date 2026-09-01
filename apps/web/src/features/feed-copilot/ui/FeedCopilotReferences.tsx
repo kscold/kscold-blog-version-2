@@ -5,12 +5,14 @@ interface FeedCopilotReferencesProps {
   references: FeedCopilotReference[];
   styleReferenceKeys?: string[];
   onToggleStyleReference?: (reference: FeedCopilotReference) => void;
+  disabled?: boolean;
 }
 
 export function FeedCopilotReferences({
   references,
   styleReferenceKeys = [],
   onToggleStyleReference,
+  disabled = false,
 }: FeedCopilotReferencesProps) {
   if (!references.length) {
     return null;
@@ -79,11 +81,12 @@ export function FeedCopilotReferences({
                   type="button"
                   onClick={() => onToggleStyleReference?.(reference)}
                   aria-pressed={isSelected}
+                  disabled={disabled}
                   className={`shrink-0 rounded-xl px-2.5 py-1.5 text-xs font-bold transition ${
                     isSelected
                       ? 'bg-surface-900 text-white hover:bg-surface-800'
                       : 'border border-surface-200 bg-white text-surface-600 hover:border-surface-400 hover:text-surface-900'
-                  }`}
+                  } disabled:cursor-not-allowed disabled:opacity-50`}
                 >
                   {isSelected ? '참고 중' : '글의 결 참고'}
                 </button>

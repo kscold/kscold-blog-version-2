@@ -20,6 +20,8 @@ export default function FloatingChatButton({
 
   return (
     <motion.button
+      type="button"
+      aria-label="KSCOLD 대화 열기"
       onClick={onClick}
       onHoverStart={supportsHover ? () => setIsHovered(true) : undefined}
       onHoverEnd={supportsHover ? () => setIsHovered(false) : undefined}

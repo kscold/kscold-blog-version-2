@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import {
   linkAgentSourceCitations,
@@ -13,8 +14,49 @@ export function AgentMessageList({
 }: {
   messages: AgentMessage[];
 }) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const shouldFollowStreamRef = useRef(true);
+  const previousLastMessageIdRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const lastMessageId = messages.at(-1)?.id;
+    if (!container || !lastMessageId) {
+      return;
+    }
+
+    const hasNewMessage = previousLastMessageIdRef.current !== lastMessageId;
+    previousLastMessageIdRef.current = lastMessageId;
+    if (!hasNewMessage && !shouldFollowStreamRef.current) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'auto',
+      });
+      shouldFollowStreamRef.current = true;
+    });
+    return () => window.cancelAnimationFrame(frameId);
+  }, [messages]);
+
+  function handleScroll() {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const remaining = container.scrollHeight - container.scrollTop - container.clientHeight;
+    shouldFollowStreamRef.current = remaining < 96;
+  }
+
   return (
-    <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-surface-50 p-3 custom-scrollbar sm:p-4">
+    <div
+      ref={scrollContainerRef}
+      data-cy="agent-message-list"
+      onScroll={handleScroll}
+      className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-surface-50 p-3 custom-scrollbar sm:p-4"
+    >
       {messages.map(message => {
         const currentStage = message.stages?.at(-1);
         const visibleStages = message.isStreaming ? [] : message.stages?.slice(0, 5) || [];

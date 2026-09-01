@@ -61,6 +61,7 @@ export function FeedCopilotPlanCard({
         references={plan.references}
         styleReferenceKeys={styleReferenceKeys}
         onToggleStyleReference={onToggleStyleReference}
+        disabled={isDrafting}
       />
 
       <button

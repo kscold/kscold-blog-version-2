@@ -13,14 +13,15 @@ import {
   type AgentMessage,
   type VaultAgentChatResponse,
   type VaultAgentContentScope,
-  type VaultAgentStage,
 } from '@/features/chat';
+import {
+  addAgentStage,
+  completeAgentMessage,
+  failAgentMessage,
+  INITIAL_STREAM_STAGE,
+  interruptAgentMessage,
+} from './agentMessageState';
 import { useAgentStreamBuffer } from './useAgentStreamBuffer';
-
-const INITIAL_STREAM_STAGE: VaultAgentStage = {
-  name: '질문 정리',
-  detail: '질문의 핵심과 필요한 기록 범위를 정리하고 있습니다.',
-};
 
 export function useAgentChat(isOpen: boolean) {
   const [agentInput, setAgentInput] = useState('');
@@ -43,6 +44,7 @@ export function useAgentChat(isOpen: boolean) {
   const hasUserAsked = agentMessages.some(message => message.role === 'user');
   const isFollowUp = dynamicFollowUps.length > 0;
   const suggestions = isFollowUp ? dynamicFollowUps : hasUserAsked ? [] : starterPrompts;
+  const isAgentHistoryLoading = isOpen && !hasLoadedAgentHistory;
 
   useEffect(() => {
     if (!isOpen) {
@@ -115,7 +117,7 @@ export function useAgentChat(isOpen: boolean) {
 
   const submitAgentQuestion = async (rawQuestion: string) => {
     const question = rawQuestion.trim();
-    if (!question || isAgentThinking) {
+    if (!question || isAgentThinking || !hasLoadedAgentHistory) {
       return;
     }
 
@@ -148,24 +150,13 @@ export function useAgentChat(isOpen: boolean) {
     setIsAgentThinking(true);
 
     try {
-      await streamVaultAgentMessage(
+      await streamVaultAgentMessage({
         question,
-        undefined,
         sessionId,
-        event => {
+        onEvent: event => {
           if (event.type === 'stage') {
             setAgentMessages(previous =>
-              previous.map(message => {
-                if (message.id !== assistantMessageId) {
-                  return message;
-                }
-                const stages = message.stages || [];
-                const alreadyAdded = stages.some(
-                  stage =>
-                    stage.name === event.stage.name && stage.detail === event.stage.detail
-                );
-                return alreadyAdded ? message : { ...message, stages: [...stages, event.stage] };
-              })
+              addAgentStage(previous, assistantMessageId, event.stage)
             );
             return;
           }
@@ -183,18 +174,7 @@ export function useAgentChat(isOpen: boolean) {
               setAgentSessionId(event.response.sessionId);
             }
             setAgentMessages(previous =>
-              previous.map(message =>
-                message.id === assistantMessageId
-                  ? {
-                      ...message,
-                      content: event.response.answer || message.content,
-                      stages: event.response.stages,
-                      sources: event.response.sources,
-                      followUps: event.response.followUps,
-                      isStreaming: false,
-                    }
-                  : message
-              )
+              completeAgentMessage(previous, assistantMessageId, event.response)
             );
             return;
           }
@@ -203,36 +183,25 @@ export function useAgentChat(isOpen: boolean) {
             throw new Error(event.message);
           }
         },
-        abortController.signal
-      );
+        signal: abortController.signal,
+      });
 
       if (!completedResponse && !abortController.signal.aborted) {
         throw new Error('Agent 응답이 끝까지 전달되지 않았습니다.');
       }
     } catch (error) {
-      if (!abortController.signal.aborted) {
-        setAgentMessages(previous =>
-          previous.map(message =>
-            message.id === assistantMessageId
-              ? {
-                  ...message,
-                  content:
-                    '지금은 답변을 이어갈 수 없어요. 잠시 뒤 다시 물어봐 주세요.',
-                  stages: [
-                    {
-                      name: '연결 확인',
-                      detail:
-                        error instanceof Error
-                          ? error.message
-                          : 'Agent 서버 응답을 받지 못했습니다.',
-                    },
-                  ],
-                  isStreaming: false,
-                }
-              : message
-          )
-        );
-      }
+      flushPendingDelta(assistantMessageId);
+      setAgentMessages(previous =>
+        abortController.signal.aborted
+          ? interruptAgentMessage(previous, assistantMessageId)
+          : failAgentMessage(
+              previous,
+              assistantMessageId,
+              error instanceof Error
+                ? error.message
+                : 'Agent 서버 응답을 받지 못했습니다.'
+            )
+      );
     } finally {
       flushPendingDelta(assistantMessageId);
       if (streamAbortControllerRef.current === abortController) {
@@ -260,6 +229,7 @@ export function useAgentChat(isOpen: boolean) {
     agentMessages,
     agentContentScope,
     isAgentThinking,
+    isAgentHistoryLoading,
     agentInput,
     setAgentInput,
     submitAgentQuestion,

@@ -62,6 +62,14 @@ export interface VaultAgentRun {
   createdAt?: string;
 }
 
+interface VaultAgentStreamRequest {
+  question: string;
+  activeFolderName?: string;
+  sessionId: string;
+  onEvent: (event: VaultAgentStreamEvent) => void;
+  signal?: AbortSignal;
+}
+
 export function sendVaultAgentMessage(
   message: string,
   activeFolderName?: string,
@@ -78,13 +86,13 @@ export function sendVaultAgentMessage(
   );
 }
 
-export async function streamVaultAgentMessage(
-  message: string,
-  activeFolderName: string | undefined,
-  sessionId: string,
-  onEvent: (event: VaultAgentStreamEvent) => void,
-  signal?: AbortSignal
-) {
+export async function streamVaultAgentMessage({
+  question,
+  activeFolderName,
+  sessionId,
+  onEvent,
+  signal,
+}: VaultAgentStreamRequest) {
   const accessToken = await apiClient.getValidToken();
   const response = await fetch(`${resolveApiBaseUrl()}/vault/agent/chat/stream`, {
     method: 'POST',
@@ -94,7 +102,7 @@ export async function streamVaultAgentMessage(
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     },
     body: JSON.stringify({
-      message,
+      message: question,
       activeFolderName,
       sessionId,
     }),
@@ -102,8 +110,7 @@ export async function streamVaultAgentMessage(
   });
 
   if (!response.ok || !response.body) {
-    const errorMessage = await response.text().catch(() => '');
-    throw new Error(errorMessage || 'Agent 응답 연결을 시작하지 못했습니다.');
+    throw new Error(await readStreamError(response));
   }
 
   const reader = response.body.getReader();
@@ -202,6 +209,30 @@ function parseStreamPayload(rawData: string): unknown {
   } catch {
     return rawData;
   }
+}
+
+async function readStreamError(response: Response) {
+  const fallback = 'Agent 응답 연결을 시작하지 못했습니다.';
+  const rawBody = await response.text().catch(() => '');
+  if (!rawBody.trim()) {
+    return fallback;
+  }
+
+  const payload = parseStreamPayload(rawBody);
+  if (typeof payload === 'string') {
+    const message = payload.trim();
+    return message && !message.startsWith('<') ? message.slice(0, 240) : fallback;
+  }
+  if (!isRecord(payload)) {
+    return fallback;
+  }
+  if (typeof payload.message === 'string' && payload.message.trim()) {
+    return payload.message.trim();
+  }
+  if (isRecord(payload.error) && typeof payload.error.message === 'string') {
+    return payload.error.message.trim() || fallback;
+  }
+  return fallback;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -46,6 +46,7 @@ export function FeedCopilotPanel({
   const [plan, setPlan] = useState<FeedCopilotPlan | null>(null);
   const [draft, setDraft] = useState<FeedCopilotDraft | null>(null);
   const [planInputKey, setPlanInputKey] = useState('');
+  const [draftInputKey, setDraftInputKey] = useState('');
   const [styleReferenceKeys, setStyleReferenceKeys] = useState<string[]>([]);
 
   const currentInputKey = useMemo(
@@ -53,6 +54,16 @@ export function FeedCopilotPanel({
     [memo, sourceUrl, styles]
   );
   const planNeedsRefresh = Boolean(plan && planInputKey !== currentInputKey);
+  const currentDraftInputKey = useMemo(
+    () =>
+      JSON.stringify({
+        currentInputKey,
+        plan,
+        styleReferenceKeys,
+      }),
+    [currentInputKey, plan, styleReferenceKeys]
+  );
+  const draftNeedsRefresh = Boolean(draft && draftInputKey !== currentDraftInputKey);
 
   function toggleStyle(style: FeedCopilotStyle) {
     setStyles(current =>
@@ -88,6 +99,7 @@ export function FeedCopilotPanel({
       });
       setPlan(nextPlan);
       setDraft(null);
+      setDraftInputKey('');
       setPlanInputKey(currentInputKey);
       setStyleReferenceKeys([]);
     } catch (error) {
@@ -106,6 +118,7 @@ export function FeedCopilotPanel({
     }
 
     try {
+      const requestedInputKey = currentDraftInputKey;
       const nextDraft = await draftMutation.mutateAsync({
         memo,
         sourceUrl,
@@ -116,13 +129,17 @@ export function FeedCopilotPanel({
         styleReferenceKeys,
       });
       setDraft(nextDraft);
+      setDraftInputKey(requestedInputKey);
     } catch (error) {
       alert.error(error instanceof Error ? error.message : '피드 초안을 만들지 못했습니다');
     }
   }
 
   function applyDraft() {
-    if (!draft) {
+    if (!draft || draftNeedsRefresh) {
+      if (draftNeedsRefresh) {
+        alert.warning('입력이 바뀌었습니다. 현재 내용으로 초안을 다시 만들어주세요');
+      }
       return;
     }
     onApplyDraft(draft);
@@ -133,6 +150,7 @@ export function FeedCopilotPanel({
 
   return (
     <section
+      data-cy="feed-copilot"
       className={`overflow-hidden rounded-[28px] border border-surface-200 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.05)] ${
         isChat ? 'shadow-none' : ''
       }`}
@@ -226,7 +244,13 @@ export function FeedCopilotPanel({
                 />
               ) : null}
 
-              {draft ? <FeedCopilotDraftCard draft={draft} onApply={applyDraft} /> : null}
+              {draft ? (
+                <FeedCopilotDraftCard
+                  draft={draft}
+                  needsRefresh={draftNeedsRefresh}
+                  onApply={applyDraft}
+                />
+              ) : null}
             </div>
           </motion.div>
         ) : null}
