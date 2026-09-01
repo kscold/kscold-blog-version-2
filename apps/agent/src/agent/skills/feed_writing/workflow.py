@@ -9,7 +9,7 @@ from agent.prompts.feed_writing import body_text, tags, text, text_list
 from agent.skills.feed_writing.models import ExternalSource, FeedCopilotDraft, FeedCopilotPlan
 from agent.skills.feed_writing.nodes import FeedCopilotNodes
 from agent.skills.feed_writing.state import FeedCopilotState, initial_state
-from agent.tools.models import ContentAccessScope
+from agent.tools.models import ContentAccessScope, SearchHit
 from agent.tools.store import VaultStore
 
 

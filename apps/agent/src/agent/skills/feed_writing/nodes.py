@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from agent.config import AgentConfig
 from agent.prompts.feed_writing import draft_messages, parse_json, plan_messages
 from agent.skills.feed_writing.state import FeedCopilotState
+from agent.tools.models import SearchHit
 from agent.tools.store import VaultStore
 
 
