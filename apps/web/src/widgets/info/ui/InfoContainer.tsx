@@ -117,27 +117,27 @@ export function InfoContainer() {
 
 function TeamBadgeLink({ team }: { team: TeamProfile }) {
   return (
-    <Link
-      href={`/info/${team.id}`}
+    <div
       className="flex items-center gap-3 p-4 bg-white border border-surface-200 rounded-2xl hover:border-surface-400 hover:shadow-md transition-all group"
     >
-      <TeamBrandBadge team={team} compact />
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold text-surface-900 group-hover:text-surface-600 transition-colors">{team.name}</p>
-        <p className="text-xs text-surface-400">{team.summary}</p>
-      </div>
+      <Link href={`/info/${team.id}`} className="flex min-w-0 flex-1 items-center gap-3">
+        <TeamBrandBadge team={team} compact />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-bold text-surface-900 group-hover:text-surface-600 transition-colors">{team.name}</p>
+          <p className="text-xs text-surface-400">{team.summary}</p>
+        </div>
+        <svg className="w-4 h-4 flex-shrink-0 text-surface-300 group-hover:text-surface-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </Link>
       <a
         href={team.externalUrl}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={e => e.stopPropagation()}
-        className="text-[10px] text-surface-400 hover:text-surface-600 underline mr-1"
+        className="mr-1 hidden flex-shrink-0 text-[10px] text-surface-400 underline hover:text-surface-600 sm:inline"
       >
         {team.externalUrl.replace('https://', '')}
       </a>
-      <svg className="w-4 h-4 text-surface-300 group-hover:text-surface-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-      </svg>
-    </Link>
+    </div>
   );
 }
