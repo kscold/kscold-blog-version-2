@@ -1,11 +1,18 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/entities/user';
 import { subscribeAuthSessionBridge } from '@/shared/model/authSessionBridge';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
+
+const ReactQueryDevtools = process.env.NODE_ENV === 'development'
+  ? dynamic(
+      () => import('@tanstack/react-query-devtools').then(module => module.ReactQueryDevtools),
+      { ssr: false }
+    )
+  : () => null;
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -22,7 +29,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    void useAuthStore.persist.rehydrate();
+    void Promise.resolve(useAuthStore.persist.rehydrate())
+      .finally(() => useAuthStore.getState().setHasHydrated(true));
 
     const unsubscribe = subscribeAuthSessionBridge({
       onTokenChange: token => {

@@ -5,8 +5,10 @@ import { User } from '@/shared/model/types/user';
 interface AuthState {
   user: User | null;
   token: string | null;
+  hasHydrated: boolean;
   setUser: (user: User) => void;
   setToken: (token: string) => void;
+  setHasHydrated: (hasHydrated: boolean) => void;
   clearAuth: () => void;
 }
 
@@ -15,8 +17,10 @@ export const useAuthStore = create<AuthState>()(
     set => ({
       user: null,
       token: null,
+      hasHydrated: false,
       setUser: user => set({ user }),
       setToken: token => set({ token }),
+      setHasHydrated: hasHydrated => set({ hasHydrated }),
       clearAuth: () => set({ user: null, token: null }),
     }),
     {

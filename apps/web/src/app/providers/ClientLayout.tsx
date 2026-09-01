@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { Suspense } from 'react';
 import { Header } from '@/widgets/header';
 import { Footer } from '@/widgets/footer';
 import { Sidebar } from '@/widgets/sidebar';
@@ -44,7 +45,9 @@ export function ClientLayout({ children, initialViewer }: ClientLayoutProps) {
             )}
           </main>
         </div>
-        <FloatingChatWidget />
+        <Suspense fallback={null}>
+          <FloatingChatWidget />
+        </Suspense>
         <AlertToast />
         <CustomCursor useHomeContrast={pathname === '/'} />
       </div>

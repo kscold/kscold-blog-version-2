@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { PasswordResetContainer } from '@/widgets/auth';
 import { buildPageMetadata } from '@/shared/lib/seo';
 
@@ -10,5 +11,9 @@ export const metadata = buildPageMetadata({
 });
 
 export default function PasswordResetPage() {
-  return <PasswordResetContainer />;
+  return (
+    <Suspense fallback={null}>
+      <PasswordResetContainer />
+    </Suspense>
+  );
 }

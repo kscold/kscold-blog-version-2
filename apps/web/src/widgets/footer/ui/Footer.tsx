@@ -41,7 +41,7 @@ export function Footer() {
                 KSCOLD
               </span>
             </Link>
-            <p className="mt-1 text-xs font-mono text-surface-400 tracking-wider uppercase">
+            <p className="mt-1 text-xs font-mono text-surface-500 tracking-wider uppercase">
               by Colding
             </p>
             <p className="mt-4 text-sm text-surface-500 font-light leading-relaxed max-w-sm text-balance">
@@ -49,16 +49,16 @@ export function Footer() {
               <br />
               <span className="text-surface-700 font-medium">연결을 공유합니다.</span>
             </p>
-            <p className="mt-3 text-xs text-surface-400 font-light leading-relaxed max-w-sm">
+            <p className="mt-3 text-xs text-surface-500 font-light leading-relaxed max-w-sm">
               개발자 김승찬이 운영하는 기술 블로그입니다.
             </p>
           </div>
 
           {/* 네비게이션 */}
           <div>
-            <h4 className="font-mono text-xs font-bold text-surface-400 uppercase tracking-[0.2em] mb-6">
+            <h2 className="font-mono text-xs font-bold text-surface-500 uppercase tracking-[0.2em] mb-6">
               Navigation
-            </h4>
+            </h2>
             <ul className="space-y-3">
               {links.quick.map(link => (
                 <li key={link.href}>
@@ -75,9 +75,9 @@ export function Footer() {
 
           {/* 연결 정보 */}
           <div>
-            <h4 className="font-mono text-xs font-bold text-surface-400 uppercase tracking-[0.2em] mb-6">
+            <h2 className="font-mono text-xs font-bold text-surface-500 uppercase tracking-[0.2em] mb-6">
               Connect
-            </h4>
+            </h2>
             <ul className="space-y-3">
               {links.social.map(link => (
                 <li key={link.href}>
@@ -97,7 +97,7 @@ export function Footer() {
 
         {/* 사업자 정보 */}
         <div className="mt-12 pt-8 border-t border-surface-100">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px] text-surface-400 leading-relaxed">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px] text-surface-500 leading-relaxed">
             <div className="space-y-1">
               <p><span className="text-surface-500 font-medium">상호</span> 콜딩(Colding)</p>
               <p><span className="text-surface-500 font-medium">대표</span> 김승찬</p>
@@ -115,7 +115,7 @@ export function Footer() {
         {/* 하단 줄 */}
         <div className="mt-8 pt-6 border-t border-surface-100 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-4">
-            <p className="text-xs text-surface-400 font-mono tracking-wider">
+            <p className="text-xs text-surface-500 font-mono tracking-wider">
               &copy; {currentYear} Colding. All rights reserved.
             </p>
             <Link

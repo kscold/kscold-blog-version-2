@@ -10,7 +10,7 @@ import { useViewer } from '@/entities/user';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function Header() {
-  const { user, isAuthenticated, role } = useViewer();
+  const { isReady, isAuthenticated, role } = useViewer();
   const { toggleSidebar } = useUiStore();
   const logout = useLogout();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -106,7 +106,13 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-            {isAuthenticated ? (
+            {!isReady ? (
+              <div
+                className="h-9 w-[76px]"
+                data-cy="header-auth-loading"
+                aria-hidden="true"
+              />
+            ) : isAuthenticated ? (
               <div className="flex items-center gap-2 sm:gap-4">
                 {role === 'ADMIN' && (
                   <Link

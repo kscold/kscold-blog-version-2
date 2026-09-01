@@ -29,7 +29,7 @@ export function AdSenseScript({ clientId }: { clientId?: string } = {}) {
       async
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${resolvedClientId}`}
       crossOrigin="anonymous"
-      strategy="afterInteractive"
+      strategy="lazyOnload"
     />
   );
 }

@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { cookies } from 'next/headers';
 import { Providers } from './providers/providers';
 import { ClientLayout } from './providers/ClientLayout';
 import { PROFILE } from '@/entities/profile';
 import { BUSINESS_INFO } from '@/entities/profile';
-import { resolveInitialViewer } from '@/shared/lib/initialViewer';
+import { ANONYMOUS_VIEWER } from '@/shared/lib/initialViewer';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, toOgImage } from '@/shared/lib/seo';
 import { AnalyticsScripts } from '@/shared/ui/AnalyticsScripts';
 import { JsonLd } from '@/shared/ui/JsonLd';
@@ -181,14 +180,11 @@ const siteJsonLd = {
   ],
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const initialViewer = resolveInitialViewer(cookieStore.get('auth-token')?.value);
-
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className="antialiased bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50 min-h-screen relative selection:bg-accent-light/30 selection:text-accent-light transition-colors duration-300">
@@ -200,7 +196,7 @@ export default async function RootLayout({
         <div className="fixed inset-0 z-[-1] pointer-events-none bg-surface-50 dark:bg-surface-950 transition-colors duration-300"></div>
 
         <Providers>
-          <ClientLayout initialViewer={initialViewer}>{children}</ClientLayout>
+          <ClientLayout initialViewer={ANONYMOUS_VIEWER}>{children}</ClientLayout>
         </Providers>
       </body>
     </html>

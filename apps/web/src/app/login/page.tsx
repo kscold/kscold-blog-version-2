@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { LoginContainer } from '@/widgets/auth';
 import { buildPageMetadata } from '@/shared/lib/seo';
 
@@ -10,5 +11,9 @@ export const metadata = buildPageMetadata({
 });
 
 export default function LoginPage() {
-  return <LoginContainer />;
+  return (
+    <Suspense fallback={null}>
+      <LoginContainer />
+    </Suspense>
+  );
 }

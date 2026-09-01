@@ -23,9 +23,9 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await mockApi(page, 'GET', '**/api/posts/public*', success(emptyPage()));
 
     await page.goto('/');
-    // hydration 리렌더가 끝나 motion 요소가 안정된 뒤 클릭
-    await page.waitForLoadState('networkidle');
-    await page.locator('[data-cy="hero-primary-cta"]').click();
+    const blogLink = page.locator('[data-cy="hero-primary-cta"]');
+    await expect(blogLink).toBeVisible();
+    await blogLink.click();
 
     await expect(page).toHaveURL(/\/blog/);
   });
@@ -35,8 +35,9 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await mockApi(page, 'GET', /\/api\/feeds(\?|$)/, success(emptyPage()));
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await page.locator('[data-cy="hero-secondary-cta"]').click();
+    const feedLink = page.locator('[data-cy="hero-secondary-cta"]');
+    await expect(feedLink).toBeVisible();
+    await feedLink.click();
 
     await expect(page).toHaveURL(/\/feed/);
   });
@@ -44,6 +45,7 @@ test.describe('공개 페이지 핵심 시나리오', () => {
   test('비로그인 상태에서는 헤더에 LOGIN 버튼이 노출된다', async ({ page }) => {
     await page.goto('/');
 
+    await expect(page.locator('[data-cy="header-auth-loading"]')).toHaveCount(0);
     const loginBtn = page.locator('[data-cy="header-login-btn"]');
     await expect(loginBtn).toBeVisible();
     await expect(loginBtn).toContainText('LOGIN');

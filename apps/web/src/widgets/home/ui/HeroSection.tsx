@@ -21,11 +21,8 @@ export function HeroSection() {
           WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 42%, black 30%, transparent 75%)',
         }}
       />
-      <motion.div
+      <div
         className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-8 sm:gap-12 text-center my-12 sm:my-16"
-        initial={animate ? { opacity: 0 } : false}
-        animate={animate ? { opacity: 1 } : undefined}
-        transition={animate ? { duration: 1 } : undefined}
       >
         <motion.div
           initial={animate ? { opacity: 0, y: 20 } : false}
@@ -40,11 +37,8 @@ export function HeroSection() {
         </motion.div>
 
         <div className="relative group w-full flex justify-center">
-          <motion.h1
+          <h1
             className="text-[14vw] md:text-[10vw] lg:text-[8rem] xl:text-[9.5rem] font-sans font-black tracking-tighter leading-none select-none relative z-10 text-surface-900"
-            initial={animate ? { opacity: 0, y: 40 } : false}
-            animate={animate ? { opacity: 1, y: 0 } : undefined}
-            transition={animate ? { duration: 1.2, delay: 0.3, ease: [0.76, 0, 0.24, 1] } : undefined}
           >
             {/* 검색·접근성용 제목 (시각적으로는 KSCOLD 로고 노출) */}
             <span className="sr-only">
@@ -56,7 +50,7 @@ export function HeroSection() {
             >
               KSCOLD
             </span>
-          </motion.h1>
+          </h1>
           {supportsHover && (
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-full bg-surface-200 blur-[60px] z-0 opacity-0 group-hover:opacity-30 transition-opacity duration-1000 pointer-events-none" />
           )}
@@ -156,7 +150,7 @@ export function HeroSection() {
             </a>
           ))}
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }
