@@ -1,3 +1,5 @@
+import type { TeamProfile } from '@/entities/profile';
+
 const NODE_W = 110;
 const NODE_H = 42;
 const GAP_X = 20;
@@ -36,14 +38,21 @@ const SVG_W = TOTAL_ROW2_W + 20;
 
 export function OrgChart({ team }: { team: TeamProfile }) {
   if (team.id !== 'pawpong') {
+    const [leader, ...members] = team.members;
+
     return (
       <div className="flex flex-col items-center">
         <div className="rounded-xl bg-surface-900 px-6 py-3 text-center text-sm font-black text-white">
           {team.shortName}
         </div>
         <div className="h-6 w-px bg-surface-300" />
+        <div className="min-w-48 rounded-xl border border-primary-200 bg-primary-50 px-6 py-3 text-center">
+          <p className="text-sm font-black text-surface-900">{leader.name}</p>
+          <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-primary-600">Tech Lead</p>
+        </div>
+        <div className="h-6 w-px bg-surface-300" />
         <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
-          {team.members.map(member => (
+          {members.map(member => (
             <div key={member.name} className="rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-center">
               <p className="text-sm font-black text-surface-900">{member.name}</p>
               <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-primary-600">Full-stack</p>
@@ -90,4 +99,3 @@ export function OrgChart({ team }: { team: TeamProfile }) {
     </svg>
   );
 }
-import type { TeamProfile } from '@/entities/profile';

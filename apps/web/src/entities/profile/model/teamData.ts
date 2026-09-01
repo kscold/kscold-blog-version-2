@@ -17,6 +17,7 @@ export interface TeamProfile {
   keywords: string[];
   badge: {
     mark: string;
+    logoSrc?: string;
     backgroundColor: string;
     textColor: string;
   };
@@ -76,6 +77,14 @@ const PAWPONG_TEAM_MEMBERS: TeamMember[] = [
 
 const GOLE_TEAM_MEMBERS: TeamMember[] = [
   {
+    name: '김승찬',
+    position: 'Founder / Tech Lead',
+    role: '제품 방향, 아키텍처 설계, 백엔드·프론트엔드·인프라 총괄',
+    skills: ['Spring Boot', 'Next.js', 'MongoDB', 'GCP', 'CI/CD'],
+    scope: '제품 설계, 기술 의사결정, 코드 리뷰, 운영과 배포',
+    department: 'engineering',
+  },
+  {
     name: '김수민',
     position: 'Full-stack Engineer',
     role: '백엔드·프론트엔드 풀스택 기능 개발',
@@ -103,8 +112,9 @@ export const TEAM_PROFILES: TeamProfile[] = [
     externalUrl: 'https://pawpong.kr',
     keywords: ['Pawpong', 'Colding', '팀 소개', '반려동물 플랫폼'],
     badge: {
-      mark: 'P',
-      backgroundColor: '#6B5744',
+      mark: 'p',
+      logoSrc: '/images/teams/pawpong-logo.png',
+      backgroundColor: '#4F3B2E',
       textColor: '#A8C8E8',
     },
     members: PAWPONG_TEAM_MEMBERS,
@@ -114,7 +124,7 @@ export const TEAM_PROFILES: TeamProfile[] = [
     name: 'GoLe Team',
     shortName: 'GoLe',
     description: '레고 중고거래 플랫폼 GoLe를 함께 만드는 풀스택 개발팀을 소개합니다.',
-    summary: '레고 중고거래 플랫폼 · 2명',
+    summary: '레고 중고거래 플랫폼 · 3명',
     externalUrl: 'https://gole.co.kr',
     keywords: ['GoLe', 'Colding', '팀 소개', '레고 중고거래', '풀스택 개발'],
     badge: {

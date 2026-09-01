@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PROFILE, PROFILE_FAQ, TEAM_PROFILES } from '@/entities/profile';
+import type { TeamProfile } from '@/entities/profile';
 import { SkillsSection } from './SkillsSection';
 import { ContactSection } from './ContactSection';
+import { TeamBrandBadge } from './TeamBrandBadge';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -70,16 +72,7 @@ export function InfoContainer() {
           <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">Teams</h2>
           <div className="space-y-3">
             {TEAM_PROFILES.map(team => (
-              <TeamBadgeLink
-                key={team.id}
-                teamId={team.id}
-                name={team.name}
-                desc={team.summary}
-                badgeColor={team.badge.backgroundColor}
-                badgeTextColor={team.badge.textColor}
-                mark={team.badge.mark}
-                externalUrl={team.externalUrl}
-              />
+              <TeamBadgeLink key={team.id} team={team} />
             ))}
           </div>
         </motion.section>
@@ -122,33 +115,25 @@ export function InfoContainer() {
   );
 }
 
-function TeamBadgeLink({ teamId, name, desc, badgeColor, badgeTextColor, mark, externalUrl }: {
-  teamId: string; name: string; desc: string; badgeColor: string; badgeTextColor: string; mark: string; externalUrl: string;
-}) {
+function TeamBadgeLink({ team }: { team: TeamProfile }) {
   return (
     <Link
-      href={`/info/${teamId}`}
+      href={`/info/${team.id}`}
       className="flex items-center gap-3 p-4 bg-white border border-surface-200 rounded-2xl hover:border-surface-400 hover:shadow-md transition-all group"
     >
-      <div
-        className="flex items-center gap-2 px-4 py-2 rounded-full shadow-sm flex-shrink-0"
-        style={{ background: badgeColor }}
-      >
-        <span className="flex h-5 w-5 items-center justify-center rounded-full border border-white/20 text-[10px] font-black text-white/80">{mark}</span>
-        <span className="font-black text-sm tracking-tight" style={{ color: badgeTextColor }}>{teamId}</span>
-      </div>
+      <TeamBrandBadge team={team} compact />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold text-surface-900 group-hover:text-surface-600 transition-colors">{name}</p>
-        <p className="text-xs text-surface-400">{desc}</p>
+        <p className="text-sm font-bold text-surface-900 group-hover:text-surface-600 transition-colors">{team.name}</p>
+        <p className="text-xs text-surface-400">{team.summary}</p>
       </div>
       <a
-        href={externalUrl}
+        href={team.externalUrl}
         target="_blank"
         rel="noopener noreferrer"
         onClick={e => e.stopPropagation()}
         className="text-[10px] text-surface-400 hover:text-surface-600 underline mr-1"
       >
-        {externalUrl.replace('https://', '')}
+        {team.externalUrl.replace('https://', '')}
       </a>
       <svg className="w-4 h-4 text-surface-300 group-hover:text-surface-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

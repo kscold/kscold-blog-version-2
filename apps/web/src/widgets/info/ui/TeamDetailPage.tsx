@@ -7,10 +7,10 @@ import type { TeamProfile } from '@/entities/profile';
 import { OrgChart } from './OrgChart';
 import { MemberCard } from './MemberCard';
 import { PrivateDocsSection } from './PrivateDocsSection';
+import { TeamBrandBadge } from './TeamBrandBadge';
 
 export function TeamDetailPage({ team }: { team: TeamProfile }) {
   const [leader, ...others] = team.members;
-  const hasTeamLeader = team.id === 'pawpong';
 
   return (
     <div className="min-h-screen bg-surface-50">
@@ -23,10 +23,7 @@ export function TeamDetailPage({ team }: { team: TeamProfile }) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </Link>
-          <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full shadow-md" style={{ background: team.badge.backgroundColor }}>
-            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white/20 text-xs font-black text-white/80">{team.badge.mark}</span>
-            <span className="font-black text-base tracking-tight" style={{ color: team.badge.textColor }}>{team.shortName}</span>
-          </div>
+          <TeamBrandBadge team={team} />
           <div className="flex-1">
             <h1 className="text-xl font-black text-surface-900">{team.name}</h1>
             <p className="text-xs text-surface-400">{team.summary}</p>
@@ -50,7 +47,7 @@ export function TeamDetailPage({ team }: { team: TeamProfile }) {
         {/* 리더 카드 */}
         {leader && (
           <div className="mb-6">
-            <MemberCard member={leader} index={0} isLeader={hasTeamLeader} />
+            <MemberCard member={leader} index={0} isLeader />
           </div>
         )}
 
