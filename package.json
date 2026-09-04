@@ -23,7 +23,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "prettier": "^3.2.5",
-    "turbo": "^2.0.0"
+    "turbo": "^2.10.12"
   },
   "engines": {
     "node": ">=20.0.0",
@@ -32,14 +32,22 @@
   "packageManager": "pnpm@8.15.4",
   "pnpm": {
     "overrides": {
+      "@humanfs/node": "0.16.8",
       "@tiptap/core": "3.31.2",
       "@tiptap/pm": "3.31.2",
+      "ajv@6": "6.15.0",
+      "brace-expansion": "1.1.18",
+      "browserslist": "4.28.9",
       "caniuse-lite": "1.0.30001810",
       "dompurify": "3.4.14",
-      "js-yaml@3": "3.15.1",
+      "flatted": "3.4.4",
+      "joi": "18.2.8",
+      "js-yaml@3": "3.15.2",
+      "js-yaml@4": "4.3.2",
       "linkify-it": "5.0.2",
       "lodash-es": "4.18.1",
       "markdown-it": "14.2.0",
+      "minimatch@3": "3.1.5",
       "nanoid@3": "3.3.18",
       "picomatch@2": "2.3.2",
       "picomatch@4": "4.0.4",
