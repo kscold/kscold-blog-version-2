@@ -1,5 +1,6 @@
 package com.kscold.blog.blog.application.service;
 
+import com.kscold.blog.blog.application.model.AccessRequestInputPolicy;
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.AccessRequest;
@@ -32,11 +33,10 @@ public class AccessRequestApplicationService implements AccessRequestUseCase {
         if (!StringUtils.hasText(userId)) {
             throw InvalidRequestException.invalidInput("로그인이 필요합니다");
         }
-        if (!StringUtils.hasText(postId)) {
-            throw InvalidRequestException.missingInput("postId");
-        }
+        String normalizedPostId = AccessRequestInputPolicy.normalizePostId(postId);
+        String normalizedMessage = AccessRequestInputPolicy.normalizeMessage(message);
 
-        Post post = postUseCase.getById(postId);
+        Post post = postUseCase.getById(normalizedPostId);
         if (post.getCategory() == null || !StringUtils.hasText(post.getCategory().getId())) {
             throw InvalidRequestException.invalidInput("카테고리 정보가 없는 글은 열람 요청을 받을 수 없습니다");
         }
@@ -44,21 +44,22 @@ public class AccessRequestApplicationService implements AccessRequestUseCase {
         String categoryId = post.getCategory().getId();
         UserQueryPort.UserInfo user = userQueryPort.getUserById(userId);
 
-        if (hasAccess(userId, postId, categoryId)) {
+        if (hasAccess(userId, normalizedPostId, categoryId)) {
             throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "이미 승인된 요청입니다");
         }
 
-        var existingPostRequest = accessRequestRepository.findByUserIdAndPostId(userId, postId);
+        var existingPostRequest =
+                accessRequestRepository.findByUserIdAndPostId(userId, normalizedPostId);
         if (existingPostRequest.isPresent()) {
             return reopenExistingRequest(
-                    existingPostRequest.get(), user.displayName(), message, post);
+                    existingPostRequest.get(), user.displayName(), normalizedMessage, post);
         }
 
         AccessRequest request =
                 AccessRequest.builder()
                         .userId(userId)
                         .username(user.displayName())
-                        .message(message)
+                        .message(normalizedMessage)
                         .grantScope(AccessRequest.GrantScope.POST)
                         .build();
 

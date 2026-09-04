@@ -49,7 +49,7 @@ class AccessRequestApplicationServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         AccessRequest saved =
-                accessRequestService.requestAccess("user-1", "post-1", "이 글을 읽고 싶습니다.");
+                accessRequestService.requestAccess("user-1", "  post-1  ", "  이 글을 읽고 싶습니다.  ");
 
         assertThat(saved.getUserId()).isEqualTo("user-1");
         assertThat(saved.getUsername()).isEqualTo("김승찬");
@@ -60,6 +60,21 @@ class AccessRequestApplicationServiceTest {
         assertThat(saved.getCategoryName()).isEqualTo("개발 이야기");
         assertThat(saved.getStatus()).isEqualTo(AccessRequest.Status.PENDING);
         assertThat(saved.getGrantScope()).isEqualTo(AccessRequest.GrantScope.POST);
+        assertThat(saved.getMessage()).isEqualTo("이 글을 읽고 싶습니다.");
+    }
+
+    @Test
+    @DisplayName("시나리오: 허용 길이를 넘긴 열람 요청 메시지는 저장하지 않는다")
+    void requestAccessRejectsOversizedMessage() {
+        assertThatThrownBy(
+                        () ->
+                                accessRequestService.requestAccess(
+                                        "user-1", "post-1", "가".repeat(501)))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessageContaining("최대 500자");
+
+        verify(postUseCase, never()).getById(any());
+        verify(accessRequestRepository, never()).save(any());
     }
 
     @Test

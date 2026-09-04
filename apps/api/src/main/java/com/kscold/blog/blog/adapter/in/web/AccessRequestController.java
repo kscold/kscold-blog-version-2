@@ -6,6 +6,7 @@ import com.kscold.blog.blog.adapter.in.web.dto.response.AccessRequestResponse;
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import com.kscold.blog.shared.web.ApiResponse;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class AccessRequestController {
     // 유저: 접근 요청
     @PostMapping("/access-requests")
     public ResponseEntity<ApiResponse<AccessRequestResponse>> requestAccess(
-            @AuthenticationPrincipal String userId, @RequestBody CreateAccessRequest body) {
+            @AuthenticationPrincipal String userId, @Valid @RequestBody CreateAccessRequest body) {
         AccessRequest request =
                 accessRequestUseCase.requestAccess(userId, body.getPostId(), body.getMessage());
         return ResponseEntity.status(HttpStatus.CREATED)
