@@ -43,7 +43,7 @@ export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {
   return (
     <div className="min-h-screen bg-surface-50">
       {hasAdworthyContent && <AdSenseScript />}
-      <div className="max-w-xl mx-auto px-4 py-8">
+      <div className="mx-auto max-w-3xl px-4 py-8">
         <motion.div
           className="mb-6"
           initial={{ opacity: 0 }}
@@ -61,7 +61,7 @@ export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {
           </Link>
         </motion.div>
 
-        <FeedCard feed={feed} showCommentLink={false} />
+        <FeedCard feed={feed} showCommentLink={false} variant="detail" />
 
         <motion.div
           className="mt-4 bg-white border border-surface-200 rounded-2xl p-4"

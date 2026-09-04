@@ -22,6 +22,14 @@ export function stripRichText(input: string) {
     .trim();
 }
 
+export function extractFirstMarkdownHeading(input?: string | null) {
+  return input?.match(/^#{1,6}\s+(.+)$/m)?.[1].trim() || null;
+}
+
+export function extractFirstMarkdownImage(input?: string | null) {
+  return input?.match(/!\[[^\]]*]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/)?.[1] || null;
+}
+
 export function toPreviewText(input?: string | null, fallback = '', maxLength = 180) {
   const cleaned = input ? stripRichText(input) : '';
   const base = cleaned || fallback;

@@ -10,16 +10,21 @@ import { useToggleLike } from '@/features/feed/api/useFeedMutations';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
-import { LinkifiedText } from '@/shared/ui/LinkifiedText';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
 import { filterVisibleTagNames } from '@/shared/lib/tags';
+import { FeedContent } from './FeedContent';
 
 interface FeedCardProps {
   feed: Feed;
   showCommentLink?: boolean;
+  variant?: 'summary' | 'detail';
 }
 
-export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
+export function FeedCard({
+  feed,
+  showCommentLink = true,
+  variant = 'summary',
+}: FeedCardProps) {
   const { allowRichEffects, reduceMotion } = usePerformanceMode();
   const toggleLike = useToggleLike();
   const router = useRouter();
@@ -102,6 +107,10 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
       {/* 첨부 이미지 */}
       {feed.images.length > 0 && <ImageCarousel images={feed.images} />}
 
+      {variant === 'detail' && (
+        <FeedContent authorName={feed.author.name} content={feed.content} variant={variant} />
+      )}
+
       {/* 반응 영역 */}
       <div className="px-4 pt-3">
         <div className="flex items-center gap-4">
@@ -148,13 +157,9 @@ export function FeedCard({ feed, showCommentLink = true }: FeedCardProps) {
       </div>
 
       {/* 본문 */}
-      <div className="px-4 py-3">
-        <LinkifiedText
-          text={feed.content}
-          className="text-sm text-surface-800 whitespace-pre-wrap leading-relaxed"
-          prefix={<span className="font-bold text-surface-900 mr-1.5">{feed.author.name}</span>}
-        />
-      </div>
+      {variant === 'summary' && (
+        <FeedContent authorName={feed.author.name} content={feed.content} variant={variant} />
+      )}
 
       {/* 해시태그 */}
       {visibleTags.length > 0 && (

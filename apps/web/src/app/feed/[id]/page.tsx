@@ -6,7 +6,10 @@ import {
   absoluteUrl,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
+  extractFirstMarkdownHeading,
+  extractFirstMarkdownImage,
   fetchPublicApi,
+  stripRichText,
   toMetaDescription,
   toOgImage,
   uniqueKeywords,
@@ -34,8 +37,13 @@ export async function generateMetadata({
     });
   }
 
-  const title = feed.linkPreview?.title || toMetaDescription(feed.content, `${feed.author.name}의 피드`, 58);
+  const title =
+    extractFirstMarkdownHeading(feed.content) ||
+    feed.linkPreview?.title ||
+    toMetaDescription(feed.content, `${feed.author.name}의 피드`, 58);
   const description = toMetaDescription(feed.content, '일상, 개발, 그리고 생각의 조각들');
+  const image =
+    feed.images[0] || extractFirstMarkdownImage(feed.content) || feed.linkPreview?.image;
 
   return buildPageMetadata({
     title,
@@ -43,7 +51,7 @@ export async function generateMetadata({
     path: `/feed/${feed.id}`,
     keywords: uniqueKeywords(['피드', feed.author.name, feed.linkPreview?.siteName]),
     type: 'article',
-    image: feed.images[0] || feed.linkPreview?.image,
+    image,
     publishedTime: feed.createdAt,
     modifiedTime: feed.updatedAt,
     authors: [{ name: feed.author.name }],
@@ -63,6 +71,10 @@ export default async function FeedDetailPage({
   }
 
   const description = toMetaDescription(feed.content, '일상, 개발, 그리고 생각의 조각들');
+  const headline =
+    extractFirstMarkdownHeading(feed.content) || feed.linkPreview?.title || description;
+  const image =
+    feed.images[0] || extractFirstMarkdownImage(feed.content) || feed.linkPreview?.image;
   const canonicalPath = `/feed/${feed.id}`;
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -71,15 +83,15 @@ export default async function FeedDetailPage({
         '@type': 'SocialMediaPosting',
         '@id': `${absoluteUrl(canonicalPath)}#posting`,
         url: absoluteUrl(canonicalPath),
-        headline: feed.linkPreview?.title || description,
-        articleBody: description,
+        headline,
+        articleBody: stripRichText(feed.content),
         datePublished: feed.createdAt,
         dateModified: feed.updatedAt,
         author: {
           '@type': 'Person',
           name: feed.author.name,
         },
-        image: [toOgImage(feed.images[0] || feed.linkPreview?.image)],
+        image: [toOgImage(image)],
         interactionStatistic: [
           {
             '@type': 'InteractionCounter',

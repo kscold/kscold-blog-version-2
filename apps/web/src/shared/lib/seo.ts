@@ -15,4 +15,11 @@ export {
   flattenCategories,
   toOgImage,
 } from './seo/metadata';
-export { stripRichText, toMetaDescription, toPreviewText, uniqueKeywords } from './seo/text';
+export {
+  extractFirstMarkdownHeading,
+  extractFirstMarkdownImage,
+  stripRichText,
+  toMetaDescription,
+  toPreviewText,
+  uniqueKeywords,
+} from './seo/text';
