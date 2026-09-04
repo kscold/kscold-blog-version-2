@@ -28,6 +28,13 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
+    public Optional<User.Role> findActiveRoleById(String id) {
+        return mongoUserRepository
+                .findActiveRoleById(id)
+                .map(MongoUserRepository.ActiveRoleProjection::getRole);
+    }
+
+    @Override
     public List<User> findAllById(Collection<String> ids) {
         return mongoUserRepository.findAllById(ids).stream().toList();
     }

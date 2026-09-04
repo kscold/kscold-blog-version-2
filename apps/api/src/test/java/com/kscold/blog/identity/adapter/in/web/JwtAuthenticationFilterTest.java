@@ -3,7 +3,6 @@ package com.kscold.blog.identity.adapter.in.web;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.adapter.out.security.JwtTokenProvider;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import jakarta.servlet.http.Cookie;
@@ -41,10 +40,10 @@ class JwtAuthenticationFilterTest {
         MockHttpServletRequest request = authenticatedRequest();
         when(jwtTokenProvider.validateAccessToken("access-token")).thenReturn(true);
         when(jwtTokenProvider.getUserIdFromAccessToken("access-token")).thenReturn("user-1");
-        when(userQueryPort.getUserById("user-1"))
+        when(userQueryPort.findAuthenticationById("user-1"))
                 .thenReturn(
-                        new UserQueryPort.UserInfo(
-                                "user-1", "kscold", "김승찬", null, false, "user@example.com"));
+                        java.util.Optional.of(
+                                new UserQueryPort.AuthenticationInfo("user-1", false)));
 
         filter.doFilter(request, new MockHttpServletResponse(), new MockFilterChain());
 
@@ -60,8 +59,7 @@ class JwtAuthenticationFilterTest {
         MockHttpServletRequest request = authenticatedRequest();
         when(jwtTokenProvider.validateAccessToken("access-token")).thenReturn(true);
         when(jwtTokenProvider.getUserIdFromAccessToken("access-token")).thenReturn("user-1");
-        when(userQueryPort.getUserById("user-1"))
-                .thenThrow(ResourceNotFoundException.user("user-1"));
+        when(userQueryPort.findAuthenticationById("user-1")).thenReturn(java.util.Optional.empty());
 
         filter.doFilter(request, new MockHttpServletResponse(), new MockFilterChain());
 

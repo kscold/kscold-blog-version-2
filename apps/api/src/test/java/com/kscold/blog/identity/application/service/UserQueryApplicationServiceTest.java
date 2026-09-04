@@ -31,6 +31,22 @@ class UserQueryApplicationServiceTest {
     }
 
     @Test
+    @DisplayName("시나리오: 인증 조회는 활성 사용자의 역할 projection만 사용한다")
+    void findAuthenticationByIdUsesActiveRoleProjection() {
+        UserRepository userRepository = mock(UserRepository.class);
+        UserQueryApplicationService service = new UserQueryApplicationService(userRepository);
+        when(userRepository.findActiveRoleById("admin-1"))
+                .thenReturn(java.util.Optional.of(User.Role.ADMIN));
+
+        UserQueryPort.AuthenticationInfo authentication =
+                service.findAuthenticationById("admin-1").orElseThrow();
+
+        assertThat(authentication.id()).isEqualTo("admin-1");
+        assertThat(authentication.isAdmin()).isTrue();
+        verify(userRepository).findActiveRoleById("admin-1");
+    }
+
+    @Test
     @DisplayName("시나리오: 여러 사용자 프로필을 저장소에서 한 번에 조회해 ID로 반환한다")
     void getUsersByIdsUsesSingleRepositoryQuery() {
         UserRepository userRepository = mock(UserRepository.class);

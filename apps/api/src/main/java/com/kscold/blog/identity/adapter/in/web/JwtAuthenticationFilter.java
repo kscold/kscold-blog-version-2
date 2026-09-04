@@ -1,6 +1,5 @@
 package com.kscold.blog.identity.adapter.in.web;
 
-import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.adapter.out.security.JwtTokenProvider;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import jakarta.servlet.FilterChain;
@@ -36,10 +35,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null && jwtTokenProvider.validateAccessToken(token)) {
             String userId = jwtTokenProvider.getUserIdFromAccessToken(token);
-            UserQueryPort.UserInfo user;
-            try {
-                user = userQueryPort.getUserById(userId);
-            } catch (ResourceNotFoundException ignored) {
+            UserQueryPort.AuthenticationInfo user =
+                    userQueryPort.findAuthenticationById(userId).orElse(null);
+            if (user == null) {
                 filterChain.doFilter(request, response);
                 return;
             }

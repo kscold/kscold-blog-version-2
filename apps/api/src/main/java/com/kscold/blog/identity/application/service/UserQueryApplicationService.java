@@ -7,6 +7,7 @@ import com.kscold.blog.identity.domain.port.out.UserRepository;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,13 @@ public class UserQueryApplicationService implements UserQueryPort {
                         .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
         return toUserInfo(user);
+    }
+
+    @Override
+    public Optional<AuthenticationInfo> findAuthenticationById(String userId) {
+        return userRepository
+                .findActiveRoleById(userId)
+                .map(role -> new AuthenticationInfo(userId, role == User.Role.ADMIN));
     }
 
     @Override

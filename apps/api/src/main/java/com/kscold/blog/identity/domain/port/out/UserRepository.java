@@ -9,6 +9,9 @@ import java.util.Optional;
 public interface UserRepository {
     Optional<User> findById(String id);
 
+    /** 인증 경로에서 활성 계정의 현재 역할만 projection으로 조회한다. */
+    Optional<User.Role> findActiveRoleById(String id);
+
     /** 주어진 id 들을 한 번에 조회함(반복 findById 로 인한 N+1 방지용). */
     List<User> findAllById(Collection<String> ids);
 
