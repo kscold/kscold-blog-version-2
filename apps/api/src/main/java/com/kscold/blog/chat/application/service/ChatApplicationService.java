@@ -7,6 +7,8 @@ import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
+import com.kscold.blog.chat.domain.port.out.ChatRateLimitPort;
+import com.kscold.blog.exception.RateLimitExceededException;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.context.annotation.Lazy;
@@ -21,14 +23,17 @@ public class ChatApplicationService implements ChatUseCase {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatBroadcastPort broadcastPort;
     private final ChatNotificationPort notificationPort;
+    private final ChatRateLimitPort rateLimitPort;
 
     public ChatApplicationService(
             ChatMessageRepository chatMessageRepository,
             @Lazy ChatBroadcastPort broadcastPort,
-            @Lazy ChatNotificationPort notificationPort) {
+            @Lazy ChatNotificationPort notificationPort,
+            ChatRateLimitPort rateLimitPort) {
         this.chatMessageRepository = chatMessageRepository;
         this.broadcastPort = broadcastPort;
         this.notificationPort = notificationPort;
+        this.rateLimitPort = rateLimitPort;
     }
 
     @Override
@@ -64,7 +69,12 @@ public class ChatApplicationService implements ChatUseCase {
             ChatMessage.MessageType type,
             String roomId,
             boolean fromAdmin) {
-        ChatMessage saved = saveMessage(sessionId, username, content, type, roomId, fromAdmin);
+        String normalizedContent = ChatMessageInputPolicy.normalizeContent(content);
+        if (!fromAdmin) {
+            rateLimitPort.checkVisitorMessageAllowed(roomId);
+        }
+        ChatMessage saved =
+                saveMessage(sessionId, username, normalizedContent, type, roomId, fromAdmin);
         broadcastPort.broadcast(saved);
         notificationPort.notifyMessage(roomId, username, saved.getContent(), fromAdmin);
         return saved;
@@ -85,6 +95,11 @@ public class ChatApplicationService implements ChatUseCase {
     @Override
     @Transactional
     public void recordSystemEvent(String roomId, String content) {
+        try {
+            rateLimitPort.checkSystemEventAllowed(roomId);
+        } catch (RateLimitExceededException ignored) {
+            return;
+        }
         ChatMessage saved =
                 saveMessage(
                         roomId, "SYSTEM", content, ChatMessage.MessageType.SYSTEM, roomId, false);

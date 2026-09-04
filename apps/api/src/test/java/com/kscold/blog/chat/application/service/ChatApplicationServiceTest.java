@@ -11,7 +11,9 @@ import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
+import com.kscold.blog.chat.domain.port.out.ChatRateLimitPort;
 import com.kscold.blog.exception.InvalidRequestException;
+import com.kscold.blog.exception.RateLimitExceededException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +29,8 @@ class ChatApplicationServiceTest {
     @Mock private ChatBroadcastPort broadcastPort;
 
     @Mock private ChatNotificationPort notificationPort;
+
+    @Mock private ChatRateLimitPort rateLimitPort;
 
     @InjectMocks private ChatApplicationService chatApplicationService;
 
@@ -51,6 +55,7 @@ class ChatApplicationServiceTest {
         assertThat(saved.getVisitorReadAt()).isNotNull();
         verify(broadcastPort).broadcast(saved);
         verify(notificationPort).notifyMessage("room-1", "visitor", "안녕하세요", false);
+        verify(rateLimitPort).checkVisitorMessageAllowed("room-1");
     }
 
     @Test
@@ -69,6 +74,27 @@ class ChatApplicationServiceTest {
                                         false))
                 .isInstanceOf(InvalidRequestException.class)
                 .hasMessageContaining("최대 1000자");
+
+        verifyNoInteractions(chatMessageRepository, broadcastPort, notificationPort);
+    }
+
+    @Test
+    @DisplayName("요청 한도를 넘긴 방문자 메시지는 저장하거나 전달하지 않는다")
+    void saveAndBroadcastRejectsRateLimitedVisitorMessage() {
+        org.mockito.Mockito.doThrow(new RateLimitExceededException("잠시 후 다시 시도해주세요."))
+                .when(rateLimitPort)
+                .checkVisitorMessageAllowed("room-1");
+
+        assertThatThrownBy(
+                        () ->
+                                chatApplicationService.saveAndBroadcast(
+                                        "session-1",
+                                        "visitor",
+                                        "안녕하세요",
+                                        ChatMessage.MessageType.TEXT,
+                                        "room-1",
+                                        false))
+                .isInstanceOf(RateLimitExceededException.class);
 
         verifyNoInteractions(chatMessageRepository, broadcastPort, notificationPort);
     }
@@ -99,5 +125,17 @@ class ChatApplicationServiceTest {
 
         verify(notificationPort).notifySystem("room-1", "방문자가 입장했습니다");
         verifyNoInteractions(broadcastPort);
+    }
+
+    @Test
+    @DisplayName("요청 한도를 넘긴 시스템 이벤트는 저장하거나 알리지 않는다")
+    void recordSystemEventSkipsRateLimitedEvent() {
+        org.mockito.Mockito.doThrow(new RateLimitExceededException("요청이 너무 많습니다."))
+                .when(rateLimitPort)
+                .checkSystemEventAllowed("room-1");
+
+        chatApplicationService.recordSystemEvent("room-1", "방문자가 입장했습니다");
+
+        verifyNoInteractions(chatMessageRepository, broadcastPort, notificationPort);
     }
 }

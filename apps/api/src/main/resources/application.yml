@@ -90,6 +90,11 @@ account-recovery:
   password-reset-expiry-minutes: ${PASSWORD_RESET_EXPIRY_MINUTES:30}
 
 chat:
+  rate-limit:
+    visitor-messages: ${CHAT_RATE_LIMIT_VISITOR_MESSAGES:12}
+    system-events: ${CHAT_RATE_LIMIT_SYSTEM_EVENTS:2}
+    window: ${CHAT_RATE_LIMIT_WINDOW:1m}
+    max-tracked-rooms: ${CHAT_RATE_LIMIT_MAX_TRACKED_ROOMS:10000}
   reminder:
     enabled: ${CHAT_REMINDER_ENABLED:true}
     fixed-delay-ms: ${CHAT_REMINDER_FIXED_DELAY_MS:300000}

@@ -16,6 +16,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
+import com.kscold.blog.exception.RateLimitExceededException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,47 @@ class ChatWebSocketHandlerTest {
                         any(ChatMessage.MessageType.class),
                         any(),
                         anyBoolean());
+    }
+
+    @Test
+    @DisplayName("시나리오: 요청 한도를 넘긴 웹소켓 메시지는 오류 프레임으로 응답한다")
+    void rateLimitedWebSocketMessageReceivesErrorFrame() throws Exception {
+        ChatUseCase chatUseCase = mock(ChatUseCase.class);
+        when(chatUseCase.getRecentMessagesByRoom("user-1", 50)).thenReturn(List.of());
+        WebSocketSession session = mock(WebSocketSession.class);
+        when(session.getId()).thenReturn("session-1");
+        when(session.getAttributes())
+                .thenReturn(
+                        Map.of(
+                                "userId", "user-1",
+                                "username", "visitor",
+                                "isAdmin", false));
+        when(session.isOpen()).thenReturn(true);
+        doThrow(new RateLimitExceededException("잠시 후 다시 시도해주세요."))
+                .when(chatUseCase)
+                .saveAndBroadcast(
+                        any(),
+                        any(),
+                        any(),
+                        any(ChatMessage.MessageType.class),
+                        any(),
+                        anyBoolean());
+        ChatWebSocketHandler handler = new ChatWebSocketHandler(chatUseCase, new ObjectMapper());
+        handler.afterConnectionEstablished(session);
+        clearInvocations(session);
+
+        String payload =
+                new ObjectMapper()
+                        .writeValueAsString(Map.of("type", "message", "content", "안녕하세요"));
+        handler.handleTextMessage(session, new TextMessage(payload));
+
+        verify(session)
+                .sendMessage(
+                        org.mockito.ArgumentMatchers.<TextMessage>argThat(
+                                response ->
+                                        response.getPayload().contains("\"type\":\"error\"")
+                                                && response.getPayload()
+                                                        .contains("\"code\":\"E501\"")));
     }
 
     @Test

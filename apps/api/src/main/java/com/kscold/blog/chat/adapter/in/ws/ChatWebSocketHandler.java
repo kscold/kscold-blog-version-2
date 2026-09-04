@@ -5,6 +5,7 @@ import com.kscold.blog.chat.application.model.ChatMessageInputPolicy;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
+import com.kscold.blog.exception.RateLimitExceededException;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -81,29 +82,38 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         if (!"message".equals(type) || content == null || content.isBlank()) return;
         if (content.length() > ChatMessageInputPolicy.CONTENT_MAX_LENGTH) return;
 
-        if (!info.isAdmin()) {
-            // 방문자 → 저장 + 브로드캐스트 + 디스코드 알림 (application 이 오케스트레이션)
-            chatUseCase.saveAndBroadcast(
-                    sessionId,
-                    info.username(),
-                    content,
-                    ChatMessage.MessageType.TEXT,
-                    info.userId(),
-                    false);
-        } else {
-            // 어드민 → toUserId 지정 방문자에게 전송 (자기 자신에게는 불가)
-            String toUserId = payload.get("toUserId");
-            if (toUserId == null || toUserId.isBlank()) return;
-            if (toUserId.equals(info.userId())) return;
+        try {
+            if (!info.isAdmin()) {
+                // 방문자 → 저장 + 브로드캐스트 + 디스코드 알림 (application 이 오케스트레이션)
+                chatUseCase.saveAndBroadcast(
+                        sessionId,
+                        info.username(),
+                        content,
+                        ChatMessage.MessageType.TEXT,
+                        info.userId(),
+                        false);
+            } else {
+                // 어드민 → toUserId 지정 방문자에게 전송 (자기 자신에게는 불가)
+                String toUserId = payload.get("toUserId");
+                if (toUserId == null || toUserId.isBlank()) return;
+                if (toUserId.equals(info.userId())) return;
 
-            // 웹 어드민 답장 → 저장 + 브로드캐스트 + 디스코드 로깅 (application 경유)
-            chatUseCase.saveAndBroadcast(
-                    sessionId,
-                    info.username(),
-                    content,
-                    ChatMessage.MessageType.TEXT,
-                    toUserId,
-                    true);
+                // 웹 어드민 답장 → 저장 + 브로드캐스트 + 디스코드 로깅 (application 경유)
+                chatUseCase.saveAndBroadcast(
+                        sessionId,
+                        info.username(),
+                        content,
+                        ChatMessage.MessageType.TEXT,
+                        toUserId,
+                        true);
+            }
+        } catch (RateLimitExceededException exception) {
+            sendToSession(
+                    session,
+                    Map.of(
+                            "type", "error",
+                            "code", exception.getErrorCode().getCode(),
+                            "message", exception.getMessage()));
         }
     }
 

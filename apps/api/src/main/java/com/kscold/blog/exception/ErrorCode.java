@@ -42,6 +42,9 @@ public enum ErrorCode {
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "E403", "이미 사용 중인 사용자명입니다"),
     DUPLICATE_SLUG(HttpStatus.CONFLICT, "E404", "이미 사용 중인 슬러그입니다"),
 
+    // 429 요청 한도 초과
+    RATE_LIMIT_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS, "E501", "요청이 너무 많습니다"),
+
     // 500 서버 내부 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E901", "서버 내부 오류가 발생했습니다"),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E902", "데이터베이스 오류가 발생했습니다"),

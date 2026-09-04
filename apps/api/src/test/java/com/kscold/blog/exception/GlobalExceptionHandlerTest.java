@@ -29,6 +29,21 @@ import org.springframework.validation.FieldError;
 class GlobalExceptionHandlerTest {
 
     @Test
+    void convertsRateLimitFailureToTooManyRequests() {
+        GlobalExceptionHandler handler =
+                new GlobalExceptionHandler(mock(NotificationUseCase.class));
+
+        ResponseEntity<ApiResponse<Void>> response =
+                handler.handleBusinessException(
+                        new RateLimitExceededException("잠시 후 다시 시도해주세요."), null);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getErrorCode())
+                .isEqualTo(ErrorCode.RATE_LIMIT_EXCEEDED.getCode());
+    }
+
+    @Test
     void convertsMethodParameterValidationFailureToBadRequest() {
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         ChatCommand request = ChatCommand.builder().message("질문").sessionId("a".repeat(81)).build();
