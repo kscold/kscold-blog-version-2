@@ -176,11 +176,7 @@ public class PostController {
     }
 
     private PostResponse toPublicPostResponse(Post post) {
-        if (isRestrictedPost(post)) {
-            return PostResponse.restricted(post);
-        }
-
-        return PostResponse.from(post);
+        return PostResponse.summary(post, isRestrictedPost(post));
     }
 
     private PostResponse toFullPostResponse(Post post) {

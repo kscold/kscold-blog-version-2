@@ -1,6 +1,7 @@
 package com.kscold.blog.blog.adapter.in.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +24,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -111,6 +114,22 @@ class PostControllerTest {
         assertThat(data.getRestricted()).isTrue();
         assertThat(data.getContent()).isEqualTo("본문");
         verify(accessRequestUseCase, never()).hasAccess("admin-1", "post-1", "cat-1");
+    }
+
+    @Test
+    @DisplayName("시나리오: 공개 글 목록은 카드에 불필요한 본문을 반환하지 않는다")
+    void getAllPostsOmitsContent() {
+        Post post = post(true);
+        when(postUseCase.getAll(any())).thenReturn(new PageImpl<>(List.of(post)));
+
+        ResponseEntity<ApiResponse<Page<PostResponse>>> response =
+                postController.getAllPosts(0, 10, "publishedAt", "desc");
+
+        assertThat(response.getBody()).isNotNull();
+        PostResponse data = response.getBody().getData().getContent().getFirst();
+        assertThat(data.getContent()).isNull();
+        assertThat(data.getExcerpt()).isEqualTo("요약");
+        assertThat(data.getRestricted()).isNull();
     }
 
     private static Post post(boolean publicOverride) {

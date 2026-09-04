@@ -168,6 +168,33 @@ public class PostResponse {
                 .build();
     }
 
+    /** 목록용 응답 — 카드에 필요하지 않은 본문을 제외해 전송량과 SSR 크기를 줄입니다. */
+    public static PostResponse summary(Post post, boolean restricted) {
+        PostResponse response = from(post, restricted);
+        return PostResponse.builder()
+                .id(response.getId())
+                .title(response.getTitle())
+                .slug(response.getSlug())
+                .content(null)
+                .excerpt(response.getExcerpt())
+                .coverImage(response.getCoverImage())
+                .category(response.getCategory())
+                .tags(response.getTags())
+                .author(response.getAuthor())
+                .status(response.getStatus())
+                .source(response.getSource())
+                .featured(response.getFeatured())
+                .publicOverride(response.getPublicOverride())
+                .restricted(restricted ? true : null)
+                .views(response.getViews())
+                .likes(response.getLikes())
+                .seo(response.getSeo())
+                .publishedAt(response.getPublishedAt())
+                .createdAt(response.getCreatedAt())
+                .updatedAt(response.getUpdatedAt())
+                .build();
+    }
+
     /** Post 리스트를 PostResponse 리스트로 변환 */
     public static List<PostResponse> from(List<Post> posts) {
         return posts.stream().map(PostResponse::from).toList();

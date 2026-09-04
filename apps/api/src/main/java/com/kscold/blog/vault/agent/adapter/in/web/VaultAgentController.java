@@ -4,17 +4,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import com.kscold.blog.vault.agent.adapter.in.web.dto.request.VaultSearchRequest;
 import com.kscold.blog.vault.agent.application.dto.command.ChatCommand;
+import com.kscold.blog.vault.agent.application.dto.command.VaultSearchCommand;
 import com.kscold.blog.vault.agent.application.dto.response.AgentContentScopeResponse;
 import com.kscold.blog.vault.agent.application.dto.response.AgentStage;
 import com.kscold.blog.vault.agent.application.dto.response.ChatHistoryResponse;
 import com.kscold.blog.vault.agent.application.dto.response.ChatResponse;
 import com.kscold.blog.vault.agent.application.dto.response.ReindexResponse;
+import com.kscold.blog.vault.agent.application.dto.response.SourceNote;
 import com.kscold.blog.vault.agent.application.port.in.VaultAgentUseCase;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +40,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Slf4j
 @RestController
 @RequestMapping("/vault/agent")
+@Validated
 public class VaultAgentController {
 
     private static final long STREAM_TIMEOUT_MILLIS = 120_000L;
@@ -111,6 +117,15 @@ public class VaultAgentController {
     public ResponseEntity<ApiResponse<AgentContentScopeResponse>> contentScope(
             @AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(ApiResponse.success(vaultAgentUseCase.contentScope(userId)));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<SourceNote>>> search(
+            @AuthenticationPrincipal String userId, @Valid VaultSearchRequest request) {
+        VaultSearchCommand command =
+                new VaultSearchCommand(
+                        request.getQ().trim(), request.getActiveFolderName(), request.getLimit());
+        return ResponseEntity.ok(ApiResponse.success(vaultAgentUseCase.search(command, userId)));
     }
 
     @PostMapping("/reindex")

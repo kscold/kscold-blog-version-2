@@ -3,6 +3,7 @@ package com.kscold.blog.vault.agent.application.service;
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.vault.agent.application.dto.command.ChatCommand;
+import com.kscold.blog.vault.agent.application.dto.command.VaultSearchCommand;
 import com.kscold.blog.vault.agent.application.dto.response.AgentContentScopeResponse;
 import com.kscold.blog.vault.agent.application.dto.response.AgentStage;
 import com.kscold.blog.vault.agent.application.dto.response.ChatHistoryMessage;
@@ -16,6 +17,7 @@ import com.kscold.blog.vault.agent.domain.model.AgentChatMessage;
 import com.kscold.blog.vault.agent.domain.model.AgentChatResult;
 import com.kscold.blog.vault.agent.domain.model.AgentChatStage;
 import com.kscold.blog.vault.agent.domain.model.AgentContentAccessScope;
+import com.kscold.blog.vault.agent.domain.model.AgentSearchQuery;
 import com.kscold.blog.vault.agent.domain.model.AgentSource;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
 import com.kscold.blog.vault.agent.domain.port.out.VaultAgentChatHistoryRepository;
@@ -146,6 +148,18 @@ public class VaultAgentService implements VaultAgentUseCase {
         }
         return new AgentContentScopeResponse(
                 "공개된 기록을 바탕으로 답합니다", "블로그 글, 피드, Vault 노트와 소개 페이지에서 답의 근거를 찾습니다.");
+    }
+
+    @Override
+    public List<SourceNote> search(VaultSearchCommand command, @Nullable String userId) {
+        AgentContentAccessScope scope = accessScopeResolver.resolve(userId);
+        AgentSearchQuery query =
+                new AgentSearchQuery(command.query(), command.activeFolderName(), command.limit());
+        try {
+            return vaultAgentClientPort.search(query, scope).stream().map(this::toSource).toList();
+        } catch (AgentClientUnavailableException exception) {
+            throw agentUnavailable(exception);
+        }
     }
 
     private ChatResponse toChatResponse(String sessionId, AgentChatResult result) {

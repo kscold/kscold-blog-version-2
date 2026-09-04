@@ -6,6 +6,7 @@ import com.kscold.blog.vault.agent.domain.model.AgentChatResult;
 import com.kscold.blog.vault.agent.domain.model.AgentChatStage;
 import com.kscold.blog.vault.agent.domain.model.AgentContentAccessScope;
 import com.kscold.blog.vault.agent.domain.model.AgentReindexResult;
+import com.kscold.blog.vault.agent.domain.model.AgentSearchQuery;
 import com.kscold.blog.vault.agent.domain.model.AgentSource;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
 import com.kscold.blog.vault.agent.domain.port.out.VaultAgentClientPort;
@@ -14,6 +15,7 @@ import com.kscold.blog.vault.agent.grpc.ChatRequest;
 import com.kscold.blog.vault.agent.grpc.ChatStreamEvent;
 import com.kscold.blog.vault.agent.grpc.ContentAccessScope;
 import com.kscold.blog.vault.agent.grpc.ReindexRequest;
+import com.kscold.blog.vault.agent.grpc.SearchRequest;
 import com.kscold.blog.vault.agent.grpc.VaultAgentServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -94,6 +96,27 @@ public class GrpcVaultAgentClient implements VaultAgentClientPort {
         }
     }
 
+    @Override
+    public List<AgentSource> search(
+            AgentSearchQuery query, AgentContentAccessScope contentAccessScope) {
+        try {
+            var response =
+                    stub().search(
+                                    SearchRequest.newBuilder()
+                                            .setQuery(query.query())
+                                            .setActiveFolderName(
+                                                    query.activeFolderName() == null
+                                                            ? ""
+                                                            : query.activeFolderName())
+                                            .setContentAccessScope(toScope(contentAccessScope))
+                                            .setLimit(query.limit())
+                                            .build());
+            return response.getSourcesList().stream().map(this::toSource).toList();
+        } catch (StatusRuntimeException exception) {
+            throw unavailable(exception);
+        }
+    }
+
     @PreDestroy
     public void shutdown() throws InterruptedException {
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
@@ -109,12 +132,15 @@ public class GrpcVaultAgentClient implements VaultAgentClientPort {
         return ChatRequest.newBuilder()
                 .setMessage(message)
                 .setActiveFolderName(activeFolderName == null ? "" : activeFolderName)
-                .setContentAccessScope(
-                        ContentAccessScope.newBuilder()
-                                .setFullContentAccess(contentAccessScope.fullContentAccess())
-                                .addAllAllowedPostIds(contentAccessScope.allowedPostIds())
-                                .addAllAllowedCategoryIds(contentAccessScope.allowedCategoryIds())
-                                .build())
+                .setContentAccessScope(toScope(contentAccessScope))
+                .build();
+    }
+
+    private ContentAccessScope toScope(AgentContentAccessScope contentAccessScope) {
+        return ContentAccessScope.newBuilder()
+                .setFullContentAccess(contentAccessScope.fullContentAccess())
+                .addAllAllowedPostIds(contentAccessScope.allowedPostIds())
+                .addAllAllowedCategoryIds(contentAccessScope.allowedCategoryIds())
                 .build();
     }
 
