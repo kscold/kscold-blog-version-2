@@ -37,7 +37,7 @@ public class ChatAdminController {
                 chatUseCase.saveAndBroadcast(
                         "admin-rest",
                         command.resolvedUsername(),
-                        command.getContent().trim(),
+                        command.getContent(),
                         ChatMessage.MessageType.TEXT,
                         roomId,
                         true);

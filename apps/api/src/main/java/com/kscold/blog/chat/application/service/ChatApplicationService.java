@@ -1,6 +1,7 @@
 package com.kscold.blog.chat.application.service;
 
 import com.kscold.blog.chat.application.dto.response.ChatRoomSummaryResponse;
+import com.kscold.blog.chat.application.model.ChatMessageInputPolicy;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
@@ -39,12 +40,13 @@ public class ChatApplicationService implements ChatUseCase {
             ChatMessage.MessageType type,
             String roomId,
             boolean fromAdmin) {
+        String normalizedContent = ChatMessageInputPolicy.normalizeContent(content);
         ChatMessage message =
                 ChatMessage.builder()
                         .sessionId(sessionId)
                         .roomId(roomId)
                         .username(username)
-                        .content(content)
+                        .content(normalizedContent)
                         .type(type)
                         .fromAdmin(fromAdmin)
                         .timestamp(LocalDateTime.now())
@@ -64,7 +66,7 @@ public class ChatApplicationService implements ChatUseCase {
             boolean fromAdmin) {
         ChatMessage saved = saveMessage(sessionId, username, content, type, roomId, fromAdmin);
         broadcastPort.broadcast(saved);
-        notificationPort.notifyMessage(roomId, username, content, fromAdmin);
+        notificationPort.notifyMessage(roomId, username, saved.getContent(), fromAdmin);
         return saved;
     }
 
@@ -83,8 +85,10 @@ public class ChatApplicationService implements ChatUseCase {
     @Override
     @Transactional
     public void recordSystemEvent(String roomId, String content) {
-        saveMessage(roomId, "SYSTEM", content, ChatMessage.MessageType.SYSTEM, roomId, false);
-        notificationPort.notifySystem(roomId, content);
+        ChatMessage saved =
+                saveMessage(
+                        roomId, "SYSTEM", content, ChatMessage.MessageType.SYSTEM, roomId, false);
+        notificationPort.notifySystem(roomId, saved.getContent());
     }
 
     @Override

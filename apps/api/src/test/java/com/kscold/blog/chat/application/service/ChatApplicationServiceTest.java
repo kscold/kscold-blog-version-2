@@ -1,6 +1,7 @@
 package com.kscold.blog.chat.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -10,6 +11,7 @@ import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
+import com.kscold.blog.exception.InvalidRequestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,16 +40,37 @@ class ChatApplicationServiceTest {
                 chatApplicationService.saveAndBroadcast(
                         "session-1",
                         "visitor",
-                        "안녕하세요",
+                        "  안녕하세요  ",
                         ChatMessage.MessageType.TEXT,
                         "room-1",
                         false);
 
         assertThat(saved.getRoomId()).isEqualTo("room-1");
+        assertThat(saved.getContent()).isEqualTo("안녕하세요");
         assertThat(saved.isFromAdmin()).isFalse();
         assertThat(saved.getVisitorReadAt()).isNotNull();
         verify(broadcastPort).broadcast(saved);
         verify(notificationPort).notifyMessage("room-1", "visitor", "안녕하세요", false);
+    }
+
+    @Test
+    @DisplayName("허용 길이를 넘긴 채팅 메시지는 저장하거나 전송하지 않는다")
+    void saveAndBroadcastRejectsOversizedMessage() {
+        String oversizedContent = "가".repeat(1001);
+
+        assertThatThrownBy(
+                        () ->
+                                chatApplicationService.saveAndBroadcast(
+                                        "session-1",
+                                        "visitor",
+                                        oversizedContent,
+                                        ChatMessage.MessageType.TEXT,
+                                        "room-1",
+                                        false))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessageContaining("최대 1000자");
+
+        verifyNoInteractions(chatMessageRepository, broadcastPort, notificationPort);
     }
 
     @Test

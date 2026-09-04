@@ -2,8 +2,11 @@ package com.kscold.blog.chat.adapter.in.ws;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,7 +15,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
+import com.kscold.blog.chat.domain.model.ChatMessage;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +27,39 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 class ChatWebSocketHandlerTest {
+
+    @Test
+    @DisplayName("시나리오: 허용 길이를 넘긴 웹소켓 메시지는 애플리케이션으로 전달하지 않는다")
+    void oversizedWebSocketMessageIsRejectedBeforeApplicationCall() throws Exception {
+        ChatUseCase chatUseCase = mock(ChatUseCase.class);
+        when(chatUseCase.getRecentMessagesByRoom("user-1", 50)).thenReturn(List.of());
+        WebSocketSession session = mock(WebSocketSession.class);
+        when(session.getId()).thenReturn("session-1");
+        when(session.getAttributes())
+                .thenReturn(
+                        Map.of(
+                                "userId", "user-1",
+                                "username", "visitor",
+                                "isAdmin", false));
+        when(session.isOpen()).thenReturn(true);
+        ChatWebSocketHandler handler = new ChatWebSocketHandler(chatUseCase, new ObjectMapper());
+        handler.afterConnectionEstablished(session);
+        clearInvocations(chatUseCase);
+
+        String payload =
+                new ObjectMapper()
+                        .writeValueAsString(Map.of("type", "message", "content", "가".repeat(1001)));
+        handler.handleTextMessage(session, new TextMessage(payload));
+
+        verify(chatUseCase, never())
+                .saveAndBroadcast(
+                        any(),
+                        any(),
+                        any(),
+                        any(ChatMessage.MessageType.class),
+                        any(),
+                        anyBoolean());
+    }
 
     @Test
     @DisplayName("시나리오: 전송 계층 오류 로그에는 원본 예외 메시지를 남기지 않는다")

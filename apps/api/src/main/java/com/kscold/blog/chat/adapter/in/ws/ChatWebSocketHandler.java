@@ -1,6 +1,7 @@
 package com.kscold.blog.chat.adapter.in.ws;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kscold.blog.chat.application.model.ChatMessageInputPolicy;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
@@ -78,13 +79,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         String type = payload.get("type");
         String content = payload.get("content");
         if (!"message".equals(type) || content == null || content.isBlank()) return;
+        if (content.length() > ChatMessageInputPolicy.CONTENT_MAX_LENGTH) return;
 
         if (!info.isAdmin()) {
             // 방문자 → 저장 + 브로드캐스트 + 디스코드 알림 (application 이 오케스트레이션)
             chatUseCase.saveAndBroadcast(
                     sessionId,
                     info.username(),
-                    content.trim(),
+                    content,
                     ChatMessage.MessageType.TEXT,
                     info.userId(),
                     false);
@@ -98,7 +100,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
             chatUseCase.saveAndBroadcast(
                     sessionId,
                     info.username(),
-                    content.trim(),
+                    content,
                     ChatMessage.MessageType.TEXT,
                     toUserId,
                     true);

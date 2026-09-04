@@ -42,7 +42,7 @@ public class ChatController {
                 chatUseCase.saveAndBroadcast(
                         "user-rest",
                         displayName,
-                        command.getContent().trim(),
+                        command.getContent(),
                         ChatMessage.MessageType.TEXT,
                         userId,
                         false);
