@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.socket.WebSocketHandler;
@@ -58,24 +60,52 @@ class ChatHandshakeInterceptorTest {
     void rejectsLegacyQueryToken() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("token", "query-token");
+        ServerHttpResponse response = mock(ServerHttpResponse.class);
 
-        boolean accepted = handshake(request, new HashMap<>());
+        boolean accepted = handshake(request, response, new HashMap<>());
 
         assertThat(accepted).isFalse();
+        verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
         verify(tokenProvider, never()).validateAccessToken("query-token");
     }
 
     @Test
     void rejectsMissingToken() {
-        boolean accepted = handshake(new MockHttpServletRequest(), new HashMap<>());
+        ServerHttpResponse response = mock(ServerHttpResponse.class);
+
+        boolean accepted = handshake(new MockHttpServletRequest(), response, new HashMap<>());
 
         assertThat(accepted).isFalse();
+        verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void rejectsTokenForMissingUserWithUnauthorizedStatus() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setCookies(new Cookie("auth-token", "valid-token"));
+        when(tokenProvider.validateAccessToken("valid-token")).thenReturn(true);
+        when(tokenProvider.getUserIdFromAccessToken("valid-token")).thenReturn("missing-user-id");
+        when(userQueryPort.getUserById("missing-user-id"))
+                .thenThrow(new IllegalArgumentException("missing"));
+        ServerHttpResponse response = mock(ServerHttpResponse.class);
+
+        boolean accepted = handshake(request, response, new HashMap<>());
+
+        assertThat(accepted).isFalse();
+        verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
     }
 
     private boolean handshake(MockHttpServletRequest request, Map<String, Object> attributes) {
+        return handshake(request, mock(ServerHttpResponse.class), attributes);
+    }
+
+    private boolean handshake(
+            MockHttpServletRequest request,
+            ServerHttpResponse response,
+            Map<String, Object> attributes) {
         return interceptor.beforeHandshake(
                 new ServletServerHttpRequest(request),
-                mock(org.springframework.http.server.ServerHttpResponse.class),
+                response,
                 mock(WebSocketHandler.class),
                 attributes);
     }

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -38,7 +39,7 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
         String token = resolveCookieToken(servletRequest.getServletRequest());
         if (token == null || token.isBlank() || !tokenProvider.validateAccessToken(token)) {
             log.warn("WebSocket 연결 거부: 유효하지 않은 토큰");
-            return false;
+            return rejectUnauthorized(response);
         }
 
         String userId = tokenProvider.getUserIdFromAccessToken(token);
@@ -47,13 +48,18 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
             user = userQueryPort.getUserById(userId);
         } catch (Exception e) {
             log.warn("WebSocket 연결 거부: 존재하지 않는 사용자");
-            return false;
+            return rejectUnauthorized(response);
         }
 
         attributes.put("userId", userId);
         attributes.put("username", user.displayName());
         attributes.put("isAdmin", user.isAdmin());
         return true;
+    }
+
+    private boolean rejectUnauthorized(ServerHttpResponse response) {
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return false;
     }
 
     @Override
