@@ -1,0 +1,39 @@
+name: Agent CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/agent/**'
+      - 'apps/api/src/main/proto/vault_agent.proto'
+      - '.github/workflows/agent-ci.yml'
+  pull_request:
+    paths:
+      - 'apps/agent/**'
+      - 'apps/api/src/main/proto/vault_agent.proto'
+      - '.github/workflows/agent-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: 소스 체크아웃
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Agent 이미지 빌드
+        run: docker build --file apps/agent/Dockerfile --tag kscold-vault-agent:ci .
+
+      - name: Python 의존성 일관성 검사
+        run: docker run --rm --env PIP_NO_CACHE_DIR=1 --entrypoint python kscold-vault-agent:ci -m pip check
+
+      - name: Python 소스 컴파일 검사
+        run: docker run --rm --env PYTHONPYCACHEPREFIX=/tmp/pycache --entrypoint python kscold-vault-agent:ci -m compileall -q /service/src
