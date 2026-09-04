@@ -6,9 +6,6 @@ import com.kscold.blog.analytics.domain.model.PageVisitLog;
 import com.kscold.blog.analytics.domain.model.PathStat;
 import com.kscold.blog.analytics.domain.model.VisitEntry;
 import com.kscold.blog.analytics.domain.port.out.PageVisitLogRepository;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -54,7 +51,10 @@ public class PageVisitService implements PageVisitUseCase {
         PageVisitLog entry =
                 PageVisitLog.builder()
                         .path(normalized)
-                        .ipHash(hash(clientIp))
+                        .ipHash(
+                                StringUtils.hasText(clientIp)
+                                        ? IpAddressHasher.hash(clientIp)
+                                        : "anon")
                         .userId(StringUtils.hasText(userId) ? userId : null)
                         .username(StringUtils.hasText(username) ? username : null)
                         .createdAt(Instant.now())
@@ -87,18 +87,5 @@ public class PageVisitService implements PageVisitUseCase {
         if (q >= 0) p = p.substring(0, q);
         if (p.isEmpty()) p = "/";
         return p;
-    }
-
-    private String hash(String raw) {
-        if (!StringUtils.hasText(raw)) return "anon";
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(raw.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : digest) sb.append(String.format("%02x", b));
-            return sb.substring(0, 32);
-        } catch (NoSuchAlgorithmException e) {
-            return raw;
-        }
     }
 }
