@@ -103,8 +103,8 @@ public class PostController {
 
     private void recordView(Post post, HttpServletRequest request) {
         if (post.getStatus() != Post.Status.PUBLISHED) return;
-        String ip = clientIdentifierResolver.resolve(request);
-        if (viewCounter.incrementIfUnique("posts", post.getId(), "POST", ip)) {
+        String clientIdentifier = clientIdentifierResolver.resolve(request);
+        if (viewCounter.incrementIfUnique("posts", post.getId(), "POST", clientIdentifier)) {
             post.setViews(post.getViews() + 1); // 응답에 최신값 반영
         }
     }

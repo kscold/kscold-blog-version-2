@@ -12,7 +12,7 @@ public interface PageVisitUseCase {
     /** 페이지 방문 기록 (실존 라우트만 집계) */
     void record(
             String path,
-            @Nullable String clientIp,
+            @Nullable String clientIdentifier,
             @Nullable String userId,
             @Nullable String username);
 

@@ -25,22 +25,20 @@ public class ViewCounter {
      * @param collectionName Post/Feed/VaultNote의 Mongo 컬렉션명
      * @param entityId 문서 ID
      * @param entityType ViewLog 분류 키 (POST/FEED/VAULT_NOTE)
-     * @param clientIp 클라이언트 IP
+     * @param clientIdentifier 요청 경계에서 단방향 변환한 클라이언트 식별자
      * @return 실제로 증가했으면 true
      */
     public boolean incrementIfUnique(
-            String collectionName, String entityId, String entityType, String clientIp) {
-        if (!StringUtils.hasText(entityId) || !StringUtils.hasText(clientIp)) {
+            String collectionName, String entityId, String entityType, String clientIdentifier) {
+        if (!StringUtils.hasText(entityId) || !StringUtils.hasText(clientIdentifier)) {
             return false;
         }
-
-        String ipHash = IpAddressHasher.hash(clientIp);
 
         ViewLog viewLog =
                 ViewLog.builder()
                         .entityType(entityType)
                         .entityId(entityId)
-                        .ipHash(ipHash)
+                        .ipHash(clientIdentifier)
                         .createdAt(Instant.now())
                         .build();
         if (!viewLogRepository.insertViewLogIfUnique(viewLog)) {

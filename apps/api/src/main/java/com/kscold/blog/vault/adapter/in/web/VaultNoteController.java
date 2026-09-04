@@ -66,8 +66,9 @@ public class VaultNoteController {
     }
 
     private void recordNoteView(VaultNote note, HttpServletRequest request) {
-        String ip = clientIdentifierResolver.resolve(request);
-        if (viewCounter.incrementIfUnique("vault_notes", note.getId(), "VAULT_NOTE", ip)) {
+        String clientIdentifier = clientIdentifierResolver.resolve(request);
+        if (viewCounter.incrementIfUnique(
+                "vault_notes", note.getId(), "VAULT_NOTE", clientIdentifier)) {
             note.setViews(note.getViews() + 1);
         }
     }

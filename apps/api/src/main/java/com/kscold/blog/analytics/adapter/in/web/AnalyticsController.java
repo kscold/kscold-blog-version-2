@@ -39,10 +39,10 @@ public class AnalyticsController {
             return ResponseEntity.ok(ApiResponse.success(null));
         }
 
-        String ip = clientIdentifierResolver.resolve(request);
+        String clientIdentifier = clientIdentifierResolver.resolve(request);
         String resolvedUserId = resolveUserId(userId);
         String username = resolveUsername(resolvedUserId);
-        pageVisitService.record(body.getPath(), ip, resolvedUserId, username);
+        pageVisitService.record(body.getPath(), clientIdentifier, resolvedUserId, username);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 
 import com.kscold.blog.analytics.domain.model.PageVisitLog;
 import com.kscold.blog.analytics.domain.port.out.PageVisitLogRepository;
+import com.kscold.blog.shared.security.OneWayIdentifierHasher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -24,8 +25,9 @@ class PageVisitServiceTest {
 
     @Test
     void recordsNewPublicRouteFamilies() {
-        service.record("/product", "203.0.113.10", null, null);
-        service.record("/profile/kscold", "203.0.113.10", "user-1", "김승찬");
+        String clientIdentifier = OneWayIdentifierHasher.hash("203.0.113.10|browser");
+        service.record("/product", clientIdentifier, null, null);
+        service.record("/profile/kscold", clientIdentifier, "user-1", "김승찬");
         service.record("/tags/AI%20Agent", null, null, null);
 
         ArgumentCaptor<PageVisitLog> logs = ArgumentCaptor.forClass(PageVisitLog.class);
@@ -33,7 +35,7 @@ class PageVisitServiceTest {
         assertThat(logs.getAllValues())
                 .extracting(PageVisitLog::getPath)
                 .containsExactly("/product", "/profile/kscold", "/tags/AI%20Agent");
-        assertThat(logs.getAllValues().getFirst().getIpHash()).hasSize(64);
+        assertThat(logs.getAllValues().getFirst().getIpHash()).isEqualTo(clientIdentifier);
         assertThat(logs.getAllValues().get(2).getIpHash()).isEqualTo("anon");
     }
 

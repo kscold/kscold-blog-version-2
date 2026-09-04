@@ -42,7 +42,7 @@ public class PageVisitService implements PageVisitUseCase {
     @Override
     public void record(
             String path,
-            @Nullable String clientIp,
+            @Nullable String clientIdentifier,
             @Nullable String userId,
             @Nullable String username) {
         if (!StringUtils.hasText(path)) return;
@@ -54,10 +54,7 @@ public class PageVisitService implements PageVisitUseCase {
         PageVisitLog entry =
                 PageVisitLog.builder()
                         .path(normalized)
-                        .ipHash(
-                                StringUtils.hasText(clientIp)
-                                        ? IpAddressHasher.hash(clientIp)
-                                        : "anon")
+                        .ipHash(StringUtils.hasText(clientIdentifier) ? clientIdentifier : "anon")
                         .userId(StringUtils.hasText(userId) ? userId : null)
                         .username(StringUtils.hasText(username) ? username : null)
                         .createdAt(Instant.now())
