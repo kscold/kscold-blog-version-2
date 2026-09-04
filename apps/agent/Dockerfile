@@ -1,5 +1,8 @@
 FROM python:3.11-slim
 
+ARG PIP_VERSION=26.2.1
+ARG SETUPTOOLS_VERSION=83.0.0
+
 WORKDIR /service
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -7,7 +10,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/service/src
 
 COPY apps/agent/requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir --upgrade \
+    "pip==${PIP_VERSION}" \
+    "setuptools==${SETUPTOOLS_VERSION}" && \
+    python -m pip install --no-cache-dir -r requirements.txt
 
 COPY apps/api/src/main/proto/vault_agent.proto ./proto/vault_agent.proto
 COPY apps/agent/src ./src
