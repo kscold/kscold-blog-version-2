@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { usePosts, usePostsByCategory, useSearchPosts } from '@/entities/post';
 import { useCategories } from '@/entities/category';
+import {
+  normalizePublicSearchQuery,
+  PUBLIC_SEARCH_QUERY_MAX_LENGTH,
+} from '@/shared/lib/search';
 import type { PageResponse } from '@/shared/model/types/api';
 import type { Category, Post } from '@/shared/model/types/blog';
 import BlogPostGrid from './BlogPostGrid';
@@ -22,7 +26,7 @@ export function BlogContainer({ initialPosts, initialCategories }: BlogContainer
   // 검색어 디바운스 처리 (300ms)
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
+      setDebouncedQuery(normalizePublicSearchQuery(searchQuery));
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
@@ -75,6 +79,7 @@ export function BlogContainer({ initialPosts, initialCategories }: BlogContainer
         <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto">
           <input
             type="text"
+            maxLength={PUBLIC_SEARCH_QUERY_MAX_LENGTH}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="포스트 검색..."

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
+import { normalizePublicSearchQuery } from '@/shared/lib/search';
 import { Post } from '@/shared/model/types/blog';
 import { PageResponse } from '@/shared/model/types/api';
 
@@ -94,13 +95,15 @@ export function usePostsByTag(options: UsePostsByTagOptions) {
 }
 
 export function useSearchPosts(query: string, page: number = 0, size: number = 10) {
+  const normalizedQuery = normalizePublicSearchQuery(query);
+
   return useQuery({
-    queryKey: ['posts', 'search', query, { page, size }],
+    queryKey: ['posts', 'search', normalizedQuery, { page, size }],
     queryFn: () =>
       apiClient.get<PageResponse<Post>>(
-        `/posts/search?q=${encodeURIComponent(query)}&page=${page}&size=${size}`
+        `/posts/search?q=${encodeURIComponent(normalizedQuery)}&page=${page}&size=${size}`
       ),
-    enabled: !!query && query.length > 0,
+    enabled: normalizedQuery.length > 0,
   });
 }
 

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
+import { normalizePublicSearchQuery } from '@/shared/lib/search';
 import {
   GraphData,
   VaultBacklink,
@@ -81,13 +82,15 @@ export function useVaultStats(enabled = true) {
 }
 
 export function useVaultSearch(query: string, page: number = 0) {
+  const normalizedQuery = normalizePublicSearchQuery(query);
+
   return useQuery({
-    queryKey: ['vault', 'search', query, page],
+    queryKey: ['vault', 'search', normalizedQuery, page],
     queryFn: () =>
       apiClient.get<PageResponse<VaultNote>>(
-        `/vault/notes/search?q=${encodeURIComponent(query)}&page=${page}`
+        `/vault/notes/search?q=${encodeURIComponent(normalizedQuery)}&page=${page}`
       ),
-    enabled: !!query && query.length > 0,
+    enabled: normalizedQuery.length > 0,
   });
 }
 
