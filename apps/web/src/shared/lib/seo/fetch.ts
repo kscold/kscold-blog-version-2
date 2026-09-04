@@ -2,6 +2,19 @@ import { cookies } from 'next/headers';
 import type { PageResponse } from '@/shared/model/types/api';
 import { API_BASE_URL } from './constants';
 
+const DEFAULT_SEO_API_TIMEOUT_MS = 8_000;
+const MAX_SEO_API_TIMEOUT_MS = 300_000;
+
+function getSeoApiTimeoutMs() {
+  const configuredTimeout = Number(process.env.SEO_API_TIMEOUT_MS);
+
+  return Number.isInteger(configuredTimeout) &&
+    configuredTimeout > 0 &&
+    configuredTimeout <= MAX_SEO_API_TIMEOUT_MS
+    ? configuredTimeout
+    : DEFAULT_SEO_API_TIMEOUT_MS;
+}
+
 export async function fetchPublicApi<T>(path: string, revalidate = 3600): Promise<T | null> {
   return fetchSeoApi<T>(
     path,
@@ -47,9 +60,7 @@ export async function fetchViewerApi<T>(path: string): Promise<T | null> {
   return fetchSeoApi<T>(
     path,
     {
-      headers: authToken
-        ? { Cookie: `auth-token=${authToken}` }
-        : {},
+      headers: authToken ? { Cookie: `auth-token=${authToken}` } : {},
       cache: 'no-store',
     },
     [401, 403, 404]
@@ -66,7 +77,10 @@ async function fetchSeoApi<T>(
   let response: Response;
 
   try {
-    response = await fetch(requestUrl, init);
+    response = await fetch(requestUrl, {
+      ...init,
+      signal: AbortSignal.timeout(getSeoApiTimeoutMs()),
+    });
   } catch {
     throw new Error('SEO API에 연결할 수 없습니다.');
   }
