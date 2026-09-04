@@ -40,7 +40,7 @@ public class AdminNightController {
 
     @PostMapping("/admin-night/requests")
     public ResponseEntity<ApiResponse<RequestResponse>> createRequest(
-            @AuthenticationPrincipal String userId, @RequestBody CreateRequest body) {
+            @AuthenticationPrincipal String userId, @Valid @RequestBody CreateRequest body) {
         AdminNightRequest request =
                 adminNightUseCase.createRequest(
                         userId,
@@ -58,7 +58,7 @@ public class AdminNightController {
     public ResponseEntity<ApiResponse<RequestResponse>> resubmitRequest(
             @PathVariable String id,
             @AuthenticationPrincipal String userId,
-            @RequestBody CreateRequest body) {
+            @Valid @RequestBody CreateRequest body) {
         AdminNightRequest request =
                 adminNightUseCase.resubmit(
                         id,
@@ -158,7 +158,7 @@ public class AdminNightController {
     public ResponseEntity<ApiResponse<RequestResponse>> approve(
             @PathVariable String id,
             @AuthenticationPrincipal String userId,
-            @RequestBody ApproveRequest body) {
+            @Valid @RequestBody ApproveRequest body) {
         AdminNightRequest request =
                 adminNightUseCase.approve(
                         id,
@@ -174,7 +174,7 @@ public class AdminNightController {
     public ResponseEntity<ApiResponse<RequestResponse>> reject(
             @PathVariable String id,
             @AuthenticationPrincipal String userId,
-            @RequestBody(required = false) ReviewRequest body) {
+            @Valid @RequestBody(required = false) ReviewRequest body) {
         AdminNightRequest request =
                 adminNightUseCase.reject(id, userId, body != null ? body.getReviewNote() : null);
         return ResponseEntity.ok(
@@ -186,7 +186,7 @@ public class AdminNightController {
     public ResponseEntity<ApiResponse<RequestResponse>> requestMoreInfo(
             @PathVariable String id,
             @AuthenticationPrincipal String userId,
-            @RequestBody ReviewRequest body) {
+            @Valid @RequestBody ReviewRequest body) {
         AdminNightRequest request =
                 adminNightUseCase.requestMoreInfo(id, userId, body.getReviewNote());
         return ResponseEntity.ok(
