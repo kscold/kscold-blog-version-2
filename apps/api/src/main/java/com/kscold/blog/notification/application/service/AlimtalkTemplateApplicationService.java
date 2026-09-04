@@ -9,6 +9,7 @@ import com.kscold.blog.notification.domain.model.AlimtalkTemplateStatus;
 import com.kscold.blog.notification.domain.port.out.AlimtalkTemplateRepository;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -26,7 +27,7 @@ public class AlimtalkTemplateApplicationService implements AlimtalkTemplateUseCa
             repository
                     .findByTemplateKey(defaults.getTemplateKey())
                     .ifPresentOrElse(
-                            existing -> refreshIfDraft(existing, defaults),
+                            existing -> refreshFromDefaults(existing, defaults),
                             () -> repository.save(defaults));
         }
     }
@@ -36,19 +37,53 @@ public class AlimtalkTemplateApplicationService implements AlimtalkTemplateUseCa
      *
      * <p>SUBMITTED·APPROVED 는 카카오에 등록된 본문과 글자까지 같아야 하므로 코드가 덮어쓰지 않는다.
      */
-    private void refreshIfDraft(AlimtalkTemplate existing, AlimtalkTemplate defaults) {
-        if (existing.getStatus() != AlimtalkTemplateStatus.DRAFT) {
-            return;
+    private void refreshFromDefaults(AlimtalkTemplate existing, AlimtalkTemplate defaults) {
+        boolean changed = backfillPresentation(existing, defaults);
+        if (existing.getStatus() == AlimtalkTemplateStatus.DRAFT
+                && hasDraftDifference(existing, defaults)) {
+            copyDraftFields(existing, defaults);
+            changed = true;
         }
-        if (defaults.getBody().equals(existing.getBody())
-                && defaults.getVariables().equals(existing.getVariables())) {
-            return;
+        if (changed) {
+            repository.save(existing);
         }
+    }
+
+    private boolean backfillPresentation(AlimtalkTemplate existing, AlimtalkTemplate defaults) {
+        boolean changed = false;
+        if (existing.getTemplateType() == null) {
+            existing.setTemplateType(defaults.getTemplateType());
+            changed = true;
+        }
+        if (existing.getEmphasisTitle() == null && defaults.getEmphasisTitle() != null) {
+            existing.setEmphasisTitle(defaults.getEmphasisTitle());
+            changed = true;
+        }
+        if (existing.getEmphasisSubtitle() == null && defaults.getEmphasisSubtitle() != null) {
+            existing.setEmphasisSubtitle(defaults.getEmphasisSubtitle());
+            changed = true;
+        }
+        return changed;
+    }
+
+    private boolean hasDraftDifference(AlimtalkTemplate existing, AlimtalkTemplate defaults) {
+        return !Objects.equals(existing.getName(), defaults.getName())
+                || !Objects.equals(existing.getPurpose(), defaults.getPurpose())
+                || !Objects.equals(existing.getBody(), defaults.getBody())
+                || !Objects.equals(existing.getTemplateType(), defaults.getTemplateType())
+                || !Objects.equals(existing.getEmphasisTitle(), defaults.getEmphasisTitle())
+                || !Objects.equals(existing.getEmphasisSubtitle(), defaults.getEmphasisSubtitle())
+                || !Objects.equals(existing.getVariables(), defaults.getVariables());
+    }
+
+    private void copyDraftFields(AlimtalkTemplate existing, AlimtalkTemplate defaults) {
         existing.setName(defaults.getName());
         existing.setPurpose(defaults.getPurpose());
         existing.setBody(defaults.getBody());
+        existing.setTemplateType(defaults.getTemplateType());
+        existing.setEmphasisTitle(defaults.getEmphasisTitle());
+        existing.setEmphasisSubtitle(defaults.getEmphasisSubtitle());
         existing.setVariables(defaults.getVariables());
-        repository.save(existing);
     }
 
     @Override

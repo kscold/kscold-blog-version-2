@@ -29,6 +29,9 @@ public class AlimtalkTemplate {
     private String name;
     private String purpose;
     private String body;
+    @Builder.Default private AlimtalkTemplateType templateType = AlimtalkTemplateType.BASIC;
+    private String emphasisTitle;
+    private String emphasisSubtitle;
 
     @Builder.Default private List<String> variables = new ArrayList<>();
 

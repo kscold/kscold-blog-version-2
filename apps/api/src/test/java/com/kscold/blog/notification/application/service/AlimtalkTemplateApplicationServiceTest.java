@@ -3,12 +3,12 @@ package com.kscold.blog.notification.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.notification.domain.model.AlimtalkTemplate;
 import com.kscold.blog.notification.domain.model.AlimtalkTemplateStatus;
+import com.kscold.blog.notification.domain.model.AlimtalkTemplateType;
 import com.kscold.blog.notification.domain.port.out.AlimtalkTemplateRepository;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +55,8 @@ class AlimtalkTemplateApplicationServiceTest {
                         .orElseThrow();
         assertThat(saved.getBody()).contains("입금 계좌", "입금 기한");
         assertThat(saved.getVariables()).contains("#{입금계좌}", "#{입금기한}");
+        assertThat(saved.getTemplateType()).isEqualTo(AlimtalkTemplateType.EMPHASIS);
+        assertThat(saved.getEmphasisTitle()).isEqualTo("[KSCOLD] 공동 구독 정산 안내");
     }
 
     @Test
@@ -66,6 +68,7 @@ class AlimtalkTemplateApplicationServiceTest {
                         .body("카카오에 승인된 본문")
                         .variables(List.of("#{이름}"))
                         .externalTemplateId("approved-id")
+                        .templateType(null)
                         .status(AlimtalkTemplateStatus.APPROVED)
                         .build();
         // 승인 템플릿만 존재하고 나머지 기본 템플릿은 없는 상태로 둔다.
@@ -75,6 +78,8 @@ class AlimtalkTemplateApplicationServiceTest {
         service.seedDefaults();
 
         assertThat(approved.getBody()).isEqualTo("카카오에 승인된 본문");
-        verify(repository, never()).save(approved);
+        assertThat(approved.getTemplateType()).isEqualTo(AlimtalkTemplateType.EMPHASIS);
+        assertThat(approved.getEmphasisSubtitle()).isEqualTo("확정된 공동 구독 정산 내역입니다.");
+        verify(repository).save(approved);
     }
 }

@@ -2,6 +2,7 @@ package com.kscold.blog.notification.application.service;
 
 import com.kscold.blog.notification.domain.model.AlimtalkTemplate;
 import com.kscold.blog.notification.domain.model.AlimtalkTemplateStatus;
+import com.kscold.blog.notification.domain.model.AlimtalkTemplateType;
 import java.util.List;
 
 final class AlimtalkTemplateDefaults {
@@ -12,27 +13,7 @@ final class AlimtalkTemplateDefaults {
         return List.of(
                 // 카카오 승인 완료(2026-09-04). 본문은 승인본과 글자까지 같아야 하므로 임의로 고치지 말 것.
                 // 강조 핵심문구 "[KSCOLD] 공동 구독 정산 안내"와 보조문구는 카카오 콘솔에만 있는 값이라 본문에 넣지 않는다.
-                template(
-                        "STACK_SHARE_SETTLEMENT",
-                        "KSCOLD 공동 구독 정산 안내",
-                        "공동 구독 참여자에게 월별 분담금과 입금 계좌를 안내합니다.",
-                        """
-                        #{이름}님, #{정산기간} #{서비스명} 공동 구독 정산 내역입니다.
-
-                        총 결제 금액: #{총금액}
-                        참여 인원: #{참여인원}명
-                        내 분담금: #{분담금}
-
-                        아래 계좌로 입금해주세요.
-                        입금 계좌: #{입금계좌}
-                        입금 기한: #{입금기한}
-                        문의: #{연락처}
-
-                        금액이나 참여 정보가 다르면 입금 전에 알려주세요.
-                        """,
-                        List.of(
-                                "#{이름}", "#{정산기간}", "#{서비스명}", "#{총금액}", "#{참여인원}", "#{분담금}",
-                                "#{입금계좌}", "#{입금기한}", "#{연락처}")),
+                settlementTemplate(),
                 template(
                         "SIGNUP_WELCOME",
                         "KSCOLD 가입 안내",
@@ -104,7 +85,39 @@ final class AlimtalkTemplateDefaults {
                 .name(name)
                 .purpose(purpose)
                 .body(body)
+                .templateType(AlimtalkTemplateType.BASIC)
                 .variables(variables)
+                .status(AlimtalkTemplateStatus.DRAFT)
+                .build();
+    }
+
+    private static AlimtalkTemplate settlementTemplate() {
+        return AlimtalkTemplate.builder()
+                .templateKey("STACK_SHARE_SETTLEMENT")
+                .name("KSCOLD 공동 구독 정산 안내")
+                .purpose("공동 구독 참여자에게 월별 분담금과 입금 계좌를 안내합니다.")
+                .body(
+                        """
+                        #{이름}님, #{정산기간} #{서비스명} 공동 구독 정산 내역입니다.
+
+                        총 결제 금액: #{총금액}
+                        참여 인원: #{참여인원}명
+                        내 분담금: #{분담금}
+
+                        아래 계좌로 입금해주세요.
+                        입금 계좌: #{입금계좌}
+                        입금 기한: #{입금기한}
+                        문의: #{연락처}
+
+                        금액이나 참여 정보가 다르면 입금 전에 알려주세요.
+                        """)
+                .templateType(AlimtalkTemplateType.EMPHASIS)
+                .emphasisTitle("[KSCOLD] 공동 구독 정산 안내")
+                .emphasisSubtitle("확정된 공동 구독 정산 내역입니다.")
+                .variables(
+                        List.of(
+                                "#{이름}", "#{정산기간}", "#{서비스명}", "#{총금액}", "#{참여인원}", "#{분담금}",
+                                "#{입금계좌}", "#{입금기한}", "#{연락처}"))
                 .status(AlimtalkTemplateStatus.DRAFT)
                 .build();
     }

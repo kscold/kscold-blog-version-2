@@ -2,6 +2,7 @@ package com.kscold.blog.notification.adapter.in.web.dto.response;
 
 import com.kscold.blog.notification.domain.model.AlimtalkTemplate;
 import com.kscold.blog.notification.domain.model.AlimtalkTemplateStatus;
+import com.kscold.blog.notification.domain.model.AlimtalkTemplateType;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,9 @@ public class AlimtalkTemplateResponse {
     private String name;
     private String purpose;
     private String body;
+    private AlimtalkTemplateType templateType;
+    private String emphasisTitle;
+    private String emphasisSubtitle;
     private List<String> variables;
     private String externalTemplateId;
     private AlimtalkTemplateStatus status;
@@ -30,6 +34,9 @@ public class AlimtalkTemplateResponse {
                 .name(template.getName())
                 .purpose(template.getPurpose())
                 .body(template.getBody())
+                .templateType(template.getTemplateType())
+                .emphasisTitle(template.getEmphasisTitle())
+                .emphasisSubtitle(template.getEmphasisSubtitle())
                 .variables(template.getVariables())
                 .externalTemplateId(template.getExternalTemplateId())
                 .status(template.getStatus())
