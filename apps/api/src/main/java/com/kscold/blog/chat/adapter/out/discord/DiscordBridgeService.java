@@ -48,10 +48,15 @@ public class DiscordBridgeService implements ChatNotificationPort {
             ThreadChannel thread = jda.getThreadChannelById(threadId);
             if (isUsableThread(thread)) {
                 thread.sendMessage("📋 " + content)
-                        .queue(ok -> {}, err -> log.error("Discord 시스템 메시지 전송 실패", err));
+                        .queue(
+                                ok -> {},
+                                error ->
+                                        log.error(
+                                                "Discord 시스템 메시지 전송 실패: type={}",
+                                                error.getClass().getSimpleName()));
             }
         } catch (Exception e) {
-            log.error("Discord 시스템 메시지 전송 실패: {}", e.getMessage());
+            log.error("Discord 시스템 메시지 전송 실패: type={}", e.getClass().getSimpleName());
         }
     }
 
@@ -62,7 +67,7 @@ public class DiscordBridgeService implements ChatNotificationPort {
         try {
             TextChannel channel = jda.getTextChannelById(discordProperties.getChannelId());
             if (channel == null) {
-                log.error("Discord 채널을 찾을 수 없음: {}", discordProperties.getChannelId());
+                log.error("Discord 채널을 찾을 수 없음");
                 return;
             }
             if (!discordProperties.isConfiguredGuild(channel.getGuild().getId())) {
@@ -73,15 +78,20 @@ public class DiscordBridgeService implements ChatNotificationPort {
             ThreadChannel thread = resolveThreadForRoom(jda, channel, roomId, username);
 
             if (thread == null) {
-                log.error("Discord 스레드를 생성하거나 복구하지 못했습니다. roomId={}", roomId);
+                log.error("Discord 스레드를 생성하거나 복구하지 못했습니다.");
                 return;
             }
 
             thread.sendMessageEmbeds(DiscordMessageEmbeds.visitorMessage(username, content).build())
-                    .queue(ok -> {}, err -> log.error("Discord 방문자 메시지 전송 실패", err));
+                    .queue(
+                            ok -> {},
+                            error ->
+                                    log.error(
+                                            "Discord 방문자 메시지 전송 실패: type={}",
+                                            error.getClass().getSimpleName()));
 
         } catch (Exception e) {
-            log.error("Discord 메시지 전송 실패: {}", e.getMessage());
+            log.error("Discord 메시지 전송 실패: type={}", e.getClass().getSimpleName());
         }
     }
 
@@ -97,10 +107,15 @@ public class DiscordBridgeService implements ChatNotificationPort {
             if (isUsableThread(thread)) {
                 thread.sendMessageEmbeds(
                                 DiscordMessageEmbeds.adminReply(adminName, content).build())
-                        .queue(ok -> {}, err -> log.error("Discord 어드민 답장 로깅 실패", err));
+                        .queue(
+                                ok -> {},
+                                error ->
+                                        log.error(
+                                                "Discord 어드민 답장 로깅 실패: type={}",
+                                                error.getClass().getSimpleName()));
             }
         } catch (Exception e) {
-            log.error("Discord 어드민 답장 로깅 실패: {}", e.getMessage());
+            log.error("Discord 어드민 답장 로깅 실패: type={}", e.getClass().getSimpleName());
         }
     }
 
@@ -143,7 +158,12 @@ public class DiscordBridgeService implements ChatNotificationPort {
 
         createdThread
                 .sendMessageEmbeds(DiscordMessageEmbeds.threadOpened(username, roomId).build())
-                .queue(ok -> {}, err -> log.error("Discord 스레드 오픈 안내 전송 실패", err));
+                .queue(
+                        ok -> {},
+                        error ->
+                                log.error(
+                                        "Discord 스레드 오픈 안내 전송 실패: type={}",
+                                        error.getClass().getSimpleName()));
 
         return createdThread;
     }

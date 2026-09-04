@@ -130,7 +130,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     @Override
     public void handleTransportError(
             @NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
-        log.error("WebSocket error for session {}: {}", session.getId(), exception.getMessage());
+        log.error(
+                "WebSocket error for session {}: type={}",
+                session.getId(),
+                exception.getClass().getSimpleName());
         session.close(CloseStatus.SERVER_ERROR);
     }
 
@@ -191,7 +194,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
                 session.sendMessage(new TextMessage(objectMapper.writeValueAsString(payload)));
             }
         } catch (Exception e) {
-            log.error("Failed to send to session {}: {}", session.getId(), e.getMessage());
+            log.error(
+                    "Failed to send to session {}: type={}",
+                    session.getId(),
+                    e.getClass().getSimpleName());
         }
     }
 
