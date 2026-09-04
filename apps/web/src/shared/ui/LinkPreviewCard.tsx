@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { LinkPreview } from '@/shared/model/types/social';
 
 interface LinkPreviewCardProps {
@@ -21,12 +20,15 @@ export function LinkPreviewCard({ preview }: LinkPreviewCardProps) {
     >
       {preview.image && (
         <div className="relative h-40 overflow-hidden bg-surface-100">
-          <Image
+          {/* 링크 미리보기는 임의 외부 사이트 이미지이므로 서버 이미지 프록시를 거치지 않는다. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={preview.image}
             alt={preview.title || ''}
-            fill
-            sizes="(max-width: 768px) 100vw, 400px"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
       )}
