@@ -159,7 +159,7 @@ export function FeedCard({
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold text-surface-900 group-hover:text-surface-600 transition-colors">{feed.author.name}</p>
-              <p className="text-xs text-surface-400">{formatRelativeTime(feed.createdAt)}</p>
+              <p className="text-xs text-surface-600">{formatRelativeTime(feed.createdAt)}</p>
             </div>
           </Link>
         ) : (
@@ -175,7 +175,7 @@ export function FeedCard({
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold text-surface-900">{feed.author.name}</p>
-              <p className="text-xs text-surface-400">{formatRelativeTime(feed.createdAt)}</p>
+              <p className="text-xs text-surface-600">{formatRelativeTime(feed.createdAt)}</p>
             </div>
           </div>
         )}
@@ -199,7 +199,7 @@ export function FeedCard({
             <Link
               key={tag}
               href={`/tags/${encodeURIComponent(tag)}`}
-              className="text-xs font-bold text-surface-400 hover:text-surface-700 transition-colors"
+              className="text-xs font-bold text-surface-600 hover:text-surface-900 transition-colors"
               onClick={e => e.stopPropagation()}
             >
               #{tag}
@@ -223,7 +223,7 @@ export function FeedCard({
         <div className={`${gutter} pb-3`}>
           <Link
             href={`/feed/${feed.id}`}
-            className="text-sm text-surface-400 hover:text-surface-600 transition-colors"
+            className="text-sm text-surface-600 hover:text-surface-900 transition-colors"
           >
             댓글 {feed.commentsCount}개 모두 보기
           </Link>

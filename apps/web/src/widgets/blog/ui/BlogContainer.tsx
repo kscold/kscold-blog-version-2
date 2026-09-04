@@ -82,6 +82,7 @@ export function BlogContainer({ initialPosts, initialCategories }: BlogContainer
           />
           <button
             type="submit"
+            aria-label="포스트 검색"
             className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-900 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -12,6 +12,7 @@ interface PostCardProps {
   post: Post;
   featured?: boolean;
   titleOnly?: boolean;
+  headingLevel?: 2 | 3;
 }
 
 function LockIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
@@ -52,7 +53,12 @@ function RestrictedPostBadge({ compact = false }: { compact?: boolean }) {
   );
 }
 
-export function PostCard({ post, featured = false, titleOnly = false }: PostCardProps) {
+export function PostCard({
+  post,
+  featured = false,
+  titleOnly = false,
+  headingLevel = 3,
+}: PostCardProps) {
   const { allowRichEffects, supportsHover, reduceMotion, isTouchDevice } = usePerformanceMode();
   const visibleTags = filterVisibleTagInfos(post.tags);
   const isRestricted = Boolean(post.restricted);
@@ -65,6 +71,7 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
         timeZone: 'Asia/Seoul',
       })
     : '';
+  const Heading = headingLevel === 2 ? 'h2' : 'h3';
 
   if (titleOnly) {
     return (
@@ -73,9 +80,9 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
         className="group block border-b border-surface-200 py-5 transition-colors hover:text-surface-600"
       >
         <div className="flex items-center gap-2">
-          <h3 className="font-sans font-black text-xl tracking-tight text-surface-900 group-hover:text-surface-600 transition-colors">
+          <Heading className="font-sans font-black text-xl tracking-tight text-surface-900 group-hover:text-surface-600 transition-colors">
             {post.title}
-          </h3>
+          </Heading>
           {isRestricted && <RestrictedPostBadge compact />}
         </div>
       </Link>
@@ -134,13 +141,13 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
             {isRestricted && <RestrictedPostBadge />}
           </div>
 
-          <h3
+          <Heading
             className={`font-sans font-black tracking-tight text-surface-900 mb-3 group-hover:text-surface-600 transition-colors ${
               featured ? 'text-3xl' : 'text-xl'
             }`}
           >
             {post.title}
-          </h3>
+          </Heading>
 
           <p
             className={`mb-6 text-sm font-medium leading-relaxed text-surface-500 break-words [overflow-wrap:anywhere] ${

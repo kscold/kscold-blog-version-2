@@ -34,12 +34,12 @@ export function LinkPreviewCard({ preview }: LinkPreviewCardProps) {
       )}
       <div className="p-3">
         {preview.siteName && (
-          <p className="text-xs text-surface-400 font-medium uppercase tracking-wider mb-1">
+          <p className="text-xs text-surface-600 font-medium uppercase tracking-wider mb-1">
             {preview.siteName}
           </p>
         )}
         {preview.title && (
-          <h4 className="text-sm font-bold text-surface-900 line-clamp-2 mb-1">{preview.title}</h4>
+          <p className="text-sm font-bold text-surface-900 line-clamp-2 mb-1">{preview.title}</p>
         )}
         {preview.description && (
           <p className="text-xs text-surface-500 line-clamp-2">{preview.description}</p>

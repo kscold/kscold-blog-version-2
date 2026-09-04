@@ -60,7 +60,7 @@ export function FeedContent({ authorName, content, variant }: FeedContentProps) 
         />
       )}
       {plainBody.length > FEED_PREVIEW_LENGTH && (
-        <p className="mt-2 text-xs font-semibold text-surface-400">상세에서 계속 읽기</p>
+        <p className="mt-2 text-xs font-semibold text-surface-600">상세에서 계속 읽기</p>
       )}
     </div>
   );

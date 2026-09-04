@@ -22,6 +22,8 @@ export function Pagination({ page, totalPages, onPageChange, maxVisible = 5 }: P
   return (
     <div className="flex justify-center items-center gap-2">
       <button
+        type="button"
+        aria-label="이전 페이지"
         onClick={() => onPageChange(Math.max(0, page - 1))}
         disabled={page === 0}
         className="px-3 py-2 rounded-xl bg-white border border-surface-200 text-surface-700 text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:border-surface-400 transition-all"
@@ -34,6 +36,9 @@ export function Pagination({ page, totalPages, onPageChange, maxVisible = 5 }: P
       {pages.map(p => (
         <button
           key={p}
+          type="button"
+          aria-label={`${p + 1}페이지로 이동`}
+          aria-current={page === p ? 'page' : undefined}
           onClick={() => onPageChange(p)}
           className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${
             page === p
@@ -46,6 +51,8 @@ export function Pagination({ page, totalPages, onPageChange, maxVisible = 5 }: P
       ))}
 
       <button
+        type="button"
+        aria-label="다음 페이지"
         onClick={() => onPageChange(Math.min(totalPages - 1, page + 1))}
         disabled={page >= totalPages - 1}
         className="px-3 py-2 rounded-xl bg-white border border-surface-200 text-surface-700 text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed hover:border-surface-400 transition-all"

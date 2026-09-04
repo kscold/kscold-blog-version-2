@@ -82,7 +82,7 @@ export function CategoryPostContainer({
                   } : undefined}
                   transition={allowRichEffects ? { duration: 0.5 } : undefined}
                 >
-                  <PostCard post={post} />
+                  <PostCard post={post} headingLevel={2} />
                 </motion.div>
               ))}
             </motion.div>

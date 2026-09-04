@@ -100,7 +100,7 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
               />
             </svg>
           </div>
-          <p className="flex-1 text-sm text-surface-400">오늘 어떤 생각을 하셨나요?</p>
+          <p className="flex-1 text-sm text-surface-600">오늘 어떤 생각을 하셨나요?</p>
         </div>
         <div className="px-5 py-5 sm:px-6">
           <p className="mb-4 text-sm text-surface-500 leading-relaxed">
