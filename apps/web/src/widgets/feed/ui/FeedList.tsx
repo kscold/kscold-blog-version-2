@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useFeeds } from '@/entities/feed';
 import { FeedCard } from '@/features/feed';
 import { FeedComposer } from './FeedComposer';
@@ -15,22 +15,22 @@ import type { PageResponse } from '@/shared/model/types/api';
 import type { Feed } from '@/shared/model/types/social';
 
 interface FeedListProps {
-  initialTag?: string;
   initialFeeds?: PageResponse<Feed>;
 }
 
-export function FeedList({ initialTag, initialFeeds }: FeedListProps = {}) {
+export function FeedList({ initialFeeds }: FeedListProps = {}) {
   const { currentUser } = useAuth();
   const { allowRichEffects } = usePerformanceMode();
   const [page, setPage] = useState(0);
   const router = useRouter();
-  const activeTag = initialTag;
+  const searchParams = useSearchParams();
+  const activeTag = searchParams.get('tag')?.trim() || undefined;
 
   const { data: feedsData, isLoading } = useFeeds({
     page,
     size: 12,
     tag: activeTag,
-    initialData: page === 0 ? initialFeeds : undefined,
+    initialData: !activeTag && page === 0 ? initialFeeds : undefined,
   });
 
   const feeds = feedsData?.content || [];

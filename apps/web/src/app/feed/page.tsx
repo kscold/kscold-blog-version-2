@@ -21,18 +21,11 @@ const feedJsonLd = {
   },
 };
 
-export default async function FeedPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ tag?: string | string[] }>;
-}) {
-  const { tag } = await searchParams;
-  const activeTag = Array.isArray(tag) ? tag[0] : tag;
-
+export default function FeedPage() {
   return (
     <>
       <JsonLd id="feed-page" data={feedJsonLd} />
-      <FeedPageView activeTag={activeTag} />
+      <FeedPageView />
     </>
   );
 }
