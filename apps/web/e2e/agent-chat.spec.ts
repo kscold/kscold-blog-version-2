@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { emptyPage, mockApi, mockShellApis, success } from './support/api';
 
+const AGENT_SESSION_STORAGE_KEY = 'kscold-agent-chat-session-id';
+
 const LONG_ANSWER = Array.from(
   { length: 36 },
   (_, index) => `${index + 1}번째 확인 항목입니다. Agent가 찾은 기록을 차례대로 설명합니다.`
@@ -66,4 +68,43 @@ test('이전 대화를 불러온 뒤 긴 Agent 답변의 마지막까지 자동�
       dialog.locator('[data-cy="agent-message-list"]').evaluate(element => element.scrollTop)
     )
     .toBeGreaterThan(0);
+});
+
+test('손상된 Agent 세션을 교체하고 질문 길이를 서버 경계와 맞춘다', async ({ page }) => {
+  const oversizedSessionId = 'x'.repeat(81);
+  await page.addInitScript(
+    ({ key, value }) => window.localStorage.setItem(key, value),
+    { key: AGENT_SESSION_STORAGE_KEY, value: oversizedSessionId }
+  );
+  await mockShellApis(page);
+  await mockApi(page, 'GET', '**/api/auth/me', success(null));
+  await mockApi(page, 'GET', /\/api\/feeds(\?|$)/, success(emptyPage(12)));
+  await mockApi(
+    page,
+    'GET',
+    '**/api/vault/agent/content-scope',
+    success({ label: '공개 기록', description: '공개된 기록을 검색합니다.' })
+  );
+
+  let requestedSessionId = '';
+  await page.route('**/api/vault/agent/history*', async route => {
+    requestedSessionId = new URL(route.request().url()).searchParams.get('sessionId') || '';
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(success({ sessionId: requestedSessionId, messages: [] })),
+    });
+  });
+
+  await page.goto('/feed');
+  await page.getByRole('button', { name: 'KSCOLD 대화 열기' }).click();
+  const input = page.getByRole('textbox', { name: 'Agent에게 보낼 질문' });
+
+  await expect(input).toHaveAttribute('maxlength', '1200');
+  await expect.poll(() => requestedSessionId).not.toBe('');
+  expect(requestedSessionId).not.toBe(oversizedSessionId);
+  expect(requestedSessionId.length).toBeLessThanOrEqual(80);
+  await expect
+    .poll(() => page.evaluate(key => window.localStorage.getItem(key), AGENT_SESSION_STORAGE_KEY))
+    .toBe(requestedSessionId);
 });

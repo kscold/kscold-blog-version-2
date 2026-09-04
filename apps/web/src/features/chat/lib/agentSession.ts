@@ -1,4 +1,9 @@
 export const AGENT_SESSION_STORAGE_KEY = 'kscold-agent-chat-session-id';
+export const AGENT_SESSION_ID_MAX_LENGTH = 80;
+
+export const isValidAgentSessionId = (
+  value: string | null | undefined
+): value is string => Boolean(value && value.length <= AGENT_SESSION_ID_MAX_LENGTH);
 
 export const createSessionId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -21,11 +26,9 @@ export const getOrCreateAgentSessionId = () => {
   }
 
   const savedSessionId = window.localStorage.getItem(AGENT_SESSION_STORAGE_KEY);
-  if (savedSessionId) {
+  if (isValidAgentSessionId(savedSessionId)) {
     return savedSessionId;
   }
 
-  const nextSessionId = createSessionId();
-  window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, nextSessionId);
-  return nextSessionId;
+  return resetAgentSessionId();
 };

@@ -7,6 +7,7 @@ import {
   fetchVaultAgentContentScope,
   fetchVaultAgentHistory,
   getOrCreateAgentSessionId,
+  isValidAgentSessionId,
   resetAgentSessionId,
   starterPrompts,
   streamVaultAgentMessage,
@@ -81,7 +82,7 @@ export function useAgentChat(isOpen: boolean) {
 
     void fetchVaultAgentHistory(sessionId)
       .then(history => {
-        if (history.sessionId && history.sessionId !== sessionId) {
+        if (isValidAgentSessionId(history.sessionId) && history.sessionId !== sessionId) {
           window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, history.sessionId);
           setAgentSessionId(history.sessionId);
         }
@@ -169,7 +170,10 @@ export function useAgentChat(isOpen: boolean) {
           if (event.type === 'complete') {
             completedResponse = event.response;
             flushPendingDelta(assistantMessageId);
-            if (event.response.sessionId && event.response.sessionId !== sessionId) {
+            if (
+              isValidAgentSessionId(event.response.sessionId) &&
+              event.response.sessionId !== sessionId
+            ) {
               window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, event.response.sessionId);
               setAgentSessionId(event.response.sessionId);
             }

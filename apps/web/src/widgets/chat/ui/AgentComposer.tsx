@@ -1,5 +1,7 @@
 'use client';
 
+import { AGENT_QUESTION_MAX_LENGTH } from '@/features/chat';
+
 interface AgentComposerProps {
   value: string;
   disabled: boolean;
@@ -21,6 +23,7 @@ export function AgentComposer({
         type="text"
         aria-label="Agent에게 보낼 질문"
         value={value}
+        maxLength={AGENT_QUESTION_MAX_LENGTH}
         onChange={e => onChange(e.target.value)}
         placeholder={
           isLoadingHistory

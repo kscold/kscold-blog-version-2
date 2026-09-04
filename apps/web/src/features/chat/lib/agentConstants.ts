@@ -14,6 +14,8 @@ export interface AgentMessage {
   isStreaming?: boolean;
 }
 
+export const AGENT_QUESTION_MAX_LENGTH = 1200;
+
 export function createInitialAgentMessages(
   contentScope?: VaultAgentContentScope
 ): AgentMessage[] {
