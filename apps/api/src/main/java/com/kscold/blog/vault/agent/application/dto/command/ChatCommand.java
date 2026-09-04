@@ -15,6 +15,7 @@ public class ChatCommand {
     @Size(max = 1200, message = "질문은 1200자 이하로 입력해주세요.")
     private String message;
 
+    @Size(max = 120, message = "활성 폴더 이름은 120자 이하여야 합니다.")
     private String activeFolderName;
 
     @Size(max = 80, message = "세션 값이 너무 깁니다.")

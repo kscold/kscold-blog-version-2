@@ -10,6 +10,7 @@ import com.kscold.blog.identity.application.dto.command.RegisterCommand;
 import com.kscold.blog.identity.application.dto.command.ResetPasswordCommand;
 import com.kscold.blog.payment.application.dto.command.CompletePaymentCommand;
 import com.kscold.blog.teamprivate.adapter.in.web.dto.request.PasswordRequest;
+import com.kscold.blog.vault.agent.application.dto.command.ChatCommand;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -89,6 +90,19 @@ class PublicRequestValidationTest {
         assertThat(hasSizeViolation(request, "preferredTimes[0].<list element>")).isTrue();
         assertThat(hasSizeViolation(request, "interestedTopics")).isTrue();
         assertThat(hasSizeViolation(request, "desiredTakeaways")).isTrue();
+    }
+
+    @Test
+    void rejectsOversizedVaultAgentContext() {
+        ChatCommand request =
+                ChatCommand.builder()
+                        .message("질문")
+                        .activeFolderName("a".repeat(121))
+                        .sessionId("a".repeat(81))
+                        .build();
+
+        assertThat(hasSizeViolation(request, "activeFolderName")).isTrue();
+        assertThat(hasSizeViolation(request, "sessionId")).isTrue();
     }
 
     private boolean hasSizeViolation(Object request, String property) {

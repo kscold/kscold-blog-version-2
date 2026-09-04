@@ -17,6 +17,7 @@ import com.kscold.blog.vault.agent.application.port.in.VaultAgentUseCase;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +107,8 @@ public class VaultAgentController {
     public ResponseEntity<ApiResponse<ChatHistoryResponse>> history(
             @AuthenticationPrincipal String userId,
             HttpServletRequest httpRequest,
-            @RequestParam(required = false) String sessionId) {
+            @RequestParam(required = false) @Size(max = 80, message = "세션 값이 너무 깁니다.")
+                    String sessionId) {
         String clientIdentifier = clientIdentifierResolver.resolve(httpRequest);
         return ResponseEntity.ok(
                 ApiResponse.success(
