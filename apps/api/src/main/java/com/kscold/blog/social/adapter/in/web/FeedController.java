@@ -12,9 +12,10 @@ import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -151,18 +152,30 @@ public class FeedController {
 
     /** 피드 목록을 작성자별 최신 프로필로 채워 응답 변환 (작성자 batch 조회) */
     private Page<FeedResponse> toResponsePage(Page<Feed> feeds, String identifier) {
-        Map<String, UserQueryPort.UserInfo> authors = new HashMap<>();
-        for (Feed feed : feeds.getContent()) {
-            String authorId = feed.getAuthor() != null ? feed.getAuthor().getId() : null;
-            if (authorId != null && !authors.containsKey(authorId)) {
-                authors.put(authorId, lookupAuthor(authorId));
-            }
-        }
+        Map<String, UserQueryPort.UserInfo> authors = lookupAuthors(feeds.getContent());
         return feeds.map(
                 feed -> {
                     String authorId = feed.getAuthor() != null ? feed.getAuthor().getId() : null;
                     return FeedResponse.from(
                             feed, identifier, authorId != null ? authors.get(authorId) : null);
                 });
+    }
+
+    private Map<String, UserQueryPort.UserInfo> lookupAuthors(List<Feed> feeds) {
+        Set<String> authorIds = new LinkedHashSet<>();
+        feeds.forEach(
+                feed -> {
+                    if (feed.getAuthor() != null && feed.getAuthor().getId() != null) {
+                        authorIds.add(feed.getAuthor().getId());
+                    }
+                });
+        if (authorIds.isEmpty()) return Map.of();
+
+        try {
+            return userQueryPort.getUsersByIds(authorIds);
+        } catch (Exception exception) {
+            log.warn("피드 목록 작성자 프로필을 일괄 조회하지 못해 저장된 정보로 응답합니다");
+            return Map.of();
+        }
     }
 }
