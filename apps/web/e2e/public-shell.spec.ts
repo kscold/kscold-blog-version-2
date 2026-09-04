@@ -68,6 +68,22 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     );
   });
 
+  test('존재하지 않는 공개 콘텐츠 경로는 HTTP 404를 반환한다', async ({ request }) => {
+    const missingRoutes = [
+      '/feed/nonexistent-id',
+      '/profile/definitely-not-a-real-user-xyz',
+      '/blog/not-a-category/not-a-real-post-xyz',
+      '/blog/not-a-real-category-xyz',
+      '/blog/tags/not-a-real-tag-xyz',
+    ];
+
+    const responses = await Promise.all(missingRoutes.map(route => request.get(route)));
+
+    for (const response of responses) {
+      expect(response.status()).toBe(404);
+    }
+  });
+
   test('이전 Feed 태그 쿼리는 통합 태그 경로로 영구 이동한다', async ({ page }) => {
     const response = await page.goto('/feed?tag=AI%20Agent');
     const redirectResponse = await response?.request().redirectedFrom()?.response();

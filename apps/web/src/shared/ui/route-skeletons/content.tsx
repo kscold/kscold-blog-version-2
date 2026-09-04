@@ -59,25 +59,33 @@ export function ArchivePageSkeleton() {
           <Skeleton className="mx-auto mt-6 h-5 w-72 sm:w-96" />
         </div>
 
-        <div className="mb-10 flex flex-wrap justify-center gap-3">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} className="h-10 w-24 rounded-full" />
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <SkeletonArticleCard key={index} />
-          ))}
-        </div>
-
-        <div className="mt-12 flex items-center justify-center gap-3">
-          <Skeleton className="h-11 w-11 rounded-xl" />
-          <Skeleton className="h-11 w-11 rounded-xl" />
-          <Skeleton className="h-11 w-11 rounded-xl" />
-        </div>
+        <ArchiveContentSkeleton />
       </div>
     </div>
+  );
+}
+
+export function ArchiveContentSkeleton() {
+  return (
+    <>
+      <div className="mb-10 flex flex-wrap justify-center gap-3">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Skeleton key={index} className="h-10 w-24 rounded-full" />
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <SkeletonArticleCard key={index} />
+        ))}
+      </div>
+
+      <div className="mt-12 flex items-center justify-center gap-3">
+        <Skeleton className="h-11 w-11 rounded-xl" />
+        <Skeleton className="h-11 w-11 rounded-xl" />
+        <Skeleton className="h-11 w-11 rounded-xl" />
+      </div>
+    </>
   );
 }
 

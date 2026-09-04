@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import { BlogArchive } from '@/widgets/blog/archive';
+import { ArchiveContentSkeleton } from '@/shared/ui/RouteSkeletons';
 
 export function BlogPageView() {
   return (
@@ -13,7 +15,9 @@ export function BlogPageView() {
           </p>
         </div>
 
-        <BlogArchive />
+        <Suspense fallback={<ArchiveContentSkeleton />}>
+          <BlogArchive />
+        </Suspense>
       </div>
     </div>
   );

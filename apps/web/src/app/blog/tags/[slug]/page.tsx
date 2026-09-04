@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { cache } from 'react';
+import { cache, Suspense } from 'react';
 import type { Post, Tag } from '@/shared/model/types/blog';
 import { TagArchive } from '@/widgets/blog/tag';
 import {
@@ -12,6 +12,7 @@ import {
   isIndexableTag,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
+import { ArchivePageSkeleton } from '@/shared/ui/RouteSkeletons';
 
 const getTagSeoData = cache(async (tagSlug: string) => {
   const tags = await fetchPublicApi<Tag[]>('/tags');
@@ -86,7 +87,9 @@ export default async function TagPage({
   return (
     <>
       <JsonLd id={`tag-${tag.id}`} data={jsonLd} />
-      <TagArchive tag={tag} />
+      <Suspense fallback={<ArchivePageSkeleton />}>
+        <TagArchive tag={tag} />
+      </Suspense>
     </>
   );
 }
