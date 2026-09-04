@@ -48,7 +48,12 @@ public class PostReferenceService {
             throw ResourceNotFoundException.tag("일부 태그를 찾을 수 없습니다");
         }
         for (Tag tag : tags) {
-            tagInfos.add(Post.TagInfo.builder().id(tag.getId()).name(tag.getName()).build());
+            tagInfos.add(
+                    Post.TagInfo.builder()
+                            .id(tag.getId())
+                            .name(tag.getName())
+                            .slug(tag.getSlug())
+                            .build());
         }
         return tagInfos;
     }

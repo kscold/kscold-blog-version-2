@@ -107,6 +107,7 @@ public class Post {
     public static class TagInfo {
         private String id;
         private String name;
+        private String slug;
     }
 
     @Getter

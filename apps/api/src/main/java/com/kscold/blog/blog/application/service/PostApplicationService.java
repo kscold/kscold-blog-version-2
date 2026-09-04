@@ -121,6 +121,7 @@ public class PostApplicationService implements PostUseCase {
                                     Post.TagInfo.builder()
                                             .id(tag.getId())
                                             .name(tag.getName())
+                                            .slug(tag.getSlug())
                                             .build()));
         }
 

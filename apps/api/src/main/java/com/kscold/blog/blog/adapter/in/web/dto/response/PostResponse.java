@@ -1,6 +1,7 @@
 package com.kscold.blog.blog.adapter.in.web.dto.response;
 
 import com.kscold.blog.blog.domain.model.Post;
+import com.kscold.blog.shared.util.SlugUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -56,6 +57,7 @@ public class PostResponse {
     public static class TagInfo {
         private String id;
         private String name;
+        private String slug;
     }
 
     /** 작성자 정보 */
@@ -109,6 +111,7 @@ public class PostResponse {
                                                         TagInfo.builder()
                                                                 .id(tag.getId())
                                                                 .name(tag.getName())
+                                                                .slug(resolveTagSlug(tag))
                                                                 .build())
                                         .toList()
                                 : null)
@@ -139,6 +142,10 @@ public class PostResponse {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
+    }
+
+    private static String resolveTagSlug(Post.TagInfo tag) {
+        return tag.getSlug() != null ? tag.getSlug() : SlugUtils.generate(tag.getName());
     }
 
     /** restricted 포스트 — 본문 제거, excerpt만 반환 */
