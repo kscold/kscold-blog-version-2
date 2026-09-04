@@ -1,10 +1,10 @@
 export const PROFILE = {
   name: '김승찬',
   handle: 'kscold',
-  title: 'Backend · Full-stack · AI Agent Engineer',
+  title: 'AI Agent · Backend · Full-stack Engineer',
   bio: [
-    '안녕하세요, 백엔드·풀스택·AI Agent 개발자 김승찬입니다. 서비스를 설계하고 구현하는 일부터 배포와 운영, 장애 대응까지 직접 연결합니다.',
-    'Spring Boot와 Next.js 기반 제품 개발, LangGraph·RAG를 활용한 AI Agent, 대규모 리팩토링과 운영 자동화 경험을 kscold.com에 기록합니다.',
+    '안녕하세요, AI Agent 개발을 중심으로 서버·웹 애플리케이션을 만드는 풀스택 개발자 김승찬입니다. 서비스를 설계하고 구현하는 일부터 배포와 운영, 장애 대응까지 직접 연결합니다.',
+    'Python·LangGraph·RAG 기반 AI Agent, Spring Boot와 Next.js 기반 제품 개발, 대규모 리팩토링과 운영 자동화 경험을 kscold.com에 기록합니다.',
   ],
   contacts: {
     github: 'https://github.com/kscold',
@@ -19,7 +19,7 @@ export const PROFILE = {
 export const PROFILE_FAQ = [
   {
     q: '김승찬은 누구인가요?',
-    a: '김승찬(kscold)은 백엔드·풀스택·AI Agent 개발자입니다. Spring Boot·Next.js·TypeScript 기반 서비스를 설계하고 배포·운영하며, LangGraph·RAG·LLM을 실제 업무 흐름에 연결하는 AI Agent를 개발합니다. 경험과 기술 기록은 김승찬 블로그 kscold.com에 공개합니다.',
+    a: '김승찬(kscold)은 AI Agent 개발을 중심으로 서버·웹 애플리케이션을 만드는 풀스택 개발자입니다. Python·LangGraph·RAG·LLM을 실제 업무 흐름에 연결하고, Spring Boot·Next.js·TypeScript 기반 서비스를 설계·배포·운영합니다. 경험과 기술 기록은 김승찬 블로그 kscold.com에 공개합니다.',
   },
   {
     q: 'kscold는 무엇인가요?',

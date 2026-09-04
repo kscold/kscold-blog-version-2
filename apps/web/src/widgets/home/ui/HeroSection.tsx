@@ -36,7 +36,7 @@ export function HeroSection() {
                 allowRichEffects ? 'animate-pulse' : ''
               }`}
             />
-            BACKEND · FULL-STACK · AI AGENT
+            AI AGENT · BACKEND · FULL-STACK
           </span>
         </motion.div>
 
@@ -46,7 +46,7 @@ export function HeroSection() {
           >
             {/* 검색·접근성용 제목 (시각적으로는 KSCOLD 로고 노출) */}
             <span className="sr-only">
-              김승찬의 기술 블로그 KSCOLD — 백엔드·풀스택·AI Agent 개발자 김승찬(kscold)
+              김승찬의 기술 블로그 KSCOLD — AI Agent·백엔드·풀스택 개발자 김승찬(kscold)
             </span>
             <span
               aria-hidden="true"
@@ -81,7 +81,7 @@ export function HeroSection() {
             개발자
           </span>
           ,<br />
-          백엔드부터 AI Agent까지
+          AI Agent부터 서버·웹까지
           <br />
           <span className="text-surface-900 font-semibold relative after:absolute after:bottom-1 after:left-0 after:w-full after:h-2 after:bg-blue-100 after:-z-10 px-1">
             문제를 서비스로 풀어내는 김승찬

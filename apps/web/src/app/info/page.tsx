@@ -11,6 +11,7 @@ export const metadata = buildPageMetadata({
   keywords: [
     '김승찬', '김승찬 개발자', '김승찬 소개', '김승찬 포트폴리오',
     'kscold', '콜딩', 'Colding', '프로필', '소개',
+    'AI Agent 개발자', 'LangGraph', 'Python', 'MongoDB',
     '풀스택 개발자', '백엔드 개발자', '프론트엔드 개발자',
   ],
   type: 'profile',

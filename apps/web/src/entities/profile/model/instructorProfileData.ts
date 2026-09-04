@@ -2,7 +2,7 @@ export const INSTRUCTOR_PROFILE = {
   name: '김승찬',
   handle: 'kscold',
   headline: ['AI Agent,', '저와 함께 직접 써보시죠.'],
-  role: '씨에스리 AI기술연구소 연구원 · 풀스택 개발자',
+  role: '씨에스리 AI기술연구소 연구원 · AI Agent/풀스택 개발자',
   company: '콜딩(Colding) 대표 · Pawpong 운영',
   introduction: [
     'B2B 워크플로우 자동화와 AI Agent를 실무에서 개발하고 있습니다. Codex와 생성형 AI를 단순 시연 도구가 아니라 기획, 개발, 검증, 운영까지 이어지는 업무 도구로 사용합니다.',
@@ -80,14 +80,14 @@ export const INSTRUCTOR_PROFILE = {
     {
       period: '2026.01 — 현재',
       organization: '씨에스리 AI기술연구소',
-      role: '연구원(사원) · 풀스택 개발자',
-      description: 'B2B 워크플로우 자동화 플랫폼과 AI Agent 개발',
+      role: '연구원(사원) · AI Agent/풀스택 개발자',
+      description: 'AI Agent 개발을 중심으로 서버·웹 애플리케이션 개발',
     },
     {
       period: '2024.08 — 2026.01',
       organization: '푼타컴퍼니',
-      role: '백엔드 개발 리드',
-      description: '식후경 Eatbuy 2.0 초기 설계와 개발 리드, 커머스 도메인 재설계, API 90% 이상 전환, 무중단 배포와 업무 자동화 구축',
+      role: '백엔드 개발자',
+      description: '식후경 Eatbuy 2.0 백엔드 개발, 커머스 도메인 재설계, API 90% 이상 전환, 무중단 배포와 업무 자동화 구축',
     },
     {
       period: '개인사업',

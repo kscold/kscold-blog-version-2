@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     '기술블로그',
     '콜딩 블로그',
     '김승찬 풀스택',
-    '김승찬 프로덕트 엔지니어',
+    '김승찬 AI Agent 개발자',
     '개발자 김승찬',
     'kscold',
     'kscold 블로그',
@@ -42,6 +42,9 @@ export const metadata: Metadata = {
     '백엔드',
     '풀스택 개발자',
     'AI 에이전트',
+    'LangGraph',
+    'RAG',
+    'MongoDB',
     'React',
     'Next.js',
     'TypeScript',
@@ -130,14 +133,14 @@ const siteJsonLd = {
         '@id': `${SITE_URL}/info#profile-page`,
       },
       description:
-        '김승찬(kscold)은 백엔드·풀스택·AI Agent 개발자입니다. ' +
-        'Spring Boot·Next.js·TypeScript 기반 서비스의 설계·배포·운영과 LangGraph·RAG 기반 AI Agent 개발을 수행하며, ' +
+        '김승찬(kscold)은 AI Agent 개발을 중심으로 서버·웹 애플리케이션을 만드는 풀스택 개발자입니다. ' +
+        'LangGraph·RAG 기반 AI Agent와 Spring Boot·Next.js·TypeScript 기반 서비스의 설계·배포·운영을 수행하며, ' +
         '경험과 기술 기록을 김승찬 블로그 kscold.com에 공개합니다.',
       image: 'https://avatars.githubusercontent.com/u/66587554?v=4',
-      jobTitle: '백엔드·풀스택·AI Agent 개발자',
+      jobTitle: 'AI Agent·백엔드·풀스택 개발자',
       hasOccupation: {
         '@type': 'Occupation',
-        name: '소프트웨어 개발자',
+        name: 'AI Agent 및 풀스택 개발자',
         occupationLocation: { '@type': 'Country', name: '대한민국' },
       },
       address: {
