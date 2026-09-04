@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
 
     private static final String PAY_METHOD_EASY_PAY = "EASY_PAY";
-    private static final String PAY_METHOD_CARD = "CARD";
     private static final String EASY_PAY_PROVIDER = "KAKAOPAY";
     private static final DateTimeFormatter PAYMENT_ID_DATE =
             DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -51,7 +50,6 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
         return new PaymentConfigResponse(
                 portOnePaymentProperties.isClientConfigured(),
                 portOnePaymentProperties.isKakaoPayLiveEnabled(),
-                portOnePaymentProperties.isCardConfigured(),
                 portOnePaymentProperties.getStoreId(),
                 portOnePaymentProperties.getKakaoPayChannelKey(),
                 product.getProductName(),
@@ -64,46 +62,29 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     @Transactional
     @Override
     public PreparePaymentResponse prepare(String userId, PreparePaymentCommand request) {
-        return prepare(userId, request, PaymentProduct.AI_AGENT_BLOOM, true);
+        return prepare(userId, request, PaymentProduct.AI_AGENT_BLOOM);
     }
 
     @Transactional
     @Override
     public PreparePaymentResponse prepareLiveTest(String userId, PreparePaymentCommand request) {
-        return prepare(userId, request, PaymentProduct.KAKAO_PAY_LIVE_TEST, false);
+        return prepare(userId, request, PaymentProduct.KAKAO_PAY_LIVE_TEST);
     }
 
     private PreparePaymentResponse prepare(
-            String userId,
-            PreparePaymentCommand request,
-            PaymentProduct product,
-            boolean cardPaymentAllowed) {
+            String userId, PreparePaymentCommand request, PaymentProduct product) {
         String paymentAccessToken = normalizePaymentAccessToken(request.getPaymentAccessToken());
-        boolean cardPayment = PAY_METHOD_CARD.equals(request.getPayMethod());
-
-        if (cardPayment && !cardPaymentAllowed) {
-            throw InvalidRequestException.invalidInput("카카오페이 실결제 확인 상품은 카카오페이만 지원합니다.");
-        }
-
-        // 신용카드(KG이니시스) 경로는 비회원 구매를 허용함. 카드 결제창까지 로그인 없이 도달할 수 있어야 하기 때문.
-        if (!cardPayment && (userId == null || userId.isBlank()) && paymentAccessToken == null) {
+        if ((userId == null || userId.isBlank()) && paymentAccessToken == null) {
             throw new BusinessException(
                     ErrorCode.UNAUTHORIZED, "로그인하거나 안내받은 결제 링크로 접속해야 결제할 수 있습니다.");
         }
-        if (cardPayment && !portOnePaymentProperties.isCardConfigured()) {
-            throw InvalidRequestException.invalidInput(
-                    "PORTONE_STORE_ID와 PORTONE_INICIS_CHANNEL_KEY 설정 후 신용카드 결제창을 열 수 있습니다.");
-        }
-        if (!cardPayment && !portOnePaymentProperties.isClientConfigured()) {
+        if (!portOnePaymentProperties.isClientConfigured()) {
             throw InvalidRequestException.invalidInput(
                     "PORTONE_STORE_ID와 PORTONE_KAKAOPAY_CHANNEL_KEY 설정 후 결제창을 열 수 있습니다.");
         }
 
         String paymentId = createPaymentId(product.getPaymentIdPrefix());
-        String channelKey =
-                cardPayment
-                        ? portOnePaymentProperties.getInicisChannelKey()
-                        : portOnePaymentProperties.getKakaoPayChannelKey();
+        String channelKey = portOnePaymentProperties.getKakaoPayChannelKey();
         Instant now = Instant.now();
         PaymentOrder order =
                 PaymentOrder.builder()
@@ -114,7 +95,7 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
                         .orderName(product.getOrderName())
                         .totalAmount(product.getTotalAmount())
                         .currency(product.getCurrency())
-                        .payMethod(cardPayment ? PAY_METHOD_CARD : PAY_METHOD_EASY_PAY)
+                        .payMethod(PAY_METHOD_EASY_PAY)
                         .expectedChannelKey(channelKey)
                         .customerName(request.getCustomerName().trim())
                         .customerEmail(request.getCustomerEmail().trim())
@@ -135,8 +116,8 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
                 product.getOrderName(),
                 product.getTotalAmount(),
                 product.getCurrency(),
-                cardPayment ? PAY_METHOD_CARD : PAY_METHOD_EASY_PAY,
-                cardPayment ? null : EASY_PAY_PROVIDER,
+                PAY_METHOD_EASY_PAY,
+                EASY_PAY_PROVIDER,
                 product.getServicePeriod(),
                 order.getCustomerName(),
                 order.getCustomerEmail(),

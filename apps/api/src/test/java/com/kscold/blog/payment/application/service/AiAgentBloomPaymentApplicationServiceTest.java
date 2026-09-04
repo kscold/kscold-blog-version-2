@@ -26,9 +26,6 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class AiAgentBloomPaymentApplicationServiceTest {
 
-    /** KG이니시스 주문번호(oid) 최대 길이. 넘기면 결제창이 Dev. Error 로 거부함. */
-    private static final int INICIS_OID_MAX_LENGTH = 40;
-
     @Mock private PaymentOrderRepository paymentOrderRepository;
     @Mock private PortOnePaymentProvider portOnePaymentProvider;
 
@@ -39,7 +36,6 @@ class AiAgentBloomPaymentApplicationServiceTest {
         PortOnePaymentProperties properties = new PortOnePaymentProperties();
         properties.setStoreId("store-test");
         properties.setKakaoPayChannelKey("channel-key-kakao");
-        properties.setInicisChannelKey("channel-key-inicis");
 
         service =
                 new AiAgentBloomPaymentApplicationService(
@@ -49,21 +45,12 @@ class AiAgentBloomPaymentApplicationServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
     }
 
-    private PreparePaymentCommand command(String payMethod) {
+    private PreparePaymentCommand command() {
         return PreparePaymentCommand.builder()
                 .customerName("테스트구매자")
                 .customerEmail("buyer@example.com")
                 .customerPhone("010-1234-5678")
-                .payMethod(payMethod)
                 .build();
-    }
-
-    @Test
-    @DisplayName("시나리오: 카드 결제용 주문번호는 KG이니시스 제한(40자)을 넘지 않는다")
-    void paymentIdFitsInicisOidLimit() {
-        PreparePaymentResponse response = service.prepare(null, command("CARD"));
-
-        assertThat(response.getPaymentId()).hasSizeLessThanOrEqualTo(INICIS_OID_MAX_LENGTH);
     }
 
     @Test
@@ -71,26 +58,16 @@ class AiAgentBloomPaymentApplicationServiceTest {
     void paymentIdIsUnique() {
         Set<String> ids = new HashSet<>();
         for (int i = 0; i < 200; i++) {
-            ids.add(service.prepare(null, command("CARD")).getPaymentId());
+            ids.add(service.prepare("user-1", command()).getPaymentId());
         }
 
         assertThat(ids).hasSize(200);
     }
 
     @Test
-    @DisplayName("시나리오: CARD 는 이니시스 채널키와 CARD 결제수단으로 준비된다")
-    void cardPaymentUsesInicisChannel() {
-        PreparePaymentResponse response = service.prepare(null, command("CARD"));
-
-        assertThat(response.getChannelKey()).isEqualTo("channel-key-inicis");
-        assertThat(response.getPayMethod()).isEqualTo("CARD");
-        assertThat(response.getEasyPayProvider()).isNull();
-    }
-
-    @Test
-    @DisplayName("시나리오: EASY_PAY 는 카카오페이 채널키와 간편결제로 준비된다")
-    void easyPayUsesKakaoChannel() {
-        PreparePaymentResponse response = service.prepare("user-1", command("EASY_PAY"));
+    @DisplayName("시나리오: 모든 주문은 카카오페이 채널과 간편결제로 준비된다")
+    void paymentUsesKakaoPayOnly() {
+        PreparePaymentResponse response = service.prepare("user-1", command());
 
         assertThat(response.getChannelKey()).isEqualTo("channel-key-kakao");
         assertThat(response.getPayMethod()).isEqualTo("EASY_PAY");
@@ -117,7 +94,7 @@ class AiAgentBloomPaymentApplicationServiceTest {
     @Test
     @DisplayName("시나리오: 실결제 확인 상품은 1,000원 카카오페이 주문으로 준비된다")
     void liveTestPaymentUsesOneThousandWon() {
-        PreparePaymentResponse response = service.prepareLiveTest("admin-1", command("EASY_PAY"));
+        PreparePaymentResponse response = service.prepareLiveTest("admin-1", command());
 
         assertThat(response.getProgramKey()).isEqualTo("kakaopay-live-test");
         assertThat(response.getTotalAmount()).isEqualTo(1_000);
