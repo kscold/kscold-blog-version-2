@@ -64,8 +64,9 @@ export function toFeedTitle(
 ) {
   return (
     extractFirstMarkdownHeading(content) ||
+    toMetaDescription(content, '', 58) ||
     linkPreviewTitle?.trim() ||
-    toMetaDescription(content, fallback, 58)
+    fallback
   );
 }
 
