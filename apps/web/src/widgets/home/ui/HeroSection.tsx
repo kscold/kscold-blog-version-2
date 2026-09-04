@@ -1,13 +1,6 @@
-'use client';
-
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function HeroSection() {
-  const { allowRichEffects, supportsHover } = usePerformanceMode();
-  const animate = allowRichEffects;
-
   return (
     <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
       {/* 에디토리얼 무드의 미세 도트 그리드 — 순수 CSS라 성능 부담 없음 */}
@@ -24,21 +17,14 @@ export function HeroSection() {
       <div
         className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-8 sm:gap-12 text-center my-12 sm:my-16"
       >
-        <motion.div
-          initial={animate ? { opacity: 0, y: 20 } : false}
-          animate={animate ? { opacity: 1, y: 0 } : undefined}
-          transition={animate ? { duration: 1.2, delay: 0.2, ease: [0.76, 0, 0.24, 1] } : undefined}
-          className="inline-block"
-        >
+        <div className="inline-block">
           <span className="px-5 py-2.5 rounded-full border border-surface-200/60 bg-white/60 backdrop-blur-md shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] text-surface-900 text-xs font-bold tracking-[0.2em] flex items-center gap-2 cursor-default">
             <span
-              className={`w-1.5 h-1.5 rounded-full bg-surface-900 shadow-[0_0_8px_rgba(15,23,42,0.4)] ${
-                allowRichEffects ? 'animate-pulse' : ''
-              }`}
+              className="hero-status-dot w-1.5 h-1.5 rounded-full bg-surface-900 shadow-[0_0_8px_rgba(15,23,42,0.4)]"
             />
             AI AGENT · BACKEND · FULL-STACK
           </span>
-        </motion.div>
+        </div>
 
         <div className="relative group w-full flex justify-center">
           <h1
@@ -50,24 +36,15 @@ export function HeroSection() {
             </span>
             <span
               aria-hidden="true"
-              className={`bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] bg-[size:200%_auto] ${
-                allowRichEffects ? 'animate-shimmer' : ''
-              }`}
+              className="hero-logo-shimmer bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] bg-[size:200%_auto]"
             >
               KSCOLD
             </span>
           </h1>
-          {supportsHover && allowRichEffects && (
-            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-full bg-surface-200 blur-[60px] z-0 opacity-0 group-hover:opacity-30 transition-opacity duration-1000 pointer-events-none" />
-          )}
+          <div className="hero-logo-glow absolute inset-x-0 top-1/2 -translate-y-1/2 h-full bg-surface-200 blur-[60px] z-0 opacity-0 transition-opacity duration-1000 pointer-events-none" />
         </div>
 
-        <motion.div
-          className="h-px w-24 bg-gradient-to-r from-transparent via-surface-300 to-transparent mx-auto opacity-70"
-          initial={animate ? { width: 0 } : false}
-          animate={animate ? { width: 96 } : undefined}
-          transition={animate ? { duration: 1.5, delay: 0.5, ease: [0.76, 0, 0.24, 1] } : undefined}
-        />
+        <div className="h-px w-24 bg-gradient-to-r from-transparent via-surface-300 to-transparent mx-auto opacity-70" />
 
         <p
           data-cy="hero-tagline"
@@ -86,19 +63,9 @@ export function HeroSection() {
           입니다.
         </p>
 
-        <motion.div
-          className="w-[1px] h-[5rem] sm:h-[8rem] bg-gradient-to-b from-surface-200/0 via-surface-300 to-surface-200/0 mx-auto mt-6 sm:mt-12 origin-top"
-          initial={animate ? { scaleY: 0 } : false}
-          animate={animate ? { scaleY: 1 } : undefined}
-          transition={animate ? { duration: 1.5, delay: 1, ease: [0.76, 0, 0.24, 1] } : undefined}
-        />
+        <div className="w-[1px] h-[5rem] sm:h-[8rem] bg-gradient-to-b from-surface-200/0 via-surface-300 to-surface-200/0 mx-auto mt-6 sm:mt-12 origin-top" />
 
-        <motion.div
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-6 sm:pt-12 pb-12 sm:pb-20 w-full max-w-3xl mx-auto"
-          initial={animate ? { opacity: 0, y: 20 } : false}
-          animate={animate ? { opacity: 1, y: 0 } : undefined}
-          transition={animate ? { duration: 1.2, delay: 0.7, ease: [0.76, 0, 0.24, 1] } : undefined}
-        >
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-6 sm:pt-12 pb-12 sm:pb-20 w-full max-w-3xl mx-auto">
           <Link
             href="/blog"
             data-cy="hero-primary-cta"
@@ -126,16 +93,10 @@ export function HeroSection() {
           >
             <span className="font-bold tracking-wide">Agent에게 묻기</span>
           </Link>
-        </motion.div>
+        </div>
 
         {/* 외부 링크 */}
-        <motion.div
-          className="flex items-center justify-center gap-10 pt-12"
-          initial={animate ? { opacity: 0 } : false}
-          animate={animate ? { opacity: 0.8 } : undefined}
-          whileHover={supportsHover ? { opacity: 1 } : undefined}
-          transition={animate ? { duration: 0.5, delay: 0.8 } : undefined}
-        >
+        <div className="hero-social-links flex items-center justify-center gap-10 pt-12 opacity-80">
           {[
             { label: 'Github', href: 'https://github.com/kscold' },
             { label: 'Instagram', href: 'https://www.instagram.com/ks_cold' },
@@ -152,7 +113,7 @@ export function HeroSection() {
               <span className="absolute -bottom-2 left-0 w-full h-[1px] bg-surface-900 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
             </a>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

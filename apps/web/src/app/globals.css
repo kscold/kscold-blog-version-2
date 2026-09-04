@@ -62,6 +62,33 @@
 }
 
 @layer components {
+  /* 홈 Hero의 반복 장식 효과는 CSS로 처리해 정적 콘텐츠를 hydration 대상에서 제외한다. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-logo-shimmer {
+      animation: shimmer 2.5s linear infinite;
+    }
+
+    .hero-status-dot {
+      animation: hero-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .group:hover > .hero-logo-glow {
+      opacity: 0.3;
+    }
+
+    .hero-social-links:hover {
+      opacity: 1;
+    }
+  }
+
+  @keyframes hero-pulse {
+    50% {
+      opacity: 0.5;
+    }
+  }
+
   /* 선명한 카드 표면 */
   .gallery-card {
     @apply bg-white dark:bg-surface-950;
