@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
-import type { PageResponse } from '@/shared/model/types/api';
 import type { Category, Post, Tag } from '@/shared/model/types/blog';
 import type { Feed } from '@/shared/model/types/social';
 import {
   SITE_URL,
+  fetchAllPublicApiPages,
   fetchPublicApi,
   flattenCategories,
   isIndexableFeed,
@@ -15,18 +15,18 @@ const toDate = (date: Date | string | undefined): string =>
   new Date(date || Date.now()).toISOString().split('T')[0];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [postsPage, categoryTree, tags, feedsPage, vaultNoteIndex] = await Promise.all([
-    fetchPublicApi<PageResponse<Post>>('/posts?size=1000'),
+  const [posts, categoryTree, tags, feeds, vaultNoteIndex] = await Promise.all([
+    fetchAllPublicApiPages<Post>('/posts'),
     fetchPublicApi<Category[]>('/categories'),
     fetchPublicApi<Tag[]>('/tags'),
-    fetchPublicApi<PageResponse<Feed>>('/feeds?page=0&size=2000'),
+    fetchAllPublicApiPages<Feed>('/feeds'),
     // 전체 그래프를 만들지 않고 검색 노출 판정에 필요한 slug 와 본문 길이만 조회한다.
     fetchPublicApi<{ slug: string; contentLength?: number }[]>('/vault/notes/sitemap-index'),
   ]);
 
   const categories = flattenCategories(categoryTree || []);
-  const posts = (postsPage?.content || []).filter(post => post.status === 'PUBLISHED');
-  const feeds = (feedsPage?.content || []).filter(
+  const indexablePosts = (posts || []).filter(post => post.status === 'PUBLISHED');
+  const indexableFeeds = (feeds || []).filter(
     feed => feed.visibility === 'PUBLIC' && isIndexableFeed(feed.content)
   );
   const indexableTags = (tags || []).filter(isIndexableTag);
@@ -98,13 +98,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.65,
     })),
-    ...posts.map(post => ({
+    ...indexablePosts.map(post => ({
       url: `${SITE_URL}/blog/${post.category.slug}/${post.slug}`,
       lastModified: toDate(post.updatedAt || post.publishedAt || post.createdAt),
       changeFrequency: 'monthly' as const,
       priority: post.featured ? 0.9 : 0.8,
     })),
-    ...feeds.map(feed => ({
+    ...indexableFeeds.map(feed => ({
       url: `${SITE_URL}/feed/${feed.id}`,
       lastModified: toDate(feed.updatedAt || feed.createdAt),
       changeFrequency: 'weekly' as const,

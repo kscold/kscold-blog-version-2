@@ -9,7 +9,7 @@ export {
   SITE_URL,
   type OpenGraphType,
 } from './seo/constants';
-export { fetchPublicApi, fetchViewerApi } from './seo/fetch';
+export { fetchAllPublicApiPages, fetchPublicApi, fetchViewerApi } from './seo/fetch';
 export { isIndexableFeed, isIndexableTag, isIndexableVaultNote } from './seo/indexability';
 export {
   absoluteUrl,
