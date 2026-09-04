@@ -198,7 +198,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ApiResponse<Void>> handleException(
             Exception e, HttpServletRequest request) {
-        log.error("Unexpected exception occurred", e);
+        log.error("Unexpected exception occurred: type={}", e.getClass().getSimpleName());
         notifyError(e, request);
 
         ApiResponse<Void> response =
@@ -220,11 +220,6 @@ public class GlobalExceptionHandler {
             String where =
                     request != null ? request.getMethod() + " " + request.getRequestURI() : "-";
             String detail = exception.getClass().getSimpleName();
-            String message = exception.getMessage();
-            if (message != null && !message.isBlank()) {
-                detail +=
-                        ": " + (message.length() > 300 ? message.substring(0, 300) + "…" : message);
-            }
 
             notificationUseCase.notify(
                     new NotificationMessage(

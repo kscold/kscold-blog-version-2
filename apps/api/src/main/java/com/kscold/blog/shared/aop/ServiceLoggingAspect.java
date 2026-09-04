@@ -35,12 +35,11 @@ public class ServiceLoggingAspect {
         } catch (Exception e) {
             stopWatch.stop();
             log.warn(
-                    "[SERVICE] {}.{}() failed after {}ms — {}: {}",
+                    "[SERVICE] {}.{}() failed after {}ms — {}",
                     className,
                     methodName,
                     stopWatch.getTotalTimeMillis(),
-                    e.getClass().getSimpleName(),
-                    e.getMessage());
+                    e.getClass().getSimpleName());
             throw e;
         }
     }

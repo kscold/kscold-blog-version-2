@@ -2,19 +2,24 @@ package com.kscold.blog.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
+import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.vault.agent.application.dto.command.ChatCommand;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,5 +79,23 @@ class GlobalExceptionHandlerTest {
             logger.detachAppender(appender);
             appender.stop();
         }
+    }
+
+    @Test
+    void unexpectedFailureDoesNotSendExceptionMessageToNotification() {
+        NotificationUseCase notificationUseCase = mock(NotificationUseCase.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getRequestURI()).thenReturn("/auth/login");
+        GlobalExceptionHandler handler = new GlobalExceptionHandler(notificationUseCase);
+
+        handler.handleException(new IllegalStateException("never-send-this-secret"), request);
+
+        ArgumentCaptor<NotificationMessage> notification =
+                ArgumentCaptor.forClass(NotificationMessage.class);
+        verify(notificationUseCase).notify(notification.capture());
+        assertThat(notification.getValue().description())
+                .isEqualTo("IllegalStateException")
+                .doesNotContain("never-send-this-secret");
     }
 }
