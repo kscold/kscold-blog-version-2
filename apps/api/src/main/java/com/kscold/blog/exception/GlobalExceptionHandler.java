@@ -5,6 +5,7 @@ import com.kscold.blog.notification.domain.model.NotificationChannel;
 import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -98,6 +99,23 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);
 
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /** 컨트롤러 메서드 파라미터 검증 실패를 400 응답으로 변환한다. */
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleConstraintViolationException(
+            ConstraintViolationException e) {
+        log.warn("ConstraintViolationException: violations={}", e.getConstraintViolations().size());
+
+        String errorMessage =
+                e.getConstraintViolations().stream()
+                        .map(violation -> violation.getMessage())
+                        .distinct()
+                        .collect(Collectors.joining(", "));
+
+        ApiResponse<Void> response =
+                ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
