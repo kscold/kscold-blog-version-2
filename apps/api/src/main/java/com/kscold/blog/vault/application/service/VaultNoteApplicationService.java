@@ -12,6 +12,8 @@ import com.kscold.blog.vault.application.dto.response.VaultNoteSitemapResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteStatsResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
+import com.kscold.blog.vault.config.InvalidateVaultReadCaches;
+import com.kscold.blog.vault.config.VaultCacheConfiguration;
 import com.kscold.blog.vault.domain.model.VaultNote;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,6 +41,7 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     private final BacklinkParsingService backlinkParsingService;
 
     @Transactional
+    @InvalidateVaultReadCaches
     public VaultNote create(NoteCreateCommand command, String userId) {
         // 폴더 존재 검증
         if (command.getFolderId() != null) {
@@ -80,6 +84,7 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     }
 
     @Transactional
+    @InvalidateVaultReadCaches
     public VaultNote update(String id, NoteUpdateCommand command) {
         VaultNote note = findById(id);
 
@@ -109,6 +114,7 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     }
 
     @Transactional
+    @InvalidateVaultReadCaches
     public void delete(String id) {
         VaultNote note = findById(id);
         vaultNoteCommentRepository.deleteAllByNoteId(id);
@@ -164,6 +170,10 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     }
 
     /** 전체 노트의 그래프 데이터 (노드 + 링크) Projection 쿼리로 필요한 필드만 조회하여 메모리 최적화 */
+    @Cacheable(
+            cacheManager = "vaultCacheManager",
+            cacheNames = VaultCacheConfiguration.GRAPH_CACHE,
+            sync = true)
     public GraphDataResponse getGraphData() {
         List<VaultNoteRepository.GraphNote> allNotes = vaultNoteRepository.findAllForGraph();
 
@@ -203,6 +213,10 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     }
 
     /** 위키 링크 변환은 전체 그래프의 링크·폴더 정보 없이 제목과 slug만 사용한다. */
+    @Cacheable(
+            cacheManager = "vaultCacheManager",
+            cacheNames = VaultCacheConfiguration.TITLE_INDEX_CACHE,
+            sync = true)
     public List<VaultNoteTitleResponse> getTitleIndex() {
         return vaultNoteRepository.findAllForTitleIndex().stream()
                 .map(note -> new VaultNoteTitleResponse(note.title(), note.slug()))
@@ -210,18 +224,27 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     }
 
     /** 사이트맵 생성은 그래프 링크를 만들지 않고 slug와 본문 길이만 조회한다. */
+    @Cacheable(
+            cacheManager = "vaultCacheManager",
+            cacheNames = VaultCacheConfiguration.SITEMAP_INDEX_CACHE,
+            sync = true)
     public List<VaultNoteSitemapResponse> getSitemapIndex() {
         return vaultNoteRepository.findAllForSitemap().stream()
                 .map(note -> new VaultNoteSitemapResponse(note.slug(), note.contentLength()))
                 .toList();
     }
 
+    @Cacheable(
+            cacheManager = "vaultCacheManager",
+            cacheNames = VaultCacheConfiguration.STATS_CACHE,
+            sync = true)
     public VaultNoteStatsResponse getStats() {
         return new VaultNoteStatsResponse(vaultNoteRepository.count());
     }
 
     /** 전체 노트의 outgoingLinks 재인덱싱 (일괄 임포트 후 백링크 복원용) */
     @Transactional
+    @InvalidateVaultReadCaches
     public int reindexAllLinks() {
         List<VaultNote> allNotes = vaultNoteRepository.findAll();
         int updated = 0;
