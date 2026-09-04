@@ -58,17 +58,13 @@ public class CookieCsrfProtectionFilter extends OncePerRequestFilter {
         if (SAFE_METHODS.contains(request.getMethod())) {
             return false;
         }
-        String authorization = request.getHeader("Authorization");
-        if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")) {
-            return false;
-        }
-
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             return false;
         }
         for (Cookie cookie : cookies) {
-            if (AuthCookieManager.ACCESS_TOKEN_COOKIE.equals(cookie.getName())
+            if ((AuthCookieManager.ACCESS_TOKEN_COOKIE.equals(cookie.getName())
+                            || AuthCookieManager.REFRESH_TOKEN_COOKIE.equals(cookie.getName()))
                     && StringUtils.hasText(cookie.getValue())) {
                 return true;
             }

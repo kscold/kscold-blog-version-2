@@ -55,8 +55,26 @@ class CookieCsrfProtectionFilterTest {
     }
 
     @Test
-    void preservesBearerAndSafeMethodApiClients() throws Exception {
-        MockHttpServletRequest bearerRequest = authenticatedPost();
+    void rejectsUntrustedOriginWhenOnlyRefreshCookieRemains() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/auth/refresh");
+        request.setCookies(new Cookie("refresh-token", "cookie-token"));
+        request.addHeader("Origin", "https://untrusted.example");
+
+        assertThat(filterContinues(request)).isFalse();
+    }
+
+    @Test
+    void bearerHeaderDoesNotBypassCookieOriginValidation() throws Exception {
+        MockHttpServletRequest request = authenticatedPost();
+        request.addHeader("Authorization", "Bearer api-token");
+        request.addHeader("Origin", "https://untrusted.example");
+
+        assertThat(filterContinues(request)).isFalse();
+    }
+
+    @Test
+    void preservesBearerWithoutCookiesAndSafeMethodApiClients() throws Exception {
+        MockHttpServletRequest bearerRequest = new MockHttpServletRequest("POST", "/users/me");
         bearerRequest.addHeader("Authorization", "Bearer api-token");
         bearerRequest.addHeader("Origin", "https://untrusted.example");
 
