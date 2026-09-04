@@ -177,19 +177,11 @@ public class PostApplicationService implements PostUseCase {
         int limit = pageable.getPageSize();
         LocalDateTime since = LocalDateTime.now().minusDays(30);
 
-        // 최근 1달 이내 posts 중 views 상위
-        List<Post> all = postRepository.findAllPublished(pageable);
-        List<Post> recent =
-                all.stream()
-                        .filter(
-                                p ->
-                                        p.getPublishedAt() != null
-                                                && p.getPublishedAt().isAfter(since))
-                        .limit(limit)
-                        .toList();
+        // 전체 인기 글을 먼저 제한하면 최근 글이 조회 후보에서 빠지므로 저장소에서 기간 조건을 먼저 적용한다.
+        List<Post> recent = postRepository.findHotPosts(since, pageable);
 
-        // 1달 이내 결과 부족하면 전체 기간 views 상위
-        return recent.size() >= limit ? recent : all;
+        // 최근 1달 이내 결과가 부족할 때만 전체 기간 조회수 상위 글로 대체한다.
+        return recent.size() >= limit ? recent : postRepository.findAllPublished(pageable);
     }
 
     /** 카테고리별 포스트 조회 */

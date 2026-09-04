@@ -1,6 +1,7 @@
 package com.kscold.blog.blog.adapter.in.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -13,6 +14,7 @@ import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
+import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import jakarta.servlet.http.HttpServletRequest;
@@ -132,6 +134,37 @@ class PostControllerTest {
         assertThat(data.getRestricted()).isNull();
     }
 
+    @Test
+    @DisplayName("시나리오: 비관리자가 초안 단건을 요청하면 존재를 숨기고 찾을 수 없음으로 응답한다")
+    void getPostBySlugHidesDraftFromPublicViewer() {
+        Post draft = post(true);
+        draft.setStatus(Post.Status.DRAFT);
+        when(postUseCase.getBySlug("test-post")).thenReturn(draft);
+
+        assertThatThrownBy(
+                        () -> postController.getPostBySlug("test-post", null, httpServletRequest))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("시나리오: 관리자는 미리보기를 위해 초안 단건의 본문을 조회할 수 있다")
+    void getPostBySlugReturnsDraftForAdmin() {
+        SecurityContextHolder.getContext()
+                .setAuthentication(
+                        new UsernamePasswordAuthenticationToken(
+                                "admin-1",
+                                null,
+                                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+        Post draft = post(true);
+        draft.setStatus(Post.Status.DRAFT);
+        when(postUseCase.getBySlug("test-post")).thenReturn(draft);
+
+        ResponseEntity<ApiResponse<PostResponse>> response =
+                postController.getPostBySlug("test-post", "admin-1", httpServletRequest);
+
+        assertThat(response.getBody().getData().getContent()).isEqualTo("본문");
+    }
+
     private static Post post(boolean publicOverride) {
         return Post.builder()
                 .id("post-1")
@@ -139,6 +172,7 @@ class PostControllerTest {
                 .slug("test-post")
                 .content("본문")
                 .excerpt("요약")
+                .status(Post.Status.PUBLISHED)
                 .publicOverride(publicOverride)
                 .category(
                         Post.CategoryInfo.builder()

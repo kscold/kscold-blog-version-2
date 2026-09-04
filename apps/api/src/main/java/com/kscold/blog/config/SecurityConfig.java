@@ -72,6 +72,12 @@ public class SecurityConfig {
                                         .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/github/**")
                                         .permitAll()
+                                        // 공개 프로필과 작성자별 공개 피드는 로그인 없이 조회할 수 있어야 한다.
+                                        .requestMatchers(
+                                                HttpMethod.GET,
+                                                "/users/profile/*",
+                                                "/users/*/feeds")
+                                        .permitAll()
                                         // 피드 공개 엔드포인트
                                         .requestMatchers(HttpMethod.GET, "/feeds/**")
                                         .permitAll()

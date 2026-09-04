@@ -9,6 +9,7 @@ import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
+import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,6 +70,7 @@ public class PostController {
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
         Post post = postUseCase.getById(id);
+        requirePublishedOrAdmin(post);
         recordView(post, request);
         return ResponseEntity.ok(ApiResponse.success(applyRestriction(post, userId)));
     }
@@ -79,8 +81,16 @@ public class PostController {
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
         Post post = postUseCase.getBySlug(slug);
+        requirePublishedOrAdmin(post);
         recordView(post, request);
         return ResponseEntity.ok(ApiResponse.success(applyRestriction(post, userId)));
+    }
+
+    /** 공개 단건 API에서 초안·보관 글의 존재와 본문이 노출되지 않도록 관리자만 허용한다. */
+    private void requirePublishedOrAdmin(Post post) {
+        if (post.getStatus() != Post.Status.PUBLISHED && !hasAdminRole()) {
+            throw ResourceNotFoundException.post(post.getId());
+        }
     }
 
     private void recordView(Post post, HttpServletRequest request) {
@@ -156,6 +166,7 @@ public class PostController {
     }
 
     @GetMapping("/exists/slug/{slug}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Boolean>> checkSlugExists(@PathVariable String slug) {
         boolean exists = postUseCase.existsBySlug(slug);
         return ResponseEntity.ok(ApiResponse.success(exists));

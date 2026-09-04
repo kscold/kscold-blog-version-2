@@ -11,6 +11,8 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,6 +23,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "posts")
+@CompoundIndexes({
+    // 공개 글 목록의 기본 정렬과 인기 글 조회가 컬렉션 전체 스캔으로 커지지 않게 한다.
+    @CompoundIndex(name = "idx_status_publishedAt", def = "{'status': 1, 'publishedAt': -1}"),
+    @CompoundIndex(name = "idx_status_views", def = "{'status': 1, 'views': -1}"),
+    // 카테고리·태그 아카이브의 공개 글 필터와 발행일 정렬을 함께 지원한다.
+    @CompoundIndex(
+            name = "idx_category_status_publishedAt",
+            def = "{'category.id': 1, 'status': 1, 'publishedAt': -1}"),
+    @CompoundIndex(
+            name = "idx_tags_status_publishedAt",
+            def = "{'tags.id': 1, 'status': 1, 'publishedAt': -1}")
+})
 public class Post {
     @Id private String id;
 
