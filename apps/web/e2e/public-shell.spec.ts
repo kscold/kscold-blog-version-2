@@ -55,21 +55,17 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await expect(page).toHaveURL(/\/feed/);
   });
 
-  test('Feed URL 태그 필터를 클라이언트에서 적용한다', async ({ page }) => {
-    let requestedTag: string | null = null;
-    await page.route(/\/api\/feeds(?:\?|$)/, async route => {
-      requestedTag = new URL(route.request().url()).searchParams.get('tag');
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(success(emptyPage(12))),
-      });
-    });
+  test('Feed SEO 메타데이터는 최초 head에 포함된다', async ({ page }) => {
+    await page.goto('/feed');
 
-    await page.goto('/feed?tag=LangGraph');
-
-    await expect(page.getByText('#LangGraph 피드가 없습니다', { exact: true })).toBeVisible();
-    expect(requestedTag).toBe('LangGraph');
+    await expect(page.locator('head meta[name="description"]')).toHaveAttribute(
+      'content',
+      /생각의 조각/
+    );
+    await expect(page.locator('head link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://kscold.com/feed'
+    );
   });
 
   test('비로그인 상태에서는 헤더에 LOGIN 버튼이 노출된다', async ({ page }) => {

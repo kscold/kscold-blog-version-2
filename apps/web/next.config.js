@@ -7,6 +7,9 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
+  // canonical·description이 본문 뒤로 스트리밍되면 일부 크롤러와 SEO 감사 도구가 놓친다.
+  // 동적 페이지도 메타데이터를 완성한 뒤 최초 head에 포함해 모든 UA에 같은 문서 계약을 제공한다.
+  htmlLimitedBots: /.*/,
 
   // 이미지 최적화
   images: {

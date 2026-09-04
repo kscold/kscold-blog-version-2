@@ -1,7 +1,10 @@
-import { Suspense } from 'react';
 import { FeedArchive } from '@/widgets/feed/archive';
 
-export function FeedPageView() {
+interface FeedPageViewProps {
+  activeTag?: string;
+}
+
+export function FeedPageView({ activeTag }: FeedPageViewProps) {
   return (
     <div className="min-h-screen bg-surface-50">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
@@ -14,9 +17,7 @@ export function FeedPageView() {
           </p>
         </div>
 
-        <Suspense fallback={null}>
-          <FeedArchive />
-        </Suspense>
+        <FeedArchive activeTag={activeTag} />
       </div>
     </div>
   );
