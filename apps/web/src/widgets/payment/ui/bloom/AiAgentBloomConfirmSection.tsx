@@ -13,7 +13,6 @@ export function AiAgentBloomConfirmSection({
   formattedAmount,
   isPreparing,
   canPay,
-  livePayment = false,
 }: {
   config: AiAgentBloomPaymentConfig | null;
   paymentStatus: string | null;
@@ -22,9 +21,9 @@ export function AiAgentBloomConfirmSection({
   formattedAmount: string;
   isPreparing: boolean;
   canPay: boolean;
-  livePayment?: boolean;
 }) {
-  const unavailable = config ? !config.configured : false;
+  const paymentAvailable = Boolean(config?.configured && config.livePayment);
+  const unavailable = config ? !paymentAvailable : false;
   return (
     <section
       id="before-payment-window"
@@ -79,14 +78,18 @@ export function AiAgentBloomConfirmSection({
             </p>
             <button
               type="submit"
-              disabled={isPreparing || !canPay}
+              disabled={isPreparing || !canPay || !paymentAvailable}
               className="mt-6 inline-flex w-full justify-center rounded-2xl bg-white px-5 py-4 text-sm font-black text-surface-950 transition hover:bg-cyan-50 disabled:cursor-not-allowed disabled:bg-surface-600 disabled:text-surface-300"
             >
-              {canPay
-                ? isPreparing
-                  ? '결제 확인 중...'
-                  : `${formattedAmount}원 카카오페이${livePayment ? '로 결제하기' : ' 테스트 결제하기'}`
-                : '로그인 또는 안내받은 결제 링크가 필요합니다'}
+              {!canPay
+                ? '로그인 또는 안내받은 결제 링크가 필요합니다'
+                : !config
+                  ? '결제 상태 확인 중...'
+                  : !paymentAvailable
+                    ? '현재 결제를 이용할 수 없습니다'
+                    : isPreparing
+                      ? '결제 확인 중...'
+                      : `${formattedAmount}원 카카오페이로 결제하기`}
             </button>
           </div>
         </div>

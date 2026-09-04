@@ -160,7 +160,7 @@ export function useAiAgentBloomPayment() {
       setPaymentStatus(configError);
       return;
     }
-    if (config && !config.configured) {
+    if (!config?.configured || !config.livePayment) {
       setPaymentStatus('현재 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.');
       return;
     }
