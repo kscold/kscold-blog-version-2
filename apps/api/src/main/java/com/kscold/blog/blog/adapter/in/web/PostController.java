@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -58,7 +59,7 @@ public class PostController {
         String safeSortBy = PUBLIC_SORT_FIELDS.contains(sortBy) ? sortBy : "publishedAt";
         Pageable pageable = PublicPageRequestFactory.of(page, size, Sort.by(direction, safeSortBy));
         Page<Post> posts = postUseCase.getAll(pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
+        return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
 
     @GetMapping("/featured")
@@ -67,8 +68,7 @@ public class PostController {
         Pageable pageable =
                 PublicPageRequestFactory.of(0, limit, Sort.by(Sort.Direction.DESC, "views"));
         List<Post> posts = postUseCase.getFeatured(pageable);
-        return ResponseEntity.ok(
-                ApiResponse.success(posts.stream().map(this::toPublicPostResponse).toList()));
+        return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
 
     @GetMapping("/{id}")
@@ -117,7 +117,7 @@ public class PostController {
                 PublicPageRequestFactory.of(
                         page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByCategory(categoryId, pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
+        return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
 
     @GetMapping("/tag/{tagId}")
@@ -129,7 +129,7 @@ public class PostController {
                 PublicPageRequestFactory.of(
                         page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByTag(tagId, pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
+        return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
 
     @GetMapping("/search")
@@ -141,7 +141,7 @@ public class PostController {
                 PublicPageRequestFactory.of(
                         page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.search(q, pageable);
-        return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
+        return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
 
     @PostMapping
@@ -199,8 +199,16 @@ public class PostController {
         return PostResponse.restricted(post);
     }
 
-    private PostResponse toPublicPostResponse(Post post) {
-        return PostResponse.summary(post, isRestrictedPost(post));
+    private Page<PostResponse> toPublicPostResponses(Page<Post> posts) {
+        RestrictionPolicy policy = loadRestrictionPolicy();
+        return posts.map(post -> PostResponse.summary(post, isRestrictedPost(post, policy)));
+    }
+
+    private List<PostResponse> toPublicPostResponses(List<Post> posts) {
+        RestrictionPolicy policy = loadRestrictionPolicy();
+        return posts.stream()
+                .map(post -> PostResponse.summary(post, isRestrictedPost(post, policy)))
+                .toList();
     }
 
     private PostResponse toFullPostResponse(Post post) {
@@ -214,10 +222,34 @@ public class PostController {
         try {
             Category category = categoryUseCase.getById(post.getCategory().getId());
             return Boolean.TRUE.equals(category.getRestricted());
-        } catch (Exception ignored) {
-            return false;
+        } catch (Exception exception) {
+            log.warn("포스트 제한 카테고리를 확인하지 못해 접근을 제한합니다: {}", post.getId());
+            return true;
         }
     }
+
+    private RestrictionPolicy loadRestrictionPolicy() {
+        try {
+            Set<String> restrictedCategoryIds =
+                    categoryUseCase.getAll().stream()
+                            .filter(category -> Boolean.TRUE.equals(category.getRestricted()))
+                            .map(Category::getId)
+                            .collect(Collectors.toUnmodifiableSet());
+            return new RestrictionPolicy(restrictedCategoryIds, true);
+        } catch (Exception exception) {
+            log.warn("포스트 목록의 제한 카테고리를 확인하지 못해 안전 모드로 처리합니다");
+            return new RestrictionPolicy(Set.of(), false);
+        }
+    }
+
+    private boolean isRestrictedPost(Post post, RestrictionPolicy policy) {
+        if (post.getCategory() == null) return false;
+        if (Boolean.TRUE.equals(post.getPublicOverride())) return false;
+        return !policy.resolved()
+                || policy.restrictedCategoryIds().contains(post.getCategory().getId());
+    }
+
+    private record RestrictionPolicy(Set<String> restrictedCategoryIds, boolean resolved) {}
 
     private boolean hasAdminRole() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

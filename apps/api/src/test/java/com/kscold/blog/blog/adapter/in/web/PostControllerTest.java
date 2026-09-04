@@ -153,6 +153,42 @@ class PostControllerTest {
     }
 
     @Test
+    @DisplayName("시나리오: 공개 글 목록은 카테고리를 한 번만 읽어 모든 제한 여부를 판정한다")
+    void getAllPostsLoadsRestrictionCategoriesOnce() {
+        Post first = post(false);
+        Post second = post(false);
+        second.setId("post-2");
+        Category restrictedCategory =
+                Category.builder().id("cat-1").name("개발 이야기").restricted(true).build();
+        when(postUseCase.getAll(any())).thenReturn(new PageImpl<>(List.of(first, second)));
+        when(categoryUseCase.getAll()).thenReturn(List.of(restrictedCategory));
+
+        ResponseEntity<ApiResponse<Page<PostResponse>>> response =
+                postController.getAllPosts(0, 10, "publishedAt", "desc");
+
+        assertThat(response.getBody().getData().getContent())
+                .extracting(PostResponse::getRestricted)
+                .containsExactly(true, true);
+        verify(categoryUseCase).getAll();
+        verify(categoryUseCase, never()).getById(any());
+    }
+
+    @Test
+    @DisplayName("시나리오: 제한 카테고리를 확인할 수 없으면 단건 본문을 안전하게 숨긴다")
+    void getPostByIdFailsClosedWhenCategoryLookupFails() {
+        Post post = post(false);
+        when(postUseCase.getById("post-1")).thenReturn(post);
+        when(categoryUseCase.getById("cat-1"))
+                .thenThrow(ResourceNotFoundException.category("cat-1"));
+
+        ResponseEntity<ApiResponse<PostResponse>> response =
+                postController.getPostById("post-1", null, httpServletRequest);
+
+        assertThat(response.getBody().getData().getRestricted()).isTrue();
+        assertThat(response.getBody().getData().getContent()).isNull();
+    }
+
+    @Test
     @DisplayName("시나리오: 비관리자가 초안 단건을 요청하면 존재를 숨기고 찾을 수 없음으로 응답한다")
     void getPostBySlugHidesDraftFromPublicViewer() {
         Post draft = post(true);
