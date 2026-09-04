@@ -1,16 +1,21 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { Header } from '@/widgets/header';
 import { Sidebar } from '@/widgets/sidebar';
-import { FloatingChatWidget } from '@/widgets/chat';
 import { AlertToast } from '@/shared/ui/AlertToast';
 import { CustomCursor } from '@/shared/ui/CustomCursor';
 import { ScrollProgress } from '@/shared/ui/ScrollProgress';
 import { ViewerProvider } from '@/shared/model/ViewerProvider';
 import type { InitialViewer } from '@/shared/lib/initialViewer';
 import { PageVisitTracker } from '@/shared/analytics/PageVisitTracker';
+
+const FloatingChatWidget = dynamic(
+  () => import('@/widgets/chat').then(module => module.FloatingChatWidget),
+  { ssr: false }
+);
 
 interface ClientLayoutProps {
   children: React.ReactNode;
