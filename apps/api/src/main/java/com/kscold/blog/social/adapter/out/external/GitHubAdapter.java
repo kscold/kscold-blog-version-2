@@ -48,7 +48,7 @@ public class GitHubAdapter implements GitHubPort {
                     root.path("following").asInt(0),
                     root.path("public_repos").asInt(0));
         } catch (IOException e) {
-            log.warn("GitHub profile fetch failed: {}", e.getMessage());
+            log.warn("GitHub profile fetch failed: type={}", e.getClass().getSimpleName());
             throw InvalidRequestException.invalidInput("GitHub 프로필을 불러오지 못했습니다");
         }
     }
@@ -97,7 +97,7 @@ public class GitHubAdapter implements GitHubPort {
             }
             return new ContributionResult(days, total);
         } catch (IOException e) {
-            log.warn("GitHub contributions fetch failed: {}", e.getMessage());
+            log.warn("GitHub contributions fetch failed: type={}", e.getClass().getSimpleName());
             return new ContributionResult(List.of(), 0);
         }
     }
@@ -125,7 +125,7 @@ public class GitHubAdapter implements GitHubPort {
                     .limit(3)
                     .toList();
         } catch (IOException e) {
-            log.warn("GitHub repository fetch failed: {}", e.getMessage());
+            log.warn("GitHub repository fetch failed: type={}", e.getClass().getSimpleName());
             return List.of();
         }
     }

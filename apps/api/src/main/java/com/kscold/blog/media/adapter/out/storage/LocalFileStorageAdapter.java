@@ -34,11 +34,11 @@ public class LocalFileStorageAdapter implements FileStoragePort {
             Path targetPath = uploadPath.resolve(savedFilename);
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-            log.info("File stored successfully: {}", savedFilename);
+            log.info("File stored successfully");
 
             return "/uploads/" + savedFilename;
         } catch (IOException e) {
-            log.error("Failed to store file", e);
+            log.error("Failed to store file: type={}", e.getClass().getSimpleName());
             throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 업로드에 실패했습니다");
         }
     }
@@ -50,17 +50,17 @@ public class LocalFileStorageAdapter implements FileStoragePort {
         Path path = uploadPath.resolve(filename).normalize();
 
         if (!path.startsWith(uploadPath)) {
-            log.warn("Attempted path traversal attack with fileUrl: {}", fileUrl);
+            log.warn("Attempted path traversal attack");
             throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "잘못된 파일 경로입니다");
         }
 
         try {
             if (Files.exists(path)) {
                 Files.delete(path);
-                log.info("File deleted successfully: {}", filename);
+                log.info("File deleted successfully");
             }
         } catch (IOException e) {
-            log.error("Failed to delete file: {}", fileUrl, e);
+            log.error("Failed to delete file: type={}", e.getClass().getSimpleName());
             throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 삭제에 실패했습니다");
         }
     }

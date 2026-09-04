@@ -172,7 +172,7 @@ public class StackShareManagementApplicationService implements StackShareManagem
         } catch (RuntimeException exception) {
             settlement.setStatus(StackShareSettlement.Status.FAILED);
             settlementRepository.save(settlement);
-            recordDelivery(settlement, null, exception.getMessage());
+            recordDelivery(settlement, null, exception.getClass().getSimpleName());
             throw exception;
         }
     }

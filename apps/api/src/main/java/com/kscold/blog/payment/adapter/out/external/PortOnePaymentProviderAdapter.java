@@ -51,15 +51,14 @@ public class PortOnePaymentProviderAdapter implements PortOnePaymentProvider {
             return payment;
         } catch (RestClientResponseException exception) {
             log.warn(
-                    "포트원 결제 조회 실패 paymentId={}, status={}",
-                    paymentId,
+                    "포트원 결제 조회 실패: status={}, type={}",
                     exception.getStatusCode(),
-                    exception);
+                    exception.getClass().getSimpleName());
             throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR, "포트원 결제 조회에 실패했습니다.");
         } catch (BusinessException exception) {
             throw exception;
         } catch (Exception exception) {
-            log.warn("포트원 결제 조회 중 예외 발생 paymentId={}", paymentId, exception);
+            log.warn("포트원 결제 조회 중 예외 발생: type={}", exception.getClass().getSimpleName());
             throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR, "포트원 결제 조회 중 오류가 발생했습니다.");
         }
     }

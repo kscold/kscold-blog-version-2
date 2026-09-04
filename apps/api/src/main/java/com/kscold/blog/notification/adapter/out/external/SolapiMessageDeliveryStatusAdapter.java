@@ -58,7 +58,7 @@ public class SolapiMessageDeliveryStatusAdapter implements MessageDeliveryStatus
                             .body(JsonNode.class);
             return toStatuses(response, groupId);
         } catch (Exception exception) {
-            log.warn("SOLAPI 발송 상태 조회 실패 groupId={}", groupId, exception);
+            log.warn("SOLAPI 발송 상태 조회 실패: type={}", exception.getClass().getSimpleName());
             return List.of();
         }
     }

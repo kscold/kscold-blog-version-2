@@ -42,11 +42,11 @@ public class DiscordBotConfig {
                                 jda.awaitReady();
                                 log.info("Discord 봇 연결 완료: {}", jda.getSelfUser().getName());
                             } catch (InterruptedException e) {
-                                log.error("Discord 봇 연결 대기 중 인터럽트", e);
+                                log.info("Discord 봇 연결 대기 중 인터럽트");
                                 Thread.currentThread().interrupt();
                             } catch (IllegalStateException e) {
                                 // 애플리케이션 종료(재배포)로 JDA가 먼저 shutdown된 경우 — 정상 흐름
-                                log.info("Discord 봇 연결 대기 중 종료됨: {}", e.getMessage());
+                                log.info("Discord 봇 연결 대기 중 종료됨");
                             }
                         });
 

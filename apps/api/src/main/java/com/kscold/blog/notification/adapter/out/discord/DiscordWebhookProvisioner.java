@@ -104,7 +104,10 @@ public class DiscordWebhookProvisioner {
                                         textChannel.getName());
                             });
         } catch (Exception exception) {
-            log.warn("디스코드 알림 채널 준비 실패: {} ({})", channel, channelName, exception);
+            log.warn(
+                    "디스코드 알림 채널 준비 실패: channel={}, type={}",
+                    channel,
+                    exception.getClass().getSimpleName());
         }
     }
 

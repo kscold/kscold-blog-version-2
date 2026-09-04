@@ -38,9 +38,11 @@ public class DiscordWebhookInitializer {
                                 Thread.currentThread().interrupt();
                             } catch (IllegalStateException exception) {
                                 // 재배포로 JDA 가 먼저 종료된 경우 — 정상 흐름
-                                log.info("알림 채널 준비 중 종료됨: {}", exception.getMessage());
+                                log.info("알림 채널 준비 중 종료됨");
                             } catch (Exception exception) {
-                                log.warn("알림 채널 준비 실패", exception);
+                                log.warn(
+                                        "알림 채널 준비 실패: type={}",
+                                        exception.getClass().getSimpleName());
                             }
                         });
     }

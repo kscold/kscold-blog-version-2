@@ -58,7 +58,7 @@ public class MediaApplicationService implements MediaUseCase {
                                         .build())
                         .build();
 
-        log.info("File uploaded successfully: {}", fileUrl);
+        log.info("File uploaded successfully");
 
         return mediaRepository.save(media);
     }
@@ -69,7 +69,7 @@ public class MediaApplicationService implements MediaUseCase {
 
         mediaRepository.findByFileUrl(fileUrl).ifPresent(mediaRepository::delete);
 
-        log.info("Media deleted successfully: {}", fileUrl);
+        log.info("Media deleted successfully");
     }
 
     private void validateFile(MultipartFile file) {

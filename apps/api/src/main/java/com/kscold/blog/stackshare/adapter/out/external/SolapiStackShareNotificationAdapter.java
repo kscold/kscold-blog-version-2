@@ -52,14 +52,14 @@ public class SolapiStackShareNotificationAdapter implements StackShareNotificati
             return toResult(response, messages.size());
         } catch (RestClientResponseException exception) {
             log.warn(
-                    "SOLAPI 알림톡 발송 실패 status={}, body={}",
+                    "SOLAPI 알림톡 발송 실패: status={}, type={}",
                     exception.getStatusCode(),
-                    exception.getResponseBodyAsString());
+                    exception.getClass().getSimpleName());
             throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR, "알림톡 발송 요청에 실패했습니다.");
         } catch (BusinessException exception) {
             throw exception;
         } catch (Exception exception) {
-            log.warn("SOLAPI 알림톡 발송 중 예외 발생", exception);
+            log.warn("SOLAPI 알림톡 발송 중 예외 발생: type={}", exception.getClass().getSimpleName());
             throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR, "알림톡 발송 중 오류가 발생했습니다.");
         }
     }

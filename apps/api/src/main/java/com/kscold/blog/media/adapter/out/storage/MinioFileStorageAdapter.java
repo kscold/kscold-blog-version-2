@@ -40,10 +40,10 @@ public class MinioFileStorageAdapter implements FileStoragePort {
                                     .build(),
                             RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-            log.info("File uploaded to MinIO: {}/{}", minioStorageSupport.getBucket(), key);
+            log.info("File uploaded to MinIO");
             return minioStorageSupport.buildPublicUrl(key);
         } catch (Exception e) {
-            log.error("Failed to upload file to MinIO", e);
+            log.error("Failed to upload file to MinIO: type={}", e.getClass().getSimpleName());
             throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 업로드에 실패했습니다");
         }
     }
@@ -59,7 +59,7 @@ public class MinioFileStorageAdapter implements FileStoragePort {
                             + minioStorageSupport.getBucket()
                             + "/";
             if (!fileUrl.startsWith(prefix)) {
-                log.warn("Unknown file URL format, skipping delete: {}", fileUrl);
+                log.warn("Unknown file URL format, skipping delete");
                 return;
             }
             String key = fileUrl.substring(prefix.length());
@@ -72,9 +72,9 @@ public class MinioFileStorageAdapter implements FileStoragePort {
                                     .key(key)
                                     .build());
 
-            log.info("File deleted from MinIO: {}/{}", minioStorageSupport.getBucket(), key);
+            log.info("File deleted from MinIO");
         } catch (Exception e) {
-            log.error("Failed to delete file from MinIO: {}", fileUrl, e);
+            log.error("Failed to delete file from MinIO: type={}", e.getClass().getSimpleName());
             throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 삭제에 실패했습니다");
         }
     }

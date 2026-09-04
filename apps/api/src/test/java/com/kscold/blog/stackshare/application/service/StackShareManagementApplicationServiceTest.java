@@ -14,6 +14,7 @@ import com.kscold.blog.notification.application.port.in.AlimtalkTemplateUseCase;
 import com.kscold.blog.notification.application.port.in.MessageDeliveryUseCase;
 import com.kscold.blog.notification.domain.model.AlimtalkTemplate;
 import com.kscold.blog.notification.domain.model.AlimtalkTemplateStatus;
+import com.kscold.blog.notification.domain.model.MessageDeliveryLog;
 import com.kscold.blog.stackshare.application.dto.SendStackShareNotificationsCommand;
 import com.kscold.blog.stackshare.application.dto.StackShareRecipientCommand;
 import com.kscold.blog.stackshare.application.dto.StackShareSettlementCommand;
@@ -177,6 +178,27 @@ class StackShareManagementApplicationServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("입금 계좌");
         verify(notificationSender, never()).send(any());
+    }
+
+    @Test
+    void 발송_실패_기록에는_예외_원문_대신_타입만_저장한다() {
+        String sensitiveFailureReason = "provider-secret-failure-detail";
+        when(templateUseCase.getTemplate("STACK_SHARE_SETTLEMENT")).thenReturn(approvedTemplate());
+        when(participantRepository.findByPhoneNumber(any())).thenReturn(Optional.empty());
+        when(participantRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(settlementRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(notificationSender.send(any()))
+                .thenThrow(new IllegalStateException(sensitiveFailureReason));
+
+        assertThatThrownBy(() -> service.createAndSend(command(30_000)))
+                .isInstanceOf(IllegalStateException.class);
+
+        ArgumentCaptor<List<MessageDeliveryLog>> captor = ArgumentCaptor.forClass(List.class);
+        verify(messageDeliveryUseCase).recordAll(captor.capture());
+        assertThat(captor.getValue())
+                .extracting(MessageDeliveryLog::getFailureReason)
+                .containsOnly("IllegalStateException")
+                .noneMatch(sensitiveFailureReason::equals);
     }
 
     /** 발송이 성공하는 최소 스텁 묶음. 계좌·기한 검증 테스트가 공유한다. */
