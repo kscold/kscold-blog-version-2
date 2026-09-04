@@ -3,6 +3,9 @@ package com.kscold.blog.exception;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.vault.agent.application.dto.command.ChatCommand;
@@ -12,8 +15,11 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 
 class GlobalExceptionHandlerTest {
 
@@ -34,5 +40,39 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().getErrorCode())
                 .isEqualTo(ErrorCode.INVALID_INPUT_VALUE.getCode());
         assertThat(response.getBody().getMessage()).isEqualTo("세션 값이 너무 깁니다.");
+    }
+
+    @Test
+    void bindFailureLogDoesNotIncludeRejectedSecretValue() {
+        Logger logger = (Logger) LoggerFactory.getLogger(GlobalExceptionHandler.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        BindException exception = new BindException(new Object(), "request");
+        exception.addError(
+                new FieldError(
+                        "request",
+                        "password",
+                        "never-log-this-secret",
+                        false,
+                        null,
+                        null,
+                        "비밀번호 형식이 올바르지 않습니다."));
+        GlobalExceptionHandler handler =
+                new GlobalExceptionHandler(mock(NotificationUseCase.class));
+
+        try {
+            handler.handleBindException(exception);
+
+            assertThat(appender.list)
+                    .extracting(ILoggingEvent::getFormattedMessage)
+                    .singleElement()
+                    .asString()
+                    .contains("password")
+                    .doesNotContain("never-log-this-secret");
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
     }
 }

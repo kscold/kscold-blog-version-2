@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -73,7 +74,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException e) {
-        log.warn("MethodArgumentNotValidException: {}", e.getMessage());
+        log.warn(
+                "MethodArgumentNotValidException: errors={}, fields={}",
+                e.getBindingResult().getErrorCount(),
+                validationFieldNames(e.getBindingResult()));
 
         String errorMessage =
                 e.getBindingResult().getFieldErrors().stream()
@@ -89,7 +93,10 @@ public class GlobalExceptionHandler {
     /** Bind 예외 처리 요청 파라미터 바인딩 실패 시 발생 */
     @ExceptionHandler(BindException.class)
     protected ResponseEntity<ApiResponse<Void>> handleBindException(BindException e) {
-        log.warn("BindException: {}", e.getMessage());
+        log.warn(
+                "BindException: errors={}, fields={}",
+                e.getBindingResult().getErrorCount(),
+                validationFieldNames(e.getBindingResult()));
 
         String errorMessage =
                 e.getBindingResult().getFieldErrors().stream()
@@ -123,20 +130,29 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ApiResponse<Void>> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException e) {
-        log.warn("MethodArgumentTypeMismatchException: {}", e.getMessage());
-
         Class<?> requiredType = e.getRequiredType();
+        log.warn(
+                "MethodArgumentTypeMismatchException: parameter={}, requiredType={}",
+                e.getName(),
+                requiredType != null ? requiredType.getSimpleName() : "unknown");
         String errorMessage =
                 String.format(
-                        "파라미터 '%s'의 값 '%s'는 타입 '%s'로 변환할 수 없습니다",
+                        "파라미터 '%s'는 타입 '%s'로 변환할 수 없습니다",
                         e.getName(),
-                        e.getValue(),
                         requiredType != null ? requiredType.getSimpleName() : "unknown");
 
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_TYPE_VALUE.getCode(), errorMessage);
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    private static List<String> validationFieldNames(BindingResult bindingResult) {
+        return bindingResult.getFieldErrors().stream()
+                .map(FieldError::getField)
+                .distinct()
+                .sorted()
+                .toList();
     }
 
     /** 지원하지 않는 HTTP 메서드 예외 처리 (405) 브라우저나 잘못된 호출이 POST 전용 엔드포인트를 GET으로 두드릴 때 내부 오류처럼 보이지 않게 처리 */
