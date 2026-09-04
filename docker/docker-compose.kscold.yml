@@ -81,7 +81,12 @@ services:
 
   blog-qdrant:
     container_name: kscold-vault-qdrant
-    image: qdrant/qdrant:v1.19.0
+    image: qdrant/qdrant:v1.19.0-unprivileged
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - blog-qdrant-data:/qdrant/storage
       - blog-qdrant-snapshots:/qdrant/snapshots
