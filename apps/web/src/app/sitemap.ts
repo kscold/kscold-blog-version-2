@@ -25,7 +25,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const categories = flattenCategories(categoryTree || []);
-  const indexablePosts = (posts || []).filter(post => post.status === 'PUBLISHED');
+  // 제한 글은 상세 메타데이터가 noindex 이므로 사이트맵에서도 제외해 크롤링 신호를 일치시킨다.
+  const indexablePosts = (posts || []).filter(
+    post => post.status === 'PUBLISHED' && !post.restricted
+  );
   const indexableFeeds = (feeds || []).filter(
     feed => feed.visibility === 'PUBLIC' && isIndexableFeed(feed.content)
   );
