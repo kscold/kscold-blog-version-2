@@ -19,6 +19,7 @@ export function SidebarMobileNav({ links }: SidebarMobileNavProps) {
         <Link
           key={link.href}
           href={link.href}
+          prefetch={false}
           data-cy={`sidebar-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
           className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             link.highlighted

@@ -62,6 +62,7 @@ export function SidebarTags({ tags, isLoading }: SidebarTagsProps) {
                   <Link
                     key={tag.name}
                     href={`/tags/${encodeURIComponent(tag.name)}`}
+                    prefetch={false}
                     className="group relative overflow-hidden rounded-lg border border-surface-200 bg-white px-3 py-1.5 text-xs font-bold text-surface-500 transition-all hover:border-surface-900 hover:text-surface-900"
                   >
                     <span className="absolute inset-0 bg-surface-50 opacity-0 transition-opacity group-hover:opacity-100" />
