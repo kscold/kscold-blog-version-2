@@ -3,30 +3,18 @@ import { notFound, redirect } from 'next/navigation';
 import { cache } from 'react';
 import { PostDetail } from '@/widgets/post';
 import type { Post } from '@/shared/model/types/blog';
-import type { PageResponse } from '@/shared/model/types/api';
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
   fetchPublicApi,
   fetchViewerApi,
-  RECENT_DETAIL_PRERENDER_COUNT,
   toMetaDescription,
   toOgImage,
   uniqueKeywords,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
-
-export async function generateStaticParams() {
-  const posts = await fetchPublicApi<PageResponse<Post>>(
-    `/posts?page=0&size=${RECENT_DETAIL_PRERENDER_COUNT}`
-  );
-
-  return (posts?.content ?? [])
-    .filter(post => post.status === 'PUBLISHED' && !post.restricted)
-    .map(post => ({ category: post.category.slug, slug: post.slug }));
-}
 
 const getPost = cache(async (slug: string): Promise<Post | null> => {
   const encodedSlug = encodeURIComponent(slug);
