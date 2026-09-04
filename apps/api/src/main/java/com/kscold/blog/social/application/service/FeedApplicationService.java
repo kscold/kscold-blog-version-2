@@ -15,6 +15,7 @@ import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
 import com.kscold.blog.social.domain.port.out.LinkScrapingPort;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -128,6 +129,23 @@ public class FeedApplicationService implements FeedUseCase {
 
     public List<Map<String, Object>> getFeedTags() {
         return feedRepository.aggregateTags();
+    }
+
+    @Override
+    public Map<String, Long> getFeedTagCounts() {
+        Map<String, Long> counts = new LinkedHashMap<>();
+        for (Map<String, Object> row : feedRepository.aggregateTags()) {
+            Object name = row.get("name");
+            Object count = row.get("count");
+            if (name == null || count == null) continue;
+            counts.put(name.toString(), ((Number) count).longValue());
+        }
+        return counts;
+    }
+
+    @Override
+    public long renameFeedTag(String fromName, String toName) {
+        return feedRepository.renameTag(fromName, toName);
     }
 
     /** 댓글 수 원자적 증가 */

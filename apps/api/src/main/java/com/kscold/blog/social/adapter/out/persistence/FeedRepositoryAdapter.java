@@ -127,4 +127,27 @@ public class FeedRepositoryAdapter implements FeedRepository {
         mongoTemplate.updateFirst(alreadyLiked, removeLike, Feed.class);
         return false;
     }
+
+    /** 이름이 같은 태그 문자열을 바꾼다. 이미 바꿀 이름을 가진 피드는 중복되지 않도록 기존 태그만 지운다. */
+    @Override
+    public long renameTag(String fromName, String toName) {
+        long renamed =
+                mongoTemplate
+                        .updateMulti(
+                                Query.query(
+                                        Criteria.where("tags").is(fromName).and("tags").ne(toName)),
+                                new Update()
+                                        .set("tags.$[old]", toName)
+                                        .filterArray(Criteria.where("old").is(fromName)),
+                                Feed.class)
+                        .getModifiedCount();
+        long merged =
+                mongoTemplate
+                        .updateMulti(
+                                Query.query(Criteria.where("tags").all(fromName, toName)),
+                                new Update().pull("tags", fromName),
+                                Feed.class)
+                        .getModifiedCount();
+        return renamed + merged;
+    }
 }

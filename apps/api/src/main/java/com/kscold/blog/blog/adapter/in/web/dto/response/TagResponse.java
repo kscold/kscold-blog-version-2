@@ -19,6 +19,7 @@ public class TagResponse {
     private String name;
     private String slug;
     private Integer postCount;
+    private String categoryId;
     private LocalDateTime createdAt;
 
     /** Tag 엔티티를 TagResponse로 변환 */
@@ -28,6 +29,7 @@ public class TagResponse {
                 .name(tag.getName())
                 .slug(tag.getSlug())
                 .postCount(tag.getPostCount())
+                .categoryId(tag.getCategoryId())
                 .createdAt(tag.getCreatedAt())
                 .build();
     }

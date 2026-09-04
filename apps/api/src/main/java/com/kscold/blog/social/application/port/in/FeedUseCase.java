@@ -35,4 +35,10 @@ public interface FeedUseCase {
     void validateOwnership(String feedId, String userId, boolean isAdmin);
 
     List<Map<String, Object>> getFeedTags();
+
+    /** 태그 이름 → 공개 피드 사용 횟수. 태그 인덱스를 만들 때 쓴다. */
+    Map<String, Long> getFeedTagCounts();
+
+    /** 피드의 태그 이름을 일괄 변경한다. 태그를 합칠 때 쓴다. */
+    long renameFeedTag(String fromName, String toName);
 }

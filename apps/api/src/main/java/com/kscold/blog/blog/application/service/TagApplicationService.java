@@ -60,6 +60,11 @@ public class TagApplicationService implements TagUseCase {
             tag.setSlug(command.getSlug());
         }
 
+        // 빈 문자열은 분류 해제로 본다. null 은 "건드리지 않음" 이라 구분이 필요하다.
+        if (command.getCategoryId() != null) {
+            tag.setCategoryId(command.getCategoryId().isBlank() ? null : command.getCategoryId());
+        }
+
         return tagRepository.save(tag);
     }
 

@@ -33,4 +33,11 @@ public interface FeedRepository {
 
     /** PUBLIC 피드의 태그별 사용 횟수: [{name, count}] 내림차순 */
     List<Map<String, Object>> aggregateTags();
+
+    /**
+     * 피드에 붙은 태그 문자열을 다른 이름으로 바꾼다. 태그를 합칠 때 쓴다.
+     *
+     * @return 바뀐 피드 수
+     */
+    long renameTag(String fromName, String toName);
 }

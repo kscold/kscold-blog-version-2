@@ -28,5 +28,8 @@ public class Tag {
 
     @Builder.Default private Integer postCount = 0;
 
+    /** 이 태그를 묶을 블로그 카테고리. 비어 있으면 아직 분류되지 않은 태그다. */
+    @Indexed private String categoryId;
+
     @CreatedDate private LocalDateTime createdAt;
 }

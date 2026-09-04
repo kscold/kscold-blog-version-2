@@ -3,6 +3,7 @@ package com.kscold.blog.blog.domain.port.out;
 import com.kscold.blog.blog.domain.model.Post;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +34,17 @@ public interface PostRepository {
     Page<Post> searchByText(String keyword, Pageable pageable);
 
     long countByStatus(Post.Status status);
+
+    /** 발행된 글의 태그 이름별 사용 횟수. 태그 목록을 매번 세지 않고 한 번의 집계로 가져온다. */
+    Map<String, Long> countPublishedByTagName();
+
+    /**
+     * 글에 박혀 있는 태그 참조를 다른 태그로 바꾼다. 태그를 합칠 때 쓴다.
+     *
+     * @return 바뀐 글 수
+     */
+    long replaceTagReference(String fromTagId, String toTagId, String toName);
+
+    /** 이 태그를 쓰는 글들의 카테고리별 사용 횟수. 태그를 어느 카테고리로 묶을지 추측할 때 쓴다. */
+    Map<String, Long> countCategoriesByTagId(String tagId);
 }
