@@ -33,8 +33,8 @@ server:
   servlet:
     context-path: /api
   error:
-    include-message: always
-    include-binding-errors: always
+    include-message: never
+    include-binding-errors: never
 
 # JWT 설정
 jwt:
@@ -135,6 +135,6 @@ vault:
 # Logging
 logging:
   level:
-    com.kscold.blog: DEBUG
-    org.springframework.data.mongodb: DEBUG
-    org.springframework.security: DEBUG
+    com.kscold.blog: INFO
+    org.springframework.data.mongodb: WARN
+    org.springframework.security: WARN

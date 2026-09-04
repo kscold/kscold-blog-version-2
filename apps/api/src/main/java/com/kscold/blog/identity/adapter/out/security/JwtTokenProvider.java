@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider {
 
+    private static final int MINIMUM_HMAC_KEY_BYTES = 32;
+
     @Value("${jwt.secret}")
     private String secret;
 
@@ -127,6 +129,10 @@ public class JwtTokenProvider {
             keyBytes = Decoders.BASE64.decode(value);
         } catch (IllegalArgumentException ignored) {
             keyBytes = value.getBytes(StandardCharsets.UTF_8);
+        }
+
+        if (keyBytes.length < MINIMUM_HMAC_KEY_BYTES) {
+            throw new IllegalStateException("JWT 서명 키는 256비트 이상이어야 합니다.");
         }
 
         return new SecretKeySpec(keyBytes, Jwts.SIG.HS256.key().build().getAlgorithm());
