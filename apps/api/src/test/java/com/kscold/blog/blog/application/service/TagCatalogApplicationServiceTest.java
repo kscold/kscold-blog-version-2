@@ -107,7 +107,7 @@ class TagCatalogApplicationServiceTest {
         Tag target = tag("t2", "AIAgent", "aiagent", null);
         when(tagRepository.findById("t1")).thenReturn(Optional.of(source));
         when(tagRepository.findById("t2")).thenReturn(Optional.of(target));
-        when(postRepository.replaceTagReference("t1", "t2", "AIAgent")).thenReturn(3L);
+        when(postRepository.replaceTagReference(any(), any())).thenReturn(3L);
         when(feedUseCase.renameFeedTag("AI에이전트", "AIAgent")).thenReturn(5L);
         when(postRepository.countPublishedByTagName()).thenReturn(Map.of("AIAgent", 3L));
 
@@ -123,7 +123,7 @@ class TagCatalogApplicationServiceTest {
     void mergeRejectsSameTag() {
         assertThatThrownBy(() -> service.merge("t1", "t1"))
                 .isInstanceOf(InvalidRequestException.class);
-        verify(postRepository, never()).replaceTagReference(any(), any(), any());
+        verify(postRepository, never()).replaceTagReference(any(), any());
         verify(tagRepository, never()).delete(any());
     }
 

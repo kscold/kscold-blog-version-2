@@ -3,12 +3,15 @@ package com.kscold.blog.blog.application.service;
 import com.kscold.blog.blog.application.dto.command.TagCommand;
 import com.kscold.blog.blog.application.port.in.TagUseCase;
 import com.kscold.blog.blog.config.InvalidateBlogCatalogCaches;
+import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.domain.model.Tag;
+import com.kscold.blog.blog.domain.port.out.PostRepository;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.exception.DuplicateResourceException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.shared.util.SlugUtils;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TagApplicationService implements TagUseCase {
 
     private final TagRepository tagRepository;
+    private final PostRepository postRepository;
 
     /** 태그 생성 - 슬러그 자동 생성 - 중복 체크 (name, slug) */
     @Transactional
@@ -46,6 +50,10 @@ public class TagApplicationService implements TagUseCase {
     @InvalidateBlogCatalogCaches
     public Tag update(String id, TagCommand command) {
         Tag tag = getById(id);
+        boolean isReferenceChanged =
+                !tag.getName().equals(command.getName())
+                        || (command.getSlug() != null
+                                && !Objects.equals(tag.getSlug(), command.getSlug()));
 
         // 이름 수정 (중복 체크)
         if (!tag.getName().equals(command.getName())) {
@@ -68,7 +76,16 @@ public class TagApplicationService implements TagUseCase {
             tag.setCategoryId(command.getCategoryId().isBlank() ? null : command.getCategoryId());
         }
 
-        return tagRepository.save(tag);
+        Tag saved = tagRepository.save(tag);
+        if (isReferenceChanged) {
+            postRepository.updateTagReference(
+                    Post.TagInfo.builder()
+                            .id(saved.getId())
+                            .name(saved.getName())
+                            .slug(saved.getSlug())
+                            .build());
+        }
+        return saved;
     }
 
     /** 태그 삭제 */

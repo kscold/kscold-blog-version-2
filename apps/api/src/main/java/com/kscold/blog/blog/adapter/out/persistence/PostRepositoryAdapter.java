@@ -107,11 +107,11 @@ public class PostRepositoryAdapter implements PostRepository {
         return toCountMap(mongoTemplate.aggregate(aggregation, "posts", Document.class));
     }
 
-    /** 태그를 합칠 때 글에 박힌 {_id, name} 참조를 통째로 바꾼다. */
+    /** 태그를 합칠 때 글에 박힌 {_id, name, slug} 참조를 통째로 바꾼다. */
     @Override
-    public long replaceTagReference(String fromTagId, String toTagId, String toName) {
+    public long replaceTagReference(String fromTagId, Post.TagInfo targetTag) {
         ObjectId sourceId = new ObjectId(fromTagId);
-        ObjectId targetId = new ObjectId(toTagId);
+        ObjectId targetId = new ObjectId(targetTag.getId());
         Criteria renameCriteria =
                 new Criteria()
                         .andOperator(
@@ -120,7 +120,8 @@ public class PostRepositoryAdapter implements PostRepository {
         Update renameUpdate =
                 new Update()
                         .set("tags.$[target]._id", targetId)
-                        .set("tags.$[target].name", toName)
+                        .set("tags.$[target].name", targetTag.getName())
+                        .set("tags.$[target].slug", targetTag.getSlug())
                         .filterArray(Criteria.where("target._id").is(sourceId));
         long renamed =
                 mongoTemplate
@@ -138,6 +139,18 @@ public class PostRepositoryAdapter implements PostRepository {
                         .updateMulti(duplicateQuery, duplicateUpdate, Post.class)
                         .getModifiedCount();
         return renamed + deduplicated;
+    }
+
+    @Override
+    public long updateTagReference(Post.TagInfo tag) {
+        ObjectId tagId = new ObjectId(tag.getId());
+        Query query = Query.query(Criteria.where("tags._id").is(tagId));
+        Update update =
+                new Update()
+                        .set("tags.$[target].name", tag.getName())
+                        .set("tags.$[target].slug", tag.getSlug())
+                        .filterArray(Criteria.where("target._id").is(tagId));
+        return mongoTemplate.updateMulti(query, update, Post.class).getModifiedCount();
     }
 
     /** 이 태그를 쓴 글들이 어느 카테고리에 얼마나 있는지 센다. */

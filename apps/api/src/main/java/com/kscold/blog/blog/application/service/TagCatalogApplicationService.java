@@ -4,6 +4,7 @@ import com.kscold.blog.blog.application.port.in.TagCatalogUseCase;
 import com.kscold.blog.blog.config.BlogCatalogCacheConfiguration;
 import com.kscold.blog.blog.config.InvalidateBlogCatalogCaches;
 import com.kscold.blog.blog.domain.model.Category;
+import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.model.TagUsage;
 import com.kscold.blog.blog.domain.port.out.CategoryRepository;
@@ -106,7 +107,12 @@ public class TagCatalogApplicationService implements TagCatalogUseCase {
 
         long movedPosts =
                 postRepository.replaceTagReference(
-                        source.getId(), target.getId(), target.getName());
+                        source.getId(),
+                        Post.TagInfo.builder()
+                                .id(target.getId())
+                                .name(target.getName())
+                                .slug(target.getSlug())
+                                .build());
         long movedFeeds = feedUseCase.renameFeedTag(source.getName(), target.getName());
 
         // 참조를 모두 옮긴 뒤에만 지운다. 중간에 실패하면 태그 문서가 남아 다시 시도할 수 있다.

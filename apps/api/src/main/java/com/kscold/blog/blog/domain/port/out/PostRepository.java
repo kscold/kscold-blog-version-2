@@ -43,7 +43,10 @@ public interface PostRepository {
      *
      * @return 바뀐 글 수
      */
-    long replaceTagReference(String fromTagId, String toTagId, String toName);
+    long replaceTagReference(String fromTagId, Post.TagInfo targetTag);
+
+    /** 글에 박혀 있는 같은 태그의 표시 정보와 슬러그를 최신 값으로 맞춘다. */
+    long updateTagReference(Post.TagInfo tag);
 
     /** 이 태그를 쓰는 글들의 카테고리별 사용 횟수. 태그를 어느 카테고리로 묶을지 추측할 때 쓴다. */
     Map<String, Long> countCategoriesByTagId(String tagId);
