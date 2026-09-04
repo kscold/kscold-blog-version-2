@@ -131,11 +131,15 @@ public class FeedRepositoryAdapter implements FeedRepository {
     /** 이름이 같은 태그 문자열을 바꾼다. 이미 바꿀 이름을 가진 피드는 중복되지 않도록 기존 태그만 지운다. */
     @Override
     public long renameTag(String fromName, String toName) {
+        Criteria renameCriteria =
+                new Criteria()
+                        .andOperator(
+                                Criteria.where("tags").is(fromName),
+                                Criteria.where("tags").ne(toName));
         long renamed =
                 mongoTemplate
                         .updateMulti(
-                                Query.query(
-                                        Criteria.where("tags").is(fromName).and("tags").ne(toName)),
+                                Query.query(renameCriteria),
                                 new Update()
                                         .set("tags.$[old]", toName)
                                         .filterArray(Criteria.where("old").is(fromName)),

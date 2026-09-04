@@ -110,13 +110,34 @@ public class PostRepositoryAdapter implements PostRepository {
     /** 태그를 합칠 때 글에 박힌 {_id, name} 참조를 통째로 바꾼다. */
     @Override
     public long replaceTagReference(String fromTagId, String toTagId, String toName) {
-        Query query = Query.query(Criteria.where("tags._id").is(new ObjectId(fromTagId)));
-        Update update =
+        ObjectId sourceId = new ObjectId(fromTagId);
+        ObjectId targetId = new ObjectId(toTagId);
+        Criteria renameCriteria =
+                new Criteria()
+                        .andOperator(
+                                Criteria.where("tags._id").is(sourceId),
+                                Criteria.where("tags._id").ne(targetId));
+        Update renameUpdate =
                 new Update()
-                        .set("tags.$[target]._id", new ObjectId(toTagId))
+                        .set("tags.$[target]._id", targetId)
                         .set("tags.$[target].name", toName)
-                        .filterArray(Criteria.where("target._id").is(new ObjectId(fromTagId)));
-        return mongoTemplate.updateMulti(query, update, Post.class).getModifiedCount();
+                        .filterArray(Criteria.where("target._id").is(sourceId));
+        long renamed =
+                mongoTemplate
+                        .updateMulti(Query.query(renameCriteria), renameUpdate, Post.class)
+                        .getModifiedCount();
+
+        Query duplicateQuery = Query.query(Criteria.where("tags._id").all(sourceId, targetId));
+        Update duplicateUpdate =
+                new Update()
+                        .pull(
+                                "tags",
+                                Query.query(Criteria.where("_id").is(sourceId)).getQueryObject());
+        long deduplicated =
+                mongoTemplate
+                        .updateMulti(duplicateQuery, duplicateUpdate, Post.class)
+                        .getModifiedCount();
+        return renamed + deduplicated;
     }
 
     /** 이 태그를 쓴 글들이 어느 카테고리에 얼마나 있는지 센다. */
