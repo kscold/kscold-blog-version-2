@@ -71,6 +71,11 @@ minio:
   bucket: ${MINIO_BUCKET:blog}
   public-url: ${MINIO_PUBLIC_URL:https://bucket.kscold.com}
 
+# 외부 결제·알림 API가 응답하지 않을 때 요청 스레드가 무기한 점유되지 않도록 제한한다.
+outbound-http:
+  connect-timeout: ${EXTERNAL_HTTP_CONNECT_TIMEOUT:3s}
+  read-timeout: ${EXTERNAL_HTTP_READ_TIMEOUT:10s}
+
 # Team private docs
 team:
   private:
