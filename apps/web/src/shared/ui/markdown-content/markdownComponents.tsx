@@ -5,6 +5,7 @@ import { getVideoEmbedConfig } from '@/shared/lib/videoEmbed';
 import { VideoEmbed } from '@/shared/ui/VideoEmbed';
 import { VideoPlayer } from '@/shared/ui/VideoPlayer';
 import { MarkdownCodeBlock } from './markdownCodeBlock';
+import { MarkdownImage } from './MarkdownImage';
 
 const VIDEO_FILE_PATTERN = /\.(mp4|webm|mov)(\?.*)?$/i;
 
@@ -53,6 +54,11 @@ function extractImageNodes(node: unknown): ImgHastNode[] {
 }
 
 function ImageGrid({ imgNodes }: { imgNodes: ImgHastNode[] }) {
+  const sizes =
+    imgNodes.length === 2
+      ? '(max-width: 768px) calc((100vw - 44px) / 2), 440px'
+      : '(max-width: 768px) calc((100vw - 56px) / 3), 290px';
+
   return (
     <div className={`my-8 grid gap-3 ${imgNodes.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
       {imgNodes.map((imgNode, i) => {
@@ -60,12 +66,11 @@ function ImageGrid({ imgNodes }: { imgNodes: ImgHastNode[] }) {
         const alt = imgNode.properties?.alt ?? '';
         return (
           <div key={i}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <MarkdownImage
               src={src}
               alt={alt}
               className="w-full rounded-2xl border border-white/10 shadow-lg object-cover"
-              loading="lazy"
+              sizes={sizes}
             />
           </div>
         );
@@ -147,12 +152,11 @@ export function createMarkdownComponents(isDark: boolean): Components {
       return <MarkdownCodeBlock className={className} isDark={isDark}>{children}</MarkdownCodeBlock>;
     },
     img: ({ src, alt }) => (
-      /* eslint-disable-next-line @next/next/no-img-element */
-      <img
-        src={src}
+      <MarkdownImage
+        src={typeof src === 'string' ? src : undefined}
         alt={alt || ''}
         className="w-full rounded-2xl border border-white/10 shadow-lg"
-        loading="lazy"
+        sizes="(max-width: 768px) calc(100vw - 32px), 896px"
       />
     ),
     table: ({ children }) => (
