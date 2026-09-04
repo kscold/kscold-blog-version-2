@@ -6,13 +6,13 @@ import { BacklinkList } from '@/entities/vault';
 import { VaultNoteContent } from '@/entities/vault';
 import { ClientVaultGraph } from '@/widgets/vault/ui/ClientVaultGraph';
 import { VaultMobileToolbar } from '@/widgets/vault/ui/VaultMobileToolbar';
-import type { GraphLink, GraphNode, VaultNote } from '@/shared/model/types/vault';
+import type { GraphLink, GraphNode, VaultBacklink, VaultNote } from '@/shared/model/types/vault';
 import type { useUiStore } from '@/shared/model/uiStore';
 
 type ThemeMode = ReturnType<typeof useUiStore.getState>['theme'];
 
 interface VaultNoteMainPanelProps {
-  backlinks: VaultNote[];
+  backlinks: VaultBacklink[];
   colorMap: Record<string, string>;
   isNoteLoading: boolean;
   isTouchDevice: boolean;

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
 import {
   GraphData,
+  VaultBacklink,
   VaultFolder,
   VaultNote,
   VaultNoteTitle,
@@ -46,7 +47,8 @@ export function useVaultNote(slug: string, initialData?: VaultNote) {
 export function useVaultBacklinks(noteId: string) {
   return useQuery({
     queryKey: ['vault', 'notes', noteId, 'backlinks'],
-    queryFn: () => apiClient.get<VaultNote[]>(`/vault/notes/${noteId}/backlinks`),
+    queryFn: () =>
+      apiClient.get<VaultBacklink[]>(`/vault/notes/${noteId}/backlinks/summary`),
     enabled: !!noteId,
   });
 }

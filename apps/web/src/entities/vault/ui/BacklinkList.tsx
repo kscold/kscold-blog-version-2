@@ -1,8 +1,8 @@
-import { VaultNote } from '@/shared/model/types/vault';
+import { VaultBacklink } from '@/shared/model/types/vault';
 import Link from 'next/link';
 
 interface BacklinkListProps {
-  backlinks: VaultNote[];
+  backlinks: VaultBacklink[];
 }
 
 export function BacklinkList({ backlinks }: BacklinkListProps) {
@@ -39,7 +39,7 @@ export function BacklinkList({ backlinks }: BacklinkListProps) {
             </h4>
             <div className="text-xs text-surface-600 dark:text-surface-400 group-hover:text-surface-700 dark:group-hover:text-surface-300 transition-colors duration-300 line-clamp-2 relative z-10">
               {/* 미리보기에는 복잡한 마크다운을 걷어내고 짧은 텍스트만 보여줍니다. */}
-              {note.content.replace(/[#*`_\[\]]/g, '').substring(0, 100)}...
+              {note.excerpt.replace(/[#*`_\[\]]/g, '').substring(0, 100)}...
             </div>
           </Link>
         ))}

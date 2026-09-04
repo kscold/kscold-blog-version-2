@@ -4,7 +4,7 @@ import { findFolderById, getSubfolderIds } from './folderTree';
 export function getLocalGraph(
   rawGraph: GraphData,
   currentNote: VaultNote,
-  backlinks: VaultNote[]
+  backlinks: Array<Pick<VaultNote, 'id'>>
 ): { nodes: GraphNode[]; links: GraphLink[] } {
   if (!rawGraph || !currentNote) {
     return { nodes: [], links: [] };

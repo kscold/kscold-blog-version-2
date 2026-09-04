@@ -34,6 +34,13 @@ export interface VaultNoteTitle {
   slug: string;
 }
 
+export interface VaultBacklink {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+}
+
 export interface GraphData {
   nodes: GraphNode[];
   links: GraphLink[];
