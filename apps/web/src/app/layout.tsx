@@ -126,7 +126,7 @@ const siteJsonLd = {
       '@type': 'Person',
       '@id': `${SITE_URL}/#person`,
       name: PROFILE.name,
-      // 콜딩/Colding 은 사람이 아니라 사업자명이라 Organization 쪽에 둔다(worksFor 로 이미 연결됨).
+      // 콜딩/Colding 은 사람이 아니라 사업자명이라 별도 Organization 으로 연결한다.
       alternateName: ['kscold', 'KSCOLD', 'Kim Seung Chan', 'KIM SEUNG CHAN'],
       url: `${SITE_URL}/info`,
       mainEntityOfPage: {
@@ -137,10 +137,10 @@ const siteJsonLd = {
         'LangGraph·RAG 기반 AI Agent와 Spring Boot·Next.js·TypeScript 기반 서비스의 설계·배포·운영을 수행하며, ' +
         '경험과 기술 기록을 김승찬 블로그 kscold.com에 공개합니다.',
       image: 'https://avatars.githubusercontent.com/u/66587554?v=4',
-      jobTitle: 'AI Agent·백엔드·풀스택 개발자',
+      jobTitle: 'AI Agent·풀스택 개발자',
       hasOccupation: {
         '@type': 'Occupation',
-        name: 'AI Agent 및 풀스택 개발자',
+        name: 'AI Agent 개발자 및 풀스택 개발자',
         occupationLocation: { '@type': 'Country', name: '대한민국' },
       },
       address: {
@@ -151,9 +151,9 @@ const siteJsonLd = {
       nationality: 'Korean',
       email: PROFILE.contacts.email,
       knowsAbout: [
-        'Spring Boot', 'Next.js', 'TypeScript', 'React', 'Java',
-        'NestJS', 'Docker', 'MongoDB', 'PostgreSQL', 'CI/CD',
-        'AI Agent', 'LangGraph', 'RAG', 'Harness Engineering', 'Claude API',
+        'AI Agent', 'LangGraph', 'RAG', 'Python', 'LLM',
+        'MongoDB', 'Spring Boot', 'Java', 'Next.js', 'TypeScript', 'React',
+        'NestJS', 'Docker', 'PostgreSQL', 'CI/CD', 'Harness Engineering', 'Claude API',
         '백엔드 개발', '프론트엔드 개발', '풀스택 개발', 'AI 에이전트',
       ],
       sameAs: [
@@ -162,7 +162,18 @@ const siteJsonLd = {
         'https://www.threads.net/@kscold_dev',
       ],
       worksFor: {
+        '@id': `${SITE_URL}/#current-employer`,
+      },
+      affiliation: {
         '@id': `${SITE_URL}/#organization`,
+      },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#current-employer`,
+      name: '씨에스리 AI기술연구소',
+      employee: {
+        '@id': `${SITE_URL}/#person`,
       },
     },
     {
