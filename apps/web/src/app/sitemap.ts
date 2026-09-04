@@ -15,14 +15,13 @@ const toDate = (date: Date | string | undefined): string =>
   new Date(date || Date.now()).toISOString().split('T')[0];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [postsPage, categoryTree, tags, feedsPage, vaultNoteGraph] = await Promise.all([
+  const [postsPage, categoryTree, tags, feedsPage, vaultNoteIndex] = await Promise.all([
     fetchPublicApi<PageResponse<Post>>('/posts?size=1000'),
     fetchPublicApi<Category[]>('/categories'),
     fetchPublicApi<Tag[]>('/tags'),
     fetchPublicApi<PageResponse<Feed>>('/feeds?page=0&size=2000'),
-    // 목록 API 는 노트 본문까지 실려 3.8MB 라 캐시 한도를 넘고 일부만 조회된다.
-    // 그래프 API 는 slug 와 본문 길이만 담아 전체 노트를 한 번에 가져올 수 있어 사이트맵에 적합하다.
-    fetchPublicApi<{ nodes: { slug: string; contentLength?: number }[] }>('/vault/notes/graph'),
+    // 전체 그래프를 만들지 않고 검색 노출 판정에 필요한 slug 와 본문 길이만 조회한다.
+    fetchPublicApi<{ slug: string; contentLength?: number }[]>('/vault/notes/sitemap-index'),
   ]);
 
   const categories = flattenCategories(categoryTree || []);
@@ -32,8 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
   const indexableTags = (tags || []).filter(isIndexableTag);
   // 본문 길이를 확인할 수 있고 독립 문서로 충분한 노트만 사이트맵에 싣는다.
-  const graphNodes = vaultNoteGraph?.nodes || [];
-  const vaultNotes = graphNodes.filter(
+  const vaultNotes = (vaultNoteIndex || []).filter(
     note => !!note.slug && isIndexableVaultNote(note.contentLength)
   );
 
