@@ -40,7 +40,7 @@ public class DiscordBotConfig {
                         () -> {
                             try {
                                 jda.awaitReady();
-                                log.info("Discord 봇 연결 완료: {}", jda.getSelfUser().getName());
+                                log.info("Discord 봇 연결 완료");
                             } catch (InterruptedException e) {
                                 log.info("Discord 봇 연결 대기 중 인터럽트");
                                 Thread.currentThread().interrupt();

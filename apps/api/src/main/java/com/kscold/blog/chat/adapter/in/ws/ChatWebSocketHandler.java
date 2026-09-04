@@ -44,7 +44,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         Boolean isAdmin = (Boolean) session.getAttributes().getOrDefault("isAdmin", false);
 
         sessions.put(sessionId, new SessionInfo(session, userId, username, isAdmin));
-        log.info("WebSocket connected: {} as {} (admin={})", sessionId, username, isAdmin);
+        log.info("WebSocket connected: admin={}", isAdmin);
 
         if (isAdmin) {
             // 어드민: 현재 접속 중인 방문자 목록 전송
@@ -111,7 +111,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         SessionInfo info = sessions.remove(session.getId());
         if (info == null) return;
 
-        log.info("WebSocket disconnected: {} ({})", session.getId(), info.username());
+        log.info("WebSocket disconnected: admin={}", info.isAdmin());
 
         if (!info.isAdmin()) {
             // 퇴장 시스템 메시지 저장 + 디스코드 알림 (application 경유)
@@ -130,10 +130,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     @Override
     public void handleTransportError(
             @NonNull WebSocketSession session, @NonNull Throwable exception) throws Exception {
-        log.error(
-                "WebSocket error for session {}: type={}",
-                session.getId(),
-                exception.getClass().getSimpleName());
+        log.error("WebSocket transport error: type={}", exception.getClass().getSimpleName());
         session.close(CloseStatus.SERVER_ERROR);
     }
 
@@ -194,10 +191,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
                 session.sendMessage(new TextMessage(objectMapper.writeValueAsString(payload)));
             }
         } catch (Exception e) {
-            log.error(
-                    "Failed to send to session {}: type={}",
-                    session.getId(),
-                    e.getClass().getSimpleName());
+            log.error("Failed to send WebSocket message: type={}", e.getClass().getSimpleName());
         }
     }
 

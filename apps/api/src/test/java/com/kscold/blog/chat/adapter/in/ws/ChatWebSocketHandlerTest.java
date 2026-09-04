@@ -38,6 +38,9 @@ class ChatWebSocketHandlerTest {
 
             verify(session).close(CloseStatus.SERVER_ERROR);
             assertSanitized(appender, sensitiveMessage, "IllegalStateException");
+            assertThat(appender.list)
+                    .extracting(ILoggingEvent::getFormattedMessage)
+                    .noneMatch(message -> message.contains("session-1"));
         } finally {
             detach(logger, appender);
         }
@@ -50,7 +53,14 @@ class ChatWebSocketHandlerTest {
         WebSocketSession session = mock(WebSocketSession.class);
         when(session.getId()).thenReturn("session-2");
         when(session.getAttributes())
-                .thenReturn(Map.of("userId", "admin-1", "username", "admin", "isAdmin", true));
+                .thenReturn(
+                        Map.of(
+                                "userId",
+                                "private-admin-id",
+                                "username",
+                                "private-operator-name",
+                                "isAdmin",
+                                true));
         when(session.isOpen()).thenReturn(true);
         doThrow(new IOException(sensitiveMessage))
                 .when(session)
@@ -63,6 +73,49 @@ class ChatWebSocketHandlerTest {
             handler.afterConnectionEstablished(session);
 
             assertSanitized(appender, sensitiveMessage, "IOException");
+            assertThat(appender.list)
+                    .extracting(ILoggingEvent::getFormattedMessage)
+                    .allMatch(
+                            message ->
+                                    !message.contains("session-2")
+                                            && !message.contains("private-admin-id")
+                                            && !message.contains("private-operator-name"));
+        } finally {
+            detach(logger, appender);
+        }
+    }
+
+    @Test
+    @DisplayName("시나리오: 연결과 종료 로그에는 세션 및 사용자 식별자를 남기지 않는다")
+    void lifecycleLogsDoNotIncludeSessionOrUserIdentity() throws Exception {
+        WebSocketSession session = mock(WebSocketSession.class);
+        when(session.getId()).thenReturn("private-session-id");
+        when(session.getAttributes())
+                .thenReturn(
+                        Map.of(
+                                "userId",
+                                "private-user-id",
+                                "username",
+                                "private-display-name",
+                                "isAdmin",
+                                true));
+        ChatWebSocketHandler handler = newHandler();
+        Logger logger = (Logger) LoggerFactory.getLogger(ChatWebSocketHandler.class);
+        ListAppender<ILoggingEvent> appender = attach(logger);
+
+        try {
+            handler.afterConnectionEstablished(session);
+            handler.afterConnectionClosed(session, CloseStatus.NORMAL);
+
+            assertThat(appender.list)
+                    .extracting(ILoggingEvent::getFormattedMessage)
+                    .anyMatch(message -> message.contains("connected: admin=true"))
+                    .anyMatch(message -> message.contains("disconnected: admin=true"))
+                    .allMatch(
+                            message ->
+                                    !message.contains("private-session-id")
+                                            && !message.contains("private-user-id")
+                                            && !message.contains("private-display-name"));
         } finally {
             detach(logger, appender);
         }

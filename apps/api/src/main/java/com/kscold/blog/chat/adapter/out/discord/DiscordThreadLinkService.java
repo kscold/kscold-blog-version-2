@@ -81,7 +81,7 @@ public class DiscordThreadLinkService {
         return restoreRoomIdFromThreadName(thread)
                 .map(
                         roomId -> {
-                            log.info("Discord 스레드 매핑 복구: thread={} -> room={}", threadId, roomId);
+                            log.info("Discord 스레드 매핑 복구 완료");
                             return roomId;
                         })
                 .orElse(null);
@@ -139,10 +139,7 @@ public class DiscordThreadLinkService {
                         .toList();
 
         if (candidates.size() != 1) {
-            log.warn(
-                    "Discord 스레드에서 방문자 이름으로 roomId 복구 실패: name={}, candidates={}",
-                    visitorName,
-                    candidates.size());
+            log.warn("Discord 스레드에서 roomId 복구 실패: candidates={}", candidates.size());
             return Optional.empty();
         }
 

@@ -6,6 +6,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.kscold.blog.chat.domain.model.ChatDiscordThreadLink;
 import com.kscold.blog.chat.domain.port.out.ChatDiscordThreadLinkRepository;
 import com.kscold.blog.identity.domain.model.User;
@@ -21,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 
 @ExtendWith(MockitoExtension.class)
 class DiscordThreadLinkServiceTest {
@@ -71,7 +75,17 @@ class DiscordThreadLinkServiceTest {
         when(userRepository.findAllOrderByCreatedAtDesc()).thenReturn(List.of(visitor));
         when(linkRepository.findByRoomId("room-2")).thenReturn(Optional.empty());
 
-        String roomId = threadLinkService.getRoomIdByThread("thread-2", jda);
+        Logger logger = (Logger) LoggerFactory.getLogger(DiscordThreadLinkService.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        String roomId;
+        try {
+            roomId = threadLinkService.getRoomIdByThread("thread-2", jda);
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
 
         assertThat(roomId).isEqualTo("room-2");
         verify(linkRepository)
@@ -81,5 +95,13 @@ class DiscordThreadLinkServiceTest {
                                         "room-2".equals(link.getRoomId())
                                                 && "thread-2".equals(link.getThreadId())
                                                 && "test".equals(link.getVisitorName())));
+        assertThat(appender.list)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .contains("Discord 스레드 매핑 복구 완료")
+                .noneMatch(
+                        message ->
+                                message.contains("thread-2")
+                                        || message.contains("room-2")
+                                        || message.contains("test"));
     }
 }

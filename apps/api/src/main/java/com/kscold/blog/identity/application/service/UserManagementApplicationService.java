@@ -27,7 +27,7 @@ public class UserManagementApplicationService implements UserManagementUseCase {
         if (user.getDeletedAt() != null) return;
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
-        log.info("Soft deleted user {}", userId);
+        log.info("Soft deleted user");
     }
 
     @Override
@@ -37,6 +37,6 @@ public class UserManagementApplicationService implements UserManagementUseCase {
             throw ResourceNotFoundException.user(userId);
         }
         userRepository.deleteById(userId);
-        log.warn("Hard deleted user {}", userId);
+        log.warn("Hard deleted user");
     }
 }

@@ -47,7 +47,7 @@ public class VaultAgentAccessScopeResolver {
             }
             return new AgentContentAccessScope(false, postIds, categoryIds);
         } catch (Exception exception) {
-            log.warn("Vault Agent 권한 범위 조회에 실패해 공개 콘텐츠만 사용합니다. userId={}", userId);
+            log.warn("Vault Agent 권한 범위 조회에 실패해 공개 콘텐츠만 사용합니다.");
             return AgentContentAccessScope.publicOnly();
         }
     }
