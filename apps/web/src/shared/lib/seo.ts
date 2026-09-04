@@ -10,7 +10,12 @@ export {
   type OpenGraphType,
 } from './seo/constants';
 export { fetchAllPublicApiPages, fetchPublicApi, fetchViewerApi } from './seo/fetch';
-export { isIndexableFeed, isIndexableTag, isIndexableVaultNote } from './seo/indexability';
+export {
+  isIndexableFeed,
+  isIndexableTag,
+  isIndexableVaultContent,
+  isIndexableVaultNote,
+} from './seo/indexability';
 export {
   absoluteUrl,
   buildBreadcrumbJsonLd,
@@ -23,6 +28,7 @@ export {
   extractFirstMarkdownImage,
   stripFirstMarkdownHeading,
   stripRichText,
+  toFeedTitle,
   toMetaDescription,
   toPreviewText,
   uniqueKeywords,

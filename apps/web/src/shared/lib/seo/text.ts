@@ -55,6 +55,19 @@ export function toMetaDescription(
   return toPreviewText(input, fallback, maxLength);
 }
 
+/** 피드 메타데이터와 문서 주 제목이 항상 같은 우선순위를 사용하게 한다. */
+export function toFeedTitle(
+  content?: string | null,
+  linkPreviewTitle?: string | null,
+  fallback = '피드'
+) {
+  return (
+    extractFirstMarkdownHeading(content) ||
+    linkPreviewTitle?.trim() ||
+    toMetaDescription(content, fallback, 58)
+  );
+}
+
 export function uniqueKeywords(values: Array<string | null | undefined>) {
   return Array.from(
     new Set(

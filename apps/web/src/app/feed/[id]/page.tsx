@@ -6,10 +6,10 @@ import {
   absoluteUrl,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
-  extractFirstMarkdownHeading,
   extractFirstMarkdownImage,
   fetchPublicApi,
   isIndexableFeed,
+  toFeedTitle,
   toMetaDescription,
   toOgImage,
   uniqueKeywords,
@@ -32,10 +32,11 @@ export async function generateMetadata({
     notFound();
   }
 
-  const title =
-    extractFirstMarkdownHeading(feed.content) ||
-    feed.linkPreview?.title ||
-    toMetaDescription(feed.content, `${feed.author.name}의 피드`, 58);
+  const title = toFeedTitle(
+    feed.content,
+    feed.linkPreview?.title,
+    `${feed.author.name}의 피드`
+  );
   const description = toMetaDescription(feed.content, '일상, 개발, 그리고 생각의 조각들');
   const image =
     feed.images[0] || extractFirstMarkdownImage(feed.content) || feed.linkPreview?.image;
@@ -67,8 +68,7 @@ export default async function FeedDetailPage({
   }
 
   const description = toMetaDescription(feed.content, '일상, 개발, 그리고 생각의 조각들');
-  const headline =
-    extractFirstMarkdownHeading(feed.content) || feed.linkPreview?.title || description;
+  const headline = toFeedTitle(feed.content, feed.linkPreview?.title, description);
   const image =
     feed.images[0] || extractFirstMarkdownImage(feed.content) || feed.linkPreview?.image;
   const canonicalPath = `/feed/${feed.id}`;

@@ -134,7 +134,11 @@ export function PostDetail({ post }: PostDetailProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <MarkdownContent content={resolvedPost.content} prioritizeFirstImage />
+              <MarkdownContent
+                content={resolvedPost.content}
+                prioritizeFirstImage
+                demotePrimaryHeading
+              />
             </motion.div>
 
             <PostCommentSection tags={resolvedPost.tags} />

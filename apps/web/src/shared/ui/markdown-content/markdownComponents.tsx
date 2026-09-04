@@ -81,7 +81,10 @@ function ImageGrid({ imgNodes }: { imgNodes: ImgHastNode[] }) {
   );
 }
 
-export function createMarkdownComponents(isDark: boolean): Components {
+export function createMarkdownComponents(
+  isDark: boolean,
+  demotePrimaryHeading = false
+): Components {
   const tableSurfaceClass = isDark
     ? 'border-surface-800 bg-surface-950/30'
     : 'border-surface-200 bg-white shadow-sm';
@@ -94,6 +97,11 @@ export function createMarkdownComponents(isDark: boolean): Components {
   const tableBodyClass = isDark ? 'divide-y divide-surface-800' : 'divide-y divide-surface-200/80';
 
   return {
+    ...(demotePrimaryHeading
+      ? {
+          h1: ({ children }) => <h2 className="markdown-source-h1">{children}</h2>,
+        }
+      : {}),
     p: ({ children, className, node }) => {
       const standaloneLink = extractStandaloneLink(children);
       if (standaloneLink && getVideoEmbedConfig(standaloneLink)) {

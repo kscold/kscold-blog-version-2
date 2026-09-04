@@ -3,11 +3,11 @@ import { notFound } from 'next/navigation';
 import type { VaultNote } from '@/shared/model/types/vault';
 import { VaultNoteLayout } from '@/widgets/vault/note';
 import {
-  MIN_INDEXABLE_VAULT_CONTENT_LENGTH,
   absoluteUrl,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
   fetchPublicApi,
+  isIndexableVaultContent,
   toMetaDescription,
   uniqueKeywords,
 } from '@/shared/lib/seo';
@@ -31,8 +31,7 @@ export async function generateMetadata({
 
   // 분량이 적은 노트(용어 스텁 등)는 색인에서 제외한다. 사이트맵 필터와 동일한 기준을 공유해
   // "색인해달라(sitemap) + 색인하지 마라(noindex)" 가 충돌하지 않도록 한다.
-  const isThinNote =
-    (note.content?.trim().length ?? 0) < MIN_INDEXABLE_VAULT_CONTENT_LENGTH;
+  const isThinNote = !isIndexableVaultContent(note.content);
 
   return buildPageMetadata({
     title: `${note.title} | Vault`,

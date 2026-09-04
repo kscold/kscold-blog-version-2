@@ -13,6 +13,8 @@ interface MarkdownContentProps {
   size?: 'sm' | 'lg';
   /** 상세 본문의 첫 이미지를 LCP 후보로 우선 요청한다. */
   prioritizeFirstImage?: boolean;
+  /** 페이지 자체 H1이 있을 때 본문의 H1을 시각 변화 없이 H2로 낮춘다. */
+  demotePrimaryHeading?: boolean;
 }
 
 export function MarkdownContent({
@@ -20,6 +22,7 @@ export function MarkdownContent({
   theme = 'light',
   size = 'lg',
   prioritizeFirstImage = false,
+  demotePrimaryHeading = false,
 }: MarkdownContentProps) {
   const isDark = theme === 'dark';
   const proseSize = size === 'sm' ? 'prose-sm' : 'prose-lg';
@@ -33,7 +36,7 @@ export function MarkdownContent({
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkLooseStrong]}
         rehypePlugins={[[rehypeImageGrid, { prioritizeFirstImage }]]}
-        components={createMarkdownComponents(isDark)}
+        components={createMarkdownComponents(isDark, demotePrimaryHeading)}
       >
         {content}
       </ReactMarkdown>

@@ -112,7 +112,12 @@ export function VaultNoteContent({ note, theme = 'light', titleSlugMap = {} }: V
       </header>
 
       <div className="mt-8 font-sans">
-        <MarkdownContent content={parsedContent} theme={actualTheme} prioritizeFirstImage />
+        <MarkdownContent
+          content={parsedContent}
+          theme={actualTheme}
+          prioritizeFirstImage
+          demotePrimaryHeading
+        />
       </div>
     </article>
   );

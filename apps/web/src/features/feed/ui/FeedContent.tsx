@@ -5,6 +5,7 @@ import {
   extractFirstMarkdownHeading,
   stripFirstMarkdownHeading,
   stripRichText,
+  toFeedTitle,
   toPreviewText,
 } from '@/shared/lib/seo/text';
 import { LinkifiedText } from '@/shared/ui/LinkifiedText';
@@ -18,18 +19,27 @@ const FEED_PREVIEW_LENGTH = 320;
 interface FeedContentProps {
   authorName: string;
   content: string;
+  linkPreviewTitle?: string;
   variant: 'summary' | 'detail';
 }
 
-export function FeedContent({ authorName, content, variant }: FeedContentProps) {
+export function FeedContent({
+  authorName,
+  content,
+  linkPreviewTitle,
+  variant,
+}: FeedContentProps) {
   if (!content.trim()) {
     return null;
   }
 
   if (variant === 'detail') {
+    const title = toFeedTitle(content, linkPreviewTitle, `${authorName}의 피드`);
+
     return (
-      <div className="px-5 py-6 sm:px-7 sm:py-8 [&_.markdown-prose_h1]:mb-8 [&_.markdown-prose_h1]:text-[2rem] [&_.markdown-prose_h1]:leading-[1.16] [&_.markdown-prose_h1]:tracking-[-0.035em] sm:[&_.markdown-prose_h1]:mb-10 sm:[&_.markdown-prose_h1]:text-[2.5rem] lg:[&_.markdown-prose_h1]:text-[2.75rem]">
-        <MarkdownContent content={content} prioritizeFirstImage />
+      <div className="px-5 py-6 sm:px-7 sm:py-8 [&_.markdown-source-h1]:mb-8 [&_.markdown-source-h1]:text-[2rem] [&_.markdown-source-h1]:leading-[1.16] [&_.markdown-source-h1]:tracking-[-0.035em] sm:[&_.markdown-source-h1]:mb-10 sm:[&_.markdown-source-h1]:text-[2.5rem] lg:[&_.markdown-source-h1]:text-[2.75rem]">
+        <h1 className="sr-only">{title}</h1>
+        <MarkdownContent content={content} prioritizeFirstImage demotePrimaryHeading />
       </div>
     );
   }

@@ -190,7 +190,12 @@ export function FeedCard({
       {feed.images.length > 0 && <ImageCarousel images={feed.images} />}
 
       {/* 본문 */}
-      <FeedContent authorName={feed.author.name} content={feed.content} variant={variant} />
+      <FeedContent
+        authorName={feed.author.name}
+        content={feed.content}
+        linkPreviewTitle={feed.linkPreview?.title}
+        variant={variant}
+      />
 
       {/* 해시태그 */}
       {visibleTags.length > 0 && (
