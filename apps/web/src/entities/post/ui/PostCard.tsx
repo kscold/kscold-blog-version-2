@@ -31,7 +31,7 @@ function RestrictedPostBadge({ compact = false }: { compact?: boolean }) {
   if (compact) {
     return (
       <span
-        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-100 text-surface-500"
+        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-100 text-surface-600"
         title="제한 글"
         aria-label="제한 글"
       >
@@ -42,7 +42,7 @@ function RestrictedPostBadge({ compact = false }: { compact?: boolean }) {
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full bg-surface-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-surface-500"
+      className="inline-flex items-center gap-1.5 rounded-full bg-surface-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-surface-600"
       title="제한 글"
       aria-label="제한 글"
     >
@@ -62,6 +62,7 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        timeZone: 'Asia/Seoul',
       })
     : '';
 
@@ -88,8 +89,12 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
       whileTap={reduceMotion ? undefined : { scale: 0.985 }}
       transition={allowRichEffects ? { type: 'spring', stiffness: 400, damping: 25 } : undefined}
     >
-      <Link href={`/blog/${post.category.slug}/${post.slug}`} className="block h-full">
-        <div className={`h-full bg-white border border-surface-200 rounded-[24px] p-6 transition-all duration-500 relative overflow-hidden ${supportsHover ? 'group-hover:border-surface-300 group-hover:bg-surface-50 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]' : ''}`}>
+      <div className={`h-full bg-white border border-surface-200 rounded-[24px] p-6 transition-all duration-500 relative overflow-hidden ${supportsHover ? 'group-hover:border-surface-300 group-hover:bg-surface-50 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]' : ''}`}>
+          <Link
+            href={`/blog/${post.category.slug}/${post.slug}`}
+            aria-label={`${post.title} 글 읽기`}
+            className="absolute inset-0 z-10 rounded-[24px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-surface-900"
+          />
           {/* 빛이 스쳐 지나가는 듯한 강조 효과 */}
           {supportsHover && allowRichEffects && (
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none z-10 mix-blend-overlay" />
@@ -145,13 +150,12 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
           </p>
 
           {visibleTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="relative z-20 flex flex-wrap gap-2">
               {visibleTags.slice(0, featured ? 5 : 3).map(tag => (
                 <Link
                   key={tag.id}
                   href={`/tags/${encodeURIComponent(tag.name)}`}
-                  onClick={e => e.stopPropagation()}
-                  className="px-2.5 py-1 text-[10px] font-bold bg-surface-100 text-surface-500 rounded-md hover:bg-surface-200 hover:text-surface-900 transition-colors tracking-wider"
+                  className="inline-flex min-h-11 items-center rounded-md bg-surface-100 px-3 text-xs font-bold tracking-wider text-surface-600 transition-colors hover:bg-surface-200 hover:text-surface-900"
                 >
                   #{tag.name}
                 </Link>
@@ -161,12 +165,12 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
 
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-surface-100">
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1.5 text-[11px] text-surface-400 font-mono">
+              <div className="flex items-center gap-1.5 text-[11px] text-surface-600 font-mono">
                 <span className="uppercase tracking-wider">Views</span>
                 <span className="font-bold text-surface-600 tabular-nums">{post.views || 0}</span>
               </div>
 
-              <div className="flex items-center gap-1.5 text-[11px] text-surface-400 font-mono">
+              <div className="flex items-center gap-1.5 text-[11px] text-surface-600 font-mono">
                 <span className="uppercase tracking-wider">Likes</span>
                 <span className="font-bold text-surface-600 tabular-nums">{post.likes || 0}</span>
               </div>
@@ -179,8 +183,7 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
               →
             </span>
           </div>
-        </div>
-      </Link>
+      </div>
     </motion.article>
   );
 }

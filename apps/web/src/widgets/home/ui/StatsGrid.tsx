@@ -26,7 +26,7 @@ export function StatsGrid({ stats }: Props) {
           viewport={allowRichEffects ? { once: true } : undefined}
           transition={allowRichEffects ? { duration: 0.5, delay: index * 0.08 } : undefined}
         >
-          <p className="mb-1 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-surface-400">{stat.label}</p>
+          <p className="mb-1 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-surface-600">{stat.label}</p>
           <div className="my-1.5 sm:my-2 flex items-end gap-1">
             {stat.value !== null && stat.value > 0 ? (
               <>
@@ -37,7 +37,7 @@ export function StatsGrid({ stats }: Props) {
               <span className="text-2xl sm:text-4xl font-black tabular-nums text-surface-300">—</span>
             )}
           </div>
-          <p className="text-[10px] sm:text-xs text-surface-400">{stat.description}</p>
+          <p className="text-[10px] sm:text-xs text-surface-600">{stat.description}</p>
         </motion.div>
       ))}
     </div>

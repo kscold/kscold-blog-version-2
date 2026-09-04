@@ -64,6 +64,8 @@ const chatRooms = [
 
 test.describe('어드민 라이브 스모크', () => {
   test('대시보드와 주요 페이지가 순차적으로 표시된다', async ({ page }) => {
+    // 여섯 경로를 처음 컴파일하고 캡처하는 시나리오라 전체 병렬 실행의 30초 한도를 넘을 수 있다.
+    test.slow();
     await page.setViewportSize({ width: 1440, height: 900 });
 
     await mockShellApis(page);

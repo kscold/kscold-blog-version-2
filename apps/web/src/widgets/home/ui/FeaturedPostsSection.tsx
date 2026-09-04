@@ -11,8 +11,8 @@ export async function FeaturedPostsSection() {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-end justify-between mb-10 sm:mb-20 border-b border-surface-200 pb-6 sm:pb-8">
           <div>
-            <p className="mb-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-400">
-              <span className="font-mono text-surface-300">01</span>
+            <p className="mb-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-600">
+              <span className="font-mono text-surface-600">01</span>
               <span className="h-px w-8 bg-surface-300" aria-hidden="true" />
               Featured
             </p>

@@ -31,6 +31,18 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await expect(page).toHaveURL(/\/blog/);
   });
 
+  test('추천 글 카드는 유효한 링크 구조와 충분한 태그 터치 영역을 제공한다', async ({ page }) => {
+    await page.goto('/');
+
+    await expect(page.getByRole('link', { name: /글 읽기/ }).first()).toBeVisible();
+    await expect(page.locator('a a')).toHaveCount(0);
+
+    const firstTag = page.locator('a[href^="/tags/"]').first();
+    await expect(firstTag).toBeVisible();
+    const tagBox = await firstTag.boundingBox();
+    expect(tagBox?.height).toBeGreaterThanOrEqual(44);
+  });
+
   test('방문자는 Feed 링크를 클릭하면 피드 페이지로 이동한다', async ({ page }) => {
     // feeds 목록만 매칭(feeds/tags 는 shell mock 이 처리하도록 제외)
     await mockApi(page, 'GET', /\/api\/feeds(\?|$)/, success(emptyPage()));

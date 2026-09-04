@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useVaultGraph } from '@/entities/vault';
+import { useVaultGraph } from '@/entities/vault/api';
 import { usePosts } from '@/entities/post';
 import { useGitHubOverview } from '@/entities/github';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
@@ -38,8 +38,8 @@ export function StatsSection() {
           viewport={allowRichEffects ? { once: true } : undefined}
           transition={allowRichEffects ? { duration: 0.6 } : undefined}
         >
-          <p className="mb-3 flex items-center justify-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-400">
-            <span className="font-mono text-surface-300">02</span>
+          <p className="mb-3 flex items-center justify-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-600">
+            <span className="font-mono text-surface-600">02</span>
             <span className="h-px w-8 bg-surface-300" aria-hidden="true" />
             By the Numbers
           </p>

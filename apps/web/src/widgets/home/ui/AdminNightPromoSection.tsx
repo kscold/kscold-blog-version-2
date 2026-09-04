@@ -17,8 +17,8 @@ export function AdminNightPromoSection() {
         transition={allowRichEffects ? { duration: 0.6 } : undefined}
       >
         <div className="space-y-4">
-          <p className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-400">
-            <span className="font-mono text-surface-300">03</span>
+          <p className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-600">
+            <span className="font-mono text-surface-600">03</span>
             <span className="h-px w-8 bg-surface-300" aria-hidden="true" />
             Admin Night
           </p>
