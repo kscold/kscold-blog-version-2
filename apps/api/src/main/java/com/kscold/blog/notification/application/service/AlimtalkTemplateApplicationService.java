@@ -51,7 +51,7 @@ public class AlimtalkTemplateApplicationService implements AlimtalkTemplateUseCa
 
     private boolean backfillPresentation(AlimtalkTemplate existing, AlimtalkTemplate defaults) {
         boolean changed = false;
-        if (existing.getTemplateType() == null) {
+        if (shouldBackfillType(existing, defaults)) {
             existing.setTemplateType(defaults.getTemplateType());
             changed = true;
         }
@@ -64,6 +64,14 @@ public class AlimtalkTemplateApplicationService implements AlimtalkTemplateUseCa
             changed = true;
         }
         return changed;
+    }
+
+    private boolean shouldBackfillType(AlimtalkTemplate existing, AlimtalkTemplate defaults) {
+        if (existing.getTemplateType() == null) {
+            return true;
+        }
+        return defaults.getTemplateType() != existing.getTemplateType()
+                && Objects.equals(existing.getEmphasisTitle(), defaults.getEmphasisTitle());
     }
 
     private boolean hasDraftDifference(AlimtalkTemplate existing, AlimtalkTemplate defaults) {

@@ -82,4 +82,27 @@ class AlimtalkTemplateApplicationServiceTest {
         assertThat(approved.getEmphasisSubtitle()).isEqualTo("확정된 공동 구독 정산 내역입니다.");
         verify(repository).save(approved);
     }
+
+    @Test
+    @DisplayName("시나리오: 기존 승인 문서의 잘못된 기본형 표시는 강조표기형으로 보정한다")
+    void correctsApprovedTemplateType() {
+        AlimtalkTemplate approved =
+                AlimtalkTemplate.builder()
+                        .templateKey(SETTLEMENT_KEY)
+                        .body("카카오에 승인된 본문")
+                        .variables(List.of("#{이름}"))
+                        .externalTemplateId("approved-id")
+                        .templateType(AlimtalkTemplateType.BASIC)
+                        .emphasisTitle("[KSCOLD] 공동 구독 정산 안내")
+                        .status(AlimtalkTemplateStatus.APPROVED)
+                        .build();
+        when(repository.findByTemplateKey(any())).thenReturn(Optional.empty());
+        when(repository.findByTemplateKey(SETTLEMENT_KEY)).thenReturn(Optional.of(approved));
+
+        service.seedDefaults();
+
+        assertThat(approved.getBody()).isEqualTo("카카오에 승인된 본문");
+        assertThat(approved.getTemplateType()).isEqualTo(AlimtalkTemplateType.EMPHASIS);
+        verify(repository).save(approved);
+    }
 }
