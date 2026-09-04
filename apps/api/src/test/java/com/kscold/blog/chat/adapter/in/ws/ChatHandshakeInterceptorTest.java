@@ -55,17 +55,14 @@ class ChatHandshakeInterceptorTest {
     }
 
     @Test
-    void acceptsLegacyQueryDuringCookieMigration() {
+    void rejectsLegacyQueryToken() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("token", "query-token");
-        when(tokenProvider.validateAccessToken("query-token")).thenReturn(true);
-        when(tokenProvider.getUserIdFromAccessToken("query-token")).thenReturn("admin-id");
-        when(userQueryPort.getUserById("admin-id"))
-                .thenReturn(new UserQueryPort.UserInfo("admin-id", "admin", "관리자", "", true, ""));
 
         boolean accepted = handshake(request, new HashMap<>());
 
-        assertThat(accepted).isTrue();
+        assertThat(accepted).isFalse();
+        verify(tokenProvider, never()).validateAccessToken("query-token");
     }
 
     @Test

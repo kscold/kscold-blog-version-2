@@ -35,7 +35,7 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
             return false;
         }
 
-        String token = resolveToken(servletRequest.getServletRequest());
+        String token = resolveCookieToken(servletRequest.getServletRequest());
         if (token == null || token.isBlank() || !tokenProvider.validateAccessToken(token)) {
             log.warn("WebSocket 연결 거부: 유효하지 않은 토큰");
             return false;
@@ -63,7 +63,7 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
             @NonNull WebSocketHandler wsHandler,
             Exception exception) {}
 
-    private String resolveToken(HttpServletRequest request) {
+    private String resolveCookieToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -76,7 +76,6 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
             }
         }
 
-        // 프런트엔드 쿠키 전환이 끝날 때까지만 기존 쿼리 인증을 허용한다.
-        return request.getParameter("token");
+        return null;
     }
 }
