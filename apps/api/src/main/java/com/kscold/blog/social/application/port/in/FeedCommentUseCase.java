@@ -17,4 +17,7 @@ public interface FeedCommentUseCase {
 
     /** 이 피드에서 @언급할 수 있는 사용자 목록(주인 + 댓글 참여자). */
     List<User> getMentionableUsers(String feedId);
+
+    /** 댓글 좋아요를 토글하고 갱신된 댓글을 돌려준다. identifier 는 로그인 userId 또는 클라이언트 식별자. */
+    FeedComment toggleLike(String feedId, String commentId, String identifier);
 }

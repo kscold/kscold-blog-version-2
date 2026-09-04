@@ -150,4 +150,36 @@ class FeedCommentApplicationServiceTest {
 
         verify(feedCommentRepository, never()).delete(any());
     }
+
+    @Test
+    @DisplayName("시나리오: 비로그인 방문자가 댓글 좋아요를 누르면 식별자로 토글되고 갱신된 댓글이 반환된다")
+    void toggleLikeUsesIdentifierAndReturnsUpdatedComment() {
+        FeedComment before = FeedComment.builder().id("comment-1").feedId("feed-1").build();
+        FeedComment after =
+                FeedComment.builder().id("comment-1").feedId("feed-1").likesCount(1).build();
+        when(feedCommentRepository.findById("comment-1"))
+                .thenReturn(Optional.of(before))
+                .thenReturn(Optional.of(after));
+
+        FeedComment result =
+                feedCommentApplicationService.toggleLike("feed-1", "comment-1", "1.2.3.4|ab12");
+
+        verify(feedCommentRepository).toggleLike("comment-1", "1.2.3.4|ab12");
+        assertThat(result.getLikesCount()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("시나리오: 다른 글의 댓글 아이디로 좋아요를 누르면 거부되고 토글이 일어나지 않는다")
+    void toggleLikeRejectsCommentFromAnotherFeed() {
+        FeedComment otherFeedComment =
+                FeedComment.builder().id("comment-1").feedId("feed-2").build();
+        when(feedCommentRepository.findById("comment-1")).thenReturn(Optional.of(otherFeedComment));
+
+        assertThatThrownBy(
+                        () ->
+                                feedCommentApplicationService.toggleLike(
+                                        "feed-1", "comment-1", "user-1"))
+                .isInstanceOf(InvalidRequestException.class);
+        verify(feedCommentRepository, never()).toggleLike(any(), any());
+    }
 }

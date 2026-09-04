@@ -2,6 +2,8 @@ package com.kscold.blog.social.domain.model;
 
 import com.kscold.blog.identity.domain.model.User;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,6 +35,11 @@ public class FeedComment {
     private User.Role authorRole;
 
     private String content;
+
+    /** 좋아요를 누른 식별자. 로그인 사용자는 userId, 비로그인은 클라이언트 식별자를 넣는다. */
+    @Builder.Default private Set<String> likedBy = new HashSet<>();
+
+    @Builder.Default private Integer likesCount = 0;
 
     @CreatedDate private LocalDateTime createdAt;
 }

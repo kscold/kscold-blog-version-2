@@ -79,6 +79,10 @@ public class SecurityConfig {
                                         .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/feeds/*/comments")
                                         .permitAll()
+                                        // 댓글 좋아요는 피드 좋아요와 같이 비로그인도 허용
+                                        .requestMatchers(
+                                                HttpMethod.POST, "/feeds/*/comments/*/like")
+                                        .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/link-preview")
                                         .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/guestbook/**")

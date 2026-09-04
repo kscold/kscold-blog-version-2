@@ -20,4 +20,11 @@ public interface FeedCommentRepository {
     List<FeedComment> findAnonymousByFeedIdAndAuthorNames(String feedId, List<String> authorNames);
 
     void deleteAllByFeedId(String feedId);
+
+    /**
+     * 좋아요를 토글한다. 동시에 눌러도 수가 어긋나지 않도록 한 번의 원자적 갱신으로 처리한다.
+     *
+     * @return 추가됐으면 true, 취소됐으면 false
+     */
+    boolean toggleLike(String commentId, String identifier);
 }

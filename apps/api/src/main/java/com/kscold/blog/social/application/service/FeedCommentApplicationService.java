@@ -96,6 +96,24 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
         feedRepository.decrementCommentCount(feedId);
     }
 
+    /** 좋아요는 로그인하지 않아도 누를 수 있어 사용자 확인 없이 식별자만으로 처리한다. */
+    @Transactional
+    public FeedComment toggleLike(String feedId, String commentId, String identifier) {
+        FeedComment comment =
+                feedCommentRepository
+                        .findById(commentId)
+                        .orElseThrow(() -> ResourceNotFoundException.feedComment(commentId));
+        // 다른 글의 댓글 아이디로 좋아요가 눌리지 않도록 소속을 확인한다.
+        if (!comment.getFeedId().equals(feedId)) {
+            throw InvalidRequestException.invalidInput("이 글의 댓글이 아닙니다");
+        }
+
+        feedCommentRepository.toggleLike(commentId, identifier);
+        return feedCommentRepository
+                .findById(commentId)
+                .orElseThrow(() -> ResourceNotFoundException.feedComment(commentId));
+    }
+
     private User getAuthenticatedUser(String userId) {
         if (userId == null || userId.isBlank()) {
             throw InvalidRequestException.invalidInput("로그인이 필요합니다");
