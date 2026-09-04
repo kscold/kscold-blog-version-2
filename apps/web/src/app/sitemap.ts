@@ -24,7 +24,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchPublicApi<{ slug: string; contentLength?: number }[]>('/vault/notes/sitemap-index'),
   ]);
 
-  const categories = flattenCategories(categoryTree || []);
+  const categories = flattenCategories(categoryTree || []).filter(
+    category => !category.restricted
+  );
   // 제한 글은 상세 메타데이터가 noindex 이므로 사이트맵에서도 제외해 크롤링 신호를 일치시킨다.
   const indexablePosts = (posts || []).filter(
     post => post.status === 'PUBLISHED' && !post.restricted
