@@ -42,7 +42,9 @@ class VaultObservabilityMixin:
     def source_excerpt(self, hit: SearchHit, question: str, limit: int = 220) -> str:
         """질문과 가장 가까운 기록 구간을 출처 카드에서 바로 읽게 합니다."""
 
-        content = re.sub(r"\s+", " ", hit.note.content).strip()
+        content = re.sub(r"\A---\s+.*?\s+---\s*", "", hit.note.content, flags=re.DOTALL)
+        content = re.sub(r"^#{1,6}\s+", "", content, flags=re.MULTILINE)
+        content = re.sub(r"\s+", " ", content).strip()
         if not content:
             return ""
         positions = [
