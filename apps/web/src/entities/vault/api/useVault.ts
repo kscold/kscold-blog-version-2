@@ -1,6 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { GraphData, VaultFolder, VaultNote, VaultSearchResult } from '@/shared/model/types/vault';
+import {
+  GraphData,
+  VaultFolder,
+  VaultNote,
+  VaultNoteTitle,
+  VaultSearchResult,
+} from '@/shared/model/types/vault';
 import { PageResponse } from '@/shared/model/types/api';
 
 export function useVaultFolders() {
@@ -45,10 +51,19 @@ export function useVaultBacklinks(noteId: string) {
   });
 }
 
-export function useVaultGraph() {
+export function useVaultGraph(enabled = true) {
   return useQuery({
     queryKey: ['vault', 'graph'],
     queryFn: () => apiClient.get<GraphData>('/vault/notes/graph'),
+    enabled,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useVaultTitleIndex() {
+  return useQuery({
+    queryKey: ['vault', 'title-index'],
+    queryFn: () => apiClient.get<VaultNoteTitle[]>('/vault/notes/title-index'),
     staleTime: 1000 * 60 * 5,
   });
 }

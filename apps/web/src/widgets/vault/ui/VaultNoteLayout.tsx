@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useUiStore } from '@/shared/model/uiStore';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { useVaultNoteData } from '@/features/vault';
@@ -16,6 +16,7 @@ interface VaultNoteLayoutProps {
 }
 
 export function VaultNoteLayout({ slug: initialSlug, initialNote }: VaultNoteLayoutProps) {
+  const [shouldLoadGraph, setShouldLoadGraph] = useState(false);
   const { theme } = useUiStore();
   const { isTouchDevice, allowRichEffects } = usePerformanceMode();
   const useSolidSurface = isTouchDevice || !allowRichEffects;
@@ -40,7 +41,11 @@ export function VaultNoteLayout({ slug: initialSlug, initialNote }: VaultNoteLay
     localGraph,
     colorMap,
     titleSlugMap,
-  } = useVaultNoteData(slug, initialNote);
+  } = useVaultNoteData(slug, initialNote, shouldLoadGraph);
+
+  const handleGraphNearViewport = useCallback(() => {
+    setShouldLoadGraph(true);
+  }, []);
 
   useEffect(() => {
     if (note?.folderId) {
@@ -95,6 +100,7 @@ export function VaultNoteLayout({ slug: initialSlug, initialNote }: VaultNoteLay
         onOpenChat={openAgentChat}
         onOpenFolders={() => setIsMobileOpen(true)}
         onFolderClick={setActiveFolderId}
+        onGraphNearViewport={handleGraphNearViewport}
         theme={theme}
         titleSlugMap={titleSlugMap}
       />

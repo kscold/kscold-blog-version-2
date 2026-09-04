@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { BacklinkList } from '@/entities/vault';
 import { VaultNoteContent } from '@/entities/vault';
@@ -18,6 +19,7 @@ interface VaultNoteMainPanelProps {
   localGraph: { nodes: GraphNode[]; links: GraphLink[] } | null;
   note: VaultNote | undefined;
   onFolderClick: (folderId: string | null) => void;
+  onGraphNearViewport: () => void;
   onOpenChat: () => void;
   onOpenFolders: () => void;
   theme: ThemeMode;
@@ -32,12 +34,38 @@ export function VaultNoteMainPanel({
   localGraph,
   note,
   onFolderClick,
+  onGraphNearViewport,
   onOpenChat,
   onOpenFolders,
   theme,
   titleSlugMap,
 }: VaultNoteMainPanelProps) {
   const router = useRouter();
+  const graphSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const graphSection = graphSectionRef.current;
+    if (!graphSection) {
+      return;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      onGraphNearViewport();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          onGraphNearViewport();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '800px 0px' }
+    );
+    observer.observe(graphSection);
+    return () => observer.disconnect();
+  }, [note?.slug, onGraphNearViewport]);
 
   return (
     <main
@@ -90,7 +118,10 @@ export function VaultNoteMainPanel({
           <VaultNoteContent note={note} theme={theme} titleSlugMap={titleSlugMap} />
           <BacklinkList backlinks={backlinks} />
 
-          <div className="mt-16 pt-8 border-t border-surface-200/50 h-[400px]">
+          <div
+            ref={graphSectionRef}
+            className="mt-16 pt-8 border-t border-surface-200/50 h-[400px]"
+          >
             <h3 className="text-sm font-bold text-surface-400 uppercase tracking-widest mb-6 flex items-center gap-2">
               <svg
                 className="w-4 h-4"

@@ -29,6 +29,11 @@ export interface VaultFolder {
   updatedAt: string;
 }
 
+export interface VaultNoteTitle {
+  name: string;
+  slug: string;
+}
+
 export interface GraphData {
   nodes: GraphNode[];
   links: GraphLink[];
