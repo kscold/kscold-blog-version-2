@@ -2,6 +2,20 @@ import { test, expect } from '@playwright/test';
 import { success, mockApi } from './support/api';
 
 test.describe('계정 복구 시나리오', () => {
+  test('로그인과 계정 복구 화면은 누락된 배경 자산을 요청하지 않는다', async ({ page }) => {
+    const missingGridResponses: number[] = [];
+    page.on('response', response => {
+      if (new URL(response.url()).pathname === '/grid.svg' && response.status() >= 400) {
+        missingGridResponses.push(response.status());
+      }
+    });
+
+    await page.goto('/login');
+    await page.goto('/login/recovery?tab=username');
+
+    expect(missingGridResponses).toEqual([]);
+  });
+
   test('로그인 화면에서 아이디 찾기와 비밀번호 재설정 페이지로 자연스럽게 이어진다', async ({
     page,
   }) => {

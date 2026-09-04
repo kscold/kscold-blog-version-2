@@ -4,6 +4,7 @@ export * from './api/useAuthRecovery';
 export * from './model/useLoginForm';
 export * from './model/authInputLimits';
 export * from './ui/LoginForm';
+export * from './ui/AuthGridPattern';
 export * from './ui/recovery/AccountRecoveryForm';
 export * from './ui/recovery/PasswordResetForm';
 export * from './ui/recovery/AuthSupportShell';

@@ -10,6 +10,7 @@ import { LoginErrorMessage } from '@/features/auth/ui/LoginErrorMessage';
 import { RegisterFields } from '@/features/auth/ui/RegisterFields';
 import { LoginRecoveryLinks } from '@/features/auth/ui/LoginRecoveryLinks';
 import { LoginHomeLink } from '@/features/auth/ui/LoginHomeLink';
+import { AuthGridPattern } from '@/features/auth/ui/AuthGridPattern';
 import { useLoginForm } from '@/features/auth/model/useLoginForm';
 import { AUTH_INPUT_LIMITS } from '@/features/auth/model/authInputLimits';
 import { slugify } from '@/features/auth/lib/slugify';
@@ -34,7 +35,7 @@ export function LoginForm() {
   return (
     <div className="relative flex min-h-screen items-start justify-center overflow-hidden bg-surface-50 px-4 pb-10 pt-24 sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white via-surface-50 to-surface-100" />
-      <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02]" />
+      <AuthGridPattern />
 
       <motion.div
         className="relative z-10 w-full max-w-[440px]"
