@@ -117,10 +117,7 @@ public class AuthApplicationService implements AuthUseCase {
 
         String userId = tokenProvider.getUserIdFromRefreshToken(refreshToken);
 
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> ResourceNotFoundException.user(userId));
+        User user = getActiveUser(userId);
 
         String newAccessToken =
                 tokenProvider.createAccessToken(user.getId(), user.getRole().name());
@@ -131,10 +128,7 @@ public class AuthApplicationService implements AuthUseCase {
     }
 
     public AuthResponse.UserInfo getMe(String userId) {
-        User user =
-                userRepository
-                        .findById(userId)
-                        .orElseThrow(() -> ResourceNotFoundException.user(userId));
+        User user = getActiveUser(userId);
 
         return AuthResponse.UserInfo.from(user);
     }
@@ -216,6 +210,17 @@ public class AuthApplicationService implements AuthUseCase {
                 .tokenType("Bearer")
                 .user(AuthResponse.UserInfo.from(user))
                 .build();
+    }
+
+    private User getActiveUser(String userId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> ResourceNotFoundException.user(userId));
+        if (user.isDeleted()) {
+            throw InvalidRequestException.invalidInput("비활성화된 계정입니다. 관리자에게 문의하세요");
+        }
+        return user;
     }
 
     private boolean isValidPasswordResetTokenInput(String token) {

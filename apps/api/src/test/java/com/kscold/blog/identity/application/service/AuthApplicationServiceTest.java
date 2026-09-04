@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.BusinessException;
+import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.identity.application.dto.command.RegisterCommand;
 import com.kscold.blog.identity.application.dto.command.ResetPasswordCommand;
 import com.kscold.blog.identity.application.dto.response.AuthResponse;
@@ -28,6 +29,7 @@ import com.kscold.blog.support.UserFixtures;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HexFormat;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -59,6 +61,34 @@ class AuthApplicationServiceTest {
     @Mock private PasswordResetSettings passwordResetSettings;
 
     @InjectMocks private AuthApplicationService authApplicationService;
+
+    @Test
+    @DisplayName("시나리오: 비활성 계정은 리프레시 토큰으로 세션을 연장할 수 없다")
+    void refreshRejectsDeletedUser() {
+        User user = UserFixtures.user("user-1", User.Role.USER, "kscold", "김승찬");
+        user.setDeletedAt(LocalDateTime.now());
+        when(tokenProvider.validateRefreshToken("refresh-token")).thenReturn(true);
+        when(tokenProvider.getUserIdFromRefreshToken("refresh-token")).thenReturn("user-1");
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authApplicationService.refresh("refresh-token"))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessageContaining("비활성화된 계정");
+        verify(tokenProvider, never()).createAccessToken(any(), any());
+        verify(tokenProvider, never()).createRefreshToken(any(), any());
+    }
+
+    @Test
+    @DisplayName("시나리오: 비활성 계정은 내 정보를 조회할 수 없다")
+    void getMeRejectsDeletedUser() {
+        User user = UserFixtures.user("user-1", User.Role.USER, "kscold", "김승찬");
+        user.setDeletedAt(LocalDateTime.now());
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authApplicationService.getMe("user-1"))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessageContaining("비활성화된 계정");
+    }
 
     @Test
     @DisplayName("시나리오: 회원가입이 완료되면 폼 흐름을 깨지 않고 환영 메일을 보낸다")

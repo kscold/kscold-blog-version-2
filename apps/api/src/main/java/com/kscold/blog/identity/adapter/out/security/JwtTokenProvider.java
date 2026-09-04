@@ -12,13 +12,11 @@ import java.util.Collections;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public class JwtTokenProvider {
 
@@ -76,9 +74,7 @@ public class JwtTokenProvider {
     public boolean validateAccessToken(String token) {
         try {
             Claims claims = parseClaims(token, accessSecretKey);
-            Object type = claims.get("type");
-            // 기존 토큰(type claim 없음)도 액세스로 허용, 리프레시만 거부
-            return !"refresh".equals(type);
+            return "access".equals(claims.get("type"));
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
@@ -89,7 +85,6 @@ public class JwtTokenProvider {
             Claims claims = parseClaims(token, refreshSecretKey);
             return "refresh".equals(claims.get("type"));
         } catch (JwtException | IllegalArgumentException e) {
-            log.warn("JWT validation failed: {}", e.getMessage());
             return false;
         }
     }
