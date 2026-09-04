@@ -81,7 +81,7 @@ public class SmtpAccessRequestMailSender implements AccessRequestMailSender {
                     new InternetAddress(fromAddress, fromName, StandardCharsets.UTF_8.name()));
             helper.setText(plain, html);
             sender.send(mime);
-            log.info("Access approval mail sent to {}", toEmail);
+            log.info("Access approval mail sent");
             messageDeliveryUseCase.record(
                     MessageDeliveryLog.sent(
                             MessageDeliveryLog.Channel.EMAIL,
@@ -90,7 +90,7 @@ public class SmtpAccessRequestMailSender implements AccessRequestMailSender {
                             displayName,
                             subject));
         } catch (Exception e) {
-            log.error("Failed to send access approval mail to {}: {}", toEmail, e.getMessage());
+            log.error("Failed to send access approval mail: type={}", e.getClass().getSimpleName());
             messageDeliveryUseCase.record(
                     MessageDeliveryLog.failed(
                             MessageDeliveryLog.Channel.EMAIL,
@@ -98,7 +98,7 @@ public class SmtpAccessRequestMailSender implements AccessRequestMailSender {
                             toEmail,
                             displayName,
                             subject,
-                            e.getMessage()));
+                            e.getClass().getSimpleName()));
         }
     }
 

@@ -58,7 +58,7 @@ public class ChatReminderScheduler {
                             recoveryMailProperties.resolvePublicUrl("/?chat=open")));
             chatApplicationService.markReminderSent(reminder.roomId(), unreadBefore);
         } catch (Exception exception) {
-            log.warn("Unread chat reminder skipped for {}", user.getEmail(), exception);
+            log.warn("Unread chat reminder skipped: type={}", exception.getClass().getSimpleName());
         }
     }
 }

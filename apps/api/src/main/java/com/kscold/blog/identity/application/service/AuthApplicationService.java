@@ -263,7 +263,9 @@ public class AuthApplicationService implements AuthUseCase {
         try {
             recoveryMailSender.send(recoveryEmailComposer.buildWelcome(user));
         } catch (Exception exception) {
-            log.warn("Welcome email delivery skipped for {}", user.getEmail(), exception);
+            log.warn(
+                    "Welcome email delivery skipped: type={}",
+                    exception.getClass().getSimpleName());
         }
     }
 
@@ -279,7 +281,7 @@ public class AuthApplicationService implements AuthUseCase {
                                     new NotificationMessage.Field("아이디", user.getUsername()),
                                     new NotificationMessage.Field("권한", user.getRole().name()))));
         } catch (Exception exception) {
-            log.warn("회원가입 알림 전송을 건너뜁니다. username={}", user.getUsername(), exception);
+            log.warn("회원가입 알림 전송을 건너뜁니다: type={}", exception.getClass().getSimpleName());
         }
     }
 

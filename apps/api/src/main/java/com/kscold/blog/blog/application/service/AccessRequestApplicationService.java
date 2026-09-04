@@ -134,7 +134,7 @@ public class AccessRequestApplicationService implements AccessRequestUseCase {
             UserQueryPort.UserInfo user = userQueryPort.getUserById(request.getUserId());
             accessRequestMailSender.sendApproved(user.email(), user.displayName(), request);
         } catch (Exception e) {
-            log.warn("승인 메일 발송 실패 (userId={}): {}", request.getUserId(), e.getMessage());
+            log.warn("승인 메일 발송 실패: type={}", e.getClass().getSimpleName());
         }
     }
 

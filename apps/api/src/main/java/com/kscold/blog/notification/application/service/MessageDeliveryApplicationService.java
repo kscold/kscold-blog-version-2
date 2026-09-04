@@ -26,7 +26,7 @@ public class MessageDeliveryApplicationService implements MessageDeliveryUseCase
         try {
             logRepository.save(deliveryLog);
         } catch (RuntimeException exception) {
-            log.warn("알림 발송 기록 실패 recipient={}", deliveryLog.getRecipient(), exception);
+            log.warn("알림 발송 기록 실패: type={}", exception.getClass().getSimpleName());
         }
     }
 
@@ -36,7 +36,10 @@ public class MessageDeliveryApplicationService implements MessageDeliveryUseCase
         try {
             logRepository.saveAll(logs);
         } catch (RuntimeException exception) {
-            log.warn("알림 발송 기록 실패 count={}", logs.size(), exception);
+            log.warn(
+                    "알림 발송 기록 실패 count={}, type={}",
+                    logs.size(),
+                    exception.getClass().getSimpleName());
         }
     }
 

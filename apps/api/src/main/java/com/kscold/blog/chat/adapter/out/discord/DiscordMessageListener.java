@@ -40,11 +40,11 @@ public class DiscordMessageListener extends ListenerAdapter {
 
         String roomId = threadLinkService.getRoomIdByThread(threadId, event.getJDA());
         if (roomId == null) {
-            log.warn("Discord → Blog: 스레드 매핑 없음 ({})", threadId);
+            log.warn("Discord → Blog: 스레드 매핑 없음");
             return;
         }
 
-        log.info("Discord → Blog: {} in thread {}: {}", ownerName, threadId, content);
+        log.info("Discord → Blog: 관리자 답장 수신");
 
         // 저장 + 방문자 WebSocket 전달 (application 이 오케스트레이션)
         chatUseCase.receiveOwnerReply("discord-" + threadId, ownerName, content, roomId);

@@ -60,10 +60,7 @@ public class AdminNightNotificationListener {
                                 requestMailComposer.buildRejectedForRequester(event.request()));
             }
         } catch (Exception exception) {
-            log.warn(
-                    "Admin Night 알림 메일 전송을 건너뜁니다. requester={}",
-                    event.request().getRequesterEmail(),
-                    exception);
+            log.warn("Admin Night 알림 메일 전송을 건너뜁니다: type={}", exception.getClass().getSimpleName());
         }
     }
 
@@ -80,9 +77,8 @@ public class AdminNightNotificationListener {
                             event.vote(), adminNightProperties.getAdminEmail()));
         } catch (Exception exception) {
             log.warn(
-                    "AI Agent Bloom 투표 알림 메일 전송을 건너뜁니다. requester={}",
-                    event.vote().getContactEmail(),
-                    exception);
+                    "AI Agent Bloom 투표 알림 메일 전송을 건너뜁니다: type={}",
+                    exception.getClass().getSimpleName());
         }
     }
 }

@@ -71,7 +71,7 @@ public class SmtpMailSender implements MailSender {
                             null,
                             message.subject()));
         } catch (Exception exception) {
-            log.error("Failed to send email to {}", message.to(), exception);
+            log.error("Failed to send email: type={}", exception.getClass().getSimpleName());
             messageDeliveryUseCase.record(
                     MessageDeliveryLog.failed(
                             MessageDeliveryLog.Channel.EMAIL,
@@ -79,7 +79,7 @@ public class SmtpMailSender implements MailSender {
                             message.to(),
                             null,
                             message.subject(),
-                            exception.getMessage()));
+                            exception.getClass().getSimpleName()));
             throw new BusinessException(
                     ErrorCode.INTERNAL_SERVER_ERROR, "이메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.");
         }

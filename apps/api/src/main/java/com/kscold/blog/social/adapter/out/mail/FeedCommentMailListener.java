@@ -60,7 +60,10 @@ public class FeedCommentMailListener {
             feedCommentMailExecutor.execute(() -> sendNotifications(event));
         } catch (TaskRejectedException exception) {
             // 혼잡할 때 요청 스레드에서 메일을 대신 보내면 댓글 UX가 다시 느려지므로 기록만 남김.
-            log.warn("피드 댓글 알림 작업 큐가 가득 차 전송을 건너뜁니다. feedId={}", event.feedId(), exception);
+            log.warn(
+                    "피드 댓글 알림 작업 큐가 가득 차 전송을 건너뜁니다. feedId={}, type={}",
+                    event.feedId(),
+                    exception.getClass().getSimpleName());
         }
     }
 
@@ -109,7 +112,10 @@ public class FeedCommentMailListener {
                                 postPreview));
             }
         } catch (Exception exception) {
-            log.warn("피드 댓글 알림 메일 전송을 건너뜁니다. feedId={}", event.feedId(), exception);
+            log.warn(
+                    "피드 댓글 알림 메일 전송을 건너뜁니다. feedId={}, type={}",
+                    event.feedId(),
+                    exception.getClass().getSimpleName());
         }
     }
 

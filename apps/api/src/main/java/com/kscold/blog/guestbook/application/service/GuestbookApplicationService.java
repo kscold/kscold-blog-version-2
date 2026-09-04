@@ -94,7 +94,10 @@ public class GuestbookApplicationService implements GuestbookUseCase {
                             entry.getContent(),
                             List.of(new NotificationMessage.Field("작성자", entry.getAuthorName()))));
         } catch (Exception exception) {
-            log.warn("방명록 알림 전송을 건너뜁니다. entryId={}", entry.getId(), exception);
+            log.warn(
+                    "방명록 알림 전송을 건너뜁니다. entryId={}, type={}",
+                    entry.getId(),
+                    exception.getClass().getSimpleName());
         }
     }
 

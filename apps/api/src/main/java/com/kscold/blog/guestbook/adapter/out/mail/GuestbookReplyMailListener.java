@@ -33,7 +33,10 @@ public class GuestbookReplyMailListener {
         try {
             guestbookReplyMailExecutor.execute(() -> send(event));
         } catch (TaskRejectedException exception) {
-            log.warn("방명록 답글 메일 작업 큐가 가득 차 전송을 건너뜁니다. entryId={}", event.entryId(), exception);
+            log.warn(
+                    "방명록 답글 메일 작업 큐가 가득 차 전송을 건너뜁니다. entryId={}, type={}",
+                    event.entryId(),
+                    exception.getClass().getSimpleName());
         }
     }
 
@@ -50,7 +53,10 @@ public class GuestbookReplyMailListener {
                             event.originalContent(),
                             event.replyContent()));
         } catch (Exception exception) {
-            log.warn("방명록 답글 알림 메일 전송을 건너뜁니다. entryId={}", event.entryId(), exception);
+            log.warn(
+                    "방명록 답글 알림 메일 전송을 건너뜁니다. entryId={}, type={}",
+                    event.entryId(),
+                    exception.getClass().getSimpleName());
         }
     }
 }

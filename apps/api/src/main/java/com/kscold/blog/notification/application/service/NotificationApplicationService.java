@@ -37,7 +37,10 @@ public class NotificationApplicationService implements NotificationUseCase {
         try {
             notificationExecutor.execute(() -> sendQuietly(message));
         } catch (TaskRejectedException exception) {
-            log.warn("알림 작업 큐가 가득 차 전송을 건너뜁니다. channel={}", message.channel(), exception);
+            log.warn(
+                    "알림 작업 큐가 가득 차 전송을 건너뜁니다. channel={}, type={}",
+                    message.channel(),
+                    exception.getClass().getSimpleName());
         }
     }
 
@@ -45,7 +48,10 @@ public class NotificationApplicationService implements NotificationUseCase {
         try {
             senderPort.send(message);
         } catch (Exception exception) {
-            log.warn("알림 전송에 실패했습니다. channel={}", message.channel(), exception);
+            log.warn(
+                    "알림 전송에 실패했습니다. channel={}, type={}",
+                    message.channel(),
+                    exception.getClass().getSimpleName());
         }
     }
 }
