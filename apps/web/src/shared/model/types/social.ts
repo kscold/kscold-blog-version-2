@@ -35,6 +35,8 @@ export interface FeedComment {
   canDelete: boolean;
   content: string;
   createdAt: string;
+  likesCount: number;
+  isLiked: boolean;
 }
 
 export interface FeedCreateRequest {
