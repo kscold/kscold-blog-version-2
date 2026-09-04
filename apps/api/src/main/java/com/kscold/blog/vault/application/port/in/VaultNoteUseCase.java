@@ -24,6 +24,8 @@ public interface VaultNoteUseCase {
 
     VaultNote getBySlugWithView(String slug);
 
+    boolean existsBySlug(String slug);
+
     Page<VaultNote> getAll(Pageable pageable);
 
     Page<VaultNote> getByFolder(String folderId, Pageable pageable);

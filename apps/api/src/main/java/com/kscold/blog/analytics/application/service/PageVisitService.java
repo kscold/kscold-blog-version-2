@@ -26,14 +26,17 @@ public class PageVisitService implements PageVisitUseCase {
     private static final Pattern ALLOWED_PATH =
             Pattern.compile(
                     "^/(?:$"
-                            + "|blog(?:/.*)?"
-                            + "|feed(?:/.*)?"
-                            + "|vault(?:/.*)?"
-                            + "|info(?:/.*)?"
+                            + "|blog(?:/[^/]+(?:/[^/]+)?)?"
+                            + "|feed(?:/[^/]+)?"
+                            + "|vault(?:/[^/]+)?"
+                            + "|info(?:/(?:instructor|pawpong|gole))?"
                             + "|guestbook"
-                            + "|admin-night(?:/.*)?"
-                            + "|login(?:/.*)?"
+                            + "|admin-night(?:/ai-agent-bloom)?"
+                            + "|login(?:/(?:recovery|reset-password))?"
                             + "|privacy"
+                            + "|product"
+                            + "|profile/[^/]+"
+                            + "|tags/[^/]+"
                             + ")$");
 
     @Override

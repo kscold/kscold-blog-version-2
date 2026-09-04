@@ -143,6 +143,10 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
         return getBySlug(slug);
     }
 
+    public boolean existsBySlug(String slug) {
+        return vaultNoteRepository.existsBySlug(slug);
+    }
+
     public Page<VaultNote> getAll(Pageable pageable) {
         return vaultNoteRepository.findAll(pageable);
     }
