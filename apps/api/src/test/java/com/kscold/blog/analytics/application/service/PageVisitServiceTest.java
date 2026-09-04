@@ -44,6 +44,7 @@ class PageVisitServiceTest {
         service.record("/login/not-found", "203.0.113.10", null, null);
         service.record("/info/not-found", "203.0.113.10", null, null);
         service.record("/blog/java/post/extra", "203.0.113.10", null, null);
+        service.record("/profile/user\nforged-log-entry", "203.0.113.10", null, null);
 
         verify(repository, never()).insert(org.mockito.ArgumentMatchers.any());
     }

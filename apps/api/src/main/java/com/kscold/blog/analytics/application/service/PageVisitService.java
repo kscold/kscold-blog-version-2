@@ -38,6 +38,7 @@ public class PageVisitService implements PageVisitUseCase {
                             + "|profile/[^/]+"
                             + "|tags/[^/]+"
                             + ")$");
+    private static final Pattern CONTROL_CHARACTER = Pattern.compile("[\\p{Cntrl}]");
 
     @Override
     public void record(
@@ -47,8 +48,9 @@ public class PageVisitService implements PageVisitUseCase {
             @Nullable String username) {
         if (!StringUtils.hasText(path)) return;
         String normalized = normalize(path);
-        if (!ALLOWED_PATH.matcher(normalized).matches()) {
-            log.debug("Rejected page visit: {}", normalized);
+        if (CONTROL_CHARACTER.matcher(normalized).find()
+                || !ALLOWED_PATH.matcher(normalized).matches()) {
+            log.debug("Rejected page visit");
             return;
         }
         PageVisitLog entry =
