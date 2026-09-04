@@ -84,6 +84,7 @@ services:
     image: qdrant/qdrant:v1.19.0
     volumes:
       - blog-qdrant-data:/qdrant/storage
+      - blog-qdrant-snapshots:/qdrant/snapshots
     networks:
       - kscold-control_default
     restart: unless-stopped
@@ -100,3 +101,6 @@ volumes:
   blog-qdrant-data:
     external: true
     name: kscold-vault-qdrant-data
+  blog-qdrant-snapshots:
+    external: true
+    name: kscold-vault-qdrant-snapshots
