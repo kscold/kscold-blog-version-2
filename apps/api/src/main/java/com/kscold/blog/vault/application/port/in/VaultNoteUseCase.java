@@ -4,6 +4,7 @@ import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteStatsResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.domain.model.VaultNote;
 import java.util.List;
@@ -33,6 +34,8 @@ public interface VaultNoteUseCase {
     GraphDataResponse getGraphData();
 
     List<VaultNoteTitleResponse> getTitleIndex();
+
+    VaultNoteStatsResponse getStats();
 
     Page<VaultNote> search(String query, Pageable pageable);
 

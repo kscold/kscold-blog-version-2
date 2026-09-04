@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteStatsResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
@@ -88,5 +89,14 @@ class VaultNoteApplicationServiceTest {
         assertThat(response)
                 .containsExactly(
                         new VaultNoteBacklinkResponse("note-2", "둘째 노트", "second-note", "짧은 본문"));
+    }
+
+    @Test
+    void 통계는전체노트수만반환한다() {
+        when(vaultNoteRepository.count()).thenReturn(1327L);
+
+        VaultNoteStatsResponse response = service.getStats();
+
+        assertThat(response.totalNotes()).isEqualTo(1327L);
     }
 }

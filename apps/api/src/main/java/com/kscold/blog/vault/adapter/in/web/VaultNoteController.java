@@ -8,6 +8,7 @@ import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteStatsResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNote;
@@ -100,6 +101,11 @@ public class VaultNoteController {
     @GetMapping("/title-index")
     public ResponseEntity<ApiResponse<List<VaultNoteTitleResponse>>> getTitleIndex() {
         return ResponseEntity.ok(ApiResponse.success(vaultNoteUseCase.getTitleIndex()));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<VaultNoteStatsResponse>> getStats() {
+        return ResponseEntity.ok(ApiResponse.success(vaultNoteUseCase.getStats()));
     }
 
     @GetMapping("/search")

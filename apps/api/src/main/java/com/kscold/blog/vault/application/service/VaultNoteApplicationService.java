@@ -8,6 +8,7 @@ import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteStatsResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNote;
@@ -205,6 +206,10 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
         return vaultNoteRepository.findAllForTitleIndex().stream()
                 .map(note -> new VaultNoteTitleResponse(note.title(), note.slug()))
                 .toList();
+    }
+
+    public VaultNoteStatsResponse getStats() {
+        return new VaultNoteStatsResponse(vaultNoteRepository.count());
     }
 
     /** 전체 노트의 outgoingLinks 재인덱싱 (일괄 임포트 후 백링크 복원용) */

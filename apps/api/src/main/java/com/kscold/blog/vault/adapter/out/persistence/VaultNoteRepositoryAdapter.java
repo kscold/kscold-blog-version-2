@@ -101,6 +101,11 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
     }
 
     @Override
+    public long count() {
+        return mongoRepository.count();
+    }
+
+    @Override
     public Page<VaultNote> searchByText(String query, Pageable pageable) {
         return mongoRepository.searchByText(query, pageable);
     }

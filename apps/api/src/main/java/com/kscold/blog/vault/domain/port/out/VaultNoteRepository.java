@@ -21,6 +21,8 @@ public interface VaultNoteRepository {
 
     List<VaultNote> findAll();
 
+    long count();
+
     Page<VaultNote> findByFolderId(String folderId, Pageable pageable);
 
     Page<VaultNote> searchByText(String query, Pageable pageable);
