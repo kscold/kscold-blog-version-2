@@ -36,6 +36,15 @@ public class StackShareSettlement {
 
     @Builder.Default private List<Recipient> recipients = new ArrayList<>();
 
+    /** 총액을 나눈 인원 수. 본인을 포함했다면 받는 사람 수 + 1 이다. 알림톡 #{참여인원} 으로 나간다. */
+    private int shareCount;
+
+    /** 결제한 본인도 분담 인원에 넣었는지 여부. */
+    private boolean includeOwner;
+
+    /** 본인 몫. 본인을 포함했을 때만 0보다 크며, 나누어떨어지지 않은 나머지는 본인이 부담한다. */
+    private long ownerAmount;
+
     private Status status;
     private String messageGroupId;
     private LocalDateTime sentAt;

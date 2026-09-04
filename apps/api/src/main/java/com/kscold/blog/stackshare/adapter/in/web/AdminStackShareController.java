@@ -102,7 +102,8 @@ public class AdminStackShareController {
                         request.getToolName(),
                         request.getBillingPeriod(),
                         request.getTotalAmount(),
-                        request.getDueDate());
+                        request.getDueDate(),
+                        request.isIncludeOwner());
         var recipients =
                 request.getRecipients().stream()
                         .map(

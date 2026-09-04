@@ -26,6 +26,15 @@ public class StackShareSettlementResponse {
     /** 발송 당시 안내한 문의 연락처. */
     private String contactText;
 
+    /** 총액을 나눈 인원 수. 본인을 포함했다면 받는 사람 수 + 1. */
+    private int shareCount;
+
+    /** 본인도 분담 인원에 넣었는지 여부. */
+    private boolean includeOwner;
+
+    /** 본인 몫. 본인을 포함했을 때만 0보다 크다. */
+    private long ownerAmount;
+
     private StackShareSettlement.Status status;
     private LocalDateTime sentAt;
     private LocalDateTime createdAt;
@@ -40,6 +49,9 @@ public class StackShareSettlementResponse {
                 .dueDate(settlement.getDueDate())
                 .accountText(settlement.getAccountText())
                 .contactText(settlement.getContactText())
+                .shareCount(settlement.getShareCount())
+                .includeOwner(settlement.isIncludeOwner())
+                .ownerAmount(settlement.getOwnerAmount())
                 .status(settlement.getStatus())
                 .sentAt(settlement.getSentAt())
                 .createdAt(settlement.getCreatedAt())

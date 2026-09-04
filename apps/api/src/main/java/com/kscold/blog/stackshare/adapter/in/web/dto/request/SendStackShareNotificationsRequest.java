@@ -23,6 +23,9 @@ public class SendStackShareNotificationsRequest {
     @Size(max = 30)
     private String dueDate;
 
+    /** 결제한 본인도 분담 인원에 넣을지 여부. 넣으면 (받는 사람 + 1)로 나누고 본인에게는 알림톡을 보내지 않는다. */
+    private boolean includeOwner;
+
     @Valid
     @NotEmpty
     @Size(max = 100)

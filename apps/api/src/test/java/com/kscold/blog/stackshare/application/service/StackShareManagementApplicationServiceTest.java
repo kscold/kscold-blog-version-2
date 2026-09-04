@@ -3,6 +3,7 @@ package com.kscold.blog.stackshare.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -19,6 +20,7 @@ import com.kscold.blog.stackshare.domain.model.StackShareAccount;
 import com.kscold.blog.stackshare.domain.model.StackShareMessage;
 import com.kscold.blog.stackshare.domain.model.StackShareParticipant;
 import com.kscold.blog.stackshare.domain.model.StackShareSendResult;
+import com.kscold.blog.stackshare.domain.model.StackShareSettlement;
 import com.kscold.blog.stackshare.domain.port.out.StackShareAccountRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareNotificationSender;
 import com.kscold.blog.stackshare.domain.port.out.StackShareParticipantRepository;
@@ -115,6 +117,50 @@ class StackShareManagementApplicationServiceTest {
     }
 
     @Test
+    void 본인을_포함하면_받는_사람_수에_한_명을_더해_나눈다() {
+        stubSendableSettlement();
+
+        service.createAndSend(command(100_000, "9월 5일", true));
+
+        ArgumentCaptor<List<StackShareMessage>> captor = ArgumentCaptor.forClass(List.class);
+        verify(notificationSender).send(captor.capture());
+        assertThat(captor.getValue())
+                .extracting(message -> message.variables().get("#{분담금}"))
+                .containsExactly("25,000원", "25,000원", "25,000원");
+        assertThat(captor.getValue().get(0).variables()).containsEntry("#{참여인원}", "4");
+    }
+
+    @Test
+    void 본인을_포함하면_나누어떨어지지_않은_나머지를_본인이_부담한다() {
+        stubSendableSettlement();
+        ArgumentCaptor<StackShareSettlement> saved =
+                ArgumentCaptor.forClass(StackShareSettlement.class);
+
+        service.createAndSend(command(10_001, "9월 5일", true));
+
+        verify(settlementRepository, atLeastOnce()).save(saved.capture());
+        StackShareSettlement settlement = saved.getValue();
+        assertThat(settlement.getRecipients()).extracting("amount").containsOnly(2_500L);
+        assertThat(settlement.getOwnerAmount()).isEqualTo(2_501L);
+        assertThat(settlement.getShareCount()).isEqualTo(4);
+    }
+
+    @Test
+    void 본인을_빼면_받는_사람끼리만_나누고_본인_몫은_없다() {
+        stubSendableSettlement();
+        ArgumentCaptor<StackShareSettlement> saved =
+                ArgumentCaptor.forClass(StackShareSettlement.class);
+
+        service.createAndSend(command(30_000, "9월 5일", false));
+
+        verify(settlementRepository, atLeastOnce()).save(saved.capture());
+        StackShareSettlement settlement = saved.getValue();
+        assertThat(settlement.getShareCount()).isEqualTo(3);
+        assertThat(settlement.getOwnerAmount()).isZero();
+        assertThat(settlement.getRecipients()).extracting("amount").containsOnly(10_000L);
+    }
+
+    @Test
     void 입금계좌가_등록되지_않았으면_발송하지_않는다() {
         when(templateUseCase.getTemplate("STACK_SHARE_SETTLEMENT")).thenReturn(approvedTemplate());
         when(accountRepository.find()).thenReturn(Optional.empty());
@@ -152,8 +198,14 @@ class StackShareManagementApplicationServiceTest {
     }
 
     private SendStackShareNotificationsCommand command(long totalAmount, String dueDate) {
+        return command(totalAmount, dueDate, false);
+    }
+
+    private SendStackShareNotificationsCommand command(
+            long totalAmount, String dueDate, boolean includeOwner) {
         return new SendStackShareNotificationsCommand(
-                new StackShareSettlementCommand("Claude Team", "2026년 8월", totalAmount, dueDate),
+                new StackShareSettlementCommand(
+                        "Claude Team", "2026년 8월", totalAmount, dueDate, includeOwner),
                 List.of(
                         new StackShareRecipientCommand("김승찬", "010-1111-1111", "a@example.com"),
                         new StackShareRecipientCommand("김수민", "010-2222-2222", "b@example.com"),
