@@ -75,7 +75,7 @@ test.describe('공개 피드 작성기 시나리오', () => {
       await expect(page.locator('[data-cy="feed-composer"]')).toBeVisible();
       await expect(page.getByText('지금 흐름 남기기')).toBeVisible();
       await expect(page.getByText('이미지 바로 첨부')).toBeVisible();
-      await expect(page.getByText('링크 함께 정리')).toBeVisible();
+      await expect(page.getByText('계획부터 함께 정리')).toBeVisible();
 
       const linkInput = page.locator('[data-cy="feed-composer-link-input"]');
       await expect(linkInput).toHaveCount(0);

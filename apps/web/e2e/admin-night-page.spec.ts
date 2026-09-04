@@ -10,7 +10,6 @@ test.describe('Admin Night 공개 페이지 시나리오', () => {
   test('헤더 네비게이션에서 공개 Admin Night 페이지로 이동할 수 있다', async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 1200 });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
     await page.locator('[data-cy="nav-link-admin-night"]').click();
 
     await expect(page).toHaveURL(/\/admin-night/);

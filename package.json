@@ -32,12 +32,22 @@
   "packageManager": "pnpm@8.15.4",
   "pnpm": {
     "overrides": {
-      "@tiptap/core": "3.20.2",
-      "@tiptap/pm": "3.20.2"
+      "@tiptap/core": "3.31.2",
+      "@tiptap/pm": "3.31.2",
+      "caniuse-lite": "1.0.30001810",
+      "dompurify": "3.4.14",
+      "js-yaml@3": "3.15.1",
+      "lodash-es": "4.17.23",
+      "nanoid@3": "3.3.18",
+      "picomatch@2": "2.3.2",
+      "picomatch@4": "4.0.4",
+      "postcss": "8.5.28",
+      "prismjs": "1.30.0",
+      "socket.io-parser": "4.2.7"
     }
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1023.0",
-    "mongodb": "^7.1.0"
+    "@aws-sdk/client-s3": "^3.1126.0",
+    "mongodb": "^7.6.0"
   }
 }

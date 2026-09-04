@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import {
   linkAgentSourceCitations,
@@ -18,7 +18,7 @@ export function AgentMessageList({
   const shouldFollowStreamRef = useRef(true);
   const previousLastMessageIdRef = useRef<string | undefined>(undefined);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = scrollContainerRef.current;
     const lastMessageId = messages.at(-1)?.id;
     if (!container || !lastMessageId) {
@@ -31,14 +31,22 @@ export function AgentMessageList({
       return;
     }
 
-    const frameId = window.requestAnimationFrame(() => {
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: 'auto',
-      });
+    let settledFrameId: number | null = null;
+    const scrollToBottom = () => {
+      container.scrollTop = container.scrollHeight;
       shouldFollowStreamRef.current = true;
+    };
+    const frameId = window.requestAnimationFrame(() => {
+      scrollToBottom();
+      // 긴 Markdown의 줄바꿈과 높이가 확정된 다음 프레임에서도 바닥을 맞춘다.
+      settledFrameId = window.requestAnimationFrame(scrollToBottom);
     });
-    return () => window.cancelAnimationFrame(frameId);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      if (settledFrameId !== null) {
+        window.cancelAnimationFrame(settledFrameId);
+      }
+    };
   }, [messages]);
 
   function handleScroll() {

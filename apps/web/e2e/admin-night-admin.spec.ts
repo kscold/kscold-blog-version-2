@@ -85,7 +85,7 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
 
     await page.goto('/admin/admin-night');
     await expect(page.getByText('문서 정리와 메일 답장')).toBeVisible();
-    await expect(page.getByText('오프라인')).toBeVisible();
+    await expect(page.getByText('진행 방식: 오프라인', { exact: true })).toBeVisible();
 
     const approvePromise = page.waitForResponse('**/api/admin/admin-night/requests/request-1/approve');
     await page.locator('[data-cy="admin-night-approve-request-1"]').click();

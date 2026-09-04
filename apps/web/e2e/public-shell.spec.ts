@@ -11,8 +11,9 @@ test.describe('공개 페이지 핵심 시나리오', () => {
 
     const tagline = page.locator('[data-cy="hero-tagline"]');
     await expect(tagline).toContainText('러닝커브를 즐기는 개발자');
+    await expect(tagline).toContainText('백엔드부터 AI Agent까지');
     await expect(tagline).toContainText('문제를 서비스로 풀어내는');
-    await expect(tagline).toContainText('프로덕트 엔지니어 김승찬입니다.');
+    await expect(tagline).toContainText('김승찬입니다.');
 
     await expect(page.locator('[data-cy="hero-primary-cta"]')).toHaveAttribute('href', '/blog');
     await expect(page.locator('[data-cy="hero-secondary-cta"]')).toHaveAttribute('href', '/feed');
