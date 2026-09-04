@@ -212,6 +212,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        {gaId ? <link rel="preconnect" href="https://www.googletagmanager.com" /> : null}
+      </head>
       <body className="antialiased bg-surface-50 dark:bg-surface-950 text-surface-900 dark:text-surface-50 min-h-screen relative selection:bg-accent-light/30 selection:text-accent-light transition-colors duration-300">
         <JsonLd id="site-graph" data={siteJsonLd} />
         <Suspense>
