@@ -23,7 +23,7 @@ import sql from 'react-syntax-highlighter/dist/cjs/languages/prism/sql';
 import tsx from 'react-syntax-highlighter/dist/cjs/languages/prism/tsx';
 import typescript from 'react-syntax-highlighter/dist/cjs/languages/prism/typescript';
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/prism/yaml';
-import oneLight from 'react-syntax-highlighter/dist/cjs/styles/prism/one-light';
+import a11yOneLight from 'react-syntax-highlighter/dist/cjs/styles/prism/a11y-one-light';
 import vscDarkPlus from 'react-syntax-highlighter/dist/cjs/styles/prism/vsc-dark-plus';
 
 const SUPPORTED_LANGUAGES = {
@@ -67,7 +67,7 @@ interface CodeHighlighterProps {
 export default function CodeHighlighter({ codeText, language, isDark }: CodeHighlighterProps) {
   return (
     <SyntaxHighlighter
-      style={isDark ? vscDarkPlus : oneLight}
+      style={isDark ? vscDarkPlus : a11yOneLight}
       language={language}
       PreTag="div"
       className="!my-0 !border-0 !bg-transparent"
