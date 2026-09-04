@@ -10,7 +10,6 @@ import {
   extractFirstMarkdownImage,
   fetchPublicApi,
   isIndexableFeed,
-  stripRichText,
   toMetaDescription,
   toOgImage,
   uniqueKeywords,
@@ -81,7 +80,6 @@ export default async function FeedDetailPage({
         '@id': `${absoluteUrl(canonicalPath)}#posting`,
         url: absoluteUrl(canonicalPath),
         headline,
-        articleBody: stripRichText(feed.content),
         datePublished: feed.createdAt,
         dateModified: feed.updatedAt,
         author: feed.author.username === 'kscold'

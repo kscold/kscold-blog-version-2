@@ -8,7 +8,6 @@ import {
   buildBreadcrumbJsonLd,
   buildPageMetadata,
   fetchPublicApi,
-  stripRichText,
   toMetaDescription,
   uniqueKeywords,
 } from '@/shared/lib/seo';
@@ -70,7 +69,6 @@ export default async function VaultNotePage({
         url: absoluteUrl(canonicalPath),
         headline: note.title,
         description: toMetaDescription(note.content, note.title),
-        articleBody: stripRichText(note.content),
         datePublished: note.createdAt,
         dateModified: note.updatedAt,
         keywords: uniqueKeywords([note.title, ...note.tags]).join(', '),
