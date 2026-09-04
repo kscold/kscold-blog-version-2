@@ -34,7 +34,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const indexableFeeds = (feeds || []).filter(
     feed => feed.visibility === 'PUBLIC' && isIndexableFeed(feed.content)
   );
-  const indexableTags = (tags || []).filter(isIndexableTag);
+  const publicPostCountsByTagId = new Map<string, number>();
+  indexablePosts.forEach(post => {
+    post.tags.forEach(tag => {
+      publicPostCountsByTagId.set(
+        tag.id,
+        (publicPostCountsByTagId.get(tag.id) || 0) + 1
+      );
+    });
+  });
+  const indexableTags = (tags || [])
+    .map(tag => ({ ...tag, postCount: publicPostCountsByTagId.get(tag.id) || 0 }))
+    .filter(isIndexableTag);
   // 본문 길이를 확인할 수 있고 독립 문서로 충분한 노트만 사이트맵에 싣는다.
   const vaultNotes = (vaultNoteIndex || []).filter(
     note => !!note.slug && isIndexableVaultNote(note.contentLength)

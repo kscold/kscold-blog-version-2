@@ -1,20 +1,29 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import type { Tag } from '@/shared/model/types/blog';
+import { cache } from 'react';
+import type { Post, Tag } from '@/shared/model/types/blog';
 import { TagArchive } from '@/widgets/blog/tag';
 import {
   SITE_URL,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
+  fetchAllPublicApiPages,
   fetchPublicApi,
   isIndexableTag,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 
-async function getTag(tagSlug: string) {
+const getTagSeoData = cache(async (tagSlug: string) => {
   const tags = await fetchPublicApi<Tag[]>('/tags');
-  return tags?.find(tag => tag.slug === tagSlug) || null;
-}
+  const tag = tags?.find(item => item.slug === tagSlug) || null;
+  if (!tag) {
+    return null;
+  }
+
+  const posts = await fetchAllPublicApiPages<Post>(`/posts/tag/${tag.id}`);
+  const publicPostCount = (posts || []).filter(post => !post.restricted).length;
+  return { tag, publicPostCount };
+});
 
 export async function generateMetadata({
   params,
@@ -23,18 +32,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const tag = await getTag(decodedSlug);
+  const seoData = await getTagSeoData(decodedSlug);
 
-  if (!tag) {
+  if (!seoData) {
     notFound();
   }
+  const { tag, publicPostCount } = seoData;
 
   return buildPageMetadata({
     title: `#${tag.name}`,
     description: `${tag.name} 태그로 묶인 포스트 모음입니다.`,
     path: `/blog/tags/${encodeURIComponent(tag.slug)}`,
     keywords: [tag.name, '태그', '기술 블로그'],
-    noIndex: !isIndexableTag(tag),
+    noIndex: !isIndexableTag({ ...tag, postCount: publicPostCount }),
   });
 }
 
@@ -45,11 +55,12 @@ export default async function TagPage({
 }) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const tag = await getTag(decodedSlug);
+  const seoData = await getTagSeoData(decodedSlug);
 
-  if (!tag) {
+  if (!seoData) {
     notFound();
   }
+  const { tag } = seoData;
 
   const jsonLd = {
     '@context': 'https://schema.org',
