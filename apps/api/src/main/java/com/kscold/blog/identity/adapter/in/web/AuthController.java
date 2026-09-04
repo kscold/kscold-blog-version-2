@@ -10,6 +10,7 @@ import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.application.port.in.AuthUseCase;
 import com.kscold.blog.shared.web.ApiResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,26 +26,30 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthUseCase authUseCase;
+    private final AuthCookieManager authCookieManager;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponse>> register(
-            @Valid @RequestBody RegisterCommand command) {
+            @Valid @RequestBody RegisterCommand command, HttpServletResponse response) {
         AuthResponse result = authUseCase.register(command);
+        authCookieManager.addAuthenticationCookies(response, result);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(result, "회원가입이 완료되었습니다"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(
-            @Valid @RequestBody LoginCommand command) {
+            @Valid @RequestBody LoginCommand command, HttpServletResponse response) {
         AuthResponse result = authUseCase.login(command);
+        authCookieManager.addAuthenticationCookies(response, result);
         return ResponseEntity.ok(ApiResponse.success(result, "로그인에 성공했습니다"));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AuthResponse>> refresh(
-            @Valid @RequestBody RefreshTokenCommand command) {
+            @Valid @RequestBody RefreshTokenCommand command, HttpServletResponse response) {
         AuthResponse result = authUseCase.refresh(command.getRefreshToken());
+        authCookieManager.addAuthenticationCookies(response, result);
         return ResponseEntity.ok(ApiResponse.success(result, "토큰이 갱신되었습니다"));
     }
 

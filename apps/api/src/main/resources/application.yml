@@ -49,6 +49,9 @@ jwt:
   access-token-expiration: 3600000 # 1 hour
   refresh-token-expiration: 604800000 # 7 days
 
+auth:
+  cookie-secure: ${AUTH_COOKIE_SECURE:false}
+
 # CORS 설정
 cors:
   allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:3001}
@@ -144,3 +147,12 @@ logging:
     com.kscold.blog: INFO
     org.springframework.data.mongodb: WARN
     org.springframework.security: WARN
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+auth:
+  cookie-secure: ${AUTH_COOKIE_SECURE:true}
