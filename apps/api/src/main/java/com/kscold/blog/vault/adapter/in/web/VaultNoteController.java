@@ -4,6 +4,7 @@ import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.shared.web.PublicPageRequestFactory;
+import com.kscold.blog.shared.web.PublicSearchQueryNormalizer;
 import com.kscold.blog.vault.adapter.in.web.dto.response.VaultNoteResponse;
 import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
@@ -122,7 +123,8 @@ public class VaultNoteController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PublicPageRequestFactory.of(page, size);
-        Page<VaultNote> notes = vaultNoteUseCase.search(q, pageable);
+        Page<VaultNote> notes =
+                vaultNoteUseCase.search(PublicSearchQueryNormalizer.normalize(q), pageable);
         return ResponseEntity.ok(ApiResponse.success(notes.map(VaultNoteResponse::from)));
     }
 

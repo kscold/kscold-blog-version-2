@@ -13,6 +13,7 @@ import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.shared.web.PublicPageRequestFactory;
+import com.kscold.blog.shared.web.PublicSearchQueryNormalizer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -140,7 +141,7 @@ public class PostController {
         Pageable pageable =
                 PublicPageRequestFactory.of(
                         page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
-        Page<Post> posts = postUseCase.search(q, pageable);
+        Page<Post> posts = postUseCase.search(PublicSearchQueryNormalizer.normalize(q), pageable);
         return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
 

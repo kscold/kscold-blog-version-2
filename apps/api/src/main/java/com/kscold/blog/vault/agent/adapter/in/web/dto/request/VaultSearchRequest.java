@@ -15,6 +15,7 @@ public class VaultSearchRequest {
     @Size(min = 2, max = 120, message = "검색어는 2자 이상 120자 이하로 입력해주세요.")
     private String q;
 
+    @Size(max = 120, message = "활성 폴더 이름은 120자 이하여야 합니다.")
     private String activeFolderName = "";
 
     @Min(value = 1, message = "검색 결과는 1개 이상이어야 합니다.")

@@ -174,6 +174,16 @@ class PostControllerTest {
     }
 
     @Test
+    @DisplayName("시나리오: 포스트 검색어를 정규화한 뒤 저장소 경계로 전달한다")
+    void searchPostsNormalizesQuery() {
+        when(postUseCase.search(any(), any())).thenReturn(Page.empty());
+
+        postController.searchPosts("  LangGraph  ", 0, 10);
+
+        verify(postUseCase).search(org.mockito.ArgumentMatchers.eq("LangGraph"), any());
+    }
+
+    @Test
     @DisplayName("시나리오: 제한 카테고리를 확인할 수 없으면 단건 본문을 안전하게 숨긴다")
     void getPostByIdFailsClosedWhenCategoryLookupFails() {
         Post post = post(false);
