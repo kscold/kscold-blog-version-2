@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useAdminUpdateProfile, AdminUser, useTechStacks } from '@/features/profile';
 import { TechStackSelector } from '@/shared/ui/TechStackSelector';
 import { useAlert } from '@/shared/model/alertStore';
+import { PROFILE_LIMITS } from '@/shared/config/profileLimits';
 
 export function UserEditModal({ user, onClose }: { user: AdminUser; onClose: () => void }) {
   const [displayName, setDisplayName] = useState(user.displayName || '');
@@ -41,15 +42,15 @@ export function UserEditModal({ user, onClose }: { user: AdminUser; onClose: () 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-surface-600 mb-1">표시 이름</label>
-            <input value={displayName} onChange={e => setDisplayName(e.target.value)} className="w-full px-3 py-2 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400" />
+            <input value={displayName} onChange={e => setDisplayName(e.target.value)} maxLength={PROFILE_LIMITS.displayName} className="w-full px-3 py-2 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400" />
           </div>
           <div>
             <label className="block text-xs font-medium text-surface-600 mb-1">소개</label>
-            <textarea value={bio} onChange={e => setBio(e.target.value)} rows={2} className="w-full px-3 py-2 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400 resize-none" />
+            <textarea value={bio} onChange={e => setBio(e.target.value)} rows={2} maxLength={PROFILE_LIMITS.bio} className="w-full px-3 py-2 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400 resize-none" />
           </div>
           <div>
             <label className="block text-xs font-medium text-surface-600 mb-1">아바타 URL</label>
-            <input value={avatar} onChange={e => setAvatar(e.target.value)} className="w-full px-3 py-2 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400" />
+            <input value={avatar} onChange={e => setAvatar(e.target.value)} type="url" maxLength={PROFILE_LIMITS.url} className="w-full px-3 py-2 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400" />
           </div>
           <div>
             <label className="block text-xs font-medium text-surface-600 mb-2">기술 스택</label>

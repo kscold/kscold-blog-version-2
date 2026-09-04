@@ -8,6 +8,7 @@ import { useUpdateProfile, useTechStacks } from '@/features/profile';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 import { TechStackSelector } from '@/shared/ui/TechStackSelector';
 import { useAlert } from '@/shared/model/alertStore';
+import { PROFILE_LIMITS } from '@/shared/config/profileLimits';
 import { WithdrawModal } from './WithdrawModal';
 
 const SOCIAL_PLATFORMS = [
@@ -115,7 +116,7 @@ export function ProfileSettingsForm() {
           <input
             value={displayName}
             onChange={e => setDisplayName(e.target.value)}
-            maxLength={40}
+            maxLength={PROFILE_LIMITS.displayName}
             placeholder={currentUser.username}
             className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400 transition-colors"
           />
@@ -127,7 +128,7 @@ export function ProfileSettingsForm() {
             value={bio}
             onChange={e => setBio(e.target.value)}
             rows={3}
-            maxLength={200}
+            maxLength={PROFILE_LIMITS.bio}
             placeholder="간단한 자기소개를 입력하세요."
             className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400 transition-colors resize-none"
           />
@@ -152,6 +153,7 @@ export function ProfileSettingsForm() {
               onChange={e => handleSocialChange(key, e.target.value)}
               placeholder={placeholder}
               type="url"
+              maxLength={PROFILE_LIMITS.url}
               className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400 transition-colors"
             />
           </div>

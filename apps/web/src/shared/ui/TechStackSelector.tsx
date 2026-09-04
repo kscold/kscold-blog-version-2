@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, KeyboardEvent } from 'react';
+import { PROFILE_LIMITS } from '@/shared/config/profileLimits';
 
 const PRESET_STACKS = [
   'Java', 'TypeScript', 'JavaScript', 'Python', 'Kotlin', 'Go', 'Rust', 'C++', 'HTML', 'CSS',
@@ -30,14 +31,23 @@ export function TechStackSelector({ value, sharedStacks = [], onChange }: TechSt
   const showCreate = input.trim() && !allOptions.some(s => s.toLowerCase() === input.toLowerCase()) && !value.includes(input.trim());
 
   const toggle = (tag: string) => {
-    onChange(value.includes(tag) ? value.filter(t => t !== tag) : [...value, tag]);
+    const normalizedTag = tag.trim();
+    if (!normalizedTag || normalizedTag.length > PROFILE_LIMITS.techStackItem) return;
+    if (value.includes(normalizedTag)) {
+      onChange(value.filter(t => t !== normalizedTag));
+      return;
+    }
+    if (value.length >= PROFILE_LIMITS.techStackCount) return;
+    onChange([...value, normalizedTag]);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === 'Enter' || e.key === ',') && input.trim()) {
       e.preventDefault();
       const tag = input.trim();
-      if (!value.includes(tag)) onChange([...value, tag]);
+      if (!value.includes(tag) && value.length < PROFILE_LIMITS.techStackCount) {
+        onChange([...value, tag]);
+      }
       setInput('');
     } else if (e.key === 'Backspace' && !input && value.length > 0) {
       onChange(value.slice(0, -1));
@@ -78,6 +88,7 @@ export function TechStackSelector({ value, sharedStacks = [], onChange }: TechSt
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          maxLength={PROFILE_LIMITS.techStackItem}
           placeholder="기술 검색 또는 직접 입력 후 Enter"
           className="flex-1 text-sm outline-none placeholder:text-surface-400 bg-transparent"
         />
