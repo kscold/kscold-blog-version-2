@@ -2,6 +2,7 @@ import { SITE_DESCRIPTION } from './constants';
 
 export function stripRichText(input: string) {
   return input
+    .replace(/^---[ \t]*\r?\n[\s\S]*?\r?\n---[ \t]*(?:\r?\n|$)/, ' ')
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/~~~[\s\S]*?~~~/g, ' ')
     .replace(/`([^`]+)`/g, '$1')
