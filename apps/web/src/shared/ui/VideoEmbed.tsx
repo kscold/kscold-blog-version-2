@@ -1,5 +1,3 @@
-'use client';
-
 import { getVideoEmbedConfig } from '@/shared/lib/videoEmbed';
 
 interface VideoEmbedProps {

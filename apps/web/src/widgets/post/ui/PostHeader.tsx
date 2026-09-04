@@ -1,8 +1,5 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { toPreviewText } from '@/shared/lib/seo/text';
 
 interface PostHeaderProps {
@@ -67,11 +64,8 @@ export function PostHeader({
   return (
     <>
       {/* 현재 위치 */}
-      <motion.nav
+      <nav
         className="mb-8 flex items-center gap-2 text-sm text-surface-500"
-        initial={false}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
       >
         <Link href="/blog" className="hover:text-surface-900 transition-colors">
           Blog
@@ -85,15 +79,10 @@ export function PostHeader({
         </Link>
         <span className="text-surface-300">/</span>
         <span className="text-surface-600 truncate max-w-[200px]">{title}</span>
-      </motion.nav>
+      </nav>
 
       {/* 포스트 상단 정보 */}
-      <motion.header
-        className="mb-12"
-        initial={false}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
+      <header className="mb-12">
         {/* 카테고리와 발행일 */}
         <div className="flex items-center gap-3 mb-6">
           <Link
@@ -170,18 +159,13 @@ export function PostHeader({
             </div>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       {/* 커버 이미지 */}
       {coverImage && (
-        <motion.div
-          className="mb-12 rounded-2xl overflow-hidden"
-          initial={false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
+        <div className="mb-12 rounded-2xl overflow-hidden">
           <Image src={coverImage} alt={title} width={1200} height={630} className="w-full h-auto" />
-        </motion.div>
+        </div>
       )}
     </>
   );
