@@ -3,9 +3,13 @@ import type { PageResponse } from '@/shared/model/types/api';
 import { API_BASE_URL } from './constants';
 
 export async function fetchPublicApi<T>(path: string, revalidate = 3600): Promise<T | null> {
-  return fetchSeoApi<T>(path, {
-    next: { revalidate },
-  });
+  return fetchSeoApi<T>(
+    path,
+    {
+      next: { revalidate },
+    },
+    [404]
+  );
 }
 
 export async function fetchAllPublicApiPages<T>(
@@ -40,28 +44,44 @@ export async function fetchViewerApi<T>(path: string): Promise<T | null> {
   const cookieStore = await cookies();
   const authToken = cookieStore.get('auth-token')?.value;
 
-  return fetchSeoApi<T>(path, {
-    headers: authToken
-      ? { Cookie: `auth-token=${authToken}` }
-      : {},
-    cache: 'no-store',
-  });
+  return fetchSeoApi<T>(
+    path,
+    {
+      headers: authToken
+        ? { Cookie: `auth-token=${authToken}` }
+        : {},
+      cache: 'no-store',
+    },
+    [401, 403, 404]
+  );
 }
 
-async function fetchSeoApi<T>(path: string, init: RequestInit): Promise<T | null> {
+async function fetchSeoApi<T>(
+  path: string,
+  init: RequestInit,
+  missingStatuses: readonly number[]
+): Promise<T | null> {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   const requestUrl = `${API_BASE_URL}${normalizedPath}`;
+  let response: Response;
 
   try {
-    const response = await fetch(requestUrl, init);
-    if (!response.ok) {
-      return null;
-    }
+    response = await fetch(requestUrl, init);
+  } catch {
+    throw new Error('SEO API에 연결할 수 없습니다.');
+  }
 
+  if (missingStatuses.includes(response.status)) {
+    return null;
+  }
+  if (!response.ok) {
+    throw new Error(`SEO API 응답이 실패했습니다. status=${response.status}`);
+  }
+
+  try {
     const payload = await response.json();
     return (payload?.data ?? payload) as T;
-  } catch (error) {
-    console.error(`Failed to fetch SEO API: ${requestUrl}`, error);
-    return null;
+  } catch {
+    throw new Error('SEO API 응답을 해석할 수 없습니다.');
   }
 }

@@ -3,8 +3,24 @@ import { fetchAllPublicApiPages } from '@/shared/lib/seo';
 import { buildRssDocument } from '@/shared/lib/seo/rss';
 
 export async function GET() {
-  const posts = await fetchAllPublicApiPages<Post>('/posts');
-  if (!posts) {
+  try {
+    const posts = await fetchAllPublicApiPages<Post>('/posts');
+    if (!posts) {
+      return unavailableResponse();
+    }
+
+    return new Response(buildRssDocument(posts), {
+      headers: {
+        'Content-Type': 'application/rss+xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
+  } catch {
+    return unavailableResponse();
+  }
+}
+
+function unavailableResponse() {
     return new Response('RSS feed unavailable', {
       status: 503,
       headers: {
@@ -12,12 +28,4 @@ export async function GET() {
         'Retry-After': '300',
       },
     });
-  }
-
-  return new Response(buildRssDocument(posts), {
-    headers: {
-      'Content-Type': 'application/rss+xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
-    },
-  });
 }
