@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import { PublicProfileContainer } from '@/widgets/profile';
 import type { PublicProfile } from '@/features/profile';
+import { PROFILE } from '@/entities/profile';
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,
@@ -15,6 +16,10 @@ import { JsonLd } from '@/shared/ui/JsonLd';
 
 interface Props {
   params: Promise<{ username: string }>;
+}
+
+export function generateStaticParams() {
+  return [{ username: PROFILE.handle }];
 }
 
 const getPublicProfile = cache((username: string) =>
