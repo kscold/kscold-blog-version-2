@@ -7,6 +7,8 @@ import com.kscold.blog.identity.application.dto.command.LoginCommand;
 import com.kscold.blog.identity.application.dto.command.RefreshTokenCommand;
 import com.kscold.blog.identity.application.dto.command.RegisterCommand;
 import com.kscold.blog.identity.application.dto.command.ResetPasswordCommand;
+import com.kscold.blog.payment.application.dto.command.CompletePaymentCommand;
+import com.kscold.blog.teamprivate.adapter.in.web.dto.request.PasswordRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -56,6 +58,18 @@ class PublicRequestValidationTest {
         assertThat(hasSizeViolation(refresh, "refreshToken")).isTrue();
         assertThat(hasSizeViolation(reset, "token")).isTrue();
         assertThat(hasSizeViolation(reset, "newPassword")).isTrue();
+    }
+
+    @Test
+    void rejectsOversizedPublicLookupFields() {
+        CompletePaymentCommand payment =
+                CompletePaymentCommand.builder().paymentId("a".repeat(101)).build();
+        PasswordRequest teamRequest =
+                PasswordRequest.builder().password("a".repeat(257)).teamId("a".repeat(65)).build();
+
+        assertThat(hasSizeViolation(payment, "paymentId")).isTrue();
+        assertThat(hasSizeViolation(teamRequest, "password")).isTrue();
+        assertThat(hasSizeViolation(teamRequest, "teamId")).isTrue();
     }
 
     private boolean hasSizeViolation(Object request, String property) {

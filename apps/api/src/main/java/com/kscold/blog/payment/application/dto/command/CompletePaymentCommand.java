@@ -13,6 +13,8 @@ import lombok.Getter;
 public class CompletePaymentCommand {
 
     @NotBlank(message = "결제 ID가 필요합니다.")
+    @Size(max = 100, message = "결제 ID가 너무 깁니다.")
+    @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "결제 ID 형식이 올바르지 않습니다.")
     private String paymentId;
 
     @Size(max = 120, message = "결제 링크 토큰은 120자 이하로 입력해주세요.")

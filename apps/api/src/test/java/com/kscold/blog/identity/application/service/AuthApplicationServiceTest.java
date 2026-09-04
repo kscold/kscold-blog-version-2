@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.identity.application.dto.command.RegisterCommand;
+import com.kscold.blog.identity.application.dto.command.ResetPasswordCommand;
 import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.domain.model.PasswordResetToken;
@@ -228,6 +229,18 @@ class AuthApplicationServiceTest {
 
         assertThat(status.isValid()).isFalse();
         assertThat(status.getMessage()).contains("만료");
+    }
+
+    @Test
+    @DisplayName("시나리오: 과도하게 긴 재설정 토큰은 저장소를 조회하지 않는다")
+    void validatePasswordResetTokenRejectsOversizedTokenBeforeLookup() {
+        String oversizedToken = "a".repeat(ResetPasswordCommand.MAX_TOKEN_LENGTH + 1);
+
+        PasswordResetTokenResponse status =
+                authApplicationService.validatePasswordResetToken(oversizedToken);
+
+        assertThat(status.isValid()).isFalse();
+        verify(passwordResetTokenRepository, never()).findByTokenHash(any());
     }
 
     private static String hash(String rawToken) {

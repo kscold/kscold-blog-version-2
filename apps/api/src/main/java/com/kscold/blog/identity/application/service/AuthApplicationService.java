@@ -7,6 +7,7 @@ import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.dto.command.LoginCommand;
 import com.kscold.blog.identity.application.dto.command.RegisterCommand;
+import com.kscold.blog.identity.application.dto.command.ResetPasswordCommand;
 import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.application.port.in.AuthUseCase;
@@ -163,7 +164,7 @@ public class AuthApplicationService implements AuthUseCase {
 
     @Override
     public PasswordResetTokenResponse validatePasswordResetToken(String token) {
-        if (token == null || token.isBlank()) {
+        if (!isValidPasswordResetTokenInput(token)) {
             return new PasswordResetTokenResponse(false, "재설정 링크를 다시 확인해주세요.", null);
         }
 
@@ -181,7 +182,7 @@ public class AuthApplicationService implements AuthUseCase {
     @Override
     @Transactional
     public void resetPassword(String token, String newPassword) {
-        if (token == null || token.isBlank()) {
+        if (!isValidPasswordResetTokenInput(token)) {
             throw InvalidRequestException.invalidInput("재설정 링크를 다시 확인해주세요.");
         }
 
@@ -215,6 +216,12 @@ public class AuthApplicationService implements AuthUseCase {
                 .tokenType("Bearer")
                 .user(AuthResponse.UserInfo.from(user))
                 .build();
+    }
+
+    private boolean isValidPasswordResetTokenInput(String token) {
+        return token != null
+                && !token.isBlank()
+                && token.length() <= ResetPasswordCommand.MAX_TOKEN_LENGTH;
     }
 
     private void sendPasswordResetMail(User user) {

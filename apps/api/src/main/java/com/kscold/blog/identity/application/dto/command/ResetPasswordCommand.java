@@ -11,8 +11,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ResetPasswordCommand {
 
+    public static final int MAX_TOKEN_LENGTH = 256;
+
     @NotBlank(message = "토큰은 필수입니다")
-    @Size(max = 256, message = "토큰이 너무 깁니다")
+    @Size(max = MAX_TOKEN_LENGTH, message = "토큰이 너무 깁니다")
     private String token;
 
     @NotBlank(message = "새 비밀번호는 필수입니다")
