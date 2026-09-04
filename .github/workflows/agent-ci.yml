@@ -33,7 +33,16 @@ jobs:
         run: docker build --file apps/agent/Dockerfile --tag kscold-vault-agent:ci .
 
       - name: Python 의존성 일관성 검사
-        run: docker run --rm --env PIP_NO_CACHE_DIR=1 --entrypoint python kscold-vault-agent:ci -m pip check
+        run: >-
+          docker run --rm --env PIP_NO_CACHE_DIR=1 --entrypoint python
+          kscold-vault-agent:ci -m pip check
 
       - name: Python 소스 컴파일 검사
-        run: docker run --rm --env PYTHONPYCACHEPREFIX=/tmp/pycache --entrypoint python kscold-vault-agent:ci -m compileall -q /service/src
+        run: >-
+          docker run --rm --env PYTHONPYCACHEPREFIX=/tmp/pycache --entrypoint python
+          kscold-vault-agent:ci -m compileall -q /service/src
+
+      - name: Agent 단위 테스트
+        run: >-
+          docker run --rm --volume "$PWD/apps/agent/tests:/tests:ro" --entrypoint python
+          kscold-vault-agent:ci -m unittest discover --start-directory /tests --verbose
