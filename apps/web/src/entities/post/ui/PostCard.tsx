@@ -92,6 +92,7 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
       <div className={`h-full bg-white border border-surface-200 rounded-[24px] p-6 transition-all duration-500 relative overflow-hidden ${supportsHover ? 'group-hover:border-surface-300 group-hover:bg-surface-50 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]' : ''}`}>
           <Link
             href={`/blog/${post.category.slug}/${post.slug}`}
+            prefetch={false}
             aria-label={`${post.title} 글 읽기`}
             className="absolute inset-0 z-10 rounded-[24px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-surface-900"
           />
@@ -155,6 +156,7 @@ export function PostCard({ post, featured = false, titleOnly = false }: PostCard
                 <Link
                   key={tag.id}
                   href={`/tags/${encodeURIComponent(tag.name)}`}
+                  prefetch={false}
                   className="inline-flex min-h-11 items-center rounded-md bg-surface-100 px-3 text-xs font-bold tracking-wider text-surface-600 transition-colors hover:bg-surface-200 hover:text-surface-900"
                 >
                   #{tag.name}

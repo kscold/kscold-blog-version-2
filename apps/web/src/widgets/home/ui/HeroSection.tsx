@@ -69,12 +69,9 @@ export function HeroSection() {
           transition={animate ? { duration: 1.5, delay: 0.5, ease: [0.76, 0, 0.24, 1] } : undefined}
         />
 
-        <motion.p
+        <p
           data-cy="hero-tagline"
           className="mt-6 text-lg sm:text-2xl text-surface-500 font-light max-w-2xl mx-auto leading-relaxed text-balance tracking-tight"
-          initial={animate ? { opacity: 0 } : false}
-          animate={animate ? { opacity: 1 } : undefined}
-          transition={animate ? { duration: 1.2, delay: 0.6, ease: [0.76, 0, 0.24, 1] } : undefined}
         >
           <span className="text-surface-900 font-semibold">러닝커브</span>를 즐기는{' '}
           <span className="text-surface-900 font-semibold relative after:absolute after:bottom-1 after:left-0 after:w-full after:h-2 after:bg-blue-100 after:-z-10 px-1">
@@ -87,7 +84,7 @@ export function HeroSection() {
             문제를 서비스로 풀어내는 김승찬
           </span>
           입니다.
-        </motion.p>
+        </p>
 
         <motion.div
           className="w-[1px] h-[5rem] sm:h-[8rem] bg-gradient-to-b from-surface-200/0 via-surface-300 to-surface-200/0 mx-auto mt-6 sm:mt-12 origin-top"
