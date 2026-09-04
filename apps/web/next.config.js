@@ -25,6 +25,7 @@ const nextConfig = {
   // 깨진 hex slug → 정상 영문 slug 301 리다이렉트 (기존 색인·외부 링크 보존)
   async redirects() {
     return [
+      { source: '/inicis/payment-path', destination: '/kakaopay/payment-path', permanent: true },
       { source: '/blog/conference/aws-summit-seoul-2026-ai-agent-고도화-방향', destination: '/blog/conference/aws-summit-seoul-2026-ai-agent-key-principles', permanent: true },
       { source: '/blog/dev-story/이상1', destination: '/blog/dev-story/reflection-1', permanent: true },
       { source: '/blog/conference/EBAABDEAB3A0-db-ECBBA8ED8DBCEB9FB0EC8AA4', destination: '/blog/conference/mongodb-conference', permanent: true },
