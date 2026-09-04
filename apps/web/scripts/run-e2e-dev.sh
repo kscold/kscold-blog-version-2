@@ -20,13 +20,14 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
+rm -rf "$APP_DIR/.next-e2e"
 cp "$APP_DIR/tsconfig.json" "$TMP_DIR/tsconfig.json"
 cp "$APP_DIR/next-env.d.ts" "$TMP_DIR/next-env.d.ts"
 
 cd "$APP_DIR"
 
 NEXT_DIST_DIR=.next-e2e \
-NEXT_PUBLIC_API_URL= \
+NEXT_PUBLIC_API_URL="${E2E_API_URL:-}" \
 NEXT_PUBLIC_WS_URL= \
 NEXT_PUBLIC_GTM_ID= \
 NEXT_PUBLIC_GA_ID= \

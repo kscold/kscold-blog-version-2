@@ -25,6 +25,38 @@ const publicProfile = {
   socialLinks: {},
   techStack: ['Spring Boot', 'Next.js', 'Python', 'LangGraph'],
 };
+const featuredPost = {
+  id: 'ci-post',
+  title: 'CI 프런트엔드 검증 글',
+  slug: 'ci-frontend-verification',
+  content: '운영 API와 분리된 프런트엔드 검증용 콘텐츠입니다.',
+  excerpt: '운영 API와 분리된 프런트엔드 검증용 콘텐츠입니다.',
+  category: {
+    id: 'ci-category',
+    name: 'Engineering',
+    slug: 'engineering',
+  },
+  tags: [
+    {
+      id: 'ci-tag',
+      name: 'CI',
+      slug: 'ci',
+    },
+  ],
+  author: {
+    id: 'ci-author',
+    name: '김승찬',
+  },
+  status: 'PUBLISHED',
+  featured: true,
+  restricted: false,
+  views: 1,
+  likes: 0,
+  publishedAt: '2026-01-01T00:00:00Z',
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z',
+};
+let requestCount = 0;
 
 function getResponseData(pathname) {
   if (pathname === '/api/health') {
@@ -36,12 +68,23 @@ function getResponseData(pathname) {
   if (
     pathname === '/api/categories' ||
     pathname === '/api/tags' ||
-    pathname === '/api/vault/notes/sitemap-index' ||
-    pathname === '/api/posts/featured'
+    pathname === '/api/vault/notes/sitemap-index'
   ) {
     return [];
   }
-  if (pathname === '/api/posts' || pathname === '/api/feeds') {
+  if (pathname === '/api/posts/featured') {
+    return [featuredPost];
+  }
+  if (pathname === '/api/posts') {
+    return {
+      ...emptyPage,
+      content: [featuredPost],
+      totalElements: 1,
+      totalPages: 1,
+      empty: false,
+    };
+  }
+  if (pathname === '/api/feeds') {
     return emptyPage;
   }
   return null;
@@ -49,6 +92,14 @@ function getResponseData(pathname) {
 
 const server = createServer((request, response) => {
   const requestUrl = new URL(request.url || '/', `http://127.0.0.1:${port}`);
+  if (requestUrl.pathname === '/__request-count') {
+    response.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end(String(requestCount));
+    return;
+  }
+  if (requestUrl.pathname !== '/api/health') {
+    requestCount += 1;
+  }
   const data = getResponseData(requestUrl.pathname);
 
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
