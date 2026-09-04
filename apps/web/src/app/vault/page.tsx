@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { VaultGraphLayout } from '@/widgets/vault';
+import { VaultGraphLayout } from '@/widgets/vault/graph';
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 

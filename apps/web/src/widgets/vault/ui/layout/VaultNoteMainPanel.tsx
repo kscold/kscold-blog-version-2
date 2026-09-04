@@ -110,6 +110,7 @@ export function VaultNoteMainPanel({
             {localGraph && (
               <ClientVaultGraph
                 graphData={localGraph}
+                deferUntilVisible
                 activeNodeSlug={note.slug}
                 folderColorMap={colorMap}
                 onFolderClick={onFolderClick}
