@@ -18,7 +18,7 @@ export function HeroSection() {
         className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-8 sm:gap-12 text-center my-12 sm:my-16"
       >
         <div className="inline-block">
-          <span className="px-5 py-2.5 rounded-full border border-surface-200/60 bg-white/60 backdrop-blur-md shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] text-surface-900 text-xs font-bold tracking-[0.2em] flex items-center gap-2 cursor-default">
+          <span className="flex max-w-full items-center gap-1.5 rounded-full border border-surface-200/60 bg-white/60 px-3 py-2.5 text-[10px] font-bold tracking-[0.12em] text-surface-900 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] backdrop-blur-md cursor-default sm:gap-2 sm:px-5 sm:text-xs sm:tracking-[0.2em]">
             <span
               className="hero-status-dot w-1.5 h-1.5 rounded-full bg-surface-900 shadow-[0_0_8px_rgba(15,23,42,0.4)]"
             />
