@@ -5,6 +5,7 @@ import {
   VaultBacklink,
   VaultFolder,
   VaultNote,
+  VaultNoteStats,
   VaultNoteTitle,
   VaultSearchResult,
 } from '@/shared/model/types/vault';
@@ -66,6 +67,14 @@ export function useVaultTitleIndex() {
   return useQuery({
     queryKey: ['vault', 'title-index'],
     queryFn: () => apiClient.get<VaultNoteTitle[]>('/vault/notes/title-index'),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useVaultStats() {
+  return useQuery({
+    queryKey: ['vault', 'stats'],
+    queryFn: () => apiClient.get<VaultNoteStats>('/vault/notes/stats'),
     staleTime: 1000 * 60 * 5,
   });
 }

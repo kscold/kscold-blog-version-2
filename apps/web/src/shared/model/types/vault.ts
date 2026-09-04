@@ -41,6 +41,10 @@ export interface VaultBacklink {
   excerpt: string;
 }
 
+export interface VaultNoteStats {
+  totalNotes: number;
+}
+
 export interface GraphData {
   nodes: GraphNode[];
   links: GraphLink[];

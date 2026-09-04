@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useVaultGraph } from '@/entities/vault/api';
+import { useVaultStats } from '@/entities/vault/api';
 import { usePosts } from '@/entities/post';
 import { useGitHubOverview } from '@/entities/github';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
@@ -12,10 +12,10 @@ import { StatsGrid } from './StatsGrid';
 export function StatsSection() {
   const { allowRichEffects, isTouchDevice } = usePerformanceMode();
   const { data: github } = useGitHubOverview('kscold');
-  const { data: graphData } = useVaultGraph();
+  const { data: vaultStats } = useVaultStats();
   const { data: postsData } = usePosts({ page: 0, size: 1 });
 
-  const noteCount = graphData?.nodes?.length ?? null;
+  const noteCount = vaultStats?.totalNotes ?? null;
   const postCount = postsData?.totalElements ?? null;
   const commitCount = github?.totalContributions ?? null;
 

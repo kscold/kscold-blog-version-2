@@ -7,6 +7,7 @@ export {
   useVaultNote,
   useVaultNoteById,
   useVaultNotes,
+  useVaultStats,
   useVaultTitleIndex,
 } from './useVault';
 export { useVaultComments } from './useVaultComments';
