@@ -11,6 +11,7 @@ import com.kscold.blog.shared.web.PublicPageRequestFactory;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,7 +40,8 @@ public class UserProfileController {
     @PatchMapping("/me/profile")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<AuthResponse.UserInfo>> updateMyProfile(
-            @AuthenticationPrincipal String userId, @RequestBody UpdateProfileCommand command) {
+            @AuthenticationPrincipal String userId,
+            @Valid @RequestBody UpdateProfileCommand command) {
         AuthResponse.UserInfo updated = userProfileUseCase.updateMyProfile(userId, command);
         return ResponseEntity.ok(ApiResponse.success(updated, "프로필이 업데이트되었습니다"));
     }

@@ -9,6 +9,7 @@ import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.application.service.UserStatsService;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import com.kscold.blog.shared.web.ApiResponse;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,7 @@ public class AdminUserController {
 
     @PatchMapping("/{userId}/profile")
     public ResponseEntity<ApiResponse<AuthResponse.UserInfo>> updateUserProfile(
-            @PathVariable String userId, @RequestBody UpdateProfileCommand command) {
+            @PathVariable String userId, @Valid @RequestBody UpdateProfileCommand command) {
         AuthResponse.UserInfo updated = userProfileUseCase.updateUserProfile(userId, command);
         return ResponseEntity.ok(ApiResponse.success(updated, "프로필이 업데이트되었습니다"));
     }
