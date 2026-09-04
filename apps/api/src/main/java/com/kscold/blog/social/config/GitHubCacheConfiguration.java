@@ -8,12 +8,14 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration(proxyBeanMethods = false)
 @EnableCaching
 public class GitHubCacheConfiguration {
 
     @Bean("githubCacheManager")
+    @Primary
     public CacheManager githubCacheManager(
             @Value("${github.cache.ttl-minutes:30}") long ttlMinutes,
             @Value("${github.cache.max-size:200}") long maxSize) {
