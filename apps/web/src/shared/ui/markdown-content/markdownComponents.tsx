@@ -33,7 +33,7 @@ function normalizeClassName(className: string | string[] | undefined): string {
 }
 
 interface ImgHastNode {
-  properties?: { src?: string; alt?: string };
+  properties?: { src?: string; alt?: string; dataPriorityImage?: boolean };
 }
 
 function hasOnlyImages(node: unknown, count = 1): boolean {
@@ -64,11 +64,13 @@ function ImageGrid({ imgNodes }: { imgNodes: ImgHastNode[] }) {
       {imgNodes.map((imgNode, i) => {
         const src = imgNode.properties?.src;
         const alt = imgNode.properties?.alt ?? '';
+        const priority = imgNode.properties?.dataPriorityImage === true;
         return (
           <div key={i}>
             <MarkdownImage
               src={src}
               alt={alt}
+              priority={priority}
               className="w-full rounded-2xl border border-white/10 shadow-lg object-cover"
               sizes={sizes}
             />
@@ -151,10 +153,11 @@ export function createMarkdownComponents(isDark: boolean): Components {
       const { className, children } = props;
       return <MarkdownCodeBlock className={className} isDark={isDark}>{children}</MarkdownCodeBlock>;
     },
-    img: ({ src, alt }) => (
+    img: ({ src, alt, node }) => (
       <MarkdownImage
         src={typeof src === 'string' ? src : undefined}
         alt={alt || ''}
+        priority={node?.properties?.dataPriorityImage === true}
         className="w-full rounded-2xl border border-white/10 shadow-lg"
         sizes="(max-width: 768px) calc(100vw - 32px), 896px"
       />

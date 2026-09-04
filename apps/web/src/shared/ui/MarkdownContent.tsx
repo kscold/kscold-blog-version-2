@@ -11,9 +11,16 @@ interface MarkdownContentProps {
   theme?: 'light' | 'dark';
   /** 본문 크기 — 블로그 본문은 lg, 챗 버블처럼 좁은 곳은 sm */
   size?: 'sm' | 'lg';
+  /** 상세 본문의 첫 이미지를 LCP 후보로 우선 요청한다. */
+  prioritizeFirstImage?: boolean;
 }
 
-export function MarkdownContent({ content, theme = 'light', size = 'lg' }: MarkdownContentProps) {
+export function MarkdownContent({
+  content,
+  theme = 'light',
+  size = 'lg',
+  prioritizeFirstImage = false,
+}: MarkdownContentProps) {
   const isDark = theme === 'dark';
   const proseSize = size === 'sm' ? 'prose-sm' : 'prose-lg';
 
@@ -23,7 +30,11 @@ export function MarkdownContent({ content, theme = 'light', size = 'lg' }: Markd
 
   return (
     <div className={`${proseClasses} min-w-0 [word-break:keep-all]`}>
-      <ReactMarkdown remarkPlugins={[remarkGfm, remarkLooseStrong]} rehypePlugins={[rehypeImageGrid]} components={createMarkdownComponents(isDark)}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkLooseStrong]}
+        rehypePlugins={[[rehypeImageGrid, { prioritizeFirstImage }]]}
+        components={createMarkdownComponents(isDark)}
+      >
         {content}
       </ReactMarkdown>
     </div>

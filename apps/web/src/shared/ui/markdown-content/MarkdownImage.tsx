@@ -8,6 +8,7 @@ interface MarkdownImageProps {
   alt?: string;
   className: string;
   sizes: string;
+  priority?: boolean;
 }
 
 function getOptimizableSource(src: string): string | null {
@@ -40,7 +41,7 @@ function optimizerUrl(src: string, width: number): string {
 }
 
 /** 본문 이미지는 고정 비율을 강제하지 않고 브라우저가 화면 폭에 맞는 변환본을 선택하게 한다. */
-export function MarkdownImage({ src, alt = '', className, sizes }: MarkdownImageProps) {
+export function MarkdownImage({ src, alt = '', className, sizes, priority = false }: MarkdownImageProps) {
   if (!src) {
     return null;
   }
@@ -62,7 +63,8 @@ export function MarkdownImage({ src, alt = '', className, sizes }: MarkdownImage
       alt={alt}
       className={className}
       sizes={optimizableSource ? sizes : undefined}
-      loading="lazy"
+      loading={priority ? 'eager' : 'lazy'}
+      fetchPriority={priority ? 'high' : undefined}
       decoding="async"
     />
   );

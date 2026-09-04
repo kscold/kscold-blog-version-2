@@ -6,9 +6,28 @@ function walk(node: any, fn: (n: any) => void) {
   }
 }
 
-export function rehypeImageGrid() {
+interface RehypeImageGridOptions {
+  prioritizeFirstImage?: boolean;
+}
+
+export function rehypeImageGrid({ prioritizeFirstImage = false }: RehypeImageGridOptions = {}) {
   return (tree: any) => {
+    let hasPriorityImage = false;
+
     walk(tree, (node: any) => {
+      if (
+        prioritizeFirstImage &&
+        !hasPriorityImage &&
+        node.type === 'element' &&
+        node.tagName === 'img'
+      ) {
+        node.properties = {
+          ...(node.properties ?? {}),
+          dataPriorityImage: true,
+        };
+        hasPriorityImage = true;
+      }
+
       if (node.type !== 'element' || node.tagName !== 'p') return;
       const children: any[] = node.children ?? [];
       const nonWs = children.filter(
