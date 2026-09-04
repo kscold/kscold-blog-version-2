@@ -2,6 +2,7 @@ package com.kscold.blog.blog.application.service;
 
 import com.kscold.blog.blog.application.dto.command.TagCommand;
 import com.kscold.blog.blog.application.port.in.TagUseCase;
+import com.kscold.blog.blog.config.InvalidateBlogCatalogCaches;
 import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.exception.DuplicateResourceException;
@@ -24,6 +25,7 @@ public class TagApplicationService implements TagUseCase {
 
     /** 태그 생성 - 슬러그 자동 생성 - 중복 체크 (name, slug) */
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Tag create(TagCommand command) {
         String slug =
                 command.getSlug() != null
@@ -41,6 +43,7 @@ public class TagApplicationService implements TagUseCase {
 
     /** 태그 수정 */
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Tag update(String id, TagCommand command) {
         Tag tag = getById(id);
 
@@ -70,6 +73,7 @@ public class TagApplicationService implements TagUseCase {
 
     /** 태그 삭제 */
     @Transactional
+    @InvalidateBlogCatalogCaches
     public void delete(String id) {
         Tag tag = getById(id);
         tagRepository.delete(tag);
@@ -93,17 +97,20 @@ public class TagApplicationService implements TagUseCase {
     }
 
     /** 태그의 postCount 원자적 증가 */
+    @InvalidateBlogCatalogCaches
     public void incrementPostCount(String tagId) {
         tagRepository.incrementPostCount(tagId);
     }
 
     /** 태그의 postCount 원자적 감소 (최소 0) */
+    @InvalidateBlogCatalogCaches
     public void decrementPostCount(String tagId) {
         tagRepository.decrementPostCount(tagId);
     }
 
     /** 태그명으로 조회하거나, 없으면 자동 생성 */
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Tag findOrCreateByName(String name) {
         return tagRepository
                 .findByName(name)

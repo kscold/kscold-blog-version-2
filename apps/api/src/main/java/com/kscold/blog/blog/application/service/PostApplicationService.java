@@ -3,6 +3,7 @@ package com.kscold.blog.blog.application.service;
 import com.kscold.blog.blog.application.dto.command.PostCreateCommand;
 import com.kscold.blog.blog.application.dto.command.PostUpdateCommand;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
+import com.kscold.blog.blog.config.InvalidateBlogCatalogCaches;
 import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.port.out.PostRepository;
@@ -38,6 +39,7 @@ public class PostApplicationService implements PostUseCase {
 
     /** 포스트 생성 */
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Post create(PostCreateCommand command, String userId) {
         String slug =
                 command.getSlug() != null ? command.getSlug() : generateSlug(command.getTitle());
@@ -54,6 +56,7 @@ public class PostApplicationService implements PostUseCase {
 
     /** 포스트 수정 (부분 업데이트) */
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Post update(String id, PostUpdateCommand command) {
         Post post = findById(id);
         Post.CategoryInfo categoryInfo =
@@ -138,6 +141,7 @@ public class PostApplicationService implements PostUseCase {
 
     /** 포스트 삭제 (Soft Delete - ARCHIVED 상태로 변경) */
     @Transactional
+    @InvalidateBlogCatalogCaches
     public void delete(String id) {
         Post post = findById(id);
         post.setStatus(Post.Status.ARCHIVED);

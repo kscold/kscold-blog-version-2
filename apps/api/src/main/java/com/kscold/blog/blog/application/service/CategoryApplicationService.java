@@ -3,6 +3,8 @@ package com.kscold.blog.blog.application.service;
 import com.kscold.blog.blog.application.dto.command.CategoryCreateCommand;
 import com.kscold.blog.blog.application.dto.command.CategoryUpdateCommand;
 import com.kscold.blog.blog.application.port.in.CategoryUseCase;
+import com.kscold.blog.blog.config.BlogCatalogCacheConfiguration;
+import com.kscold.blog.blog.config.InvalidateBlogCatalogCaches;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.port.out.CategoryRepository;
 import com.kscold.blog.exception.InvalidRequestException;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ public class CategoryApplicationService implements CategoryUseCase {
 
     /** 카테고리 생성 (커맨드에서 엔티티 변환 포함) */
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Category create(CategoryCreateCommand command) {
         String slug =
                 command.getSlug() != null
@@ -67,6 +71,10 @@ public class CategoryApplicationService implements CategoryUseCase {
     }
 
     /** 전체 카테고리 조회 (flat 리스트 - 트리 구조는 CategoryResponse에서 처리) */
+    @Cacheable(
+            cacheManager = "blogCatalogCacheManager",
+            cacheNames = BlogCatalogCacheConfiguration.CATEGORY_INDEX_CACHE,
+            sync = true)
     public List<Category> getAll() {
         return categoryRepository.findAll();
     }
@@ -92,6 +100,7 @@ public class CategoryApplicationService implements CategoryUseCase {
 
     /** 카테고리 수정 (null 필드는 기존 값 유지) */
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Category update(String id, CategoryUpdateCommand command) {
         Category category = getById(id);
 
@@ -118,6 +127,7 @@ public class CategoryApplicationService implements CategoryUseCase {
     }
 
     @Transactional
+    @InvalidateBlogCatalogCaches
     public void delete(String id) {
         Category category = getById(id);
 
@@ -130,6 +140,7 @@ public class CategoryApplicationService implements CategoryUseCase {
     }
 
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Category move(String id, String newParentId) {
         Category category = getById(id);
         Category newParent = newParentId != null ? getById(newParentId) : null;
@@ -160,11 +171,13 @@ public class CategoryApplicationService implements CategoryUseCase {
     }
 
     /** 카테고리의 postCount 원자적 증가 */
+    @InvalidateBlogCatalogCaches
     public void incrementPostCount(String categoryId) {
         categoryRepository.incrementPostCount(categoryId);
     }
 
     /** 카테고리의 postCount 원자적 감소 (최소 0) */
+    @InvalidateBlogCatalogCaches
     public void decrementPostCount(String categoryId) {
         categoryRepository.decrementPostCount(categoryId);
     }

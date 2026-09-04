@@ -1,5 +1,6 @@
 package com.kscold.blog.social.application.service;
 
+import com.kscold.blog.blog.config.InvalidateBlogCatalogCaches;
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
@@ -36,6 +37,7 @@ public class FeedApplicationService implements FeedUseCase {
     private final LinkScrapingPort linkScrapingPort;
 
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Feed create(FeedCreateCommand command, String userId) {
         String content = normalizeContent(command.getContent());
         List<String> images = normalizeImages(command.getImages());
@@ -70,6 +72,7 @@ public class FeedApplicationService implements FeedUseCase {
     }
 
     @Transactional
+    @InvalidateBlogCatalogCaches
     public Feed update(String id, FeedUpdateCommand command) {
         Feed feed = findById(id);
 
@@ -95,6 +98,7 @@ public class FeedApplicationService implements FeedUseCase {
     }
 
     @Transactional
+    @InvalidateBlogCatalogCaches
     public void delete(String id) {
         Feed feed = findById(id);
         feedCommentRepository.deleteAllByFeedId(id);
@@ -144,6 +148,7 @@ public class FeedApplicationService implements FeedUseCase {
     }
 
     @Override
+    @InvalidateBlogCatalogCaches
     public long renameFeedTag(String fromName, String toName) {
         return feedRepository.renameTag(fromName, toName);
     }

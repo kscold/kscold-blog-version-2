@@ -1,6 +1,8 @@
 package com.kscold.blog.blog.application.service;
 
 import com.kscold.blog.blog.application.port.in.TagCatalogUseCase;
+import com.kscold.blog.blog.config.BlogCatalogCacheConfiguration;
+import com.kscold.blog.blog.config.InvalidateBlogCatalogCaches;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.model.TagUsage;
@@ -20,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +44,10 @@ public class TagCatalogApplicationService implements TagCatalogUseCase {
     private final FeedUseCase feedUseCase;
 
     @Override
+    @Cacheable(
+            cacheManager = "blogCatalogCacheManager",
+            cacheNames = BlogCatalogCacheConfiguration.TAG_INDEX_CACHE,
+            sync = true)
     public List<TagUsage> getIndex() {
         Map<String, Long> postCounts = postRepository.countPublishedByTagName();
         Map<String, Long> feedCounts = feedUseCase.getFeedTagCounts();
@@ -79,6 +86,7 @@ public class TagCatalogApplicationService implements TagCatalogUseCase {
     /** 등록되지 않은 피드 태그를 채우고, 분류가 비어 있는 태그를 글이 가장 많은 카테고리로 묶는다. */
     @Override
     @Transactional
+    @InvalidateBlogCatalogCaches
     public int reindex() {
         int changed = registerMissingFeedTags();
         changed += assignMissingCategories();
@@ -88,6 +96,7 @@ public class TagCatalogApplicationService implements TagCatalogUseCase {
 
     @Override
     @Transactional
+    @InvalidateBlogCatalogCaches
     public long merge(String sourceTagId, String targetTagId) {
         if (sourceTagId.equals(targetTagId)) {
             throw InvalidRequestException.invalidInput("같은 태그끼리는 합칠 수 없습니다");
