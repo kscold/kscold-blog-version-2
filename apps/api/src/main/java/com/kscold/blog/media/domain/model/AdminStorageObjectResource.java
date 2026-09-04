@@ -1,5 +1,6 @@
 package com.kscold.blog.media.domain.model;
 
+import java.io.InputStream;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,5 +14,5 @@ public class AdminStorageObjectResource {
     private String fileName;
     private String contentType;
     private long contentLength;
-    private byte[] buffer;
+    private InputStream inputStream;
 }

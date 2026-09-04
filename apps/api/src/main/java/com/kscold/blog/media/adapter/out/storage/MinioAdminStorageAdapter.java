@@ -194,32 +194,25 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
     public AdminStorageObjectResource getObject(String keyInput) {
         String key = normalizeObjectKey(keyInput);
 
-        try (ResponseInputStream<GetObjectResponse> stream =
+        ResponseInputStream<GetObjectResponse> stream =
                 minioStorageSupport
                         .getClient()
                         .getObject(
                                 GetObjectRequest.builder()
                                         .bucket(minioStorageSupport.getBucket())
                                         .key(key)
-                                        .build())) {
-            byte[] buffer = stream.readAllBytes();
-            GetObjectResponse response = stream.response();
+                                        .build());
+        GetObjectResponse response = stream.response();
 
-            return AdminStorageObjectResource.builder()
-                    .fileName(extractLeafName(key))
-                    .contentType(
-                            response.contentType() == null
-                                    ? inferContentType(key)
-                                    : response.contentType())
-                    .contentLength(
-                            response.contentLength() == null
-                                    ? buffer.length
-                                    : response.contentLength())
-                    .buffer(buffer)
-                    .build();
-        } catch (IOException exception) {
-            throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일을 불러오지 못했습니다.");
-        }
+        return AdminStorageObjectResource.builder()
+                .fileName(extractLeafName(key))
+                .contentType(
+                        response.contentType() == null
+                                ? inferContentType(key)
+                                : response.contentType())
+                .contentLength(response.contentLength() == null ? -1L : response.contentLength())
+                .inputStream(stream)
+                .build();
     }
 
     private List<String> listKeysRecursively(String prefix) {

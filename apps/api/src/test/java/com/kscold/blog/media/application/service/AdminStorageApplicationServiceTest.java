@@ -10,6 +10,7 @@ import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.media.domain.model.AdminStorageListing;
 import com.kscold.blog.media.domain.model.AdminStorageObjectResource;
 import com.kscold.blog.media.domain.port.out.AdminStoragePort;
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -104,7 +105,7 @@ class AdminStorageApplicationServiceTest {
                         .fileName("hero.png")
                         .contentType("image/png")
                         .contentLength(3L)
-                        .buffer(new byte[] {1, 2, 3})
+                        .inputStream(new ByteArrayInputStream(new byte[] {1, 2, 3}))
                         .build();
         when(adminStoragePort.getObject("hero.png")).thenReturn(resource);
 

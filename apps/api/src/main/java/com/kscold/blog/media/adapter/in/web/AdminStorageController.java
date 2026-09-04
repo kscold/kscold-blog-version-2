@@ -5,6 +5,7 @@ import com.kscold.blog.media.adapter.in.web.dto.response.AdminStorageListingResp
 import com.kscold.blog.media.application.port.in.AdminStorageUseCase;
 import com.kscold.blog.media.domain.model.AdminStorageObjectResource;
 import com.kscold.blog.shared.web.ApiResponse;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @RestController
 @RequestMapping("/admin/storage")
@@ -71,7 +73,7 @@ public class AdminStorageController {
     }
 
     @GetMapping("/object")
-    public ResponseEntity<byte[]> getObject(
+    public ResponseEntity<StreamingResponseBody> getObject(
             @RequestParam String key, @RequestParam(defaultValue = "0") int download) {
         AdminStorageObjectResource object = adminStorageUseCase.getObject(key);
 
@@ -80,11 +82,23 @@ public class AdminStorageController {
                         .filename(object.getFileName(), StandardCharsets.UTF_8)
                         .build();
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, object.getContentType())
-                .header(HttpHeaders.CACHE_CONTROL, "no-store")
-                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
-                .contentLength(object.getContentLength())
-                .body(object.getBuffer());
+        StreamingResponseBody body =
+                outputStream -> {
+                    try (InputStream inputStream = object.getInputStream()) {
+                        inputStream.transferTo(outputStream);
+                    }
+                };
+
+        ResponseEntity.BodyBuilder response =
+                ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_TYPE, object.getContentType())
+                        .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                        .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString());
+
+        if (object.getContentLength() >= 0) {
+            response.contentLength(object.getContentLength());
+        }
+
+        return response.body(body);
     }
 }
