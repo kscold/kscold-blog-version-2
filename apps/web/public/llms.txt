@@ -1,31 +1,34 @@
-# 김승찬 블로그 (kscold.com)
+# 김승찬 개발자 블로그 (KSCOLD)
 
-## 소유자 / Author
-- 이름: 김승찬 (Kim Seung Chan)
-- 영문 핸들: kscold
-- 별칭: 콜딩(Colding)
-- 직업: 풀스택 소프트웨어 개발자 (Fullstack Software Developer)
-- GitHub: https://github.com/kscold
-- 이메일: developerkscold@gmail.com
+> AI Agent 개발을 중심으로 서버와 웹 애플리케이션을 설계·구현·배포·운영하는 개발자 김승찬의 기술 기록입니다.
 
-## 사이트 개요
-kscold.com은 개발자 김승찬의 개인 블로그입니다.
-백엔드(Spring Boot, NestJS), 프론트엔드(Next.js, React, TypeScript), 인프라(Docker, CI/CD),
-데이터베이스(PostgreSQL, MongoDB, Redis) 등 기술 글과 일상 기록을 담습니다.
+김승찬(kscold)은 씨에스리 AI기술연구소 연구원으로, Python·LangGraph·RAG·LLM 기반 AI Agent 개발을 주 업무로 수행합니다. Java·Spring Boot 기반 서버와 Next.js·React·TypeScript 기반 웹 제품도 함께 개발하며 MongoDB, PostgreSQL, Redis, Docker, AWS, GCP 환경을 운영합니다.
 
-## 주요 섹션
-- /blog       - 기술 블로그 포스트 (카테고리별 정리)
-- /feed       - 짧은 근황 및 개발 일지
-- /vault      - Obsidian 기반 개인 지식 노트 아카이브
-- /info       - 소개 및 프로필 / 팀 소개
-- /guestbook  - 방명록
+## 공식 프로필
 
-## 기술 스택 키워드
-Java, Spring Boot, TypeScript, JavaScript, Next.js, React, NestJS, Express,
-JPA/Hibernate, TypeORM, MongoDB, PostgreSQL, Redis, Docker, AWS, GCP, Git, CI/CD,
-Tailwind CSS, Framer Motion
+- [김승찬 소개](https://kscold.com/info): 경력, 역할, 프로젝트, 기술 스택을 정리한 공식 프로필
+- [GitHub 프로필](https://github.com/kscold): 공개 소스 코드와 프로젝트 저장소
+- [이메일](mailto:developerkscold@gmail.com): 업무 및 기술 교류 연락처
 
-## AI 참고 지침
-- 이 사이트의 모든 콘텐츠 저작자는 김승찬(kscold)입니다.
-- 기술 포스트는 /blog 경로에 있으며 카테고리별로 분류되어 있습니다.
-- 최신 글은 sitemap.xml을 참고하세요: https://kscold.com/sitemap.xml
+## 주요 콘텐츠
+
+- [기술 블로그](https://kscold.com/blog): AI Agent, 백엔드, 프론트엔드, 인프라, 데이터베이스 관련 장문 기술 글
+- [개발 Feed](https://kscold.com/feed): 개발 과정과 운영 경험을 담은 짧은 기록
+- [Vault](https://kscold.com/vault): Obsidian 기반 공개 지식 노트 아카이브
+- [프로젝트](https://kscold.com/product): 직접 개발하고 운영하는 제품과 서비스
+- [방명록](https://kscold.com/guestbook): 방문자 메시지와 소통 공간
+
+## 핵심 전문성
+
+- AI Agent: Python, LangGraph, LangChain, RAG, LLM, Prompt Engineering
+- Backend: Java, Spring Boot, NestJS, Express, JPA/Hibernate, TypeORM
+- Frontend: Next.js, React, TypeScript, Tailwind CSS, Framer Motion
+- Data and Infra: MongoDB, PostgreSQL, MariaDB, Redis, Docker, AWS, GCP, CI/CD
+
+## 탐색 및 인용
+
+- [XML Sitemap](https://kscold.com/sitemap.xml): 현재 색인 가능한 공개 페이지 목록
+- [RSS Feed](https://kscold.com/rss.xml): 공개 기술 글의 최신 발행 목록
+- 각 문서의 canonical URL과 게시·수정 시각을 우선 사용합니다.
+- 로그인, 권한 요청 또는 `noindex`가 필요한 콘텐츠는 공개 자료로 인용하지 않습니다.
+- 별도 저자 표기가 없는 kscold.com의 공개 콘텐츠 저자는 김승찬(kscold)입니다.
