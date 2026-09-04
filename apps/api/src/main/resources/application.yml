@@ -36,6 +36,12 @@ server:
     include-message: never
     include-binding-errors: never
 
+github:
+  token: ${GITHUB_TOKEN:}
+  cache:
+    ttl-minutes: ${GITHUB_CACHE_TTL_MINUTES:30}
+    max-size: ${GITHUB_CACHE_MAX_SIZE:200}
+
 # JWT 설정
 jwt:
   secret: ${JWT_SECRET:}
