@@ -37,10 +37,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ApiResponse<Void>> handleBusinessException(
             BusinessException e, HttpServletRequest request) {
-        log.warn(
-                "BusinessException: code={}, message={}",
-                e.getErrorCode().getCode(),
-                e.getMessage());
+        log.warn("BusinessException: code={}", e.getErrorCode().getCode());
 
         ErrorCode errorCode = e.getErrorCode();
         // DB·외부 API 실패처럼 5xx 로 나가는 건 실제 장애이므로 알림 대상에 포함한다.
@@ -57,7 +54,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateResourceException.class)
     protected ResponseEntity<ApiResponse<Void>> handleDuplicateResource(
             DuplicateResourceException e) {
-        log.warn("DuplicateResourceException: {}", e.getMessage());
+        log.warn("DuplicateResourceException: code={}", e.getErrorCode().getCode());
         ApiResponse<Void> response = ApiResponse.error(e.getErrorCode().getCode(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
@@ -65,7 +62,7 @@ public class GlobalExceptionHandler {
     /** InvalidRequestException 처리 잘못된 요청 시 HTTP 400 Bad Request 응답 */
     @ExceptionHandler(InvalidRequestException.class)
     protected ResponseEntity<ApiResponse<Void>> handleInvalidRequest(InvalidRequestException e) {
-        log.warn("InvalidRequestException: {}", e.getMessage());
+        log.warn("InvalidRequestException: code={}", e.getErrorCode().getCode());
         ApiResponse<Void> response = ApiResponse.error(e.getErrorCode().getCode(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -159,7 +156,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     protected ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupported(
             HttpRequestMethodNotSupportedException e) {
-        log.warn("HttpRequestMethodNotSupportedException: {}", e.getMessage());
+        log.warn("HttpRequestMethodNotSupportedException: method={}", e.getMethod());
 
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED.getCode(), "지원하지 않는 요청 방식입니다.");
@@ -170,7 +167,7 @@ public class GlobalExceptionHandler {
     /** 인증 실패 예외 처리 (401) JWT 토큰 없음, 만료 등 인증 관련 예외 */
     @ExceptionHandler(AuthenticationException.class)
     protected ResponseEntity<ApiResponse<Void>> handleAuthentication(AuthenticationException e) {
-        log.warn("AuthenticationException: {}", e.getMessage());
+        log.warn("AuthenticationException: type={}", e.getClass().getSimpleName());
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.UNAUTHORIZED.getCode(), "인증이 필요합니다. 다시 로그인해주세요.");
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
@@ -179,7 +176,7 @@ public class GlobalExceptionHandler {
     /** 접근 권한 없음 예외 처리 (403) @PreAuthorize 등 권한 검사 실패 시 발생 */
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException e) {
-        log.warn("AccessDeniedException: {}", e.getMessage());
+        log.warn("AccessDeniedException: type={}", e.getClass().getSimpleName());
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.FORBIDDEN.getCode(), "접근 권한이 없습니다.");
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
@@ -188,7 +185,7 @@ public class GlobalExceptionHandler {
     /** 존재하지 않는 정적 리소스 요청 처리 (404) socket.io 등 불필요한 요청에 의한 ERROR 로그 노이즈 방지 */
     @ExceptionHandler(NoResourceFoundException.class)
     protected ResponseEntity<ApiResponse<Void>> handleNoResourceFound(NoResourceFoundException e) {
-        log.debug("NoResourceFoundException: {}", e.getMessage());
+        log.debug("NoResourceFoundException");
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.RESOURCE_NOT_FOUND.getCode(), "요청한 리소스를 찾을 수 없습니다.");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
@@ -228,7 +225,7 @@ public class GlobalExceptionHandler {
                             detail,
                             List.of(new NotificationMessage.Field("요청", where))));
         } catch (Exception notifyFailure) {
-            log.warn("오류 알림 전송을 건너뜁니다", notifyFailure);
+            log.warn("오류 알림 전송을 건너뜁니다: type={}", notifyFailure.getClass().getSimpleName());
         }
     }
 }

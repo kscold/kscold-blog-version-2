@@ -98,4 +98,33 @@ class GlobalExceptionHandlerTest {
                 .isEqualTo("IllegalStateException")
                 .doesNotContain("never-send-this-secret");
     }
+
+    @Test
+    void businessFailureLogDoesNotIncludeUserControlledMessage() {
+        String sensitiveMessage = "user-input-never-log-this";
+        Logger logger = (Logger) LoggerFactory.getLogger(GlobalExceptionHandler.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        GlobalExceptionHandler handler =
+                new GlobalExceptionHandler(mock(NotificationUseCase.class));
+
+        try {
+            ResponseEntity<ApiResponse<Void>> response =
+                    handler.handleInvalidRequest(
+                            InvalidRequestException.invalidInput(sensitiveMessage));
+
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().getMessage()).isEqualTo(sensitiveMessage);
+            assertThat(appender.list)
+                    .extracting(ILoggingEvent::getFormattedMessage)
+                    .singleElement()
+                    .asString()
+                    .contains(ErrorCode.INVALID_INPUT_VALUE.getCode())
+                    .doesNotContain(sensitiveMessage);
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
+    }
 }
