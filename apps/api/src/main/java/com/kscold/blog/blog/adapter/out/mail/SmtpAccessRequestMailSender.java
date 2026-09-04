@@ -2,6 +2,8 @@ package com.kscold.blog.blog.adapter.out.mail;
 
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import com.kscold.blog.blog.domain.port.out.AccessRequestMailSender;
+import com.kscold.blog.notification.application.port.in.MessageDeliveryUseCase;
+import com.kscold.blog.notification.domain.model.MessageDeliveryLog;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +23,7 @@ import org.springframework.util.StringUtils;
 public class SmtpAccessRequestMailSender implements AccessRequestMailSender {
 
     private final ObjectProvider<JavaMailSender> mailSenderProvider;
+    private final MessageDeliveryUseCase messageDeliveryUseCase;
 
     @Value("${spring.mail.host:}")
     private String mailHost;
@@ -79,8 +82,23 @@ public class SmtpAccessRequestMailSender implements AccessRequestMailSender {
             helper.setText(plain, html);
             sender.send(mime);
             log.info("Access approval mail sent to {}", toEmail);
+            messageDeliveryUseCase.record(
+                    MessageDeliveryLog.sent(
+                            MessageDeliveryLog.Channel.EMAIL,
+                            "ACCESS_REQUEST_APPROVED",
+                            toEmail,
+                            displayName,
+                            subject));
         } catch (Exception e) {
             log.error("Failed to send access approval mail to {}: {}", toEmail, e.getMessage());
+            messageDeliveryUseCase.record(
+                    MessageDeliveryLog.failed(
+                            MessageDeliveryLog.Channel.EMAIL,
+                            "ACCESS_REQUEST_APPROVED",
+                            toEmail,
+                            displayName,
+                            subject,
+                            e.getMessage()));
         }
     }
 

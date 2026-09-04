@@ -3,19 +3,24 @@ package com.kscold.blog.stackshare.application.service;
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.notification.application.port.in.AlimtalkTemplateUseCase;
+import com.kscold.blog.notification.application.port.in.MessageDeliveryUseCase;
 import com.kscold.blog.notification.domain.model.AlimtalkTemplate;
+import com.kscold.blog.notification.domain.model.MessageDeliveryLog;
 import com.kscold.blog.stackshare.application.dto.SaveStackShareAccountCommand;
+import com.kscold.blog.stackshare.application.dto.SaveStackShareGroupCommand;
 import com.kscold.blog.stackshare.application.dto.SaveStackShareParticipantCommand;
 import com.kscold.blog.stackshare.application.dto.SendStackShareNotificationsCommand;
 import com.kscold.blog.stackshare.application.dto.StackShareRecipientCommand;
 import com.kscold.blog.stackshare.application.dto.StackShareSettlementCommand;
 import com.kscold.blog.stackshare.application.port.in.StackShareManagementUseCase;
 import com.kscold.blog.stackshare.domain.model.StackShareAccount;
+import com.kscold.blog.stackshare.domain.model.StackShareGroup;
 import com.kscold.blog.stackshare.domain.model.StackShareMessage;
 import com.kscold.blog.stackshare.domain.model.StackShareParticipant;
 import com.kscold.blog.stackshare.domain.model.StackShareSendResult;
 import com.kscold.blog.stackshare.domain.model.StackShareSettlement;
 import com.kscold.blog.stackshare.domain.port.out.StackShareAccountRepository;
+import com.kscold.blog.stackshare.domain.port.out.StackShareGroupRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareNotificationSender;
 import com.kscold.blog.stackshare.domain.port.out.StackShareParticipantRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareSettlementRepository;
@@ -26,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +48,10 @@ public class StackShareManagementApplicationService implements StackShareManagem
     private final StackShareParticipantRepository participantRepository;
     private final StackShareSettlementRepository settlementRepository;
     private final StackShareAccountRepository accountRepository;
+    private final StackShareGroupRepository groupRepository;
     private final StackShareNotificationSender notificationSender;
     private final AlimtalkTemplateUseCase templateUseCase;
+    private final MessageDeliveryUseCase messageDeliveryUseCase;
 
     @Override
     public StackShareAccount getAccount() {
@@ -94,6 +102,46 @@ public class StackShareManagementApplicationService implements StackShareManagem
     }
 
     @Override
+    public List<StackShareGroup> getGroups() {
+        return groupRepository.findAllByOrderByNameAsc();
+    }
+
+    @Override
+    public StackShareGroup saveGroup(SaveStackShareGroupCommand command) {
+        String name = normalizeText(command.name());
+        if (name.isBlank()) {
+            throw invalidInput("그룹 이름을 입력해주세요.");
+        }
+        // 같은 이름이 이미 있으면 그 그룹을 고쳐준다. 이름으로 찾아 쓰는 묶음이라 중복이 생기면 헷갈린다.
+        StackShareGroup group =
+                findGroup(command.id())
+                        .or(() -> groupRepository.findByName(name))
+                        .orElseGet(StackShareGroup::new);
+        group.setName(name);
+        group.setDefaultToolName(normalizeText(command.defaultToolName()));
+        group.setIncludeOwner(command.includeOwner());
+        group.setParticipantIds(
+                command.participantIds() == null
+                        ? new ArrayList<>()
+                        : command.participantIds().stream()
+                                .filter(id -> id != null && !id.isBlank())
+                                .distinct()
+                                .collect(Collectors.toCollection(ArrayList::new)));
+        return groupRepository.save(group);
+    }
+
+    @Override
+    public void deleteGroup(String id) {
+        groupRepository.deleteById(id);
+    }
+
+    private java.util.Optional<StackShareGroup> findGroup(String id) {
+        return (id == null || id.isBlank())
+                ? java.util.Optional.empty()
+                : groupRepository.findById(id);
+    }
+
+    @Override
     public List<StackShareSettlement> getSettlements() {
         return settlementRepository.findRecent();
     }
@@ -119,12 +167,49 @@ public class StackShareManagementApplicationService implements StackShareManagem
             settlement.setMessageGroupId(result.groupId());
             settlement.setSentAt(LocalDateTime.now());
             settlementRepository.save(settlement);
+            recordDelivery(settlement, result.groupId(), null);
             return result;
         } catch (RuntimeException exception) {
             settlement.setStatus(StackShareSettlement.Status.FAILED);
             settlementRepository.save(settlement);
+            recordDelivery(settlement, null, exception.getMessage());
             throw exception;
         }
+    }
+
+    /** 누구에게 무엇이 나갔는지 남긴다. 그룹 아이디가 있으면 나중에 실제 도달 여부를 다시 조회할 수 있다. */
+    private void recordDelivery(
+            StackShareSettlement settlement, String groupId, String failureReason) {
+        List<MessageDeliveryLog> logs =
+                settlement.getRecipients().stream()
+                        .map(
+                                recipient -> {
+                                    String summary =
+                                            "%s %s 분담금 %s"
+                                                    .formatted(
+                                                            settlement.getBillingPeriod(),
+                                                            settlement.getToolName(),
+                                                            formatWon(recipient.getAmount()));
+                                    MessageDeliveryLog log =
+                                            failureReason == null
+                                                    ? MessageDeliveryLog.sent(
+                                                            MessageDeliveryLog.Channel.ALIMTALK,
+                                                            TEMPLATE_KEY,
+                                                            recipient.getPhoneNumber(),
+                                                            recipient.getName(),
+                                                            summary)
+                                                    : MessageDeliveryLog.failed(
+                                                            MessageDeliveryLog.Channel.ALIMTALK,
+                                                            TEMPLATE_KEY,
+                                                            recipient.getPhoneNumber(),
+                                                            recipient.getName(),
+                                                            summary,
+                                                            failureReason);
+                                    log.setProviderGroupId(groupId);
+                                    return log;
+                                })
+                        .toList();
+        messageDeliveryUseCase.recordAll(logs);
     }
 
     private StackShareParticipant findParticipant(String id, String phoneNumber) {

@@ -2,13 +2,16 @@ package com.kscold.blog.stackshare.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.stackshare.adapter.in.web.dto.request.SaveStackShareAccountRequest;
+import com.kscold.blog.stackshare.adapter.in.web.dto.request.SaveStackShareGroupRequest;
 import com.kscold.blog.stackshare.adapter.in.web.dto.request.SaveStackShareParticipantRequest;
 import com.kscold.blog.stackshare.adapter.in.web.dto.request.SendStackShareNotificationsRequest;
 import com.kscold.blog.stackshare.adapter.in.web.dto.response.StackShareAccountResponse;
+import com.kscold.blog.stackshare.adapter.in.web.dto.response.StackShareGroupResponse;
 import com.kscold.blog.stackshare.adapter.in.web.dto.response.StackShareNotificationResponse;
 import com.kscold.blog.stackshare.adapter.in.web.dto.response.StackShareParticipantResponse;
 import com.kscold.blog.stackshare.adapter.in.web.dto.response.StackShareSettlementResponse;
 import com.kscold.blog.stackshare.application.dto.SaveStackShareAccountCommand;
+import com.kscold.blog.stackshare.application.dto.SaveStackShareGroupCommand;
 import com.kscold.blog.stackshare.application.dto.SaveStackShareParticipantCommand;
 import com.kscold.blog.stackshare.application.dto.SendStackShareNotificationsCommand;
 import com.kscold.blog.stackshare.application.dto.StackShareRecipientCommand;
@@ -85,6 +88,34 @@ public class AdminStackShareController {
     public ResponseEntity<ApiResponse<Void>> deleteParticipant(@RequestParam String id) {
         useCase.deleteParticipant(id);
         return ResponseEntity.ok(ApiResponse.success(null, "참여자를 삭제했습니다."));
+    }
+
+    @GetMapping("/groups")
+    public ResponseEntity<ApiResponse<List<StackShareGroupResponse>>> getGroups() {
+        var groups = useCase.getGroups().stream().map(StackShareGroupResponse::from).toList();
+        return ResponseEntity.ok(ApiResponse.success(groups));
+    }
+
+    @PostMapping("/groups")
+    public ResponseEntity<ApiResponse<StackShareGroupResponse>> saveGroup(
+            @Valid @RequestBody SaveStackShareGroupRequest request) {
+        var command =
+                new SaveStackShareGroupCommand(
+                        request.getId(),
+                        request.getName(),
+                        request.getDefaultToolName(),
+                        request.isIncludeOwner(),
+                        request.getParticipantIds());
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        StackShareGroupResponse.from(useCase.saveGroup(command)),
+                        "정산 그룹을 저장했습니다."));
+    }
+
+    @DeleteMapping("/groups")
+    public ResponseEntity<ApiResponse<Void>> deleteGroup(@RequestParam String id) {
+        useCase.deleteGroup(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "정산 그룹을 삭제했습니다."));
     }
 
     @GetMapping("/settlements")

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.notification.application.port.in.AlimtalkTemplateUseCase;
+import com.kscold.blog.notification.application.port.in.MessageDeliveryUseCase;
 import com.kscold.blog.notification.domain.model.AlimtalkTemplate;
 import com.kscold.blog.notification.domain.model.AlimtalkTemplateStatus;
 import com.kscold.blog.stackshare.application.dto.SendStackShareNotificationsCommand;
@@ -22,6 +23,7 @@ import com.kscold.blog.stackshare.domain.model.StackShareParticipant;
 import com.kscold.blog.stackshare.domain.model.StackShareSendResult;
 import com.kscold.blog.stackshare.domain.model.StackShareSettlement;
 import com.kscold.blog.stackshare.domain.port.out.StackShareAccountRepository;
+import com.kscold.blog.stackshare.domain.port.out.StackShareGroupRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareNotificationSender;
 import com.kscold.blog.stackshare.domain.port.out.StackShareParticipantRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareSettlementRepository;
@@ -37,8 +39,10 @@ class StackShareManagementApplicationServiceTest {
     private StackShareParticipantRepository participantRepository;
     private StackShareSettlementRepository settlementRepository;
     private StackShareAccountRepository accountRepository;
+    private StackShareGroupRepository groupRepository;
     private StackShareNotificationSender notificationSender;
     private AlimtalkTemplateUseCase templateUseCase;
+    private MessageDeliveryUseCase messageDeliveryUseCase;
     private StackShareManagementApplicationService service;
 
     @BeforeEach
@@ -46,15 +50,19 @@ class StackShareManagementApplicationServiceTest {
         participantRepository = mock(StackShareParticipantRepository.class);
         settlementRepository = mock(StackShareSettlementRepository.class);
         accountRepository = mock(StackShareAccountRepository.class);
+        groupRepository = mock(StackShareGroupRepository.class);
         notificationSender = mock(StackShareNotificationSender.class);
         templateUseCase = mock(AlimtalkTemplateUseCase.class);
+        messageDeliveryUseCase = mock(MessageDeliveryUseCase.class);
         service =
                 new StackShareManagementApplicationService(
                         participantRepository,
                         settlementRepository,
                         accountRepository,
+                        groupRepository,
                         notificationSender,
-                        templateUseCase);
+                        templateUseCase,
+                        messageDeliveryUseCase);
         when(accountRepository.find()).thenReturn(Optional.of(registeredAccount()));
     }
 
