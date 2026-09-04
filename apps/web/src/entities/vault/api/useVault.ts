@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
-import { VaultNote, VaultFolder, GraphData } from '@/shared/model/types/vault';
+import { GraphData, VaultFolder, VaultNote, VaultSearchResult } from '@/shared/model/types/vault';
 import { PageResponse } from '@/shared/model/types/api';
 
 export function useVaultFolders() {
@@ -61,6 +61,18 @@ export function useVaultSearch(query: string, page: number = 0) {
         `/vault/notes/search?q=${encodeURIComponent(query)}&page=${page}`
       ),
     enabled: !!query && query.length > 0,
+  });
+}
+
+export function useVaultSemanticSearch(query: string, activeFolderName: string) {
+  return useQuery({
+    queryKey: ['vault', 'semantic-search', query, activeFolderName],
+    queryFn: () =>
+      apiClient.get<VaultSearchResult[]>('/vault/agent/search', {
+        params: { q: query, activeFolderName, limit: 8 },
+      }),
+    enabled: query.length >= 2,
+    staleTime: 1000 * 60 * 5,
   });
 }
 

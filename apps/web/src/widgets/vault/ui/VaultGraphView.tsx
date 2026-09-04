@@ -26,6 +26,7 @@ export function VaultGraphView(props: VaultGraphViewProps) {
   return (
     <div
       ref={g.containerRef}
+      data-vault-graph
       onMouseEnter={g.handleGraphMouseEnter}
       onMouseLeave={g.handleGraphMouseLeave}
       onMouseMove={g.supportsHover ? g.handleParallaxMouse : undefined}
@@ -59,15 +60,15 @@ export function VaultGraphView(props: VaultGraphViewProps) {
         enableNodeDrag
         enablePanInteraction
         enableZoomInteraction
-        d3AlphaDecay={g.reducedGraphEffects ? 0.05 : 0.015}
+        d3AlphaDecay={g.reducedGraphEffects ? 0.06 : 0.03}
         d3VelocityDecay={g.reducedGraphEffects ? 0.48 : 0.35}
-        warmupTicks={g.reducedGraphEffects ? 36 : 80}
-        cooldownTicks={g.reducedGraphEffects ? 90 : 180}
+        warmupTicks={g.reducedGraphEffects ? 24 : 50}
+        cooldownTicks={g.reducedGraphEffects ? 60 : 110}
         nodeCanvasObject={g.nodeCanvasObject}
         nodePointerAreaPaint={g.renderNodeHitArea}
         onNodeHover={node => {
           g.setHoverNode((node as GraphNode) || null);
-          const el = document.querySelector('canvas');
+          const el = document.querySelector<HTMLCanvasElement>('[data-vault-graph] canvas');
           if (el) el.style.cursor = node ? 'pointer' : 'default';
         }}
         onRenderFramePre={g.handleRenderStarfield}

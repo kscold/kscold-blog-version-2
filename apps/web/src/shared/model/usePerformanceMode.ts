@@ -58,7 +58,7 @@ function detectSoftwareRendering() {
       canvas.getContext('webgl') ??
       canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
 
-    if (!context) return false;
+    if (!context) return true;
 
     const rendererInfo = context.getExtension('WEBGL_debug_renderer_info');
     if (!rendererInfo) return false;

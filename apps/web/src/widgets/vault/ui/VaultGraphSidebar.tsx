@@ -1,6 +1,7 @@
 'use client';
 
 import { VaultFolderTree } from './VaultFolderTree';
+import { VaultSemanticSearch } from './VaultSemanticSearch';
 import type { VaultFolder } from '@/shared/model/types/vault';
 
 interface VaultGraphSidebarProps {
@@ -12,6 +13,7 @@ interface VaultGraphSidebarProps {
   isFoldersLoading: boolean;
   activeFolderId: string | null;
   activeFolderParentId: string | null;
+  activeFolderName: string;
   onFolderSelect: (id: string | null) => void;
   onFolderHover?: (id: string | null) => void;
   onClose: () => void;
@@ -27,6 +29,7 @@ export function VaultGraphSidebar({
   isFoldersLoading,
   activeFolderId,
   activeFolderParentId,
+  activeFolderName,
   onFolderSelect,
   onFolderHover,
   onClose,
@@ -38,6 +41,7 @@ export function VaultGraphSidebar({
       style={isDesktop ? { width: `${sidebarWidth}px` } : undefined}
     >
       <div className="flex-1 space-y-6 p-5 pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] lg:p-6 lg:pb-6">
+        <VaultSemanticSearch activeFolderName={activeFolderName} onNavigate={onClose} />
         {activeFolderId && (
           <div className="lg:hidden">
             <button

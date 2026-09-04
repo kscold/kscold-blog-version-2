@@ -105,6 +105,7 @@ export function VaultGraphLayout() {
         isFoldersLoading={isFoldersLoading}
         activeFolderId={activeFolderId}
         activeFolderParentId={activeFolder?.parent ?? null}
+        activeFolderName={activeFolder?.name ?? ''}
         onFolderSelect={id => {
           setActiveFolderId(id);
           if (!isDesktop) setIsMobileOpen(false);

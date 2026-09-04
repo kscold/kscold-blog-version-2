@@ -81,3 +81,13 @@ export interface VaultNoteComment {
 export interface VaultNoteCommentCreateRequest {
   content: string;
 }
+
+export interface VaultSearchResult {
+  id: string;
+  title: string;
+  slug: string;
+  score: number;
+  type: string;
+  path: string;
+  excerpt: string;
+}
