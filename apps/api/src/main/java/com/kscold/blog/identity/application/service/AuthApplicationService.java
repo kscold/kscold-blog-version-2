@@ -12,15 +12,16 @@ import com.kscold.blog.identity.application.dto.response.PasswordResetTokenRespo
 import com.kscold.blog.identity.application.port.in.AuthUseCase;
 import com.kscold.blog.identity.domain.model.PasswordResetToken;
 import com.kscold.blog.identity.domain.model.User;
+import com.kscold.blog.identity.domain.port.out.PasswordResetSettings;
 import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
-import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import com.kscold.blog.notification.domain.model.NotificationChannel;
 import com.kscold.blog.notification.domain.model.NotificationMessage;
+import com.kscold.blog.notification.domain.port.out.MailSender;
+import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -43,9 +44,10 @@ public class AuthApplicationService implements AuthUseCase {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    private final RecoveryMailSender recoveryMailSender;
+    private final MailSender recoveryMailSender;
     private final RecoveryMailComposer recoveryEmailComposer;
     private final PublicUrlResolver recoveryMailProperties;
+    private final PasswordResetSettings passwordResetSettings;
     private final NotificationUseCase notificationUseCase;
 
     @Transactional
@@ -221,7 +223,7 @@ public class AuthApplicationService implements AuthUseCase {
         String rawToken = generateRawToken();
         Instant expiresAt =
                 Instant.now()
-                        .plusSeconds(recoveryMailProperties.getPasswordResetExpiryMinutes() * 60);
+                        .plusSeconds(passwordResetSettings.getPasswordResetExpiryMinutes() * 60);
         PasswordResetToken savedToken =
                 PasswordResetToken.builder()
                         .userId(user.getId())

@@ -1,6 +1,6 @@
-package com.kscold.blog.identity.adapter.out.mail;
+package com.kscold.blog.notification.config;
 
-import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
+import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -11,12 +11,11 @@ import org.springframework.util.StringUtils;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "account-recovery")
-public class RecoveryMailProperties implements PublicUrlResolver {
+public class MailProperties implements PublicUrlResolver {
 
     private String publicUrl = "https://kscold.com";
     private String fromAddress = "";
     private String fromName = "KSCOLD";
-    private long passwordResetExpiryMinutes = 30;
 
     @Override
     public String resolvePublicUrl(String path) {

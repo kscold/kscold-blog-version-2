@@ -9,11 +9,11 @@ import static org.mockito.Mockito.when;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import com.kscold.blog.chat.domain.port.out.ChatReminderSettings;
 import com.kscold.blog.identity.domain.model.User;
-import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.notification.domain.model.MailMessage;
+import com.kscold.blog.notification.domain.port.out.MailSender;
+import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
 import com.kscold.blog.support.UserFixtures;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +32,7 @@ class ChatReminderSchedulerTest {
 
     @Mock private UserRepository userRepository;
 
-    @Mock private RecoveryMailSender recoveryMailSender;
+    @Mock private MailSender recoveryMailSender;
 
     @Mock private RecoveryMailComposer recoveryEmailComposer;
 
@@ -49,9 +49,8 @@ class ChatReminderSchedulerTest {
         ChatMessageRepository.PendingAdminReminder reminder =
                 new ChatMessageRepository.PendingAdminReminder(
                         "user-1", "관리자", "새 답장을 남겼습니다.", LocalDateTime.now().minusMinutes(40), 2);
-        RecoveryMailMessage mailMessage =
-                new RecoveryMailMessage(
-                        user.getEmail(), "[KSCOLD] 새 답장이 도착했습니다", "plain", "<html></html>");
+        MailMessage mailMessage =
+                new MailMessage(user.getEmail(), "[KSCOLD] 새 답장이 도착했습니다", "plain", "<html></html>");
 
         when(chatReminderProperties.isEnabled()).thenReturn(true);
         when(chatReminderProperties.getUnreadThresholdMinutes()).thenReturn(30L);

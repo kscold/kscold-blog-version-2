@@ -1,7 +1,7 @@
 package com.kscold.blog.social.adapter.out.mail;
 
-import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
+import com.kscold.blog.notification.domain.model.MailMessage;
+import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ public class FeedCommentEmailComposer {
     private final PublicUrlResolver urlResolver;
 
     /** 새 댓글이 달렸음을 블로그 주인(admin)에게 알림. */
-    public RecoveryMailMessage adminNewComment(
+    public MailMessage adminNewComment(
             String toEmail, String authorName, String content, String feedId, String postPreview) {
         String url = urlResolver.resolvePublicUrl("/feed/" + feedId);
         return build(
@@ -28,7 +28,7 @@ public class FeedCommentEmailComposer {
     }
 
     /** 댓글에서 언급된 사용자에게 알림. */
-    public RecoveryMailMessage mention(
+    public MailMessage mention(
             String toEmail, String authorName, String content, String feedId, String postPreview) {
         String url = urlResolver.resolvePublicUrl("/feed/" + feedId);
         return build(
@@ -42,7 +42,7 @@ public class FeedCommentEmailComposer {
                 "댓글 확인하기");
     }
 
-    private RecoveryMailMessage build(
+    private MailMessage build(
             String toEmail,
             String subject,
             String heading,
@@ -97,7 +97,7 @@ public class FeedCommentEmailComposer {
                                 url,
                                 escapeHtml(actionLabel));
 
-        return new RecoveryMailMessage(toEmail, subject, plain, html);
+        return new MailMessage(toEmail, subject, plain, html);
     }
 
     private String escapeHtml(String value) {

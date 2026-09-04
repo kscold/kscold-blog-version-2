@@ -3,10 +3,10 @@ package com.kscold.blog.chat.application.service;
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
 import com.kscold.blog.chat.domain.port.out.ChatReminderSettings;
 import com.kscold.blog.identity.domain.model.User;
-import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.notification.domain.port.out.MailSender;
+import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class ChatReminderScheduler {
 
     private final ChatApplicationService chatApplicationService;
     private final UserRepository userRepository;
-    private final RecoveryMailSender recoveryMailSender;
+    private final MailSender recoveryMailSender;
     private final RecoveryMailComposer recoveryEmailComposer;
     private final PublicUrlResolver recoveryMailProperties;
     private final ChatReminderSettings chatReminderProperties;

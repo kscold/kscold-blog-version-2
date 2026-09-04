@@ -1,7 +1,7 @@
 package com.kscold.blog.guestbook.adapter.out.mail;
 
-import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
+import com.kscold.blog.notification.domain.model.MailMessage;
+import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +12,7 @@ public class GuestbookReplyEmailComposer {
 
     private final PublicUrlResolver urlResolver;
 
-    public RecoveryMailMessage compose(
+    public MailMessage compose(
             String toEmail, String recipientName, String originalContent, String replyContent) {
         String url = urlResolver.resolvePublicUrl("/guestbook");
         String greeting = displayName(recipientName) + "님, 방명록에 답글이 달렸어요.";
@@ -43,7 +43,7 @@ public class GuestbookReplyEmailComposer {
                                 escapeHtml(replyContent),
                                 url);
 
-        return new RecoveryMailMessage(toEmail, "[KSCOLD] 방명록에 답글이 달렸어요", plain, html);
+        return new MailMessage(toEmail, "[KSCOLD] 방명록에 답글이 달렸어요", plain, html);
     }
 
     private String displayName(String recipientName) {

@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.kscold.blog.guestbook.application.event.GuestbookReplyCreatedEvent;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
+import com.kscold.blog.notification.domain.port.out.MailSender;
 import java.util.concurrent.Executor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import org.springframework.core.task.TaskRejectedException;
 @ExtendWith(MockitoExtension.class)
 class GuestbookReplyMailListenerTest {
 
-    @Mock private RecoveryMailSender recoveryMailSender;
+    @Mock private MailSender recoveryMailSender;
 
     @Mock private GuestbookReplyEmailComposer composer;
 

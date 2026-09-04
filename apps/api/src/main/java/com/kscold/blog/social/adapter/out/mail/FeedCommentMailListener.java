@@ -1,7 +1,7 @@
 package com.kscold.blog.social.adapter.out.mail;
 
 import com.kscold.blog.identity.domain.model.User;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
+import com.kscold.blog.notification.domain.port.out.MailSender;
 import com.kscold.blog.social.application.event.FeedCommentCreatedEvent;
 import com.kscold.blog.social.application.service.FeedMentionResolver;
 import com.kscold.blog.social.domain.model.Feed;
@@ -30,7 +30,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class FeedCommentMailListener {
 
-    private final RecoveryMailSender recoveryMailSender;
+    private final MailSender recoveryMailSender;
     private final FeedCommentEmailComposer composer;
     private final FeedMentionResolver mentionResolver;
     private final FeedRepository feedRepository;
@@ -41,7 +41,7 @@ public class FeedCommentMailListener {
     private String adminEmail;
 
     public FeedCommentMailListener(
-            RecoveryMailSender recoveryMailSender,
+            MailSender recoveryMailSender,
             FeedCommentEmailComposer composer,
             FeedMentionResolver mentionResolver,
             FeedRepository feedRepository,

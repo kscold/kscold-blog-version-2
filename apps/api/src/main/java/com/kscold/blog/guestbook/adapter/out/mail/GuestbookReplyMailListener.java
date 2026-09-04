@@ -1,7 +1,7 @@
 package com.kscold.blog.guestbook.adapter.out.mail;
 
 import com.kscold.blog.guestbook.application.event.GuestbookReplyCreatedEvent;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
+import com.kscold.blog.notification.domain.port.out.MailSender;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,12 +15,12 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class GuestbookReplyMailListener {
 
-    private final RecoveryMailSender recoveryMailSender;
+    private final MailSender recoveryMailSender;
     private final GuestbookReplyEmailComposer composer;
     private final Executor guestbookReplyMailExecutor;
 
     public GuestbookReplyMailListener(
-            RecoveryMailSender recoveryMailSender,
+            MailSender recoveryMailSender,
             GuestbookReplyEmailComposer composer,
             @Qualifier("guestbookReplyMailExecutor") Executor guestbookReplyMailExecutor) {
         this.recoveryMailSender = recoveryMailSender;

@@ -15,13 +15,14 @@ import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.domain.model.PasswordResetToken;
 import com.kscold.blog.identity.domain.model.User;
+import com.kscold.blog.identity.domain.port.out.PasswordResetSettings;
 import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
-import com.kscold.blog.identity.domain.port.out.PublicUrlResolver;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailMessage;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.notification.domain.model.MailMessage;
+import com.kscold.blog.notification.domain.port.out.MailSender;
+import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
 import com.kscold.blog.support.UserFixtures;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -48,11 +49,13 @@ class AuthApplicationServiceTest {
 
     @Mock private TokenProvider tokenProvider;
 
-    @Mock private RecoveryMailSender recoveryMailSender;
+    @Mock private MailSender recoveryMailSender;
 
     @Mock private RecoveryMailComposer recoveryEmailComposer;
 
     @Mock private PublicUrlResolver recoveryMailProperties;
+
+    @Mock private PasswordResetSettings passwordResetSettings;
 
     @InjectMocks private AuthApplicationService authApplicationService;
 
@@ -61,9 +64,8 @@ class AuthApplicationServiceTest {
     void registerSendsWelcomeMailWithoutBlockingSignup() {
         RegisterCommand command =
                 new RegisterCommand("hello@example.com", "hello", "password-123", "헬로");
-        RecoveryMailMessage welcomeMail =
-                new RecoveryMailMessage(
-                        command.getEmail(), "[KSCOLD] 가입을 환영합니다", "plain", "<html></html>");
+        MailMessage welcomeMail =
+                new MailMessage(command.getEmail(), "[KSCOLD] 가입을 환영합니다", "plain", "<html></html>");
 
         when(userRepository.existsByEmail(command.getEmail())).thenReturn(false);
         when(userRepository.existsByUsername(command.getUsername())).thenReturn(false);
@@ -91,9 +93,8 @@ class AuthApplicationServiceTest {
     @DisplayName("시나리오: 아이디 찾기는 가입한 이메일이 있으면 안내 메일을 보낸다")
     void sendUsernameReminderDeliversMailForExistingUser() {
         User user = UserFixtures.user("user-1", User.Role.USER, "kscold", "김승찬");
-        RecoveryMailMessage mailMessage =
-                new RecoveryMailMessage(
-                        user.getEmail(), "[KSCOLD] 가입 아이디 안내", "plain", "<html></html>");
+        MailMessage mailMessage =
+                new MailMessage(user.getEmail(), "[KSCOLD] 가입 아이디 안내", "plain", "<html></html>");
 
         when(recoveryMailSender.isAvailable()).thenReturn(true);
         when(userRepository.findByEmail("kscold@example.com")).thenReturn(Optional.of(user));
@@ -108,12 +109,11 @@ class AuthApplicationServiceTest {
     @DisplayName("시나리오: 비밀번호 재설정 요청은 새 토큰을 저장하고 메일을 보낸다")
     void requestPasswordResetStoresTokenAndSendsMail() {
         User user = UserFixtures.user("user-1", User.Role.USER, "kscold", "김승찬");
-        RecoveryMailMessage mailMessage =
-                new RecoveryMailMessage(
-                        user.getEmail(), "[KSCOLD] 비밀번호 재설정 안내", "plain", "<html></html>");
+        MailMessage mailMessage =
+                new MailMessage(user.getEmail(), "[KSCOLD] 비밀번호 재설정 안내", "plain", "<html></html>");
 
         when(recoveryMailSender.isAvailable()).thenReturn(true);
-        when(recoveryMailProperties.getPasswordResetExpiryMinutes()).thenReturn(30L);
+        when(passwordResetSettings.getPasswordResetExpiryMinutes()).thenReturn(30L);
         when(recoveryMailProperties.resolvePublicUrl(startsWith("/login/reset-password?token=")))
                 .thenAnswer(
                         invocation ->

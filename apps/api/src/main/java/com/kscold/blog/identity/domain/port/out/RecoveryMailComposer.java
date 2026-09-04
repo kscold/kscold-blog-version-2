@@ -3,39 +3,38 @@ package com.kscold.blog.identity.domain.port.out;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.identity.domain.model.User;
+import com.kscold.blog.notification.domain.model.MailMessage;
 
 public interface RecoveryMailComposer {
 
-    RecoveryMailMessage buildUsernameReminder(User user);
+    MailMessage buildUsernameReminder(User user);
 
-    RecoveryMailMessage buildPasswordReset(User user, String resetUrl);
+    MailMessage buildPasswordReset(User user, String resetUrl);
 
-    RecoveryMailMessage buildWelcome(User user);
+    MailMessage buildWelcome(User user);
 
-    RecoveryMailMessage buildUnreadChatReminder(
+    MailMessage buildUnreadChatReminder(
             User user, String adminName, String latestContent, long unreadCount, String actionUrl);
 
-    RecoveryMailMessage buildAdminNightRequestConfirmation(AdminNightRequest request);
+    MailMessage buildAdminNightRequestConfirmation(AdminNightRequest request);
 
-    RecoveryMailMessage buildAdminNightRequestNotification(
+    MailMessage buildAdminNightRequestNotification(AdminNightRequest request, String adminEmail);
+
+    MailMessage buildAdminNightApprovedForRequester(AdminNightRequest request);
+
+    MailMessage buildAdminNightInfoRequestedForRequester(AdminNightRequest request);
+
+    MailMessage buildAdminNightApprovedForAdmin(AdminNightRequest request, String adminEmail);
+
+    MailMessage buildAdminNightResubmittedConfirmation(AdminNightRequest request);
+
+    MailMessage buildAdminNightResubmittedNotification(
             AdminNightRequest request, String adminEmail);
 
-    RecoveryMailMessage buildAdminNightApprovedForRequester(AdminNightRequest request);
+    MailMessage buildAdminNightRejectedForRequester(AdminNightRequest request);
 
-    RecoveryMailMessage buildAdminNightInfoRequestedForRequester(AdminNightRequest request);
+    MailMessage buildAdminNightProgramVoteThanks(AdminNightProgramVote vote);
 
-    RecoveryMailMessage buildAdminNightApprovedForAdmin(
-            AdminNightRequest request, String adminEmail);
-
-    RecoveryMailMessage buildAdminNightResubmittedConfirmation(AdminNightRequest request);
-
-    RecoveryMailMessage buildAdminNightResubmittedNotification(
-            AdminNightRequest request, String adminEmail);
-
-    RecoveryMailMessage buildAdminNightRejectedForRequester(AdminNightRequest request);
-
-    RecoveryMailMessage buildAdminNightProgramVoteThanks(AdminNightProgramVote vote);
-
-    RecoveryMailMessage buildAdminNightProgramVoteNotification(
+    MailMessage buildAdminNightProgramVoteNotification(
             AdminNightProgramVote vote, String adminEmail);
 }

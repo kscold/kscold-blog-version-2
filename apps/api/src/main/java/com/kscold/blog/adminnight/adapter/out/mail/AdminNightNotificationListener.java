@@ -4,7 +4,7 @@ import com.kscold.blog.adminnight.application.event.AdminNightNotificationEvent;
 import com.kscold.blog.adminnight.application.event.AdminNightProgramVoteNotificationEvent;
 import com.kscold.blog.adminnight.config.AdminNightProperties;
 import com.kscold.blog.identity.adapter.out.mail.RecoveryEmailComposer;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
+import com.kscold.blog.notification.domain.port.out.MailSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class AdminNightNotificationListener {
 
-    private final RecoveryMailSender recoveryMailSender;
+    private final MailSender recoveryMailSender;
     private final RecoveryEmailComposer recoveryEmailComposer;
     private final AdminNightProperties adminNightProperties;
 

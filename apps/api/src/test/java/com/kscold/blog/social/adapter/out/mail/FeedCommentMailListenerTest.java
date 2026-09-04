@@ -6,7 +6,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import com.kscold.blog.identity.domain.port.out.RecoveryMailSender;
+import com.kscold.blog.notification.domain.port.out.MailSender;
 import com.kscold.blog.social.application.event.FeedCommentCreatedEvent;
 import com.kscold.blog.social.application.service.FeedMentionResolver;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
@@ -23,7 +23,7 @@ import org.springframework.core.task.TaskRejectedException;
 @ExtendWith(MockitoExtension.class)
 class FeedCommentMailListenerTest {
 
-    @Mock private RecoveryMailSender recoveryMailSender;
+    @Mock private MailSender recoveryMailSender;
 
     @Mock private FeedCommentEmailComposer composer;
 
