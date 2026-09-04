@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import logging
 import threading
 from typing import Iterator
 
@@ -12,6 +13,9 @@ from agent.graph.state.vault_chat_state import AgentStage, AgentState, initial_s
 from agent.tools.capabilities import WebSearchTool
 from agent.tools.models import ContentAccessScope
 from agent.tools.store import VaultStore
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -118,4 +122,7 @@ class VaultRagGraph:
                 flush=True,
             )
         except Exception as exception:
-            print(f"Vault Agent 색인 동기화 실패: {exception}", flush=True)
+            logger.error(
+                "Vault Agent 색인 동기화 실패: error_type=%s",
+                type(exception).__name__,
+            )
