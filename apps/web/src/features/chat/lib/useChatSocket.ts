@@ -30,7 +30,7 @@ export function useChatSocket({ isOpen, username: _username }: UseChatSocketOpti
     const token = await apiClient.getValidToken();
     if (!token || !shouldReconnectRef.current || wsRef.current) return;
 
-    const ws = new WebSocket(`${resolveChatWsUrl()}?token=${encodeURIComponent(token)}`);
+    const ws = new WebSocket(resolveChatWsUrl());
     wsRef.current = ws;
     ws.onopen = () => setIsConnected(true);
     ws.onmessage = event => handleSocketMessage(event, setMessages);

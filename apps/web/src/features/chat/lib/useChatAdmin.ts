@@ -34,7 +34,7 @@ export function useChatAdmin() {
   const connect = useCallback(() => {
     const token = getAccessToken();
     if (!token) return;
-    const ws = new WebSocket(`${resolveChatWsUrl()}?token=${encodeURIComponent(token)}`);
+    const ws = new WebSocket(resolveChatWsUrl());
     wsRef.current = ws;
     ws.onopen = () => setIsConnected(true);
     ws.onmessage = event => handleSocketMessage(event, selectedRef.current, setRooms);
