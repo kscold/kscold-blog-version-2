@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Button from '@/shared/ui/Button';
@@ -32,13 +32,27 @@ function formatExpiry(value: string | null) {
 
 export function PasswordResetForm() {
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const [token] = useState(() => searchParams.get('token'));
   const { data, isLoading } = usePasswordResetTokenStatus(token);
   const passwordReset = usePasswordReset();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    if (!searchParams.has('token')) {
+      return;
+    }
+
+    const sanitizedUrl = new URL(window.location.href);
+    sanitizedUrl.searchParams.delete('token');
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${sanitizedUrl.pathname}${sanitizedUrl.search}${sanitizedUrl.hash}`
+    );
+  }, [searchParams]);
 
   const expiryLabel = useMemo(() => formatExpiry(data?.expiresAt ?? null), [data?.expiresAt]);
 

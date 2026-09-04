@@ -16,16 +16,45 @@ interface AnalyticsScriptsProps {
   gaId?: string;
 }
 
+const SENSITIVE_QUERY_KEYS = new Set([
+  'access_token',
+  'code',
+  'id_token',
+  'refresh_token',
+  'token',
+]);
+
+function buildAnalyticsLocation(pathname: string, searchParams: URLSearchParams) {
+  const sanitizedSearchParams = new URLSearchParams(searchParams);
+
+  for (const key of sanitizedSearchParams.keys()) {
+    if (SENSITIVE_QUERY_KEYS.has(key.toLowerCase())) {
+      sanitizedSearchParams.delete(key);
+    }
+  }
+
+  const search = sanitizedSearchParams.toString();
+  const pagePath = `${pathname}${search ? `?${search}` : ''}`;
+
+  return {
+    pagePath,
+    pageLocation: new URL(pagePath, window.location.origin).href,
+  };
+}
+
 export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!gaId || !window.gtag) return;
-    const pagePath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+    const { pagePath, pageLocation } = buildAnalyticsLocation(
+      pathname,
+      new URLSearchParams(searchParams.toString())
+    );
     window.gtag('config', gaId, {
       page_path: pagePath,
-      page_location: window.location.href,
+      page_location: pageLocation,
       page_title: document.title,
     });
   }, [gaId, pathname, searchParams]);
@@ -43,7 +72,7 @@ export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${gaId}', { send_page_view: true });
+          gtag('config', '${gaId}', { send_page_view: false });
         `}
       </Script>
     </>

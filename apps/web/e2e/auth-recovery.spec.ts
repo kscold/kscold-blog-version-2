@@ -110,6 +110,8 @@ test.describe('계정 복구 시나리오', () => {
 
     await page.goto('/login/reset-password?token=valid-token');
 
+    await expect(page).toHaveURL('/login/reset-password');
+
     await page.locator('[data-cy="reset-password-input"]').fill('new-password-123');
     await page.locator('[data-cy="reset-password-confirm-input"]').fill('new-password-123');
     await page.locator('[data-cy="reset-password-submit"]').click();
