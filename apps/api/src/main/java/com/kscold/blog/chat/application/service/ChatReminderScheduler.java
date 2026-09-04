@@ -1,9 +1,9 @@
 package com.kscold.blog.chat.application.service;
 
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
+import com.kscold.blog.chat.domain.port.out.ChatReminderMailComposer;
 import com.kscold.blog.chat.domain.port.out.ChatReminderSettings;
 import com.kscold.blog.identity.domain.model.User;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import com.kscold.blog.notification.domain.port.out.MailSender;
 import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
@@ -21,7 +21,7 @@ public class ChatReminderScheduler {
     private final ChatApplicationService chatApplicationService;
     private final UserRepository userRepository;
     private final MailSender recoveryMailSender;
-    private final RecoveryMailComposer recoveryEmailComposer;
+    private final ChatReminderMailComposer mailComposer;
     private final PublicUrlResolver recoveryMailProperties;
     private final ChatReminderSettings chatReminderProperties;
 
@@ -49,8 +49,9 @@ public class ChatReminderScheduler {
             LocalDateTime unreadBefore) {
         try {
             recoveryMailSender.send(
-                    recoveryEmailComposer.buildUnreadChatReminder(
-                            user,
+                    mailComposer.buildUnreadReminder(
+                            user.getEmail(),
+                            user.getDisplayName(),
                             reminder.adminName(),
                             reminder.latestContent(),
                             reminder.unreadCount(),

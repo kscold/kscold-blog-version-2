@@ -3,7 +3,8 @@ package com.kscold.blog.adminnight.adapter.out.mail;
 import com.kscold.blog.adminnight.application.event.AdminNightNotificationEvent;
 import com.kscold.blog.adminnight.application.event.AdminNightProgramVoteNotificationEvent;
 import com.kscold.blog.adminnight.config.AdminNightProperties;
-import com.kscold.blog.identity.adapter.out.mail.RecoveryEmailComposer;
+import com.kscold.blog.adminnight.domain.port.out.AdminNightProgramVoteMailComposer;
+import com.kscold.blog.adminnight.domain.port.out.AdminNightRequestMailComposer;
 import com.kscold.blog.notification.domain.port.out.MailSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class AdminNightNotificationListener {
 
     private final MailSender recoveryMailSender;
-    private final RecoveryEmailComposer recoveryEmailComposer;
+    private final AdminNightRequestMailComposer requestMailComposer;
+    private final AdminNightProgramVoteMailComposer programVoteMailComposer;
     private final AdminNightProperties adminNightProperties;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -30,36 +32,32 @@ public class AdminNightNotificationListener {
             switch (event.type()) {
                 case REQUEST_CREATED -> {
                     recoveryMailSender.send(
-                            recoveryEmailComposer.buildAdminNightRequestConfirmation(
-                                    event.request()));
+                            requestMailComposer.buildRequestConfirmation(event.request()));
                     recoveryMailSender.send(
-                            recoveryEmailComposer.buildAdminNightRequestNotification(
+                            requestMailComposer.buildRequestNotification(
                                     event.request(), adminNightProperties.getAdminEmail()));
                 }
                 case REQUEST_RESUBMITTED -> {
                     recoveryMailSender.send(
-                            recoveryEmailComposer.buildAdminNightResubmittedConfirmation(
-                                    event.request()));
+                            requestMailComposer.buildResubmittedConfirmation(event.request()));
                     recoveryMailSender.send(
-                            recoveryEmailComposer.buildAdminNightResubmittedNotification(
+                            requestMailComposer.buildResubmittedNotification(
                                     event.request(), adminNightProperties.getAdminEmail()));
                 }
                 case REQUEST_APPROVED -> {
                     recoveryMailSender.send(
-                            recoveryEmailComposer.buildAdminNightApprovedForRequester(
-                                    event.request()));
+                            requestMailComposer.buildApprovedForRequester(event.request()));
                     recoveryMailSender.send(
-                            recoveryEmailComposer.buildAdminNightApprovedForAdmin(
+                            requestMailComposer.buildApprovedForAdmin(
                                     event.request(), adminNightProperties.getAdminEmail()));
                 }
                 case MORE_INFO_REQUESTED ->
                         recoveryMailSender.send(
-                                recoveryEmailComposer.buildAdminNightInfoRequestedForRequester(
+                                requestMailComposer.buildInfoRequestedForRequester(
                                         event.request()));
                 case REQUEST_REJECTED ->
                         recoveryMailSender.send(
-                                recoveryEmailComposer.buildAdminNightRejectedForRequester(
-                                        event.request()));
+                                requestMailComposer.buildRejectedForRequester(event.request()));
             }
         } catch (Exception exception) {
             log.warn(
@@ -76,10 +74,9 @@ public class AdminNightNotificationListener {
         }
 
         try {
+            recoveryMailSender.send(programVoteMailComposer.buildProgramVoteThanks(event.vote()));
             recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightProgramVoteThanks(event.vote()));
-            recoveryMailSender.send(
-                    recoveryEmailComposer.buildAdminNightProgramVoteNotification(
+                    programVoteMailComposer.buildProgramVoteNotification(
                             event.vote(), adminNightProperties.getAdminEmail()));
         } catch (Exception exception) {
             log.warn(

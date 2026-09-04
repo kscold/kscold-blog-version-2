@@ -7,9 +7,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.chat.domain.port.out.ChatMessageRepository;
+import com.kscold.blog.chat.domain.port.out.ChatReminderMailComposer;
 import com.kscold.blog.chat.domain.port.out.ChatReminderSettings;
 import com.kscold.blog.identity.domain.model.User;
-import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import com.kscold.blog.notification.domain.model.MailMessage;
 import com.kscold.blog.notification.domain.port.out.MailSender;
@@ -34,7 +34,7 @@ class ChatReminderSchedulerTest {
 
     @Mock private MailSender recoveryMailSender;
 
-    @Mock private RecoveryMailComposer recoveryEmailComposer;
+    @Mock private ChatReminderMailComposer mailComposer;
 
     @Mock private PublicUrlResolver recoveryMailProperties;
 
@@ -59,8 +59,13 @@ class ChatReminderSchedulerTest {
         when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
         when(recoveryMailProperties.resolvePublicUrl("/?chat=open"))
                 .thenReturn("https://kscold.com/?chat=open");
-        when(recoveryEmailComposer.buildUnreadChatReminder(
-                        user, "관리자", "새 답장을 남겼습니다.", 2, "https://kscold.com/?chat=open"))
+        when(mailComposer.buildUnreadReminder(
+                        user.getEmail(),
+                        user.getDisplayName(),
+                        "관리자",
+                        "새 답장을 남겼습니다.",
+                        2,
+                        "https://kscold.com/?chat=open"))
                 .thenReturn(mailMessage);
 
         chatReminderScheduler.sendUnreadAdminReplyReminders();

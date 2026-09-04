@@ -67,6 +67,18 @@ class HexagonalArchitectureTest {
     }
 
     @Test
+    void identity_도메인은_Admin_Night를_의존하지_않는다() {
+        ArchRule rule =
+                noClasses()
+                        .that()
+                        .resideInAPackage("..identity.domain..")
+                        .should()
+                        .dependOnClassesThat()
+                        .resideInAPackage("..adminnight..");
+        rule.check(classes);
+    }
+
+    @Test
     void 아웃바운드_포트는_domain_port_out에만_둔다() {
         // driven 포트 명명(*Port / *Repository / *Sender / *Provider)은 domain.port.out 에만 존재
         ArchRule rule =
