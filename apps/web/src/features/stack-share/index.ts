@@ -1,9 +1,12 @@
 export {
+  useDeleteStackShareGroup,
   useDeleteStackShareParticipant,
   useSaveStackShareAccount,
+  useSaveStackShareGroup,
   useSaveStackShareParticipant,
   useSendStackShareSettlement,
   useStackShareAccount,
+  useStackShareGroups,
   useStackShareParticipants,
   useStackShareSettlements,
 } from './api/useStackShareAdmin';
@@ -14,6 +17,8 @@ export type { SplitResult } from './model/splitAmount';
 export type {
   StackShareAccount,
   StackShareAccountInput,
+  StackShareGroup,
+  StackShareGroupInput,
   StackShareParticipant,
   StackShareParticipantInput,
   StackShareSettlement,

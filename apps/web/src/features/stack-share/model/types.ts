@@ -33,6 +33,25 @@ export interface StackShareAccountInput {
   contactPhone: string;
 }
 
+/** 자주 함께 정산하는 사람 묶음 */
+export interface StackShareGroup {
+  id: string;
+  name: string;
+  /** 이 그룹으로 정산할 때 기본으로 채울 서비스명 */
+  defaultToolName?: string;
+  /** 결제한 본인도 인원에 넣을지 기본값 */
+  includeOwner: boolean;
+  participantIds: string[];
+}
+
+export interface StackShareGroupInput {
+  id?: string;
+  name: string;
+  defaultToolName?: string;
+  includeOwner: boolean;
+  participantIds: string[];
+}
+
 export interface StackShareSettlementPayload {
   toolName: string;
   billingPeriod: string;

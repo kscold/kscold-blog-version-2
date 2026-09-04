@@ -12,6 +12,7 @@ export { PostCreateEditor } from './ui/posts/PostCreateEditor';
 export { PostEditEditor } from './ui/posts/PostEditEditor';
 export { AdminStorageSection } from './ui/storage/AdminStorageSection';
 export { AdminStackShareNotificationSection } from './ui/stack-share/AdminStackShareNotificationSection';
+export { MessageDeliveryContainer } from './ui/message-delivery/MessageDeliveryContainer';
 export { TagManagementContainer } from './ui/tags/TagManagementContainer';
 export { AdminTestingSection } from './ui/testing/AdminTestingSection';
 export { AdminUsersContainer } from './ui/users/AdminUsersContainer';

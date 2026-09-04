@@ -56,6 +56,7 @@ export function AdminDashboardContainer() {
     { name: '채팅 관리', description: '방문자 실시간 채팅을 관리합니다', link: '/admin/chat' },
     { name: '스토리지 관리', description: 'blog 버킷 파일과 폴더를 관리합니다', link: '/admin/storage', dataCy: 'admin-storage-link' },
     { name: 'Stack Share 알림', description: '공동 구독 분담금을 계산하고 알림톡을 발송합니다', link: '/admin/stack-share' },
+    { name: '알림 발송 로그', description: '알림톡·이메일이 실제로 도착했는지 확인합니다', link: '/admin/message-deliveries' },
     { name: 'Admin Night 관리', description: '참가 신청을 승인하고 일정을 merge 합니다', link: '/admin/admin-night' },
     { name: '결제 경로 캡처', description: '카카오페이 심사용 상품·결제 화면을 확인합니다', link: '/admin/payment-preview' },
     { name: '카테고리 관리', description: '카테고리를 관리합니다', link: '/admin/categories' },

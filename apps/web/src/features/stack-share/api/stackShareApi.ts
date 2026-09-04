@@ -2,6 +2,8 @@ import { apiClient } from '@/shared/api/api-client';
 import type {
   StackShareAccount,
   StackShareAccountInput,
+  StackShareGroup,
+  StackShareGroupInput,
   StackShareParticipant,
   StackShareParticipantInput,
   StackShareSendResult,
@@ -19,6 +21,11 @@ export const stackShareApi = {
     apiClient.post<StackShareParticipant>('/admin/stack-share/participants', input),
   deleteParticipant: (id: string) =>
     apiClient.delete<void>('/admin/stack-share/participants', { params: { id } }),
+  getGroups: () => apiClient.get<StackShareGroup[]>('/admin/stack-share/groups'),
+  saveGroup: (input: StackShareGroupInput) =>
+    apiClient.post<StackShareGroup>('/admin/stack-share/groups', input),
+  deleteGroup: (id: string) =>
+    apiClient.delete<void>('/admin/stack-share/groups', { params: { id } }),
   getSettlements: () =>
     apiClient.get<StackShareSettlement[]>('/admin/stack-share/settlements'),
   sendSettlement: (payload: StackShareSettlementPayload) =>

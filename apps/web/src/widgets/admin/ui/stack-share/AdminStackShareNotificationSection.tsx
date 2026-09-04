@@ -1,5 +1,6 @@
 import { AlimtalkTemplateManager } from './AlimtalkTemplateManager';
 import { StackShareAccountPanel } from './StackShareAccountPanel';
+import { StackShareGroupPanel } from './StackShareGroupPanel';
 import { StackShareParticipantPanel } from './StackShareParticipantPanel';
 import { StackShareSettlementComposer } from './StackShareSettlementComposer';
 import { StackShareSettlementHistory } from './StackShareSettlementHistory';
@@ -21,6 +22,7 @@ export function AdminStackShareNotificationSection() {
         </header>
         <StackShareAccountPanel />
         <StackShareParticipantPanel />
+        <StackShareGroupPanel />
         <StackShareSettlementComposer />
         <StackShareSettlementHistory />
         <AlimtalkTemplateManager />

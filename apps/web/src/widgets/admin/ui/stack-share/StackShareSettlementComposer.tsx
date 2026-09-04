@@ -8,6 +8,7 @@ import {
   splitEvenly,
   useSendStackShareSettlement,
   useStackShareAccount,
+  useStackShareGroups,
   useStackShareParticipants,
 } from '@/features/stack-share';
 import Button from '@/shared/ui/Button';
@@ -36,6 +37,7 @@ const createRow = (name = '', phoneNumber = ''): MemberRow => ({
 export function StackShareSettlementComposer() {
   const alerts = useAlert();
   const participants = useStackShareParticipants();
+  const groups = useStackShareGroups();
   const account = useStackShareAccount();
   const sendSettlement = useSendStackShareSettlement();
 
@@ -90,6 +92,23 @@ export function StackShareSettlementComposer() {
 
   const removeRow = (key: string) => {
     setRows(current => (current.length === 1 ? [createRow()] : current.filter(r => r.key !== key)));
+  };
+
+  /** 그룹을 고르면 서비스명·인원·본인 포함 여부를 한 번에 채운다. 입력하던 금액과 기한은 건드리지 않는다. */
+  const applyGroup = (groupId: string) => {
+    const group = groups.data?.find(item => item.id === groupId);
+    if (!group) return;
+    const members = group.participantIds
+      .map(id => participants.data?.find(participant => participant.id === id))
+      .filter((participant): participant is NonNullable<typeof participant> => Boolean(participant));
+
+    if (members.length === 0) {
+      alerts.error('그룹에 담긴 참여자를 찾을 수 없습니다. 그룹을 다시 저장해주세요.');
+      return;
+    }
+    setRows(members.map(member => createRow(member.name, formatPhoneNumber(member.phoneNumber))));
+    setIncludeOwner(group.includeOwner);
+    if (group.defaultToolName) setToolName(group.defaultToolName);
   };
 
   const addSavedParticipant = (name: string, phoneNumber: string) => {
@@ -192,6 +211,27 @@ export function StackShareSettlementComposer() {
             </span>
           </span>
         </label>
+
+        {(groups.data?.length ?? 0) > 0 && (
+          <div className="mt-6">
+            <p className="mb-2 text-sm font-bold text-surface-900">정산 그룹으로 채우기</p>
+            <div className="flex flex-wrap gap-2">
+              {groups.data?.map(group => (
+                <button
+                  key={group.id}
+                  type="button"
+                  onClick={() => applyGroup(group.id)}
+                  className="rounded-full border border-surface-200 bg-white px-4 py-2 text-sm font-semibold text-surface-600 transition hover:border-surface-400"
+                >
+                  {group.name}
+                  <span className="ml-1.5 text-xs text-surface-400">
+                    {group.participantIds.length}명
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-6">
           <div className="flex items-center justify-between">

@@ -6,6 +6,7 @@ import { stackShareApi } from './stackShareApi';
 const PARTICIPANTS_KEY = ['admin', 'stack-share', 'participants'];
 const SETTLEMENTS_KEY = ['admin', 'stack-share', 'settlements'];
 const ACCOUNT_KEY = ['admin', 'stack-share', 'account'];
+const GROUPS_KEY = ['admin', 'stack-share', 'groups'];
 
 export function useStackShareAccount() {
   return useQuery({ queryKey: ACCOUNT_KEY, queryFn: stackShareApi.getAccount });
@@ -16,6 +17,26 @@ export function useSaveStackShareAccount() {
   return useMutation({
     mutationFn: stackShareApi.saveAccount,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ACCOUNT_KEY }),
+  });
+}
+
+export function useStackShareGroups() {
+  return useQuery({ queryKey: GROUPS_KEY, queryFn: stackShareApi.getGroups });
+}
+
+export function useSaveStackShareGroup() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: stackShareApi.saveGroup,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: GROUPS_KEY }),
+  });
+}
+
+export function useDeleteStackShareGroup() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: stackShareApi.deleteGroup,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: GROUPS_KEY }),
   });
 }
 
