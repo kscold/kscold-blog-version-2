@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { filterVisibleTagInfos } from '@/shared/lib/tags';
 import type { Tag } from '@/shared/model/types/blog';
 
-type PostTagInfo = Pick<Tag, 'id' | 'name'>;
+type PostTagInfo = Pick<Tag, 'id' | 'name' | 'slug'>;
 
 interface PostCommentSectionProps {
   tags: PostTagInfo[];
@@ -67,7 +67,7 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
             {visibleTags.map(tag => (
               <Link
                 key={tag.id}
-                href={`/tags/${encodeURIComponent(tag.name)}`}
+                href={`/blog/tags/${encodeURIComponent(tag.slug)}`}
                 className="px-3 py-1.5 bg-white border border-surface-200 text-surface-600 rounded-lg hover:border-surface-900 hover:text-surface-900 transition-all text-sm font-medium"
               >
                 #{tag.name}

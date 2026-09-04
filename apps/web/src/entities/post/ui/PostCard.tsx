@@ -162,7 +162,7 @@ export function PostCard({
               {visibleTags.slice(0, featured ? 5 : 3).map(tag => (
                 <Link
                   key={tag.id}
-                  href={`/tags/${encodeURIComponent(tag.name)}`}
+                  href={`/blog/tags/${encodeURIComponent(tag.slug)}`}
                   prefetch={false}
                   className="inline-flex min-h-11 items-center rounded-md bg-surface-100 px-3 text-xs font-bold tracking-wider text-surface-600 transition-colors hover:bg-surface-200 hover:text-surface-900"
                 >

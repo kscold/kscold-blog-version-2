@@ -32,6 +32,7 @@ export interface Post {
   tags: {
     id: string;
     name: string;
+    slug: string;
   }[];
   author: {
     id: string;

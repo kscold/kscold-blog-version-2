@@ -37,7 +37,7 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await expect(page.getByRole('link', { name: /글 읽기/ }).first()).toBeVisible();
     await expect(page.locator('a a')).toHaveCount(0);
 
-    const firstTag = page.locator('a[href^="/tags/"]').first();
+    const firstTag = page.locator('a[href^="/blog/tags/"]').first();
     await expect(firstTag).toBeVisible();
     const tagBox = await firstTag.boundingBox();
     expect(tagBox?.height).toBeGreaterThanOrEqual(44);
@@ -108,6 +108,43 @@ test.describe('공개 페이지 핵심 시나리오', () => {
 
     await page.locator('[data-cy="sidebar-toggle"]').click();
     await expect.poll(() => sidebarApiCalls).toBe(2);
+  });
+
+  test('사이드바는 블로그 태그와 피드 전용 태그를 알맞은 경로로 연결한다', async ({ page }) => {
+    await mockApi(
+      page,
+      'GET',
+      '**/api/tags/index',
+      success([
+        {
+          id: 'tag-1',
+          name: 'AI Agent',
+          slug: 'ai-agent',
+          categoryId: null,
+          categoryName: 'AI',
+          postCount: 3,
+          feedCount: 2,
+          totalCount: 5,
+          unregistered: false,
+        },
+        {
+          id: null,
+          name: '오늘기록',
+          slug: null,
+          categoryId: null,
+          categoryName: null,
+          postCount: 0,
+          feedCount: 2,
+          totalCount: 2,
+          unregistered: true,
+        },
+      ])
+    );
+
+    await page.goto('/login');
+
+    await expect(page.locator('a[href="/blog/tags/ai-agent"]')).toBeVisible();
+    await expect(page.locator('a[href="/tags/%EC%98%A4%EB%8A%98%EA%B8%B0%EB%A1%9D"]')).toBeVisible();
   });
 
   test('방문자는 헤더에서 방명록으로 이동해 빈 상태를 확인할 수 있다', async ({ page }) => {

@@ -61,7 +61,11 @@ export function SidebarTags({ tags, isLoading }: SidebarTagsProps) {
                 {group.items.map(tag => (
                   <Link
                     key={tag.name}
-                    href={`/tags/${encodeURIComponent(tag.name)}`}
+                    href={
+                      tag.slug && tag.postCount > 0
+                        ? `/blog/tags/${encodeURIComponent(tag.slug)}`
+                        : `/tags/${encodeURIComponent(tag.name)}`
+                    }
                     prefetch={false}
                     className="group relative overflow-hidden rounded-lg border border-surface-200 bg-white px-3 py-1.5 text-xs font-bold text-surface-500 transition-all hover:border-surface-900 hover:text-surface-900"
                   >
