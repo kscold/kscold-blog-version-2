@@ -81,6 +81,14 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     );
   });
 
+  test('서버 렌더링 Footer는 일반 페이지에만 표시된다', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('footer')).toContainText('Colding. All rights reserved.');
+
+    await page.goto('/vault');
+    await expect(page.locator('footer')).toHaveCount(0);
+  });
+
   test('비로그인 상태에서는 헤더에 LOGIN 버튼이 노출된다', async ({ page }) => {
     await page.goto('/');
 

@@ -3,7 +3,6 @@
 import { usePathname } from 'next/navigation';
 import { Suspense } from 'react';
 import { Header } from '@/widgets/header';
-import { Footer } from '@/widgets/footer';
 import { Sidebar } from '@/widgets/sidebar';
 import { FloatingChatWidget } from '@/widgets/chat';
 import { AlertToast } from '@/shared/ui/AlertToast';
@@ -15,10 +14,11 @@ import { PageVisitTracker } from '@/shared/analytics/PageVisitTracker';
 
 interface ClientLayoutProps {
   children: React.ReactNode;
+  footer: React.ReactNode;
   initialViewer: InitialViewer;
 }
 
-export function ClientLayout({ children, initialViewer }: ClientLayoutProps) {
+export function ClientLayout({ children, footer, initialViewer }: ClientLayoutProps) {
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
 
@@ -40,7 +40,7 @@ export function ClientLayout({ children, initialViewer }: ClientLayoutProps) {
             ) : (
               <>
                 <div className="flex-1 flex flex-col">{children}</div>
-                <Footer />
+                {footer}
               </>
             )}
           </main>
