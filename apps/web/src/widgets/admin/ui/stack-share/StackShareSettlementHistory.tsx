@@ -37,6 +37,14 @@ export function StackShareSettlementHistory() {
                 {settlement.contactText && <> · 문의: {settlement.contactText}</>}
               </p>
             )}
+            {!!settlement.shareCount && (
+              <p className="mt-2 text-xs text-surface-500">
+                {settlement.shareCount}명으로 나눔
+                {settlement.includeOwner && !!settlement.ownerAmount && (
+                  <> · 내 몫 {formatWon(settlement.ownerAmount)}</>
+                )}
+              </p>
+            )}
             <div className="mt-4 grid gap-2 border-t border-surface-100 pt-4 sm:grid-cols-2">
               {settlement.recipients.map(recipient => (
                 <div
