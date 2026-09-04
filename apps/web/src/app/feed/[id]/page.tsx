@@ -129,7 +129,6 @@ export default async function FeedDetailPage({
   return (
     <>
       <JsonLd id={`feed-${feed.id}`} data={jsonLd} />
-      <h1 className="sr-only">{headline}</h1>
       <FeedDetail initialFeed={feed} />
     </>
   );

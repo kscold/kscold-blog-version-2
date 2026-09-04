@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useFeed } from '@/entities/feed';
@@ -64,7 +65,9 @@ export function FeedDetail({ initialFeed }: { initialFeed: Feed }) {
           transition={{ duration: 0.4, delay: 0.1 }}
         >
           <h3 className="text-sm font-bold text-surface-900 mb-4">댓글 {feed.commentsCount}개</h3>
-          <CommentSection feedId={feedId} />
+          <Suspense fallback={null}>
+            <CommentSection feedId={feedId} />
+          </Suspense>
         </motion.div>
       </div>
     </div>
