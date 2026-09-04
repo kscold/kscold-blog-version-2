@@ -1,12 +1,12 @@
 package com.kscold.blog.chat.adapter.out.discord;
 
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
+import com.kscold.blog.config.DiscordProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,17 +20,17 @@ public class DiscordMessageListener extends ListenerAdapter {
 
     private final DiscordThreadLinkService threadLinkService;
     private final ChatUseCase chatUseCase;
-
-    @Value("${discord.channel-id:}")
-    private String supportChannelId;
+    private final DiscordProperties discordProperties;
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
+        if (!event.isFromGuild() || !discordProperties.isConfiguredGuild(event.getGuild().getId()))
+            return;
         if (!event.isFromType(ChannelType.GUILD_PUBLIC_THREAD)) return;
 
         String parentId = event.getChannel().asThreadChannel().getParentChannel().getId();
-        if (!parentId.equals(supportChannelId)) return;
+        if (!parentId.equals(discordProperties.getChannelId())) return;
 
         String threadId = event.getChannel().getId();
         String ownerName = event.getAuthor().getEffectiveName();

@@ -1,5 +1,6 @@
 package com.kscold.blog.notification.adapter.out.discord;
 
+import com.kscold.blog.config.DiscordProperties;
 import com.kscold.blog.notification.config.NotificationProperties;
 import com.kscold.blog.notification.domain.model.NotificationChannel;
 import java.util.EnumMap;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -29,12 +31,17 @@ import org.springframework.stereotype.Component;
 public class DiscordWebhookProvisioner {
 
     @Nullable private final JDA jda;
+    private final DiscordProperties discordProperties;
     private final NotificationProperties properties;
     private final Map<NotificationChannel, String> webhookUrls =
             new ConcurrentHashMap<>(new EnumMap<>(NotificationChannel.class));
 
-    public DiscordWebhookProvisioner(@Nullable JDA jda, NotificationProperties properties) {
+    public DiscordWebhookProvisioner(
+            @Nullable JDA jda,
+            DiscordProperties discordProperties,
+            NotificationProperties properties) {
         this.jda = jda;
+        this.discordProperties = discordProperties;
         this.properties = properties;
     }
 
@@ -53,23 +60,39 @@ public class DiscordWebhookProvisioner {
             return;
         }
 
-        for (Guild guild : jda.getGuilds()) {
-            provision(guild, NotificationChannel.SIGNUP, properties.getSignupChannelName());
-            provision(guild, NotificationChannel.ERROR, properties.getErrorChannelName());
-            provision(guild, NotificationChannel.GUESTBOOK, properties.getGuestbookChannelName());
+        String guildId = discordProperties.getGuildId();
+        if (guildId == null || guildId.isBlank()) {
+            log.error("DISCORD_GUILD_ID가 없어 알림 채널 자동 준비를 중단합니다.");
+            return;
+        }
+
+        Guild guild = jda.getGuildById(guildId);
+        if (guild == null) {
+            log.error("설정된 Discord 서버를 찾을 수 없어 알림 채널 자동 준비를 중단합니다.");
+            return;
+        }
+
+        Category category = findOrCreateCategory(guild);
+        for (NotificationChannel channel : NotificationChannel.values()) {
+            provision(guild, category, channel, properties.channelName(channel));
         }
     }
 
-    private void provision(Guild guild, NotificationChannel channel, String channelName) {
+    private void provision(
+            Guild guild,
+            @Nullable Category category,
+            NotificationChannel channel,
+            String channelName) {
         if (channelName == null || channelName.isBlank() || webhookUrls.containsKey(channel)) {
             return;
         }
 
         try {
-            TextChannel textChannel = findOrCreateChannel(guild, channelName);
+            TextChannel textChannel = findOrCreateChannel(guild, category, channelName);
             if (textChannel == null) {
                 return;
             }
+            alignChannel(textChannel, category, channel);
 
             findOrCreateWebhook(textChannel)
                     .ifPresent(
@@ -86,10 +109,42 @@ public class DiscordWebhookProvisioner {
     }
 
     @Nullable
-    private TextChannel findOrCreateChannel(Guild guild, String channelName) {
-        List<TextChannel> found = guild.getTextChannelsByName(channelName, true);
+    private Category findOrCreateCategory(Guild guild) {
+        String categoryName = properties.getCategoryName();
+        if (categoryName == null || categoryName.isBlank()) {
+            return null;
+        }
+
+        List<Category> found = guild.getCategoriesByName(categoryName, true);
         if (!found.isEmpty()) {
             return found.getFirst();
+        }
+        if (!properties.isAutoCreateChannel()) {
+            log.info("알림 카테고리 '{}' 을 찾지 못했고 자동 생성이 꺼져 있어 건너뜁니다.", categoryName);
+            return null;
+        }
+        if (!guild.getSelfMember().hasPermission(Permission.MANAGE_CHANNEL)) {
+            log.warn("알림 카테고리 '{}' 이 없지만 봇에 채널 관리 권한이 없어 만들지 못했습니다.", categoryName);
+            return null;
+        }
+
+        Category created = guild.createCategory(categoryName).complete();
+        log.info("알림 카테고리 자동 생성: {}", created.getName());
+        return created;
+    }
+
+    @Nullable
+    private TextChannel findOrCreateChannel(
+            Guild guild, @Nullable Category category, String channelName) {
+        List<TextChannel> found = guild.getTextChannelsByName(channelName, true);
+        if (!found.isEmpty()) {
+            return found.stream()
+                    .filter(
+                            channel ->
+                                    category != null
+                                            && category.equals(channel.getParentCategory()))
+                    .findFirst()
+                    .orElse(found.getFirst());
         }
 
         if (!properties.isAutoCreateChannel()) {
@@ -101,9 +156,43 @@ public class DiscordWebhookProvisioner {
             return null;
         }
 
-        TextChannel created = guild.createTextChannel(channelName).complete();
+        var createAction = guild.createTextChannel(channelName);
+        if (category != null) {
+            createAction.setParent(category);
+        }
+        TextChannel created = createAction.complete();
         log.info("알림 채널 자동 생성: #{}", created.getName());
         return created;
+    }
+
+    private void alignChannel(
+            TextChannel channel,
+            @Nullable Category category,
+            NotificationChannel notificationChannel) {
+        if (!properties.isAlignChannelCategory()) {
+            return;
+        }
+        if (!channel.getGuild().getSelfMember().hasPermission(Permission.MANAGE_CHANNEL)) {
+            log.warn("채널 #{} 을 운영 카테고리에 정렬할 권한이 없습니다.", channel.getName());
+            return;
+        }
+
+        String topic = properties.channelTopic(notificationChannel);
+        boolean moveRequired = category != null && !category.equals(channel.getParentCategory());
+        boolean topicRequired = topic != null && !topic.equals(channel.getTopic());
+        if (!moveRequired && !topicRequired) {
+            return;
+        }
+
+        var manager = channel.getManager();
+        if (moveRequired) {
+            manager.setParent(category);
+        }
+        if (topicRequired) {
+            manager.setTopic(topic);
+        }
+        manager.complete();
+        log.info("디스코드 알림 채널 정렬 완료: #{}", channel.getName());
     }
 
     private Optional<String> findOrCreateWebhook(TextChannel channel) {

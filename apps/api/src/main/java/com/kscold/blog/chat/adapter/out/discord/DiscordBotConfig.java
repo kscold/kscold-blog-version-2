@@ -1,11 +1,12 @@
 package com.kscold.blog.chat.adapter.out.discord;
 
+import com.kscold.blog.config.DiscordProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -14,14 +15,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 @ConditionalOnProperty(name = "discord.token", matchIfMissing = false)
 public class DiscordBotConfig {
 
-    @Value("${discord.token}")
-    private String token;
+    private final DiscordProperties properties;
 
     @Bean
     public JDA jda() {
+        String token = properties.getToken();
         if (token == null || token.isBlank()) {
             log.warn("Discord 봇 토큰이 설정되지 않아 비활성화됩니다");
             return null;

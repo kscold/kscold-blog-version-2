@@ -1,13 +1,13 @@
 package com.kscold.blog.chat.adapter.out.discord;
 
 import com.kscold.blog.chat.domain.port.out.ChatNotificationPort;
+import com.kscold.blog.config.DiscordProperties;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +16,16 @@ import org.springframework.stereotype.Service;
 public class DiscordBridgeService implements ChatNotificationPort {
 
     @Nullable private final JDA jda;
-
-    @Value("${discord.channel-id:}")
-    private String channelId;
-
     private final DiscordThreadLinkService threadLinkService;
+    private final DiscordProperties discordProperties;
 
-    public DiscordBridgeService(@Nullable JDA jda, DiscordThreadLinkService threadLinkService) {
+    public DiscordBridgeService(
+            @Nullable JDA jda,
+            DiscordThreadLinkService threadLinkService,
+            DiscordProperties discordProperties) {
         this.jda = jda;
         this.threadLinkService = threadLinkService;
+        this.discordProperties = discordProperties;
     }
 
     @Override
@@ -38,14 +39,14 @@ public class DiscordBridgeService implements ChatNotificationPort {
 
     @Override
     public void notifySystem(String roomId, String content) {
-        if (jda == null || channelId.isBlank()) return;
+        if (!isConfigured()) return;
 
         String threadId = threadLinkService.findThreadIdByRoomId(roomId).orElse(null);
         if (threadId == null) return;
 
         try {
             ThreadChannel thread = jda.getThreadChannelById(threadId);
-            if (thread != null && !thread.isArchived()) {
+            if (isUsableThread(thread)) {
                 thread.sendMessage("📋 " + content)
                         .queue(ok -> {}, err -> log.error("Discord 시스템 메시지 전송 실패", err));
             }
@@ -56,12 +57,16 @@ public class DiscordBridgeService implements ChatNotificationPort {
 
     /** 블로그 방문자 메시지 → 디스코드 스레드로 전송 */
     private void sendVisitorMessageToDiscord(String roomId, String username, String content) {
-        if (jda == null || channelId.isBlank()) return;
+        if (!isConfigured()) return;
 
         try {
-            TextChannel channel = jda.getTextChannelById(channelId);
+            TextChannel channel = jda.getTextChannelById(discordProperties.getChannelId());
             if (channel == null) {
-                log.error("Discord 채널을 찾을 수 없음: {}", channelId);
+                log.error("Discord 채널을 찾을 수 없음: {}", discordProperties.getChannelId());
+                return;
+            }
+            if (!discordProperties.isConfiguredGuild(channel.getGuild().getId())) {
+                log.error("Discord 채팅 채널이 설정된 서버에 속하지 않습니다.");
                 return;
             }
 
@@ -82,14 +87,14 @@ public class DiscordBridgeService implements ChatNotificationPort {
 
     /** 웹 어드민 답장 → 디스코드 스레드에 로깅 */
     private void sendAdminReplyToDiscord(String roomId, String adminName, String content) {
-        if (jda == null || channelId.isBlank()) return;
+        if (!isConfigured()) return;
 
         String threadId = threadLinkService.findThreadIdByRoomId(roomId).orElse(null);
         if (threadId == null) return;
 
         try {
             ThreadChannel thread = jda.getThreadChannelById(threadId);
-            if (thread != null && !thread.isArchived()) {
+            if (isUsableThread(thread)) {
                 thread.sendMessageEmbeds(
                                 DiscordMessageEmbeds.adminReply(adminName, content).build())
                         .queue(ok -> {}, err -> log.error("Discord 어드민 답장 로깅 실패", err));
@@ -141,5 +146,19 @@ public class DiscordBridgeService implements ChatNotificationPort {
                 .queue(ok -> {}, err -> log.error("Discord 스레드 오픈 안내 전송 실패", err));
 
         return createdThread;
+    }
+
+    private boolean isConfigured() {
+        return jda != null
+                && discordProperties.getChannelId() != null
+                && !discordProperties.getChannelId().isBlank()
+                && discordProperties.getGuildId() != null
+                && !discordProperties.getGuildId().isBlank();
+    }
+
+    private boolean isUsableThread(@Nullable ThreadChannel thread) {
+        return thread != null
+                && !thread.isArchived()
+                && discordProperties.isConfiguredGuild(thread.getGuild().getId());
     }
 }

@@ -24,6 +24,12 @@ public class NotificationProperties {
     /** 채널이 없을 때 봇이 직접 만들지 여부. 봇에 채널 관리 권한이 없으면 false 로 둔다. */
     private boolean autoCreateChannel = true;
 
+    /** 알림 채널을 묶을 카테고리 이름 */
+    private String categoryName = "KSCOLD 운영";
+
+    /** 기존 알림 채널도 설정된 카테고리와 설명에 맞출지 여부 */
+    private boolean alignChannelCategory = true;
+
     /** 회원가입 알림 채널 이름 */
     private String signupChannelName = "회원가입";
 
@@ -53,6 +59,22 @@ public class NotificationProperties {
 
     /** 방명록 알림 봇 아바타 URL(비우면 기본 웹훅 아바타) */
     private String guestbookBotAvatarUrl = "";
+
+    public String channelName(NotificationChannel channel) {
+        return switch (channel) {
+            case SIGNUP -> signupChannelName;
+            case ERROR -> errorChannelName;
+            case GUESTBOOK -> guestbookChannelName;
+        };
+    }
+
+    public String channelTopic(NotificationChannel channel) {
+        return switch (channel) {
+            case SIGNUP -> "KSCOLD 신규 회원가입 알림";
+            case ERROR -> "KSCOLD 서버 오류 및 장애 알림";
+            case GUESTBOOK -> "KSCOLD 방명록 작성 알림";
+        };
+    }
 
     /** 채널별로 표시할 봇 이름 */
     public String botName(NotificationChannel channel) {
