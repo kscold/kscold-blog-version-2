@@ -74,12 +74,13 @@ export function useAdminUpdateProfile() {
   });
 }
 
-export function usePublicProfile(username: string) {
+export function usePublicProfile(username: string, initialData?: PublicProfile) {
   return useQuery<PublicProfile>({
     queryKey: ['users', 'profile', username],
     queryFn: () => apiClient.get<PublicProfile>(`/users/profile/${username}`),
     enabled: !!username,
     staleTime: 1000 * 60 * 5,
+    initialData,
   });
 }
 

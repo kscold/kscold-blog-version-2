@@ -26,12 +26,7 @@ export async function generateMetadata({
   const tag = await getTag(decodedSlug);
 
   if (!tag) {
-    return buildPageMetadata({
-      title: '태그를 찾을 수 없습니다',
-      description: '요청한 태그를 찾을 수 없습니다.',
-      path: '/blog',
-      noIndex: true,
-    });
+    notFound();
   }
 
   return buildPageMetadata({

@@ -2,16 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePublicProfile, useUserFeeds } from '@/features/profile';
+import { type PublicProfile, usePublicProfile, useUserFeeds } from '@/features/profile';
 import { ProfileHeaderCard } from './ProfileHeaderCard';
 import { ProfileFeedList } from './ProfileFeedList';
 
 interface Props {
   username: string;
+  initialProfile: PublicProfile;
 }
 
-export function PublicProfileContainer({ username }: Props) {
-  const { data: profile, isLoading: profileLoading, isError } = usePublicProfile(username);
+export function PublicProfileContainer({ username, initialProfile }: Props) {
+  const { data: profile, isLoading: profileLoading, isError } = usePublicProfile(
+    username,
+    initialProfile
+  );
   const [page, setPage] = useState(0);
   const { data: feedsData, isLoading: feedsLoading } = useUserFeeds(username, page);
 

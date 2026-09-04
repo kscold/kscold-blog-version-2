@@ -17,7 +17,6 @@ function VideoView({ node, deleteNode }: NodeViewProps) {
         contentEditable={false}
         data-drag-handle
       >
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
           src={src}
           controls

@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
+import { cache } from 'react';
 import { PostDetail } from '@/widgets/post';
 import type { Post } from '@/shared/model/types/blog';
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
+  fetchPublicApi,
   fetchViewerApi,
   stripRichText,
   toMetaDescription,
@@ -15,14 +17,24 @@ import {
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
-async function getPost(slug: string) {
-  return fetchViewerApi<Post>(`/posts/slug/${slug}`);
-}
+const getPost = cache(async (slug: string): Promise<Post | null> => {
+  const encodedSlug = encodeURIComponent(slug);
+  const publicPost = await fetchPublicApi<Post>(`/posts/slug/${encodedSlug}`, 300);
 
-async function isAdmin(): Promise<boolean> {
-  const me = await fetchViewerApi<{ role: string }>('/auth/me');
-  return me?.role === 'ADMIN';
-}
+  if (publicPost?.status === 'PUBLISHED' && !publicPost.restricted) {
+    return publicPost;
+  }
+
+  const viewerPost = await fetchViewerApi<Post>(`/posts/slug/${encodedSlug}`);
+  const post = viewerPost || publicPost;
+  if (!post || post.status === 'PUBLISHED') {
+    return post;
+  }
+
+  // 공개 API가 초안을 잘못 반환하는 이전 백엔드와의 배포 시차에도 관리자만 미리볼 수 있게 방어한다.
+  const viewer = await fetchViewerApi<{ role: string }>('/auth/me');
+  return viewer?.role === 'ADMIN' ? post : null;
+});
 
 export async function generateMetadata({
   params,
@@ -30,15 +42,10 @@ export async function generateMetadata({
   params: Promise<{ category: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const [post, admin] = await Promise.all([getPost(slug), isAdmin()]);
+  const post = await getPost(slug);
 
-  if (!post || (post.status !== 'PUBLISHED' && !admin)) {
-    return buildPageMetadata({
-      title: '포스트를 찾을 수 없습니다',
-      description: '요청한 포스트를 찾을 수 없습니다.',
-      path: '/blog',
-      noIndex: true,
-    });
+  if (!post) {
+    notFound();
   }
 
   const title = post.seo?.metaTitle || post.title;
@@ -65,9 +72,9 @@ export default async function PostPage({
   params: Promise<{ category: string; slug: string }>;
 }) {
   const { category, slug } = await params;
-  const [post, admin] = await Promise.all([getPost(slug), isAdmin()]);
+  const post = await getPost(slug);
 
-  if (!post || (post.status !== 'PUBLISHED' && !admin)) {
+  if (!post) {
     notFound();
   }
 
@@ -118,4 +125,4 @@ export default async function PostPage({
   );
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;

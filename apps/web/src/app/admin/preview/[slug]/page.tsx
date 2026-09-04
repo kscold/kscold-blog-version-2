@@ -1,22 +1,12 @@
-import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { PostDetail } from '@/widgets/post';
 import type { Post } from '@/shared/model/types/blog';
+import { fetchViewerApi } from '@/shared/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
-async function getPostDirect(slug: string, authToken: string | undefined): Promise<Post | null> {
-  try {
-    const res = await fetch(`http://localhost:8080/api/posts/slug/${slug}`, {
-      headers: authToken ? { Cookie: `auth-token=${authToken}` } : {},
-      cache: 'no-store',
-    });
-    if (!res.ok) return null;
-    const payload = await res.json();
-    return (payload?.data ?? null) as Post | null;
-  } catch {
-    return null;
-  }
+async function getPostDirect(slug: string): Promise<Post | null> {
+  return fetchViewerApi<Post>(`/posts/slug/${encodeURIComponent(slug)}`);
 }
 
 export default async function AdminPreviewPage({
@@ -25,9 +15,7 @@ export default async function AdminPreviewPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get('auth-token')?.value;
-  const post = await getPostDirect(slug, authToken);
+  const post = await getPostDirect(slug);
 
   if (!post) {
     notFound();

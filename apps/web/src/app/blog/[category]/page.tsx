@@ -23,12 +23,7 @@ export async function generateMetadata({
   const categoryData = await getCategory(category);
 
   if (!categoryData) {
-    return buildPageMetadata({
-      title: '카테고리를 찾을 수 없습니다',
-      description: '요청한 카테고리를 찾을 수 없습니다.',
-      path: '/blog',
-      noIndex: true,
-    });
+    notFound();
   }
 
   return buildPageMetadata({

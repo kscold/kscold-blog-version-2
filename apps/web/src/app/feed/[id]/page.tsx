@@ -30,12 +30,7 @@ export async function generateMetadata({
   const feed = await getFeed(id);
 
   if (!feed || feed.visibility !== 'PUBLIC') {
-    return buildPageMetadata({
-      title: '피드를 찾을 수 없습니다',
-      description: '요청한 피드를 찾을 수 없습니다.',
-      path: '/feed',
-      noIndex: true,
-    });
+    notFound();
   }
 
   const title =

@@ -15,12 +15,7 @@ export async function generateMetadata({
   const team = getTeamProfile(teamId);
 
   if (!team) {
-    return buildPageMetadata({
-      title: '팀 정보를 찾을 수 없습니다',
-      description: '요청한 팀 정보를 찾을 수 없습니다.',
-      path: '/info',
-      noIndex: true,
-    });
+    notFound();
   }
 
   return buildPageMetadata({

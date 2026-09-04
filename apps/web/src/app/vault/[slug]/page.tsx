@@ -27,12 +27,7 @@ export async function generateMetadata({
   const note = await getVaultNote(slug);
 
   if (!note) {
-    return buildPageMetadata({
-      title: '노트를 찾을 수 없습니다',
-      description: '요청한 Vault 노트를 찾을 수 없습니다.',
-      path: '/vault',
-      noIndex: true,
-    });
+    notFound();
   }
 
   // 분량이 적은 노트(용어 스텁 등)는 색인에서 제외한다. 사이트맵 필터와 동일한 기준을 공유해
