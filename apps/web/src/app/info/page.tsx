@@ -14,7 +14,7 @@ export const metadata = buildPageMetadata({
     '풀스택 개발자', '백엔드 개발자', '프론트엔드 개발자',
   ],
   type: 'profile',
-  authors: [{ name: '김승찬', url: 'https://github.com/kscold' }],
+  authors: [{ name: '김승찬', url: `${SITE_URL}/info` }],
 });
 
 const infoJsonLd = {
@@ -24,6 +24,9 @@ const infoJsonLd = {
   url: `${SITE_URL}/info`,
   name: '김승찬 소개',
   description: PROFILE.bio.join(' '),
+  isPartOf: {
+    '@id': `${SITE_URL}/#website`,
+  },
   mainEntity: {
     '@id': `${SITE_URL}/#person`,
   },

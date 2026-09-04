@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     'NestJS',
     'Docker',
   ],
-  authors: [{ name: '김승찬', url: 'https://github.com/kscold' }],
+  authors: [{ name: '김승찬', url: `${SITE_URL}/info` }],
   creator: '김승찬',
   publisher: '콜딩(Colding)',
   category: 'technology',
@@ -111,7 +111,7 @@ const siteJsonLd = {
       name: SITE_NAME,
       // alternateName 은 사이트를 부르는 다른 이름만 담는다. 노리는 검색어를 나열하면
       // 구글이 사이트 이름 후보 판정을 아예 포기해 오히려 손해다. name(김승찬 블로그)과 중복도 제거.
-      alternateName: ['KSCOLD', 'kscold.com'],
+      alternateName: ['KSCOLD', '김승찬의 기술 블로그'],
       inLanguage: 'ko-KR',
       description: SITE_DESCRIPTION,
       about: { '@id': `${SITE_URL}/#person` },
@@ -124,15 +124,17 @@ const siteJsonLd = {
       '@id': `${SITE_URL}/#person`,
       name: PROFILE.name,
       // 콜딩/Colding 은 사람이 아니라 사업자명이라 Organization 쪽에 둔다(worksFor 로 이미 연결됨).
-      alternateName: ['kscold', 'KSCOLD', 'Kim Seung Chan'],
-      url: SITE_URL,
-      mainEntityOfPage: SITE_URL,
+      alternateName: ['kscold', 'KSCOLD', 'Kim Seung Chan', 'KIM SEUNG CHAN'],
+      url: `${SITE_URL}/info`,
+      mainEntityOfPage: {
+        '@id': `${SITE_URL}/info#profile-page`,
+      },
       description:
-        '김승찬(kscold)은 백엔드·프론트엔드를 아우르는 풀스택 프로덕트 엔지니어입니다. ' +
-        'Spring Boot·Next.js·TypeScript 기반 서비스 개발과 AI 에이전트(LangGraph·RAG·하네스 엔지니어링)를 다루며, ' +
-        '배운 것을 블로그(kscold.com)에 기록합니다.',
+        '김승찬(kscold)은 백엔드·풀스택·AI Agent 개발자입니다. ' +
+        'Spring Boot·Next.js·TypeScript 기반 서비스의 설계·배포·운영과 LangGraph·RAG 기반 AI Agent 개발을 수행하며, ' +
+        '경험과 기술 기록을 김승찬 블로그 kscold.com에 공개합니다.',
       image: 'https://avatars.githubusercontent.com/u/66587554?v=4',
-      jobTitle: '풀스택 프로덕트 엔지니어',
+      jobTitle: '백엔드·풀스택·AI Agent 개발자',
       hasOccupation: {
         '@type': 'Occupation',
         name: '소프트웨어 개발자',
@@ -166,7 +168,11 @@ const siteJsonLd = {
       name: BUSINESS_INFO.companyName,
       alternateName: ['콜딩', 'Colding'],
       url: SITE_URL,
-      founder: PROFILE.name,
+      description:
+        '콜딩(Colding)은 김승찬이 운영하는 개인사업자입니다. cold와 ing의 결합이자 coding과의 언어유희를 담은 이름으로, 소프트웨어와 AI 서비스를 개발·운영합니다.',
+      founder: {
+        '@id': `${SITE_URL}/#person`,
+      },
       email: BUSINESS_INFO.email,
       taxID: BUSINESS_INFO.registrationNumber,
       address: {
