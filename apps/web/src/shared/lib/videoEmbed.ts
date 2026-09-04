@@ -33,6 +33,18 @@ function normalizeVimeoId(url: URL) {
   return candidate ?? null;
 }
 
+function normalizeVimeoHash(url: URL, videoId: string) {
+  const queryHash = url.searchParams.get('h');
+  if (queryHash && /^[a-zA-Z0-9]+$/.test(queryHash)) {
+    return queryHash;
+  }
+
+  const segments = url.pathname.split('/').filter(Boolean);
+  const videoIndex = segments.indexOf(videoId);
+  const pathHash = videoIndex >= 0 ? segments[videoIndex + 1] : null;
+  return pathHash && /^[a-zA-Z0-9]+$/.test(pathHash) ? pathHash : null;
+}
+
 function normalizeLoomId(url: URL) {
   if (!url.hostname.endsWith('loom.com')) return null;
   const match = url.pathname.match(/\/share\/([a-zA-Z0-9]+)/);
@@ -54,10 +66,13 @@ export function getVideoEmbedConfig(rawUrl: string): VideoEmbedConfig | null {
 
     const vimeoId = normalizeVimeoId(url);
     if (vimeoId) {
+      const vimeoHash = normalizeVimeoHash(url, vimeoId);
+      const embedQuery = vimeoHash ? `?h=${encodeURIComponent(vimeoHash)}` : '';
+      const canonicalHash = vimeoHash ? `/${encodeURIComponent(vimeoHash)}` : '';
       return {
         provider: 'vimeo',
-        embedUrl: `https://player.vimeo.com/video/${vimeoId}`,
-        canonicalUrl: `https://vimeo.com/${vimeoId}`,
+        embedUrl: `https://player.vimeo.com/video/${vimeoId}${embedQuery}`,
+        canonicalUrl: `https://vimeo.com/${vimeoId}${canonicalHash}`,
       };
     }
 

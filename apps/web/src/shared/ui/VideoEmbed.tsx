@@ -44,6 +44,7 @@ export function VideoEmbed({ url }: VideoEmbedProps) {
           title="Embedded video"
           data-video-provider={config.provider}
           className="absolute inset-0 h-full w-full"
+          loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
         />
