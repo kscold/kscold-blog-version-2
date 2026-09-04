@@ -25,6 +25,7 @@ const vaultJsonLd = {
 export default function VaultIndexPage() {
   return (
     <>
+      <h1 className="sr-only">KSCOLD Vault 지식 그래프</h1>
       <JsonLd id="vault-page" data={vaultJsonLd} />
       <Suspense>
         <VaultGraphLayout />

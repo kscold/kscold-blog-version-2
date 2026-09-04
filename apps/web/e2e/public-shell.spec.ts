@@ -68,6 +68,19 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     );
   });
 
+  test('사이트맵 정적 페이지는 canonical과 주 제목을 제공한다', async ({ page }) => {
+    await page.goto('/privacy');
+    await expect(page.locator('head link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://kscold.com/privacy'
+    );
+
+    await page.goto('/vault');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'KSCOLD Vault 지식 그래프'
+    );
+  });
+
   test('비로그인 상태에서는 헤더에 LOGIN 버튼이 노출된다', async ({ page }) => {
     await page.goto('/');
 
