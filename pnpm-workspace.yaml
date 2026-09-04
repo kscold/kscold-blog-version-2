@@ -1,3 +1,15 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+
+# macOS에서 만든 standalone 산출물을 Linux ARM64 운영 컨테이너에서도 실행한다.
+supportedArchitectures:
+  os:
+    - current
+    - linux
+  cpu:
+    - current
+    - arm64
+  libc:
+    - current
+    - glibc
