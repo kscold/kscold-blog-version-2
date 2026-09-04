@@ -93,8 +93,6 @@ public class SecurityConfig {
                                         .requestMatchers(
                                                 HttpMethod.POST, "/feeds/*/comments/*/like")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/link-preview")
-                                        .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/guestbook/**")
                                         .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/admin-night/calendar")
