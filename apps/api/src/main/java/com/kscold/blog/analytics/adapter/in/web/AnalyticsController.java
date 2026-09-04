@@ -10,6 +10,7 @@ import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class AnalyticsController {
     /** 프론트에서 페이지 방문 시 호출 (인증 불필요) - 실존 페이지만 집계 */
     @PostMapping("/analytics/page-visit")
     public ResponseEntity<ApiResponse<Void>> trackPageVisit(
-            @RequestBody PageVisitRequest body,
+            @Valid @RequestBody PageVisitRequest body,
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
         String normalized = normalize(body.getPath());
