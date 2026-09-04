@@ -18,6 +18,7 @@ export {
 export {
   extractFirstMarkdownHeading,
   extractFirstMarkdownImage,
+  stripFirstMarkdownHeading,
   stripRichText,
   toMetaDescription,
   toPreviewText,

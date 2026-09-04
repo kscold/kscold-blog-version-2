@@ -49,6 +49,88 @@ export function FeedCard({
     }
   };
 
+  const isDetail = variant === 'detail';
+  // 상세는 본문 폭에 맞춰 여백을 넓게 쓰고, 목록은 기존 카드 여백을 그대로 둔다.
+  const gutter = isDetail ? 'px-5 sm:px-7' : 'px-4';
+
+  // 반응은 글과 링크를 다 본 뒤에 누르는 동작이라 항상 카드 맨 아래에 둔다.
+  // 이미지 없는 글이 많아 예전처럼 위에 두면 본문보다 먼저 보여 어색했다.
+  const reactionRow = (
+    <div className={`${gutter} border-t border-surface-100 py-3 ${isDetail ? 'sm:py-4' : ''}`}>
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          aria-label={isLiked ? '좋아요 취소' : '좋아요'}
+          aria-pressed={isLiked}
+          onClick={e => {
+            e.stopPropagation();
+            handleLike();
+          }}
+          className="flex items-center gap-1.5 group"
+        >
+          <motion.svg
+            className={`w-6 h-6 transition-colors ${isLiked ? 'text-red-500 fill-red-500' : 'text-surface-700'}`}
+            viewBox="0 0 24 24"
+            fill={isLiked ? 'currentColor' : 'none'}
+            stroke="currentColor"
+            strokeWidth={2}
+            whileTap={reduceMotion ? undefined : { scale: 1.18 }}
+            transition={reduceMotion ? undefined : { type: 'spring', stiffness: 500, damping: 15 }}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+            />
+          </motion.svg>
+          <span className={`text-sm font-bold ${isLiked ? 'text-red-500' : 'text-surface-700'}`}>
+            {likesCount}
+          </span>
+        </button>
+
+        {showCommentLink && (
+          <Link href={`/feed/${feed.id}`} className="flex items-center gap-1.5 group">
+            <svg
+              className="w-6 h-6 text-surface-700 group-hover:text-surface-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"
+              />
+            </svg>
+            <span className="text-sm font-bold text-surface-700">{feed.commentsCount}</span>
+          </Link>
+        )}
+
+        {/* 상세에는 댓글이 바로 아래 이어지므로 이동 링크 대신 개수만 보여준다. */}
+        {isDetail && (
+          <span className="flex items-center gap-1.5 text-surface-500">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"
+              />
+            </svg>
+            <span className="text-sm font-bold">{feed.commentsCount}</span>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <motion.article
       className="bg-white border border-surface-200 rounded-2xl overflow-hidden"
@@ -59,7 +141,7 @@ export function FeedCard({
       style={showCommentLink ? { cursor: 'pointer' } : undefined}
     >
       {/* 작성자 정보 */}
-      <div className="flex items-center gap-3 px-4 py-3">
+      <div className={`${gutter} flex items-center gap-3 py-3`}>
         {feed.author.username ? (
           <Link
             href={`/profile/${feed.author.username}`}
@@ -107,63 +189,12 @@ export function FeedCard({
       {/* 첨부 이미지 */}
       {feed.images.length > 0 && <ImageCarousel images={feed.images} />}
 
-      {variant === 'detail' && (
-        <FeedContent authorName={feed.author.name} content={feed.content} variant={variant} />
-      )}
-
-      {/* 반응 영역 */}
-      <div className="px-4 pt-3">
-        <div className="flex items-center gap-4">
-          <button onClick={e => { e.stopPropagation(); handleLike(); }} className="flex items-center gap-1.5 group">
-            <motion.svg
-              className={`w-6 h-6 transition-colors ${isLiked ? 'text-red-500 fill-red-500' : 'text-surface-700'}`}
-              viewBox="0 0 24 24"
-              fill={isLiked ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              strokeWidth={2}
-              whileTap={reduceMotion ? undefined : { scale: 1.18 }}
-              transition={reduceMotion ? undefined : { type: 'spring', stiffness: 500, damping: 15 }}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-              />
-            </motion.svg>
-            <span className={`text-sm font-bold ${isLiked ? 'text-red-500' : 'text-surface-700'}`}>
-              {likesCount}
-            </span>
-          </button>
-
-          {showCommentLink && (
-            <Link href={`/feed/${feed.id}`} className="flex items-center gap-1.5 group">
-              <svg
-                className="w-6 h-6 text-surface-700 group-hover:text-surface-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z"
-                />
-              </svg>
-              <span className="text-sm font-bold text-surface-700">{feed.commentsCount}</span>
-            </Link>
-          )}
-        </div>
-      </div>
-
       {/* 본문 */}
-      {variant === 'summary' && (
-        <FeedContent authorName={feed.author.name} content={feed.content} variant={variant} />
-      )}
+      <FeedContent authorName={feed.author.name} content={feed.content} variant={variant} />
 
       {/* 해시태그 */}
       {visibleTags.length > 0 && (
-        <div className="px-4 pb-2 flex flex-wrap gap-1.5">
+        <div className={`${gutter} pb-3 flex flex-wrap gap-1.5`}>
           {visibleTags.map(tag => (
             <Link
               key={tag}
@@ -179,14 +210,17 @@ export function FeedCard({
 
       {/* 링크 미리보기 */}
       {feed.linkPreview && (
-        <div className="px-4 pb-3" onClick={e => e.stopPropagation()}>
+        <div className={`${gutter} pb-3`} onClick={e => e.stopPropagation()}>
           <LinkPreviewCard preview={feed.linkPreview} />
         </div>
       )}
 
+      {/* 반응 영역 */}
+      {reactionRow}
+
       {/* 댓글 이동 */}
       {showCommentLink && feed.commentsCount > 0 && (
-        <div className="px-4 pb-3">
+        <div className={`${gutter} pb-3`}>
           <Link
             href={`/feed/${feed.id}`}
             className="text-sm text-surface-400 hover:text-surface-600 transition-colors"

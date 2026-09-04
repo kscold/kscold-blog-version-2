@@ -26,6 +26,12 @@ export function extractFirstMarkdownHeading(input?: string | null) {
   return input?.match(/^#{1,6}\s+(.+)$/m)?.[1].trim() || null;
 }
 
+/** 제목을 따로 보여줄 때 본문 미리보기에서 그 제목 줄만 덜어낸다. */
+export function stripFirstMarkdownHeading(input?: string | null) {
+  if (!input) return '';
+  return input.replace(/^#{1,6}[ \t]+.+$/m, '').replace(/^\s+/, '');
+}
+
 export function extractFirstMarkdownImage(input?: string | null) {
   return input?.match(/!\[[^\]]*]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/)?.[1] || null;
 }

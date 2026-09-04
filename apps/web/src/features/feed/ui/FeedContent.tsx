@@ -1,6 +1,11 @@
 'use client';
 
-import { stripRichText, toPreviewText } from '@/shared/lib/seo/text';
+import {
+  extractFirstMarkdownHeading,
+  stripFirstMarkdownHeading,
+  stripRichText,
+  toPreviewText,
+} from '@/shared/lib/seo/text';
 import { LinkifiedText } from '@/shared/ui/LinkifiedText';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 
@@ -25,17 +30,32 @@ export function FeedContent({ authorName, content, variant }: FeedContentProps) 
     );
   }
 
-  const plainText = stripRichText(content);
-  const preview = toPreviewText(content, '', FEED_PREVIEW_LENGTH);
+  // 제목이 있으면 본문에서 떼어내 제목 줄로 세우고, 미리보기는 그 아래 본문만 보여준다.
+  const heading = extractFirstMarkdownHeading(content);
+  const body = heading ? stripFirstMarkdownHeading(content) : content;
+  const plainBody = stripRichText(body);
+  const preview = toPreviewText(body, '', FEED_PREVIEW_LENGTH);
 
   return (
     <div className="px-4 py-3">
-      <LinkifiedText
-        text={preview}
-        className="text-sm leading-relaxed text-surface-800"
-        prefix={<span className="mr-1.5 font-bold text-surface-900">{authorName}</span>}
-      />
-      {plainText.length > FEED_PREVIEW_LENGTH && (
+      {heading && (
+        <h2 className="mb-2 text-base font-bold leading-snug tracking-[-0.01em] text-surface-900 sm:text-lg">
+          {heading}
+        </h2>
+      )}
+      {preview && (
+        <LinkifiedText
+          text={preview}
+          className="text-sm leading-relaxed text-surface-800"
+          // 제목이 서면 카드 상단의 작성자 이름과 겹치므로 이름 접두사를 빼고 본문만 읽히게 둔다.
+          prefix={
+            heading ? undefined : (
+              <span className="mr-1.5 font-bold text-surface-900">{authorName}</span>
+            )
+          }
+        />
+      )}
+      {plainBody.length > FEED_PREVIEW_LENGTH && (
         <p className="mt-2 text-xs font-semibold text-surface-400">상세에서 계속 읽기</p>
       )}
     </div>
