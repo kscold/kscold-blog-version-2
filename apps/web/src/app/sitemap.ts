@@ -25,14 +25,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchPublicApi<{ slug: string; contentLength?: number }[]>('/vault/notes/sitemap-index'),
   ]);
 
-  const categories = flattenCategories(categoryTree || []).filter(
+  // 일부 데이터만 빠진 200 응답을 캐시하면 검색엔진에는 대량 URL 삭제로 보인다.
+  // 재생성 오류를 그대로 올려 직전 정상 ISR 결과를 유지하고 다음 요청에서 재시도한다.
+  if (
+    posts === null ||
+    categoryTree === null ||
+    tags === null ||
+    feeds === null ||
+    vaultNoteIndex === null
+  ) {
+    throw new Error('사이트맵 데이터를 모두 불러오지 못했습니다.');
+  }
+
+  const categories = flattenCategories(categoryTree).filter(
     category => !category.restricted
   );
   // 제한 글은 상세 메타데이터가 noindex 이므로 사이트맵에서도 제외해 크롤링 신호를 일치시킨다.
-  const indexablePosts = (posts || []).filter(
+  const indexablePosts = posts.filter(
     post => post.status === 'PUBLISHED' && !post.restricted
   );
-  const indexableFeeds = (feeds || []).filter(
+  const indexableFeeds = feeds.filter(
     feed => feed.visibility === 'PUBLIC' && isIndexableFeed(feed.content)
   );
   const publicPostCountsByTagId = new Map<string, number>();
@@ -44,11 +56,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       );
     });
   });
-  const indexableTags = (tags || [])
+  const indexableTags = tags
     .map(tag => ({ ...tag, postCount: publicPostCountsByTagId.get(tag.id) || 0 }))
     .filter(isIndexableTag);
   // 본문 길이를 확인할 수 있고 독립 문서로 충분한 노트만 사이트맵에 싣는다.
-  const vaultNotes = (vaultNoteIndex || []).filter(
+  const vaultNotes = vaultNoteIndex.filter(
     note => !!note.slug && isIndexableVaultNote(note.contentLength)
   );
 
