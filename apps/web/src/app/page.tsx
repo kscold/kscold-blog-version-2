@@ -10,6 +10,9 @@ import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 export const metadata: Metadata = {
   alternates: {
     canonical: '/',
+    types: {
+      'application/rss+xml': `${SITE_URL}/rss.xml`,
+    },
   },
 };
 

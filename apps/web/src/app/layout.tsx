@@ -57,6 +57,11 @@ export const metadata: Metadata = {
   creator: '김승찬',
   publisher: '콜딩(Colding)',
   category: 'technology',
+  alternates: {
+    types: {
+      'application/rss+xml': `${SITE_URL}/rss.xml`,
+    },
+  },
   openGraph: {
     type: 'website',
     locale: 'ko_KR',

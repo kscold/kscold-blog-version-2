@@ -61,6 +61,9 @@ export function buildPageMetadata({
     authors,
     alternates: {
       canonical,
+      types: {
+        'application/rss+xml': `${SITE_URL}/rss.xml`,
+      },
     },
     openGraph: {
       title,
