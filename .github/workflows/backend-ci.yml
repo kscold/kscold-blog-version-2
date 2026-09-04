@@ -35,8 +35,6 @@ jobs:
 
       - name: Gradle 설정 및 래퍼 검증
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6
-        with:
-          build-root-directory: apps/api
 
       - name: 테스트, 포맷 및 패키징 검사
         working-directory: apps/api
