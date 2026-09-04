@@ -25,13 +25,13 @@ export function InfoContainer() {
           <h1 className="text-4xl sm:text-5xl font-sans font-black tracking-tight text-surface-900 mb-2">
             {PROFILE.name}
           </h1>
-          <p className="text-sm font-mono text-surface-400 mb-3">@{PROFILE.handle}</p>
+          <p className="text-sm font-mono text-surface-600 mb-3">@{PROFILE.handle}</p>
           <p className="text-lg text-surface-500 font-medium">{PROFILE.title}</p>
         </div>
 
         {/* 소개 섹션 */}
         <section className="mb-16">
-          <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">About</h2>
+          <h2 className="text-sm font-bold text-surface-600 uppercase tracking-wider mb-6">About</h2>
           <div className="space-y-4">
             {PROFILE.bio.map((paragraph, i) => (
               <p key={i} className="text-surface-600 leading-relaxed">{paragraph}</p>
@@ -44,7 +44,7 @@ export function InfoContainer() {
 
         {/* 팀 소개 섹션 */}
         <section className="mb-16">
-          <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">Teams</h2>
+          <h2 className="text-sm font-bold text-surface-600 uppercase tracking-wider mb-6">Teams</h2>
           <div className="space-y-3">
             {TEAM_PROFILES.map(team => (
               <TeamBadgeLink key={team.id} team={team} />
@@ -54,7 +54,7 @@ export function InfoContainer() {
 
         {/* 자주 묻는 질문 (FAQ) */}
         <section className="mb-16">
-          <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">FAQ</h2>
+          <h2 className="text-sm font-bold text-surface-600 uppercase tracking-wider mb-6">FAQ</h2>
           <div className="space-y-3">
             {PROFILE_FAQ.map((item, i) => (
               <div key={i} className="bg-white border border-surface-200 rounded-2xl p-5">
@@ -88,7 +88,7 @@ function TeamBadgeLink({ team }: { team: TeamProfile }) {
         <TeamBrandBadge team={team} compact />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-surface-900 group-hover:text-surface-600 transition-colors">{team.name}</p>
-          <p className="text-xs text-surface-400">{team.summary}</p>
+          <p className="text-xs text-surface-600">{team.summary}</p>
         </div>
         <svg className="w-4 h-4 flex-shrink-0 text-surface-300 group-hover:text-surface-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

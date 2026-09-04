@@ -106,18 +106,18 @@ export function CommentSection({ feedId }: CommentSectionProps) {
                       ADMIN
                     </span>
                   )}
-                  <span className="text-xs text-surface-400">
+                  <span className="text-xs text-surface-600">
                     {formatRelativeTime(comment.createdAt)}
                   </span>
                   <button
                     type="button"
-                    aria-label={comment.isLiked ? '댓글 좋아요 취소' : '댓글 좋아요'}
+                    aria-label={`${comment.isLiked ? '댓글 좋아요 취소' : '댓글 좋아요'}${comment.likesCount > 0 ? ` ${comment.likesCount}개` : ''}`}
                     aria-pressed={comment.isLiked}
                     onClick={() => handleToggleLike(comment.id)}
                     className={`ml-1 flex items-center gap-1 text-xs font-bold transition-colors ${
                       comment.isLiked
                         ? 'text-red-500'
-                        : 'text-surface-400 hover:text-surface-600'
+                        : 'text-surface-600 hover:text-surface-900'
                     }`}
                   >
                     <motion.svg

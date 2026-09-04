@@ -3,7 +3,7 @@ import { PROFILE } from '@/entities/profile';
 export function ContactSection() {
   return (
     <section className="mb-16">
-      <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">Contact</h2>
+      <h2 className="text-sm font-bold text-surface-600 uppercase tracking-wider mb-6">Contact</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <a
           href={PROFILE.contacts.github}

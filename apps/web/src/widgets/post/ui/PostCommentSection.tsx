@@ -60,9 +60,9 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <h3 className="text-sm font-bold text-surface-900 mb-4 uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-surface-900 mb-4 uppercase tracking-wider">
             Tags
-          </h3>
+          </h2>
           <div className="flex flex-wrap gap-2">
             {visibleTags.map(tag => (
               <Link
@@ -103,6 +103,9 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
           <button
             type="button"
             onClick={() => setShowShareMenu(prev => !prev)}
+            aria-label={showShareMenu ? '공유 메뉴 닫기' : '공유 메뉴 열기'}
+            aria-haspopup="menu"
+            aria-expanded={showShareMenu}
             className="p-2.5 bg-white border border-surface-200 text-surface-600 rounded-lg hover:border-surface-900 hover:text-surface-900 transition-all"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,9 +119,13 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
           </button>
 
           {showShareMenu && (
-            <div className="absolute right-0 mt-2 w-44 bg-white border border-surface-200 rounded-lg shadow-lg overflow-hidden z-50">
+            <div
+              role="menu"
+              className="absolute right-0 mt-2 w-44 bg-white border border-surface-200 rounded-lg shadow-lg overflow-hidden z-50"
+            >
               <button
                 type="button"
+                role="menuitem"
                 onClick={handleCopyLink}
                 className="w-full px-4 py-2.5 text-sm text-surface-700 hover:bg-surface-50 transition-colors text-left"
               >
@@ -126,6 +133,7 @@ export function PostCommentSection({ tags }: PostCommentSectionProps) {
               </button>
               <button
                 type="button"
+                role="menuitem"
                 onClick={handleShareThreads}
                 className="w-full px-4 py-2.5 text-sm text-surface-700 hover:bg-surface-50 transition-colors text-left"
               >

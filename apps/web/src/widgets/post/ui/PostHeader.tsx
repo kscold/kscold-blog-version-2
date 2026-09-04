@@ -84,7 +84,7 @@ export function PostHeader({
           {category.name}
         </Link>
         <span className="text-surface-300">/</span>
-        <span className="text-surface-400 truncate max-w-[200px]">{title}</span>
+        <span className="text-surface-600 truncate max-w-[200px]">{title}</span>
       </motion.nav>
 
       {/* 포스트 상단 정보 */}
@@ -103,7 +103,7 @@ export function PostHeader({
             {category.icon && <span>{category.icon}</span>}
             {category.name}
           </Link>
-          <span className="text-sm text-surface-400">{formattedDate}</span>
+          <span className="text-sm text-surface-600">{formattedDate}</span>
           {restricted && <RestrictedPostBadge />}
           {featured && (
             <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-medium border border-amber-200">

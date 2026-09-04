@@ -46,13 +46,13 @@ export function VaultMobileToolbar({
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold text-surface-900 dark:text-white">{label}</p>
-        {meta && <p className="truncate text-[11px] text-surface-400">{meta}</p>}
+        {meta && <p className="truncate text-[11px] text-surface-600">{meta}</p>}
       </div>
 
       <button
         type="button"
         onClick={onOpenChat}
-        aria-label="Vault Agent에게 묻기"
+        aria-label="AI로 Vault Agent에게 묻기"
         className="flex h-10 shrink-0 items-center justify-center rounded-xl bg-surface-900 px-3 text-white shadow-sm transition active:scale-95 dark:bg-white dark:text-surface-900"
       >
         <svg

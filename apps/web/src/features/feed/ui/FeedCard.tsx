@@ -60,7 +60,7 @@ export function FeedCard({
       <div className="flex items-center gap-4">
         <button
           type="button"
-          aria-label={isLiked ? '좋아요 취소' : '좋아요'}
+          aria-label={`${isLiked ? '좋아요 취소' : '좋아요'} ${likesCount}개`}
           aria-pressed={isLiked}
           onClick={e => {
             e.stopPropagation();
