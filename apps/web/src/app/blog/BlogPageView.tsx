@@ -1,4 +1,4 @@
-import { BlogArchive } from '@/widgets/blog';
+import { BlogArchive } from '@/widgets/blog/archive';
 
 export function BlogPageView() {
   return (

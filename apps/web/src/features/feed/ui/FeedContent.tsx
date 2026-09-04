@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import {
   extractFirstMarkdownHeading,
   stripFirstMarkdownHeading,
@@ -7,7 +8,10 @@ import {
   toPreviewText,
 } from '@/shared/lib/seo/text';
 import { LinkifiedText } from '@/shared/ui/LinkifiedText';
-import { MarkdownContent } from '@/shared/ui/MarkdownContent';
+
+const MarkdownContent = dynamic(
+  () => import('@/shared/ui/MarkdownContent').then(module => module.MarkdownContent)
+);
 
 const FEED_PREVIEW_LENGTH = 320;
 

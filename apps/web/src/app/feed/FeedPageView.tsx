@@ -1,4 +1,4 @@
-import { FeedArchive } from '@/widgets/feed';
+import { FeedArchive } from '@/widgets/feed/archive';
 
 interface FeedPageViewProps {
   activeTag?: string;
