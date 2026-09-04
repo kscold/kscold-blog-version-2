@@ -1,5 +1,7 @@
 'use client';
 
+import { OWNER_CHAT_MESSAGE_MAX_LENGTH } from '@/features/chat';
+
 interface Props {
   value: string;
   placeholder: string;
@@ -17,6 +19,7 @@ export function ChatComposer({ value, placeholder, disabled, onChange, onSubmit 
       <form onSubmit={onSubmit} className="flex min-w-0 gap-2.5">
         <input
           type="text"
+          maxLength={OWNER_CHAT_MESSAGE_MAX_LENGTH}
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}

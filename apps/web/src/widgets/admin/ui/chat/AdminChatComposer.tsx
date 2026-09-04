@@ -1,5 +1,7 @@
 'use client';
 
+import { OWNER_CHAT_MESSAGE_MAX_LENGTH } from '@/features/chat';
+
 interface Props {
   value: string;
   disabled: boolean;
@@ -12,6 +14,7 @@ export function AdminChatComposer({ value, disabled, onChange, onSend }: Props) 
     <div className="flex gap-2 border-t border-surface-200 px-4 py-3">
       <input
         type="text"
+        maxLength={OWNER_CHAT_MESSAGE_MAX_LENGTH}
         value={value}
         onChange={e => onChange(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), onSend())}

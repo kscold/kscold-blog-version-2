@@ -1,0 +1,1 @@
+export const OWNER_CHAT_MESSAGE_MAX_LENGTH = 1000;
