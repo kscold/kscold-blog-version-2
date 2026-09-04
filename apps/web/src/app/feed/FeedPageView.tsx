@@ -1,10 +1,6 @@
 import { FeedArchive } from '@/widgets/feed/archive';
 
-interface FeedPageViewProps {
-  activeTag?: string;
-}
-
-export function FeedPageView({ activeTag }: FeedPageViewProps) {
+export function FeedPageView() {
   return (
     <div className="min-h-screen bg-surface-50">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
@@ -17,7 +13,7 @@ export function FeedPageView({ activeTag }: FeedPageViewProps) {
           </p>
         </div>
 
-        <FeedArchive activeTag={activeTag} />
+        <FeedArchive />
       </div>
     </div>
   );

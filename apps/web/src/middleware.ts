@@ -45,6 +45,14 @@ function clearAuthCookie(response: NextResponse) {
 }
 
 export function middleware(request: NextRequest) {
+  const legacyFeedTag = request.nextUrl.searchParams.get('tag')?.trim();
+  if (request.nextUrl.pathname === '/feed' && legacyFeedTag) {
+    const tagUrl = request.nextUrl.clone();
+    tagUrl.pathname = `/tags/${legacyFeedTag}`;
+    tagUrl.search = '';
+    return NextResponse.redirect(tagUrl, 308);
+  }
+
   const token = request.cookies.get('auth-token')?.value;
   const authHeader = request.headers.get('authorization');
 
@@ -99,5 +107,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/login'],
+  matcher: ['/admin/:path*', '/feed', '/login'],
 };

@@ -68,6 +68,14 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     );
   });
 
+  test('이전 Feed 태그 쿼리는 통합 태그 경로로 영구 이동한다', async ({ page }) => {
+    const response = await page.goto('/feed?tag=AI%20Agent');
+    const redirectResponse = await response?.request().redirectedFrom()?.response();
+
+    expect(redirectResponse?.status()).toBe(308);
+    await expect(page).toHaveURL(/\/tags\/AI%20Agent$/);
+  });
+
   test('사이트맵 정적 페이지는 canonical과 주 제목을 제공한다', async ({ page }) => {
     await page.goto('/privacy');
     await expect(page.locator('head link[rel="canonical"]')).toHaveAttribute(

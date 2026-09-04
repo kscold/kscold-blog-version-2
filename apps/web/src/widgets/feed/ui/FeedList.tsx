@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import { useFeeds } from '@/entities/feed';
 import { FeedCard } from '@/features/feed';
 import { FeedComposer } from './FeedComposer';
@@ -15,30 +14,22 @@ import type { PageResponse } from '@/shared/model/types/api';
 import type { Feed } from '@/shared/model/types/social';
 
 interface FeedListProps {
-  initialTag?: string;
   initialFeeds?: PageResponse<Feed>;
 }
 
-export function FeedList({ initialTag, initialFeeds }: FeedListProps = {}) {
+export function FeedList({ initialFeeds }: FeedListProps = {}) {
   const { currentUser } = useAuth();
   const { allowRichEffects } = usePerformanceMode();
   const [page, setPage] = useState(0);
-  const router = useRouter();
-  const activeTag = initialTag;
 
   const { data: feedsData, isLoading } = useFeeds({
     page,
     size: 12,
-    tag: activeTag,
     initialData: page === 0 ? initialFeeds : undefined,
   });
 
   const feeds = feedsData?.content || [];
   const totalPages = feedsData?.totalPages || 0;
-
-  const clearTag = () => {
-    router.push('/feed');
-  };
 
   if (isLoading) {
     return (
@@ -68,10 +59,10 @@ export function FeedList({ initialTag, initialFeeds }: FeedListProps = {}) {
         <FeedComposer currentUser={currentUser ?? null} />
         <div className="text-center py-20">
           <h2 className="text-xl font-black tracking-tight text-surface-900 mb-2">
-            {activeTag ? `#${activeTag} 피드가 없습니다` : '아직 피드가 없습니다'}
+            아직 피드가 없습니다
           </h2>
           <p className="text-sm text-surface-500">
-            {activeTag ? '다른 태그를 선택해보세요.' : '첫 번째 피드를 작성해보세요!'}
+            첫 번째 피드를 작성해보세요!
           </p>
         </div>
       </div>
@@ -87,19 +78,6 @@ export function FeedList({ initialTag, initialFeeds }: FeedListProps = {}) {
     <>
       {hasAdworthyContent && <AdSenseScript />}
       <FeedComposer currentUser={currentUser ?? null} />
-
-      {activeTag && (
-        <div className="flex items-center gap-2 my-4">
-          <span className="text-xs text-surface-500 font-medium">필터:</span>
-          <button
-            onClick={clearTag}
-            className="flex items-center gap-1 px-3 py-1 bg-surface-900 text-white text-xs font-bold rounded-full hover:bg-surface-700 transition-colors"
-          >
-            #{activeTag}
-            <span className="ml-1 opacity-70">×</span>
-          </button>
-        </div>
-      )}
 
       <motion.div
         className="space-y-6"
