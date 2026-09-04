@@ -61,6 +61,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth ->
                                 auth
+                                        // 공개 포스트 와일드카드보다 먼저 관리자 조회 경로를 잠근다.
+                                        .requestMatchers(
+                                                HttpMethod.GET, "/posts/admin", "/posts/exists/**")
+                                        .hasRole("ADMIN")
                                         // 공개 엔드포인트
                                         .requestMatchers(HttpMethod.GET, "/posts/**")
                                         .permitAll()
