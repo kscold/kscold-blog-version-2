@@ -73,7 +73,15 @@ test('이전 대화를 불러온 뒤 긴 Agent 답변의 마지막까지 자동�
 test('손상된 Agent 세션을 교체하고 질문 길이를 서버 경계와 맞춘다', async ({ page }) => {
   const oversizedSessionId = 'x'.repeat(81);
   await page.addInitScript(
-    ({ key, value }) => window.localStorage.setItem(key, value),
+    ({ key, value }) => {
+      const seedKey = `${key}-e2e-seeded`;
+      if (window.sessionStorage.getItem(seedKey)) {
+        return;
+      }
+
+      window.localStorage.setItem(key, value);
+      window.sessionStorage.setItem(seedKey, 'true');
+    },
     { key: AGENT_SESSION_STORAGE_KEY, value: oversizedSessionId }
   );
   await mockShellApis(page);
