@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Button from '@/shared/ui/Button';
 import Input from '@/shared/ui/Input';
+import { AUTH_INPUT_LIMITS } from '@/features/auth/model/authInputLimits';
 import {
   usePasswordReset,
   usePasswordResetTokenStatus,
@@ -115,6 +116,7 @@ export function PasswordResetForm() {
             onChange={event => setNewPassword(event.target.value)}
             required
             minLength={8}
+            maxLength={AUTH_INPUT_LIMITS.password}
           />
 
           <Input
@@ -126,6 +128,7 @@ export function PasswordResetForm() {
             onChange={event => setConfirmPassword(event.target.value)}
             required
             minLength={8}
+            maxLength={AUTH_INPUT_LIMITS.password}
           />
 
           {error ? (

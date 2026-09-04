@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/shared/ui/Button';
 import Input from '@/shared/ui/Input';
+import { AUTH_INPUT_LIMITS } from '@/features/auth/model/authInputLimits';
 import {
   usePasswordResetRequest,
   useUsernameRecovery,
@@ -99,6 +100,7 @@ export function AccountRecoveryForm() {
           placeholder="가입에 사용한 이메일을 입력해 주세요"
           value={email}
           onChange={event => setEmail(event.target.value)}
+          maxLength={AUTH_INPUT_LIMITS.email}
           required
         />
 

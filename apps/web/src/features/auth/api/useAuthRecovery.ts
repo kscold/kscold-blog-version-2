@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
+import { AUTH_INPUT_LIMITS } from '@/features/auth/model/authInputLimits';
 import type {
   EmailRecoveryRequest,
   PasswordResetTokenStatus,
@@ -29,7 +30,7 @@ export function usePasswordResetTokenStatus(token: string | null) {
       apiClient.get<PasswordResetTokenStatus>(
         `/auth/password-reset/validate?token=${encodeURIComponent(token ?? '')}`
       ),
-    enabled: Boolean(token),
+    enabled: Boolean(token && token.length <= AUTH_INPUT_LIMITS.resetToken),
     retry: false,
   });
 }

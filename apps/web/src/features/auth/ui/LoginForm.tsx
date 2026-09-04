@@ -11,6 +11,7 @@ import { RegisterFields } from '@/features/auth/ui/RegisterFields';
 import { LoginRecoveryLinks } from '@/features/auth/ui/LoginRecoveryLinks';
 import { LoginHomeLink } from '@/features/auth/ui/LoginHomeLink';
 import { useLoginForm } from '@/features/auth/model/useLoginForm';
+import { AUTH_INPUT_LIMITS } from '@/features/auth/model/authInputLimits';
 import { slugify } from '@/features/auth/lib/slugify';
 
 export function LoginForm() {
@@ -66,6 +67,7 @@ export function LoginForm() {
                   value={formData.email}
                   onChange={e => updateField('email', e.target.value)}
                   autoComplete="email"
+                  maxLength={AUTH_INPUT_LIMITS.email}
                   data-cy={isLogin ? 'login-email-input' : 'register-email-input'}
                   required
                 />
@@ -88,6 +90,7 @@ export function LoginForm() {
                   autoComplete={isLogin ? 'current-password' : 'new-password'}
                   data-cy={isLogin ? 'login-password-input' : 'register-password-input'}
                   minLength={isLogin ? undefined : 8}
+                  maxLength={AUTH_INPUT_LIMITS.password}
                   required
                 />
 

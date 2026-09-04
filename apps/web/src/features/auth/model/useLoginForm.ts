@@ -6,6 +6,7 @@ import { useAuth } from '@/features/auth/api/useAuth';
 import { useAuthStore } from '@/entities/user';
 import { apiClient } from '@/shared/api/api-client';
 import type { User } from '@/shared/model/types/user';
+import { AUTH_INPUT_LIMITS } from './authInputLimits';
 
 interface LoginFormData {
   email: string;
@@ -42,6 +43,10 @@ function validateRegistrationForm(formData: LoginFormData) {
     return '이메일을 입력해주세요.';
   }
 
+  if (email.length > AUTH_INPUT_LIMITS.email) {
+    return `이메일은 ${AUTH_INPUT_LIMITS.email}자 이내로 입력해주세요.`;
+  }
+
   if (!displayName) {
     return '이름을 입력해주세요.';
   }
@@ -68,6 +73,10 @@ function validateRegistrationForm(formData: LoginFormData) {
 
   if (password.length < 8) {
     return '비밀번호는 최소 8자 이상이어야 합니다.';
+  }
+
+  if (password.length > AUTH_INPUT_LIMITS.password) {
+    return `비밀번호는 ${AUTH_INPUT_LIMITS.password}자 이내로 입력해주세요.`;
   }
 
   return null;
