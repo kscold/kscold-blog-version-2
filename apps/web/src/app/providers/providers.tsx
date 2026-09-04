@@ -7,7 +7,8 @@ import { useAuthStore } from '@/entities/user';
 import { subscribeAuthSessionBridge } from '@/shared/model/authSessionBridge';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 
-const ReactQueryDevtools = process.env.NODE_ENV === 'development'
+const ReactQueryDevtools =
+  process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_QUERY_DEVTOOLS !== 'false'
   ? dynamic(
       () => import('@tanstack/react-query-devtools').then(module => module.ReactQueryDevtools),
       { ssr: false }
