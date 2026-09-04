@@ -81,7 +81,7 @@ services:
 
   blog-qdrant:
     container_name: kscold-vault-qdrant
-    image: qdrant/qdrant:v1.10.1
+    image: qdrant/qdrant:v1.19.0
     volumes:
       - blog-qdrant-data:/qdrant/storage
     networks:
@@ -98,4 +98,5 @@ volumes:
   blog-uploads:
     driver: local
   blog-qdrant-data:
-    driver: local
+    external: true
+    name: kscold-vault-qdrant-data
