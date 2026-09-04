@@ -31,7 +31,8 @@ export const SETTLEMENT_REGISTRATION_STEPS = [
 ] as const;
 
 export function createSettlementRegistrationText(template: AlimtalkTemplate) {
-  const fields = [`템플릿 이름\n${template.name}`, `템플릿 유형\n${template.templateType}`];
+  const templateType = template.templateType === 'EMPHASIS' ? '강조표기형' : '기본형';
+  const fields = [`템플릿 이름\n${template.name}`, `템플릿 유형\n${templateType}`];
   if (template.emphasisTitle) {
     fields.push(`강조표기 제목\n${template.emphasisTitle}`);
   }
