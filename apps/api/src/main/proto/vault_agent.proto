@@ -9,9 +9,21 @@ option java_outer_classname = "VaultAgentProto";
 service VaultAgentService {
   rpc Chat(ChatRequest) returns (ChatResponse);
   rpc ChatStream(ChatRequest) returns (stream ChatStreamEvent);
+  rpc Search(SearchRequest) returns (SearchResponse);
   rpc CreateFeedPlan(FeedCopilotPlanRequest) returns (FeedCopilotPlanResponse);
   rpc CreateFeedDraft(FeedCopilotDraftRequest) returns (FeedCopilotDraftResponse);
   rpc Reindex(ReindexRequest) returns (ReindexResponse);
+}
+
+message SearchRequest {
+  string query = 1;
+  string active_folder_name = 2;
+  ContentAccessScope content_access_scope = 3;
+  int32 limit = 4;
+}
+
+message SearchResponse {
+  repeated SourceNote sources = 1;
 }
 
 message ChatRequest {

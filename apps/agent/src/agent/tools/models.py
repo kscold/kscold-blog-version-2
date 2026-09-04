@@ -65,3 +65,13 @@ class ContentAccessScope:
         if self.allowed_post_ids or self.allowed_category_ids:
             return "granted"
         return "public"
+
+
+@dataclass(frozen=True)
+class SearchOptions:
+    """검색 범위와 결과 수를 하나의 값으로 묶어 호출 계약을 단순하게 유지합니다."""
+
+    limit: int
+    active_folder_name: str = ""
+    scope: ContentAccessScope = field(default_factory=ContentAccessScope)
+    content_types: frozenset[str] = field(default_factory=frozenset)

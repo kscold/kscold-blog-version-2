@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from agent.config import AgentConfig
 from agent.graph.state.vault_chat_state import AgentState
 from agent.tools.capabilities import WebSearchTool
+from agent.tools.models import SearchOptions
 from agent.tools.store import VaultStore
 
 
@@ -24,9 +25,11 @@ class VaultRagNodes:
         )
         hits = self.store.search(
             scoped_question,
-            self.config.max_context_notes,
-            state.get("active_folder_name", ""),
-            state["content_access_scope"],
+            SearchOptions(
+                limit=self.config.max_context_notes,
+                active_folder_name=state.get("active_folder_name", ""),
+                scope=state["content_access_scope"],
+            ),
         )
         state["hits"] = hits
         state["stages"].append(

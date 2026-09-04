@@ -4,7 +4,7 @@ from agent.application import VaultAgentApplication
 from agent.config import AgentConfig
 from agent.grpc import vault_agent_pb2, vault_agent_pb2_grpc
 from agent.skills.feed_writing.models import ExternalSource
-from agent.tools.models import ContentAccessScope, SearchHit
+from agent.tools.models import ContentAccessScope, SearchHit, SearchOptions
 
 
 class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
@@ -42,6 +42,7 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
                         detail=payload["detail"],
                     )
                 )
+
             elif event_type == "delta":
                 yield vault_agent_pb2.ChatStreamEvent(delta=payload)
             elif event_type == "completed":
@@ -55,6 +56,17 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
                         follow_ups=payload.get("follow_ups", []),
                     )
                 )
+
+    def Search(self, request, context):
+        options = SearchOptions(
+            limit=request.limit,
+            active_folder_name=request.active_folder_name,
+            scope=self._content_access_scope(request),
+        )
+        hits = self.application.search_vault(request.query, options)
+        return vault_agent_pb2.SearchResponse(
+            sources=[self._source_note(hit, request.query) for hit in hits]
+        )
 
     def CreateFeedPlan(self, request, context):
         source = self._external_source(request.external_source)

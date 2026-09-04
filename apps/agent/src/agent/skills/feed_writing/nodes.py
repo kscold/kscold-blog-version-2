@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from agent.config import AgentConfig
 from agent.prompts.feed_writing import draft_messages, parse_json, plan_messages
 from agent.skills.feed_writing.state import FeedCopilotState
-from agent.tools.models import SearchHit
+from agent.tools.models import SearchHit, SearchOptions
 from agent.tools.store import VaultStore
 
 
@@ -30,9 +30,10 @@ class FeedCopilotNodes:
         )
         hits = self.store.search(
             query or source.url,
-            self.config.max_context_notes,
-            "",
-            state["content_access_scope"],
+            SearchOptions(
+                limit=self.config.max_context_notes,
+                scope=state["content_access_scope"],
+            ),
         )
         state["context"] = self.store.expand_graph(
             hits,

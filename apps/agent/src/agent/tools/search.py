@@ -4,35 +4,55 @@ import re
 
 from bson import ObjectId
 
-from agent.tools.models import ContentAccessScope, SearchHit
+from agent.tools.models import ContentAccessScope, SearchHit, SearchOptions
 from agent.tools.profile import profile_query_matches, public_profile_note
 
 
 class VaultSearchMixin:
     """Qdrant 의미 검색, MongoDB 키워드 검색, 링크 확장을 같은 권한 범위로 실행합니다."""
 
-    def search(
-        self,
-        query: str,
-        limit: int,
-        active_folder_name: str = "",
-        scope: ContentAccessScope | None = None,
-    ) -> list[SearchHit]:
-        access_scope = scope or ContentAccessScope()
-        folder_ids = self.resolve_folder_scope(active_folder_name)
-        keyword_hits = self.keyword_search(query, limit * 2, folder_ids, access_scope)
-        if self.qdrant.count(collection_name=self.config.qdrant_collection, exact=True).count == 0:
-            return keyword_hits[:limit]
+    def search(self, query: str, options: SearchOptions) -> list[SearchHit]:
+        folder_ids = self.resolve_folder_scope(options.active_folder_name)
+        keyword_hits = self.keyword_search(
+            query,
+            options.limit * 2,
+            folder_ids,
+            options.scope,
+            options.content_types,
+        )
         try:
-            vector_hits = self._vector_search(query, limit, folder_ids, access_scope)
+            if (
+                self.qdrant.count(
+                    collection_name=self.config.qdrant_collection,
+                    exact=True,
+                ).count
+                == 0
+            ):
+                return keyword_hits[: options.limit]
+            vector_hits = self._vector_search(
+                query,
+                options.limit,
+                folder_ids,
+                options.scope,
+                options.content_types,
+            )
         except Exception:
-            return keyword_hits[:limit]
+            return keyword_hits[: options.limit]
         return self._merge_search_hits(
             vector_hits,
             keyword_hits,
-            limit,
+            options.limit,
             self._language_hints(self._query_terms(query)),
         )
+
+    def search_vault(self, query: str, options: SearchOptions) -> list[SearchHit]:
+        vault_options = SearchOptions(
+            limit=options.limit,
+            active_folder_name=options.active_folder_name,
+            scope=options.scope,
+            content_types=frozenset({"vault"}),
+        )
+        return self.search(query, vault_options)
 
     def _vector_search(
         self,
@@ -40,6 +60,7 @@ class VaultSearchMixin:
         limit: int,
         folder_ids: set[str | ObjectId],
         scope: ContentAccessScope,
+        content_types: frozenset[str],
     ) -> list[SearchHit]:
         response = self.qdrant.search(
             collection_name=self.config.qdrant_collection,
@@ -56,6 +77,10 @@ class VaultSearchMixin:
             )
             for hit in response
             if hit.payload and (hit.payload.get("document_id") or hit.payload.get("note_id"))
+            and (
+                not content_types
+                or str(hit.payload.get("content_type") or "vault") in content_types
+            )
         ]
         documents = self._fetch_index_documents(
             [(content_type, document_id) for _, content_type, document_id in scored_refs], scope
@@ -80,6 +105,7 @@ class VaultSearchMixin:
         limit: int,
         folder_ids: set[str | ObjectId] | None = None,
         scope: ContentAccessScope | None = None,
+        content_types: frozenset[str] = frozenset(),
     ) -> list[SearchHit]:
         access_scope = scope or ContentAccessScope()
         terms = self._query_terms(query)
@@ -87,6 +113,8 @@ class VaultSearchMixin:
         folder_filter = {"folderId": {"$in": list(folder_ids)}} if folder_ids else {}
         vault_filter = self._vault_access_filter(access_scope)
         if not terms:
+            if content_types and "vault" not in content_types:
+                return []
             query_filter = {"$and": [vault_filter, folder_filter]} if folder_filter else vault_filter
             return [
                 SearchHit(note=self._to_note(document), score=0.35)
@@ -106,10 +134,16 @@ class VaultSearchMixin:
             if folder_filter
             else {"$and": [vault_filter, {"$or": conditions}]}
         )
-        candidates = [self._to_note(document) for document in self.notes.find(query_filter).limit(800)]
-        if not folder_ids:
+        candidates = (
+            [self._to_note(document) for document in self.notes.find(query_filter).limit(800)]
+            if not content_types or "vault" in content_types
+            else []
+        )
+        if not folder_ids and (not content_types or "post" in content_types):
             candidates.extend(self._post_candidates(conditions, access_scope))
+        if not folder_ids and (not content_types or "feed" in content_types):
             candidates.extend(self._feed_candidates(conditions, access_scope))
+        if not folder_ids and (not content_types or "profile" in content_types):
             profile = public_profile_note()
             if profile_query_matches(query, terms) or self._note_matches_query_focus(profile, terms):
                 candidates.append(profile)
@@ -120,7 +154,11 @@ class VaultSearchMixin:
             )
             for candidate in candidates
         ]
-        if not folder_ids and profile_query_matches(query, terms):
+        if (
+            not folder_ids
+            and (not content_types or "profile" in content_types)
+            and profile_query_matches(query, terms)
+        ):
             scored.append(SearchHit(note=public_profile_note(), score=12.0))
         scored.sort(key=lambda hit: hit.score, reverse=True)
         return self._balanced_hits(scored, language_hints, terms, limit)
