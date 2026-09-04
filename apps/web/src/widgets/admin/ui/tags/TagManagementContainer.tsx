@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useTags } from '@/entities/tag';
 import { useCreateTag, useUpdateTag, useDeleteTag } from '@/entities/tag';
-import { Tag } from '@/shared/model/types/blog';
+import type { Tag } from '@/shared/model/types/blog';
+import { TagCatalogPanel } from './TagCatalogPanel';
 import { TagManagementTable } from './TagManagementTable';
 
 export function TagManagementContainer() {
@@ -58,6 +59,8 @@ export function TagManagementContainer() {
           </button>
         </form>
       </div>
+
+      <TagCatalogPanel />
 
       {/* 태그 목록 */}
       <TagManagementTable

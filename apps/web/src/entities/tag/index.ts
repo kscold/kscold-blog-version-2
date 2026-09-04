@@ -1,6 +1,9 @@
-// entities/tag 슬라이스 퍼블릭 API
-export * from './api/useTags';
-
-// FSD public API 보강
-export { useCreateTag, useDeleteTag, useUpdateTag } from './api/useTagMutations';
+export {
+  useCreateTag,
+  useDeleteTag,
+  useMergeTags,
+  useReindexTags,
+  useUpdateTag,
+} from './api/useTagMutations';
+export { useTagIndex } from './api/useTagIndex';
 export { useTags } from './api/useTags';

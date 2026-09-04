@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { useCategories } from '@/entities/category';
-import { useTags } from '@/entities/tag';
-import { useFeedTags } from '@/entities/feed';
+import { useTagIndex } from '@/entities/tag';
 import { useUiStore } from '@/shared/model/uiStore';
 import { useViewer } from '@/entities/user';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
@@ -17,27 +16,11 @@ import { SidebarTags } from '@/widgets/sidebar/ui/SidebarTags';
 export function Sidebar() {
   const { data: categories } = useCategories();
   const { sidebarOpen, setSidebarOpen } = useUiStore();
-  const { data: blogTags } = useTags();
-  const { data: feedTagsRaw } = useFeedTags();
+  const { data: tagIndex, isLoading: isTagsLoading } = useTagIndex();
 
-  const tags = (() => {
-    const map = new Map<string, { name: string; slug?: string; count: number }>();
-    blogTags
-      ?.filter(tag => !isSystemTagName(tag.name))
-      .forEach(t => map.set(t.name, { name: t.name, slug: t.slug, count: t.postCount }));
-    feedTagsRaw?.forEach(ft => {
-      if (isSystemTagName(ft.name)) return;
-      const existing = map.get(ft.name);
-      if (existing) {
-        map.set(ft.name, { ...existing, count: existing.count + ft.count });
-      } else {
-        map.set(ft.name, { name: ft.name, count: ft.count });
-      }
-    });
-    return [...map.values()].sort((a, b) => b.count - a.count);
-  })();
-
-  const isTagsLoading = !blogTags && !feedTagsRaw;
+  const tags = (tagIndex ?? []).filter(
+    tag => !isSystemTagName(tag.name) && tag.totalCount > 0
+  );
   const { role } = useViewer();
   const { isTouchDevice, allowRichEffects } = usePerformanceMode();
   const useSolidSurface = isTouchDevice || !allowRichEffects;

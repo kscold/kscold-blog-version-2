@@ -60,7 +60,20 @@ export interface Tag {
   name: string;
   slug: string;
   postCount: number;
+  categoryId: string | null;
   createdAt: string;
+}
+
+export interface TagUsage {
+  id: string | null;
+  name: string;
+  slug: string | null;
+  categoryId: string | null;
+  categoryName: string | null;
+  postCount: number;
+  feedCount: number;
+  totalCount: number;
+  unregistered: boolean;
 }
 
 export interface PostCreateRequest {
