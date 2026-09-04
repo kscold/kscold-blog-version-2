@@ -39,8 +39,7 @@ public class LocalFileStorageAdapter implements FileStoragePort {
             return "/uploads/" + savedFilename;
         } catch (IOException e) {
             log.error("Failed to store file", e);
-            throw new InvalidRequestException(
-                    ErrorCode.INVALID_INPUT_VALUE, "파일 업로드에 실패했습니다: " + e.getMessage());
+            throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 업로드에 실패했습니다");
         }
     }
 
@@ -62,8 +61,7 @@ public class LocalFileStorageAdapter implements FileStoragePort {
             }
         } catch (IOException e) {
             log.error("Failed to delete file: {}", fileUrl, e);
-            throw new InvalidRequestException(
-                    ErrorCode.INVALID_INPUT_VALUE, "파일 삭제에 실패했습니다: " + e.getMessage());
+            throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 삭제에 실패했습니다");
         }
     }
 

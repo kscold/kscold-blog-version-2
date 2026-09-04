@@ -44,8 +44,7 @@ public class MinioFileStorageAdapter implements FileStoragePort {
             return minioStorageSupport.buildPublicUrl(key);
         } catch (Exception e) {
             log.error("Failed to upload file to MinIO", e);
-            throw new InvalidRequestException(
-                    ErrorCode.INVALID_INPUT_VALUE, "파일 업로드에 실패했습니다: " + e.getMessage());
+            throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 업로드에 실패했습니다");
         }
     }
 
@@ -76,8 +75,7 @@ public class MinioFileStorageAdapter implements FileStoragePort {
             log.info("File deleted from MinIO: {}/{}", minioStorageSupport.getBucket(), key);
         } catch (Exception e) {
             log.error("Failed to delete file from MinIO: {}", fileUrl, e);
-            throw new InvalidRequestException(
-                    ErrorCode.INVALID_INPUT_VALUE, "파일 삭제에 실패했습니다: " + e.getMessage());
+            throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 삭제에 실패했습니다");
         }
     }
 

@@ -6,8 +6,11 @@ import com.kscold.blog.media.application.port.in.MediaUseCase;
 import com.kscold.blog.media.domain.model.Media;
 import com.kscold.blog.media.domain.port.out.FileStoragePort;
 import com.kscold.blog.media.domain.port.out.MediaRepository;
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,11 +29,13 @@ public class MediaApplicationService implements MediaUseCase {
     @Value("${file.max-size:10485760}")
     private long maxFileSize;
 
-    private static final List<String> ALLOWED_EXTENSIONS =
-            Arrays.asList("jpg", "jpeg", "png", "gif", "webp", "svg");
-
-    private static final List<String> ALLOWED_MIME_TYPES =
-            Arrays.asList("image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml");
+    private static final Map<String, String> ALLOWED_IMAGE_TYPES =
+            Map.of(
+                    "jpg", "image/jpeg",
+                    "jpeg", "image/jpeg",
+                    "png", "image/png",
+                    "gif", "image/gif",
+                    "webp", "image/webp");
 
     @Transactional
     public Media upload(MultipartFile file, String uploaderId, String uploaderName) {
@@ -79,15 +84,16 @@ public class MediaApplicationService implements MediaUseCase {
         }
 
         String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_MIME_TYPES.contains(contentType)) {
-            throw new InvalidRequestException(
-                    ErrorCode.INVALID_INPUT_VALUE, "지원하지 않는 파일 형식입니다. 이미지 파일만 업로드 가능합니다");
+        String filename = file.getOriginalFilename();
+        String extension = getFileExtension(filename).toLowerCase(Locale.ROOT);
+        String expectedContentType = ALLOWED_IMAGE_TYPES.get(extension);
+        if (expectedContentType == null || !expectedContentType.equals(contentType)) {
+            throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "허용되지 않는 파일 형식입니다");
         }
 
-        String filename = file.getOriginalFilename();
-        String extension = getFileExtension(filename);
-        if (!ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
-            throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "허용되지 않는 파일 확장자입니다");
+        if (!hasExpectedFileSignature(file, expectedContentType)) {
+            throw new InvalidRequestException(
+                    ErrorCode.INVALID_INPUT_VALUE, "파일 내용이 이미지 형식과 일치하지 않습니다");
         }
     }
 
@@ -103,5 +109,45 @@ public class MediaApplicationService implements MediaUseCase {
             return fileUrl;
         }
         return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+    }
+
+    private boolean hasExpectedFileSignature(MultipartFile file, String contentType) {
+        try (InputStream inputStream = file.getInputStream()) {
+            byte[] header = inputStream.readNBytes(12);
+            return switch (contentType) {
+                case "image/jpeg" ->
+                        startsWith(header, new byte[] {(byte) 0xff, (byte) 0xd8, (byte) 0xff});
+                case "image/png" ->
+                        startsWith(
+                                header,
+                                new byte[] {(byte) 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a});
+                case "image/gif" ->
+                        startsWith(header, "GIF87a".getBytes(StandardCharsets.US_ASCII))
+                                || startsWith(header, "GIF89a".getBytes(StandardCharsets.US_ASCII));
+                case "image/webp" ->
+                        header.length >= 12
+                                && startsWith(header, "RIFF".getBytes(StandardCharsets.US_ASCII))
+                                && matchesAt(header, 8, "WEBP".getBytes(StandardCharsets.US_ASCII));
+                default -> false;
+            };
+        } catch (IOException ignored) {
+            return false;
+        }
+    }
+
+    private boolean startsWith(byte[] value, byte[] prefix) {
+        return matchesAt(value, 0, prefix);
+    }
+
+    private boolean matchesAt(byte[] value, int offset, byte[] expected) {
+        if (value.length < offset + expected.length) {
+            return false;
+        }
+        for (int index = 0; index < expected.length; index++) {
+            if (value[offset + index] != expected[index]) {
+                return false;
+            }
+        }
+        return true;
     }
 }
