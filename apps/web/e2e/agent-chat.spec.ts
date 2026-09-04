@@ -16,8 +16,12 @@ test('이전 대화를 불러온 뒤 긴 Agent 답변의 마지막까지 자동�
     '**/api/vault/agent/content-scope',
     success({ label: '공개 기록', description: '공개된 기록을 검색합니다.' })
   );
+  let releaseHistory!: () => void;
+  const historyGate = new Promise<void>(resolve => {
+    releaseHistory = resolve;
+  });
   await page.route('**/api/vault/agent/history*', async route => {
-    await new Promise(resolve => setTimeout(resolve, 350));
+    await historyGate;
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -48,6 +52,7 @@ test('이전 대화를 불러온 뒤 긴 Agent 답변의 마지막까지 자동�
 
   await input.fill('긴 답변으로 기록을 설명해줘');
   await expect(submit).toBeDisabled();
+  releaseHistory();
   await expect(submit).toBeEnabled();
   await submit.click();
 

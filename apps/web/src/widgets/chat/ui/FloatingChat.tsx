@@ -1,12 +1,15 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import FloatingChatButton from './FloatingChatButton';
-import ChatModal from './ChatModal';
+
+const ChatModal = dynamic(() => import('./ChatModal'), { ssr: false });
 
 export default function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
+  const [shouldLoadModal, setShouldLoadModal] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -14,6 +17,7 @@ export default function FloatingChat() {
 
   useEffect(() => {
     if (searchParams.get('chat') === 'open') {
+      setShouldLoadModal(true);
       setIsOpen(true);
     }
   }, [searchParams]);
@@ -30,6 +34,7 @@ export default function FloatingChat() {
   };
 
   const handleOpen = useCallback(() => {
+    setShouldLoadModal(true);
     setIsOpen(true);
     if (searchParams.get('chat') === 'open') {
       return;
@@ -55,7 +60,9 @@ export default function FloatingChat() {
       <div className={isVaultPage ? 'lg:block max-lg:hidden' : undefined}>
         <FloatingChatButton onClick={handleOpen} unreadCount={0} />
       </div>
-      <ChatModal isOpen={isOpen} isElevated={isVaultPage} onClose={handleClose} />
+      {shouldLoadModal && (
+        <ChatModal isOpen={isOpen} isElevated={isVaultPage} onClose={handleClose} />
+      )}
     </>
   );
 }
