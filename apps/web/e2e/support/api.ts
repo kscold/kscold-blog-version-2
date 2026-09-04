@@ -123,7 +123,7 @@ export async function mockShellApis(page: Page): Promise<void> {
   });
 
   await mockApi(page, 'GET', '**/api/categories', success([]));
-  await mockApi(page, 'GET', '**/api/tags', success([]));
+  await mockApi(page, 'GET', '**/api/tags/index', success([]));
   await mockApi(page, 'GET', /\/api\/feeds(?:\?|$)/, success(emptyPage()));
   await mockApi(page, 'GET', '**/api/feeds/tags', success([]));
 }

@@ -77,6 +77,26 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await expect(loginBtn).toContainText('LOGIN');
   });
 
+  test('모바일 사이드바 데이터는 메뉴를 열 때 불러온다', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    let sidebarApiCalls = 0;
+    await page.route(/\/api\/(?:categories|tags\/index)$/, async route => {
+      sidebarApiCalls += 1;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(success([])),
+      });
+    });
+
+    await page.goto('/login');
+    await page.waitForTimeout(300);
+    expect(sidebarApiCalls).toBe(0);
+
+    await page.locator('[data-cy="sidebar-toggle"]').click();
+    await expect.poll(() => sidebarApiCalls).toBe(2);
+  });
+
   test('방문자는 헤더에서 방명록으로 이동해 빈 상태를 확인할 수 있다', async ({ page }) => {
     await mockApi(page, 'GET', '**/api/guestbook*', success(emptyPage(12)));
 

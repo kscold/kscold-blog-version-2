@@ -6,6 +6,7 @@ type PerformanceSnapshot = {
   hasResolved: boolean;
   isTouchDevice: boolean;
   isMobileViewport: boolean;
+  isDesktopViewport: boolean;
   supportsHover: boolean;
   prefersReducedMotion: boolean;
   usesSoftwareRendering: boolean;
@@ -15,6 +16,7 @@ const initialSnapshot: PerformanceSnapshot = {
   hasResolved: false,
   isTouchDevice: true,
   isMobileViewport: true,
+  isDesktopViewport: false,
   supportsHover: false,
   prefersReducedMotion: false,
   usesSoftwareRendering: false,
@@ -40,6 +42,7 @@ function updateSnapshot(nextSnapshot: PerformanceSnapshot) {
     snapshot.hasResolved === nextSnapshot.hasResolved &&
     snapshot.isTouchDevice === nextSnapshot.isTouchDevice &&
     snapshot.isMobileViewport === nextSnapshot.isMobileViewport &&
+    snapshot.isDesktopViewport === nextSnapshot.isDesktopViewport &&
     snapshot.supportsHover === nextSnapshot.supportsHover &&
     snapshot.prefersReducedMotion === nextSnapshot.prefersReducedMotion &&
     snapshot.usesSoftwareRendering === nextSnapshot.usesSoftwareRendering
@@ -83,6 +86,7 @@ function ensureStore() {
 
   const touchQuery = window.matchMedia('(pointer: coarse), (hover: none)');
   const mobileQuery = window.matchMedia('(max-width: 768px)');
+  const desktopQuery = window.matchMedia('(min-width: 1024px)');
   const hoverQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
   const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   const usesSoftwareRendering = detectSoftwareRendering();
@@ -92,6 +96,7 @@ function ensureStore() {
       hasResolved: true,
       isTouchDevice: touchQuery.matches,
       isMobileViewport: mobileQuery.matches,
+      isDesktopViewport: desktopQuery.matches,
       supportsHover: hoverQuery.matches,
       prefersReducedMotion: motionQuery.matches,
       usesSoftwareRendering,
@@ -102,6 +107,7 @@ function ensureStore() {
 
   touchQuery.addEventListener('change', syncSnapshot);
   mobileQuery.addEventListener('change', syncSnapshot);
+  desktopQuery.addEventListener('change', syncSnapshot);
   hoverQuery.addEventListener('change', syncSnapshot);
   motionQuery.addEventListener('change', syncSnapshot);
 }
@@ -128,6 +134,7 @@ export function usePerformanceMode() {
     hasResolved,
     isTouchDevice,
     isMobileViewport,
+    isDesktopViewport,
     supportsHover,
     prefersReducedMotion,
     usesSoftwareRendering,
@@ -143,6 +150,7 @@ export function usePerformanceMode() {
     allowRichEffects,
     isTouchDevice,
     isMobileViewport,
+    isDesktopViewport,
     supportsHover,
     prefersReducedMotion,
     usesSoftwareRendering,

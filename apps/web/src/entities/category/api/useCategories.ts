@@ -2,11 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
 import { Category } from '@/shared/model/types/blog';
 
-export function useCategories(initialData?: Category[]) {
+export function useCategories(initialData?: Category[], enabled = true) {
   return useQuery({
     queryKey: ['categories'],
     queryFn: () => apiClient.get<Category[]>('/categories'),
     initialData,
+    enabled,
   });
 }
 

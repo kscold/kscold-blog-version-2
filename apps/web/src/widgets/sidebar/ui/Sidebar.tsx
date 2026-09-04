@@ -14,19 +14,23 @@ import { SidebarCategories } from '@/widgets/sidebar/ui/SidebarCategories';
 import { SidebarTags } from '@/widgets/sidebar/ui/SidebarTags';
 
 export function Sidebar() {
-  const { data: categories } = useCategories();
   const { sidebarOpen, setSidebarOpen } = useUiStore();
-  const { data: tagIndex, isLoading: isTagsLoading } = useTagIndex();
+  const { role } = useViewer();
+  const { isTouchDevice, isDesktopViewport, allowRichEffects } = usePerformanceMode();
+  const pathname = usePathname();
+  const isVaultPage = pathname.startsWith('/vault');
+  const shouldLoadSidebarData = sidebarOpen || (isDesktopViewport && !isVaultPage);
+  const { data: categories } = useCategories(undefined, shouldLoadSidebarData);
+  const { data: tagIndex, isLoading: isTagsLoading } = useTagIndex(
+    undefined,
+    shouldLoadSidebarData
+  );
 
   const tags = (tagIndex ?? []).filter(
     tag => !isSystemTagName(tag.name) && tag.totalCount > 0
   );
-  const { role } = useViewer();
-  const { isTouchDevice, allowRichEffects } = usePerformanceMode();
   const useSolidSurface = isTouchDevice || !allowRichEffects;
   const closeSidebar = () => setSidebarOpen(false);
-  const pathname = usePathname();
-  const isVaultPage = pathname.startsWith('/vault');
 
   useEffect(() => {
     setSidebarOpen(false);
