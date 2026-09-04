@@ -110,13 +110,12 @@ export async function mockApi(
 
 /**
  * 모든 페이지의 공통 API와 외부 피드 이미지를 결정적인 응답으로 목킹한다.
- * 외부 CDN 상태가 UI 시나리오 결과에 영향을 주지 않도록 Instagram 이미지만 대체한다.
+ * 외부 CDN 상태가 UI 시나리오 결과에 영향을 주지 않도록 원격 최적화 요청을 대체한다.
  */
 export async function mockShellApis(page: Page): Promise<void> {
   await page.route('**/_next/image?**', async route => {
     const source = new URL(route.request().url()).searchParams.get('url');
-    const sourceHost = source ? new URL(source, route.request().url()).hostname : '';
-    if (sourceHost.endsWith('cdninstagram.com')) {
+    if (source?.startsWith('http://') || source?.startsWith('https://')) {
       await route.fulfill({ status: 200, contentType: 'image/png', body: TRANSPARENT_PIXEL });
       return;
     }

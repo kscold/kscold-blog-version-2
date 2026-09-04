@@ -15,7 +15,8 @@ const LINK_PREVIEW = success({
   url: 'https://kscold.com/info/team',
   title: 'Colding 소개',
   description: '브랜드와 프로젝트 방향을 소개하는 안내 페이지입니다.',
-  image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
+  image:
+    'https://images.ctfassets.net/kftzwdyauwt9/example/preview/Hero_16x9.png',
   siteName: 'KSCOLD',
 });
 
@@ -91,6 +92,10 @@ test.describe('공개 피드 작성기 시나리오', () => {
       await expect(linkInput).toBeVisible();
       await linkInput.fill('https://kscold.com/info/team');
       await expect(page.getByText('Colding 소개')).toBeVisible();
+      await expect(page.locator('a[href="https://kscold.com/info/team"] img')).toHaveAttribute(
+        'src',
+        /\/_next\/image\?/
+      );
 
       await expect(page.locator('[data-cy="feed-composer-upload"]')).toBeAttached();
       await page.locator('[data-cy="feed-composer-submit"]').click();

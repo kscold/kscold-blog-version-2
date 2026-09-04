@@ -1,0 +1,15 @@
+{
+  "optimizedPatterns": [
+    {
+      "protocol": "https",
+      "hostname": "images.ctfassets.net",
+      "pathname": "/kftzwdyauwt9/**"
+    },
+    {
+      "protocol": "https",
+      "hostname": "d2908q01vomqb2.cloudfront.net",
+      "pathname": "/2a459380709e2fe4ac2dae5733c73225ff6cfee1/**"
+    }
+  ],
+  "blockedHostnameSuffixes": ["cdninstagram.com"]
+}

@@ -1,3 +1,5 @@
+const linkPreviewImagePolicy = require('./src/shared/config/link-preview-images.json');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
@@ -22,6 +24,10 @@ const nextConfig = {
         port: '',
         pathname: '/u/**',
       },
+      ...linkPreviewImagePolicy.optimizedPatterns.map(pattern => ({
+        ...pattern,
+        port: '',
+      })),
     ],
   },
 
