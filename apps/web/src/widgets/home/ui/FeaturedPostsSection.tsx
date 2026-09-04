@@ -4,7 +4,14 @@ import type { Post } from '@/shared/model/types/blog';
 import { fetchPublicApi } from '@/shared/lib/seo';
 
 export async function FeaturedPostsSection() {
-  const featuredPosts = await fetchPublicApi<Post[]>('/posts/featured?limit=3');
+  let featuredPosts: Post[] | null;
+
+  try {
+    featuredPosts = await fetchPublicApi<Post[]>('/posts/featured?limit=3');
+  } catch {
+    // 추천 글은 홈의 보조 콘텐츠이므로 일시적인 API 장애를 페이지 전체 500으로 전파하지 않는다.
+    return null;
+  }
 
   return (
     <section className="py-16 sm:py-32 px-4 sm:px-6 lg:px-8 bg-surface-50 relative border-t border-surface-200">
