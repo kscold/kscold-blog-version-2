@@ -9,6 +9,7 @@ interface UsePostsOptions {
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
   initialData?: PageResponse<Post>;
+  enabled?: boolean;
 }
 
 export function usePosts(options: UsePostsOptions = {}) {
@@ -18,6 +19,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     sortBy = 'publishedAt',
     sortDirection = 'desc',
     initialData,
+    enabled = true,
   } = options;
 
   return useQuery({
@@ -27,6 +29,7 @@ export function usePosts(options: UsePostsOptions = {}) {
         `/posts?page=${page}&size=${size}&sortBy=${sortBy}&sortDirection=${sortDirection}`
       ),
     initialData,
+    enabled,
   });
 }
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 import { useVaultStats } from '@/entities/vault/api';
 import { usePosts } from '@/entities/post';
 import { useGitHubOverview } from '@/entities/github';
@@ -10,10 +11,36 @@ import { GitHubHeatmap } from './GitHubHeatmap';
 import { StatsGrid } from './StatsGrid';
 
 export function StatsSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [shouldLoadStats, setShouldLoadStats] = useState(false);
   const { allowRichEffects, isTouchDevice } = usePerformanceMode();
-  const { data: github } = useGitHubOverview('kscold');
-  const { data: vaultStats } = useVaultStats();
-  const { data: postsData } = usePosts({ page: 0, size: 1 });
+  const { data: github } = useGitHubOverview('kscold', shouldLoadStats);
+  const { data: vaultStats } = useVaultStats(shouldLoadStats);
+  const { data: postsData } = usePosts({ page: 0, size: 1, enabled: shouldLoadStats });
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || shouldLoadStats) {
+      return;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      setShouldLoadStats(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          setShouldLoadStats(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '1200px 0px' }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [shouldLoadStats]);
 
   const noteCount = vaultStats?.totalNotes ?? null;
   const postCount = postsData?.totalElements ?? null;
@@ -28,7 +55,10 @@ export function StatsSection() {
   ];
 
   return (
-    <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-surface-50/60">
+    <section
+      ref={sectionRef}
+      className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-surface-50/60"
+    >
       <div className="max-w-5xl mx-auto">
       <div className="rounded-[32px] border border-surface-200 bg-white px-5 sm:px-12 py-10 sm:py-16 space-y-10 sm:space-y-12 shadow-sm">
         <motion.div
@@ -48,7 +78,7 @@ export function StatsSection() {
 
         <StatsGrid stats={stats} />
 
-        <GitHubHeatmap username="kscold" />
+        <GitHubHeatmap username="kscold" enabled={shouldLoadStats} />
 
         <motion.div
           className="text-center"

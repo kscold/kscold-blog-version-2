@@ -14,10 +14,11 @@ interface ContributionResponse {
   days: GitHubContributionDay[];
 }
 
-function useContributions(username: string, year: number) {
+function useContributions(username: string, year: number, enabled: boolean) {
   return useQuery({
     queryKey: ['github-contributions', username, year],
     queryFn: () => apiClient.get<ContributionResponse>(`/github/${username}/contributions?year=${year}`),
+    enabled: enabled && !!username,
     staleTime: 1000 * 60 * 30,
   });
 }
@@ -47,13 +48,16 @@ function buildGrid(days: GitHubContributionDay[]) {
   return { weeks, monthLabels };
 }
 
-interface Props { username: string }
+interface Props {
+  username: string;
+  enabled?: boolean;
+}
 
-export function GitHubHeatmap({ username }: Props) {
+export function GitHubHeatmap({ username, enabled = true }: Props) {
   const currentYear = new Date().getFullYear();
   const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
   const [year, setYear] = useState(currentYear);
-  const { data } = useContributions(username, year);
+  const { data } = useContributions(username, year, enabled);
 
   const days = data?.days ?? [];
   const total = data?.total ?? 0;

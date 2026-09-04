@@ -71,10 +71,11 @@ export function useVaultTitleIndex() {
   });
 }
 
-export function useVaultStats() {
+export function useVaultStats(enabled = true) {
   return useQuery({
     queryKey: ['vault', 'stats'],
     queryFn: () => apiClient.get<VaultNoteStats>('/vault/notes/stats'),
+    enabled,
     staleTime: 1000 * 60 * 5,
   });
 }
