@@ -15,6 +15,9 @@ export const MIN_INDEXABLE_VAULT_CONTENT_LENGTH = 1500;
 /** 독립된 목록 페이지로 색인할 태그의 최소 공개 포스트 수. */
 export const MIN_INDEXABLE_TAG_POST_COUNT = 3;
 
+/** 상세 페이지 빌드 비용을 제한하면서 최신 콘텐츠의 첫 응답을 캐시할 개수. */
+export const RECENT_DETAIL_PRERENDER_COUNT = 12;
+
 export type OpenGraphType =
   | 'website'
   | 'article'

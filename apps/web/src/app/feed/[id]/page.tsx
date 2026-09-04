@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { Feed } from '@/shared/model/types/social';
+import type { PageResponse } from '@/shared/model/types/api';
 import { FeedDetail } from '@/widgets/feed/detail';
 import {
   absoluteUrl,
@@ -9,12 +10,23 @@ import {
   extractFirstMarkdownImage,
   fetchPublicApi,
   isIndexableFeed,
+  RECENT_DETAIL_PRERENDER_COUNT,
   toFeedTitle,
   toMetaDescription,
   toOgImage,
   uniqueKeywords,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
+
+export async function generateStaticParams() {
+  const feeds = await fetchPublicApi<PageResponse<Feed>>(
+    `/feeds?page=0&size=${RECENT_DETAIL_PRERENDER_COUNT}`
+  );
+
+  return (feeds?.content ?? [])
+    .filter(feed => feed.visibility === 'PUBLIC')
+    .map(feed => ({ id: feed.id }));
+}
 
 async function getFeed(id: string) {
   return fetchPublicApi<Feed>(`/feeds/${id}`);
