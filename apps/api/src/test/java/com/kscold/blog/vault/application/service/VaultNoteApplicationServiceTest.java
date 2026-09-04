@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
@@ -55,5 +56,21 @@ class VaultNoteApplicationServiceTest {
         assertThat(response.getLinks()).hasSize(1);
         assertThat(response.getLinks().getFirst().getSource()).isEqualTo("note-1");
         assertThat(response.getLinks().getFirst().getTarget()).isEqualTo("note-2");
+    }
+
+    @Test
+    void 제목인덱스는위키링크에필요한필드만반환한다() {
+        when(vaultNoteRepository.findAllForTitleIndex())
+                .thenReturn(
+                        List.of(
+                                new VaultNoteRepository.TitleNote("첫 노트", "first-note"),
+                                new VaultNoteRepository.TitleNote("둘째 노트", "second-note")));
+
+        List<VaultNoteTitleResponse> response = service.getTitleIndex();
+
+        assertThat(response)
+                .containsExactly(
+                        new VaultNoteTitleResponse("첫 노트", "first-note"),
+                        new VaultNoteTitleResponse("둘째 노트", "second-note"));
     }
 }

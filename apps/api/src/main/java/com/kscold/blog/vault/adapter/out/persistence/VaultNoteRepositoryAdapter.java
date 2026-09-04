@@ -112,6 +112,16 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
                 .toList();
     }
 
+    @Override
+    public List<TitleNote> findAllForTitleIndex() {
+        Query query = new Query();
+        query.fields().include("title").include("slug");
+
+        return mongoTemplate.find(query, Document.class, "vault_notes").stream()
+                .map(doc -> new TitleNote(doc.getString("title"), doc.getString("slug")))
+                .toList();
+    }
+
     private List<String> readStringList(Document document, String fieldName) {
         Object value = document.get(fieldName);
         if (!(value instanceof List<?> values)) {

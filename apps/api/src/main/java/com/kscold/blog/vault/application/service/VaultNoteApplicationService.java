@@ -7,6 +7,7 @@ import com.kscold.blog.shared.util.SlugUtils;
 import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNote;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
@@ -187,6 +188,13 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
         }
 
         return GraphDataResponse.builder().nodes(nodes).links(links).build();
+    }
+
+    /** 위키 링크 변환은 전체 그래프의 링크·폴더 정보 없이 제목과 slug만 사용한다. */
+    public List<VaultNoteTitleResponse> getTitleIndex() {
+        return vaultNoteRepository.findAllForTitleIndex().stream()
+                .map(note -> new VaultNoteTitleResponse(note.title(), note.slug()))
+                .toList();
     }
 
     /** 전체 노트의 outgoingLinks 재인덱싱 (일괄 임포트 후 백링크 복원용) */
