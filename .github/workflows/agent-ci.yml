@@ -37,6 +37,14 @@ jobs:
           docker run --rm --env PIP_NO_CACHE_DIR=1 --entrypoint python
           kscold-vault-agent:ci -m pip check
 
+      - name: Python 취약점 검사
+        run: |
+          docker run --rm --user root --entrypoint sh kscold-vault-agent:ci -c '
+            python -m venv /tmp/audit &&
+            PIP_DISABLE_PIP_VERSION_CHECK=1 /tmp/audit/bin/pip install --quiet --no-cache-dir pip-audit==2.10.1 &&
+            /tmp/audit/bin/pip-audit --path /usr/local/lib/python3.11/site-packages --progress-spinner off
+          '
+
       - name: Python 소스 컴파일 검사
         run: >-
           docker run --rm --env PYTHONPYCACHEPREFIX=/tmp/pycache --entrypoint python
