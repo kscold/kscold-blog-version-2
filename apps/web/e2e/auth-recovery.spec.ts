@@ -47,27 +47,22 @@ test.describe('계정 복구 시나리오', () => {
     );
   });
 
-  test('가입되지 않은 이메일로 비밀번호 재설정 시도 시 에러 메시지를 보여준다', async ({ page }) => {
+  test('가입되지 않은 이메일도 계정 존재 여부를 드러내지 않는다', async ({ page }) => {
     await mockApi(
       page,
       'POST',
       '**/api/auth/request-password-reset',
-      {
-        success: false,
-        data: null,
-        message: '가입되지 않은 이메일입니다.',
-        errorCode: 'INVALID_INPUT',
-        timestamp: '2026-04-13T00:00:00',
-      },
-      { status: 400 }
+      success(null, '비밀번호 재설정 안내를 이메일로 보냈습니다.')
     );
 
     await page.goto('/login/recovery?tab=password');
     await page.locator('[data-cy="recovery-email-input"]').fill('notregistered@example.com');
     await page.locator('[data-cy="recovery-submit"]').click();
 
-    await expect(page.locator('[data-cy="recovery-error"]')).toContainText('가입되지 않은 이메일입니다.');
-    await expect(page.locator('[data-cy="recovery-success"]')).toHaveCount(0);
+    await expect(page.locator('[data-cy="recovery-success"]')).toContainText(
+      '비밀번호 재설정 링크를 이메일로 보냈습니다'
+    );
+    await expect(page.locator('[data-cy="recovery-error"]')).toHaveCount(0);
   });
 
   test('비밀번호 재설정 탭은 메일함으로 링크를 보내고 성공 상태를 보여준다', async ({ page }) => {
