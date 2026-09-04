@@ -1,0 +1,81 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - '.github/workflows/frontend-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: 소스 체크아웃
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: pnpm 설정
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 8.15.4
+          run_install: false
+
+      - name: Node.js 설정
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: 린트 검사
+        run: pnpm --dir apps/web lint
+
+      - name: 타입 검사
+        run: pnpm --dir apps/web type-check
+
+      - name: 운영 의존성 보안 검사
+        run: pnpm audit --prod --audit-level high
+
+      - name: 운영 빌드 검사
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:4100/api
+        run: |
+          node apps/web/e2e/support/build-api-stub.mjs &
+          stub_pid=$!
+          trap 'kill "${stub_pid}"' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:4100/api/health >/dev/null; then
+              break
+            fi
+            if [ "${attempt}" -eq 20 ]; then
+              exit 1
+            fi
+            sleep 0.25
+          done
+          pnpm --dir apps/web build
