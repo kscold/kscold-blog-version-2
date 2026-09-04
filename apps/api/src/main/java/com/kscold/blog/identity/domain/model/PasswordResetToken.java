@@ -29,7 +29,7 @@ public class PasswordResetToken {
 
     private Instant createdAt;
 
-    @Indexed(expireAfterSeconds = 0)
+    @Indexed(expireAfter = "0s")
     private Instant expiresAt;
 
     public boolean isExpired(Instant now) {

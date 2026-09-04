@@ -30,6 +30,6 @@ public class PageVisitLog {
     /** 표시용 이름 (denormalized) */
     private String username;
 
-    @Indexed(expireAfterSeconds = 7776000) // 90일
+    @Indexed(expireAfter = "90d")
     private Instant createdAt;
 }

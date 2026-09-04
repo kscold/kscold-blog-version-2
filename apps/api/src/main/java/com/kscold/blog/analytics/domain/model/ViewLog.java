@@ -36,6 +36,6 @@ public class ViewLog {
 
     private String ipHash;
 
-    @Indexed(expireAfterSeconds = 3600)
+    @Indexed(expireAfter = "1h")
     private Instant createdAt;
 }
