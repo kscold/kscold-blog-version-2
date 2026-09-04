@@ -149,11 +149,7 @@ public class AuthApplicationService implements AuthUseCase {
     public void requestPasswordReset(String email) {
         ensureRecoveryMailConfigured();
 
-        User user =
-                userRepository
-                        .findByEmail(normalizeEmail(email))
-                        .orElseThrow(() -> InvalidRequestException.invalidInput("가입되지 않은 이메일입니다."));
-        sendPasswordResetMail(user);
+        userRepository.findByEmail(normalizeEmail(email)).ifPresent(this::sendPasswordResetMail);
     }
 
     @Override

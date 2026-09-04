@@ -172,6 +172,18 @@ class AuthApplicationServiceTest {
     }
 
     @Test
+    @DisplayName("시나리오: 미가입 이메일도 계정 존재 여부를 드러내지 않고 동일하게 처리한다")
+    void requestPasswordResetDoesNotRevealMissingAccount() {
+        when(recoveryMailSender.isAvailable()).thenReturn(true);
+        when(userRepository.findByEmail("missing@example.com")).thenReturn(Optional.empty());
+
+        authApplicationService.requestPasswordReset("missing@example.com");
+
+        verify(passwordResetTokenRepository, never()).save(any());
+        verify(recoveryMailSender, never()).send(any());
+    }
+
+    @Test
     @DisplayName("시나리오: 유효한 재설정 링크로 비밀번호를 바꾸면 저장된 토큰이 함께 정리된다")
     void resetPasswordUpdatesUserAndDeletesToken() {
         User user = UserFixtures.user("user-1", User.Role.USER, "kscold", "김승찬");
