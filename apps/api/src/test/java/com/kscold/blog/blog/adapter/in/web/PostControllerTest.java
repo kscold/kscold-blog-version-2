@@ -23,11 +23,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -132,6 +134,22 @@ class PostControllerTest {
         assertThat(data.getContent()).isNull();
         assertThat(data.getExcerpt()).isEqualTo("요약");
         assertThat(data.getRestricted()).isNull();
+    }
+
+    @Test
+    @DisplayName("시나리오: 공개 글 목록은 과도한 크기와 임의 정렬 필드를 제한한다")
+    void getAllPostsLimitsPageSizeAndSortField() {
+        when(postUseCase.getAll(any())).thenReturn(Page.empty());
+
+        postController.getAllPosts(-1, 10_000, "content", "asc");
+
+        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(postUseCase).getAll(pageableCaptor.capture());
+        Pageable pageable = pageableCaptor.getValue();
+        assertThat(pageable.getPageNumber()).isZero();
+        assertThat(pageable.getPageSize()).isEqualTo(100);
+        assertThat(pageable.getSort().getOrderFor("publishedAt")).isNotNull();
+        assertThat(pageable.getSort().getOrderFor("content")).isNull();
     }
 
     @Test

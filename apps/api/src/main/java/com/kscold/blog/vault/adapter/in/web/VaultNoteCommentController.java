@@ -1,6 +1,7 @@
 package com.kscold.blog.vault.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.PublicPageRequestFactory;
 import com.kscold.blog.vault.adapter.in.web.dto.response.VaultNoteCommentResponse;
 import com.kscold.blog.vault.application.dto.command.NoteCommentCreateCommand;
 import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
@@ -9,7 +10,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,8 @@ public class VaultNoteCommentController {
             @AuthenticationPrincipal String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
+        Pageable pageable =
+                PublicPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
         Page<VaultNoteComment> comments = commentUseCase.getByNoteId(noteId, pageable, userId);
         boolean isAdmin = hasAdminRole();
         return ResponseEntity.ok(

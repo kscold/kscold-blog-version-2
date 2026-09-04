@@ -4,6 +4,7 @@ import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import com.kscold.blog.shared.web.PublicPageRequestFactory;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
@@ -46,7 +47,8 @@ public class FeedController {
             @RequestParam(required = false) String tag,
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable =
+                PublicPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Feed> feeds =
                 (tag != null && !tag.isBlank())
                         ? feedUseCase.getPublicFeedsByTag(tag, pageable)

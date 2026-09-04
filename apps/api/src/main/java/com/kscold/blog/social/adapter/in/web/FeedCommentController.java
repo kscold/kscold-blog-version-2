@@ -2,6 +2,7 @@ package com.kscold.blog.social.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import com.kscold.blog.shared.web.PublicPageRequestFactory;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedCommentResponse;
 import com.kscold.blog.social.adapter.in.web.dto.response.MentionableUserResponse;
 import com.kscold.blog.social.application.dto.command.FeedCommentCreateCommand;
@@ -13,7 +14,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -39,7 +39,8 @@ public class FeedCommentController {
             HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
+        Pageable pageable =
+                PublicPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
         Page<FeedComment> comments = feedCommentUseCase.getByFeedId(feedId, pageable, userId);
         boolean isAdmin = hasAdminRole();
         String identifier = resolveIdentifier(userId, request);

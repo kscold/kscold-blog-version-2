@@ -12,9 +12,11 @@ import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import com.kscold.blog.shared.web.PublicPageRequestFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -36,6 +38,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PostController {
 
+    private static final Set<String> PUBLIC_SORT_FIELDS =
+            Set.of("publishedAt", "createdAt", "updatedAt", "views");
+
     private final PostUseCase postUseCase;
     private final AccessRequestUseCase accessRequestUseCase;
     private final CategoryUseCase categoryUseCase;
@@ -50,7 +55,8 @@ public class PostController {
             @RequestParam(defaultValue = "desc") String sortDirection) {
         Sort.Direction direction =
                 sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        String safeSortBy = PUBLIC_SORT_FIELDS.contains(sortBy) ? sortBy : "publishedAt";
+        Pageable pageable = PublicPageRequestFactory.of(page, size, Sort.by(direction, safeSortBy));
         Page<Post> posts = postUseCase.getAll(pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
     }
@@ -58,7 +64,8 @@ public class PostController {
     @GetMapping("/featured")
     public ResponseEntity<ApiResponse<List<PostResponse>>> getFeaturedPosts(
             @RequestParam(defaultValue = "5") int limit) {
-        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "views"));
+        Pageable pageable =
+                PublicPageRequestFactory.of(0, limit, Sort.by(Sort.Direction.DESC, "views"));
         List<Post> posts = postUseCase.getFeatured(pageable);
         return ResponseEntity.ok(
                 ApiResponse.success(posts.stream().map(this::toPublicPostResponse).toList()));
@@ -106,7 +113,9 @@ public class PostController {
             @PathVariable String categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
+        Pageable pageable =
+                PublicPageRequestFactory.of(
+                        page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByCategory(categoryId, pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
     }
@@ -116,7 +125,9 @@ public class PostController {
             @PathVariable String tagId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
+        Pageable pageable =
+                PublicPageRequestFactory.of(
+                        page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByTag(tagId, pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
     }
@@ -126,7 +137,9 @@ public class PostController {
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
+        Pageable pageable =
+                PublicPageRequestFactory.of(
+                        page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.search(q, pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toPublicPostResponse)));
     }
