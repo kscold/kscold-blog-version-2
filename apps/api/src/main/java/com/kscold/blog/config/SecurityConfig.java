@@ -113,6 +113,7 @@ public class SecurityConfig {
                                                 "/auth/login",
                                                 "/auth/register",
                                                 "/auth/refresh",
+                                                "/auth/logout",
                                                 "/auth/recover-username",
                                                 "/auth/request-password-reset",
                                                 "/auth/reset-password",

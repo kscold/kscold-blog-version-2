@@ -10,6 +10,7 @@ import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.application.port.in.AuthUseCase;
 import com.kscold.blog.shared.web.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,10 +48,20 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<AuthResponse>> refresh(
-            @Valid @RequestBody RefreshTokenCommand command, HttpServletResponse response) {
-        AuthResponse result = authUseCase.refresh(command.getRefreshToken());
+            @Valid @RequestBody(required = false) RefreshTokenCommand command,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        String requestToken = command == null ? null : command.getRefreshToken();
+        String refreshToken = authCookieManager.resolveRefreshToken(request, requestToken);
+        AuthResponse result = authUseCase.refresh(refreshToken);
         authCookieManager.addAuthenticationCookies(response, result);
         return ResponseEntity.ok(ApiResponse.success(result, "토큰이 갱신되었습니다"));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletResponse response) {
+        authCookieManager.clearAuthenticationCookies(response);
+        return ResponseEntity.ok(ApiResponse.successWithMessage("로그아웃되었습니다"));
     }
 
     @GetMapping("/me")
