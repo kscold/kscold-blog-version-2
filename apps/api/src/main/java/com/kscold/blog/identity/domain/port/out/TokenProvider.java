@@ -12,6 +12,4 @@ public interface TokenProvider {
     String getUserIdFromAccessToken(String token);
 
     String getUserIdFromRefreshToken(String token);
-
-    String getRoleFromAccessToken(String token);
 }

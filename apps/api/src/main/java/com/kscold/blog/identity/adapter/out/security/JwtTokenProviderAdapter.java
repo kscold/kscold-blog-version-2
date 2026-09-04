@@ -40,9 +40,4 @@ public class JwtTokenProviderAdapter implements TokenProvider {
     public String getUserIdFromRefreshToken(String token) {
         return jwtTokenProvider.getUserIdFromRefreshToken(token);
     }
-
-    @Override
-    public String getRoleFromAccessToken(String token) {
-        return jwtTokenProvider.getRoleFromAccessToken(token);
-    }
 }

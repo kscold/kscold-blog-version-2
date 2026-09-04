@@ -1,6 +1,8 @@
 package com.kscold.blog.identity.adapter.in.web;
 
+import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.adapter.out.security.JwtTokenProvider;
+import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -22,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserQueryPort userQueryPort;
 
     @Override
     protected void doFilterInternal(
@@ -33,7 +36,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null && jwtTokenProvider.validateAccessToken(token)) {
             String userId = jwtTokenProvider.getUserIdFromAccessToken(token);
-            String role = jwtTokenProvider.getRoleFromAccessToken(token);
+            UserQueryPort.UserInfo user;
+            try {
+                user = userQueryPort.getUserById(userId);
+            } catch (ResourceNotFoundException ignored) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            String role = user.isAdmin() ? "ADMIN" : "USER";
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(

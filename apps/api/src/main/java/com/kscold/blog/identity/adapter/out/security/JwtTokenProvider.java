@@ -97,10 +97,6 @@ public class JwtTokenProvider {
         return parseClaims(token, refreshSecretKey).getSubject();
     }
 
-    public String getRoleFromAccessToken(String token) {
-        return (String) parseClaims(token, accessSecretKey).get("role");
-    }
-
     public Authentication getAuthentication(String token) {
         try {
             Claims claims = parseClaims(token, accessSecretKey);

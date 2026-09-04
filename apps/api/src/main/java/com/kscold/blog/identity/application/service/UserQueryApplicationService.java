@@ -21,6 +21,7 @@ public class UserQueryApplicationService implements UserQueryPort {
         User user =
                 userRepository
                         .findById(userId)
+                        .filter(candidate -> !candidate.isDeleted())
                         .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
         return toUserInfo(user);
