@@ -14,6 +14,8 @@ const nextConfig = {
   // 이미지 최적화
   images: {
     formats: ['image/avif', 'image/webp'],
+    // UUID 업로드와 허용된 외부 이미지를 반복 변환하지 않되 프로필 변경은 한 시간 안에 반영한다.
+    minimumCacheTTL: 3600,
     remotePatterns: [
       {
         protocol: 'https',
