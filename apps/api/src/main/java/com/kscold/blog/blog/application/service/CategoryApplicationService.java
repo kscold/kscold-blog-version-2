@@ -6,12 +6,15 @@ import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.config.BlogCatalogCacheConfiguration;
 import com.kscold.blog.blog.config.InvalidateBlogCatalogCaches;
 import com.kscold.blog.blog.domain.model.Category;
+import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.domain.port.out.CategoryRepository;
+import com.kscold.blog.blog.domain.port.out.PostRepository;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.shared.util.SlugUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryApplicationService implements CategoryUseCase {
 
     private final CategoryRepository categoryRepository;
+    private final PostRepository postRepository;
     private static final int MAX_DEPTH = 4; // 0-4 = 5단계
 
     /** 카테고리 생성 (커맨드에서 엔티티 변환 포함) */
@@ -103,6 +107,10 @@ public class CategoryApplicationService implements CategoryUseCase {
     @InvalidateBlogCatalogCaches
     public Category update(String id, CategoryUpdateCommand command) {
         Category category = getById(id);
+        boolean isReferenceChanged =
+                (command.getName() != null && !category.getName().equals(command.getName()))
+                        || (command.getSlug() != null
+                                && !Objects.equals(category.getSlug(), command.getSlug()));
 
         if (command.getName() != null) {
             category.setName(command.getName());
@@ -123,7 +131,16 @@ public class CategoryApplicationService implements CategoryUseCase {
             category.setColor(command.getColor());
         }
 
-        return categoryRepository.save(category);
+        Category saved = categoryRepository.save(category);
+        if (isReferenceChanged) {
+            postRepository.updateCategoryReference(
+                    Post.CategoryInfo.builder()
+                            .id(saved.getId())
+                            .name(saved.getName())
+                            .slug(saved.getSlug())
+                            .build());
+        }
+        return saved;
     }
 
     @Transactional
@@ -134,6 +151,9 @@ public class CategoryApplicationService implements CategoryUseCase {
         List<Category> children = categoryRepository.findByParent(id);
         if (!children.isEmpty()) {
             throw InvalidRequestException.invalidInput("하위 카테고리가 있는 카테고리는 삭제할 수 없습니다");
+        }
+        if (category.getPostCount() != null && category.getPostCount() > 0) {
+            throw InvalidRequestException.invalidInput("포스트가 있는 카테고리는 삭제할 수 없습니다");
         }
 
         categoryRepository.delete(category);

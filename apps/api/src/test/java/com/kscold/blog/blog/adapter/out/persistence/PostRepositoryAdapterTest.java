@@ -73,4 +73,28 @@ class PostRepositoryAdapterTest {
                 .contains("tags.$[target].name", "renamed", "tags.$[target].slug", "renamed-slug");
         assertThat(modified).isEqualTo(1L);
     }
+
+    @Test
+    void updateCategoryReferenceUpdatesEmbeddedNameAndSlug() {
+        MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+        when(mongoTemplate.updateMulti(
+                        any(Query.class), any(UpdateDefinition.class), eq(Post.class)))
+                .thenReturn(UpdateResult.acknowledged(1L, 1L, null));
+        PostRepositoryAdapter adapter =
+                new PostRepositoryAdapter(mock(MongoPostRepository.class), mongoTemplate);
+
+        long modified =
+                adapter.updateCategoryReference(
+                        Post.CategoryInfo.builder()
+                                .id("507f191e810c19729de860ea")
+                                .name("renamed")
+                                .slug("renamed-slug")
+                                .build());
+
+        ArgumentCaptor<UpdateDefinition> update = ArgumentCaptor.forClass(UpdateDefinition.class);
+        verify(mongoTemplate).updateMulti(any(Query.class), update.capture(), eq(Post.class));
+        assertThat(update.getValue().getUpdateObject().toJson())
+                .contains("category.name", "renamed", "category.slug", "renamed-slug");
+        assertThat(modified).isEqualTo(1L);
+    }
 }

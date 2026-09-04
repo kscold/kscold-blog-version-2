@@ -108,8 +108,9 @@ class BlogCatalogCacheTest {
         }
 
         @Bean
-        CategoryUseCase categoryUseCase(CategoryRepository categoryRepository) {
-            return new CategoryApplicationService(categoryRepository);
+        CategoryUseCase categoryUseCase(
+                CategoryRepository categoryRepository, PostRepository postRepository) {
+            return new CategoryApplicationService(categoryRepository, postRepository);
         }
 
         @Bean

@@ -48,6 +48,9 @@ public interface PostRepository {
     /** 글에 박혀 있는 같은 태그의 표시 정보와 슬러그를 최신 값으로 맞춘다. */
     long updateTagReference(Post.TagInfo tag);
 
+    /** 글에 박혀 있는 카테고리의 표시 정보와 슬러그를 최신 값으로 맞춘다. */
+    long updateCategoryReference(Post.CategoryInfo category);
+
     /** 이 태그를 쓰는 글들의 카테고리별 사용 횟수. 태그를 어느 카테고리로 묶을지 추측할 때 쓴다. */
     Map<String, Long> countCategoriesByTagId(String tagId);
 }

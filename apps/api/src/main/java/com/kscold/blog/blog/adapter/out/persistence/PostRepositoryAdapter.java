@@ -153,6 +153,17 @@ public class PostRepositoryAdapter implements PostRepository {
         return mongoTemplate.updateMulti(query, update, Post.class).getModifiedCount();
     }
 
+    @Override
+    public long updateCategoryReference(Post.CategoryInfo category) {
+        ObjectId categoryId = new ObjectId(category.getId());
+        Query query = Query.query(Criteria.where("category._id").is(categoryId));
+        Update update =
+                new Update()
+                        .set("category.name", category.getName())
+                        .set("category.slug", category.getSlug());
+        return mongoTemplate.updateMulti(query, update, Post.class).getModifiedCount();
+    }
+
     /** 이 태그를 쓴 글들이 어느 카테고리에 얼마나 있는지 센다. */
     @Override
     public Map<String, Long> countCategoriesByTagId(String tagId) {
