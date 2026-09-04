@@ -2,6 +2,7 @@ package com.kscold.blog.shared.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.kscold.blog.adminnight.adapter.in.web.dto.request.ProgramVoteRequest;
 import com.kscold.blog.analytics.adapter.in.web.dto.request.PageVisitRequest;
 import com.kscold.blog.identity.application.dto.command.LoginCommand;
 import com.kscold.blog.identity.application.dto.command.RefreshTokenCommand;
@@ -13,6 +14,8 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.Size;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -70,6 +73,22 @@ class PublicRequestValidationTest {
         assertThat(hasSizeViolation(payment, "paymentId")).isTrue();
         assertThat(hasSizeViolation(teamRequest, "password")).isTrue();
         assertThat(hasSizeViolation(teamRequest, "teamId")).isTrue();
+    }
+
+    @Test
+    void rejectsOversizedPublicProgramVoteFields() {
+        ProgramVoteRequest request =
+                ProgramVoteRequest.builder()
+                        .requesterName("가".repeat(41))
+                        .preferredTimes(List.of("slot".repeat(21)))
+                        .interestedTopics(Collections.nCopies(13, "topic"))
+                        .desiredTakeaways("a".repeat(1001))
+                        .build();
+
+        assertThat(hasSizeViolation(request, "requesterName")).isTrue();
+        assertThat(hasSizeViolation(request, "preferredTimes[0].<list element>")).isTrue();
+        assertThat(hasSizeViolation(request, "interestedTopics")).isTrue();
+        assertThat(hasSizeViolation(request, "desiredTakeaways")).isTrue();
     }
 
     private boolean hasSizeViolation(Object request, String property) {

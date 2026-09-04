@@ -15,6 +15,7 @@ import com.kscold.blog.adminnight.application.port.in.AdminNightUseCase;
 import com.kscold.blog.adminnight.domain.model.AdminNightProgramVote;
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.shared.web.ApiResponse;
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -97,7 +98,7 @@ public class AdminNightController {
     public ResponseEntity<ApiResponse<ProgramVoteResponse>> upsertProgramVote(
             @PathVariable String programKey,
             @AuthenticationPrincipal String userId,
-            @RequestBody ProgramVoteRequest body) {
+            @Valid @RequestBody ProgramVoteRequest body) {
         AdminNightProgramVote vote =
                 adminNightUseCase.upsertProgramVote(
                         programKey,
