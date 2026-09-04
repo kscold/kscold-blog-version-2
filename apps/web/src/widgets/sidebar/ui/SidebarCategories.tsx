@@ -11,7 +11,7 @@ interface SidebarCategoriesProps {
 export function SidebarCategories({ categories }: SidebarCategoriesProps) {
   return (
     <div>
-      <h2 className="text-xs font-bold text-surface-400 mb-4 tracking-[0.2em] uppercase">
+      <h2 className="text-xs font-bold text-surface-600 mb-4 tracking-[0.2em] uppercase">
         Categories
       </h2>
       {categories ? (

@@ -38,7 +38,7 @@ export function SidebarTags({ tags, isLoading }: SidebarTagsProps) {
 
   return (
     <div>
-      <h2 className="text-xs font-bold text-surface-400 mb-4 tracking-[0.2em] uppercase">
+      <h2 className="text-xs font-bold text-surface-600 mb-4 tracking-[0.2em] uppercase">
         Popular Tags
       </h2>
 
@@ -49,12 +49,12 @@ export function SidebarTags({ tags, isLoading }: SidebarTagsProps) {
           ))}
         </div>
       ) : groups.length === 0 ? (
-        <p className="text-xs text-surface-400">태그가 없습니다</p>
+        <p className="text-xs text-surface-600">태그가 없습니다</p>
       ) : (
         <div className="space-y-4">
           {groups.map(group => (
             <div key={group.name}>
-              <p className="mb-2 text-[10px] font-bold tracking-[0.16em] text-surface-300">
+              <p className="mb-2 text-[10px] font-bold tracking-[0.16em] text-surface-600">
                 {group.name}
               </p>
               <div className="flex flex-wrap gap-2">
@@ -71,7 +71,7 @@ export function SidebarTags({ tags, isLoading }: SidebarTagsProps) {
                   >
                     <span className="absolute inset-0 bg-surface-50 opacity-0 transition-opacity group-hover:opacity-100" />
                     <span className="relative z-10">#{tag.name}</span>
-                    <span className="relative z-10 ml-1 text-[10px] text-surface-400">
+                    <span className="relative z-10 ml-1 text-[10px] text-surface-600">
                       {tag.totalCount}
                     </span>
                   </Link>

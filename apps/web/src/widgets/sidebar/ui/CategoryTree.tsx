@@ -29,7 +29,7 @@ export function CategoryTree({ categories, depth = 0 }: { categories: Category[]
               <span className="flex-1 text-surface-600 group-hover:text-surface-900 transition-colors font-medium tracking-wide relative z-10">
                 {category.name}
               </span>
-              <span className="text-[10px] text-surface-400 group-hover:text-surface-900 font-mono relative z-10">
+              <span className="text-[10px] text-surface-600 group-hover:text-surface-900 font-mono relative z-10">
                 {category.postCount}
               </span>
             </Link>
