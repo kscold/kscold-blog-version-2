@@ -21,6 +21,10 @@ const getPublicProfile = cache((username: string) =>
   fetchPublicApi<PublicProfile>(`/users/profile/${encodeURIComponent(username)}`, 300)
 );
 
+function getProfileName(profile: PublicProfile) {
+  return profile.username === 'kscold' ? '김승찬' : profile.displayName;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   const profile = await getPublicProfile(username);
@@ -29,10 +33,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     notFound();
   }
 
-  const title = `${profile.displayName} (@${profile.username})`;
+  const profileName = getProfileName(profile);
+  const title = `${profileName} (@${profile.username})`;
   const description = toMetaDescription(
     profile.bio,
-    `${profile.displayName}님의 공개 프로필과 피드입니다.`
+    `${profileName}님의 공개 프로필과 피드입니다.`
   );
 
   return buildPageMetadata({
@@ -41,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `/profile/${encodeURIComponent(profile.username)}`,
     image: profile.avatar,
     keywords: uniqueKeywords([
-      profile.displayName,
+      profileName,
       profile.username,
       ...(profile.techStack || []),
     ]),
@@ -58,16 +63,17 @@ export default async function PublicProfilePage({ params }: Props) {
   }
 
   const canonicalPath = `/profile/${encodeURIComponent(profile.username)}`;
+  const profileName = getProfileName(profile);
   const description = toMetaDescription(
     profile.bio,
-    `${profile.displayName}님의 공개 프로필과 피드입니다.`
+    `${profileName}님의 공개 프로필과 피드입니다.`
   );
   const profileEntity =
     profile.username === 'kscold'
       ? { '@id': `${absoluteUrl('/')}#person` }
       : {
           '@type': 'Person',
-          name: profile.displayName,
+          name: profileName,
           alternateName: profile.username,
           description,
           image: profile.avatar,
@@ -83,7 +89,7 @@ export default async function PublicProfilePage({ params }: Props) {
         '@type': 'ProfilePage',
         '@id': `${absoluteUrl(canonicalPath)}#profile-page`,
         url: absoluteUrl(canonicalPath),
-        name: `${profile.displayName} (@${profile.username})`,
+        name: `${profileName} (@${profile.username})`,
         description,
         mainEntity: profileEntity,
         isPartOf: { '@id': `${absoluteUrl('/')}#website` },
@@ -91,7 +97,7 @@ export default async function PublicProfilePage({ params }: Props) {
       buildBreadcrumbJsonLd([
         { name: '홈', path: '/' },
         { name: '피드', path: '/feed' },
-        { name: profile.displayName, path: canonicalPath },
+        { name: profileName, path: canonicalPath },
       ]),
     ],
   };
