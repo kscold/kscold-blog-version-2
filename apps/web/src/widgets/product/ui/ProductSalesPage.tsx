@@ -119,18 +119,10 @@ export function ProductSalesPage() {
             </dl>
 
             <div className="flex flex-wrap gap-3 pt-2">
-              {config?.cardConfigured && (
-                <Link
-                  href="/inicis/payment-path"
-                  className="inline-flex rounded-2xl bg-surface-900 px-6 py-4 text-sm font-black text-white transition-colors hover:bg-surface-800"
-                >
-                  신용카드로 테스트 결제하기
-                </Link>
-              )}
               {config?.configured && (
                 <Link
                   href="/kakaopay/payment-path"
-                  className="inline-flex rounded-2xl border border-surface-200 bg-white px-6 py-4 text-sm font-black text-surface-900 transition-colors hover:bg-surface-50"
+                  className="inline-flex rounded-2xl bg-surface-900 px-6 py-4 text-sm font-black text-white transition-colors hover:bg-surface-800"
                 >
                   카카오페이로 {livePayment ? '결제하기' : '테스트 결제하기'}
                 </Link>
@@ -144,8 +136,8 @@ export function ProductSalesPage() {
             </div>
 
             <p className="text-xs leading-6 text-surface-500">
-              결제는 신용카드(KG이니시스) 또는 카카오페이로 진행되며, 회원가입 없이 결제할 수
-              있습니다. 결제 정보는 결제대행사를 통해 안전하게 처리됩니다.
+              결제는 카카오페이로 진행됩니다. 로그인하거나 안내받은 전용 결제 링크로 접속한 경우에만
+              결제할 수 있으며, 결제 정보는 결제대행사를 통해 안전하게 처리됩니다.
             </p>
           </div>
         </article>

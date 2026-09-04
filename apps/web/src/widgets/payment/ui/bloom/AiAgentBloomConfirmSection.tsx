@@ -13,7 +13,6 @@ export function AiAgentBloomConfirmSection({
   formattedAmount,
   isPreparing,
   canPay,
-  isCardPayment = false,
   livePayment = false,
 }: {
   config: AiAgentBloomPaymentConfig | null;
@@ -23,16 +22,9 @@ export function AiAgentBloomConfirmSection({
   formattedAmount: string;
   isPreparing: boolean;
   canPay: boolean;
-  isCardPayment?: boolean;
   livePayment?: boolean;
 }) {
-  const methodLabel = isCardPayment ? '신용카드' : '카카오페이';
-  const isLiveKakaoPay = !isCardPayment && livePayment;
-  const unavailable = config
-    ? isCardPayment
-      ? !config.cardConfigured
-      : !config.configured
-    : false;
+  const unavailable = config ? !config.configured : false;
   return (
     <section
       id="before-payment-window"
@@ -45,12 +37,12 @@ export function AiAgentBloomConfirmSection({
           </div>
           <h2 className="text-3xl font-black tracking-tight">결제창 직전 화면</h2>
           <p className="text-sm leading-7 text-surface-600">
-            {methodLabel} 결제창으로 이동하기 직전 화면입니다. 상품명, 판매자, 결제수단, 금액을 최종
+            카카오페이 결제창으로 이동하기 직전 화면입니다. 상품명, 판매자, 결제수단, 금액을 최종
             확인할 수 있습니다.
           </p>
           {unavailable && (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold leading-6 text-amber-950">
-              현재 {methodLabel} 결제를 이용할 수 없습니다. 잠시 후 다시 시도해주세요.
+              현재 카카오페이 결제를 이용할 수 없습니다. 잠시 후 다시 시도해주세요.
             </div>
           )}
           {paymentStatus && (
@@ -66,9 +58,7 @@ export function AiAgentBloomConfirmSection({
               <span className="rounded-full bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.3em] text-cyan-100">
                 Confirm
               </span>
-              <span className="text-sm font-black text-cyan-100">
-                {isCardPayment ? 'KG이니시스' : 'KakaoPay'}
-              </span>
+              <span className="text-sm font-black text-cyan-100">KakaoPay</span>
             </div>
             <h3 className="mt-5 text-2xl font-black">결제 정보 확인</h3>
             <div className="mt-5 space-y-3 text-sm">
@@ -79,11 +69,7 @@ export function AiAgentBloomConfirmSection({
                 value={`${form.customerName || '홍길동'} · ${form.customerEmail || 'buyer@example.com'}`}
                 dark
               />
-              <PaymentInfoRow
-                label="결제수단"
-                value={isCardPayment ? '신용카드 (KG이니시스)' : '카카오페이'}
-                dark
-              />
+              <PaymentInfoRow label="결제수단" value="카카오페이" dark />
               <PaymentInfoRow label="결제금액" value={`${formattedAmount}원`} dark />
               <PaymentInfoRow label="서비스 제공 기간" value={displayConfig.servicePeriod} dark />
             </div>
@@ -99,7 +85,7 @@ export function AiAgentBloomConfirmSection({
               {canPay
                 ? isPreparing
                   ? '결제 확인 중...'
-                  : `${formattedAmount}원 ${methodLabel}${isLiveKakaoPay ? '로 결제하기' : ' 테스트 결제하기'}`
+                  : `${formattedAmount}원 카카오페이${livePayment ? '로 결제하기' : ' 테스트 결제하기'}`
                 : '로그인 또는 안내받은 결제 링크가 필요합니다'}
             </button>
           </div>

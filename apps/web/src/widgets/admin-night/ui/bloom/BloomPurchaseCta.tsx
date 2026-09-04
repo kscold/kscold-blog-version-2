@@ -5,10 +5,7 @@ import Link from 'next/link';
 import { aiAgentBloomPaymentApi, type AiAgentBloomPaymentConfig } from '@/features/payment';
 import { SERVICE_PERIOD } from '@/shared/model/aiAgentBloomContent';
 
-/**
- * 상품 상세의 구매 영역. 결제수단은 서버 설정에 따라 노출되며, 신용카드(KG이니시스) 채널키가 없으면
- * 카드 버튼이 자동으로 숨겨짐.
- */
+/** 상품 상세의 카카오페이 구매 영역. */
 export function BloomPurchaseCta() {
   const [config, setConfig] = useState<AiAgentBloomPaymentConfig | null>(null);
 
@@ -44,18 +41,10 @@ export function BloomPurchaseCta() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          {config?.cardConfigured && (
-            <Link
-              href="/inicis/payment-path"
-              className="inline-flex rounded-2xl bg-surface-900 px-6 py-4 text-sm font-black text-white transition-colors hover:bg-surface-800"
-            >
-              신용카드 결제하기
-            </Link>
-          )}
           {config?.configured && (
             <Link
               href="/kakaopay/payment-path"
-              className="inline-flex rounded-2xl border border-surface-200 bg-white px-6 py-4 text-sm font-black text-surface-900 transition-colors hover:bg-surface-50"
+              className="inline-flex rounded-2xl bg-surface-900 px-6 py-4 text-sm font-black text-white transition-colors hover:bg-surface-800"
             >
               카카오페이로 결제하기
             </Link>

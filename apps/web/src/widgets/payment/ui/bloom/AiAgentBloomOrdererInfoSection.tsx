@@ -8,7 +8,6 @@ export function AiAgentBloomOrdererInfoSection({
   isPreparing,
   paymentAccessToken,
   updateField,
-  isCardPayment = false,
 }: {
   form: FormState;
   errors: FormErrors;
@@ -16,7 +15,6 @@ export function AiAgentBloomOrdererInfoSection({
   isPreparing: boolean;
   paymentAccessToken: string | undefined;
   updateField: (field: keyof FormState, value: string) => void;
-  isCardPayment?: boolean;
 }) {
   return (
     <section
@@ -86,17 +84,15 @@ export function AiAgentBloomOrdererInfoSection({
                   <span className="h-2.5 w-2.5 rounded-full bg-surface-950" />
                 </span>
                 <span className="text-sm font-black text-surface-900">
-                  {isCardPayment ? '신용카드' : '카카오페이'}
+                  카카오페이
                   <p className="mt-1 text-xs font-bold text-surface-500">
-                    {isCardPayment
-                      ? 'KG이니시스 신용카드 결제창이 열립니다.'
-                      : '카카오페이 결제창이 열립니다.'}
+                    카카오페이 결제창이 열립니다.
                   </p>
                 </span>
               </div>
             </div>
             <p className="mt-2 text-xs font-bold text-surface-500">
-              선택한 결제수단: {isCardPayment ? '신용카드 (KG이니시스)' : '카카오페이'}
+              선택한 결제수단: 카카오페이
             </p>
           </div>
         </div>

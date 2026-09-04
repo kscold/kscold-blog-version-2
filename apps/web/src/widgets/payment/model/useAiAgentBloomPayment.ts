@@ -2,11 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useViewer } from '@/entities/user';
-import {
-  aiAgentBloomPaymentApi,
-  type AiAgentBloomPayMethod,
-  type AiAgentBloomPaymentConfig,
-} from '@/features/payment';
+import { aiAgentBloomPaymentApi, type AiAgentBloomPaymentConfig } from '@/features/payment';
 import {
   ORDER_NAME,
   PAYMENT_PATH,
@@ -24,10 +20,8 @@ import {
 } from '@/widgets/payment/lib/aiAgentBloomPaymentForm';
 import { requestPortOnePayment } from '@/widgets/payment/lib/requestPortOnePayment';
 
-/** defaultPayMethod 를 CARD 로 주면 KG이니시스 신용카드 결제 경로로 동작함. */
-export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod = 'EASY_PAY') {
+export function useAiAgentBloomPayment() {
   const { user, isAuthenticated } = useViewer();
-  const [payMethod, setPayMethod] = useState<AiAgentBloomPayMethod>(defaultPayMethod);
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<FormErrors>({});
   const [config, setConfig] = useState<AiAgentBloomPaymentConfig | null>(null);
@@ -36,9 +30,7 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
   const [paymentAccessToken, setPaymentAccessToken] = useState<string | undefined>();
   const [isPreparing, setIsPreparing] = useState(false);
   const handledRedirectPaymentId = useRef<string | null>(null);
-  const isCardPayment = payMethod === 'CARD';
-  // 신용카드(KG이니시스) 경로는 비회원도 결제창까지 진행할 수 있음
-  const canPay = isCardPayment || isAuthenticated || !!paymentAccessToken;
+  const canPay = isAuthenticated || !!paymentAccessToken;
   const paymentPathWithToken = paymentAccessToken
     ? `${PAYMENT_PATH}?token=${encodeURIComponent(paymentAccessToken)}`
     : PAYMENT_PATH;
@@ -47,7 +39,6 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
   const displayConfig = config ?? {
     configured: false,
     livePayment: false,
-    cardConfigured: false,
     storeId: '',
     channelKey: '',
     productName: PRODUCT_NAME,
@@ -169,7 +160,7 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
       setPaymentStatus(configError);
       return;
     }
-    if (config && (isCardPayment ? !config.cardConfigured : !config.configured)) {
+    if (config && !config.configured) {
       setPaymentStatus('현재 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.');
       return;
     }
@@ -182,11 +173,7 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
     }
 
     setIsPreparing(true);
-    setPaymentStatus(
-      isCardPayment
-        ? '신용카드 결제창을 준비하고 있습니다.'
-        : '카카오페이 결제창을 준비하고 있습니다.'
-    );
+    setPaymentStatus('카카오페이 결제창을 준비하고 있습니다.');
 
     try {
       const preparedPayment = await aiAgentBloomPaymentApi.prepare({
@@ -194,7 +181,6 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
         customerEmail: form.customerEmail.trim(),
         customerPhone: form.customerPhone.trim(),
         paymentAccessToken,
-        payMethod,
       });
       const paymentResponse = await requestPortOnePayment(preparedPayment);
 
@@ -228,9 +214,6 @@ export function useAiAgentBloomPayment(defaultPayMethod: AiAgentBloomPayMethod =
     loginPath,
     displayConfig,
     formattedAmount,
-    payMethod,
-    setPayMethod,
-    isCardPayment,
     updateField,
     handleSubmit,
   };
