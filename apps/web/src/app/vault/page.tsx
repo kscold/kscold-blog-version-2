@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { VaultGraphLayout } from '@/widgets/vault/graph';
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
+import { VaultIndexPageSkeleton } from '@/shared/ui/RouteSkeletons';
 
 export const metadata = buildPageMetadata({
   title: 'Vault 노트',
@@ -27,7 +28,7 @@ export default function VaultIndexPage() {
     <>
       <h1 className="sr-only">KSCOLD Vault 지식 그래프</h1>
       <JsonLd id="vault-page" data={vaultJsonLd} />
-      <Suspense>
+      <Suspense fallback={<VaultIndexPageSkeleton />}>
         <VaultGraphLayout />
       </Suspense>
     </>

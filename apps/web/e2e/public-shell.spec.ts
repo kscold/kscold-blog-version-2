@@ -75,6 +75,8 @@ test.describe('공개 페이지 핵심 시나리오', () => {
       '/blog/not-a-category/not-a-real-post-xyz',
       '/blog/not-a-real-category-xyz',
       '/blog/tags/not-a-real-tag-xyz',
+      '/info/not-a-real-team-xyz',
+      '/vault/not-a-real-note-xyz',
     ];
 
     const responses = await Promise.all(missingRoutes.map(route => request.get(route)));

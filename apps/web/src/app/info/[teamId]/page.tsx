@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { TeamDetailPage } from '@/widgets/info';
-import { BUSINESS_INFO, getTeamProfile } from '@/entities/profile';
+import { BUSINESS_INFO, getTeamProfile, TEAM_PROFILES } from '@/entities/profile';
 import { buildBreadcrumbJsonLd, buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
@@ -88,4 +88,8 @@ export default async function Page({ params }: { params: Promise<{ teamId: strin
       <TeamDetailPage team={team} />
     </>
   );
+}
+
+export function generateStaticParams() {
+  return TEAM_PROFILES.map(team => ({ teamId: team.id }));
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import type { VaultNote } from '@/shared/model/types/vault';
 import { VaultNoteLayout } from '@/widgets/vault/note';
 import {
@@ -12,6 +13,7 @@ import {
   uniqueKeywords,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
+import { VaultNotePageSkeleton } from '@/shared/ui/RouteSkeletons';
 
 async function getVaultNote(slug: string) {
   return fetchPublicApi<VaultNote>(`/vault/notes/slug/${slug}`);
@@ -85,7 +87,9 @@ export default async function VaultNotePage({
   return (
     <>
       <JsonLd id={`vault-${note.id}`} data={jsonLd} />
-      <VaultNoteLayout slug={note.slug} initialNote={note} />
+      <Suspense fallback={<VaultNotePageSkeleton />}>
+        <VaultNoteLayout slug={note.slug} initialNote={note} />
+      </Suspense>
     </>
   );
 }
