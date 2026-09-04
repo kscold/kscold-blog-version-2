@@ -27,17 +27,13 @@ public class HttpAccessLogFilter extends OncePerRequestFilter {
             chain.doFilter(req, res);
         } finally {
             long ms = System.currentTimeMillis() - start;
-            String userId = resolveUserId();
-            String query = req.getQueryString() != null ? "?" + req.getQueryString() : "";
             log.info(
-                    "[HTTP] {} {} {}{} → {} {}ms ip={}",
+                    "[HTTP] {} {} authenticated={} → {} {}ms",
                     req.getMethod(),
                     req.getRequestURI(),
-                    query,
-                    userId != null ? " user=" + userId : "",
+                    isAuthenticated(),
                     res.getStatus(),
-                    ms,
-                    getClientIp(req));
+                    ms);
         }
     }
 
@@ -50,24 +46,14 @@ public class HttpAccessLogFilter extends OncePerRequestFilter {
         return false;
     }
 
-    private String resolveUserId() {
+    private boolean isAuthenticated() {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null
+            return auth != null
                     && auth.isAuthenticated()
-                    && !"anonymousUser".equals(auth.getPrincipal())) {
-                return String.valueOf(auth.getPrincipal());
-            }
+                    && !"anonymousUser".equals(auth.getPrincipal());
         } catch (Exception ignored) {
+            return false;
         }
-        return null;
-    }
-
-    private String getClientIp(HttpServletRequest req) {
-        String ip = req.getHeader("X-Forwarded-For");
-        if (ip != null && !ip.isBlank()) return ip.split(",")[0].trim();
-        ip = req.getHeader("X-Real-IP");
-        if (ip != null && !ip.isBlank()) return ip;
-        return req.getRemoteAddr();
     }
 }
