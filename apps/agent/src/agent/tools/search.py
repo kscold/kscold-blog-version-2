@@ -139,7 +139,7 @@ class VaultSearchMixin:
             if not content_types or "vault" in content_types
             else []
         )
-        if not folder_ids and (not content_types or "post" in content_types):
+        if not folder_ids and (not content_types or "blog" in content_types):
             candidates.extend(self._post_candidates(conditions, access_scope))
         if not folder_ids and (not content_types or "feed" in content_types):
             candidates.extend(self._feed_candidates(conditions, access_scope))
