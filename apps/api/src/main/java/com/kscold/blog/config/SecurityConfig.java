@@ -2,6 +2,7 @@ package com.kscold.blog.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.exception.ErrorCode;
+import com.kscold.blog.identity.adapter.in.web.CookieCsrfProtectionFilter;
 import com.kscold.blog.identity.adapter.in.web.JwtAuthenticationFilter;
 import com.kscold.blog.shared.web.ApiResponse;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CookieCsrfProtectionFilter cookieCsrfProtectionFilter;
     private final ObjectMapper objectMapper;
     private final CorsOriginPolicy corsOriginPolicy;
 
@@ -144,7 +146,8 @@ public class SecurityConfig {
                                         .anyRequest()
                                         .authenticated())
                 .addFilterBefore(
-                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(cookieCsrfProtectionFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }

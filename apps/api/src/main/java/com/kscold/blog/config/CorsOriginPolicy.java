@@ -28,4 +28,8 @@ public class CorsOriginPolicy {
     public List<String> allowedOrigins() {
         return allowedOrigins;
     }
+
+    public boolean allows(String origin) {
+        return allowedOrigins.contains(origin);
+    }
 }
