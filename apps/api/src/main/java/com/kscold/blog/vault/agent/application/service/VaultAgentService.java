@@ -48,8 +48,8 @@ public class VaultAgentService implements VaultAgentUseCase {
             var response = vaultAgentClientPort.reindex(false);
             return new ReindexResponse(
                     response.totalNotes(), response.indexedNotes(), response.skippedNotes());
-        } catch (AgentClientUnavailableException exception) {
-            throw agentUnavailable(exception);
+        } catch (AgentClientUnavailableException ignored) {
+            throw agentUnavailable();
         }
     }
 
@@ -68,8 +68,8 @@ public class VaultAgentService implements VaultAgentUseCase {
             saveUserMessage(scopeKey, sessionId, userId, clientIdentifier, request.getMessage());
             saveAssistantMessage(scopeKey, sessionId, userId, clientIdentifier, result);
             return toChatResponse(sessionId, result);
-        } catch (AgentClientUnavailableException exception) {
-            throw agentUnavailable(exception);
+        } catch (AgentClientUnavailableException ignored) {
+            throw agentUnavailable();
         }
     }
 
@@ -119,8 +119,8 @@ public class VaultAgentService implements VaultAgentUseCase {
                     new AgentChatResult(answer, stages, rawResult.sources(), rawResult.followUps());
             saveAssistantMessage(scopeKey, sessionId, userId, clientIdentifier, result);
             eventConsumer.accept(AgentStreamEvent.completed(result));
-        } catch (AgentClientUnavailableException exception) {
-            throw agentUnavailable(exception);
+        } catch (AgentClientUnavailableException ignored) {
+            throw agentUnavailable();
         }
     }
 
@@ -157,8 +157,8 @@ public class VaultAgentService implements VaultAgentUseCase {
                 new AgentSearchQuery(command.query(), command.activeFolderName(), command.limit());
         try {
             return vaultAgentClientPort.search(query, scope).stream().map(this::toSource).toList();
-        } catch (AgentClientUnavailableException exception) {
-            throw agentUnavailable(exception);
+        } catch (AgentClientUnavailableException ignored) {
+            throw agentUnavailable();
         }
     }
 
@@ -254,7 +254,7 @@ public class VaultAgentService implements VaultAgentUseCase {
         return "guest:%s:%s".formatted(clientIdentifier, sessionId);
     }
 
-    private BusinessException agentUnavailable(AgentClientUnavailableException exception) {
-        return new BusinessException(ErrorCode.EXTERNAL_API_ERROR, exception.getMessage());
+    private BusinessException agentUnavailable() {
+        return new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
     }
 }

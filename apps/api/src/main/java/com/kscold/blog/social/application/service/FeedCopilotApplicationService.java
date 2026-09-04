@@ -43,8 +43,8 @@ public class FeedCopilotApplicationService implements FeedCopilotUseCase {
                             article,
                             normalizeStyles(command.getStyles()),
                             userId));
-        } catch (FeedCopilotUnavailableException exception) {
-            throw unavailable(exception);
+        } catch (FeedCopilotUnavailableException ignored) {
+            throw unavailable();
         }
     }
 
@@ -69,8 +69,8 @@ public class FeedCopilotApplicationService implements FeedCopilotUseCase {
                             plan,
                             normalizeStyleReferenceKeys(command.getStyleReferenceKeys()),
                             userId));
-        } catch (FeedCopilotUnavailableException exception) {
-            throw unavailable(exception);
+        } catch (FeedCopilotUnavailableException ignored) {
+            throw unavailable();
         }
     }
 
@@ -130,7 +130,7 @@ public class FeedCopilotApplicationService implements FeedCopilotUseCase {
         return value == null ? "" : value.trim();
     }
 
-    private BusinessException unavailable(FeedCopilotUnavailableException exception) {
-        return new BusinessException(ErrorCode.EXTERNAL_API_ERROR, exception.getMessage());
+    private BusinessException unavailable() {
+        return new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
     }
 }

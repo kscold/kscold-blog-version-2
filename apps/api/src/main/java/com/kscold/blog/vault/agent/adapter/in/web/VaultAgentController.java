@@ -2,6 +2,7 @@ package com.kscold.blog.vault.agent.adapter.in.web;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.vault.agent.adapter.in.web.dto.request.VaultSearchRequest;
@@ -91,8 +92,10 @@ public class VaultAgentController {
                                 event -> sendAgentEvent(emitter, event));
                         emitter.complete();
                     } catch (Exception exception) {
-                        log.warn("Vault Agent SSE 응답 중 오류가 발생했습니다.", exception);
-                        sendError(emitter, exception.getMessage());
+                        log.warn(
+                                "Vault Agent SSE 응답 중 오류가 발생했습니다: type={}",
+                                exception.getClass().getSimpleName());
+                        sendError(emitter, ErrorCode.EXTERNAL_API_ERROR.getMessage());
                         emitter.completeWithError(exception);
                     }
                 });

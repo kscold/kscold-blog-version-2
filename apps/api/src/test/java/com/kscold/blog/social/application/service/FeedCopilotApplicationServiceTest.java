@@ -8,11 +8,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.kscold.blog.exception.BusinessException;
+import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.social.application.dto.command.FeedCopilotDraftCommand;
 import com.kscold.blog.social.application.dto.command.FeedCopilotPlanCommand;
 import com.kscold.blog.social.application.dto.response.FeedCopilotDraftResponse;
 import com.kscold.blog.social.application.dto.response.FeedCopilotPlanResponse;
+import com.kscold.blog.social.domain.exception.FeedCopilotUnavailableException;
 import com.kscold.blog.social.domain.model.ExternalArticle;
 import com.kscold.blog.social.domain.model.FeedCopilotDraft;
 import com.kscold.blog.social.domain.model.FeedCopilotPlan;
@@ -148,5 +151,25 @@ class FeedCopilotApplicationServiceTest {
         assertThat(planCaptor.getValue().keyPoints()).containsExactly("문제를 먼저 설명", "시도와 결과를 나눠 기록");
         assertThat(response.title()).isEqualTo("초안 제목");
         assertThat(response.tags()).containsExactly("AI", "회고");
+    }
+
+    @Test
+    @DisplayName("시나리오: Agent 내부 오류 메시지는 API 예외로 노출하지 않는다")
+    void createPlanSanitizesProviderError() {
+        String sensitiveMessage = "provider-token-sensitive-value";
+        when(feedCopilotProvider.createPlan(any(), any(), any(), eq("user-1")))
+                .thenThrow(new FeedCopilotUnavailableException(sensitiveMessage, null));
+
+        assertThatThrownBy(
+                        () ->
+                                feedCopilotApplicationService.createPlan(
+                                        FeedCopilotPlanCommand.builder().memo("작성 메모").build(),
+                                        "user-1"))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.EXTERNAL_API_ERROR.getMessage())
+                .satisfies(
+                        exception ->
+                                assertThat(exception.getMessage()).doesNotContain(sensitiveMessage))
+                .hasNoCause();
     }
 }
