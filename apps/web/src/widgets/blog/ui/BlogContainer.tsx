@@ -4,9 +4,16 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { usePosts, usePostsByCategory, useSearchPosts } from '@/entities/post';
 import { useCategories } from '@/entities/category';
+import type { PageResponse } from '@/shared/model/types/api';
+import type { Category, Post } from '@/shared/model/types/blog';
 import BlogPostGrid from './BlogPostGrid';
 
-export function BlogContainer() {
+interface BlogContainerProps {
+  initialPosts?: PageResponse<Post>;
+  initialCategories?: Category[];
+}
+
+export function BlogContainer({ initialPosts, initialCategories }: BlogContainerProps) {
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -20,19 +27,20 @@ export function BlogContainer() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const { data: categories } = useCategories();
+  const { data: categories } = useCategories(initialCategories);
   const { data: allPostsData, isLoading: isLoadingAll } = usePosts({
     page,
     size: 12,
     sortBy: 'publishedAt',
     sortDirection: 'desc',
+    initialData: page === 0 ? initialPosts : undefined,
   });
 
-  const { data: categoryPostsData, isLoading: isLoadingCategory } = usePostsByCategory(
-    selectedCategory || '',
+  const { data: categoryPostsData, isLoading: isLoadingCategory } = usePostsByCategory({
+    categoryId: selectedCategory || '',
     page,
-    12
-  );
+    size: 12,
+  });
 
   const { data: searchResults, isLoading: isSearching } = useSearchPosts(debouncedQuery, page, 12);
 
@@ -60,7 +68,7 @@ export function BlogContainer() {
       {/* 검색 바 */}
       <motion.div
         className="mb-12"
-        initial={{ opacity: 0, y: 20 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.1, ease: [0.76, 0, 0.24, 1] }}
       >

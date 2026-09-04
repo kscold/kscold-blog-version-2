@@ -7,24 +7,27 @@ interface UseFeedsOptions {
   page?: number;
   size?: number;
   tag?: string;
+  initialData?: PageResponse<Feed>;
 }
 
 export function useFeeds(options: UseFeedsOptions = {}) {
-  const { page = 0, size = 12, tag } = options;
+  const { page = 0, size = 12, tag, initialData } = options;
   const params = new URLSearchParams({ page: String(page), size: String(size) });
   if (tag) params.set('tag', tag);
 
   return useQuery({
     queryKey: ['feeds', { page, size, tag }],
     queryFn: () => apiClient.get<PageResponse<Feed>>(`/feeds?${params.toString()}`),
+    initialData,
   });
 }
 
-export function useFeed(id: string) {
+export function useFeed(id: string, initialData?: Feed) {
   return useQuery({
     queryKey: ['feeds', id],
     queryFn: () => apiClient.get<Feed>(`/feeds/${id}`),
     enabled: !!id,
+    initialData,
   });
 }
 

@@ -1,6 +1,3 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PROFILE, PROFILE_FAQ, TEAM_PROFILES } from '@/entities/profile';
@@ -9,22 +6,12 @@ import { SkillsSection } from './SkillsSection';
 import { ContactSection } from './ContactSection';
 import { TeamBrandBadge } from './TeamBrandBadge';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
 export function InfoContainer() {
   return (
     <div className="min-h-screen bg-surface-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* 프로필 섹션 */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
+        <div className="text-center mb-16">
           <div className="w-28 h-28 rounded-full mx-auto mb-6 ring-4 ring-surface-200 overflow-hidden">
             <Image
               src="https://avatars.githubusercontent.com/u/66587554?v=4"
@@ -40,51 +27,33 @@ export function InfoContainer() {
           </h1>
           <p className="text-sm font-mono text-surface-400 mb-3">@{PROFILE.handle}</p>
           <p className="text-lg text-surface-500 font-medium">{PROFILE.title}</p>
-        </motion.div>
+        </div>
 
         {/* 소개 섹션 */}
-        <motion.section
-          className="mb-16"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
+        <section className="mb-16">
           <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">About</h2>
           <div className="space-y-4">
             {PROFILE.bio.map((paragraph, i) => (
               <p key={i} className="text-surface-600 leading-relaxed">{paragraph}</p>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         <SkillsSection />
         <ContactSection />
 
         {/* 팀 소개 섹션 */}
-        <motion.section
-          className="mb-16"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.6, delay: 0.45 }}
-        >
+        <section className="mb-16">
           <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">Teams</h2>
           <div className="space-y-3">
             {TEAM_PROFILES.map(team => (
               <TeamBadgeLink key={team.id} team={team} />
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* 자주 묻는 질문 (FAQ) */}
-        <motion.section
-          className="mb-16"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.6, delay: 0.48 }}
-        >
+        <section className="mb-16">
           <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">FAQ</h2>
           <div className="space-y-3">
             {PROFILE_FAQ.map((item, i) => (
@@ -94,22 +63,17 @@ export function InfoContainer() {
               </div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* 블로그 이동 버튼 */}
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-        >
+        <div className="text-center">
           <Link
             href="/blog"
             className="inline-block px-8 py-3 bg-surface-900 text-white rounded-xl font-bold hover:bg-surface-800 transition-colors text-sm"
           >
             블로그 둘러보기
           </Link>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

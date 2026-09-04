@@ -1,22 +1,8 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import { PROFILE } from '@/entities/profile';
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
 
 export function ContactSection() {
   return (
-    <motion.section
-      className="mb-16"
-      variants={fadeUp}
-      initial="hidden"
-      animate="visible"
-      transition={{ duration: 0.6, delay: 0.4 }}
-    >
+    <section className="mb-16">
       <h2 className="text-sm font-bold text-surface-400 uppercase tracking-wider mb-6">Contact</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <a
@@ -50,6 +36,6 @@ export function ContactSection() {
           </div>
         </a>
       </div>
-    </motion.section>
+    </section>
   );
 }

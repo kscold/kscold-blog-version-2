@@ -1,6 +1,6 @@
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
-import { FeedPageClient } from './FeedPageClient';
+import { FeedPageView } from './FeedPageView';
 
 export const metadata = buildPageMetadata({
   title: '피드',
@@ -21,11 +21,18 @@ const feedJsonLd = {
   },
 };
 
-export default function FeedPage() {
+export default async function FeedPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tag?: string | string[] }>;
+}) {
+  const { tag } = await searchParams;
+  const activeTag = Array.isArray(tag) ? tag[0] : tag;
+
   return (
     <>
       <JsonLd id="feed-page" data={feedJsonLd} />
-      <FeedPageClient />
+      <FeedPageView activeTag={activeTag} />
     </>
   );
 }

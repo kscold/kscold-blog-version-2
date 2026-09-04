@@ -3,11 +3,12 @@ import { notFound } from 'next/navigation';
 import type { VaultNote } from '@/shared/model/types/vault';
 import { VaultNoteLayout } from '@/widgets/vault';
 import {
-  MIN_INDEXABLE_CONTENT_LENGTH,
+  MIN_INDEXABLE_VAULT_CONTENT_LENGTH,
   absoluteUrl,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
   fetchPublicApi,
+  stripRichText,
   toMetaDescription,
   uniqueKeywords,
 } from '@/shared/lib/seo';
@@ -36,7 +37,8 @@ export async function generateMetadata({
 
   // 분량이 적은 노트(용어 스텁 등)는 색인에서 제외한다. 사이트맵 필터와 동일한 기준을 공유해
   // "색인해달라(sitemap) + 색인하지 마라(noindex)" 가 충돌하지 않도록 한다.
-  const isThinNote = (note.content?.trim().length ?? 0) < MIN_INDEXABLE_CONTENT_LENGTH;
+  const isThinNote =
+    (note.content?.trim().length ?? 0) < MIN_INDEXABLE_VAULT_CONTENT_LENGTH;
 
   return buildPageMetadata({
     title: `${note.title} | Vault`,
@@ -73,15 +75,11 @@ export default async function VaultNotePage({
         url: absoluteUrl(canonicalPath),
         headline: note.title,
         description: toMetaDescription(note.content, note.title),
-        articleBody: toMetaDescription(note.content, note.title, 320),
+        articleBody: stripRichText(note.content),
         datePublished: note.createdAt,
         dateModified: note.updatedAt,
         keywords: uniqueKeywords([note.title, ...note.tags]).join(', '),
-        author: {
-          '@type': 'Person',
-          name: note.author.name,
-          url: absoluteUrl('/info'),
-        },
+        author: { '@id': `${absoluteUrl('/')}#person` },
         mainEntityOfPage: absoluteUrl(canonicalPath),
       },
       buildBreadcrumbJsonLd([
@@ -95,7 +93,7 @@ export default async function VaultNotePage({
   return (
     <>
       <JsonLd id={`vault-${note.id}`} data={jsonLd} />
-      <VaultNoteLayout slug={note.slug} />
+      <VaultNoteLayout slug={note.slug} initialNote={note} />
     </>
   );
 }

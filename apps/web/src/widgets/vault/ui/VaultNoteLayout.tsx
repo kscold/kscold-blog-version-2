@@ -8,8 +8,14 @@ import { useVaultNoteLayout } from '@/widgets/vault/model/useVaultNoteLayout';
 import { VaultNoteSidebar } from '@/widgets/vault/ui/layout/VaultNoteSidebar';
 import { VaultNoteMainPanel } from '@/widgets/vault/ui/layout/VaultNoteMainPanel';
 import { VaultMobileListButton } from '@/widgets/vault/ui/VaultMobileListButton';
+import type { VaultNote } from '@/shared/model/types/vault';
 
-export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
+interface VaultNoteLayoutProps {
+  slug?: string;
+  initialNote?: VaultNote;
+}
+
+export function VaultNoteLayout({ slug: initialSlug, initialNote }: VaultNoteLayoutProps) {
   const { theme } = useUiStore();
   const { isTouchDevice, allowRichEffects } = usePerformanceMode();
   const useSolidSurface = isTouchDevice || !allowRichEffects;
@@ -34,7 +40,7 @@ export function VaultNoteLayout({ slug: initialSlug }: { slug?: string }) {
     localGraph,
     colorMap,
     titleSlugMap,
-  } = useVaultNoteData(slug);
+  } = useVaultNoteData(slug, initialNote);
 
   useEffect(() => {
     if (note?.folderId) {

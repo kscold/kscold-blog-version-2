@@ -8,10 +8,17 @@ interface UsePostsOptions {
   size?: number;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
+  initialData?: PageResponse<Post>;
 }
 
 export function usePosts(options: UsePostsOptions = {}) {
-  const { page = 0, size = 10, sortBy = 'publishedAt', sortDirection = 'desc' } = options;
+  const {
+    page = 0,
+    size = 10,
+    sortBy = 'publishedAt',
+    sortDirection = 'desc',
+    initialData,
+  } = options;
 
   return useQuery({
     queryKey: ['posts', { page, size, sortBy, sortDirection }],
@@ -19,6 +26,7 @@ export function usePosts(options: UsePostsOptions = {}) {
       apiClient.get<PageResponse<Post>>(
         `/posts?page=${page}&size=${size}&sortBy=${sortBy}&sortDirection=${sortDirection}`
       ),
+    initialData,
   });
 }
 
@@ -44,21 +52,41 @@ export function useFeaturedPosts(limit: number = 5) {
   });
 }
 
-export function usePostsByCategory(categoryId: string, page: number = 0, size: number = 10) {
+interface UsePostsByCategoryOptions {
+  categoryId: string;
+  page?: number;
+  size?: number;
+  initialData?: PageResponse<Post>;
+}
+
+export function usePostsByCategory(options: UsePostsByCategoryOptions) {
+  const { categoryId, page = 0, size = 10, initialData } = options;
+
   return useQuery({
     queryKey: ['posts', 'category', categoryId, { page, size }],
     queryFn: () =>
       apiClient.get<PageResponse<Post>>(`/posts/category/${categoryId}?page=${page}&size=${size}`),
     enabled: !!categoryId,
+    initialData,
   });
 }
 
-export function usePostsByTag(tagId: string, page: number = 0, size: number = 10) {
+interface UsePostsByTagOptions {
+  tagId: string;
+  page?: number;
+  size?: number;
+  initialData?: PageResponse<Post>;
+}
+
+export function usePostsByTag(options: UsePostsByTagOptions) {
+  const { tagId, page = 0, size = 10, initialData } = options;
+
   return useQuery({
     queryKey: ['posts', 'tag', tagId, { page, size }],
     queryFn: () =>
       apiClient.get<PageResponse<Post>>(`/posts/tag/${tagId}?page=${page}&size=${size}`),
     enabled: !!tagId,
+    initialData,
   });
 }
 

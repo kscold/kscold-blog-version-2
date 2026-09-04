@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
 import { Category } from '@/shared/model/types/blog';
 
-export function useCategories() {
+export function useCategories(initialData?: Category[]) {
   return useQuery({
     queryKey: ['categories'],
     queryFn: () => apiClient.get<Category[]>('/categories'),
+    initialData,
   });
 }
 
@@ -31,4 +32,3 @@ export function useRootCategories() {
     queryFn: () => apiClient.get<Category[]>('/categories/root'),
   });
 }
-

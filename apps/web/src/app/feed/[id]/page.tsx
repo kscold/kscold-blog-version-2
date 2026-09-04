@@ -9,6 +9,7 @@ import {
   extractFirstMarkdownHeading,
   extractFirstMarkdownImage,
   fetchPublicApi,
+  isIndexableFeed,
   stripRichText,
   toMetaDescription,
   toOgImage,
@@ -55,6 +56,7 @@ export async function generateMetadata({
     publishedTime: feed.createdAt,
     modifiedTime: feed.updatedAt,
     authors: [{ name: feed.author.name }],
+    noIndex: !isIndexableFeed(feed.content),
   });
 }
 
@@ -87,10 +89,15 @@ export default async function FeedDetailPage({
         articleBody: stripRichText(feed.content),
         datePublished: feed.createdAt,
         dateModified: feed.updatedAt,
-        author: {
-          '@type': 'Person',
-          name: feed.author.name,
-        },
+        author: feed.author.username === 'kscold'
+          ? { '@id': `${absoluteUrl('/')}#person` }
+          : {
+              '@type': 'Person',
+              name: feed.author.name,
+              url: feed.author.username
+                ? absoluteUrl(`/profile/${feed.author.username}`)
+                : undefined,
+            },
         image: [toOgImage(image)],
         interactionStatistic: [
           {
@@ -117,7 +124,7 @@ export default async function FeedDetailPage({
   return (
     <>
       <JsonLd id={`feed-${feed.id}`} data={jsonLd} />
-      <FeedDetail feedId={id} />
+      <FeedDetail initialFeed={feed} />
     </>
   );
 }

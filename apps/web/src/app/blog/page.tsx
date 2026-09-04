@@ -1,6 +1,6 @@
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
-import { BlogPageClient } from './BlogPageClient';
+import { BlogPageView } from './BlogPageView';
 
 export const metadata = buildPageMetadata({
   // 괄호는 메타 설명 정제 과정에서 공백으로 치환되므로 description 에는 쓰지 않는다.
@@ -38,7 +38,7 @@ export default function BlogPage() {
   return (
     <>
       <JsonLd id="blog-page" data={blogJsonLd} />
-      <BlogPageClient />
+      <BlogPageView />
     </>
   );
 }

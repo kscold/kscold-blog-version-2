@@ -6,14 +6,14 @@ export const SITE_DESCRIPTION =
   '개발자 김승찬(kscold)의 기술 블로그. 백엔드·프론트엔드 개발과 AI 에이전트 실험, 일상의 기록을 남깁니다.';
 export const DEFAULT_OG_IMAGE = '/apple-touch-icon.png';
 
-/**
- * 단독 페이지로 색인할 최소 본문 길이(글자 수).
- *
- * 이 값보다 짧은 문서(용어 스텁 등)는 사이트맵에서 제외하고 페이지에도 noindex 를 넣는다.
- * 얇은 페이지가 대량으로 색인되면 사이트 전체 품질 평가에 불리하고 애드센스 정책 위반 사유가 된다.
- * 사이트맵과 페이지가 서로 다른 기준을 쓰면 "색인해달라 + 색인하지 마라" 가 충돌하므로 반드시 이 상수를 공유한다.
- */
+/** 피드 상세와 광고 노출에 필요한 최소 본문 길이(글자 수). */
 export const MIN_INDEXABLE_CONTENT_LENGTH = 500;
+
+/** 독립된 지식 문서로 색인할 Vault 노트의 최소 본문 길이(글자 수). */
+export const MIN_INDEXABLE_VAULT_CONTENT_LENGTH = 1500;
+
+/** 독립된 목록 페이지로 색인할 태그의 최소 공개 포스트 수. */
+export const MIN_INDEXABLE_TAG_POST_COUNT = 3;
 
 export type OpenGraphType =
   | 'website'

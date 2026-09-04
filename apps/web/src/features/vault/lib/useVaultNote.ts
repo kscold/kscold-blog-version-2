@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { useVaultNote as useVaultNoteQuery, useVaultBacklinks, useVaultFolders, useVaultGraph } from '@/entities/vault';
 import { buildFolderColorMap, getLocalGraph } from '@/entities/vault';
+import type { VaultNote } from '@/shared/model/types/vault';
 
-export function useVaultNoteData(slug: string) {
-  const { data: note, isLoading: isNoteLoading, isError } = useVaultNoteQuery(slug);
+export function useVaultNoteData(slug: string, initialNote?: VaultNote) {
+  const { data: note, isLoading: isNoteLoading, isError } = useVaultNoteQuery(slug, initialNote);
   const { data: backlinks } = useVaultBacklinks(note?.id || '');
   const { data: folders, isLoading: isFoldersLoading } = useVaultFolders();
   const { data: graphData } = useVaultGraph();

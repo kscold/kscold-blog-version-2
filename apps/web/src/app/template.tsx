@@ -1,26 +1,3 @@
-'use client';
-
-import { motion } from 'framer-motion';
-import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
-
 export default function Template({ children }: { children: React.ReactNode }) {
-  const { allowRichEffects } = usePerformanceMode();
-
-  if (!allowRichEffects) {
-    return <div className="h-full">{children}</div>;
-  }
-
-  return (
-    <motion.div
-      className="h-full"
-      initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={{
-        duration: 1,
-        ease: [0.76, 0, 0.24, 1], // 고급 이징 커브 (애니메이션용)
-      }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className="h-full">{children}</div>;
 }

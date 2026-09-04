@@ -3,44 +3,30 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useTags } from '@/entities/tag';
 import { usePostsByTag } from '@/entities/post';
 import { PostCard } from '@/entities/post';
+import type { PageResponse } from '@/shared/model/types/api';
+import type { Post, Tag } from '@/shared/model/types/blog';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 
 interface TagPostContainerProps {
-  tagSlug: string;
+  tag: Tag;
+  initialPosts?: PageResponse<Post>;
 }
 
-export function TagPostContainer({ tagSlug }: TagPostContainerProps) {
+export function TagPostContainer({ tag, initialPosts }: TagPostContainerProps) {
   const [page, setPage] = useState(0);
   const { allowRichEffects } = usePerformanceMode();
 
-  const { data: tags = [] } = useTags();
-  const tag = tags.find(
-    t => t.name.toLowerCase() === tagSlug.toLowerCase() || t.slug === tagSlug
-  );
-
-  const { data: postsData, isLoading } = usePostsByTag(tag?.id || '', page, 12);
+  const { data: postsData, isLoading } = usePostsByTag({
+    tagId: tag.id,
+    page,
+    size: 12,
+    initialData: page === 0 ? initialPosts : undefined,
+  });
   const posts = postsData?.content || [];
   const totalPages = postsData?.totalPages || 0;
-
-  if (!tag && tags.length > 0) {
-    return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-black text-surface-900 mb-2">
-            태그를 찾을 수 없습니다
-          </h1>
-          <p className="text-surface-500 mb-4">&ldquo;{tagSlug}&rdquo; 태그가 존재하지 않습니다.</p>
-          <Link href="/blog" className="text-sm text-surface-500 hover:text-surface-900 transition-colors">
-            블로그로 돌아가기
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-surface-50">
@@ -56,7 +42,7 @@ export function TagPostContainer({ tagSlug }: TagPostContainerProps) {
             Blog
           </Link>
           <span className="text-surface-300">/</span>
-          <span className="text-surface-900 font-medium">#{tag?.name || tagSlug}</span>
+          <span className="text-surface-900 font-medium">#{tag.name}</span>
         </motion.nav>
 
         {/* 헤더 */}
@@ -67,10 +53,10 @@ export function TagPostContainer({ tagSlug }: TagPostContainerProps) {
           transition={allowRichEffects ? { duration: 0.6 } : undefined}
         >
           <h1 className="text-5xl font-sans font-black tracking-tight text-surface-900 mb-2">
-            #{tag?.name || tagSlug}
+            #{tag.name}
           </h1>
           <p className="text-sm text-surface-400">
-            {tag?.postCount || 0}개의 포스트
+            {tag.postCount}개의 포스트
           </p>
         </motion.div>
 

@@ -15,7 +15,7 @@ export function CategoryHeader({ category, subcategories }: CategoryHeaderProps)
       {/* 현재 위치 */}
       <motion.nav
         className="mb-8 flex items-center gap-2 text-sm text-surface-500"
-        initial={{ opacity: 0, y: -10 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
@@ -32,7 +32,7 @@ export function CategoryHeader({ category, subcategories }: CategoryHeaderProps)
       {/* 카테고리 헤더 */}
       <motion.div
         className="mb-12"
-        initial={{ opacity: 0, y: 20 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
@@ -56,7 +56,7 @@ export function CategoryHeader({ category, subcategories }: CategoryHeaderProps)
       {subcategories.length > 0 && (
         <motion.div
           className="mb-8"
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >

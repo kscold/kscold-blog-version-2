@@ -1,23 +1,17 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useFeed } from '@/entities/feed';
-import { FeedDetailPageSkeleton } from '@/shared/ui/RouteSkeletons';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 import { MIN_INDEXABLE_CONTENT_LENGTH } from '@/shared/lib/seo/constants';
+import type { Feed } from '@/shared/model/types/social';
 import { FeedCard } from '@/features/feed';
 import { CommentSection } from './CommentSection';
 
-export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {
-  const params = useParams();
-  const feedId = initialFeedId || (params.id as string);
-  const { data: feed, isLoading } = useFeed(feedId);
-
-  if (isLoading) {
-    return <FeedDetailPageSkeleton />;
-  }
+export function FeedDetail({ initialFeed }: { initialFeed: Feed }) {
+  const feedId = initialFeed.id;
+  const { data: feed = initialFeed } = useFeed(feedId, initialFeed);
 
   if (!feed) {
     return (
@@ -46,7 +40,7 @@ export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {
       <div className="mx-auto max-w-3xl px-4 py-8">
         <motion.div
           className="mb-6"
-          initial={{ opacity: 0 }}
+          initial={false}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
@@ -65,7 +59,7 @@ export function FeedDetail({ feedId: initialFeedId }: { feedId?: string }) {
 
         <motion.div
           className="mt-4 bg-white border border-surface-200 rounded-2xl p-4"
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >

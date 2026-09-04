@@ -26,7 +26,11 @@ export function UnifiedTagContainer({ tagName }: UnifiedTagContainerProps) {
     t => t.name.toLowerCase() === tagName.toLowerCase() || t.slug === tagName
   );
 
-  const { data: postsData, isLoading: postsLoading } = usePostsByTag(blogTag?.id || '', postPage, 9);
+  const { data: postsData, isLoading: postsLoading } = usePostsByTag({
+    tagId: blogTag?.id || '',
+    page: postPage,
+    size: 9,
+  });
   const { data: feedsData, isLoading: feedsLoading } = useFeeds({ page: feedPage, size: 9, tag: tagName });
 
   const posts = postsData?.content || [];

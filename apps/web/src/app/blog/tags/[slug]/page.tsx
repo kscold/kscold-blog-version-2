@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { Tag } from '@/shared/model/types/blog';
-import { TagPostContainer } from '@/widgets/blog';
+import { TagArchive } from '@/widgets/blog';
 import {
   SITE_URL,
   buildBreadcrumbJsonLd,
   buildPageMetadata,
   fetchPublicApi,
+  isIndexableTag,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 
@@ -38,6 +39,7 @@ export async function generateMetadata({
     description: `${tag.name} 태그로 묶인 포스트 모음입니다.`,
     path: `/blog/tags/${encodeURIComponent(tag.slug)}`,
     keywords: [tag.name, '태그', '기술 블로그'],
+    noIndex: !isIndexableTag(tag),
   });
 }
 
@@ -78,7 +80,7 @@ export default async function TagPage({
   return (
     <>
       <JsonLd id={`tag-${tag.id}`} data={jsonLd} />
-      <TagPostContainer tagSlug={tag.slug} />
+      <TagArchive tag={tag} />
     </>
   );
 }

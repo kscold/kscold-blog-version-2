@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useFeeds } from '@/entities/feed';
 import { FeedCard } from '@/features/feed';
 import { FeedComposer } from './FeedComposer';
@@ -11,28 +11,33 @@ import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 import { MIN_INDEXABLE_CONTENT_LENGTH } from '@/shared/lib/seo/constants';
+import type { PageResponse } from '@/shared/model/types/api';
+import type { Feed } from '@/shared/model/types/social';
 
 interface FeedListProps {
   initialTag?: string;
+  initialFeeds?: PageResponse<Feed>;
 }
 
-export function FeedList({ initialTag }: FeedListProps = {}) {
+export function FeedList({ initialTag, initialFeeds }: FeedListProps = {}) {
   const { currentUser } = useAuth();
   const { allowRichEffects } = usePerformanceMode();
   const [page, setPage] = useState(0);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const activeTag = searchParams.get('tag') ?? initialTag ?? undefined;
+  const activeTag = initialTag;
 
-  const { data: feedsData, isLoading } = useFeeds({ page, size: 12, tag: activeTag });
+  const { data: feedsData, isLoading } = useFeeds({
+    page,
+    size: 12,
+    tag: activeTag,
+    initialData: page === 0 ? initialFeeds : undefined,
+  });
 
   const feeds = feedsData?.content || [];
   const totalPages = feedsData?.totalPages || 0;
 
   const clearTag = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('tag');
-    router.push(`/feed${params.toString() ? `?${params.toString()}` : ''}`);
+    router.push('/feed');
   };
 
   if (isLoading) {

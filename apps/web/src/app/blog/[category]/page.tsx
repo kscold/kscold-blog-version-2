@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { Category } from '@/shared/model/types/blog';
-import { CategoryPostContainer } from '@/widgets/blog';
+import { CategoryArchive } from '@/widgets/blog';
 import {
   SITE_URL,
   buildBreadcrumbJsonLd,
@@ -76,7 +76,7 @@ export default async function CategoryPage({
   return (
     <>
       <JsonLd id={`category-${categoryData.id}`} data={jsonLd} />
-      <CategoryPostContainer category={categoryData} />
+      <CategoryArchive category={categoryData} />
     </>
   );
 }
