@@ -9,6 +9,13 @@ plugins {
 group = 'com.kscold'
 version = '2.0.0'
 
+ext {
+    set('netty.version', '4.1.137.Final')
+    set('tomcat.version', '10.1.59')
+    grpcVersion = '1.84.0'
+    protobufVersion = '3.25.9'
+}
+
 java {
     sourceCompatibility = '21'
 }
@@ -58,9 +65,9 @@ dependencies {
     implementation 'net.dv8tion:JDA:5.0.0-beta.24'
 
     // gRPC (Vault Agent bridge)
-    implementation 'io.grpc:grpc-netty-shaded:1.64.0'
-    implementation 'io.grpc:grpc-protobuf:1.64.0'
-    implementation 'io.grpc:grpc-stub:1.64.0'
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 
     // JWT
@@ -92,11 +99,11 @@ tasks.named('test') {
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.25.3'
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
     }
     plugins {
         grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.64.0'
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
         }
     }
     generateProtoTasks {
