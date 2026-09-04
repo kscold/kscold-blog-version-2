@@ -8,6 +8,7 @@ import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteSitemapResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteStatsResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
@@ -205,6 +206,13 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     public List<VaultNoteTitleResponse> getTitleIndex() {
         return vaultNoteRepository.findAllForTitleIndex().stream()
                 .map(note -> new VaultNoteTitleResponse(note.title(), note.slug()))
+                .toList();
+    }
+
+    /** 사이트맵 생성은 그래프 링크를 만들지 않고 slug와 본문 길이만 조회한다. */
+    public List<VaultNoteSitemapResponse> getSitemapIndex() {
+        return vaultNoteRepository.findAllForSitemap().stream()
+                .map(note -> new VaultNoteSitemapResponse(note.slug(), note.contentLength()))
                 .toList();
     }
 

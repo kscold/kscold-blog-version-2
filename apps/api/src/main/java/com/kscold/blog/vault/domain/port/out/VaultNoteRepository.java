@@ -38,6 +38,9 @@ public interface VaultNoteRepository {
     /** 위키 링크 해석에 필요한 제목과 slug만 조회한다. */
     List<TitleNote> findAllForTitleIndex();
 
+    /** 사이트맵 색인 판정에 필요한 slug와 본문 길이만 조회한다. */
+    List<SitemapNote> findAllForSitemap();
+
     /** Vault 그래프 전용 읽기 모델 */
     record GraphNote(
             String id,
@@ -49,6 +52,9 @@ public interface VaultNoteRepository {
 
     /** Vault 위키 링크 전용 읽기 모델 */
     record TitleNote(String title, String slug) {}
+
+    /** Vault 사이트맵 전용 읽기 모델 */
+    record SitemapNote(String slug, int contentLength) {}
 
     /** Vault 백링크 카드 전용 읽기 모델 */
     record BacklinkNote(String id, String title, String slug, String excerpt) {}

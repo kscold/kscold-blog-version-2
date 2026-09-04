@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteSitemapResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteStatsResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
@@ -74,6 +75,22 @@ class VaultNoteApplicationServiceTest {
                 .containsExactly(
                         new VaultNoteTitleResponse("첫 노트", "first-note"),
                         new VaultNoteTitleResponse("둘째 노트", "second-note"));
+    }
+
+    @Test
+    void 사이트맵인덱스는슬러그와본문길이만반환한다() {
+        when(vaultNoteRepository.findAllForSitemap())
+                .thenReturn(
+                        List.of(
+                                new VaultNoteRepository.SitemapNote("first-note", 120),
+                                new VaultNoteRepository.SitemapNote("second-note", 80)));
+
+        List<VaultNoteSitemapResponse> response = service.getSitemapIndex();
+
+        assertThat(response)
+                .containsExactly(
+                        new VaultNoteSitemapResponse("first-note", 120),
+                        new VaultNoteSitemapResponse("second-note", 80));
     }
 
     @Test

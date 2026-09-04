@@ -163,6 +163,36 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
                 .toList();
     }
 
+    @Override
+    public List<SitemapNote> findAllForSitemap() {
+        AggregationOperation project =
+                context ->
+                        new Document(
+                                "$project",
+                                new Document("_id", 0)
+                                        .append("slug", 1)
+                                        .append(
+                                                "contentLength",
+                                                new Document(
+                                                        "$strLenCP",
+                                                        new Document(
+                                                                "$ifNull",
+                                                                List.of("$content", "")))));
+
+        return mongoTemplate
+                .aggregate(Aggregation.newAggregation(project), "vault_notes", Document.class)
+                .getMappedResults()
+                .stream()
+                .map(
+                        doc ->
+                                new SitemapNote(
+                                        doc.getString("slug"),
+                                        doc.get("contentLength") instanceof Number number
+                                                ? number.intValue()
+                                                : 0))
+                .toList();
+    }
+
     private List<String> readStringList(Document document, String fieldName) {
         Object value = document.get(fieldName);
         if (!(value instanceof List<?> values)) {
