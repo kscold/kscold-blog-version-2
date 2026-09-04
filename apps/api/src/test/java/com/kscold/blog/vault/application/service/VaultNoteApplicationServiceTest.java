@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
@@ -72,5 +73,20 @@ class VaultNoteApplicationServiceTest {
                 .containsExactly(
                         new VaultNoteTitleResponse("첫 노트", "first-note"),
                         new VaultNoteTitleResponse("둘째 노트", "second-note"));
+    }
+
+    @Test
+    void 백링크요약은카드에필요한필드만반환한다() {
+        when(vaultNoteRepository.findBacklinkSummaries("note-1"))
+                .thenReturn(
+                        List.of(
+                                new VaultNoteRepository.BacklinkNote(
+                                        "note-2", "둘째 노트", "second-note", "짧은 본문")));
+
+        List<VaultNoteBacklinkResponse> response = service.getBacklinkSummaries("note-1");
+
+        assertThat(response)
+                .containsExactly(
+                        new VaultNoteBacklinkResponse("note-2", "둘째 노트", "second-note", "짧은 본문"));
     }
 }

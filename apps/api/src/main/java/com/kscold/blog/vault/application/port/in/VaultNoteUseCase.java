@@ -3,6 +3,7 @@ package com.kscold.blog.vault.application.port.in;
 import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.domain.model.VaultNote;
 import java.util.List;
@@ -26,6 +27,8 @@ public interface VaultNoteUseCase {
     Page<VaultNote> getByFolder(String folderId, Pageable pageable);
 
     List<VaultNote> getBackreferences(String noteId);
+
+    List<VaultNoteBacklinkResponse> getBacklinkSummaries(String noteId);
 
     GraphDataResponse getGraphData();
 

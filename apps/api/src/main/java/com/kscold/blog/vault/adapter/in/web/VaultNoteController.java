@@ -7,6 +7,7 @@ import com.kscold.blog.vault.adapter.in.web.dto.response.VaultNoteResponse;
 import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNote;
@@ -83,6 +84,12 @@ public class VaultNoteController {
         List<VaultNote> backlinks = vaultNoteUseCase.getBackreferences(id);
         List<VaultNoteResponse> response = backlinks.stream().map(VaultNoteResponse::from).toList();
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/{id}/backlinks/summary")
+    public ResponseEntity<ApiResponse<List<VaultNoteBacklinkResponse>>> getBacklinkSummaries(
+            @PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.success(vaultNoteUseCase.getBacklinkSummaries(id)));
     }
 
     @GetMapping("/graph")

@@ -27,6 +27,9 @@ public interface VaultNoteRepository {
 
     List<VaultNote> findByOutgoingLinksContaining(String noteId);
 
+    /** 백링크 카드에 필요한 식별자와 짧은 본문만 조회한다. */
+    List<BacklinkNote> findBacklinkSummaries(String noteId);
+
     /** 그래프 렌더링에 필요한 필드와 본문 길이만 조회한다. 본문 원문을 애플리케이션으로 옮기지 않고 DB에서 길이를 계산해 응답 크기와 메모리 사용량을 줄인다. */
     List<GraphNote> findAllForGraph();
 
@@ -44,6 +47,9 @@ public interface VaultNoteRepository {
 
     /** Vault 위키 링크 전용 읽기 모델 */
     record TitleNote(String title, String slug) {}
+
+    /** Vault 백링크 카드 전용 읽기 모델 */
+    record BacklinkNote(String id, String title, String slug, String excerpt) {}
 
     void incrementCommentCount(String noteId);
 

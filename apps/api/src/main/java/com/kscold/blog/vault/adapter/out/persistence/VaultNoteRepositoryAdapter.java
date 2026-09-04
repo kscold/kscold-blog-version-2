@@ -55,6 +55,42 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
     }
 
     @Override
+    public List<BacklinkNote> findBacklinkSummaries(String noteId) {
+        AggregationOperation match =
+                context -> new Document("$match", new Document("outgoingLinks", noteId));
+        AggregationOperation project =
+                context ->
+                        new Document(
+                                "$project",
+                                new Document("title", 1)
+                                        .append("slug", 1)
+                                        .append(
+                                                "excerpt",
+                                                new Document(
+                                                        "$substrCP",
+                                                        List.of(
+                                                                new Document(
+                                                                        "$ifNull",
+                                                                        List.of("$content", "")),
+                                                                0,
+                                                                160))));
+
+        return mongoTemplate
+                .aggregate(
+                        Aggregation.newAggregation(match, project), "vault_notes", Document.class)
+                .getMappedResults()
+                .stream()
+                .map(
+                        doc ->
+                                new BacklinkNote(
+                                        String.valueOf(doc.get("_id")),
+                                        doc.getString("title"),
+                                        doc.getString("slug"),
+                                        doc.getString("excerpt")))
+                .toList();
+    }
+
+    @Override
     public Page<VaultNote> findAll(Pageable pageable) {
         return mongoRepository.findAll(pageable);
     }

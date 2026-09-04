@@ -7,6 +7,7 @@ import com.kscold.blog.shared.util.SlugUtils;
 import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
 import com.kscold.blog.vault.application.dto.command.NoteUpdateCommand;
 import com.kscold.blog.vault.application.dto.response.GraphDataResponse;
+import com.kscold.blog.vault.application.dto.response.VaultNoteBacklinkResponse;
 import com.kscold.blog.vault.application.dto.response.VaultNoteTitleResponse;
 import com.kscold.blog.vault.application.port.in.VaultNoteUseCase;
 import com.kscold.blog.vault.domain.model.VaultNote;
@@ -149,6 +150,15 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
     /** 이 노트를 참조하는 다른 노트 목록 (백링크/역방향 참조) */
     public List<VaultNote> getBackreferences(String noteId) {
         return vaultNoteRepository.findByOutgoingLinksContaining(noteId);
+    }
+
+    public List<VaultNoteBacklinkResponse> getBacklinkSummaries(String noteId) {
+        return vaultNoteRepository.findBacklinkSummaries(noteId).stream()
+                .map(
+                        note ->
+                                new VaultNoteBacklinkResponse(
+                                        note.id(), note.title(), note.slug(), note.excerpt()))
+                .toList();
     }
 
     /** 전체 노트의 그래프 데이터 (노드 + 링크) Projection 쿼리로 필요한 필드만 조회하여 메모리 최적화 */
