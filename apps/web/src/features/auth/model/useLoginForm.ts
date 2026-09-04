@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/api/useAuth';
 import { useAuthStore } from '@/entities/user';
-import { apiClient } from '@/shared/api/api-client';
 import type { User } from '@/shared/model/types/user';
 import { AUTH_INPUT_LIMITS } from './authInputLimits';
 
@@ -85,14 +84,13 @@ function validateRegistrationForm(formData: LoginFormData) {
 export function useLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { loginAsync, registerAsync, isLoggingIn, isRegistering, currentUser, isLoading: isAuthLoading } = useAuth();
-  const { setUser, setToken } = useAuthStore();
+  const { loginAsync, registerAsync, isLoggingIn, isRegistering, currentUser } = useAuth();
+  const { setUser } = useAuthStore();
   const [isLogin, setIsLogin] = useState(true);
-  const [isRestoringSession, setIsRestoringSession] = useState(false);
   const [formData, setFormData] = useState<LoginFormData>(DEFAULT_FORM_DATA);
   const [error, setError] = useState('');
 
-  const isLoading = isLoggingIn || isRegistering || isRestoringSession;
+  const isLoading = isLoggingIn || isRegistering;
   const redirect = useMemo(() => searchParams.get('redirect') || '/admin', [searchParams]);
 
   useEffect(() => {
@@ -102,48 +100,6 @@ export function useLoginForm() {
 
     router.replace(resolveSafeRedirect(redirect, currentUser.role));
   }, [currentUser, redirect, router]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const restoreSession = async () => {
-      if (apiClient.getToken() || !apiClient.hasRefreshToken()) {
-        return;
-      }
-
-      setIsRestoringSession(true);
-
-      try {
-        const accessToken = await apiClient.restoreSession();
-        if (!accessToken || cancelled) {
-          return;
-        }
-
-        const user = await apiClient.get<User>('/auth/me');
-        if (cancelled) {
-          return;
-        }
-
-        setToken(accessToken);
-        setUser(user);
-        router.replace(resolveSafeRedirect(redirect, user.role));
-      } catch {
-        // 의도적으로 무시
-      } finally {
-        if (!cancelled) {
-          setIsRestoringSession(false);
-        }
-      }
-    };
-
-    if (!isAuthLoading) {
-      void restoreSession();
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthLoading, redirect, router, setToken, setUser]);
 
   const updateField = <K extends keyof LoginFormData>(key: K, value: LoginFormData[K]) => {
     if (error) {

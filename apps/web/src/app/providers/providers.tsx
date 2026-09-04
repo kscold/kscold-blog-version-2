@@ -4,7 +4,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/entities/user';
+import { apiClient } from '@/shared/api/api-client';
+import { hasLegacyAuthTokens } from '@/shared/lib/authTokenStorage';
 import { subscribeAuthSessionBridge } from '@/shared/model/authSessionBridge';
+import type { User } from '@/shared/model/types/user';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 
 const ReactQueryDevtools =
@@ -30,20 +33,36 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    void Promise.resolve(useAuthStore.persist.rehydrate())
-      .finally(() => useAuthStore.getState().setHasHydrated(true));
-
     const unsubscribe = subscribeAuthSessionBridge({
-      onTokenChange: token => {
-        if (token) {
-          useAuthStore.getState().setToken(token);
-        }
-      },
       onSessionCleared: () => {
         useAuthStore.getState().clearAuth();
         queryClient.clear();
       },
     });
+
+    const restoreSession = async () => {
+      await Promise.resolve(useAuthStore.persist.rehydrate());
+      const storedUser = useAuthStore.getState().user;
+
+      if (!storedUser && !hasLegacyAuthTokens()) {
+        return;
+      }
+
+      if (!(await apiClient.migrateLegacySession())) {
+        throw new Error('기존 세션을 안전한 쿠키로 전환하지 못했습니다.');
+      }
+
+      const user = await apiClient.get<User>('/auth/me');
+      useAuthStore.getState().setUser(user);
+      queryClient.setQueryData(['auth', 'me'], user);
+    };
+
+    void restoreSession()
+      .catch(() => {
+        apiClient.clearSession();
+        queryClient.clear();
+      })
+      .finally(() => useAuthStore.getState().setHasHydrated(true));
 
     return unsubscribe;
   }, [queryClient]);

@@ -24,6 +24,7 @@ class ApiClient {
     this.session = new ApiClientSession(this.apiUrl);
     this.client = axios.create({
       baseURL: this.apiUrl,
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -34,17 +35,6 @@ class ApiClient {
   }
 
   private setupInterceptors() {
-    this.client.interceptors.request.use(
-      (config: InternalAxiosRequestConfig) => {
-        const token = this.session.getAccessToken();
-        if (token && config.headers) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      error => Promise.reject(error)
-    );
-
     this.client.interceptors.response.use(
       response => response,
       async (error: AxiosError) => {
@@ -62,9 +52,8 @@ class ApiClient {
         ) {
           originalRequest._retry = true;
 
-          const newToken = await this.session.refreshAccessToken();
-          if (newToken && originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          const refreshed = await this.session.refreshSession();
+          if (refreshed) {
             return this.client(originalRequest);
           }
 
@@ -122,34 +111,24 @@ class ApiClient {
     return response.data.data;
   }
 
-  public setToken(token: string, refreshToken?: string): void {
-    this.session.setTokens(token, refreshToken);
-    this.session.applyAccessToken(this.client);
+  public establishSession(): void {
+    this.session.establishSession();
   }
 
-  public removeToken(): void {
+  public clearSession(): void {
     this.session.clearTokens();
-    this.session.applyAccessToken(this.client);
   }
 
-  public getToken(): string | null {
-    return this.session.getAccessToken();
+  public migrateLegacySession(): Promise<boolean> {
+    return this.session.migrateLegacySession();
   }
 
-  public async getValidToken(): Promise<string | null> {
-    const accessToken = await this.session.getValidAccessToken();
-    this.session.applyAccessToken(this.client);
-    return accessToken;
-  }
-
-  public hasRefreshToken(): boolean {
-    return this.session.hasRefreshToken();
-  }
-
-  public async restoreSession(): Promise<string | null> {
-    const accessToken = await this.session.restoreSession();
-    this.session.applyAccessToken(this.client);
-    return accessToken;
+  public async logout(): Promise<void> {
+    try {
+      await this.client.post('/auth/logout');
+    } finally {
+      this.clearSession();
+    }
   }
 }
 

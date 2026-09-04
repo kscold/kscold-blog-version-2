@@ -9,7 +9,6 @@ import {
 import type { RawChatPayload } from '@/entities/chat';
 import { toVisitorMessage } from '@/entities/chat';
 import { fetchMyChatMessages, sendVisitorMessage, type VisitorChatMessage } from '@/entities/chat';
-import apiClient from '@/shared/api/api-client';
 import { resolveChatWsUrl } from '@/shared/lib/runtime-url';
 
 interface UseChatSocketOptions {
@@ -27,8 +26,7 @@ export function useChatSocket({ isOpen, username: _username }: UseChatSocketOpti
   const connect = useCallback(async () => {
     if (!shouldReconnectRef.current || wsRef.current) return;
 
-    const token = await apiClient.getValidToken();
-    if (!token || !shouldReconnectRef.current || wsRef.current) return;
+    if (!shouldReconnectRef.current || wsRef.current) return;
 
     const ws = new WebSocket(resolveChatWsUrl());
     wsRef.current = ws;

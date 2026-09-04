@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { getAccessToken } from '@/shared/lib/authTokenStorage';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
@@ -13,14 +12,11 @@ export function PageVisitTracker() {
     if (!pathname) return;
     if (pathname.startsWith('/admin') || pathname.startsWith('/api')) return;
 
-    const token = getAccessToken();
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers.Authorization = `Bearer ${token}`;
-
     const controller = new AbortController();
     fetch(`${API_BASE}/analytics/page-visit`, {
       method: 'POST',
-      headers,
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ path: pathname }),
       signal: controller.signal,
       keepalive: true,

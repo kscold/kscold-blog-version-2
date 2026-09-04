@@ -97,7 +97,7 @@ export function PrivacyPolicy() {
 
           <Section title="8. 쿠키 및 추적 기술 사용">
             <p>
-              <strong>1) 자체 쿠키:</strong> 로그인 상태 유지를 위해 JWT 토큰을 localStorage 및 HttpOnly 쿠키 형태로 저장합니다. 사용자는 브라우저 설정에서 쿠키 저장을 거부할 수 있으나, 이 경우 로그인 기반 기능을 이용할 수 없습니다.
+              <strong>1) 자체 쿠키:</strong> 로그인 상태 유지를 위해 JWT 토큰을 JavaScript로 읽을 수 없는 HttpOnly 쿠키에 저장합니다. 사용자는 브라우저 설정에서 쿠키 저장을 거부할 수 있으나, 이 경우 로그인 기반 기능을 이용할 수 없습니다.
             </p>
             <p className="mt-3">
               <strong>2) Google Analytics:</strong> 본 사이트는 방문자의 사이트 이용 행태(페이지뷰, 체류 시간, 유입 경로 등)를 분석하기 위해 Google Analytics를 사용합니다. 분석 과정에서 IP 주소, 브라우저 정보 등이 수집되며, 이는 통계 목적으로만 사용됩니다.

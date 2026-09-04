@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { success, mockShellApis } from './support/api';
+import { seedSession } from './support/auth';
 
 interface GuestbookEntry {
   id: string;
@@ -23,7 +24,7 @@ function pageOf(entries: GuestbookEntry[], page = 0, size = 12) {
   };
 }
 
-/** 로그인 사용자 시드 (auth/me 목 + localStorage 토큰) */
+/** 로그인 사용자 시드 (auth/me 목 + 쿠키 세션) */
 async function seedUser(page: Page, role: 'USER' | 'ADMIN', id: string) {
   await mockShellApis(page);
   await page.route('**/api/auth/me', async route => {
@@ -41,9 +42,12 @@ async function seedUser(page: Page, role: 'USER' | 'ADMIN', id: string) {
       ),
     });
   });
-  await page.addInitScript(() => {
-    window.localStorage.setItem('accessToken', 'fake-access-token');
-    window.localStorage.setItem('refreshToken', 'fake-refresh-token');
+  await seedSession(page, {
+    id,
+    email: 'developerkscold@gmail.com',
+    username: 'kscold',
+    displayName: '김승찬',
+    role,
   });
 }
 

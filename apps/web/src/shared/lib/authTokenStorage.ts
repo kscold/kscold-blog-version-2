@@ -1,53 +1,50 @@
-import { notifyAuthSessionCleared, notifyAuthTokenChanged } from '@/shared/model/authSessionBridge';
+import { notifyAuthSessionCleared } from '@/shared/model/authSessionBridge';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 const AUTH_STORAGE_KEY = 'auth-storage';
-const ACCESS_TOKEN_COOKIE = 'auth-token';
-const ACCESS_TOKEN_COOKIE_MAX_AGE = 60 * 60;
 
 function isBrowser() {
   return typeof window !== 'undefined';
 }
 
-function resolveCookieSuffix() {
-  return window.location.protocol === 'https:' ? '; Secure' : '';
-}
-
-export function getAccessToken() {
+export function getLegacyRefreshToken() {
   if (!isBrowser()) return null;
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  try {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  } catch {
+    return null;
+  }
 }
 
-export function getRefreshToken() {
-  if (!isBrowser()) return null;
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
+export function hasLegacyAuthTokens() {
+  if (!isBrowser()) return false;
+  try {
+    return Boolean(localStorage.getItem(ACCESS_TOKEN_KEY) || getLegacyRefreshToken());
+  } catch {
+    return false;
+  }
 }
 
-export function hasRefreshToken() {
-  return !!getRefreshToken();
-}
-
-export function storeAccessToken(token: string) {
+export function clearLegacyAuthTokens() {
   if (!isBrowser()) return;
 
-  localStorage.setItem(ACCESS_TOKEN_KEY, token);
-  document.cookie = `${ACCESS_TOKEN_COOKIE}=${token}; path=/; max-age=${ACCESS_TOKEN_COOKIE_MAX_AGE}; SameSite=Lax${resolveCookieSuffix()}`;
-  notifyAuthTokenChanged(token);
-}
-
-export function storeRefreshToken(token: string) {
-  if (!isBrowser()) return;
-  localStorage.setItem(REFRESH_TOKEN_KEY, token);
+  try {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  } catch {
+    // 저장소 사용이 제한되어도 HttpOnly 쿠키 세션은 유지할 수 있다.
+  }
 }
 
 export function clearStoredAuth() {
   if (!isBrowser()) return;
 
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
-  localStorage.removeItem(AUTH_STORAGE_KEY);
-  document.cookie = `${ACCESS_TOKEN_COOKIE}=; path=/; max-age=0`;
-  notifyAuthTokenChanged(null);
+  clearLegacyAuthTokens();
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch {
+    // 저장소 사용이 제한된 브라우저에서도 서버 로그아웃은 계속 처리한다.
+  }
   notifyAuthSessionCleared();
 }

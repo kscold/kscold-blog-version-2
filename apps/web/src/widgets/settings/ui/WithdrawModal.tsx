@@ -19,7 +19,7 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
   const router = useRouter();
   const alert = useAlert();
   const withdrawAccount = useWithdrawAccount();
-  const { setUser, setToken } = useAuthStore();
+  const { setUser } = useAuthStore();
   const [confirmInput, setConfirmInput] = useState('');
 
   const handleClose = () => {
@@ -31,9 +31,8 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
     if (confirmInput !== CONFIRM_PHRASE) return;
     try {
       await withdrawAccount.mutateAsync();
-      apiClient.removeToken();
-      setToken('');
-      setUser(null as never);
+      await apiClient.logout().catch(() => undefined);
+      setUser(null);
       router.replace('/');
     } catch {
       alert.error('탈퇴 처리 중 오류가 발생했습니다.');

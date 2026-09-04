@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateA
 import { applyAdminSocketEvent, mergeRestRooms, patchRoom, type Rooms } from '@/entities/chat';
 import type { AdminMessage } from '@/entities/chat';
 import { fetchChatRooms, fetchRoomMessages, sendRestMessage } from '@/entities/chat';
-import { getAccessToken } from '@/shared/lib/authTokenStorage';
 import { resolveChatWsUrl } from '@/shared/lib/runtime-url';
 
 export function useChatAdmin() {
@@ -32,8 +31,6 @@ export function useChatAdmin() {
   }, []);
 
   const connect = useCallback(() => {
-    const token = getAccessToken();
-    if (!token) return;
     const ws = new WebSocket(resolveChatWsUrl());
     wsRef.current = ws;
     ws.onopen = () => setIsConnected(true);

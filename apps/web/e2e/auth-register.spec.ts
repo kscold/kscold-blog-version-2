@@ -107,5 +107,13 @@ test.describe('회원가입 시나리오', () => {
     await page.locator('[data-cy="register-submit"]').click();
 
     await expect(page).toHaveURL(`${baseURL}/`);
+    await expect
+      .poll(() =>
+        page.evaluate(() => ({
+          accessToken: window.localStorage.getItem('accessToken'),
+          refreshToken: window.localStorage.getItem('refreshToken'),
+        }))
+      )
+      .toEqual({ accessToken: null, refreshToken: null });
   });
 });

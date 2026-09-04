@@ -24,26 +24,49 @@ export function createAdminAccessToken(): string {
   return `${header}.${payload}.signature`;
 }
 
+async function mockCurrentUser(page: Page, user: SessionUser) {
+  await page.route('**/api/auth/me', async route => {
+    if (route.request().method() !== 'GET') {
+      await route.fallback();
+      return;
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        data: user,
+        message: null,
+        errorCode: null,
+        timestamp: '2026-09-05T00:00:00',
+      }),
+    });
+  });
+}
+
 /**
  * cy 의 seedAdminSession() 대응.
- * auth-token 쿠키 + localStorage(auth-storage 등)를 심어 어드민 로그인 상태를 만든다.
+ * auth-token 쿠키 + localStorage(auth-storage)를 심어 어드민 로그인 상태를 만든다.
  * page.goto 전에 호출해야 하므로 addInitScript 로 localStorage 를 주입한다.
  */
 export async function seedAdminSession(page: Page): Promise<string> {
   const accessToken = createAdminAccessToken();
+  const user: SessionUser = {
+    id: 'admin-1',
+    email: 'developerkscold@gmail.com',
+    username: 'kscold',
+    displayName: '김승찬',
+    role: 'ADMIN',
+  };
   const persistedAuth = JSON.stringify({
     state: {
-      user: {
-        id: 'admin-1',
-        email: 'developerkscold@gmail.com',
-        username: 'kscold',
-        displayName: '김승찬',
-        role: 'ADMIN',
-      },
-      token: accessToken,
+      user,
     },
     version: 0,
   });
+
+  await mockCurrentUser(page, user);
 
   const url = new URL(baseURL);
   await page.context().addCookies([
@@ -56,16 +79,14 @@ export async function seedAdminSession(page: Page): Promise<string> {
   ]);
 
   await page.addInitScript(
-    ({ token, auth }) => {
+    ({ auth }) => {
       try {
-        window.localStorage.setItem('accessToken', token);
-        window.localStorage.setItem('refreshToken', 'fake-refresh-token');
         window.localStorage.setItem('auth-storage', auth);
       } catch {
         /* localStorage 접근 불가 환경은 무시 */
       }
     },
-    { token: accessToken, auth: persistedAuth }
+    { auth: persistedAuth }
   );
 
   return accessToken;
@@ -96,9 +117,11 @@ function createAccessToken(user: SessionUser): string {
 export async function seedSession(page: Page, user: SessionUser): Promise<string> {
   const accessToken = createAccessToken(user);
   const persistedAuth = JSON.stringify({
-    state: { user, token: accessToken },
+    state: { user },
     version: 0,
   });
+
+  await mockCurrentUser(page, user);
 
   const url = new URL(baseURL);
   await page.context().addCookies([
@@ -106,16 +129,14 @@ export async function seedSession(page: Page, user: SessionUser): Promise<string
   ]);
 
   await page.addInitScript(
-    ({ token, auth }) => {
+    ({ auth }) => {
       try {
-        window.localStorage.setItem('accessToken', token);
-        window.localStorage.setItem('refreshToken', 'fake-refresh-token');
         window.localStorage.setItem('auth-storage', auth);
       } catch {
         /* noop */
       }
     },
-    { token: accessToken, auth: persistedAuth }
+    { auth: persistedAuth }
   );
 
   return accessToken;

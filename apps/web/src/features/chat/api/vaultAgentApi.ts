@@ -93,14 +93,13 @@ export async function streamVaultAgentMessage({
   onEvent,
   signal,
 }: VaultAgentStreamRequest) {
-  const accessToken = await apiClient.getValidToken();
   const response = await fetch(`${resolveApiBaseUrl()}/vault/agent/chat/stream`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'text/event-stream',
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     },
+    credentials: 'include',
     body: JSON.stringify({
       message: question,
       activeFolderName,
