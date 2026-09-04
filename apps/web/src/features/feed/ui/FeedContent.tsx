@@ -19,7 +19,7 @@ export function FeedContent({ authorName, content, variant }: FeedContentProps) 
 
   if (variant === 'detail') {
     return (
-      <div className="px-5 py-6 sm:px-7 sm:py-8">
+      <div className="px-5 py-6 sm:px-7 sm:py-8 [&_.markdown-prose_h1]:mb-8 [&_.markdown-prose_h1]:text-[2rem] [&_.markdown-prose_h1]:leading-[1.16] [&_.markdown-prose_h1]:tracking-[-0.035em] sm:[&_.markdown-prose_h1]:mb-10 sm:[&_.markdown-prose_h1]:text-[2.5rem] lg:[&_.markdown-prose_h1]:text-[2.75rem]">
         <MarkdownContent content={content} />
       </div>
     );
