@@ -2,14 +2,11 @@ package com.kscold.blog.social.application.service;
 
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,13 +29,8 @@ public class FeedMentionResolver {
                 .filter(user -> !user.isDeleted())
                 .forEach(user -> byId.put(user.getId(), user));
 
-        // 해당 글 댓글 참여자 — userId 를 모아 한 번에 배치 조회함(댓글마다 findById 하지 않음).
-        List<String> commenterIds =
-                feedCommentRepository.findByFeedId(feedId, Pageable.unpaged()).getContent().stream()
-                        .map(FeedComment::getUserId)
-                        .filter(Objects::nonNull)
-                        .distinct()
-                        .toList();
+        // 댓글 본문은 읽지 않고 MongoDB에서 고유 userId만 조회한 뒤 사용자를 한 번에 불러온다.
+        List<String> commenterIds = feedCommentRepository.findDistinctUserIdsByFeedId(feedId);
 
         userRepository.findAllById(commenterIds).stream()
                 .filter(user -> !user.isDeleted())

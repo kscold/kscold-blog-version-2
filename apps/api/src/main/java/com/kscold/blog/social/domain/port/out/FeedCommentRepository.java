@@ -17,6 +17,8 @@ public interface FeedCommentRepository {
 
     Page<FeedComment> findByFeedId(String feedId, Pageable pageable);
 
+    List<String> findDistinctUserIdsByFeedId(String feedId);
+
     List<FeedComment> findAnonymousByFeedIdAndAuthorNames(String feedId, List<String> authorNames);
 
     void deleteAllByFeedId(String feedId);

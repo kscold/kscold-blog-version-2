@@ -42,6 +42,12 @@ public class FeedCommentRepositoryAdapter implements FeedCommentRepository {
     }
 
     @Override
+    public List<String> findDistinctUserIdsByFeedId(String feedId) {
+        Query query = Query.query(Criteria.where("feedId").is(feedId).and("userId").ne(null));
+        return mongoTemplate.findDistinct(query, "userId", FeedComment.class, String.class);
+    }
+
+    @Override
     public List<FeedComment> findAnonymousByFeedIdAndAuthorNames(
             String feedId, List<String> authorNames) {
         return mongoFeedCommentRepository.findByFeedIdAndUserIdIsNullAndAuthorNameIn(
