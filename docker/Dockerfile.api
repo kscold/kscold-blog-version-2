@@ -1,32 +1,33 @@
-# Multi-stage build for Spring Boot
+FROM gradle:8.5-jdk21@sha256:873def2b8a73d00f5616043ac9ff65576b055942701391ad66499f1a1f53f1b2 AS builder
 
-# Builder stage
-FROM gradle:8.5-jdk21 AS builder
 WORKDIR /app
 
-# Copy Gradle files
+# 의존성 정의를 먼저 복사해 애플리케이션 소스 변경 시에도 다운로드 계층을 재사용합니다.
 COPY apps/api/build.gradle apps/api/settings.gradle ./
+COPY apps/api/gradlew ./gradlew
 COPY apps/api/gradle ./gradle
+RUN ./gradlew dependencies --configuration runtimeClasspath --no-daemon --quiet >/dev/null
 
-# Download dependencies (cached)
-RUN gradle dependencies --no-daemon || true
-
-# Copy source code
 COPY apps/api/src ./src
+RUN ./gradlew bootJar --no-daemon
 
-# Build the application
-RUN gradle build -x test --no-daemon
+FROM eclipse-temurin:21-jre-alpine@sha256:974b08960c5d96694c780e65b2d5705268ab1e1ca1a0dd0caf4ba6c3fe34d699 AS runner
 
-# Runner stage
-FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Create uploads directory
-RUN mkdir -p /uploads && chmod 755 /uploads
+RUN apk upgrade --no-cache \
+    && addgroup -S -g 10001 blog-api \
+    && adduser -S -D -H -u 10001 -G blog-api blog-api \
+    && mkdir -p /app/uploads \
+    && chown -R blog-api:blog-api /app
 
-# Copy the built JAR
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=builder --chown=blog-api:blog-api /app/build/libs/blog-api-*.jar ./app.jar
+
+USER blog-api
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD wget --quiet --timeout=3 --output-document=/dev/null http://127.0.0.1:8080/api/health || exit 1
+
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]

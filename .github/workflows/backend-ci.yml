@@ -5,10 +5,14 @@ on:
     branches: [main]
     paths:
       - 'apps/api/**'
+      - 'docker/Dockerfile.api'
+      - '.dockerignore'
       - '.github/workflows/backend-ci.yml'
   pull_request:
     paths:
       - 'apps/api/**'
+      - 'docker/Dockerfile.api'
+      - '.dockerignore'
       - '.github/workflows/backend-ci.yml'
   workflow_dispatch:
 
@@ -39,3 +43,22 @@ jobs:
       - name: 테스트, 포맷 및 패키징 검사
         working-directory: apps/api
         run: ./gradlew test spotlessCheck bootJar --no-daemon
+
+      - name: API 이미지 빌드
+        run: docker build --file docker/Dockerfile.api --tag kscold-blog-api:ci .
+
+      - name: API 이미지 실행 권한 검사
+        run: |
+          test "$(docker image inspect kscold-blog-api:ci --format '{{.Config.User}}')" = blog-api
+          test "$(docker run --rm --entrypoint id kscold-blog-api:ci -u)" = 10001
+          test "$(docker image inspect kscold-blog-api:ci --format '{{if .Config.Healthcheck}}yes{{end}}')" = yes
+
+      - name: API 이미지 보안 검사
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: kscold-blog-api:ci
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
