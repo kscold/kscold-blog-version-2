@@ -44,8 +44,8 @@ importers:
         specifier: ^2.27.1
         version: 2.29.8
       prettier:
-        specifier: ^3.2.5
-        version: 3.8.1
+        specifier: ^3.9.6
+        version: 3.9.6
       turbo:
         specifier: ^2.10.12
         version: 2.10.12
@@ -62,11 +62,11 @@ importers:
         specifier: ^0.5.20
         version: 0.5.20(tailwindcss@3.4.19)
       '@tanstack/react-query':
-        specifier: ^5.62.7
-        version: 5.90.21(react@19.2.8)
+        specifier: ^5.102.8
+        version: 5.102.8(react@19.2.8)
       '@tanstack/react-query-devtools':
-        specifier: ^5.91.3
-        version: 5.91.3(@tanstack/react-query@5.90.21)(react@19.2.8)
+        specifier: ^5.102.8
+        version: 5.102.8(@tanstack/react-query@5.102.8)(react@19.2.8)
       '@tiptap/extension-bubble-menu':
         specifier: ^3.31.2
         version: 3.31.2(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)
@@ -90,7 +90,7 @@ importers:
         version: 3.31.2
       '@tiptap/react':
         specifier: ^3.31.2
-        version: 3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)(@types/react-dom@19.2.3)(@types/react@19.2.14)(react-dom@19.2.8)(react@19.2.8)
+        version: 3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)(@types/react-dom@19.2.5)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8)
       '@tiptap/starter-kit':
         specifier: ^3.31.2
         version: 3.31.2
@@ -117,7 +117,7 @@ importers:
         version: 11.17.2
       next:
         specifier: ^15.5.25
-        version: 15.5.25(@playwright/test@1.60.0)(@types/node@22.19.11)(react-dom@19.2.8)(react@19.2.8)
+        version: 15.5.25(@playwright/test@1.62.1)(@types/node@22.19.11)(react-dom@19.2.8)(react@19.2.8)
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -129,7 +129,7 @@ importers:
         version: 1.29.1(react@19.2.8)
       react-markdown:
         specifier: ^9.0.1
-        version: 9.1.0(@types/react@19.2.14)(react@19.2.8)
+        version: 9.1.0(@types/react@19.2.18)(react@19.2.8)
       react-syntax-highlighter:
         specifier: ^15.6.1
         version: 15.6.6(react@19.2.8)
@@ -149,12 +149,12 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0(@tiptap/core@3.31.2)
       zustand:
-        specifier: ^5.0.2
-        version: 5.0.11(@types/react@19.2.14)(react@19.2.8)
+        specifier: ^5.0.15
+        version: 5.0.15(@types/react@19.2.18)(react@19.2.8)
     devDependencies:
       '@playwright/test':
-        specifier: ^1.60.0
-        version: 1.60.0
+        specifier: ^1.62.1
+        version: 1.62.1
       '@types/d3-force':
         specifier: ^3.0.10
         version: 3.0.10
@@ -162,17 +162,17 @@ importers:
         specifier: ^22.10.1
         version: 22.19.11
       '@types/react':
-        specifier: ^19.0.1
-        version: 19.2.14
+        specifier: ^19.2.18
+        version: 19.2.18
       '@types/react-dom':
-        specifier: ^19.0.2
-        version: 19.2.3(@types/react@19.2.14)
+        specifier: ^19.2.5
+        version: 19.2.5(@types/react@19.2.18)
       '@types/react-syntax-highlighter':
         specifier: ^15.5.13
         version: 15.5.13
       autoprefixer:
-        specifier: ^10.4.20
-        version: 10.4.24(postcss@8.5.28)
+        specifier: ^10.5.4
+        version: 10.5.4(postcss@8.5.28)
       eslint:
         specifier: ^9.17.0
         version: 9.39.2
@@ -1288,12 +1288,12 @@ packages:
     engines: {node: '>=12.4.0'}
     dev: true
 
-  /@playwright/test@1.60.0:
-    resolution: {integrity: sha512-O71yZIbAh/PxDMNGns37GHBIfrVkEVyn+AXyIa5dOTfb4/xNvRWV+Vv/NMbNCtODB/pO7vLlF2OTmMVLhmr7Ag==}
-    engines: {node: '>=18'}
+  /@playwright/test@1.62.1:
+    resolution: {integrity: sha512-DTcUc8qii+cpHvtOwggMtBRMjKZHXYWdw8syRYu2vtzuq4Wxphqq4NfCs5Zt44L6mA8rfDfj+PHnxFc/FeK6mQ==}
+    engines: {node: '>=20'}
     hasBin: true
     dependencies:
-      playwright: 1.60.0
+      playwright: 1.62.1
 
   /@portone/browser-sdk@0.1.9:
     resolution: {integrity: sha512-GiLziqmKKSrorjWDvWjPhtD1nBd4zlY1crIPX5Kisx797MQYveqhtSMYwuyjRgwgInfEWonXjXWkHd5bTFUiWQ==}
@@ -1377,31 +1377,31 @@ packages:
       tailwindcss: 3.4.19
     dev: false
 
-  /@tanstack/query-core@5.90.20:
-    resolution: {integrity: sha512-OMD2HLpNouXEfZJWcKeVKUgQ5n+n3A2JFmBaScpNDUqSrQSjiveC7dKMe53uJUg1nDG16ttFPz2xfilz6i2uVg==}
+  /@tanstack/query-core@5.102.8:
+    resolution: {integrity: sha512-ZNjkJ33CqvPNec/6lZBnHqLc3EVGPZ9ySLhYahU9TcuRFdmwXewuj0c4hwSWcGHqEUwcSrKeZ+oGcvPBqXcQcg==}
     dev: false
 
-  /@tanstack/query-devtools@5.93.0:
-    resolution: {integrity: sha512-+kpsx1NQnOFTZsw6HAFCW3HkKg0+2cepGtAWXjiiSOJJ1CtQpt72EE2nyZb+AjAbLRPoeRmPJ8MtQd8r8gsPdg==}
+  /@tanstack/query-devtools@5.102.8:
+    resolution: {integrity: sha512-ZgeMKuF5d/zOE+tgWm3cSbD6Zcbr6IugVsnbHzUcSismqLZDSUPBKM6ILUxExgwe6rPAOox2x5bA5T+PSOQG0Q==}
     dev: false
 
-  /@tanstack/react-query-devtools@5.91.3(@tanstack/react-query@5.90.21)(react@19.2.8):
-    resolution: {integrity: sha512-nlahjMtd/J1h7IzOOfqeyDh5LNfG0eULwlltPEonYy0QL+nqrBB+nyzJfULV+moL7sZyxc2sHdNJki+vLA9BSA==}
+  /@tanstack/react-query-devtools@5.102.8(@tanstack/react-query@5.102.8)(react@19.2.8):
+    resolution: {integrity: sha512-QKb7A44BZOU7nxsGA4gFN1fofjYovar5O0T83Ff4Y+2eRq09RGFrAzzutVdF/6/emfSaMDohp6e759BjB3fxEw==}
     peerDependencies:
-      '@tanstack/react-query': ^5.90.20
+      '@tanstack/react-query': ^5.102.8
       react: ^18 || ^19
     dependencies:
-      '@tanstack/query-devtools': 5.93.0
-      '@tanstack/react-query': 5.90.21(react@19.2.8)
+      '@tanstack/query-devtools': 5.102.8
+      '@tanstack/react-query': 5.102.8(react@19.2.8)
       react: 19.2.8
     dev: false
 
-  /@tanstack/react-query@5.90.21(react@19.2.8):
-    resolution: {integrity: sha512-0Lu6y5t+tvlTJMTO7oh5NSpJfpg/5D41LlThfepTixPYkJ0sE2Jj0m0f6yYqujBwIXlId87e234+MxG3D3g7kg==}
+  /@tanstack/react-query@5.102.8(react@19.2.8):
+    resolution: {integrity: sha512-TYBea4OuXWD7MhaSHq069TWbFe7rcwWN6kzT7JF0OKi1K6c1gTv2IzD6A6ExJsCMozdkqBWeuIUZmu4KQg0O5A==}
     peerDependencies:
       react: ^18 || ^19
     dependencies:
-      '@tanstack/query-core': 5.90.20
+      '@tanstack/query-core': 5.102.8
       react: 19.2.8
     dev: false
 
@@ -1500,8 +1500,8 @@ packages:
       '@tiptap/extensions': 3.31.2(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)
     dev: false
 
-  /@tiptap/extension-floating-menu@3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2):
-    resolution: {integrity: sha512-DLjtMDg9kjv7tHFtms4OeZwEsa6tW60jexWMT3rTT4qQ+laqZjeNOYxJ0vwNmM4gDWXKkFifQHwzm13Zq5jv5A==}
+  /@tiptap/extension-floating-menu@3.31.3(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2):
+    resolution: {integrity: sha512-rd4VJ9PGSP9Eop8ZTEwaLZcMzMXLuJKe3hUNf58rq+zANpwM+9fI+vB7g9MAc3eXwUNDxNDVACFIL2oeBqpQ3A==}
     requiresBuild: true
     peerDependencies:
       '@floating-ui/dom': ^1.0.0
@@ -1687,7 +1687,7 @@ packages:
       prosemirror-view: 1.42.3
     dev: false
 
-  /@tiptap/react@3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)(@types/react-dom@19.2.3)(@types/react@19.2.14)(react-dom@19.2.8)(react@19.2.8):
+  /@tiptap/react@3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)(@types/react-dom@19.2.5)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8):
     resolution: {integrity: sha512-ZHg1t9zwINlSgK9+Ky6K6bRP2pnX0/Z0W0DOV9B6sRhmxxK1xsUZ7o/spJ0FjKVqPYYi/Py2cQzX72nyiu2knQ==}
     peerDependencies:
       '@tiptap/core': 3.31.2
@@ -1699,8 +1699,8 @@ packages:
     dependencies:
       '@tiptap/core': 3.31.2(@tiptap/pm@3.31.2)
       '@tiptap/pm': 3.31.2
-      '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
+      '@types/react': 19.2.18
+      '@types/react-dom': 19.2.5(@types/react@19.2.18)
       '@types/use-sync-external-store': 0.0.6
       fast-equals: 5.4.2
       react: 19.2.8
@@ -1708,7 +1708,7 @@ packages:
       use-sync-external-store: 1.6.0(react@19.2.8)
     optionalDependencies:
       '@tiptap/extension-bubble-menu': 3.31.2(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)
-      '@tiptap/extension-floating-menu': 3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)
+      '@tiptap/extension-floating-menu': 3.31.3(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)
     transitivePeerDependencies:
       - '@floating-ui/dom'
     dev: false
@@ -2084,21 +2084,21 @@ packages:
     dependencies:
       undici-types: 6.21.0
 
-  /@types/react-dom@19.2.3(@types/react@19.2.14):
-    resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
+  /@types/react-dom@19.2.5(@types/react@19.2.18):
+    resolution: {integrity: sha512-fMPwH9v7r/pp43yUd2/Mbiex5KouJwwR3dzHkhLREUC6764VyDsqxhAxv6OFEYR1RhjOyD1naqba8ECDBe7ZQg==}
     peerDependencies:
       '@types/react': ^19.2.0
     dependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.18
 
   /@types/react-syntax-highlighter@15.5.13:
     resolution: {integrity: sha512-uLGJ87j6Sz8UaBAooU0T6lWJ0dBmjZgN1PZTrj05TNql2/XpC6+4HhMT5syIdFUUt+FASfCeLLv4kBygNU+8qA==}
     dependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.18
     dev: true
 
-  /@types/react@19.2.14:
-    resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
+  /@types/react@19.2.18:
+    resolution: {integrity: sha512-AnzbBERsrLKtk2XSfTbYRLjQPdy116Sty4q+T+Bp3IC4l6jNBvreVPAHmpq9qhXQM7CXZPjLVmGMw9sy+hxQ3w==}
     dependencies:
       csstype: 3.2.3
 
@@ -2652,8 +2652,8 @@ packages:
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  /autoprefixer@10.4.24(postcss@8.5.28):
-    resolution: {integrity: sha512-uHZg7N9ULTVbutaIsDRoUkoS8/h3bdsmVJYZ5l3wv8Cp/6UIIoRDm90hZ+BwxUj/hGBEzLxdHNSKuFpn8WOyZw==}
+  /autoprefixer@10.5.4(postcss@8.5.28):
+    resolution: {integrity: sha512-MaU0U/za7N3r6brxD4YB/l4NSrFzLPlANv6wEuQVaIPlD3L4W9rFcQPbL/EilY9BHhHvhfcz3gInDLrEtWT4EA==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
@@ -5711,7 +5711,7 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
 
-  /next@15.5.25(@playwright/test@1.60.0)(@types/node@22.19.11)(react-dom@19.2.8)(react@19.2.8):
+  /next@15.5.25(@playwright/test@1.62.1)(@types/node@22.19.11)(react-dom@19.2.8)(react@19.2.8):
     resolution: {integrity: sha512-OMWNulIIqKM2ykvC2qMjIt0IoavB4UB2SCs4iXJ6z6847FvyH8jBmBWcvrF5iuhTu8Przh20Fo/aoszIdqx4PA==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
@@ -5733,7 +5733,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 15.5.25
-      '@playwright/test': 1.60.0
+      '@playwright/test': 1.62.1
       '@swc/helpers': 0.5.15
       caniuse-lite: 1.0.30001810
       postcss: 8.5.28
@@ -6025,17 +6025,17 @@ packages:
     resolution: {integrity: sha512-TfySrs/5nm8fQJDcBDuUng3VOUKsd7S+zqvbOTiGXHfxX4wK31ard+hoNuvkicM/2YFzlpDgABOevKSsB4G/FA==}
     engines: {node: '>= 6'}
 
-  /playwright-core@1.60.0:
-    resolution: {integrity: sha512-9bW6zvX/m0lEbgTKJ6YppOKx8H3VOPBMOCFh2irXFOT4BbHgrx5hPjwJYLT40Lu+4qtD36qKc/Hn56StUW57IA==}
-    engines: {node: '>=18'}
+  /playwright-core@1.62.1:
+    resolution: {integrity: sha512-wPYSwEBJY9GHraISXqyqtx0na0LpO3XEX7jNDhntbex7tzUS7kLnZsOlFruFJB4Hi/rhDMjXGqHewDZ68nYZVw==}
+    engines: {node: '>=20'}
     hasBin: true
 
-  /playwright@1.60.0:
-    resolution: {integrity: sha512-hheHdokM8cdqCb0lcE3s+zT4t4W+vvjpGxsZlDnikarzx8tSzMebh3UiFtgqwFwnTnjYQcsyMF8ei2mCO/tpeA==}
-    engines: {node: '>=18'}
+  /playwright@1.62.1:
+    resolution: {integrity: sha512-0M+L3LAD8/nm554LOla9Ayx0j0tmFZ0FBcoQ7F1VuVHpM/XpiC8RcDzBQB8W5+hA8L22THxELzeF+2WcUzvcLg==}
+    engines: {node: '>=20'}
     hasBin: true
     dependencies:
-      playwright-core: 1.60.0
+      playwright-core: 1.62.1
     optionalDependencies:
       fsevents: 2.3.2
 
@@ -6139,8 +6139,8 @@ packages:
     hasBin: true
     dev: true
 
-  /prettier@3.8.1:
-    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
+  /prettier@3.9.6:
+    resolution: {integrity: sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true
@@ -6343,7 +6343,7 @@ packages:
       react: 19.2.8
     dev: false
 
-  /react-markdown@9.1.0(@types/react@19.2.14)(react@19.2.8):
+  /react-markdown@9.1.0(@types/react@19.2.18)(react@19.2.8):
     resolution: {integrity: sha512-xaijuJB0kzGiUdG7nc2MOMDUDBWPyGAjZtUrow9XxUeua8IqeP+VlIfAZ3bphpcLTnSZXz6z9jcVC/TCwbfgdw==}
     peerDependencies:
       '@types/react': '>=18'
@@ -6351,7 +6351,7 @@ packages:
     dependencies:
       '@types/hast': 3.0.4
       '@types/mdast': 4.0.4
-      '@types/react': 19.2.14
+      '@types/react': 19.2.18
       devlop: 1.1.0
       hast-util-to-jsx-runtime: 2.3.6
       html-url-attributes: 3.0.1
@@ -7554,8 +7554,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zustand@5.0.11(@types/react@19.2.14)(react@19.2.8):
-    resolution: {integrity: sha512-fdZY+dk7zn/vbWNCYmzZULHRrss0jx5pPFiOuMZ/5HJN6Yv3u+1Wswy/4MpZEkEGhtNH+pwxZB8OKgUBPzYAGg==}
+  /zustand@5.0.15(@types/react@19.2.18)(react@19.2.8):
+    resolution: {integrity: sha512-MpSEjRiBkA9crSYeOUH32rJC7SVqAbm0Fqcqge/bUi2PPoLcBWKOsG+C8mevmpr8TwXHBVkChbbJiyvkE+i/3A==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=18.0.0'
@@ -7572,7 +7572,7 @@ packages:
       use-sync-external-store:
         optional: true
     dependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.18
       react: 19.2.8
     dev: false
 
