@@ -2,6 +2,7 @@ package com.kscold.blog.analytics.application.service;
 
 import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
+import com.kscold.blog.blog.application.port.in.TagCatalogUseCase;
 import com.kscold.blog.blog.application.port.in.TagUseCase;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
@@ -24,6 +25,7 @@ public class PageExistenceChecker {
     private final PostUseCase postUseCase;
     private final CategoryUseCase categoryUseCase;
     private final TagUseCase tagUseCase;
+    private final TagCatalogUseCase tagCatalogUseCase;
     private final FeedUseCase feedUseCase;
     private final VaultNoteUseCase vaultNoteUseCase;
     private final UserProfileUseCase userProfileUseCase;
@@ -53,12 +55,16 @@ public class PageExistenceChecker {
     private static final Pattern FEED_DETAIL = Pattern.compile("^/feed/([^/]+)$");
     private static final Pattern VAULT_DETAIL = Pattern.compile("^/vault/([^/]+)$");
     private static final Pattern PROFILE_DETAIL = Pattern.compile("^/profile/([^/]+)$");
-    private static final Pattern UNIFIED_TAG = Pattern.compile("^/tags/[^/]+$");
+    private static final Pattern UNIFIED_TAG = Pattern.compile("^/tags/([^/]+)$");
 
     public boolean exists(String path) {
         if (path == null) return false;
         if (STATIC_PATHS.contains(path)) return true;
-        if (UNIFIED_TAG.matcher(path).matches()) return true;
+
+        Matcher unifiedTag = UNIFIED_TAG.matcher(path);
+        if (unifiedTag.matches()) {
+            return unifiedTagExists(decode(unifiedTag.group(1)));
+        }
 
         Matcher tag = BLOG_TAG.matcher(path);
         if (tag.matches()) {
@@ -97,6 +103,17 @@ public class PageExistenceChecker {
         }
 
         return false;
+    }
+
+    private boolean unifiedTagExists(String value) {
+        return callSafely(
+                () ->
+                        tagCatalogUseCase.getIndex().stream()
+                                .anyMatch(
+                                        usage ->
+                                                usage.name().equalsIgnoreCase(value)
+                                                        || (usage.slug() != null
+                                                                && usage.slug().equals(value))));
     }
 
     private boolean callSafely(java.util.function.Supplier<Boolean> supplier) {

@@ -8,9 +8,11 @@ import static org.mockito.Mockito.when;
 
 import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
+import com.kscold.blog.blog.application.port.in.TagCatalogUseCase;
 import com.kscold.blog.blog.application.port.in.TagUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Tag;
+import com.kscold.blog.blog.domain.model.TagUsage;
 import com.kscold.blog.identity.application.dto.response.PublicProfileResponse;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
@@ -23,6 +25,7 @@ class PageExistenceCheckerTest {
     private PostUseCase postUseCase;
     private CategoryUseCase categoryUseCase;
     private TagUseCase tagUseCase;
+    private TagCatalogUseCase tagCatalogUseCase;
     private FeedUseCase feedUseCase;
     private VaultNoteUseCase vaultNoteUseCase;
     private UserProfileUseCase userProfileUseCase;
@@ -33,6 +36,7 @@ class PageExistenceCheckerTest {
         postUseCase = mock(PostUseCase.class);
         categoryUseCase = mock(CategoryUseCase.class);
         tagUseCase = mock(TagUseCase.class);
+        tagCatalogUseCase = mock(TagCatalogUseCase.class);
         feedUseCase = mock(FeedUseCase.class);
         vaultNoteUseCase = mock(VaultNoteUseCase.class);
         userProfileUseCase = mock(UserProfileUseCase.class);
@@ -41,6 +45,7 @@ class PageExistenceCheckerTest {
                         postUseCase,
                         categoryUseCase,
                         tagUseCase,
+                        tagCatalogUseCase,
                         feedUseCase,
                         vaultNoteUseCase,
                         userProfileUseCase);
@@ -77,6 +82,18 @@ class PageExistenceCheckerTest {
 
         verify(tagUseCase).getBySlug("ai-agent");
         verify(postUseCase, never()).existsBySlug("ai-agent");
+    }
+
+    @Test
+    void checksUnifiedTagAgainstTheSharedTagIndex() {
+        when(tagCatalogUseCase.getIndex())
+                .thenReturn(
+                        java.util.List.of(
+                                new TagUsage("tag-1", "AI Agent", "ai-agent", null, null, 1, 2)));
+
+        assertThat(checker.exists("/tags/AI%20Agent")).isTrue();
+        assertThat(checker.exists("/tags/ai-agent")).isTrue();
+        assertThat(checker.exists("/tags/not-real")).isFalse();
     }
 
     @Test
