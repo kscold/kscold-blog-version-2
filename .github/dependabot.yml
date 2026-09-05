@@ -93,6 +93,9 @@ updates:
       - dependency-name: '*'
         update-types:
           - version-update:semver-major
+      - dependency-name: gradle
+        update-types:
+          - version-update:semver-minor
     groups:
       docker-minor-patch:
         patterns:
