@@ -11,6 +11,7 @@ import {
   fetchPublicApi,
   isIndexableTag,
 } from '@/shared/lib/seo';
+import { safeDecodeURIComponent } from '@/shared/lib/safeDecodeURIComponent';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { ArchivePageSkeleton } from '@/shared/ui/RouteSkeletons';
 
@@ -32,7 +33,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const seoData = await getTagSeoData(slug);
+  const seoData = await getTagSeoData(safeDecodeURIComponent(slug));
 
   if (!seoData) {
     notFound();
@@ -54,7 +55,7 @@ export default async function TagPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const seoData = await getTagSeoData(slug);
+  const seoData = await getTagSeoData(safeDecodeURIComponent(slug));
 
   if (!seoData) {
     notFound();
