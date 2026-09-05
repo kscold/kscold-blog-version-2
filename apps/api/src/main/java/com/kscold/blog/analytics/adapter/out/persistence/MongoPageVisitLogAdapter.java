@@ -16,7 +16,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.Fields;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -57,18 +57,19 @@ public class MongoPageVisitLogAdapter implements PageVisitLogRepository {
         Aggregation agg =
                 Aggregation.newAggregation(
                         match(Criteria.where("createdAt").gte(after)),
-                        group("path").count().as("visits"),
+                        group(Fields.fields("path", "ipHash")).count().as("visitsPerVisitor"),
+                        group("_id.path")
+                                .sum("visitsPerVisitor")
+                                .as("visits")
+                                .count()
+                                .as("uniqueVisitors"),
                         sort(DESC, "visits"),
                         Aggregation.limit(limit));
-        AggregationResults<RawPathStat> results =
-                mongoTemplate.aggregate(agg, "page_visit_logs", RawPathStat.class);
-        return results.getMappedResults().stream()
-                .map(
-                        r ->
-                                new PathStat(
-                                        r.get_id(),
-                                        r.getVisits(),
-                                        countUniqueVisitors(r.get_id(), after)))
+        return mongoTemplate
+                .aggregate(agg, "page_visit_logs", RawPathStat.class)
+                .getMappedResults()
+                .stream()
+                .map(r -> new PathStat(r.get_id(), r.getVisits(), r.getUniqueVisitors()))
                 .toList();
     }
 
@@ -93,23 +94,12 @@ public class MongoPageVisitLogAdapter implements PageVisitLogRepository {
                 .toList();
     }
 
-    private long countUniqueVisitors(String path, Instant after) {
-        Aggregation agg =
-                Aggregation.newAggregation(
-                        match(Criteria.where("path").is(path).and("createdAt").gte(after)),
-                        group("ipHash"),
-                        Aggregation.count().as("uniques"));
-        AggregationResults<org.bson.Document> out =
-                mongoTemplate.aggregate(agg, "page_visit_logs", org.bson.Document.class);
-        List<org.bson.Document> list = out.getMappedResults();
-        return list.isEmpty() ? 0 : list.get(0).getInteger("uniques", 0);
-    }
-
     @lombok.Getter
     @lombok.Setter
     public static class RawPathStat {
         private String _id;
         private long visits;
+        private long uniqueVisitors;
     }
 
     @lombok.Getter

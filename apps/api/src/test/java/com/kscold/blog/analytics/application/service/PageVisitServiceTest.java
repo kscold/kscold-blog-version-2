@@ -48,4 +48,15 @@ class PageVisitServiceTest {
 
         verify(repository, never()).insert(org.mockito.ArgumentMatchers.any());
     }
+
+    @Test
+    void boundsAnalyticsQueryRanges() {
+        service.topPaths(-1, 10_000);
+        service.dailyVisits(10_000);
+        service.recentVisits(null, true, 0);
+
+        verify(repository).topPaths(1, PageVisitService.MAX_RESULT_LIMIT);
+        verify(repository).dailyVisits(PageVisitService.MAX_ANALYTICS_DAYS);
+        verify(repository).recentVisits(null, true, 1);
+    }
 }

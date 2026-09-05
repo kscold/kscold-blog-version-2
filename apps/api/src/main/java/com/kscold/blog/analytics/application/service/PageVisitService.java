@@ -20,6 +20,9 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class PageVisitService implements PageVisitUseCase {
 
+    static final int MAX_ANALYTICS_DAYS = 90;
+    static final int MAX_RESULT_LIMIT = 200;
+
     private final PageVisitLogRepository pageVisitLogRepository;
 
     // 실제 서비스 라우트만 허용
@@ -67,19 +70,27 @@ public class PageVisitService implements PageVisitUseCase {
     /** 최근 방문 히스토리 (path 필터 가능, 로그인 유저만 or 전체) */
     @Override
     public List<VisitEntry> recentVisits(String path, boolean loggedInOnly, int limit) {
-        return pageVisitLogRepository.recentVisits(path, loggedInOnly, limit);
+        return pageVisitLogRepository.recentVisits(path, loggedInOnly, normalizeLimit(limit));
     }
 
     /** 최근 N일 동안 path별 방문수 (내림차순) */
     @Override
     public List<PathStat> topPaths(int days, int limit) {
-        return pageVisitLogRepository.topPaths(days, limit);
+        return pageVisitLogRepository.topPaths(normalizeDays(days), normalizeLimit(limit));
     }
 
     /** 최근 N일 일별 방문수 (전체) */
     @Override
     public List<DailyStat> dailyVisits(int days) {
-        return pageVisitLogRepository.dailyVisits(days);
+        return pageVisitLogRepository.dailyVisits(normalizeDays(days));
+    }
+
+    private int normalizeDays(int days) {
+        return Math.min(Math.max(days, 1), MAX_ANALYTICS_DAYS);
+    }
+
+    private int normalizeLimit(int limit) {
+        return Math.min(Math.max(limit, 1), MAX_RESULT_LIMIT);
     }
 
     private String normalize(String path) {
