@@ -16,7 +16,7 @@ export async function FeaturedPostsSection() {
   return (
     <section className="py-16 sm:py-32 px-4 sm:px-6 lg:px-8 bg-surface-50 relative border-t border-surface-200">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-end justify-between mb-10 sm:mb-20 border-b border-surface-200 pb-6 sm:pb-8">
+        <div className="mb-10 flex flex-col items-start gap-4 border-b border-surface-200 pb-6 sm:mb-20 sm:flex-row sm:items-end sm:justify-between sm:pb-8">
           <div>
             <p className="mb-3 flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.3em] text-surface-600">
               <span className="font-mono text-surface-600">01</span>
