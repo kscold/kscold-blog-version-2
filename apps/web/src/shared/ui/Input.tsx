@@ -1,6 +1,6 @@
 'use client';
 
-import { InputHTMLAttributes, forwardRef } from 'react';
+import { InputHTMLAttributes, forwardRef, useId } from 'react';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -10,7 +10,24 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, helperText, variant = 'default', className = '', ...props }, ref) => {
+  (
+    {
+      label,
+      error,
+      helperText,
+      variant = 'default',
+      className = '',
+      id,
+      'aria-describedby': ariaDescribedBy,
+      'aria-invalid': ariaInvalid,
+      ...props
+    },
+    ref
+  ) => {
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
+    const messageId = error || helperText ? `${inputId}-message` : undefined;
+    const descriptionIds = [ariaDescribedBy, messageId].filter(Boolean).join(' ') || undefined;
     const inputStyles =
       variant === 'bank'
         ? 'input-bank'
@@ -28,13 +45,31 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="space-y-2">
         {label && (
-          <label className="block text-sm font-medium text-surface-900 tracking-tight">
+          <label
+            htmlFor={inputId}
+            className="block text-sm font-medium text-surface-900 tracking-tight"
+          >
             {label}
           </label>
         )}
-        <input ref={ref} className={`${inputStyles} ${className}`} {...props} />
-        {error && <p className="text-sm text-red-400">{error}</p>}
-        {helperText && !error && <p className="text-sm text-surface-400">{helperText}</p>}
+        <input
+          ref={ref}
+          id={inputId}
+          aria-describedby={descriptionIds}
+          aria-invalid={ariaInvalid ?? (error ? true : undefined)}
+          className={`${inputStyles} ${className}`}
+          {...props}
+        />
+        {error && (
+          <p id={messageId} role="alert" className="text-sm text-red-400">
+            {error}
+          </p>
+        )}
+        {helperText && !error && (
+          <p id={messageId} className="text-sm text-surface-400">
+            {helperText}
+          </p>
+        )}
       </div>
     );
   }

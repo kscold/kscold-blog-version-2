@@ -67,9 +67,9 @@ test.describe('공동 구독 정산 작성기', () => {
       has: page.getByRole('heading', { name: '이번 정산 만들기' }),
     });
     await composer.getByRole('button', { name: /AI 도구 모임/ }).click();
-    await composer.locator('input[inputmode="numeric"]').fill('10000');
+    await composer.getByLabel('총 결제 금액').fill('10000');
 
-    await expect(composer.getByPlaceholder('예: Claude Team')).toHaveValue('Claude Team');
+    await expect(composer.getByLabel('툴 또는 구독 이름')).toHaveValue('Claude Team');
     await expect(composer.getByText('3명으로 나눔')).toBeVisible();
     await expect(composer.getByText('3,334원')).toBeVisible();
     await expect(composer.getByText('3,333원')).toHaveCount(2);
