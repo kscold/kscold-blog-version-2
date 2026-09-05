@@ -7,7 +7,6 @@ import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.dto.command.LoginCommand;
 import com.kscold.blog.identity.application.dto.command.RegisterCommand;
-import com.kscold.blog.identity.application.dto.command.ResetPasswordCommand;
 import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.application.port.in.AuthUseCase;
@@ -23,12 +22,7 @@ import com.kscold.blog.notification.domain.model.NotificationChannel;
 import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.notification.domain.port.out.MailSender;
 import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.HexFormat;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -154,12 +148,12 @@ public class AuthApplicationService implements AuthUseCase {
 
     @Override
     public PasswordResetTokenResponse validatePasswordResetToken(String token) {
-        if (!isValidPasswordResetTokenInput(token)) {
+        if (!PasswordResetTokenCodec.isValidInput(token)) {
             return new PasswordResetTokenResponse(false, "재설정 링크를 다시 확인해주세요.", null);
         }
 
         return passwordResetTokenRepository
-                .findByTokenHash(hashToken(token))
+                .findByTokenHash(PasswordResetTokenCodec.hash(token))
                 .filter(savedToken -> !savedToken.isExpired(Instant.now()))
                 .map(
                         savedToken ->
@@ -172,13 +166,13 @@ public class AuthApplicationService implements AuthUseCase {
     @Override
     @Transactional
     public void resetPassword(String token, String newPassword) {
-        if (!isValidPasswordResetTokenInput(token)) {
+        if (!PasswordResetTokenCodec.isValidInput(token)) {
             throw InvalidRequestException.invalidInput("재설정 링크를 다시 확인해주세요.");
         }
 
         PasswordResetToken savedToken =
                 passwordResetTokenRepository
-                        .findByTokenHash(hashToken(token))
+                        .findByTokenHash(PasswordResetTokenCodec.hash(token))
                         .orElseThrow(
                                 () ->
                                         InvalidRequestException.invalidInput(
@@ -219,16 +213,10 @@ public class AuthApplicationService implements AuthUseCase {
         return user;
     }
 
-    private boolean isValidPasswordResetTokenInput(String token) {
-        return token != null
-                && !token.isBlank()
-                && token.length() <= ResetPasswordCommand.MAX_TOKEN_LENGTH;
-    }
-
     private void sendPasswordResetMail(User user) {
         passwordResetTokenRepository.deleteByUserId(user.getId());
 
-        String rawToken = generateRawToken();
+        String rawToken = PasswordResetTokenCodec.generate();
         Instant expiresAt =
                 Instant.now()
                         .plusSeconds(passwordResetSettings.getPasswordResetExpiryMinutes() * 60);
@@ -236,7 +224,7 @@ public class AuthApplicationService implements AuthUseCase {
                 PasswordResetToken.builder()
                         .userId(user.getId())
                         .email(user.getEmail())
-                        .tokenHash(hashToken(rawToken))
+                        .tokenHash(PasswordResetTokenCodec.hash(rawToken))
                         .createdAt(Instant.now())
                         .expiresAt(expiresAt)
                         .build();
@@ -287,21 +275,5 @@ public class AuthApplicationService implements AuthUseCase {
 
     private String normalizeEmail(String email) {
         return email.trim();
-    }
-
-    private String generateRawToken() {
-        byte[] randomBytes = new byte[32];
-        new java.security.SecureRandom().nextBytes(randomBytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
-    }
-
-    private String hashToken(String rawToken) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(hash);
-        } catch (NoSuchAlgorithmException exception) {
-            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, exception);
-        }
     }
 }

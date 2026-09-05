@@ -26,11 +26,8 @@ import com.kscold.blog.notification.domain.model.MailMessage;
 import com.kscold.blog.notification.domain.port.out.MailSender;
 import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
 import com.kscold.blog.support.UserFixtures;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.HexFormat;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -286,13 +283,6 @@ class AuthApplicationServiceTest {
     }
 
     private static String hash(String rawToken) {
-        try {
-            byte[] hash =
-                    MessageDigest.getInstance("SHA-256")
-                            .digest(rawToken.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(hash);
-        } catch (Exception exception) {
-            throw new IllegalStateException(exception);
-        }
+        return PasswordResetTokenCodec.hash(rawToken);
     }
 }
