@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import { cache, Suspense } from 'react';
 import type { Category } from '@/shared/model/types/blog';
 import { CategoryArchive } from '@/widgets/blog/category';
 import {
@@ -12,9 +12,9 @@ import {
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { ArchivePageSkeleton } from '@/shared/ui/RouteSkeletons';
 
-async function getCategory(categorySlug: string) {
-  return fetchPublicApi<Category>(`/categories/slug/${categorySlug}`);
-}
+const getCategory = cache((categorySlug: string) =>
+  fetchPublicApi<Category>(`/categories/slug/${categorySlug}`)
+);
 
 export async function generateMetadata({
   params,

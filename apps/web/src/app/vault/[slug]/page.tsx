@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import { cache, Suspense } from 'react';
 import type { VaultNote } from '@/shared/model/types/vault';
 import { VaultNoteLayout } from '@/widgets/vault/note';
 import {
@@ -15,9 +15,9 @@ import {
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { VaultNotePageSkeleton } from '@/shared/ui/RouteSkeletons';
 
-async function getVaultNote(slug: string) {
-  return fetchPublicApi<VaultNote>(`/vault/notes/slug/${slug}`);
-}
+const getVaultNote = cache((slug: string) =>
+  fetchPublicApi<VaultNote>(`/vault/notes/slug/${slug}`)
+);
 
 export async function generateMetadata({
   params,

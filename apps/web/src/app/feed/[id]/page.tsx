@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 import type { Feed } from '@/shared/model/types/social';
 import type { PageResponse } from '@/shared/model/types/api';
 import { FeedDetail } from '@/widgets/feed/detail';
@@ -28,9 +29,7 @@ export async function generateStaticParams() {
     .map(feed => ({ id: feed.id }));
 }
 
-async function getFeed(id: string) {
-  return fetchPublicApi<Feed>(`/feeds/${id}`);
-}
+const getFeed = cache((id: string) => fetchPublicApi<Feed>(`/feeds/${id}`));
 
 export async function generateMetadata({
   params,

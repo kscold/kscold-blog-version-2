@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import type { Category, Post, Tag } from '@/shared/model/types/blog';
 import type { Feed } from '@/shared/model/types/social';
-import { TEAM_PROFILES } from '@/entities/profile';
+import { PROFILE, TEAM_PROFILES } from '@/entities/profile';
 import {
   SITE_URL,
   fetchAllPublicApiPages,
@@ -109,6 +109,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${SITE_URL}/info`,
       changeFrequency: 'monthly',
       priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/profile/${PROFILE.handle}`,
+      changeFrequency: 'weekly',
+      priority: 0.65,
     },
     ...TEAM_PROFILES.map(team => ({
       url: `${SITE_URL}/info/${team.id}`,
