@@ -2,8 +2,8 @@ package com.kscold.blog.vault.adapter.in.web;
 
 import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
-import com.kscold.blog.shared.web.PublicPageRequestFactory;
 import com.kscold.blog.shared.web.PublicSearchQueryNormalizer;
 import com.kscold.blog.vault.adapter.in.web.dto.response.VaultNoteResponse;
 import com.kscold.blog.vault.application.dto.command.NoteCreateCommand;
@@ -44,7 +44,7 @@ public class VaultNoteController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable =
-                PublicPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
+                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
         Page<VaultNote> notes = vaultNoteUseCase.getAll(pageable);
         return ResponseEntity.ok(ApiResponse.success(notes.map(VaultNoteResponse::from)));
     }
@@ -79,7 +79,7 @@ public class VaultNoteController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable =
-                PublicPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "title"));
+                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "title"));
         Page<VaultNote> notes = vaultNoteUseCase.getByFolder(folderId, pageable);
         return ResponseEntity.ok(ApiResponse.success(notes.map(VaultNoteResponse::from)));
     }
@@ -123,7 +123,7 @@ public class VaultNoteController {
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PublicPageRequestFactory.of(page, size);
+        Pageable pageable = BoundedPageRequestFactory.of(page, size);
         Page<VaultNote> notes =
                 vaultNoteUseCase.search(PublicSearchQueryNormalizer.normalize(q), pageable);
         return ResponseEntity.ok(ApiResponse.success(notes.map(VaultNoteResponse::from)));

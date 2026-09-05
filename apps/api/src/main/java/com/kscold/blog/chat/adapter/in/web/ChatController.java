@@ -6,7 +6,7 @@ import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.shared.web.PublicPageRequestFactory;
+import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class ChatController {
                 ApiResponse.success(
                         ChatMessageResponse.from(
                                 chatUseCase.getRecentMessagesByRoom(
-                                        userId, PublicPageRequestFactory.limit(limit)))));
+                                        userId, BoundedPageRequestFactory.limit(limit)))));
     }
 
     @PostMapping("/messages")

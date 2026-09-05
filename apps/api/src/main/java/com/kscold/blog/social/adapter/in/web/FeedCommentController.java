@@ -1,8 +1,8 @@
 package com.kscold.blog.social.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
-import com.kscold.blog.shared.web.PublicPageRequestFactory;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedCommentResponse;
 import com.kscold.blog.social.adapter.in.web.dto.response.MentionableUserResponse;
 import com.kscold.blog.social.application.dto.command.FeedCommentCreateCommand;
@@ -40,7 +40,7 @@ public class FeedCommentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable =
-                PublicPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
+                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
         Page<FeedComment> comments = feedCommentUseCase.getByFeedId(feedId, pageable, userId);
         boolean isAdmin = hasAdminRole();
         String identifier = resolveIdentifier(userId, request);

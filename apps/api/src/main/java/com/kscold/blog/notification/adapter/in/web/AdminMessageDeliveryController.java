@@ -5,10 +5,10 @@ import com.kscold.blog.notification.adapter.in.web.dto.response.MessageDeliveryS
 import com.kscold.blog.notification.application.port.in.MessageDeliveryUseCase;
 import com.kscold.blog.notification.domain.model.MessageDeliveryLog;
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +33,7 @@ public class AdminMessageDeliveryController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size) {
         Page<MessageDeliveryLogResponse> logs =
-                useCase.search(channel, status, PageRequest.of(page, size))
+                useCase.search(channel, status, BoundedPageRequestFactory.of(page, size))
                         .map(MessageDeliveryLogResponse::from);
         return ResponseEntity.ok(ApiResponse.success(logs));
     }

@@ -3,8 +3,8 @@ package com.kscold.blog.social.adapter.in.web;
 import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
-import com.kscold.blog.shared.web.PublicPageRequestFactory;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
@@ -19,7 +19,6 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -49,7 +48,7 @@ public class FeedController {
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
         Pageable pageable =
-                PublicPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Feed> feeds =
                 (tag != null && !tag.isBlank())
                         ? feedUseCase.getPublicFeedsByTag(tag, pageable)
@@ -68,7 +67,8 @@ public class FeedController {
     public ResponseEntity<ApiResponse<Page<FeedResponse>>> getAllFeeds(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable =
+                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Feed> feeds = feedUseCase.getAllFeeds(pageable);
         return ResponseEntity.ok(ApiResponse.success(toResponsePage(feeds, null)));
     }

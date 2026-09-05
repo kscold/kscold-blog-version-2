@@ -6,11 +6,11 @@ import com.kscold.blog.chat.application.dto.response.ChatRoomSummaryResponse;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +49,8 @@ public class ChatAdminController {
             @PathVariable String roomId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "timestamp"));
+        Pageable pageable =
+                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "timestamp"));
         return ResponseEntity.ok(
                 ApiResponse.success(
                         chatUseCase
@@ -61,7 +62,8 @@ public class ChatAdminController {
     public ResponseEntity<ApiResponse<Page<ChatMessageResponse>>> getAllMessages(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
+        Pageable pageable =
+                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
         return ResponseEntity.ok(
                 ApiResponse.success(
                         chatUseCase.getAllMessages(pageable).map(ChatMessageResponse::from)));

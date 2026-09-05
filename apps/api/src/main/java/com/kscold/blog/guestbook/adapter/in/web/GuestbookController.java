@@ -6,7 +6,7 @@ import com.kscold.blog.guestbook.application.dto.command.GuestbookReplyCommand;
 import com.kscold.blog.guestbook.application.port.in.GuestbookUseCase;
 import com.kscold.blog.guestbook.domain.model.GuestbookEntry;
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.shared.web.PublicPageRequestFactory;
+import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class GuestbookController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable =
-                PublicPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<GuestbookEntry> entries = guestbookUseCase.getEntries(pageable);
         boolean isAdmin = hasAdminRole();
         return ResponseEntity.ok(

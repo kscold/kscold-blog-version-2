@@ -1,7 +1,7 @@
 package com.kscold.blog.vault.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.shared.web.PublicPageRequestFactory;
+import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import com.kscold.blog.vault.adapter.in.web.dto.response.VaultNoteCommentResponse;
 import com.kscold.blog.vault.application.dto.command.NoteCommentCreateCommand;
 import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
@@ -34,7 +34,7 @@ public class VaultNoteCommentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable =
-                PublicPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
+                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
         Page<VaultNoteComment> comments = commentUseCase.getByNoteId(noteId, pageable, userId);
         boolean isAdmin = hasAdminRole();
         return ResponseEntity.ok(

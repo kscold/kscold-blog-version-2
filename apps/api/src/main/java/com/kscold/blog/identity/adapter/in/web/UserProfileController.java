@@ -7,7 +7,7 @@ import com.kscold.blog.identity.application.port.in.UserManagementUseCase;
 import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
-import com.kscold.blog.shared.web.PublicPageRequestFactory;
+import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
@@ -75,7 +75,7 @@ public class UserProfileController {
         Page<Feed> feeds =
                 feedUseCase.getPublicFeedsByAuthorId(
                         profile.getId(),
-                        PublicPageRequestFactory.of(
+                        BoundedPageRequestFactory.of(
                                 page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
         // 작성자(=프로필 주인)의 최신 프로필로 피드 작성자 정보를 채움.
         UserQueryPort.UserInfo author =
