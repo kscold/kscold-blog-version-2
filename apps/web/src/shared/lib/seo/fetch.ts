@@ -4,6 +4,9 @@ import { API_BASE_URL } from './constants';
 
 const DEFAULT_SEO_API_TIMEOUT_MS = 8_000;
 const MAX_SEO_API_TIMEOUT_MS = 300_000;
+const DEFAULT_SEO_PAGE_SIZE = 100;
+const MAX_SEO_PAGE_SIZE = 100;
+const MAX_SEO_PAGE_REQUESTS = 500;
 
 function getSeoApiTimeoutMs() {
   const configuredTimeout = Number(process.env.SEO_API_TIMEOUT_MS);
@@ -27,16 +30,17 @@ export async function fetchPublicApi<T>(path: string, revalidate = 3600): Promis
 
 export async function fetchAllPublicApiPages<T>(
   path: string,
-  pageSize = 100,
+  pageSize = DEFAULT_SEO_PAGE_SIZE,
   revalidate = 3600
 ): Promise<T[] | null> {
   const items: T[] = [];
+  const normalizedPageSize = normalizeSeoPageSize(pageSize);
   let pageNumber = 0;
 
-  while (true) {
+  while (pageNumber < MAX_SEO_PAGE_REQUESTS) {
     const separator = path.includes('?') ? '&' : '?';
     const page = await fetchPublicApi<PageResponse<T>>(
-      `${path}${separator}page=${pageNumber}&size=${pageSize}`,
+      `${path}${separator}page=${pageNumber}&size=${normalizedPageSize}`,
       revalidate
     );
 
@@ -44,12 +48,32 @@ export async function fetchAllPublicApiPages<T>(
       return null;
     }
 
+    validateSeoPage(page, pageNumber);
     items.push(...page.content);
     if (page.last || pageNumber + 1 >= page.totalPages) {
       return items;
     }
 
     pageNumber += 1;
+  }
+
+  throw new Error(`SEO API 페이지 수가 안전 상한을 초과했습니다. path=${path}`);
+}
+
+function normalizeSeoPageSize(pageSize: number) {
+  if (!Number.isInteger(pageSize) || pageSize < 1) {
+    return DEFAULT_SEO_PAGE_SIZE;
+  }
+
+  return Math.min(pageSize, MAX_SEO_PAGE_SIZE);
+}
+
+function validateSeoPage<T>(page: PageResponse<T>, pageNumber: number) {
+  if (!Array.isArray(page.content) || !Number.isInteger(page.totalPages) || page.totalPages < 0) {
+    throw new Error(`SEO API 페이지 응답이 올바르지 않습니다. page=${pageNumber}`);
+  }
+  if (!page.last && pageNumber + 1 < page.totalPages && page.content.length === 0) {
+    throw new Error(`SEO API 페이지 수집이 진행되지 않습니다. page=${pageNumber}`);
   }
 }
 
