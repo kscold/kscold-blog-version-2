@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
@@ -19,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -150,6 +152,28 @@ public class GlobalExceptionHandler {
                 .distinct()
                 .sorted()
                 .toList();
+    }
+
+    /** 필수 쿼리 파라미터·헤더·쿠키가 누락된 요청을 서버 오류가 아닌 400 응답으로 변환한다. */
+    @ExceptionHandler(ServletRequestBindingException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleRequestBinding(
+            ServletRequestBindingException e) {
+        log.warn("ServletRequestBindingException: type={}", e.getClass().getSimpleName());
+        ApiResponse<Void> response =
+                ApiResponse.error(
+                        ErrorCode.MISSING_INPUT_VALUE.getCode(),
+                        ErrorCode.MISSING_INPUT_VALUE.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /** 비어 있거나 형식이 깨진 JSON 본문을 서버 오류가 아닌 400 응답으로 변환한다. */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleUnreadableMessage(
+            HttpMessageNotReadableException e) {
+        log.warn("HttpMessageNotReadableException");
+        ApiResponse<Void> response =
+                ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), "요청 본문 형식이 올바르지 않습니다.");
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     /** 지원하지 않는 HTTP 메서드 예외 처리 (405) 브라우저나 잘못된 호출이 POST 전용 엔드포인트를 GET으로 두드릴 때 내부 오류처럼 보이지 않게 처리 */

@@ -21,10 +21,13 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
 class GlobalExceptionHandlerTest {
 
@@ -60,6 +63,43 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().getErrorCode())
                 .isEqualTo(ErrorCode.INVALID_INPUT_VALUE.getCode());
         assertThat(response.getBody().getMessage()).isEqualTo("세션 값이 너무 깁니다.");
+    }
+
+    @Test
+    void convertsMissingRequestParameterToBadRequest() {
+        GlobalExceptionHandler handler =
+                new GlobalExceptionHandler(mock(NotificationUseCase.class));
+
+        ResponseEntity<ApiResponse<Void>> response =
+                handler.handleRequestBinding(
+                        new MissingServletRequestParameterException("from", "LocalDate"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getErrorCode())
+                .isEqualTo(ErrorCode.MISSING_INPUT_VALUE.getCode());
+        assertThat(response.getBody().getMessage())
+                .isEqualTo(ErrorCode.MISSING_INPUT_VALUE.getMessage());
+    }
+
+    @Test
+    void unreadableRequestBodyDoesNotExposeParserMessage() {
+        String sensitiveMessage = "malformed-body-never-return-this";
+        GlobalExceptionHandler handler =
+                new GlobalExceptionHandler(mock(NotificationUseCase.class));
+
+        ResponseEntity<ApiResponse<Void>> response =
+                handler.handleUnreadableMessage(
+                        new HttpMessageNotReadableException(
+                                sensitiveMessage, mock(HttpInputMessage.class)));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE.getCode());
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("요청 본문 형식이 올바르지 않습니다.")
+                .doesNotContain(sensitiveMessage);
     }
 
     @Test
