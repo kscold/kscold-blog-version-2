@@ -1,6 +1,7 @@
 package com.kscold.blog.social.domain.port.out;
 
 import com.kscold.blog.social.domain.model.Feed;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,8 @@ public interface FeedRepository {
     Page<Feed> findByVisibilityAndTag(Feed.Visibility visibility, String tag, Pageable pageable);
 
     Page<Feed> findAll(Pageable pageable);
+
+    List<SitemapFeed> findAllPublicForSitemap();
 
     void incrementCommentCount(String feedId);
 
@@ -40,4 +43,6 @@ public interface FeedRepository {
      * @return 바뀐 피드 수
      */
     long renameTag(String fromName, String toName);
+
+    record SitemapFeed(String id, int contentLength, Instant createdAt, Instant updatedAt) {}
 }

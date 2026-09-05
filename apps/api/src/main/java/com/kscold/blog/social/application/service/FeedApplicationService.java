@@ -9,6 +9,7 @@ import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.application.port.in.UserQueryPort.UserInfo;
 import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
+import com.kscold.blog.social.application.dto.response.FeedSitemapResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
 import com.kscold.blog.social.domain.model.LinkPreviewResponse;
@@ -124,6 +125,19 @@ public class FeedApplicationService implements FeedUseCase {
 
     public Page<Feed> getAllFeeds(Pageable pageable) {
         return feedRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<FeedSitemapResponse> getSitemapIndex() {
+        return feedRepository.findAllPublicForSitemap().stream()
+                .map(
+                        feed ->
+                                new FeedSitemapResponse(
+                                        feed.id(),
+                                        feed.contentLength(),
+                                        feed.createdAt(),
+                                        feed.updatedAt()))
+                .toList();
     }
 
     public Feed toggleLike(String feedId, String identifier) {

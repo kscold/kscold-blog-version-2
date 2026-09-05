@@ -8,6 +8,7 @@ import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
+import com.kscold.blog.social.application.dto.response.FeedSitemapResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,6 +61,11 @@ public class FeedController {
     @GetMapping("/tags")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getFeedTags() {
         return ResponseEntity.ok(ApiResponse.success(feedUseCase.getFeedTags()));
+    }
+
+    @GetMapping("/sitemap-index")
+    public ResponseEntity<ApiResponse<List<FeedSitemapResponse>>> getSitemapIndex() {
+        return ResponseEntity.ok(ApiResponse.success(feedUseCase.getSitemapIndex()));
     }
 
     @GetMapping("/admin")

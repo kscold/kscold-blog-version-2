@@ -15,6 +15,7 @@ import com.kscold.blog.social.domain.model.Feed;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
 import com.kscold.blog.social.domain.port.out.LinkScrapingPort;
+import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -79,5 +80,26 @@ class FeedApplicationServiceTest {
 
         verify(userQueryPort, never()).getUserById(any());
         verify(feedRepository, never()).save(any());
+    }
+
+    @Test
+    void returnsOnlyTheMinimalSitemapIndex() {
+        Instant createdAt = Instant.parse("2026-09-01T00:00:00Z");
+        Instant updatedAt = Instant.parse("2026-09-02T00:00:00Z");
+        when(feedRepository.findAllPublicForSitemap())
+                .thenReturn(
+                        List.of(
+                                new FeedRepository.SitemapFeed(
+                                        "feed-1", 120, createdAt, updatedAt)));
+
+        assertThat(feedApplicationService.getSitemapIndex())
+                .singleElement()
+                .satisfies(
+                        feed -> {
+                            assertThat(feed.id()).isEqualTo("feed-1");
+                            assertThat(feed.contentLength()).isEqualTo(120);
+                            assertThat(feed.createdAt()).isEqualTo(createdAt);
+                            assertThat(feed.updatedAt()).isEqualTo(updatedAt);
+                        });
     }
 }

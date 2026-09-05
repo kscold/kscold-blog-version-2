@@ -2,6 +2,7 @@ package com.kscold.blog.social.application.port.in;
 
 import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
+import com.kscold.blog.social.application.dto.response.FeedSitemapResponse;
 import com.kscold.blog.social.domain.model.Feed;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,8 @@ public interface FeedUseCase {
     Page<Feed> getPublicFeedsByAuthorId(String authorId, Pageable pageable);
 
     Page<Feed> getAllFeeds(Pageable pageable);
+
+    List<FeedSitemapResponse> getSitemapIndex();
 
     Feed toggleLike(String feedId, String identifier);
 

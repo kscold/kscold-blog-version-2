@@ -2,6 +2,8 @@ package com.kscold.blog.social.adapter.out.persistence;
 
 import com.kscold.blog.social.domain.model.Feed;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -51,6 +54,29 @@ public class FeedRepositoryAdapter implements FeedRepository {
     @Override
     public Page<Feed> findAll(Pageable pageable) {
         return mongoFeedRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<SitemapFeed> findAllPublicForSitemap() {
+        AggregationOperation project =
+                context ->
+                        new Document(
+                                "$project",
+                                new Document("contentLength", contentLengthExpression())
+                                        .append("createdAt", 1)
+                                        .append("updatedAt", 1));
+        Aggregation aggregation =
+                Aggregation.newAggregation(
+                        Aggregation.match(
+                                Criteria.where("visibility").is(Feed.Visibility.PUBLIC.name())),
+                        project);
+
+        return mongoTemplate
+                .aggregate(aggregation, "feeds", Document.class)
+                .getMappedResults()
+                .stream()
+                .map(this::toSitemapFeed)
+                .toList();
     }
 
     @Override
@@ -153,5 +179,24 @@ public class FeedRepositoryAdapter implements FeedRepository {
                                 Feed.class)
                         .getModifiedCount();
         return renamed + merged;
+    }
+
+    private Document contentLengthExpression() {
+        return new Document("$strLenCP", new Document("$ifNull", List.of("$content", "")));
+    }
+
+    private SitemapFeed toSitemapFeed(Document document) {
+        Object id = document.get("_id");
+        Object length = document.get("contentLength");
+        return new SitemapFeed(
+                id != null ? id.toString() : null,
+                length instanceof Number number ? number.intValue() : 0,
+                readInstant(document, "createdAt"),
+                readInstant(document, "updatedAt"));
+    }
+
+    private Instant readInstant(Document document, String field) {
+        Object value = document.get(field);
+        return value instanceof Date date ? date.toInstant() : null;
     }
 }
