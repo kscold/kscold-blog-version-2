@@ -16,7 +16,6 @@ import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +26,6 @@ import org.springframework.util.StringUtils;
 @Service
 @RequiredArgsConstructor
 public class AdminNightApplicationService implements AdminNightUseCase {
-
-    private static final String ANONYMOUS_PRINCIPAL = "anonymousUser";
 
     private final AdminNightRequestRepository adminNightRequestRepository;
     private final AdminNightProgramVoteRepository adminNightProgramVoteRepository;
@@ -75,12 +72,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         return adminNightRequestRepository
                 .findByStatusOrderByCreatedAtDesc(AdminNightRequest.Status.APPROVED)
                 .stream()
-                .filter(
-                        request ->
-                                request.getScheduledSlot() != null
-                                        && request.getScheduledSlot().getDate() != null)
-                .filter(request -> !request.getScheduledSlot().getDate().isBefore(from))
-                .filter(request -> !request.getScheduledSlot().getDate().isAfter(to))
+                .filter(request -> AdminNightScheduleRange.includes(request, from, to))
                 .toList();
     }
 
@@ -97,12 +89,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
         }
 
         adminNightRequestDraftService.applyResubmission(request, user.getEmail(), command);
-        request.setScheduledSlot(null);
-        request.setReviewNote(null);
-        request.setStatus(AdminNightRequest.Status.PENDING);
-        request.setDecidedAt(null);
-        request.setDecidedByUserId(null);
-        request.setDecidedByName(null);
+        AdminNightRequestStateUpdater.markResubmitted(request);
 
         AdminNightRequest saved = adminNightRequestRepository.save(request);
         adminNightNotificationPort.notifyRequestResubmitted(saved);
@@ -120,12 +107,10 @@ public class AdminNightApplicationService implements AdminNightUseCase {
             throw InvalidRequestException.invalidInput("거절된 신청은 다시 승인할 수 없습니다.");
         }
 
-        request.setStatus(AdminNightRequest.Status.APPROVED);
-        request.setScheduledSlot(adminNightRequestDraftService.resolveScheduledSlot(command));
-        request.setReviewNote(null);
-        request.setDecidedAt(LocalDateTime.now());
-        request.setDecidedByUserId(admin.id());
-        request.setDecidedByName(admin.displayName());
+        AdminNightRequestStateUpdater.approve(
+                request,
+                adminNightRequestDraftService.resolveScheduledSlot(command),
+                AdminNightRequestStateUpdater.DecisionActor.from(admin));
 
         AdminNightRequest saved = adminNightRequestRepository.save(request);
         adminNightNotificationPort.notifyRequestApproved(saved);
@@ -146,12 +131,10 @@ public class AdminNightApplicationService implements AdminNightUseCase {
             throw InvalidRequestException.invalidInput("거절된 신청에는 추가 정보를 요청할 수 없습니다.");
         }
 
-        request.setStatus(AdminNightRequest.Status.INFO_REQUESTED);
-        request.setScheduledSlot(null);
-        request.setReviewNote(adminNightRequestDraftService.requireReviewNote(reviewNote));
-        request.setDecidedAt(LocalDateTime.now());
-        request.setDecidedByUserId(admin.id());
-        request.setDecidedByName(admin.displayName());
+        AdminNightRequestStateUpdater.requestMoreInfo(
+                request,
+                adminNightRequestDraftService.requireReviewNote(reviewNote),
+                AdminNightRequestStateUpdater.DecisionActor.from(admin));
 
         AdminNightRequest saved = adminNightRequestRepository.save(request);
         adminNightNotificationPort.notifyMoreInfoRequested(saved);
@@ -168,13 +151,10 @@ public class AdminNightApplicationService implements AdminNightUseCase {
             throw InvalidRequestException.invalidInput("이미 승인된 일정은 거절할 수 없습니다.");
         }
 
-        request.setStatus(AdminNightRequest.Status.REJECTED);
-        request.setScheduledSlot(null);
-        request.setReviewNote(
-                adminNightRequestDraftService.normalizeOptionalReviewNote(reviewNote));
-        request.setDecidedAt(LocalDateTime.now());
-        request.setDecidedByUserId(admin.id());
-        request.setDecidedByName(admin.displayName());
+        AdminNightRequestStateUpdater.reject(
+                request,
+                adminNightRequestDraftService.normalizeOptionalReviewNote(reviewNote),
+                AdminNightRequestStateUpdater.DecisionActor.from(admin));
         AdminNightRequest saved = adminNightRequestRepository.save(request);
         adminNightNotificationPort.notifyRequestRejected(saved);
         return saved;
@@ -267,7 +247,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     }
 
     private User requireUser(String userId) {
-        if (!hasAuthenticatedUserId(userId)) {
+        if (!AdminNightPrincipalPolicy.isAuthenticated(userId)) {
             throw InvalidRequestException.invalidInput("로그인이 필요합니다.");
         }
 
@@ -276,7 +256,7 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     }
 
     private Optional<User> findAuthenticatedUser(String userId) {
-        if (!hasAuthenticatedUserId(userId)) {
+        if (!AdminNightPrincipalPolicy.isAuthenticated(userId)) {
             return Optional.empty();
         }
         Optional<User> user = userRepository.findById(userId);
@@ -284,10 +264,6 @@ public class AdminNightApplicationService implements AdminNightUseCase {
             throw ResourceNotFoundException.user(userId);
         }
         return user;
-    }
-
-    private boolean hasAuthenticatedUserId(String userId) {
-        return StringUtils.hasText(userId) && !ANONYMOUS_PRINCIPAL.equals(userId);
     }
 
     private UserQueryPort.UserInfo requireAdmin(String userId) {
