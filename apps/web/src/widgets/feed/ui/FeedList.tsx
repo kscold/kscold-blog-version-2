@@ -9,7 +9,7 @@ import { useAuth } from '@/features/auth';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
-import { MIN_INDEXABLE_CONTENT_LENGTH } from '@/shared/lib/seo/constants';
+import { isIndexableFeed } from '@/shared/lib/seo/indexability';
 import type { PageResponse } from '@/shared/model/types/api';
 import type { Feed } from '@/shared/model/types/social';
 
@@ -70,9 +70,7 @@ export function FeedList({ initialFeeds }: FeedListProps = {}) {
   }
 
   // 목록에 분량 있는 피드가 하나도 없으면 광고를 붙이지 않는다(단문만 나열된 화면 방지).
-  const hasAdworthyContent = feeds.some(
-    item => (item.content?.trim().length ?? 0) >= MIN_INDEXABLE_CONTENT_LENGTH
-  );
+  const hasAdworthyContent = feeds.some(item => isIndexableFeed(item.content));
 
   return (
     <>

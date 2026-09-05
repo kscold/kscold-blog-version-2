@@ -1,16 +1,22 @@
 import type { MetadataRoute } from 'next';
 import type { Category, Post, Tag } from '@/shared/model/types/blog';
-import type { Feed } from '@/shared/model/types/social';
 import { PROFILE, TEAM_PROFILES } from '@/entities/profile';
 import {
   SITE_URL,
   fetchAllPublicApiPages,
   fetchPublicApi,
   flattenCategories,
-  isIndexableFeed,
+  isIndexableFeedLength,
   isIndexableTag,
   isIndexableVaultNote,
 } from '@/shared/lib/seo';
+
+interface FeedSitemapEntry {
+  id: string;
+  contentLength: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 const toLastModified = (value: Date | string | undefined): string | undefined => {
   if (!value) return undefined;
@@ -24,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchAllPublicApiPages<Post>('/posts'),
     fetchPublicApi<Category[]>('/categories'),
     fetchPublicApi<Tag[]>('/tags'),
-    fetchAllPublicApiPages<Feed>('/feeds'),
+    fetchPublicApi<FeedSitemapEntry[]>('/feeds/sitemap-index'),
     // 전체 그래프를 만들지 않고 검색 노출 판정에 필요한 slug 와 본문 길이만 조회한다.
     fetchPublicApi<{ slug: string; contentLength?: number }[]>('/vault/notes/sitemap-index'),
   ]);
@@ -48,9 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const indexablePosts = posts.filter(
     post => post.status === 'PUBLISHED' && !post.restricted
   );
-  const indexableFeeds = feeds.filter(
-    feed => feed.visibility === 'PUBLIC' && isIndexableFeed(feed.content)
-  );
+  const indexableFeeds = feeds.filter(feed => isIndexableFeedLength(feed.contentLength));
   const publicPostCountsByTagId = new Map<string, number>();
   indexablePosts.forEach(post => {
     post.tags.forEach(tag => {

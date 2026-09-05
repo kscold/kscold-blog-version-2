@@ -4,8 +4,8 @@ import { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useFeed } from '@/entities/feed';
+import { isIndexableFeed } from '@/shared/lib/seo/indexability';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
-import { MIN_INDEXABLE_CONTENT_LENGTH } from '@/shared/lib/seo/constants';
 import type { Feed } from '@/shared/model/types/social';
 import { FeedCard } from '@/features/feed';
 import { CommentSection } from './CommentSection';
@@ -32,8 +32,7 @@ export function FeedDetail({ initialFeed }: { initialFeed: Feed }) {
 
   // 피드는 짧은 단문이 많아 그대로 광고를 붙이면 "게시자 콘텐츠가 없는 화면" 정책에 걸린다.
   // 단독 페이지로서 충분한 분량을 갖춘 피드에서만 광고를 노출한다.
-  const hasAdworthyContent =
-    (feed.content?.trim().length ?? 0) >= MIN_INDEXABLE_CONTENT_LENGTH;
+  const hasAdworthyContent = isIndexableFeed(feed.content);
 
   return (
     <div className="min-h-screen bg-surface-50">

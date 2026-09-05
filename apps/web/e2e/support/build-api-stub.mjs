@@ -68,6 +68,7 @@ function getResponseData(pathname) {
   if (
     pathname === '/api/categories' ||
     pathname === '/api/tags' ||
+    pathname === '/api/feeds/sitemap-index' ||
     pathname === '/api/vault/notes/sitemap-index'
   ) {
     return [];

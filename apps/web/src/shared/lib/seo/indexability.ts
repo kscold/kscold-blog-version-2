@@ -7,7 +7,13 @@ import {
 const INTERNAL_TAG_SLUGS = new Set(['public', 'private']);
 
 export function isIndexableFeed(content?: string | null) {
-  return (content?.trim().length ?? 0) >= MIN_INDEXABLE_CONTENT_LENGTH;
+  return isIndexableFeedLength(
+    content == null ? null : Array.from(content.trim()).length
+  );
+}
+
+export function isIndexableFeedLength(contentLength?: number | null) {
+  return typeof contentLength === 'number' && contentLength >= MIN_INDEXABLE_CONTENT_LENGTH;
 }
 
 export function isIndexableVaultNote(contentLength?: number | null) {

@@ -13,6 +13,7 @@ export {
 export { fetchAllPublicApiPages, fetchPublicApi, fetchViewerApi } from './seo/fetch';
 export {
   isIndexableFeed,
+  isIndexableFeedLength,
   isIndexableTag,
   isIndexableVaultContent,
   isIndexableVaultNote,
