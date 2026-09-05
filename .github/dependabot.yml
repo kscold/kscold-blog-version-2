@@ -100,3 +100,23 @@ updates:
         update-types:
           - minor
           - patch
+
+  - package-ecosystem: docker
+    directory: /apps/agent
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:50'
+      timezone: Asia/Seoul
+    open-pull-requests-limit: 2
+    ignore:
+      - dependency-name: python
+        update-types:
+          - version-update:semver-major
+          - version-update:semver-minor
+    groups:
+      docker-agent-patch:
+        patterns:
+          - '*'
+        update-types:
+          - patch
