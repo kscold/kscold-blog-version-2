@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/api/useAuth';
 import { useAuthStore } from '@/entities/user';
-import type { User } from '@/shared/model/types/user';
 import { AUTH_INPUT_LIMITS } from './authInputLimits';
+import { resolveSafeRedirect } from '../lib/resolveSafeRedirect';
 
 interface LoginFormData {
   email: string;
@@ -20,17 +20,6 @@ const DEFAULT_FORM_DATA: LoginFormData = {
   username: '',
   displayName: '',
 };
-
-function resolveSafeRedirect(requestedPath: string, role: User['role']) {
-  const fallback = role === 'ADMIN' ? '/admin' : '/';
-  if (!requestedPath.startsWith('/') || requestedPath.startsWith('//')) {
-    return fallback;
-  }
-  if (requestedPath.startsWith('/admin') && role !== 'ADMIN') {
-    return '/';
-  }
-  return requestedPath;
-}
 
 function validateRegistrationForm(formData: LoginFormData) {
   const email = formData.email.trim();
