@@ -5,7 +5,6 @@ import com.kscold.blog.adminnight.domain.port.out.AdminNightProgramVoteMailCompo
 import com.kscold.blog.notification.adapter.out.mail.BrandedMailTemplate;
 import com.kscold.blog.notification.config.MailProperties;
 import com.kscold.blog.notification.domain.model.MailMessage;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -51,20 +50,29 @@ public class AdminNightProgramVoteEmailComposer implements AdminNightProgramVote
                         .formatted(
                                 vote.getRequesterName(),
                                 vote.getRequesterName(),
-                                resolveProgramVoteContactEmail(vote),
-                                fallbackText(vote.getContact(), "별도 연락처 없음"),
-                                describeInterestLevel(vote.getInterestLevel()),
-                                describePreferredFormat(vote.getPreferredFormat()),
-                                describePreferredDays(vote.getPreferredDays()),
-                                describePreferredTimes(vote.getPreferredTimes()),
-                                describeSessionStyle(vote.getSessionStyle()),
-                                describeSessionLength(vote.getSessionLength()),
-                                describeFoodPreference(vote.getFoodPreference()),
-                                fallbackText(vote.getDesiredTakeaways(), "별도 작성 없음"),
+                                AdminNightProgramVoteLabels.resolveContactEmail(vote),
+                                AdminNightProgramVoteLabels.fallbackText(
+                                        vote.getContact(), "별도 연락처 없음"),
+                                AdminNightProgramVoteLabels.describeInterestLevel(
+                                        vote.getInterestLevel()),
+                                AdminNightProgramVoteLabels.describePreferredFormat(
+                                        vote.getPreferredFormat()),
+                                AdminNightProgramVoteLabels.describePreferredDays(
+                                        vote.getPreferredDays()),
+                                AdminNightProgramVoteLabels.describePreferredTimes(
+                                        vote.getPreferredTimes()),
+                                AdminNightProgramVoteLabels.describeSessionStyle(
+                                        vote.getSessionStyle()),
+                                AdminNightProgramVoteLabels.describeSessionLength(
+                                        vote.getSessionLength()),
+                                AdminNightProgramVoteLabels.describeFoodPreference(
+                                        vote.getFoodPreference()),
+                                AdminNightProgramVoteLabels.fallbackText(
+                                        vote.getDesiredTakeaways(), "별도 작성 없음"),
                                 actionUrl);
 
         return new MailMessage(
-                resolveProgramVoteContactEmail(vote),
+                AdminNightProgramVoteLabels.resolveContactEmail(vote),
                 subject,
                 plainText,
                 mailTemplate.render(
@@ -93,7 +101,8 @@ public class AdminNightProgramVoteEmailComposer implements AdminNightProgramVote
                         "NEW BLOOM SIGNAL",
                         vote.getRequesterName()
                                 + " · "
-                                + describeInterestLevel(vote.getInterestLevel()),
+                                + AdminNightProgramVoteLabels.describeInterestLevel(
+                                        vote.getInterestLevel()),
                         vote);
         String plainText =
                 """
@@ -119,19 +128,31 @@ public class AdminNightProgramVoteEmailComposer implements AdminNightProgramVote
                 """
                         .formatted(
                                 vote.getRequesterName(),
-                                fallbackText(vote.getRequesterEmail(), "없음"),
-                                resolveProgramVoteContactEmail(vote),
-                                fallbackText(vote.getContact(), "별도 연락처 없음"),
-                                describeInterestLevel(vote.getInterestLevel()),
-                                describePreferredFormat(vote.getPreferredFormat()),
-                                describePreferredDays(vote.getPreferredDays()),
-                                describePreferredTimes(vote.getPreferredTimes()),
-                                describeSessionStyle(vote.getSessionStyle()),
-                                describeSessionLength(vote.getSessionLength()),
-                                describeFoodPreference(vote.getFoodPreference()),
-                                describeInterestedTopics(vote.getInterestedTopics()),
-                                fallbackText(vote.getDesiredTakeaways(), "별도 작성 없음"),
-                                fallbackText(vote.getMessage(), "별도 메모 없음"),
+                                AdminNightProgramVoteLabels.fallbackText(
+                                        vote.getRequesterEmail(), "없음"),
+                                AdminNightProgramVoteLabels.resolveContactEmail(vote),
+                                AdminNightProgramVoteLabels.fallbackText(
+                                        vote.getContact(), "별도 연락처 없음"),
+                                AdminNightProgramVoteLabels.describeInterestLevel(
+                                        vote.getInterestLevel()),
+                                AdminNightProgramVoteLabels.describePreferredFormat(
+                                        vote.getPreferredFormat()),
+                                AdminNightProgramVoteLabels.describePreferredDays(
+                                        vote.getPreferredDays()),
+                                AdminNightProgramVoteLabels.describePreferredTimes(
+                                        vote.getPreferredTimes()),
+                                AdminNightProgramVoteLabels.describeSessionStyle(
+                                        vote.getSessionStyle()),
+                                AdminNightProgramVoteLabels.describeSessionLength(
+                                        vote.getSessionLength()),
+                                AdminNightProgramVoteLabels.describeFoodPreference(
+                                        vote.getFoodPreference()),
+                                AdminNightProgramVoteLabels.describeInterestedTopics(
+                                        vote.getInterestedTopics()),
+                                AdminNightProgramVoteLabels.fallbackText(
+                                        vote.getDesiredTakeaways(), "별도 작성 없음"),
+                                AdminNightProgramVoteLabels.fallbackText(
+                                        vote.getMessage(), "별도 메모 없음"),
                                 actionUrl);
 
         return new MailMessage(
@@ -173,143 +194,31 @@ public class AdminNightProgramVoteEmailComposer implements AdminNightProgramVote
                 .formatted(
                         mailTemplate.escapeHtml(label),
                         mailTemplate.escapeHtml(headline),
-                        mailTemplate.escapeHtml(resolveProgramVoteContactEmail(vote)),
-                        mailTemplate.escapeHtml(fallbackText(vote.getContact(), "별도 연락처 없음")),
-                        mailTemplate.escapeHtml(describePreferredDays(vote.getPreferredDays())),
-                        mailTemplate.escapeHtml(describePreferredTimes(vote.getPreferredTimes())),
-                        mailTemplate.escapeHtml(describeSessionStyle(vote.getSessionStyle())),
-                        mailTemplate.escapeHtml(describeSessionLength(vote.getSessionLength())),
-                        mailTemplate.escapeHtml(describeFoodPreference(vote.getFoodPreference())),
                         mailTemplate.escapeHtml(
-                                describeInterestedTopics(vote.getInterestedTopics())),
+                                AdminNightProgramVoteLabels.resolveContactEmail(vote)),
                         mailTemplate.escapeHtml(
-                                fallbackText(vote.getDesiredTakeaways(), "별도 작성 없음")));
-    }
-
-    private String resolveProgramVoteContactEmail(AdminNightProgramVote vote) {
-        return fallbackText(vote.getContactEmail(), vote.getRequesterEmail());
-    }
-
-    private String describeInterestLevel(AdminNightProgramVote.InterestLevel interestLevel) {
-        if (interestLevel == null) {
-            return "미정";
-        }
-        return switch (interestLevel) {
-            case CURIOUS -> "목차 보고 결정";
-            case WANT_TO_ATTEND -> "듣고 싶어요";
-            case READY_IF_SCHEDULE_FITS -> "일정 맞으면 참여";
-        };
-    }
-
-    private String describePreferredFormat(AdminNightProgramVote.PreferredFormat preferredFormat) {
-        if (preferredFormat == null) {
-            return "미정";
-        }
-        return switch (preferredFormat) {
-            case ONLINE -> "온라인";
-            case OFFLINE -> "오프라인";
-            case HYBRID -> "하이브리드";
-            case FLEXIBLE -> "상관없음";
-        };
-    }
-
-    private String describeSessionStyle(AdminNightProgramVote.SessionStyle sessionStyle) {
-        if (sessionStyle == null) {
-            return "섞어서";
-        }
-        return switch (sessionStyle) {
-            case LECTURE -> "강의 중심";
-            case WORKSHOP -> "실습 중심";
-            case NETWORKING -> "네트워킹 중심";
-            case MIXED -> "섞어서";
-        };
-    }
-
-    private String describeSessionLength(AdminNightProgramVote.SessionLength sessionLength) {
-        if (sessionLength == null) {
-            return "2시간";
-        }
-        return switch (sessionLength) {
-            case SHORT_90 -> "90분";
-            case STANDARD_120 -> "2시간";
-            case HALF_DAY -> "반나절";
-            case SERIES -> "짧은 연속 세션";
-        };
-    }
-
-    private String describeFoodPreference(AdminNightProgramVote.FoodPreference foodPreference) {
-        if (foodPreference == null) {
-            return "가벼운 간식";
-        }
-        return switch (foodPreference) {
-            case NO_NEED -> "없어도 됨";
-            case DRINKS_ONLY -> "음료 정도";
-            case LIGHT_SNACK -> "가벼운 간식";
-            case MEAL -> "식사도 원함";
-        };
-    }
-
-    private String describePreferredDays(List<AdminNightProgramVote.PreferredDay> preferredDays) {
-        if (preferredDays == null || preferredDays.isEmpty()) {
-            return "토요일, 일요일";
-        }
-        return String.join(", ", preferredDays.stream().map(this::describePreferredDay).toList());
-    }
-
-    private String describePreferredDay(AdminNightProgramVote.PreferredDay preferredDay) {
-        if (preferredDay == null) {
-            return "미정";
-        }
-        return switch (preferredDay) {
-            case FRIDAY -> "금요일";
-            case SATURDAY -> "토요일";
-            case SUNDAY -> "일요일";
-        };
-    }
-
-    private String describePreferredTimes(List<String> preferredTimes) {
-        if (preferredTimes == null || preferredTimes.isEmpty()) {
-            return "미정";
-        }
-        return String.join(", ", preferredTimes.stream().map(this::describePreferredTime).toList());
-    }
-
-    private String describePreferredTime(String preferredTime) {
-        if (preferredTime == null) {
-            return "미정";
-        }
-        return switch (preferredTime) {
-            case "weekday-night" -> "평일 저녁";
-            case "friday-night" -> "금요일 밤";
-            case "weekend-day" -> "주말 낮";
-            case "weekend-night" -> "주말 저녁";
-            default -> preferredTime;
-        };
-    }
-
-    private String describeInterestedTopics(List<String> interestedTopics) {
-        if (interestedTopics == null || interestedTopics.isEmpty()) {
-            return "미정";
-        }
-        return String.join(
-                ", ", interestedTopics.stream().map(this::describeInterestedTopic).toList());
-    }
-
-    private String describeInterestedTopic(String interestedTopic) {
-        if (interestedTopic == null) {
-            return "미정";
-        }
-        return switch (interestedTopic) {
-            case "agent-methodology" -> "Agent 설계 방법론";
-            case "langgraph-workflow" -> "LangGraph 워크플로우";
-            case "tool-rag-memory" -> "Tool · RAG · Memory";
-            case "evaluation-observability" -> "평가와 관측";
-            case "production-ops" -> "실전 적용";
-            default -> interestedTopic;
-        };
-    }
-
-    private String fallbackText(String value, String fallback) {
-        return value == null || value.isBlank() ? fallback : value;
+                                AdminNightProgramVoteLabels.fallbackText(
+                                        vote.getContact(), "별도 연락처 없음")),
+                        mailTemplate.escapeHtml(
+                                AdminNightProgramVoteLabels.describePreferredDays(
+                                        vote.getPreferredDays())),
+                        mailTemplate.escapeHtml(
+                                AdminNightProgramVoteLabels.describePreferredTimes(
+                                        vote.getPreferredTimes())),
+                        mailTemplate.escapeHtml(
+                                AdminNightProgramVoteLabels.describeSessionStyle(
+                                        vote.getSessionStyle())),
+                        mailTemplate.escapeHtml(
+                                AdminNightProgramVoteLabels.describeSessionLength(
+                                        vote.getSessionLength())),
+                        mailTemplate.escapeHtml(
+                                AdminNightProgramVoteLabels.describeFoodPreference(
+                                        vote.getFoodPreference())),
+                        mailTemplate.escapeHtml(
+                                AdminNightProgramVoteLabels.describeInterestedTopics(
+                                        vote.getInterestedTopics())),
+                        mailTemplate.escapeHtml(
+                                AdminNightProgramVoteLabels.fallbackText(
+                                        vote.getDesiredTakeaways(), "별도 작성 없음")));
     }
 }
