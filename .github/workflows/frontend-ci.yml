@@ -85,13 +85,16 @@ jobs:
 
       - name: 브라우저 E2E 검사
         env:
-          E2E_API_URL: http://127.0.0.1:4100/api
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3101
         run: |
           node apps/web/e2e/support/build-api-stub.mjs &
           stub_pid=$!
-          trap 'kill "${stub_pid}"' EXIT
+          pnpm --dir apps/web exec next start -p 3101 &
+          web_pid=$!
+          trap 'kill "${web_pid}" "${stub_pid}"' EXIT
           for attempt in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:4100/api/health >/dev/null; then
+            if curl --fail --silent http://127.0.0.1:4100/api/health >/dev/null \
+              && curl --fail --silent http://127.0.0.1:3101/ >/dev/null; then
               break
             fi
             if [ "${attempt}" -eq 20 ]; then
@@ -99,5 +102,5 @@ jobs:
             fi
             sleep 0.25
           done
-          pnpm --dir apps/web test:e2e
+          pnpm --dir apps/web exec playwright test
           test "$(curl --fail --silent http://127.0.0.1:4100/__request-count)" -gt 0
