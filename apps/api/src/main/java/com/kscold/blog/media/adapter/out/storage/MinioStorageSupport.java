@@ -19,18 +19,21 @@ public class MinioStorageSupport {
 
     public MinioStorageSupport(
             @Value("${minio.endpoint:http://localhost:9000}") String endpoint,
-            @Value("${minio.access-key:minioadmin}") String accessKey,
-            @Value("${minio.secret-key:minioadmin}") String secretKey,
+            @Value("${minio.access-key}") String accessKey,
+            @Value("${minio.secret-key}") String secretKey,
             @Value("${minio.bucket:blog}") String bucket,
             @Value("${minio.public-url:https://bucket.kscold.com}") String publicUrl,
             @Value("${minio.region:us-east-1}") String region) {
+        String requiredAccessKey = requireCredential(accessKey, "minio.access-key");
+        String requiredSecretKey = requireCredential(secretKey, "minio.secret-key");
         this.client =
                 S3Client.builder()
                         .endpointOverride(URI.create(endpoint))
                         .region(Region.of(region))
                         .credentialsProvider(
                                 StaticCredentialsProvider.create(
-                                        AwsBasicCredentials.create(accessKey, secretKey)))
+                                        AwsBasicCredentials.create(
+                                                requiredAccessKey, requiredSecretKey)))
                         .forcePathStyle(true)
                         .build();
         this.bucket = bucket;
@@ -49,5 +52,12 @@ public class MinioStorageSupport {
             return "";
         }
         return value.replaceAll("^/+", "").replaceAll("/+$", "");
+    }
+
+    private static String requireCredential(String value, String propertyName) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException(propertyName + " must be configured");
+        }
+        return value;
     }
 }
