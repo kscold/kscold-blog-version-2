@@ -30,6 +30,24 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private static final String[] PUBLIC_READ_PATHS = {
+        "/posts/**",
+        "/categories/**",
+        "/tags/**",
+        "/search/**",
+        "/github/**",
+        "/users/profile/*",
+        "/users/*/feeds",
+        "/feeds/**",
+        "/guestbook/**",
+        "/admin-night/calendar",
+        "/admin-night/programs/*/summary",
+        "/vault/**",
+        "/access-requests/check/**"
+    };
+
+    private static final String[] ADMIN_POST_READ_PATHS = {"/posts/admin", "/posts/exists/**"};
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CookieCsrfProtectionFilter cookieCsrfProtectionFilter;
     private final ObjectMapper objectMapper;
@@ -60,52 +78,29 @@ public class SecurityConfig {
                         auth ->
                                 auth
                                         // 공개 포스트 와일드카드보다 먼저 관리자 조회 경로를 잠근다.
-                                        .requestMatchers(
-                                                HttpMethod.GET, "/posts/admin", "/posts/exists/**")
+                                        .requestMatchers(HttpMethod.GET, ADMIN_POST_READ_PATHS)
+                                        .hasRole("ADMIN")
+                                        .requestMatchers(HttpMethod.HEAD, ADMIN_POST_READ_PATHS)
                                         .hasRole("ADMIN")
                                         // 공개 엔드포인트
-                                        .requestMatchers(HttpMethod.GET, "/posts/**")
+                                        .requestMatchers(HttpMethod.GET, PUBLIC_READ_PATHS)
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/categories/**")
+                                        // GET으로 공개한 리소스는 본문 없는 HEAD 검사에도 같은 권한을 적용한다.
+                                        .requestMatchers(HttpMethod.HEAD, PUBLIC_READ_PATHS)
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/tags/**")
-                                        .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/search/**")
-                                        .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/github/**")
-                                        .permitAll()
-                                        // 공개 프로필과 작성자별 공개 피드는 로그인 없이 조회할 수 있어야 한다.
-                                        .requestMatchers(
-                                                HttpMethod.GET,
-                                                "/users/profile/*",
-                                                "/users/*/feeds")
-                                        .permitAll()
-                                        // 피드 공개 엔드포인트
-                                        .requestMatchers(HttpMethod.GET, "/feeds/**")
-                                        .permitAll()
+                                        // 피드 쓰기 공개 엔드포인트
                                         .requestMatchers(HttpMethod.POST, "/feeds/*/like")
-                                        .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/feeds/*/comments")
                                         .permitAll()
                                         // 댓글 좋아요는 피드 좋아요와 같이 비로그인도 허용
                                         .requestMatchers(
                                                 HttpMethod.POST, "/feeds/*/comments/*/like")
-                                        .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/guestbook/**")
-                                        .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/admin-night/calendar")
-                                        .permitAll()
-                                        .requestMatchers(
-                                                HttpMethod.GET, "/admin-night/programs/*/summary")
                                         .permitAll()
                                         .requestMatchers(
                                                 HttpMethod.POST, "/admin-night/programs/*/votes")
                                         .permitAll()
                                         .requestMatchers("/payments/ai-agent-bloom/**")
                                         .permitAll()
-                                        // Vault 공개 엔드포인트
-                                        .requestMatchers(HttpMethod.GET, "/vault/**")
-                                        .permitAll()
+                                        // Vault 쓰기 공개 엔드포인트
                                         .requestMatchers(HttpMethod.POST, "/vault/agent/chat")
                                         .permitAll()
                                         .requestMatchers(
@@ -131,10 +126,6 @@ public class SecurityConfig {
                                         .permitAll()
                                         // 웹소켓
                                         .requestMatchers("/ws/**", "/socket.io/**")
-                                        .permitAll()
-                                        // 접근 요청 확인 (비로그인도 가능하게 - 필터에서 null userId 처리)
-                                        .requestMatchers(
-                                                HttpMethod.GET, "/access-requests/check/**")
                                         .permitAll()
                                         // 페이지 방문 트래킹 (비로그인 허용)
                                         .requestMatchers(HttpMethod.POST, "/analytics/page-visit")
