@@ -1,7 +1,7 @@
 # Multi-stage build for Next.js
 
 # Base image
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 RUN npm install -g pnpm@8
 
 # Dependencies stage
@@ -29,7 +29,7 @@ ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
 RUN cd apps/web && pnpm build
 
 # Runner stage
-FROM node:20-alpine AS runner
+FROM node:26-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
