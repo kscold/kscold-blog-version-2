@@ -17,7 +17,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -32,7 +31,6 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MinioAdminStorageAdapter implements AdminStoragePort {
@@ -41,7 +39,7 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
 
     @Override
     public AdminStorageListing list(String prefixInput) {
-        String currentPrefix = normalizePrefix(prefixInput);
+        String currentPrefix = AdminStoragePathPolicy.normalizePrefix(prefixInput);
         Collator collator = Collator.getInstance(Locale.KOREAN);
         ListObjectsV2Response response =
                 minioStorageSupport
@@ -93,7 +91,7 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
                                                     lastModified == null
                                                             ? null
                                                             : lastModified.toString())
-                                            .image(isImageName(name))
+                                            .image(AdminStorageContentTypeResolver.isImage(name))
                                             .publicUrl(minioStorageSupport.buildPublicUrl(key))
                                             .build();
                                 })
@@ -103,7 +101,7 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
         return AdminStorageListing.builder()
                 .bucket(minioStorageSupport.getBucket())
                 .currentPrefix(currentPrefix)
-                .parentPrefix(buildParentPrefix(currentPrefix))
+                .parentPrefix(AdminStoragePathPolicy.buildParentPrefix(currentPrefix))
                 .folders(folders)
                 .objects(objects)
                 .build();
@@ -111,9 +109,10 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
 
     @Override
     public void createFolder(String prefixInput, String folderName) {
-        String currentPrefix = normalizePrefix(prefixInput);
-        String normalizedName = trimSlashes(folderName == null ? "" : folderName).trim();
-        String key = normalizePrefix(currentPrefix + normalizedName);
+        String currentPrefix = AdminStoragePathPolicy.normalizePrefix(prefixInput);
+        String normalizedName =
+                AdminStoragePathPolicy.trimSlashes(folderName == null ? "" : folderName).trim();
+        String key = AdminStoragePathPolicy.normalizePrefix(currentPrefix + normalizedName);
 
         minioStorageSupport
                 .getClient()
@@ -128,10 +127,10 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
 
     @Override
     public void uploadFiles(String prefixInput, List<MultipartFile> files) {
-        String currentPrefix = normalizePrefix(prefixInput);
+        String currentPrefix = AdminStoragePathPolicy.normalizePrefix(prefixInput);
 
         for (MultipartFile file : files) {
-            String fileName = extractFileName(file.getOriginalFilename());
+            String fileName = AdminStoragePathPolicy.extractFileName(file.getOriginalFilename());
             String key = currentPrefix + fileName;
 
             try {
@@ -142,7 +141,8 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
                                         .bucket(minioStorageSupport.getBucket())
                                         .key(key)
                                         .contentType(
-                                                resolveContentType(file.getContentType(), fileName))
+                                                AdminStorageContentTypeResolver.resolve(
+                                                        file.getContentType(), fileName))
                                         .contentLength(file.getSize())
                                         .build(),
                                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
@@ -156,7 +156,10 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
     @Override
     public int deleteEntry(String keyInput) {
         boolean isFolder = keyInput != null && keyInput.trim().replace("\\", "/").endsWith("/");
-        String key = isFolder ? normalizePrefix(keyInput) : normalizeObjectKey(keyInput);
+        String key =
+                isFolder
+                        ? AdminStoragePathPolicy.normalizePrefix(keyInput)
+                        : AdminStoragePathPolicy.normalizeObjectKey(keyInput);
 
         if (isFolder) {
             List<String> keys = listKeysRecursively(key);
@@ -192,7 +195,7 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
 
     @Override
     public AdminStorageObjectResource getObject(String keyInput) {
-        String key = normalizeObjectKey(keyInput);
+        String key = AdminStoragePathPolicy.normalizeObjectKey(keyInput);
 
         ResponseInputStream<GetObjectResponse> stream =
                 minioStorageSupport
@@ -205,10 +208,10 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
         GetObjectResponse response = stream.response();
 
         return AdminStorageObjectResource.builder()
-                .fileName(extractLeafName(key))
+                .fileName(AdminStoragePathPolicy.extractLeafName(key))
                 .contentType(
                         response.contentType() == null
-                                ? inferContentType(key)
+                                ? AdminStorageContentTypeResolver.infer(key)
                                 : response.contentType())
                 .contentLength(response.contentLength() == null ? -1L : response.contentLength())
                 .inputStream(stream)
@@ -239,117 +242,5 @@ public class MinioAdminStorageAdapter implements AdminStoragePort {
         } while (continuationToken != null);
 
         return keys;
-    }
-
-    private String buildParentPrefix(String prefix) {
-        if (prefix == null || prefix.isBlank()) {
-            return null;
-        }
-
-        String normalized = prefix.replaceAll("/$", "");
-        int lastSlashIndex = normalized.lastIndexOf('/');
-        if (lastSlashIndex < 0) {
-            return "";
-        }
-
-        return normalized.substring(0, lastSlashIndex + 1);
-    }
-
-    private String normalizePrefix(String value) {
-        String normalized = normalizePath(value, true);
-        return normalized.isBlank() ? "" : normalized + "/";
-    }
-
-    private String normalizeObjectKey(String value) {
-        String normalized = normalizePath(value, false);
-        if (normalized.isBlank()) {
-            throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 경로를 확인해주세요.");
-        }
-        return normalized;
-    }
-
-    private String normalizePath(String value, boolean allowTrailingSlash) {
-        String raw = value == null ? "" : value.trim().replace("\\", "/");
-        if (raw.isBlank()) {
-            return "";
-        }
-
-        String[] segments = raw.replaceAll("^/+", "").split("/");
-        List<String> normalizedSegments = new ArrayList<>();
-        for (String segment : segments) {
-            if (segment == null || segment.isBlank() || ".".equals(segment)) {
-                continue;
-            }
-
-            if ("..".equals(segment)) {
-                throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "잘못된 경로입니다.");
-            }
-
-            normalizedSegments.add(segment);
-        }
-
-        String normalized = String.join("/", normalizedSegments);
-        if (allowTrailingSlash && value != null && value.endsWith("/") && !normalized.isBlank()) {
-            return normalized;
-        }
-        return normalized;
-    }
-
-    private String trimSlashes(String value) {
-        return value.replaceAll("^/+", "").replaceAll("/+$", "");
-    }
-
-    private String extractFileName(String originalFilename) {
-        String normalized =
-                trimSlashes(
-                        (originalFilename == null ? "" : originalFilename.trim())
-                                .replace("\\", "/"));
-        int lastSlashIndex = normalized.lastIndexOf('/');
-        String fileName =
-                lastSlashIndex >= 0 ? normalized.substring(lastSlashIndex + 1) : normalized;
-
-        if (fileName.isBlank()) {
-            throw new InvalidRequestException(ErrorCode.INVALID_INPUT_VALUE, "파일 이름을 확인해주세요.");
-        }
-
-        return fileName;
-    }
-
-    private String extractLeafName(String key) {
-        int lastSlashIndex = key.lastIndexOf('/');
-        return lastSlashIndex >= 0 ? key.substring(lastSlashIndex + 1) : key;
-    }
-
-    private String resolveContentType(String contentType, String fileName) {
-        if (contentType != null && !contentType.isBlank()) {
-            return contentType;
-        }
-        return inferContentType(fileName);
-    }
-
-    private boolean isImageName(String name) {
-        String lowerCase = name.toLowerCase(Locale.ROOT);
-        return lowerCase.endsWith(".png")
-                || lowerCase.endsWith(".jpg")
-                || lowerCase.endsWith(".jpeg")
-                || lowerCase.endsWith(".gif")
-                || lowerCase.endsWith(".webp")
-                || lowerCase.endsWith(".svg");
-    }
-
-    private String inferContentType(String name) {
-        String lowerCase = name.toLowerCase(Locale.ROOT);
-        if (lowerCase.endsWith(".png")) return "image/png";
-        if (lowerCase.endsWith(".jpg") || lowerCase.endsWith(".jpeg")) return "image/jpeg";
-        if (lowerCase.endsWith(".gif")) return "image/gif";
-        if (lowerCase.endsWith(".webp")) return "image/webp";
-        if (lowerCase.endsWith(".svg")) return "image/svg+xml";
-        if (lowerCase.endsWith(".json")) return "application/json; charset=utf-8";
-        if (lowerCase.endsWith(".txt")) return "text/plain; charset=utf-8";
-        if (lowerCase.endsWith(".md")) return "text/markdown; charset=utf-8";
-        if (lowerCase.endsWith(".html")) return "text/html; charset=utf-8";
-        if (lowerCase.endsWith(".css")) return "text/css; charset=utf-8";
-        if (lowerCase.endsWith(".js")) return "application/javascript; charset=utf-8";
-        return "application/octet-stream";
     }
 }
