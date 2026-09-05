@@ -22,7 +22,7 @@ interface BuildPageMetadataInput {
 }
 
 export function absoluteUrl(path = '/') {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const normalizedPath = `/${path.replace(/^\/+/, '')}`;
   return new URL(normalizedPath, SITE_URL).toString();
 }
 
@@ -32,7 +32,8 @@ export function toOgImage(image?: string | null) {
   }
 
   try {
-    return new URL(image, SITE_URL).toString();
+    const resolved = new URL(image, SITE_URL);
+    return resolved.protocol === 'https:' ? resolved.toString() : absoluteUrl(DEFAULT_OG_IMAGE);
   } catch {
     return absoluteUrl(DEFAULT_OG_IMAGE);
   }
