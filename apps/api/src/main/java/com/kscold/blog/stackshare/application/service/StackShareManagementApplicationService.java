@@ -15,7 +15,6 @@ import com.kscold.blog.stackshare.application.dto.StackShareSettlementCommand;
 import com.kscold.blog.stackshare.application.port.in.StackShareManagementUseCase;
 import com.kscold.blog.stackshare.domain.model.StackShareAccount;
 import com.kscold.blog.stackshare.domain.model.StackShareGroup;
-import com.kscold.blog.stackshare.domain.model.StackShareMessage;
 import com.kscold.blog.stackshare.domain.model.StackShareParticipant;
 import com.kscold.blog.stackshare.domain.model.StackShareSendResult;
 import com.kscold.blog.stackshare.domain.model.StackShareSettlement;
@@ -24,12 +23,9 @@ import com.kscold.blog.stackshare.domain.port.out.StackShareGroupRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareNotificationSender;
 import com.kscold.blog.stackshare.domain.port.out.StackShareParticipantRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareSettlementRepository;
-import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +37,6 @@ public class StackShareManagementApplicationService implements StackShareManagem
 
     private static final String TEMPLATE_KEY = "STACK_SHARE_SETTLEMENT";
     private static final Pattern MOBILE_PATTERN = Pattern.compile("01[016789]\\d{7,8}");
-
-    /** 입금 기한을 비워둔 경우 알림톡에 대신 넣을 문구. 변수는 비워 보낼 수 없어 기본값이 필요함. */
-    private static final String DUE_DATE_FALLBACK = "협의";
 
     private final StackShareParticipantRepository participantRepository;
     private final StackShareSettlementRepository settlementRepository;
@@ -189,7 +182,8 @@ public class StackShareManagementApplicationService implements StackShareManagem
                                                     .formatted(
                                                             settlement.getBillingPeriod(),
                                                             settlement.getToolName(),
-                                                            formatWon(recipient.getAmount()));
+                                                            StackShareAmountFormatter.formatWon(
+                                                                    recipient.getAmount()));
                                     MessageDeliveryLog log =
                                             failureReason == null
                                                     ? MessageDeliveryLog.sent(
@@ -223,85 +217,19 @@ public class StackShareManagementApplicationService implements StackShareManagem
 
     private StackShareSettlement createSettlement(
             SendStackShareNotificationsCommand command, StackShareAccount account) {
-        StackShareSettlementCommand source = command.settlement();
-        int receiverCount = command.recipients().size();
-        // 본인을 포함하면 나누는 인원이 한 명 늘어난다. 본인에게는 알림톡을 보내지 않는다.
-        int shareCount = receiverCount + (source.includeOwner() ? 1 : 0);
-        long baseAmount = source.totalAmount() / shareCount;
-        long remainder = source.totalAmount() % shareCount;
-        List<StackShareSettlement.Recipient> recipients = new ArrayList<>();
-
-        for (int index = 0; index < receiverCount; index++) {
-            StackShareRecipientCommand recipient = command.recipients().get(index);
-            StackShareParticipant participant =
-                    saveParticipant(
-                            new SaveStackShareParticipantCommand(
-                                    null,
-                                    recipient.name(),
-                                    recipient.phoneNumber(),
-                                    recipient.email(),
-                                    null));
-            recipients.add(
-                    StackShareSettlement.Recipient.builder()
-                            .participantId(participant.getId())
-                            .name(participant.getName())
-                            .phoneNumber(participant.getPhoneNumber())
-                            .amount(
-                                    baseAmount
-                                            + (index < remainderForReceivers(source, remainder)
-                                                    ? 1
-                                                    : 0))
-                            .build());
-        }
-        String dueDate = normalizeText(source.dueDate());
-        return StackShareSettlement.builder()
-                .toolName(source.toolName().trim())
-                .billingPeriod(source.billingPeriod().trim())
-                .totalAmount(source.totalAmount())
-                .dueDate(dueDate.isBlank() ? DUE_DATE_FALLBACK : dueDate)
-                .accountText(account.toDisplayText())
-                .contactText(account.toContactText())
-                .recipients(recipients)
-                .shareCount(shareCount)
-                .includeOwner(source.includeOwner())
-                .ownerAmount(source.includeOwner() ? baseAmount + remainder : 0)
-                .status(StackShareSettlement.Status.DRAFT)
-                .build();
+        List<StackShareParticipant> participants =
+                command.recipients().stream().map(this::saveSettlementParticipant).toList();
+        return StackShareSettlementFactory.create(command.settlement(), account, participants);
     }
 
-    /**
-     * 나누어떨어지지 않은 나머지를 받는 사람에게 1원씩 더 물릴지 결정한다. 본인이 분담에 끼어 있으면 결제한 사람이 나머지를 떠안는 편이 자연스러우므로 받는 사람에게는
-     * 나머지를 넘기지 않는다.
-     */
-    private long remainderForReceivers(StackShareSettlementCommand source, long remainder) {
-        return source.includeOwner() ? 0 : remainder;
+    private StackShareParticipant saveSettlementParticipant(StackShareRecipientCommand recipient) {
+        return saveParticipant(
+                new SaveStackShareParticipantCommand(
+                        null, recipient.name(), recipient.phoneNumber(), recipient.email(), null));
     }
 
     private StackShareSendResult send(StackShareSettlement settlement, String templateId) {
-        MessageContext context = new MessageContext(settlement, templateId);
-        List<StackShareMessage> messages =
-                settlement.getRecipients().stream()
-                        .map(recipient -> toMessage(context, recipient))
-                        .toList();
-        return notificationSender.send(messages);
-    }
-
-    private StackShareMessage toMessage(
-            MessageContext context, StackShareSettlement.Recipient recipient) {
-        StackShareSettlement settlement = context.settlement();
-        // Map.of 는 10쌍까지만 받으므로 변수를 더 늘릴 때는 형태를 바꿔야 함.
-        Map<String, String> variables =
-                Map.of(
-                        "#{이름}", recipient.getName(),
-                        "#{정산기간}", settlement.getBillingPeriod(),
-                        "#{서비스명}", settlement.getToolName(),
-                        "#{총금액}", formatWon(settlement.getTotalAmount()),
-                        "#{참여인원}", String.valueOf(settlement.getShareCount()),
-                        "#{분담금}", formatWon(recipient.getAmount()),
-                        "#{입금계좌}", settlement.getAccountText(),
-                        "#{입금기한}", settlement.getDueDate(),
-                        "#{연락처}", settlement.getContactText());
-        return new StackShareMessage(recipient.getPhoneNumber(), context.templateId(), variables);
+        return notificationSender.send(StackShareMessageFactory.create(settlement, templateId));
     }
 
     private void validateSettlement(SendStackShareNotificationsCommand command) {
@@ -333,13 +261,7 @@ public class StackShareManagementApplicationService implements StackShareManagem
         return value == null ? "" : value.trim();
     }
 
-    private String formatWon(long amount) {
-        return NumberFormat.getNumberInstance(Locale.KOREA).format(amount) + "원";
-    }
-
     private BusinessException invalidInput(String message) {
         return new BusinessException(ErrorCode.INVALID_INPUT_VALUE, message);
     }
-
-    private record MessageContext(StackShareSettlement settlement, String templateId) {}
 }
