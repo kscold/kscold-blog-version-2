@@ -109,9 +109,17 @@ function classifyUrl(href: string, label: string): LinkifySegment {
   if (blogMatch) {
     const path = blogMatch[1] || '/';
     const post = path.match(BLOG_POST_RE);
-    if (post) return { kind: 'blog-post', href, slug: decodeURIComponent(post[1]) };
+    if (post) return { kind: 'blog-post', href, slug: decodeUrlSegment(post[1]) };
     const feed = path.match(FEED_RE);
     if (feed) return { kind: 'feed', href, feedId: feed[1] };
   }
   return { kind: 'external', href, label };
+}
+
+function decodeUrlSegment(value: string) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
 }

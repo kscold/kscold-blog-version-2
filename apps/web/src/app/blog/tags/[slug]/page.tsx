@@ -32,8 +32,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
-  const seoData = await getTagSeoData(decodedSlug);
+  const seoData = await getTagSeoData(slug);
 
   if (!seoData) {
     notFound();
@@ -55,8 +54,7 @@ export default async function TagPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
-  const seoData = await getTagSeoData(decodedSlug);
+  const seoData = await getTagSeoData(slug);
 
   if (!seoData) {
     notFound();
