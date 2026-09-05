@@ -1,6 +1,7 @@
 package com.kscold.blog.adminnight.adapter.out.persistence;
 
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -10,6 +11,9 @@ public interface MongoAdminNightRequestRepository
     List<AdminNightRequest> findByUserIdOrderByCreatedAtDesc(String userId);
 
     List<AdminNightRequest> findByStatusOrderByCreatedAtDesc(AdminNightRequest.Status status);
+
+    List<AdminNightRequest> findByStatusAndScheduledSlotDateBetweenOrderByScheduledSlotDateAsc(
+            AdminNightRequest.Status status, LocalDate from, LocalDate to);
 
     List<AdminNightRequest> findAllByOrderByCreatedAtDesc();
 }

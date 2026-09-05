@@ -69,11 +69,8 @@ public class AdminNightApplicationService implements AdminNightUseCase {
     @Override
     @Transactional(readOnly = true)
     public List<AdminNightRequest> getApprovedRequests(LocalDate from, LocalDate to) {
-        return adminNightRequestRepository
-                .findByStatusOrderByCreatedAtDesc(AdminNightRequest.Status.APPROVED)
-                .stream()
-                .filter(request -> AdminNightScheduleRange.includes(request, from, to))
-                .toList();
+        AdminNightScheduleRange.validate(from, to);
+        return adminNightRequestRepository.findApprovedScheduledBetween(from, to);
     }
 
     @Override

@@ -50,6 +50,26 @@ class AdminNightApplicationServiceTest {
     @InjectMocks private AdminNightApplicationService adminNightApplicationService;
 
     @Test
+    @DisplayName("시나리오: 공개 캘린더는 승인 일정의 날짜 범위 쿼리를 사용한다")
+    void calendarUsesApprovedScheduleRangeQuery() {
+        LocalDate from = LocalDate.of(2026, 9, 1);
+        LocalDate to = LocalDate.of(2026, 9, 7);
+        AdminNightRequest approved =
+                AdminNightRequest.builder()
+                        .id("request-1")
+                        .status(AdminNightRequest.Status.APPROVED)
+                        .scheduledSlot(slot("2026-09-03", "목", "20:30 - 22:00", "Inbox", "Open"))
+                        .build();
+        when(adminNightRequestRepository.findApprovedScheduledBetween(from, to))
+                .thenReturn(List.of(approved));
+
+        List<AdminNightRequest> result = adminNightApplicationService.getApprovedRequests(from, to);
+
+        assertThat(result).containsExactly(approved);
+        verify(adminNightRequestRepository).findApprovedScheduledBetween(from, to);
+    }
+
+    @Test
     @DisplayName("시나리오: 로그인 사용자가 Admin Night 신청을 보내면 저장 후 알림 포트가 호출된다")
     void createRequestPublishesNotification() {
         User user = UserFixtures.user("user-1", User.Role.USER, "nightowl", "류태호");

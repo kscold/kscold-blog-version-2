@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
@@ -18,6 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "admin_night_requests")
+@CompoundIndex(name = "status_scheduled_date_idx", def = "{'status': 1, 'scheduledSlot.date': 1}")
 public class AdminNightRequest {
 
     @Id private String id;

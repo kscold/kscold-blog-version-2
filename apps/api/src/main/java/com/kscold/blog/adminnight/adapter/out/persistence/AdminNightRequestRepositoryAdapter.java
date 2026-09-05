@@ -2,6 +2,7 @@ package com.kscold.blog.adminnight.adapter.out.persistence;
 
 import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
 import com.kscold.blog.adminnight.domain.port.out.AdminNightRequestRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,13 @@ public class AdminNightRequestRepositoryAdapter implements AdminNightRequestRepo
     public List<AdminNightRequest> findByStatusOrderByCreatedAtDesc(
             AdminNightRequest.Status status) {
         return mongoAdminNightRequestRepository.findByStatusOrderByCreatedAtDesc(status);
+    }
+
+    @Override
+    public List<AdminNightRequest> findApprovedScheduledBetween(LocalDate from, LocalDate to) {
+        return mongoAdminNightRequestRepository
+                .findByStatusAndScheduledSlotDateBetweenOrderByScheduledSlotDateAsc(
+                        AdminNightRequest.Status.APPROVED, from, to);
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.kscold.blog.adminnight.application.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.kscold.blog.adminnight.domain.model.AdminNightRequest;
+import com.kscold.blog.exception.InvalidRequestException;
 import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,35 +14,25 @@ class AdminNightScheduleRangeTest {
     private static final LocalDate TO = LocalDate.of(2026, 9, 12);
 
     @Test
-    @DisplayName("조회 시작일과 종료일의 일정도 범위에 포함한다")
-    void includesBoundaryDates() {
-        assertThat(List.of(includes(FROM), includes(TO))).containsExactly(true, true);
+    @DisplayName("조회 시작일과 종료일이 같은 날이어도 허용한다")
+    void acceptsSameBoundaryDate() {
+        assertThatCode(() -> AdminNightScheduleRange.validate(FROM, FROM))
+                .doesNotThrowAnyException();
     }
 
     @Test
-    @DisplayName("일정이 없거나 조회 범위 밖이면 제외한다")
-    void excludesMissingAndOutsideDates() {
-        AdminNightRequest missingSchedule = AdminNightRequest.builder().build();
-        AdminNightRequest missingDate =
-                AdminNightRequest.builder()
-                        .scheduledSlot(AdminNightRequest.SlotInfo.builder().build())
-                        .build();
-
-        assertThat(
-                        List.of(
-                                AdminNightScheduleRange.includes(missingSchedule, FROM, TO),
-                                AdminNightScheduleRange.includes(missingDate, FROM, TO),
-                                includes(FROM.minusDays(1)),
-                                includes(TO.plusDays(1))))
-                .containsOnly(false);
+    @DisplayName("조회 시작일이 종료일보다 늦으면 거부한다")
+    void rejectsReversedRange() {
+        assertThatThrownBy(() -> AdminNightScheduleRange.validate(TO, FROM))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessage("조회 시작일은 종료일보다 늦을 수 없습니다.");
     }
 
-    private boolean includes(LocalDate scheduledDate) {
-        AdminNightRequest request =
-                AdminNightRequest.builder()
-                        .scheduledSlot(
-                                AdminNightRequest.SlotInfo.builder().date(scheduledDate).build())
-                        .build();
-        return AdminNightScheduleRange.includes(request, FROM, TO);
+    @Test
+    @DisplayName("조회 경계가 누락되면 거부한다")
+    void rejectsMissingBoundary() {
+        assertThatThrownBy(() -> AdminNightScheduleRange.validate(null, TO))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessage("조회 시작일과 종료일이 필요합니다.");
     }
 }
