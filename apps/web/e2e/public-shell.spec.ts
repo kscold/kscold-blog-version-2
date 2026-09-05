@@ -108,13 +108,26 @@ test.describe('공개 페이지 핵심 시나리오', () => {
   });
 
   test('사이트맵은 운영자 공개 프로필을 검색 경로로 제공한다', async ({ request }) => {
-    const response = await request.get('/sitemap.xml');
+    const [response, robotsResponse] = await Promise.all([
+      request.get('/sitemap.xml'),
+      request.get('/robots.txt'),
+    ]);
     const sitemap = await response.text();
+    const lastModifiedValues = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map(
+      match => match[1]
+    );
 
     expect(response.status()).toBe(200);
+    expect(response.headers()['cache-control']).toContain('s-maxage=3600');
+    expect(robotsResponse.status()).toBe(200);
+    expect(robotsResponse.headers()['cache-control']).toContain('s-maxage=86400');
     expect(sitemap).toContain('<loc>https://kscold.com/profile/kscold</loc>');
     expect(sitemap).not.toContain('<loc>https://kscold.com/admin</loc>');
     expect(sitemap).not.toContain('<loc>https://kscold.com/login</loc>');
+    expect(lastModifiedValues.length).toBeGreaterThan(0);
+    for (const value of lastModifiedValues) {
+      expect(value).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
   });
 
   test('서버 렌더링 Footer는 일반 페이지에만 표시된다', async ({ page }) => {

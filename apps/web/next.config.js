@@ -1,5 +1,10 @@
 const linkPreviewImagePolicy = require('./src/shared/config/link-preview-images.json');
 
+const SITEMAP_CACHE_CONTROL =
+  'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
+const ROBOTS_CACHE_CONTROL =
+  'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
@@ -39,6 +44,19 @@ const nextConfig = {
   // 실험적 기능
   experimental: {
     optimizePackageImports: ['framer-motion', '@tanstack/react-query'],
+  },
+
+  async headers() {
+    return [
+      {
+        source: '/sitemap.xml',
+        headers: [{ key: 'Cache-Control', value: SITEMAP_CACHE_CONTROL }],
+      },
+      {
+        source: '/robots.txt',
+        headers: [{ key: 'Cache-Control', value: ROBOTS_CACHE_CONTROL }],
+      },
+    ];
   },
 
   // 깨진 hex slug → 정상 영문 slug 301 리다이렉트 (기존 색인·외부 링크 보존)

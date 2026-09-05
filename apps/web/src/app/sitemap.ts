@@ -12,8 +12,12 @@ import {
   isIndexableVaultNote,
 } from '@/shared/lib/seo';
 
-const toDate = (date: Date | string | undefined): string =>
-  new Date(date || Date.now()).toISOString().split('T')[0];
+const toLastModified = (value: Date | string | undefined): string | undefined => {
+  if (!value) return undefined;
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString().split('T')[0];
+};
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [posts, categoryTree, tags, feeds, vaultNoteIndex] = await Promise.all([
@@ -122,25 +126,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     ...categories.map(category => ({
       url: `${SITE_URL}/blog/${category.slug}`,
-      lastModified: toDate(category.updatedAt || category.createdAt),
+      lastModified: toLastModified(category.updatedAt || category.createdAt),
       changeFrequency: 'weekly' as const,
       priority: 0.75,
     })),
     ...indexableTags.map(tag => ({
       url: `${SITE_URL}/blog/tags/${encodeURIComponent(tag.slug)}`,
-      lastModified: toDate(tag.createdAt),
+      lastModified: toLastModified(tag.createdAt),
       changeFrequency: 'weekly' as const,
       priority: 0.65,
     })),
     ...indexablePosts.map(post => ({
       url: `${SITE_URL}/blog/${post.category.slug}/${post.slug}`,
-      lastModified: toDate(post.updatedAt || post.publishedAt || post.createdAt),
+      lastModified: toLastModified(post.updatedAt || post.publishedAt || post.createdAt),
       changeFrequency: 'monthly' as const,
       priority: post.featured ? 0.9 : 0.8,
     })),
     ...indexableFeeds.map(feed => ({
       url: `${SITE_URL}/feed/${feed.id}`,
-      lastModified: toDate(feed.updatedAt || feed.createdAt),
+      lastModified: toLastModified(feed.updatedAt || feed.createdAt),
       changeFrequency: 'weekly' as const,
       priority: 0.55,
     })),
