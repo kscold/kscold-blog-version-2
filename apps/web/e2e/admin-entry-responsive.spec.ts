@@ -31,8 +31,17 @@ test.describe('관리자 진입 반응형 시나리오', () => {
     test(`${label} 해상도에서는 사이드바에서 Admin으로 이동할 수 있다`, async ({ page }) => {
       await visitAsAdmin(page, width, height);
 
-      const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
-      expect(scrollWidth).toBeLessThanOrEqual(width);
+      const layout = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        overflowingElements: Array.from(document.querySelectorAll<HTMLElement>('body *'))
+          .map(element => ({
+            element: `${element.tagName.toLowerCase()}${element.id ? `#${element.id}` : ''}.${Array.from(element.classList).join('.')}`,
+            right: Math.round(element.getBoundingClientRect().right),
+          }))
+          .filter(element => element.right > window.innerWidth)
+          .slice(0, 5),
+      }));
+      expect(layout.scrollWidth, JSON.stringify(layout.overflowingElements)).toBeLessThanOrEqual(width);
 
       // 사이드바는 데스크탑·모바일 두 벌이 렌더되어 CSS 로 숨겨지므로 :visible 로 좁힌다
       await expectWithinViewport(page, '[data-cy="sidebar-toggle"]:visible', width);

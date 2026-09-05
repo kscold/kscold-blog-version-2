@@ -84,7 +84,7 @@ export function Header() {
                 height={32}
                 className="group-hover:scale-110 transition-transform duration-500 will-change-transform"
               />
-              <span className="relative text-lg sm:text-2xl font-sans font-black tracking-tighter text-surface-900 z-10 group-hover:text-surface-600 transition-colors truncate">
+              <span className="relative hidden min-[341px]:inline text-lg sm:text-2xl font-sans font-black tracking-tighter text-surface-900 z-10 group-hover:text-surface-600 transition-colors truncate">
                 KSCOLD
               </span>
             </Link>
