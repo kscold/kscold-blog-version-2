@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
@@ -20,11 +21,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "feed_comments")
+@CompoundIndexes({
+    @CompoundIndex(name = "idx_feed_createdAt", def = "{'feedId': 1, 'createdAt': 1}"),
+    @CompoundIndex(name = "idx_feed_userId", def = "{'feedId': 1, 'userId': 1}")
+})
 public class FeedComment {
 
     @Id private String id;
 
-    @Indexed private String feedId;
+    private String feedId;
 
     private String authorName;
 
