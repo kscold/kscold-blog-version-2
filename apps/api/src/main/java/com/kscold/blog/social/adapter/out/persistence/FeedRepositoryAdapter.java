@@ -182,7 +182,8 @@ public class FeedRepositoryAdapter implements FeedRepository {
     }
 
     private Document contentLengthExpression() {
-        return new Document("$strLenCP", new Document("$ifNull", List.of("$content", "")));
+        Document content = new Document("$ifNull", List.of("$content", ""));
+        return new Document("$strLenCP", new Document("$trim", new Document("input", content)));
     }
 
     private SitemapFeed toSitemapFeed(Document document) {

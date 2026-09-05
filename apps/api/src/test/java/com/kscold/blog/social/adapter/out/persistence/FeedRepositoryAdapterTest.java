@@ -51,9 +51,11 @@ class FeedRepositoryAdapterTest {
                                 id.toHexString(), 120, createdAt, updatedAt));
         ArgumentCaptor<Aggregation> aggregation = ArgumentCaptor.forClass(Aggregation.class);
         verify(mongoTemplate).aggregate(aggregation.capture(), eq("feeds"), eq(Document.class));
-        assertThat(aggregation.getValue().toPipeline(Aggregation.DEFAULT_CONTEXT))
+        List<Document> pipeline = aggregation.getValue().toPipeline(Aggregation.DEFAULT_CONTEXT);
+        assertThat(pipeline)
                 .extracting(document -> document.keySet().iterator().next())
                 .containsExactly("$match", "$project");
+        assertThat(pipeline.get(1).toJson()).contains("$strLenCP", "$trim", "$ifNull");
     }
 
     @Test
