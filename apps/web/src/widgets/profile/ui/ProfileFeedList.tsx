@@ -22,7 +22,12 @@ export function ProfileFeedList({ feedsData, feedsLoading, page, setPage }: Prop
       ) : feedsData?.content && feedsData.content.length > 0 ? (
         <div className="space-y-4">
           {feedsData.content.map(feed => (
-            <FeedCard key={feed.id} feed={feed} showCommentLink />
+            <FeedCard
+              key={feed.id}
+              feed={feed}
+              showCommentLink
+              imageSizes="(max-width: 767px) calc(100vw - 2rem), 624px"
+            />
           ))}
           {/* 페이지네이션 */}
           {(feedsData.totalPages ?? 1) > 1 && (

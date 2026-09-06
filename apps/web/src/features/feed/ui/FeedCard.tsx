@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -11,6 +10,7 @@ import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
+import { toFeedTitle } from '@/shared/lib/seo/text';
 import { filterVisibleTagNames } from '@/shared/lib/tags';
 import { FeedContent } from './FeedContent';
 
@@ -18,23 +18,22 @@ interface FeedCardProps {
   feed: Feed;
   showCommentLink?: boolean;
   variant?: 'summary' | 'detail';
+  imageSizes?: string;
 }
+
+const DEFAULT_IMAGE_SIZES = '(max-width: 767px) calc(100vw - 2rem), 736px';
 
 export function FeedCard({
   feed,
   showCommentLink = true,
   variant = 'summary',
+  imageSizes = DEFAULT_IMAGE_SIZES,
 }: FeedCardProps) {
   const { allowRichEffects, reduceMotion } = usePerformanceMode();
   const toggleLike = useToggleLike();
-  const router = useRouter();
   const [isLiked, setIsLiked] = useState(feed.isLiked);
   const [likesCount, setLikesCount] = useState(feed.likesCount);
   const visibleTags = filterVisibleTagNames(feed.tags);
-
-  const handleCardClick = () => {
-    if (showCommentLink) router.push(`/feed/${feed.id}`);
-  };
 
   const handleLike = async () => {
     const wasLiked = isLiked;
@@ -50,6 +49,7 @@ export function FeedCard({
   };
 
   const isDetail = variant === 'detail';
+  const feedTitle = toFeedTitle(feed.content, feed.linkPreview?.title, `${feed.author.name}의 피드`);
   // 상세는 본문 폭에 맞춰 여백을 넓게 쓰고, 목록은 기존 카드 여백을 그대로 둔다.
   const gutter = isDetail ? 'px-5 sm:px-7' : 'px-4';
 
@@ -62,11 +62,8 @@ export function FeedCard({
           type="button"
           aria-label={`${isLiked ? '좋아요 취소' : '좋아요'} ${likesCount}개`}
           aria-pressed={isLiked}
-          onClick={e => {
-            e.stopPropagation();
-            handleLike();
-          }}
-          className="flex items-center gap-1.5 group"
+          onClick={() => void handleLike()}
+          className="relative z-20 flex items-center gap-1.5 group"
         >
           <motion.svg
             className={`w-6 h-6 transition-colors ${isLiked ? 'text-red-500 fill-red-500' : 'text-surface-700'}`}
@@ -76,6 +73,7 @@ export function FeedCard({
             strokeWidth={2}
             whileTap={reduceMotion ? undefined : { scale: 1.18 }}
             transition={reduceMotion ? undefined : { type: 'spring', stiffness: 500, damping: 15 }}
+            aria-hidden
           >
             <path
               strokeLinecap="round"
@@ -89,13 +87,19 @@ export function FeedCard({
         </button>
 
         {showCommentLink && (
-          <Link href={`/feed/${feed.id}`} className="flex items-center gap-1.5 group">
+          <Link
+            href={`/feed/${feed.id}`}
+            prefetch={false}
+            aria-label={`댓글 ${feed.commentsCount}개 보기`}
+            className="relative z-20 flex items-center gap-1.5 group"
+          >
             <svg
               className="w-6 h-6 text-surface-700 group-hover:text-surface-500"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={2}
+              aria-hidden
             >
               <path
                 strokeLinecap="round"
@@ -133,20 +137,26 @@ export function FeedCard({
 
   return (
     <motion.article
-      className="bg-white border border-surface-200 rounded-2xl overflow-hidden"
+      className="relative bg-white border border-surface-200 rounded-2xl overflow-hidden"
       initial={allowRichEffects ? { opacity: 0, y: 20 } : false}
       animate={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
       transition={allowRichEffects ? { duration: 0.4 } : undefined}
-      onClick={handleCardClick}
-      style={showCommentLink ? { cursor: 'pointer' } : undefined}
     >
+      {showCommentLink && !isDetail && (
+        <Link
+          href={`/feed/${feed.id}`}
+          prefetch={false}
+          aria-label={`${feedTitle} 피드 보기`}
+          className="absolute inset-0 z-10 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-surface-900"
+        />
+      )}
+
       {/* 작성자 정보 */}
       <div className={`${gutter} flex items-center gap-3 py-3`}>
         {feed.author.username ? (
           <Link
             href={`/profile/${feed.author.username}`}
-            className="flex items-center gap-3 flex-1 min-w-0 group"
-            onClick={e => e.stopPropagation()}
+            className="relative z-20 flex items-center gap-3 flex-1 min-w-0 group"
           >
             <div className="relative w-9 h-9 bg-surface-200 rounded-full flex items-center justify-center overflow-hidden shrink-0">
               {feed.author.avatar ? (
@@ -187,7 +197,13 @@ export function FeedCard({
       </div>
 
       {/* 첨부 이미지 */}
-      {feed.images.length > 0 && <ImageCarousel images={feed.images} />}
+      {feed.images.length > 0 && (
+        <ImageCarousel
+          images={feed.images}
+          label={`${feed.author.name}의 ${feedTitle} 첨부 이미지`}
+          sizes={imageSizes}
+        />
+      )}
 
       {/* 본문 */}
       <FeedContent
@@ -204,8 +220,7 @@ export function FeedCard({
             <Link
               key={tag}
               href={`/tags/${encodeURIComponent(tag)}`}
-              className="text-xs font-bold text-surface-600 hover:text-surface-900 transition-colors"
-              onClick={e => e.stopPropagation()}
+              className="relative z-20 text-xs font-bold text-surface-600 hover:text-surface-900 transition-colors"
             >
               #{tag}
             </Link>
@@ -215,7 +230,7 @@ export function FeedCard({
 
       {/* 링크 미리보기 */}
       {feed.linkPreview && (
-        <div className={`${gutter} pb-3`} onClick={e => e.stopPropagation()}>
+        <div className={`relative z-20 ${gutter} pb-3`}>
           <LinkPreviewCard preview={feed.linkPreview} />
         </div>
       )}
@@ -228,7 +243,8 @@ export function FeedCard({
         <div className={`${gutter} pb-3`}>
           <Link
             href={`/feed/${feed.id}`}
-            className="text-sm text-surface-600 hover:text-surface-900 transition-colors"
+            prefetch={false}
+            className="relative z-20 text-sm text-surface-600 hover:text-surface-900 transition-colors"
           >
             댓글 {feed.commentsCount}개 모두 보기
           </Link>

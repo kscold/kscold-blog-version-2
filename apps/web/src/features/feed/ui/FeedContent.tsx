@@ -51,7 +51,7 @@ export function FeedContent({
   const preview = toPreviewText(body, '', FEED_PREVIEW_LENGTH);
 
   return (
-    <div className="px-4 py-3">
+    <div className="px-4 py-3 [&_a]:relative [&_a]:z-20">
       {heading && (
         <h2 className="mb-2 text-base font-bold leading-snug tracking-[-0.01em] text-surface-900 sm:text-lg">
           {heading}

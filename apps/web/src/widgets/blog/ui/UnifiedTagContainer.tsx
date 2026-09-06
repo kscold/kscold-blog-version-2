@@ -155,7 +155,10 @@ export function UnifiedTagContainer({ tagName }: UnifiedTagContainerProps) {
                       variants={allowRichEffects ? { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } } : undefined}
                       transition={allowRichEffects ? { duration: 0.4 } : undefined}
                     >
-                      <FeedCard feed={feed} />
+                      <FeedCard
+                        feed={feed}
+                        imageSizes="(max-width: 767px) calc(100vw - 2rem), (max-width: 1023px) calc((100vw - 4.5rem) / 2), (max-width: 1279px) calc((100vw - 5.5rem) / 2), 596px"
+                      />
                     </motion.div>
                   ))}
                 </motion.div>
