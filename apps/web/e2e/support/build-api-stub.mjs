@@ -1,4 +1,5 @@
 import { createServer } from 'node:http';
+import { blogArchiveCategory, getBlogArchivePage } from './blog-archive-fixtures.mjs';
 import {
   emptyProfileFeedPage,
   getProfileFeedPage,
@@ -94,12 +95,14 @@ function getResponseData(requestUrl) {
     return invalidProfileFeedPage;
   }
   if (
-    pathname === '/api/categories' ||
     pathname === '/api/tags' ||
     pathname === '/api/feeds/sitemap-index' ||
     pathname === '/api/vault/notes/sitemap-index'
   ) {
     return [];
+  }
+  if (pathname === '/api/categories') {
+    return [blogArchiveCategory];
   }
   if (pathname === '/api/posts/featured') {
     return [featuredPost];
@@ -108,13 +111,7 @@ function getResponseData(requestUrl) {
     return featuredPost;
   }
   if (pathname === '/api/posts') {
-    return {
-      ...emptyPage,
-      content: [featuredPost],
-      totalElements: 1,
-      totalPages: 1,
-      empty: false,
-    };
+    return getBlogArchivePage(featuredPost, searchParams);
   }
   if (pathname === '/api/feeds') {
     return emptyPage;

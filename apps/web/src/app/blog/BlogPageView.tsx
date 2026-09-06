@@ -1,8 +1,6 @@
-import { Suspense } from 'react';
-import { BlogArchive } from '@/widgets/blog/archive';
-import { ArchiveContentSkeleton } from '@/shared/ui/RouteSkeletons';
+import { BlogArchive, type BlogArchiveProps } from '@/widgets/blog/archive';
 
-export function BlogPageView() {
+export function BlogPageView({ archive }: { archive: BlogArchiveProps }) {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -15,9 +13,7 @@ export function BlogPageView() {
           </p>
         </div>
 
-        <Suspense fallback={<ArchiveContentSkeleton />}>
-          <BlogArchive />
-        </Suspense>
+        <BlogArchive {...archive} />
       </div>
     </div>
   );

@@ -1,20 +1,20 @@
 import type { PageResponse } from '@/shared/model/types/api';
 import type { Category, Post } from '@/shared/model/types/blog';
-import { fetchPublicApi } from '@/shared/lib/seo';
+import { JsonLd } from '@/shared/ui/JsonLd';
+import { buildBlogArchiveJsonLd } from '../lib/blogArchiveMetadata';
 import { BlogContainer } from './BlogContainer';
 
-export async function BlogArchive() {
-  const [initialPosts, initialCategories] = await Promise.all([
-    fetchPublicApi<PageResponse<Post>>(
-      '/posts?page=0&size=12&sortBy=publishedAt&sortDirection=desc'
-    ),
-    fetchPublicApi<Category[]>('/categories'),
-  ]);
+export interface BlogArchiveProps {
+  page: number;
+  initialPosts: PageResponse<Post>;
+  initialCategories: Category[];
+}
 
+export function BlogArchive(props: BlogArchiveProps) {
   return (
-    <BlogContainer
-      initialPosts={initialPosts ?? undefined}
-      initialCategories={initialCategories ?? undefined}
-    />
+    <>
+      <JsonLd id="blog-page" data={buildBlogArchiveJsonLd(props.page)} />
+      <BlogContainer key={props.page} {...props} />
+    </>
   );
 }
