@@ -1,7 +1,8 @@
 package com.kscold.blog.identity.adapter.in.web;
 
-import com.kscold.blog.identity.adapter.out.security.JwtTokenProvider;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
+import com.kscold.blog.identity.domain.model.TokenIdentity;
+import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -22,7 +23,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenProvider tokenProvider;
     private final UserQueryPort userQueryPort;
 
     @Override
@@ -33,27 +34,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = resolveToken(request);
 
-        if (token != null && jwtTokenProvider.validateAccessToken(token)) {
-            String userId = jwtTokenProvider.getUserIdFromAccessToken(token);
+        TokenIdentity tokenIdentity =
+                token == null ? null : tokenProvider.parseAccessToken(token).orElse(null);
+        if (tokenIdentity != null) {
             UserQueryPort.AuthenticationInfo user =
-                    userQueryPort.findAuthenticationById(userId).orElse(null);
-            if (user == null) {
-                filterChain.doFilter(request, response);
-                return;
+                    userQueryPort.findAuthenticationById(tokenIdentity.userId()).orElse(null);
+            if (user != null && user.credentialVersion() == tokenIdentity.credentialVersion()) {
+                setAuthentication(user);
             }
-
-            String role = user.isAdmin() ? "ADMIN" : "USER";
-
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            userId,
-                            null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)));
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void setAuthentication(UserQueryPort.AuthenticationInfo user) {
+        String role = user.isAdmin() ? "ADMIN" : "USER";
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        user.id(),
+                        null,
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     private String resolveToken(HttpServletRequest request) {

@@ -31,8 +31,14 @@ public class UserQueryApplicationService implements UserQueryPort {
     @Override
     public Optional<AuthenticationInfo> findAuthenticationById(String userId) {
         return userRepository
-                .findActiveRoleById(userId)
-                .map(role -> new AuthenticationInfo(userId, role == User.Role.ADMIN));
+                .findActiveAuthenticationById(userId)
+                .map(
+                        state ->
+                                new AuthenticationInfo(
+                                        userId,
+                                        state.displayName(),
+                                        state.role() == User.Role.ADMIN,
+                                        state.credentialVersion()));
     }
 
     @Override

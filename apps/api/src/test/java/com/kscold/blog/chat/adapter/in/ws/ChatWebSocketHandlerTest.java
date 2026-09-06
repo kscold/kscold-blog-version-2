@@ -17,9 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.exception.RateLimitExceededException;
+import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
@@ -39,11 +41,18 @@ class ChatWebSocketHandlerTest {
         when(session.getAttributes())
                 .thenReturn(
                         Map.of(
-                                "userId", "user-1",
-                                "username", "visitor",
-                                "isAdmin", false));
+                                "userId",
+                                "user-1",
+                                "username",
+                                "visitor",
+                                "isAdmin",
+                                false,
+                                "credentialVersion",
+                                0L));
         when(session.isOpen()).thenReturn(true);
-        ChatWebSocketHandler handler = new ChatWebSocketHandler(chatUseCase, new ObjectMapper());
+        ChatWebSocketHandler handler =
+                new ChatWebSocketHandler(
+                        chatUseCase, new ObjectMapper(), new ChatSessionRegistry(visitorQuery()));
         handler.afterConnectionEstablished(session);
         clearInvocations(chatUseCase);
 
@@ -72,9 +81,14 @@ class ChatWebSocketHandlerTest {
         when(session.getAttributes())
                 .thenReturn(
                         Map.of(
-                                "userId", "user-1",
-                                "username", "visitor",
-                                "isAdmin", false));
+                                "userId",
+                                "user-1",
+                                "username",
+                                "visitor",
+                                "isAdmin",
+                                false,
+                                "credentialVersion",
+                                0L));
         when(session.isOpen()).thenReturn(true);
         doThrow(new RateLimitExceededException("잠시 후 다시 시도해주세요."))
                 .when(chatUseCase)
@@ -85,7 +99,9 @@ class ChatWebSocketHandlerTest {
                         any(ChatMessage.MessageType.class),
                         any(),
                         anyBoolean());
-        ChatWebSocketHandler handler = new ChatWebSocketHandler(chatUseCase, new ObjectMapper());
+        ChatWebSocketHandler handler =
+                new ChatWebSocketHandler(
+                        chatUseCase, new ObjectMapper(), new ChatSessionRegistry(visitorQuery()));
         handler.afterConnectionEstablished(session);
         clearInvocations(session);
 
@@ -140,7 +156,9 @@ class ChatWebSocketHandlerTest {
                                 "username",
                                 "private-operator-name",
                                 "isAdmin",
-                                true));
+                                true,
+                                "credentialVersion",
+                                0L));
         when(session.isOpen()).thenReturn(true);
         doThrow(new IOException(sensitiveMessage))
                 .when(session)
@@ -178,7 +196,10 @@ class ChatWebSocketHandlerTest {
                                 "username",
                                 "private-display-name",
                                 "isAdmin",
-                                true));
+                                true,
+                                "credentialVersion",
+                                0L));
+        when(session.isOpen()).thenReturn(true);
         ChatWebSocketHandler handler = newHandler();
         Logger logger = (Logger) LoggerFactory.getLogger(ChatWebSocketHandler.class);
         ListAppender<ILoggingEvent> appender = attach(logger);
@@ -202,7 +223,27 @@ class ChatWebSocketHandlerTest {
     }
 
     private ChatWebSocketHandler newHandler() {
-        return new ChatWebSocketHandler(mock(ChatUseCase.class), new ObjectMapper());
+        UserQueryPort userQueryPort = mock(UserQueryPort.class);
+        when(userQueryPort.findAuthenticationById(any()))
+                .thenAnswer(
+                        invocation ->
+                                Optional.of(
+                                        new UserQueryPort.AuthenticationInfo(
+                                                invocation.getArgument(0), "관리자", true, 0L)));
+        return new ChatWebSocketHandler(
+                mock(ChatUseCase.class),
+                new ObjectMapper(),
+                new ChatSessionRegistry(userQueryPort));
+    }
+
+    private UserQueryPort visitorQuery() {
+        UserQueryPort userQueryPort = mock(UserQueryPort.class);
+        when(userQueryPort.findAuthenticationById("user-1"))
+                .thenReturn(
+                        Optional.of(
+                                new UserQueryPort.AuthenticationInfo(
+                                        "user-1", "visitor", false, 0L)));
+        return userQueryPort;
     }
 
     private ListAppender<ILoggingEvent> attach(Logger logger) {

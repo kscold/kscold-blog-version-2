@@ -11,12 +11,14 @@ import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.application.port.in.AuthUseCase;
 import com.kscold.blog.identity.domain.model.PasswordResetToken;
+import com.kscold.blog.identity.domain.model.TokenIdentity;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.PasswordResetSettings;
 import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.identity.domain.port.out.UserSessionRevocationPort;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import com.kscold.blog.notification.domain.model.NotificationChannel;
 import com.kscold.blog.notification.domain.model.NotificationMessage;
@@ -44,6 +46,7 @@ public class AuthApplicationService implements AuthUseCase {
     private final PublicUrlResolver recoveryMailProperties;
     private final PasswordResetSettings passwordResetSettings;
     private final NotificationUseCase notificationUseCase;
+    private final UserSessionRevocationPort userSessionRevocationPort;
 
     @Transactional
     public AuthResponse register(RegisterCommand command) {
@@ -59,6 +62,7 @@ public class AuthApplicationService implements AuthUseCase {
                         .email(command.getEmail())
                         .username(command.getUsername())
                         .password(passwordEncoder.encode(command.getPassword()))
+                        .credentialVersion(0L)
                         // 공개 회원가입은 데이터베이스 상태와 무관하게 최소 권한만 부여한다.
                         .role(User.Role.USER)
                         .profile(
@@ -74,10 +78,7 @@ public class AuthApplicationService implements AuthUseCase {
         sendWelcomeMailSafely(user);
         notifySignup(user);
 
-        String accessToken = tokenProvider.createAccessToken(user.getId(), user.getRole().name());
-        String refreshToken = tokenProvider.createRefreshToken(user.getId(), user.getRole().name());
-
-        return buildAuthResult(user, accessToken, refreshToken);
+        return buildAuthResult(user);
     }
 
     public AuthResponse login(LoginCommand command) {
@@ -93,27 +94,20 @@ public class AuthApplicationService implements AuthUseCase {
             throw InvalidRequestException.invalidInput("이메일 또는 비밀번호가 올바르지 않습니다");
         }
 
-        String accessToken = tokenProvider.createAccessToken(user.getId(), user.getRole().name());
-        String refreshToken = tokenProvider.createRefreshToken(user.getId(), user.getRole().name());
-
-        return buildAuthResult(user, accessToken, refreshToken);
+        return buildAuthResult(user);
     }
 
     public AuthResponse refresh(String refreshToken) {
-        if (!tokenProvider.validateRefreshToken(refreshToken)) {
-            throw InvalidRequestException.invalidInput("유효하지 않은 리프레시 토큰입니다");
+        TokenIdentity tokenIdentity =
+                tokenProvider
+                        .parseRefreshToken(refreshToken)
+                        .orElseThrow(this::invalidRefreshToken);
+        User user = getActiveUser(tokenIdentity.userId());
+        if (tokenIdentity.credentialVersion() != user.getCredentialVersion()) {
+            throw invalidRefreshToken();
         }
 
-        String userId = tokenProvider.getUserIdFromRefreshToken(refreshToken);
-
-        User user = getActiveUser(userId);
-
-        String newAccessToken =
-                tokenProvider.createAccessToken(user.getId(), user.getRole().name());
-        String newRefreshToken =
-                tokenProvider.createRefreshToken(user.getId(), user.getRole().name());
-
-        return buildAuthResult(user, newAccessToken, newRefreshToken);
+        return buildAuthResult(user);
     }
 
     public AuthResponse.UserInfo getMe(String userId) {
@@ -187,16 +181,30 @@ public class AuthApplicationService implements AuthUseCase {
             passwordResetTokenRepository.deleteByUserId(savedToken.getUserId());
             throw invalidResetLink();
         }
+        revokeUserSessionsSafely(savedToken.getUserId());
         passwordResetTokenRepository.deleteByUserId(savedToken.getUserId());
     }
 
-    private AuthResponse buildAuthResult(User user, String accessToken, String refreshToken) {
+    private AuthResponse buildAuthResult(User user) {
+        String role = user.getRole().name();
+        long credentialVersion = user.getCredentialVersion();
         return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .accessToken(tokenProvider.createAccessToken(user.getId(), role, credentialVersion))
+                .refreshToken(
+                        tokenProvider.createRefreshToken(user.getId(), role, credentialVersion))
                 .tokenType("Bearer")
                 .user(AuthResponse.UserInfo.from(user))
                 .build();
+    }
+
+    private void revokeUserSessionsSafely(String userId) {
+        try {
+            userSessionRevocationPort.revokeUserSessions(userId);
+        } catch (RuntimeException exception) {
+            log.warn(
+                    "WebSocket session revocation skipped: type={}",
+                    exception.getClass().getSimpleName());
+        }
     }
 
     private User getActiveUser(String userId) {
@@ -212,6 +220,10 @@ public class AuthApplicationService implements AuthUseCase {
 
     private InvalidRequestException invalidResetLink() {
         return InvalidRequestException.invalidInput("만료되었거나 유효하지 않은 링크입니다.");
+    }
+
+    private InvalidRequestException invalidRefreshToken() {
+        return InvalidRequestException.invalidInput("유효하지 않은 리프레시 토큰입니다");
     }
 
     private void sendPasswordResetMail(User user) {

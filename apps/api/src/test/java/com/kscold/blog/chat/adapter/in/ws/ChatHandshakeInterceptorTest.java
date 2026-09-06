@@ -7,10 +7,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
+import com.kscold.blog.identity.domain.model.TokenIdentity;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import jakarta.servlet.http.Cookie;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,10 +42,12 @@ class ChatHandshakeInterceptorTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setCookies(new Cookie("auth-token", "cookie-token"));
         request.addParameter("token", "query-token");
-        when(tokenProvider.validateAccessToken("cookie-token")).thenReturn(true);
-        when(tokenProvider.getUserIdFromAccessToken("cookie-token")).thenReturn("user-id");
-        when(userQueryPort.getUserById("user-id"))
-                .thenReturn(new UserQueryPort.UserInfo("user-id", "user", "사용자", "", false, ""));
+        when(tokenProvider.parseAccessToken("cookie-token"))
+                .thenReturn(Optional.of(new TokenIdentity("user-id", 4L)));
+        when(userQueryPort.findAuthenticationById("user-id"))
+                .thenReturn(
+                        Optional.of(
+                                new UserQueryPort.AuthenticationInfo("user-id", "사용자", false, 4L)));
         Map<String, Object> attributes = new HashMap<>();
 
         boolean accepted = handshake(request, attributes);
@@ -52,8 +56,9 @@ class ChatHandshakeInterceptorTest {
         assertThat(attributes)
                 .containsEntry("userId", "user-id")
                 .containsEntry("username", "사용자")
-                .containsEntry("isAdmin", false);
-        verify(tokenProvider, never()).validateAccessToken("query-token");
+                .containsEntry("isAdmin", false)
+                .containsEntry("credentialVersion", 4L);
+        verify(tokenProvider, never()).parseAccessToken("query-token");
     }
 
     @Test
@@ -66,7 +71,7 @@ class ChatHandshakeInterceptorTest {
 
         assertThat(accepted).isFalse();
         verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
-        verify(tokenProvider, never()).validateAccessToken("query-token");
+        verify(tokenProvider, never()).parseAccessToken("query-token");
     }
 
     @Test
@@ -83,10 +88,27 @@ class ChatHandshakeInterceptorTest {
     void rejectsTokenForMissingUserWithUnauthorizedStatus() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setCookies(new Cookie("auth-token", "valid-token"));
-        when(tokenProvider.validateAccessToken("valid-token")).thenReturn(true);
-        when(tokenProvider.getUserIdFromAccessToken("valid-token")).thenReturn("missing-user-id");
-        when(userQueryPort.getUserById("missing-user-id"))
-                .thenThrow(new IllegalArgumentException("missing"));
+        when(tokenProvider.parseAccessToken("valid-token"))
+                .thenReturn(Optional.of(new TokenIdentity("missing-user-id", 0L)));
+        when(userQueryPort.findAuthenticationById("missing-user-id")).thenReturn(Optional.empty());
+        ServerHttpResponse response = mock(ServerHttpResponse.class);
+
+        boolean accepted = handshake(request, response, new HashMap<>());
+
+        assertThat(accepted).isFalse();
+        verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void rejectsTokenWhenCredentialVersionHasChanged() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setCookies(new Cookie("auth-token", "stale-token"));
+        when(tokenProvider.parseAccessToken("stale-token"))
+                .thenReturn(Optional.of(new TokenIdentity("user-id", 1L)));
+        when(userQueryPort.findAuthenticationById("user-id"))
+                .thenReturn(
+                        Optional.of(
+                                new UserQueryPort.AuthenticationInfo("user-id", "관리자", true, 2L)));
         ServerHttpResponse response = mock(ServerHttpResponse.class);
 
         boolean accepted = handshake(request, response, new HashMap<>());

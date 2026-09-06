@@ -2,6 +2,8 @@ package com.kscold.blog.identity.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -10,6 +12,7 @@ import static org.mockito.Mockito.when;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.dto.command.UpdateProfileCommand;
+import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import java.time.LocalDateTime;
@@ -37,7 +40,13 @@ class UserProfileApplicationServiceTest {
                         .role(User.Role.USER)
                         .profile(User.Profile.builder().displayName("기존 이름").build())
                         .build();
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
+        when(userRepository.findActiveById("user-1")).thenReturn(Optional.of(user));
+        when(userRepository.updateProfileIfActive(eq("user-1"), any(User.Profile.class)))
+                .thenAnswer(
+                        invocation -> {
+                            user.setProfile(invocation.getArgument(1));
+                            return Optional.of(user);
+                        });
     }
 
     @Test
@@ -59,7 +68,8 @@ class UserProfileApplicationServiceTest {
         assertThat(user.getProfile().getSocialLinks())
                 .containsEntry("github", "https://github.com/kscold");
         assertThat(user.getProfile().getTechStack()).containsExactly("Java", "Python");
-        verify(userRepository).save(user);
+        verify(userRepository).updateProfileIfActive("user-1", user.getProfile());
+        verify(userRepository, never()).save(any());
     }
 
     @Test
@@ -75,7 +85,7 @@ class UserProfileApplicationServiceTest {
                 .isInstanceOf(InvalidRequestException.class);
         assertThatThrownBy(() -> service.updateMyProfile("user-1", insecureAvatar))
                 .isInstanceOf(InvalidRequestException.class);
-        verify(userRepository, never()).save(user);
+        verify(userRepository, never()).updateProfileIfActive(eq("user-1"), any());
     }
 
     @Test
@@ -96,7 +106,7 @@ class UserProfileApplicationServiceTest {
                 .isInstanceOf(InvalidRequestException.class);
         assertThatThrownBy(() -> service.updateMyProfile("user-1", tooManyStacks))
                 .isInstanceOf(InvalidRequestException.class);
-        verify(userRepository, never()).save(user);
+        verify(userRepository, never()).updateProfileIfActive(eq("user-1"), any());
     }
 
     @Test
@@ -127,5 +137,37 @@ class UserProfileApplicationServiceTest {
 
         assertThat(service.getAllTechStacks()).containsExactly("Spring Boot");
         verify(userRepository).findAllActive();
+    }
+
+    @Test
+    void 프로필_변경_중_탈퇴한_사용자는_찾을_수_없는_사용자로_처리한다() {
+        when(userRepository.updateProfileIfActive(eq("user-1"), any(User.Profile.class)))
+                .thenReturn(Optional.empty());
+        UpdateProfileCommand command = UpdateProfileCommand.builder().displayName("새 이름").build();
+
+        assertThatThrownBy(() -> service.updateMyProfile("user-1", command))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void 프로필_응답은_원자_갱신이_반환한_최종_사용자를_사용한다() {
+        User persisted =
+                User.builder()
+                        .id("user-1")
+                        .username("kscold")
+                        .email("user@example.com")
+                        .role(User.Role.USER)
+                        .profile(User.Profile.builder().displayName("저장된 이름").build())
+                        .build();
+        when(userRepository.updateProfileIfActive(eq("user-1"), any(User.Profile.class)))
+                .thenReturn(Optional.of(persisted));
+
+        AuthResponse.UserInfo response =
+                service.updateMyProfile(
+                        "user-1", UpdateProfileCommand.builder().displayName("요청 이름").build());
+
+        assertThat(response.getDisplayName()).isEqualTo("저장된 이름");
     }
 }

@@ -22,5 +22,6 @@ public interface UserQueryPort {
             boolean isAdmin,
             String email) {}
 
-    record AuthenticationInfo(String id, boolean isAdmin) {}
+    record AuthenticationInfo(
+            String id, String displayName, boolean isAdmin, long credentialVersion) {}
 }

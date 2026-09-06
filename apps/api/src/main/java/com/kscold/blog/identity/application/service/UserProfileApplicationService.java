@@ -64,7 +64,7 @@ public class UserProfileApplicationService implements UserProfileUseCase {
     private AuthResponse.UserInfo applyProfileUpdate(String userId, UpdateProfileCommand command) {
         User user =
                 userRepository
-                        .findById(userId)
+                        .findActiveById(userId)
                         .orElseThrow(() -> ResourceNotFoundException.user(userId));
 
         User.Profile existing = user.getProfile();
@@ -98,9 +98,11 @@ public class UserProfileApplicationService implements UserProfileUseCase {
                         .techStack(techStack)
                         .build();
 
-        user.setProfile(updated);
-        userRepository.save(user);
-        return AuthResponse.UserInfo.from(user);
+        User savedUser =
+                userRepository
+                        .updateProfileIfActive(userId, updated)
+                        .orElseThrow(() -> ResourceNotFoundException.user(userId));
+        return AuthResponse.UserInfo.from(savedUser);
     }
 
     private List<String> normalizeTechStack(List<String> values) {

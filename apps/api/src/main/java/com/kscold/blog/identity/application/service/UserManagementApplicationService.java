@@ -5,7 +5,7 @@ import com.kscold.blog.identity.application.port.in.UserManagementUseCase;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import java.time.LocalDateTime;
+import com.kscold.blog.identity.domain.port.out.UserSessionRevocationPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,7 @@ public class UserManagementApplicationService implements UserManagementUseCase {
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final UserSessionRevocationPort userSessionRevocationPort;
 
     @Override
     @Transactional
@@ -27,10 +28,14 @@ public class UserManagementApplicationService implements UserManagementUseCase {
                         .findById(userId)
                         .orElseThrow(() -> ResourceNotFoundException.user(userId));
         passwordResetTokenRepository.deleteByUserId(userId);
-        if (user.getDeletedAt() != null) return;
-        user.setDeletedAt(LocalDateTime.now());
-        userRepository.save(user);
-        log.info("Soft deleted user");
+        if (user.getDeletedAt() != null) {
+            revokeUserSessionsSafely(userId);
+            return;
+        }
+        if (userRepository.softDeleteIfActive(userId)) {
+            revokeUserSessionsSafely(userId);
+            log.info("Soft deleted user");
+        }
     }
 
     @Override
@@ -41,6 +46,17 @@ public class UserManagementApplicationService implements UserManagementUseCase {
         }
         passwordResetTokenRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
+        revokeUserSessionsSafely(userId);
         log.warn("Hard deleted user");
+    }
+
+    private void revokeUserSessionsSafely(String userId) {
+        try {
+            userSessionRevocationPort.revokeUserSessions(userId);
+        } catch (RuntimeException exception) {
+            log.warn(
+                    "WebSocket session revocation skipped: type={}",
+                    exception.getClass().getSimpleName());
+        }
     }
 }

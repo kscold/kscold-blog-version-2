@@ -2,9 +2,11 @@ package com.kscold.blog.identity.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +22,7 @@ import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import com.kscold.blog.identity.domain.port.out.UserSessionRevocationPort;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import com.kscold.blog.notification.domain.model.MailMessage;
 import com.kscold.blog.notification.domain.port.out.MailSender;
@@ -48,6 +51,7 @@ class AuthRecoveryApplicationServiceTest {
     @Mock private PublicUrlResolver recoveryMailProperties;
     @Mock private PasswordResetSettings passwordResetSettings;
     @Mock private NotificationUseCase notificationUseCase;
+    @Mock private UserSessionRevocationPort userSessionRevocationPort;
 
     @InjectMocks private AuthApplicationService authApplicationService;
 
@@ -190,6 +194,25 @@ class AuthRecoveryApplicationServiceTest {
 
         verify(userRepository).updatePasswordIfActive("user-1", "encoded-new");
         verify(userRepository, never()).save(any());
+        verify(userSessionRevocationPort).revokeUserSessions("user-1");
+        verify(passwordResetTokenRepository).deleteByUserId("user-1");
+    }
+
+    @Test
+    @DisplayName("시나리오: 연결 폐기 실패가 비밀번호 재설정과 토큰 정리를 방해하지 않는다")
+    void resetPasswordCompletesWhenSessionRevocationFails() {
+        String rawToken = "valid-reset-token";
+        when(passwordResetTokenRepository.consumeByTokenHash(hash(rawToken)))
+                .thenReturn(Optional.of(validToken(rawToken)));
+        when(passwordEncoder.encode("new-password-123")).thenReturn("encoded-new");
+        when(userRepository.updatePasswordIfActive("user-1", "encoded-new")).thenReturn(true);
+        doThrow(new IllegalStateException("revocation failed"))
+                .when(userSessionRevocationPort)
+                .revokeUserSessions("user-1");
+
+        assertDoesNotThrow(
+                () -> authApplicationService.resetPassword(rawToken, "new-password-123"));
+
         verify(passwordResetTokenRepository).deleteByUserId("user-1");
     }
 
@@ -209,6 +232,7 @@ class AuthRecoveryApplicationServiceTest {
         verify(passwordResetTokenRepository).deleteByUserId("user-1");
         verify(userRepository).updatePasswordIfActive("user-1", "encoded-new");
         verify(userRepository, never()).save(any());
+        verify(userSessionRevocationPort, never()).revokeUserSessions(any());
     }
 
     @Test
@@ -226,6 +250,7 @@ class AuthRecoveryApplicationServiceTest {
 
         verify(passwordEncoder, never()).encode(any());
         verify(userRepository, never()).updatePasswordIfActive(any(), any());
+        verify(userSessionRevocationPort, never()).revokeUserSessions(any());
     }
 
     private void stubRecoveryMail(User user, MailMessage mail) {

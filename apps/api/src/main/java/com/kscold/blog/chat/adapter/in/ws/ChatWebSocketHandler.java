@@ -6,11 +6,11 @@ import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.chat.domain.port.out.ChatBroadcastPort;
 import com.kscold.blog.exception.RateLimitExceededException;
+import com.kscold.blog.identity.domain.port.out.UserSessionRevocationPort;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -27,28 +27,31 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBroadcastPort {
+public class ChatWebSocketHandler extends TextWebSocketHandler
+        implements ChatBroadcastPort, UserSessionRevocationPort {
 
     private final ChatUseCase chatUseCase;
     private final ObjectMapper objectMapper;
-
-    // sessionId → 세션 정보
-    private record SessionInfo(
-            WebSocketSession session, String userId, String username, boolean isAdmin) {}
-
-    private final Map<String, SessionInfo> sessions = new ConcurrentHashMap<>();
+    private final ChatSessionRegistry sessionRegistry;
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
-        String sessionId = session.getId();
         String userId = (String) session.getAttributes().get("userId");
         String username = (String) session.getAttributes().get("username");
         Boolean isAdmin = (Boolean) session.getAttributes().getOrDefault("isAdmin", false);
+        Object versionAttribute = session.getAttributes().get("credentialVersion");
+        long credentialVersion =
+                versionAttribute instanceof Long version && version >= 0 ? version : -1L;
+        ChatSessionInfo info =
+                new ChatSessionInfo(session, userId, username, isAdmin, credentialVersion);
 
-        sessions.put(sessionId, new SessionInfo(session, userId, username, isAdmin));
-        log.info("WebSocket connected: admin={}", isAdmin);
+        ValidatedChatSession validated = sessionRegistry.registerIfCurrent(info).orElse(null);
+        if (validated == null) return;
+        if (!session.isOpen()) return;
+        log.info("WebSocket connected: admin={}", validated.authentication().isAdmin());
+        String currentUsername = validated.authentication().displayName();
 
-        if (isAdmin) {
+        if (validated.authentication().isAdmin()) {
             // 어드민: 현재 접속 중인 방문자 목록 전송
             sendRoomList(session);
         } else {
@@ -60,11 +63,12 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
             sendToSession(session, Map.of("type", "history", "messages", historyList));
 
             // 입장 시스템 메시지 저장 + 디스코드 알림 (application 경유)
-            chatUseCase.recordSystemEvent(userId, username + "님이 입장했습니다");
+            chatUseCase.recordSystemEvent(userId, currentUsername + "님이 입장했습니다");
 
             // 어드민에게 새 방문자 알림
             broadcastToAdmins(
-                    Map.of("type", "room_joined", "userId", userId, "username", username));
+                    Map.of("type", "room_joined", "userId", userId, "username", currentUsername),
+                    sessionRegistry.validSnapshot());
         }
     }
 
@@ -73,8 +77,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     protected void handleTextMessage(
             @NonNull WebSocketSession session, @NonNull TextMessage message) throws Exception {
         String sessionId = session.getId();
-        SessionInfo info = sessions.get(sessionId);
+        ChatSessionInfo info = sessionRegistry.get(sessionId);
         if (info == null) return;
+        ValidatedChatSession current = sessionRegistry.validate(info).orElse(null);
+        if (current == null) return;
 
         Map<String, String> payload = objectMapper.readValue(message.getPayload(), Map.class);
         String type = payload.get("type");
@@ -83,11 +89,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         if (content.length() > ChatMessageInputPolicy.CONTENT_MAX_LENGTH) return;
 
         try {
-            if (!info.isAdmin()) {
+            if (!current.authentication().isAdmin()) {
                 // 방문자 → 저장 + 브로드캐스트 + 디스코드 알림 (application 이 오케스트레이션)
                 chatUseCase.saveAndBroadcast(
                         sessionId,
-                        info.username(),
+                        current.authentication().displayName(),
                         content,
                         ChatMessage.MessageType.TEXT,
                         info.userId(),
@@ -101,7 +107,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
                 // 웹 어드민 답장 → 저장 + 브로드캐스트 + 디스코드 로깅 (application 경유)
                 chatUseCase.saveAndBroadcast(
                         sessionId,
-                        info.username(),
+                        current.authentication().displayName(),
                         content,
                         ChatMessage.MessageType.TEXT,
                         toUserId,
@@ -120,7 +126,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
     @Override
     public void afterConnectionClosed(
             @NonNull WebSocketSession session, @NonNull CloseStatus status) throws Exception {
-        SessionInfo info = sessions.remove(session.getId());
+        ChatSessionInfo info = sessionRegistry.remove(session.getId());
         if (info == null) return;
 
         log.info("WebSocket disconnected: admin={}", info.isAdmin());
@@ -135,7 +141,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
                             "userId",
                             info.userId(),
                             "username",
-                            info.username()));
+                            info.username()),
+                    sessionRegistry.validSnapshot());
         }
     }
 
@@ -146,49 +153,59 @@ public class ChatWebSocketHandler extends TextWebSocketHandler implements ChatBr
         session.close(CloseStatus.SERVER_ERROR);
     }
 
-    // ChatBroadcastPort 구현
-
     @Override
     public void broadcast(ChatMessage message) {
         Map<String, Object> payload = toMessageMap(message);
-        broadcastToAdmins(payload);
+        List<ValidatedChatSession> recipients = sessionRegistry.validSnapshot();
+        broadcastToAdmins(payload, recipients);
         if (message.getRoomId() != null) {
-            broadcastToUserSessions(message.getRoomId(), payload);
+            broadcastToUserSessions(message.getRoomId(), payload, recipients);
             // 관리자 답장이 온라인 방문자에게 전달되면 읽음 처리(웹·디스코드 답장 공통)
-            if (message.isFromAdmin() && hasActiveUserSession(message.getRoomId())) {
+            if (message.isFromAdmin() && hasActiveUserSession(message.getRoomId(), recipients)) {
                 chatUseCase.markAdminMessagesRead(message.getRoomId());
             }
         }
     }
 
-    // 내부 보조 메서드
-
-    private void broadcastToAdmins(Map<String, Object> payload) {
-        sessions.values().stream()
-                .filter(SessionInfo::isAdmin)
-                .forEach(i -> sendToSession(i.session(), payload));
+    @Override
+    public void revokeUserSessions(String userId) {
+        sessionRegistry.revoke(userId);
     }
 
-    private void broadcastToUserSessions(String userId, Map<String, Object> payload) {
-        sessions.values().stream()
-                .filter(i -> !i.isAdmin() && userId.equals(i.userId()))
-                .forEach(i -> sendToSession(i.session(), payload));
+    private void broadcastToAdmins(
+            Map<String, Object> payload, List<ValidatedChatSession> recipients) {
+        recipients.stream()
+                .filter(recipient -> recipient.authentication().isAdmin())
+                .forEach(recipient -> sendToSession(recipient.sessionInfo().session(), payload));
     }
 
-    private boolean hasActiveUserSession(String userId) {
-        return sessions.values().stream()
-                .anyMatch(i -> !i.isAdmin() && userId.equals(i.userId()) && i.session().isOpen());
+    private void broadcastToUserSessions(
+            String userId, Map<String, Object> payload, List<ValidatedChatSession> recipients) {
+        recipients.stream()
+                .filter(recipient -> !recipient.authentication().isAdmin())
+                .filter(recipient -> userId.equals(recipient.sessionInfo().userId()))
+                .forEach(recipient -> sendToSession(recipient.sessionInfo().session(), payload));
+    }
+
+    private boolean hasActiveUserSession(String userId, List<ValidatedChatSession> recipients) {
+        return recipients.stream()
+                .filter(recipient -> !recipient.authentication().isAdmin())
+                .anyMatch(
+                        recipient ->
+                                userId.equals(recipient.sessionInfo().userId())
+                                        && recipient.sessionInfo().session().isOpen());
     }
 
     private void sendRoomList(WebSocketSession session) {
         List<Map<String, Object>> rooms =
-                sessions.values().stream()
-                        .filter(i -> !i.isAdmin())
+                sessionRegistry.validSnapshot().stream()
+                        .filter(recipient -> !recipient.authentication().isAdmin())
                         .map(
-                                i -> {
+                                recipient -> {
+                                    ChatSessionInfo info = recipient.sessionInfo();
                                     Map<String, Object> room = new LinkedHashMap<>();
-                                    room.put("userId", i.userId());
-                                    room.put("username", i.username());
+                                    room.put("userId", info.userId());
+                                    room.put("username", recipient.authentication().displayName());
                                     room.put("online", true);
                                     return room;
                                 })

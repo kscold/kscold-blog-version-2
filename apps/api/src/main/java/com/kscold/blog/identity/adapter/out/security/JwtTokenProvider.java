@@ -1,26 +1,26 @@
 package com.kscold.blog.identity.adapter.out.security;
 
-import com.kscold.blog.exception.BusinessException;
-import com.kscold.blog.exception.ErrorCode;
+import com.kscold.blog.identity.domain.model.TokenIdentity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import jakarta.annotation.PostConstruct;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
+import java.util.OptionalLong;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider {
 
     private static final int MINIMUM_HMAC_KEY_BYTES = 32;
+    private static final String CREDENTIAL_VERSION_CLAIM = "credentialVersion";
 
     @Value("${jwt.secret}")
     private String secret;
@@ -43,7 +43,7 @@ public class JwtTokenProvider {
         refreshSecretKey = toSecretKey(refreshSecret);
     }
 
-    public String createAccessToken(String userId, String role) {
+    public String createAccessToken(String userId, String role, long credentialVersion) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
@@ -51,13 +51,14 @@ public class JwtTokenProvider {
                 .subject(userId)
                 .claim("role", role)
                 .claim("type", "access")
+                .claim(CREDENTIAL_VERSION_CLAIM, credentialVersion)
                 .issuedAt(now)
                 .expiration(validity)
                 .signWith(accessSecretKey, Jwts.SIG.HS256)
                 .compact();
     }
 
-    public String createRefreshToken(String userId, String role) {
+    public String createRefreshToken(String userId, String role, long credentialVersion) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + refreshTokenValidity);
 
@@ -65,49 +66,67 @@ public class JwtTokenProvider {
                 .subject(userId)
                 .claim("role", role)
                 .claim("type", "refresh")
+                .claim(CREDENTIAL_VERSION_CLAIM, credentialVersion)
                 .issuedAt(now)
                 .expiration(validity)
                 .signWith(refreshSecretKey, Jwts.SIG.HS256)
                 .compact();
     }
 
-    public boolean validateAccessToken(String token) {
+    public Optional<TokenIdentity> parseAccessToken(String token) {
+        return parseIdentity(token, accessSecretKey, "access");
+    }
+
+    public Optional<TokenIdentity> parseRefreshToken(String token) {
+        return parseIdentity(token, refreshSecretKey, "refresh");
+    }
+
+    private Optional<TokenIdentity> parseIdentity(
+            String token, SecretKey key, String expectedType) {
         try {
-            Claims claims = parseClaims(token, accessSecretKey);
-            return "access".equals(claims.get("type"));
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    public boolean validateRefreshToken(String token) {
-        try {
-            Claims claims = parseClaims(token, refreshSecretKey);
-            return "refresh".equals(claims.get("type"));
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    public String getUserIdFromAccessToken(String token) {
-        return parseClaims(token, accessSecretKey).getSubject();
-    }
-
-    public String getUserIdFromRefreshToken(String token) {
-        return parseClaims(token, refreshSecretKey).getSubject();
-    }
-
-    public Authentication getAuthentication(String token) {
-        try {
-            Claims claims = parseClaims(token, accessSecretKey);
-            if (!"access".equals(claims.get("type"))) {
-                throw new BusinessException(ErrorCode.INVALID_TOKEN);
+            Claims claims = parseClaims(token, key);
+            if (!expectedType.equals(claims.get("type"))) {
+                return Optional.empty();
             }
+
             String userId = claims.getSubject();
-            return new UsernamePasswordAuthenticationToken(userId, "", Collections.emptyList());
+            if (userId == null || userId.isBlank()) {
+                return Optional.empty();
+            }
+
+            OptionalLong credentialVersion = parseCredentialVersion(claims);
+            if (credentialVersion.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(new TokenIdentity(userId, credentialVersion.getAsLong()));
         } catch (JwtException | IllegalArgumentException e) {
-            throw new BusinessException(ErrorCode.INVALID_TOKEN);
+            return Optional.empty();
         }
+    }
+
+    private OptionalLong parseCredentialVersion(Claims claims) {
+        Object value = claims.get(CREDENTIAL_VERSION_CLAIM);
+        if (value == null) {
+            return OptionalLong.of(0L);
+        }
+
+        long credentialVersion;
+        if (value instanceof Byte
+                || value instanceof Short
+                || value instanceof Integer
+                || value instanceof Long) {
+            credentialVersion = ((Number) value).longValue();
+        } else if (value instanceof BigInteger bigInteger) {
+            try {
+                credentialVersion = bigInteger.longValueExact();
+            } catch (ArithmeticException exception) {
+                return OptionalLong.empty();
+            }
+        } else {
+            return OptionalLong.empty();
+        }
+
+        return credentialVersion >= 0 ? OptionalLong.of(credentialVersion) : OptionalLong.empty();
     }
 
     private Claims parseClaims(String token, SecretKey key) {

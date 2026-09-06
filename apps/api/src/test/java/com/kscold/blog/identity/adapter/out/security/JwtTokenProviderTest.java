@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.kscold.blog.identity.domain.model.TokenIdentity;
 import io.jsonwebtoken.Jwts;
 import java.util.Base64;
 import java.util.Date;
@@ -30,32 +31,79 @@ class JwtTokenProviderTest {
 
     @Test
     void 액세스_타입이_없는_과거_토큰은_거부한다() {
-        String encodedKey = Base64.getEncoder().encodeToString(new byte[32]);
-        JwtTokenProvider provider = providerWithKeys(encodedKey, encodedKey);
-        provider.init();
-        SecretKey accessKey = (SecretKey) ReflectionTestUtils.getField(provider, "accessSecretKey");
-        String legacyToken =
-                Jwts.builder()
-                        .subject("user-1")
-                        .issuedAt(new Date())
-                        .expiration(new Date(System.currentTimeMillis() + 60_000))
-                        .signWith(accessKey, Jwts.SIG.HS256)
-                        .compact();
+        JwtTokenProvider provider = initializedProvider();
+        String token = signedAccessToken(provider, null, null);
 
-        assertThat(provider.validateAccessToken(legacyToken)).isFalse();
+        assertThat(provider.parseAccessToken(token)).isEmpty();
     }
 
     @Test
-    void 액세스_타입_토큰만_액세스_검증을_통과한다() {
+    void 발급한_토큰에서_자격_버전을_한번에_읽는다() {
+        JwtTokenProvider provider = initializedProvider();
+
+        String accessToken = provider.createAccessToken("user-1", "USER", 7L);
+        String refreshToken = provider.createRefreshToken("user-1", "USER", 7L);
+
+        assertThat(provider.parseAccessToken(accessToken))
+                .contains(new TokenIdentity("user-1", 7L));
+        assertThat(provider.parseRefreshToken(refreshToken))
+                .contains(new TokenIdentity("user-1", 7L));
+        assertThat(provider.parseAccessToken(refreshToken)).isEmpty();
+    }
+
+    @Test
+    void 자격_버전이_없는_기존_토큰은_영으로_해석한다() {
+        JwtTokenProvider provider = initializedProvider();
+        String token = signedAccessToken(provider, "access", null);
+
+        assertThat(provider.parseAccessToken(token)).contains(new TokenIdentity("user-1", 0L));
+    }
+
+    @Test
+    void 문자열_자격_버전은_거부한다() {
+        JwtTokenProvider provider = initializedProvider();
+        String token = signedAccessToken(provider, "access", "1");
+
+        assertThat(provider.parseAccessToken(token)).isEmpty();
+    }
+
+    @Test
+    void 소수_자격_버전은_거부한다() {
+        JwtTokenProvider provider = initializedProvider();
+        String token = signedAccessToken(provider, "access", 1.0D);
+
+        assertThat(provider.parseAccessToken(token)).isEmpty();
+    }
+
+    @Test
+    void 음수_자격_버전은_거부한다() {
+        JwtTokenProvider provider = initializedProvider();
+        String token = signedAccessToken(provider, "access", -1L);
+
+        assertThat(provider.parseAccessToken(token)).isEmpty();
+    }
+
+    private JwtTokenProvider initializedProvider() {
         String encodedKey = Base64.getEncoder().encodeToString(new byte[32]);
         JwtTokenProvider provider = providerWithKeys(encodedKey, encodedKey);
         provider.init();
+        return provider;
+    }
 
-        String accessToken = provider.createAccessToken("user-1", "USER");
-        String refreshToken = provider.createRefreshToken("user-1", "USER");
-
-        assertThat(provider.validateAccessToken(accessToken)).isTrue();
-        assertThat(provider.validateAccessToken(refreshToken)).isFalse();
+    private String signedAccessToken(JwtTokenProvider provider, String type, Object version) {
+        SecretKey accessKey = (SecretKey) ReflectionTestUtils.getField(provider, "accessSecretKey");
+        var builder =
+                Jwts.builder()
+                        .subject("user-1")
+                        .issuedAt(new Date())
+                        .expiration(new Date(System.currentTimeMillis() + 60_000));
+        if (type != null) {
+            builder.claim("type", type);
+        }
+        if (version != null) {
+            builder.claim("credentialVersion", version);
+        }
+        return builder.signWith(accessKey, Jwts.SIG.HS256).compact();
     }
 
     private JwtTokenProvider providerWithKeys(String accessKey, String refreshKey) {

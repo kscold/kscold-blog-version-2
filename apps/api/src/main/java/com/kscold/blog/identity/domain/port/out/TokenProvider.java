@@ -1,15 +1,14 @@
 package com.kscold.blog.identity.domain.port.out;
 
+import com.kscold.blog.identity.domain.model.TokenIdentity;
+import java.util.Optional;
+
 public interface TokenProvider {
-    String createAccessToken(String userId, String role);
+    String createAccessToken(String userId, String role, long credentialVersion);
 
-    String createRefreshToken(String userId, String role);
+    String createRefreshToken(String userId, String role, long credentialVersion);
 
-    boolean validateAccessToken(String token);
+    Optional<TokenIdentity> parseAccessToken(String token);
 
-    boolean validateRefreshToken(String token);
-
-    String getUserIdFromAccessToken(String token);
-
-    String getUserIdFromRefreshToken(String token);
+    Optional<TokenIdentity> parseRefreshToken(String token);
 }

@@ -1,6 +1,7 @@
 package com.kscold.blog.chat.adapter.in.ws;
 
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
+import com.kscold.blog.identity.domain.model.TokenIdentity;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,23 +38,25 @@ public class ChatHandshakeInterceptor implements HandshakeInterceptor {
         }
 
         String token = resolveCookieToken(servletRequest.getServletRequest());
-        if (token == null || token.isBlank() || !tokenProvider.validateAccessToken(token)) {
+        TokenIdentity tokenIdentity =
+                token == null ? null : tokenProvider.parseAccessToken(token).orElse(null);
+        if (tokenIdentity == null) {
             log.warn("WebSocket 연결 거부: 유효하지 않은 토큰");
             return rejectUnauthorized(response);
         }
 
-        String userId = tokenProvider.getUserIdFromAccessToken(token);
-        UserQueryPort.UserInfo user;
-        try {
-            user = userQueryPort.getUserById(userId);
-        } catch (Exception e) {
-            log.warn("WebSocket 연결 거부: 존재하지 않는 사용자");
+        UserQueryPort.AuthenticationInfo authentication =
+                userQueryPort.findAuthenticationById(tokenIdentity.userId()).orElse(null);
+        if (authentication == null
+                || authentication.credentialVersion() != tokenIdentity.credentialVersion()) {
+            log.warn("WebSocket 연결 거부: 만료된 자격 정보");
             return rejectUnauthorized(response);
         }
 
-        attributes.put("userId", userId);
-        attributes.put("username", user.displayName());
-        attributes.put("isAdmin", user.isAdmin());
+        attributes.put("userId", tokenIdentity.userId());
+        attributes.put("username", authentication.displayName());
+        attributes.put("isAdmin", authentication.isAdmin());
+        attributes.put("credentialVersion", authentication.credentialVersion());
         return true;
     }
 

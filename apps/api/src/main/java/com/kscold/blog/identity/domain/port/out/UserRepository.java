@@ -12,8 +12,8 @@ public interface UserRepository {
     /** 인증·복구 경로에서 활성 계정만 조회한다. */
     Optional<User> findActiveById(String id);
 
-    /** 인증 경로에서 활성 계정의 현재 역할만 projection으로 조회한다. */
-    Optional<User.Role> findActiveRoleById(String id);
+    /** 인증 경로에서 활성 계정의 현재 역할·자격 버전·표시 이름만 projection으로 조회한다. */
+    Optional<AuthenticationState> findActiveAuthenticationById(String id);
 
     /** 주어진 id 들을 한 번에 조회함(반복 findById 로 인한 N+1 방지용). */
     List<User> findAllById(Collection<String> ids);
@@ -31,6 +31,12 @@ public interface UserRepository {
 
     /** 탈퇴와 경합해도 계정을 되살리지 않도록 활성 계정의 비밀번호만 원자적으로 변경한다. */
     boolean updatePasswordIfActive(String id, String encodedPassword);
+
+    /** 탈퇴와 경합해도 다른 사용자 필드를 덮지 않도록 활성 계정의 프로필만 원자적으로 변경한다. */
+    Optional<User> updateProfileIfActive(String id, User.Profile profile);
+
+    /** 다른 사용자 필드를 덮지 않고 활성 계정만 원자적으로 소프트 삭제한다. */
+    boolean softDeleteIfActive(String id);
 
     boolean existsByEmail(String email);
 
@@ -56,4 +62,6 @@ public interface UserRepository {
 
     /** 영구 삭제 (하드 딜리트) */
     void deleteById(String id);
+
+    record AuthenticationState(User.Role role, long credentialVersion, String displayName) {}
 }

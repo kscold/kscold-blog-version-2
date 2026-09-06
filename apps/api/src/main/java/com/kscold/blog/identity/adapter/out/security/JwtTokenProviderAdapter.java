@@ -1,6 +1,8 @@
 package com.kscold.blog.identity.adapter.out.security;
 
+import com.kscold.blog.identity.domain.model.TokenIdentity;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,32 +14,22 @@ public class JwtTokenProviderAdapter implements TokenProvider {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public String createAccessToken(String userId, String role) {
-        return jwtTokenProvider.createAccessToken(userId, role);
+    public String createAccessToken(String userId, String role, long credentialVersion) {
+        return jwtTokenProvider.createAccessToken(userId, role, credentialVersion);
     }
 
     @Override
-    public String createRefreshToken(String userId, String role) {
-        return jwtTokenProvider.createRefreshToken(userId, role);
+    public String createRefreshToken(String userId, String role, long credentialVersion) {
+        return jwtTokenProvider.createRefreshToken(userId, role, credentialVersion);
     }
 
     @Override
-    public boolean validateAccessToken(String token) {
-        return jwtTokenProvider.validateAccessToken(token);
+    public Optional<TokenIdentity> parseAccessToken(String token) {
+        return jwtTokenProvider.parseAccessToken(token);
     }
 
     @Override
-    public boolean validateRefreshToken(String token) {
-        return jwtTokenProvider.validateRefreshToken(token);
-    }
-
-    @Override
-    public String getUserIdFromAccessToken(String token) {
-        return jwtTokenProvider.getUserIdFromAccessToken(token);
-    }
-
-    @Override
-    public String getUserIdFromRefreshToken(String token) {
-        return jwtTokenProvider.getUserIdFromRefreshToken(token);
+    public Optional<TokenIdentity> parseRefreshToken(String token) {
+        return jwtTokenProvider.parseRefreshToken(token);
     }
 }

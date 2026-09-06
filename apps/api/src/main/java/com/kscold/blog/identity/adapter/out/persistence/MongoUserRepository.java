@@ -11,12 +11,21 @@ import org.springframework.data.mongodb.repository.Query;
 /** Spring Data MongoDB 인터페이스 (인프라 계층) */
 public interface MongoUserRepository extends MongoRepository<User, String> {
 
-    interface ActiveRoleProjection {
+    interface ActiveAuthenticationProjection {
         User.Role getRole();
+
+        Long getCredentialVersion();
+
+        String getUsername();
+
+        User.Profile getProfile();
     }
 
-    @Query(value = "{ '_id': ?0, 'deletedAt': null }", fields = "{ 'role': 1 }")
-    Optional<ActiveRoleProjection> findActiveRoleById(String id);
+    @Query(
+            value = "{ '_id': ?0, 'deletedAt': null }",
+            fields =
+                    "{ 'role': 1, 'credentialVersion': 1, 'username': 1, 'profile.displayName': 1 }")
+    Optional<ActiveAuthenticationProjection> findActiveAuthenticationById(String id);
 
     @Query("{ '_id': ?0, 'deletedAt': null }")
     Optional<User> findActiveById(String id);

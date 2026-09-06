@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -38,10 +39,18 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public Optional<User.Role> findActiveRoleById(String id) {
+    public Optional<AuthenticationState> findActiveAuthenticationById(String id) {
         return mongoUserRepository
-                .findActiveRoleById(id)
-                .map(MongoUserRepository.ActiveRoleProjection::getRole);
+                .findActiveAuthenticationById(id)
+                .filter(projection -> projection.getRole() != null)
+                .map(
+                        projection ->
+                                new AuthenticationState(
+                                        projection.getRole(),
+                                        projection.getCredentialVersion() == null
+                                                ? 0L
+                                                : projection.getCredentialVersion(),
+                                        getDisplayName(projection)));
     }
 
     @Override
@@ -71,9 +80,32 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public boolean updatePasswordIfActive(String id, String encodedPassword) {
-        Query query = Query.query(Criteria.where("_id").is(id).and("deletedAt").is(null));
+        Query query = activeUserQuery(id);
         Update update =
-                new Update().set("password", encodedPassword).set("updatedAt", LocalDateTime.now());
+                new Update()
+                        .set("password", encodedPassword)
+                        .set("updatedAt", LocalDateTime.now())
+                        .inc("credentialVersion", 1L);
+        return mongoTemplate.updateFirst(query, update, User.class).getModifiedCount() == 1;
+    }
+
+    @Override
+    public Optional<User> updateProfileIfActive(String id, User.Profile profile) {
+        Query query = activeUserQuery(id);
+        Update update = new Update().set("profile", profile).set("updatedAt", LocalDateTime.now());
+        FindAndModifyOptions options = FindAndModifyOptions.options().returnNew(true);
+        return Optional.ofNullable(mongoTemplate.findAndModify(query, update, options, User.class));
+    }
+
+    @Override
+    public boolean softDeleteIfActive(String id) {
+        Query query = activeUserQuery(id);
+        LocalDateTime deletedAt = LocalDateTime.now();
+        Update update =
+                new Update()
+                        .set("deletedAt", deletedAt)
+                        .set("updatedAt", deletedAt)
+                        .inc("credentialVersion", 1L);
         return mongoTemplate.updateFirst(query, update, User.class).getModifiedCount() == 1;
     }
 
@@ -120,5 +152,16 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public void deleteById(String id) {
         mongoUserRepository.deleteById(id);
+    }
+
+    private String getDisplayName(MongoUserRepository.ActiveAuthenticationProjection projection) {
+        User.Profile profile = projection.getProfile();
+        return profile != null && profile.getDisplayName() != null
+                ? profile.getDisplayName()
+                : projection.getUsername();
+    }
+
+    private Query activeUserQuery(String id) {
+        return Query.query(Criteria.where("_id").is(id).and("deletedAt").is(null));
     }
 }
