@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { cache } from 'react';
 import { PostDetail } from '@/widgets/post';
 import type { Post } from '@/shared/model/types/blog';
@@ -78,7 +78,7 @@ export default async function PostPage({
   }
 
   if (category !== post.category.slug) {
-    redirect(`/blog/${post.category.slug}/${post.slug}`);
+    permanentRedirect(`/blog/${post.category.slug}/${post.slug}`);
   }
 
   const description = toMetaDescription(post.seo?.metaDescription || post.excerpt || post.content);

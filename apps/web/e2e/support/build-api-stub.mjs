@@ -76,6 +76,9 @@ function getResponseData(pathname) {
   if (pathname === '/api/posts/featured') {
     return [featuredPost];
   }
+  if (pathname === '/api/posts/slug/ci-frontend-verification') {
+    return featuredPost;
+  }
   if (pathname === '/api/posts') {
     return {
       ...emptyPage,

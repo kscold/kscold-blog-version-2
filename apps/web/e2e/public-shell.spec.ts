@@ -135,6 +135,18 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await expect(page).toHaveURL(/\/tags\/AI%20Agent$/);
   });
 
+  test('이전 글 카테고리 경로는 canonical 경로로 영구 이동한다', async ({ request }) => {
+    const response = await request.get(
+      '/blog/old-category/ci-frontend-verification',
+      { maxRedirects: 0 }
+    );
+
+    expect(response.status()).toBe(308);
+    expect(response.headers().location).toBe(
+      '/blog/engineering/ci-frontend-verification'
+    );
+  });
+
   test('사이트맵 정적 페이지는 canonical과 주 제목을 제공한다', async ({ page }) => {
     await page.goto('/privacy');
     await expect(page.locator('head link[rel="canonical"]')).toHaveAttribute(
