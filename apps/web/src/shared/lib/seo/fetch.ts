@@ -71,9 +71,9 @@ export async function fetchAllPublicApiPages<T>(
       return null;
     }
 
-    validateSeoPage(page, pageNumber);
+    validateSeoPage(page, pageNumber, normalizedPageSize);
     items.push(...page.content);
-    if (page.last || pageNumber + 1 >= page.totalPages) {
+    if (page.last) {
       return items;
     }
 
@@ -91,12 +91,39 @@ function normalizeSeoPageSize(pageSize: number) {
   return Math.min(pageSize, MAX_SEO_PAGE_SIZE);
 }
 
-function validateSeoPage<T>(page: PageResponse<T>, pageNumber: number) {
-  if (!Array.isArray(page.content) || !Number.isInteger(page.totalPages) || page.totalPages < 0) {
+function validateSeoPage<T>(page: PageResponse<T>, pageNumber: number, pageSize: number) {
+  const numericFields = [page.number, page.size, page.totalElements, page.totalPages];
+  const booleanFields = [page.first, page.last, page.empty];
+
+  if (
+    !Array.isArray(page.content) ||
+    numericFields.some(value => !Number.isSafeInteger(value) || value < 0) ||
+    booleanFields.some(value => typeof value !== 'boolean')
+  ) {
+    throw new Error(`SEO API 페이지 응답이 올바르지 않습니다. page=${pageNumber}`);
+  }
+  const expectedTotalPages = Math.ceil(page.totalElements / page.size);
+  const expectedLast = page.totalPages === 0 || pageNumber + 1 >= page.totalPages;
+  if (
+    page.number !== pageNumber ||
+    page.size !== pageSize ||
+    page.size === 0 ||
+    page.totalPages !== expectedTotalPages ||
+    page.first !== (pageNumber === 0) ||
+    page.last !== expectedLast ||
+    page.empty !== (page.content.length === 0)
+  ) {
     throw new Error(`SEO API 페이지 응답이 올바르지 않습니다. page=${pageNumber}`);
   }
   if (!page.last && pageNumber + 1 < page.totalPages && page.content.length === 0) {
     throw new Error(`SEO API 페이지 수집이 진행되지 않습니다. page=${pageNumber}`);
+  }
+  const expectedContentLength = Math.min(
+    page.size,
+    Math.max(page.totalElements - pageNumber * page.size, 0)
+  );
+  if (page.content.length !== expectedContentLength) {
+    throw new Error(`SEO API 페이지 응답이 올바르지 않습니다. page=${pageNumber}`);
   }
 }
 

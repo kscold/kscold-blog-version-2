@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { parseBlogArchivePage } from '../src/widgets/blog/lib/blogArchivePage';
+import { parseArchivePage } from '../src/widgets/blog/lib/archivePage';
 
 const isEmptyArchive = process.env.BUILD_BLOG_EMPTY === 'true';
 
@@ -108,9 +108,9 @@ test('빈 첫 아카이브는 200이고 2페이지는 404이다', async ({ reque
 });
 
 test('페이지 입력 파서는 중복과 잘못된 숫자를 거부한다', () => {
-  expect(parseBlogArchivePage(undefined)).toBe(1);
-  expect(parseBlogArchivePage('2')).toBe(2);
+  expect(parseArchivePage(undefined)).toBe(1);
+  expect(parseArchivePage('2')).toBe(2);
   for (const input of ['', '0', '-1', '1.2', 'NaN', 'Infinity', '01', '2147483648', ['2']]) {
-    expect(parseBlogArchivePage(input)).toBeNull();
+    expect(parseArchivePage(input)).toBeNull();
   }
 });

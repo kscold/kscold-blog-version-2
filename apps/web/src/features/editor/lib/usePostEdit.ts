@@ -14,7 +14,7 @@ export function usePostEdit(postId: string) {
     ? {
         title: post.title,
         slug: post.slug,
-        content: post.content,
+        content: post.content ?? '',
         excerpt: post.excerpt || '',
         coverImage: post.coverImage || '',
         categoryId: post.category.id,

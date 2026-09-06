@@ -28,7 +28,7 @@ function post(id: string, updatedAt: string, visibility: 'PUBLIC' | 'RESTRICTED'
     id,
     title: id,
     slug: id,
-    content: '본문',
+    content: null,
     excerpt: '요약',
     category: { id: category.id, name: category.name, slug: category.slug },
     tags: [{ id: tag.id, name: tag.name, slug: tag.slug }],
@@ -56,7 +56,7 @@ test('사이트맵 갱신일은 색인 가능한 공개 콘텐츠의 최신 수�
       '/api/posts',
       {
         content: posts,
-        page: 0,
+        number: 0,
         size: 100,
         totalElements: posts.length,
         totalPages: 1,

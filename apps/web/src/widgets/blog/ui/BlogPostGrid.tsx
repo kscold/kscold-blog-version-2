@@ -2,12 +2,12 @@
 
 import { Pagination } from '@/shared/ui/Pagination';
 import { CategoryFilter } from './CategoryFilter';
-import { BlogArchivePagination } from './BlogArchivePagination';
+import { ArchivePagination } from './ArchivePagination';
 import { BlogPostResults } from './BlogPostResults';
-import type { Post, Category } from '@/shared/model/types/blog';
+import type { PostSummary, Category } from '@/shared/model/types/blog';
 
 interface BlogPostGridProps {
-  posts: Post[];
+  posts: PostSummary[];
   totalPages: number;
   page: number;
   isArchive: boolean;
@@ -43,7 +43,12 @@ export default function BlogPostGrid({
       {!isLoading &&
         posts.length > 0 &&
         (isArchive ? (
-          <BlogArchivePagination page={page + 1} totalPages={totalPages} />
+          <ArchivePagination
+            basePath="/blog"
+            page={page + 1}
+            totalPages={totalPages}
+            ariaLabel="블로그 페이지"
+          />
         ) : (
           <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} />
         ))}

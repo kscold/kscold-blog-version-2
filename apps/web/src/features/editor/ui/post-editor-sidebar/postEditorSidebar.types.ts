@@ -4,8 +4,8 @@ export interface PostEditorCategoryOption {
   id: string;
   name: string;
   depth: number;
-  icon?: string;
-  restricted?: boolean;
+  icon?: string | null;
+  restricted?: boolean | null;
 }
 
 export interface PostEditorSidebarProps {

@@ -37,14 +37,14 @@ export function RestrictedPostDetail({ post }: RestrictedPostDetailProps) {
   }, [post]);
 
   useEffect(() => {
-    if (!isAuthenticated && post.restricted && !post.content) {
+    if (!isAuthenticated && post.restricted && post.content === null) {
       setResolvedPost(post);
       setIsResolvingAccess(false);
     }
   }, [isAuthenticated, post]);
 
   useEffect(() => {
-    if (!isAuthenticated || !post.restricted || post.content) {
+    if (!isAuthenticated || !post.restricted || post.content !== null) {
       return;
     }
 
@@ -58,7 +58,7 @@ export function RestrictedPostDetail({ post }: RestrictedPostDetailProps) {
 
         if (!active) return;
 
-        if (latestPost?.content) {
+        if (latestPost.content !== null) {
           setResolvedPost(latestPost);
         }
       } catch (error) {
@@ -82,7 +82,8 @@ export function RestrictedPostDetail({ post }: RestrictedPostDetailProps) {
         day: 'numeric',
       })
     : '';
-  const isRestricted = Boolean(resolvedPost.restricted && !resolvedPost.content);
+  const resolvedContent = resolvedPost.content;
+  const isRestricted = resolvedContent === null;
   const isCheckingRestrictedAccess = isRestricted && isAuthenticated && isResolvingAccess;
   const headerExcerpt = isRestricted ? resolvedPost.excerpt : undefined;
   const accessStatusMessage = useMemo(
@@ -137,7 +138,7 @@ export function RestrictedPostDetail({ post }: RestrictedPostDetailProps) {
           <>
             <div className="mb-12">
               <MarkdownContent
-                content={resolvedPost.content}
+                content={resolvedContent}
                 prioritizeFirstImage
                 demotePrimaryHeading
               />

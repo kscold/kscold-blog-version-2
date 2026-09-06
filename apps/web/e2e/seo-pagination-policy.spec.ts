@@ -7,7 +7,16 @@ test.describe('SEO 페이지 수집 정책', () => {
     const originalFetch = global.fetch;
     global.fetch = async input => {
       requestedUrls.push(String(input));
-      return Response.json({ content: [], last: true, totalPages: 0 });
+      return Response.json({
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        size: 100,
+        number: 0,
+        first: true,
+        last: true,
+        empty: true,
+      });
     };
 
     try {
@@ -23,11 +32,43 @@ test.describe('SEO 페이지 수집 정책', () => {
   test('비어 있는 중간 페이지에서는 수집을 중단한다', async () => {
     const originalFetch = global.fetch;
     global.fetch = async () =>
-      Response.json({ content: [], last: false, number: 0, totalPages: 2 });
+      Response.json({
+        content: [],
+        totalElements: 200,
+        totalPages: 2,
+        size: 100,
+        number: 0,
+        first: true,
+        last: false,
+        empty: true,
+      });
 
     try {
       await expect(fetchAllPublicApiPages('/posts')).rejects.toThrow(
         'SEO API 페이지 수집이 진행되지 않습니다.'
+      );
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  test('마지막 페이지 플래그가 너무 일찍 설정되면 부분 결과를 거부한다', async () => {
+    const originalFetch = global.fetch;
+    global.fetch = async () =>
+      Response.json({
+        content: Array.from({ length: 100 }, (_, index) => index),
+        totalElements: 200,
+        totalPages: 2,
+        size: 100,
+        number: 0,
+        first: true,
+        last: true,
+        empty: false,
+      });
+
+    try {
+      await expect(fetchAllPublicApiPages('/posts')).rejects.toThrow(
+        'SEO API 페이지 응답이 올바르지 않습니다.'
       );
     } finally {
       global.fetch = originalFetch;
@@ -39,11 +80,21 @@ test.describe('SEO 페이지 수집 정책', () => {
     const originalFetch = global.fetch;
     global.fetch = async () => {
       requestCount += 1;
-      return Response.json({ content: [requestCount], last: false, totalPages: 501 });
+      const pageNumber = requestCount - 1;
+      return Response.json({
+        content: [requestCount],
+        totalElements: 501,
+        totalPages: 501,
+        size: 1,
+        number: pageNumber,
+        first: pageNumber === 0,
+        last: false,
+        empty: false,
+      });
     };
 
     try {
-      await expect(fetchAllPublicApiPages('/posts')).rejects.toThrow(
+      await expect(fetchAllPublicApiPages('/posts', 1)).rejects.toThrow(
         'SEO API 페이지 수가 안전 상한을 초과했습니다.'
       );
     } finally {

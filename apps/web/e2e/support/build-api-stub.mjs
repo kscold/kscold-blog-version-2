@@ -1,5 +1,12 @@
 import { createServer } from 'node:http';
-import { blogArchiveCategory, getBlogArchivePage } from './blog-archive-fixtures.mjs';
+import {
+  blogArchiveCategory,
+  categoryArchiveCategory,
+  getBlogArchivePage,
+  getCategoryArchivePage,
+  getTagArchivePage,
+  tagArchiveTag,
+} from './blog-archive-fixtures.mjs';
 import {
   emptyProfileFeedPage,
   getProfileFeedPage,
@@ -56,6 +63,7 @@ const featuredPost = {
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
 };
+const featuredPostSummary = { ...featuredPost, content: null };
 const vaultWikiLinkNote = {
   id: 'ci-vault-note',
   title: 'CI Vault 위키링크 검증',
@@ -102,16 +110,31 @@ function getResponseData(requestUrl) {
     return [];
   }
   if (pathname === '/api/categories') {
-    return [blogArchiveCategory];
+    return [blogArchiveCategory, categoryArchiveCategory];
+  }
+  if (pathname === '/api/categories/slug/engineering') {
+    return blogArchiveCategory;
+  }
+  if (pathname === '/api/categories/slug/dev-story') {
+    return categoryArchiveCategory;
+  }
+  if (pathname === '/api/tags/index') {
+    return [tagArchiveTag];
   }
   if (pathname === '/api/posts/featured') {
-    return [featuredPost];
+    return [featuredPostSummary];
   }
   if (pathname === '/api/posts/slug/ci-frontend-verification') {
     return featuredPost;
   }
   if (pathname === '/api/posts') {
-    return getBlogArchivePage(featuredPost, searchParams);
+    return getBlogArchivePage(featuredPostSummary, searchParams);
+  }
+  if (pathname === `/api/posts/category/${categoryArchiveCategory.id}`) {
+    return getCategoryArchivePage(featuredPostSummary, searchParams);
+  }
+  if (pathname === `/api/posts/tag/${tagArchiveTag.id}`) {
+    return getTagArchivePage(featuredPostSummary, searchParams);
   }
   if (pathname === '/api/feeds') {
     return emptyPage;

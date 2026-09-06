@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { usePostsByCategory, useSearchPosts } from '@/entities/post';
 import { normalizePublicSearchQuery } from '@/shared/lib/search';
 import type { PageResponse } from '@/shared/model/types/api';
-import type { Post } from '@/shared/model/types/blog';
+import type { PostSummary } from '@/shared/model/types/blog';
 
-export function useBlogArchiveFilter(initialPosts: PageResponse<Post>) {
+export function useBlogArchiveFilter(initialPosts: PageResponse<PostSummary>) {
   const [filterPage, setFilterPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
 import { normalizePublicSearchQuery } from '@/shared/lib/search';
-import { Post } from '@/shared/model/types/blog';
+import type { Post, PostSummary } from '@/shared/model/types/blog';
 import { PageResponse } from '@/shared/model/types/api';
 
 interface UsePostsOptions {
@@ -9,7 +9,7 @@ interface UsePostsOptions {
   size?: number;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
-  initialData?: PageResponse<Post>;
+  initialData?: PageResponse<PostSummary>;
   enabled?: boolean;
 }
 
@@ -26,7 +26,7 @@ export function usePosts(options: UsePostsOptions = {}) {
   return useQuery({
     queryKey: ['posts', { page, size, sortBy, sortDirection }],
     queryFn: () =>
-      apiClient.get<PageResponse<Post>>(
+      apiClient.get<PageResponse<PostSummary>>(
         `/posts?page=${page}&size=${size}&sortBy=${sortBy}&sortDirection=${sortDirection}`
       ),
     initialData,
@@ -52,7 +52,7 @@ export function usePost(slug: string) {
 export function useFeaturedPosts(limit: number = 5) {
   return useQuery({
     queryKey: ['posts', 'featured', limit],
-    queryFn: () => apiClient.get<Post[]>(`/posts/featured?limit=${limit}`),
+    queryFn: () => apiClient.get<PostSummary[]>(`/posts/featured?limit=${limit}`),
   });
 }
 
@@ -60,7 +60,7 @@ interface UsePostsByCategoryOptions {
   categoryId: string;
   page?: number;
   size?: number;
-  initialData?: PageResponse<Post>;
+  initialData?: PageResponse<PostSummary>;
 }
 
 export function usePostsByCategory(options: UsePostsByCategoryOptions) {
@@ -69,7 +69,9 @@ export function usePostsByCategory(options: UsePostsByCategoryOptions) {
   return useQuery({
     queryKey: ['posts', 'category', categoryId, { page, size }],
     queryFn: () =>
-      apiClient.get<PageResponse<Post>>(`/posts/category/${categoryId}?page=${page}&size=${size}`),
+      apiClient.get<PageResponse<PostSummary>>(
+        `/posts/category/${categoryId}?page=${page}&size=${size}`
+      ),
     enabled: !!categoryId,
     initialData,
   });
@@ -79,7 +81,7 @@ interface UsePostsByTagOptions {
   tagId: string;
   page?: number;
   size?: number;
-  initialData?: PageResponse<Post>;
+  initialData?: PageResponse<PostSummary>;
 }
 
 export function usePostsByTag(options: UsePostsByTagOptions) {
@@ -88,7 +90,7 @@ export function usePostsByTag(options: UsePostsByTagOptions) {
   return useQuery({
     queryKey: ['posts', 'tag', tagId, { page, size }],
     queryFn: () =>
-      apiClient.get<PageResponse<Post>>(`/posts/tag/${tagId}?page=${page}&size=${size}`),
+      apiClient.get<PageResponse<PostSummary>>(`/posts/tag/${tagId}?page=${page}&size=${size}`),
     enabled: !!tagId,
     initialData,
   });
@@ -100,7 +102,7 @@ export function useSearchPosts(query: string, page: number = 0, size: number = 1
   return useQuery({
     queryKey: ['posts', 'search', normalizedQuery, { page, size }],
     queryFn: () =>
-      apiClient.get<PageResponse<Post>>(
+      apiClient.get<PageResponse<PostSummary>>(
         `/posts/search?q=${encodeURIComponent(normalizedQuery)}&page=${page}&size=${size}`
       ),
     enabled: normalizedQuery.length > 0,

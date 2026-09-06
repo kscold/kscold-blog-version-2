@@ -5,7 +5,7 @@ import { toPreviewText } from '@/shared/lib/seo/text';
 interface PostHeaderProps {
   title: string;
   excerpt?: string;
-  coverImage?: string;
+  coverImage?: string | null;
   category: {
     name: string;
     slug: string;

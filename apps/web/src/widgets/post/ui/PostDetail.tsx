@@ -8,7 +8,7 @@ interface PostDetailProps {
   post: Post;
 }
 
-function formatPublishedDate(publishedAt?: string) {
+function formatPublishedDate(publishedAt?: string | null) {
   return publishedAt
     ? new Date(publishedAt).toLocaleDateString('ko-KR', {
         year: 'numeric',
@@ -21,6 +21,9 @@ function formatPublishedDate(publishedAt?: string) {
 export function PostDetail({ post }: PostDetailProps) {
   if (post.restricted) {
     return <RestrictedPostDetail post={post} />;
+  }
+  if (post.content === null) {
+    throw new Error('포스트 본문 응답이 올바르지 않습니다.');
   }
 
   return (

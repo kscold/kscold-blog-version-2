@@ -1,7 +1,11 @@
 import type { PageResponse } from '@/shared/model/types/api';
-import { BLOG_ARCHIVE_PAGE_SIZE } from './blogArchivePage';
+import { ARCHIVE_PAGE_SIZE } from './archivePage';
 
-export function validateBlogArchiveResponse<T>(posts: PageResponse<T>, page: number): boolean {
+export function validateArchiveResponse<T>(
+  posts: PageResponse<T>,
+  page: number,
+  isValidItem: (item: unknown) => item is T
+): boolean {
   const hasValidNumbers = [posts.totalPages, posts.totalElements, posts.number, posts.size].every(
     value => Number.isSafeInteger(value) && value >= 0
   );
@@ -12,15 +16,16 @@ export function validateBlogArchiveResponse<T>(posts: PageResponse<T>, page: num
   if (
     !hasValidNumbers ||
     !Array.isArray(posts.content) ||
+    !posts.content.every(isValidItem) ||
     posts.number !== page - 1 ||
-    posts.size !== BLOG_ARCHIVE_PAGE_SIZE ||
+    posts.size !== ARCHIVE_PAGE_SIZE ||
     posts.content.length !== expectedCount ||
     posts.totalPages !== Math.ceil(posts.totalElements / posts.size) ||
     posts.empty !== (posts.content.length === 0) ||
     posts.first !== (page === 1) ||
     posts.last !== page >= posts.totalPages
   ) {
-    throw new Error('블로그 페이지 응답이 올바르지 않습니다.');
+    throw new Error('아카이브 페이지 응답이 올바르지 않습니다.');
   }
 
   // 첫 페이지는 글이 없어도 유효하지만 이후 빈 페이지는 404 대상이다.

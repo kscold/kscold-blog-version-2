@@ -1,4 +1,4 @@
-import type { Post } from '@/shared/model/types/blog';
+import type { PostSummary } from '@/shared/model/types/blog';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from './constants';
 import { absoluteUrl } from './metadata';
 import { toPreviewText } from './text';
@@ -25,7 +25,7 @@ function toRfc822(value?: string): string | null {
   return timestamp > 0 ? new Date(timestamp).toUTCString() : null;
 }
 
-export function buildRssDocument(posts: Post[]): string {
+export function buildRssDocument(posts: PostSummary[]): string {
   const publicPosts = posts
     .filter(post => post.status === 'PUBLISHED' && !post.restricted)
     .sort(
@@ -39,7 +39,7 @@ export function buildRssDocument(posts: Post[]): string {
     .map(post => {
       const link = absoluteUrl(`/blog/${post.category.slug}/${post.slug}`);
       const title = post.seo?.metaTitle?.trim() || post.title;
-      const description = toPreviewText(post.excerpt || post.content, post.title, 280);
+      const description = toPreviewText(post.excerpt, post.title, 280);
       const publishedAt = toRfc822(post.publishedAt || post.createdAt);
 
       return [

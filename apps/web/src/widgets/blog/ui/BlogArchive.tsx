@@ -1,12 +1,12 @@
 import type { PageResponse } from '@/shared/model/types/api';
-import type { Category, Post } from '@/shared/model/types/blog';
+import type { Category, PostSummary } from '@/shared/model/types/blog';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { buildBlogArchiveJsonLd } from '../lib/blogArchiveMetadata';
 import { BlogContainer } from './BlogContainer';
 
 export interface BlogArchiveProps {
   page: number;
-  initialPosts: PageResponse<Post>;
+  initialPosts: PageResponse<PostSummary>;
   initialCategories: Category[];
   categoriesDegraded: boolean;
 }

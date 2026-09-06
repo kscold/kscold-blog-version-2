@@ -1,11 +1,11 @@
-import type { Post } from '@/shared/model/types/blog';
 import { fetchAllPublicApiPages } from '@/shared/lib/seo';
 import { buildRssDocument } from '@/shared/lib/seo/rss';
+import { isPostSummary } from '@/widgets/blog/archive';
 
 export async function GET() {
   try {
-    const posts = await fetchAllPublicApiPages<Post>('/posts');
-    if (!posts) {
+    const posts = await fetchAllPublicApiPages<unknown>('/posts');
+    if (!posts || !posts.every(isPostSummary)) {
       return unavailableResponse();
     }
 
@@ -21,11 +21,11 @@ export async function GET() {
 }
 
 function unavailableResponse() {
-    return new Response('RSS feed unavailable', {
-      status: 503,
-      headers: {
-        'Cache-Control': 'no-store',
-        'Retry-After': '300',
-      },
-    });
+  return new Response('RSS feed unavailable', {
+    status: 503,
+    headers: {
+      'Cache-Control': 'no-store',
+      'Retry-After': '300',
+    },
+  });
 }

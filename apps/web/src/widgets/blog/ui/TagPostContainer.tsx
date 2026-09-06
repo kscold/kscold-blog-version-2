@@ -1,32 +1,15 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { usePostsByTag } from '@/entities/post';
 import { PostCard } from '@/entities/post';
-import type { PageResponse } from '@/shared/model/types/api';
-import type { Post, Tag } from '@/shared/model/types/blog';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
-import { Pagination } from '@/shared/ui/Pagination';
+import type { TagArchiveData } from '../lib/loadTagArchive';
+import { ArchivePagination } from './ArchivePagination';
 
-interface TagPostContainerProps {
-  tag: Pick<Tag, 'id' | 'name' | 'postCount'>;
-  initialPosts?: PageResponse<Post>;
-}
-
-export function TagPostContainer({ tag, initialPosts }: TagPostContainerProps) {
-  const [page, setPage] = useState(0);
+export function TagPostContainer({ page, basePath, tag, initialPosts }: TagArchiveData) {
   const { allowRichEffects } = usePerformanceMode();
-
-  const { data: postsData, isLoading } = usePostsByTag({
-    tagId: tag.id,
-    page,
-    size: 12,
-    initialData: page === 0 ? initialPosts : undefined,
-  });
-  const posts = postsData?.content || [];
-  const totalPages = postsData?.totalPages || 0;
+  const posts = initialPosts.content;
 
   return (
     <div className="min-h-screen bg-surface-50">
@@ -56,21 +39,12 @@ export function TagPostContainer({ tag, initialPosts }: TagPostContainerProps) {
             #{tag.name}
           </h1>
           <p className="text-sm text-surface-400">
-            {tag.postCount}개의 포스트
+            {initialPosts.totalElements}개의 포스트
           </p>
         </motion.div>
 
         {/* 포스트 그리드 */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="h-96 bg-white border border-surface-200 rounded-2xl animate-pulse"
-              />
-            ))}
-          </div>
-        ) : posts.length > 0 ? (
+        {posts.length > 0 ? (
           <>
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
@@ -94,7 +68,12 @@ export function TagPostContainer({ tag, initialPosts }: TagPostContainerProps) {
               ))}
             </motion.div>
 
-            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+            <ArchivePagination
+              basePath={basePath}
+              page={page}
+              totalPages={initialPosts.totalPages}
+              ariaLabel={`${tag.name} 태그 페이지`}
+            />
           </>
         ) : (
           <div className="text-center py-20">

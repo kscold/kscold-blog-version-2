@@ -1,16 +1,16 @@
-import type { PageResponse } from '@/shared/model/types/api';
-import type { Post, Tag } from '@/shared/model/types/blog';
-import { fetchPublicApi } from '@/shared/lib/seo';
+import { JsonLd } from '@/shared/ui/JsonLd';
+import { buildTagArchiveJsonLd } from '../lib/tagArchiveMetadata';
+import type { TagArchiveData } from '../lib/loadTagArchive';
 import { TagPostContainer } from './TagPostContainer';
 
-interface TagArchiveProps {
-  tag: Pick<Tag, 'id' | 'name' | 'postCount'>;
-}
-
-export async function TagArchive({ tag }: TagArchiveProps) {
-  const initialPosts = await fetchPublicApi<PageResponse<Post>>(
-    `/posts/tag/${tag.id}?page=0&size=12`
+export function TagArchive(archive: TagArchiveData) {
+  return (
+    <>
+      <JsonLd
+        id={`tag-${archive.tag.id}-page-${archive.page}`}
+        data={buildTagArchiveJsonLd(archive)}
+      />
+      <TagPostContainer {...archive} />
+    </>
   );
-
-  return <TagPostContainer tag={tag} initialPosts={initialPosts ?? undefined} />;
 }

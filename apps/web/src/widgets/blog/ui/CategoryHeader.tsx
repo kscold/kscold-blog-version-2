@@ -7,9 +7,10 @@ import { Category } from '@/shared/model/types/blog';
 interface CategoryHeaderProps {
   category: Category;
   subcategories: Category[];
+  postCount: number;
 }
 
-export function CategoryHeader({ category, subcategories }: CategoryHeaderProps) {
+export function CategoryHeader({ category, subcategories, postCount }: CategoryHeaderProps) {
   return (
     <>
       {/* 현재 위치 */}
@@ -48,7 +49,7 @@ export function CategoryHeader({ category, subcategories }: CategoryHeaderProps)
           </p>
         )}
         <div className="mt-4 text-sm text-surface-400">
-          {category.postCount}개의 포스트
+          {postCount}개의 포스트
         </div>
       </motion.div>
 

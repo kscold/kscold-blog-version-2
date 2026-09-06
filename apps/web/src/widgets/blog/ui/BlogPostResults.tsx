@@ -2,12 +2,12 @@
 
 import { motion } from 'framer-motion';
 import { PostCard } from '@/entities/post';
-import type { Post } from '@/shared/model/types/blog';
+import type { PostSummary } from '@/shared/model/types/blog';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 interface BlogPostResultsProps {
-  posts: Post[];
+  posts: PostSummary[];
   isLoading: boolean;
   searchQuery: string;
 }
@@ -23,7 +23,7 @@ export function BlogPostResults({ posts, isLoading, searchQuery }: BlogPostResul
   );
 }
 
-function BlogPostCards({ posts }: { posts: Post[] }) {
+function BlogPostCards({ posts }: { posts: PostSummary[] }) {
   const { allowRichEffects } = usePerformanceMode();
   const gridVariants = allowRichEffects
     ? { visible: { transition: { staggerChildren: 0.1 } } }

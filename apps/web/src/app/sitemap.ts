@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
-import type { Category, Post, Tag } from '@/shared/model/types/blog';
+import type { Category, Tag } from '@/shared/model/types/blog';
 import { PROFILE, TEAM_PROFILES } from '@/entities/profile';
+import { isPostSummary } from '@/widgets/blog/archive';
 import {
   SITE_URL,
   fetchAllPublicApiPages,
@@ -32,8 +33,8 @@ const updateLatestModified = (dates: Map<string, string>, key: string, value: st
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, categoryTree, tags, feeds, vaultNoteIndex] = await Promise.all([
-    fetchAllPublicApiPages<Post>('/posts'),
+  const [postItems, categoryTree, tags, feeds, vaultNoteIndex] = await Promise.all([
+    fetchAllPublicApiPages<unknown>('/posts'),
     fetchPublicApi<Category[]>('/categories'),
     fetchPublicApi<Tag[]>('/tags'),
     fetchPublicApi<FeedSitemapEntry[]>('/feeds/sitemap-index'),
@@ -44,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 일부 데이터만 빠진 200 응답을 캐시하면 검색엔진에는 대량 URL 삭제로 보인다.
   // 재생성 오류를 그대로 올려 직전 정상 ISR 결과를 유지하고 다음 요청에서 재시도한다.
   if (
-    posts === null ||
+    postItems === null ||
     categoryTree === null ||
     tags === null ||
     feeds === null ||
@@ -52,7 +53,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ) {
     throw new Error('사이트맵 데이터를 모두 불러오지 못했습니다.');
   }
+  if (!postItems.every(isPostSummary)) {
+    throw new Error('사이트맵 포스트 응답이 올바르지 않습니다.');
+  }
 
+  const posts = postItems;
   const categories = flattenCategories(categoryTree).filter(
     category => !category.restricted
   );

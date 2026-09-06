@@ -1,23 +1,16 @@
-import type { PageResponse } from '@/shared/model/types/api';
-import type { Category, Post } from '@/shared/model/types/blog';
-import { fetchPublicApi } from '@/shared/lib/seo';
+import { JsonLd } from '@/shared/ui/JsonLd';
+import { buildCategoryArchiveJsonLd } from '../lib/categoryArchiveMetadata';
+import type { CategoryArchiveData } from '../lib/loadCategoryArchive';
 import { CategoryPostContainer } from './CategoryPostContainer';
 
-interface CategoryArchiveProps {
-  category: Category;
-}
-
-export async function CategoryArchive({ category }: CategoryArchiveProps) {
-  const [initialPosts, initialCategories] = await Promise.all([
-    fetchPublicApi<PageResponse<Post>>(`/posts/category/${category.id}?page=0&size=12`),
-    fetchPublicApi<Category[]>('/categories'),
-  ]);
-
+export function CategoryArchive(archive: CategoryArchiveData) {
   return (
-    <CategoryPostContainer
-      category={category}
-      initialPosts={initialPosts ?? undefined}
-      initialCategories={initialCategories ?? undefined}
-    />
+    <>
+      <JsonLd
+        id={`category-${archive.category.id}-page-${archive.page}`}
+        data={buildCategoryArchiveJsonLd(archive)}
+      />
+      <CategoryPostContainer {...archive} />
+    </>
   );
 }

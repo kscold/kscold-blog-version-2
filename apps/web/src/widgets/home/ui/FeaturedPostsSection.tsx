@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import { PostCard } from '@/entities/post';
-import type { Post } from '@/shared/model/types/blog';
+import type { PostSummary } from '@/shared/model/types/blog';
 import { fetchPublicApi } from '@/shared/lib/seo';
 
 export async function FeaturedPostsSection() {
-  let featuredPosts: Post[] | null;
+  let featuredPosts: PostSummary[] | null;
 
   try {
-    featuredPosts = await fetchPublicApi<Post[]>('/posts/featured?limit=3');
+    featuredPosts = await fetchPublicApi<PostSummary[]>('/posts/featured?limit=3');
   } catch {
     // 추천 글은 홈의 보조 콘텐츠이므로 일시적인 API 장애를 페이지 전체 500으로 전파하지 않는다.
     return null;
