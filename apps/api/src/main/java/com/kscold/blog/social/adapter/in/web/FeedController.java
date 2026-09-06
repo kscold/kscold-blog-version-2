@@ -1,5 +1,7 @@
 package com.kscold.blog.social.adapter.in.web;
 
+import static com.kscold.blog.shared.security.AuthenticatedPrincipalPolicy.normalize;
+
 import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -140,7 +142,10 @@ public class FeedController {
 
     /** 로그인 유저 → userId, 비로그인 → IP */
     private String resolveIdentifier(String userId, HttpServletRequest request) {
-        return (userId != null) ? userId : clientIdentifierResolver.resolve(request);
+        String authenticatedUserId = normalize(userId);
+        return authenticatedUserId != null
+                ? authenticatedUserId
+                : clientIdentifierResolver.resolve(request);
     }
 
     /** 작성자 최신 프로필을 안전하게 조회 (탈퇴·삭제 사용자는 null) */

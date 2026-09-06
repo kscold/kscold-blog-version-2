@@ -1,9 +1,13 @@
 package com.kscold.blog.payment.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.payment.application.dto.command.PreparePaymentCommand;
 import com.kscold.blog.payment.application.dto.response.PaymentConfigResponse;
 import com.kscold.blog.payment.application.dto.response.PreparePaymentResponse;
@@ -72,6 +76,16 @@ class AiAgentBloomPaymentApplicationServiceTest {
         assertThat(response.getChannelKey()).isEqualTo("channel-key-kakao");
         assertThat(response.getPayMethod()).isEqualTo("EASY_PAY");
         assertThat(response.getEasyPayProvider()).isEqualTo("KAKAOPAY");
+    }
+
+    @Test
+    @DisplayName("시나리오: Spring 익명 principal만으로는 주문을 준비할 수 없다")
+    void anonymousPrincipalCannotPrepareOrderWithoutAccessToken() {
+        assertThatThrownBy(() -> service.prepare("anonymousUser", command()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("로그인하거나");
+
+        verify(paymentOrderRepository, never()).save(any());
     }
 
     @Test

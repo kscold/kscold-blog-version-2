@@ -1,5 +1,7 @@
 package com.kscold.blog.payment.application.service;
 
+import static com.kscold.blog.shared.security.AuthenticatedPrincipalPolicy.normalize;
+
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
@@ -73,8 +75,9 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
 
     private PreparePaymentResponse prepare(
             String userId, PreparePaymentCommand request, PaymentProduct product) {
+        String authenticatedUserId = normalize(userId);
         String paymentAccessToken = normalizePaymentAccessToken(request.getPaymentAccessToken());
-        if ((userId == null || userId.isBlank()) && paymentAccessToken == null) {
+        if (authenticatedUserId == null && paymentAccessToken == null) {
             throw new BusinessException(
                     ErrorCode.UNAUTHORIZED, "로그인하거나 안내받은 결제 링크로 접속해야 결제할 수 있습니다.");
         }
@@ -89,7 +92,7 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
         PaymentOrder order =
                 PaymentOrder.builder()
                         .paymentId(paymentId)
-                        .userId(userId)
+                        .userId(authenticatedUserId)
                         .paymentAccessToken(paymentAccessToken)
                         .programKey(product.getProgramKey())
                         .orderName(product.getOrderName())
@@ -208,7 +211,8 @@ public class AiAgentBloomPaymentApplicationService implements PaymentUseCase {
     }
 
     private boolean canAccessOrder(String userId, String paymentAccessToken, PaymentOrder order) {
-        if (userId != null && !userId.isBlank() && userId.equals(order.getUserId())) {
+        String authenticatedUserId = normalize(userId);
+        if (authenticatedUserId != null && authenticatedUserId.equals(order.getUserId())) {
             return true;
         }
         if (paymentAccessToken != null

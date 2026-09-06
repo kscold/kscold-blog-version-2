@@ -3,6 +3,7 @@ package com.kscold.blog.vault.agent.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.BusinessException;
@@ -12,6 +13,7 @@ import com.kscold.blog.vault.agent.domain.exception.AgentClientUnavailableExcept
 import com.kscold.blog.vault.agent.domain.model.AgentContentAccessScope;
 import com.kscold.blog.vault.agent.domain.port.out.VaultAgentChatHistoryRepository;
 import com.kscold.blog.vault.agent.domain.port.out.VaultAgentClientPort;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,5 +53,16 @@ class VaultAgentServiceTest {
                         exception ->
                                 assertThat(exception.getMessage()).doesNotContain(sensitiveMessage))
                 .hasNoCause();
+    }
+
+    @Test
+    @DisplayName("시나리오: Spring 익명 principal의 대화 기록은 클라이언트 범위로 격리한다")
+    void anonymousPrincipalUsesGuestHistoryScope() {
+        when(chatHistoryRepository.findByScopeKey("guest:client-1:session-1", 80))
+                .thenReturn(List.of());
+
+        vaultAgentService.history("session-1", "anonymousUser", "client-1");
+
+        verify(chatHistoryRepository).findByScopeKey("guest:client-1:session-1", 80);
     }
 }

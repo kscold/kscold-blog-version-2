@@ -1,5 +1,7 @@
 package com.kscold.blog.vault.agent.application.service;
 
+import static com.kscold.blog.shared.security.AuthenticatedPrincipalPolicy.normalize;
+
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.vault.agent.application.dto.command.ChatCommand;
@@ -56,17 +58,25 @@ public class VaultAgentService implements VaultAgentUseCase {
     @Override
     public ChatResponse chat(
             ChatCommand request, @Nullable String userId, String clientIdentifier) {
+        String authenticatedUserId = normalize(userId);
         String sessionId = normalizeSessionId(request.getSessionId());
-        String scopeKey = scopeKey(userId, clientIdentifier, sessionId);
-        AgentContentAccessScope contentAccessScope = accessScopeResolver.resolve(userId);
+        String scopeKey = scopeKey(authenticatedUserId, clientIdentifier, sessionId);
+        AgentContentAccessScope contentAccessScope =
+                accessScopeResolver.resolve(authenticatedUserId);
         try {
             AgentChatResult result =
                     vaultAgentClientPort.chat(
                             request.getMessage(),
                             request.getActiveFolderName(),
                             contentAccessScope);
-            saveUserMessage(scopeKey, sessionId, userId, clientIdentifier, request.getMessage());
-            saveAssistantMessage(scopeKey, sessionId, userId, clientIdentifier, result);
+            saveUserMessage(
+                    scopeKey,
+                    sessionId,
+                    authenticatedUserId,
+                    clientIdentifier,
+                    request.getMessage());
+            saveAssistantMessage(
+                    scopeKey, sessionId, authenticatedUserId, clientIdentifier, result);
             return toChatResponse(sessionId, result);
         } catch (AgentClientUnavailableException ignored) {
             throw agentUnavailable();
@@ -79,14 +89,17 @@ public class VaultAgentService implements VaultAgentUseCase {
             @Nullable String userId,
             String clientIdentifier,
             Consumer<AgentStreamEvent> eventConsumer) {
+        String authenticatedUserId = normalize(userId);
         String sessionId = normalizeSessionId(request.getSessionId());
-        String scopeKey = scopeKey(userId, clientIdentifier, sessionId);
-        AgentContentAccessScope contentAccessScope = accessScopeResolver.resolve(userId);
+        String scopeKey = scopeKey(authenticatedUserId, clientIdentifier, sessionId);
+        AgentContentAccessScope contentAccessScope =
+                accessScopeResolver.resolve(authenticatedUserId);
         List<AgentChatStage> stages = new ArrayList<>();
         StringBuilder answerBuilder = new StringBuilder();
         AtomicReference<AgentChatResult> completedResult = new AtomicReference<>();
 
-        saveUserMessage(scopeKey, sessionId, userId, clientIdentifier, request.getMessage());
+        saveUserMessage(
+                scopeKey, sessionId, authenticatedUserId, clientIdentifier, request.getMessage());
         try {
             vaultAgentClientPort.streamChat(
                     request.getMessage(),
@@ -117,7 +130,8 @@ public class VaultAgentService implements VaultAgentUseCase {
                     rawResult.answer().isBlank() ? answerBuilder.toString() : rawResult.answer();
             AgentChatResult result =
                     new AgentChatResult(answer, stages, rawResult.sources(), rawResult.followUps());
-            saveAssistantMessage(scopeKey, sessionId, userId, clientIdentifier, result);
+            saveAssistantMessage(
+                    scopeKey, sessionId, authenticatedUserId, clientIdentifier, result);
             eventConsumer.accept(AgentStreamEvent.completed(result));
         } catch (AgentClientUnavailableException ignored) {
             throw agentUnavailable();
@@ -128,7 +142,7 @@ public class VaultAgentService implements VaultAgentUseCase {
     public ChatHistoryResponse history(
             @Nullable String requestedSessionId, @Nullable String userId, String clientIdentifier) {
         String sessionId = normalizeSessionId(requestedSessionId);
-        String scopeKey = scopeKey(userId, clientIdentifier, sessionId);
+        String scopeKey = scopeKey(normalize(userId), clientIdentifier, sessionId);
         List<ChatHistoryMessage> messages =
                 chatHistoryRepository.findByScopeKey(scopeKey, HISTORY_LIMIT).stream()
                         .map(this::toHistoryMessage)

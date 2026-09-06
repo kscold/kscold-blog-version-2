@@ -62,6 +62,19 @@ class FeedCommentControllerTest {
         verify(clientIdentifierResolver, org.mockito.Mockito.never()).resolve(httpServletRequest);
     }
 
+    @Test
+    @DisplayName("시나리오: Spring 익명 principal은 댓글 좋아요 식별자로 사용하지 않는다")
+    void toggleLikeNormalizesAnonymousPrincipal() {
+        when(clientIdentifierResolver.resolve(httpServletRequest)).thenReturn("client-1");
+        when(feedCommentUseCase.toggleLike("feed-1", "comment-1", "client-1"))
+                .thenReturn(likedComment("client-1"));
+
+        feedCommentController.toggleLike(
+                "feed-1", "comment-1", "anonymousUser", httpServletRequest);
+
+        verify(feedCommentUseCase).toggleLike("feed-1", "comment-1", "client-1");
+    }
+
     private FeedComment likedComment(String identifier) {
         return FeedComment.builder()
                 .id("comment-1")

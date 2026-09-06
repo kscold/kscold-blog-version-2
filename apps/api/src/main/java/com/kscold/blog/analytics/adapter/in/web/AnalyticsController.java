@@ -1,5 +1,7 @@
 package com.kscold.blog.analytics.adapter.in.web;
 
+import static com.kscold.blog.shared.security.AuthenticatedPrincipalPolicy.normalize;
+
 import com.kscold.blog.analytics.adapter.in.web.dto.request.PageVisitRequest;
 import com.kscold.blog.analytics.application.port.in.PageVisitUseCase;
 import com.kscold.blog.analytics.application.service.PageExistenceChecker;
@@ -16,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -80,8 +81,7 @@ public class AnalyticsController {
     }
 
     private String resolveUserId(String raw) {
-        if (!StringUtils.hasText(raw) || "anonymousUser".equals(raw)) return null;
-        return raw;
+        return normalize(raw);
     }
 
     private String resolveUsername(String userId) {

@@ -1,5 +1,7 @@
 package com.kscold.blog.social.adapter.in.web;
 
+import static com.kscold.blog.shared.security.AuthenticatedPrincipalPolicy.normalize;
+
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
@@ -111,7 +113,10 @@ public class FeedCommentController {
 
     /** 로그인 유저 → userId, 비로그인 → 클라이언트 식별자. 피드 좋아요와 같은 규칙. */
     private String resolveIdentifier(String userId, HttpServletRequest request) {
-        return (userId != null) ? userId : clientIdentifierResolver.resolve(request);
+        String authenticatedUserId = normalize(userId);
+        return authenticatedUserId != null
+                ? authenticatedUserId
+                : clientIdentifierResolver.resolve(request);
     }
 
     private boolean hasAdminRole() {

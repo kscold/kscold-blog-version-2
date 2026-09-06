@@ -1,5 +1,7 @@
 package com.kscold.blog.vault.agent.application.service;
 
+import static com.kscold.blog.shared.security.AuthenticatedPrincipalPolicy.normalize;
+
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
@@ -21,18 +23,19 @@ public class VaultAgentAccessScopeResolver {
     private final UserQueryPort userQueryPort;
 
     public AgentContentAccessScope resolve(@Nullable String userId) {
-        if (!StringUtils.hasText(userId)) {
+        String authenticatedUserId = normalize(userId);
+        if (authenticatedUserId == null) {
             return AgentContentAccessScope.publicOnly();
         }
 
         try {
-            if (userQueryPort.getUserById(userId).isAdmin()) {
+            if (userQueryPort.getUserById(authenticatedUserId).isAdmin()) {
                 return AgentContentAccessScope.fullAccess();
             }
 
             Set<String> postIds = new LinkedHashSet<>();
             Set<String> categoryIds = new LinkedHashSet<>();
-            for (AccessRequest request : accessRequestUseCase.getMyRequests(userId)) {
+            for (AccessRequest request : accessRequestUseCase.getMyRequests(authenticatedUserId)) {
                 if (request.getStatus() != AccessRequest.Status.APPROVED) {
                     continue;
                 }

@@ -75,6 +75,18 @@ class FeedControllerTest {
         verify(userQueryPort, never()).getUserById(any());
     }
 
+    @Test
+    @DisplayName("시나리오: Spring 익명 principal은 피드 좋아요 식별자로 사용하지 않는다")
+    void anonymousPrincipalUsesClientIdentifier() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(feedUseCase.getPublicFeeds(any())).thenReturn(new PageImpl<>(List.of()));
+        when(clientIdentifierResolver.resolve(request)).thenReturn("client-1");
+
+        controller.getPublicFeeds(0, 12, null, "anonymousUser", request);
+
+        verify(clientIdentifierResolver).resolve(request);
+    }
+
     private Feed feed(String id, String authorId) {
         return Feed.builder()
                 .id(id)
