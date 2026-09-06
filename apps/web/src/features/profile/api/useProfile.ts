@@ -3,6 +3,7 @@ import apiClient from '@/shared/api/api-client';
 import { User } from '@/shared/model/types/user';
 import { Feed } from '@/shared/model/types/social';
 import { PageResponse } from '@/shared/model/types/api';
+import { type ProfileFeedPage, toProfileFeedPage } from '../lib/profileFeedPage';
 
 export interface PublicProfile {
   id: string;
@@ -84,11 +85,24 @@ export function usePublicProfile(username: string, initialData?: PublicProfile) 
   });
 }
 
-export function useUserFeeds(username: string, page = 0) {
-  return useQuery<PageResponse<Feed>>({
+interface UseUserFeedsOptions {
+  username: string;
+  page?: number;
+  initialData?: ProfileFeedPage;
+}
+
+export function useUserFeeds({ username, page = 0, initialData }: UseUserFeedsOptions) {
+  return useQuery<ProfileFeedPage>({
     queryKey: ['users', username, 'feeds', page],
-    queryFn: () => apiClient.get<PageResponse<Feed>>(`/users/${username}/feeds?page=${page}&size=12`),
+    queryFn: async () => {
+      const feedPage = await apiClient.get<PageResponse<Feed>>(
+        `/users/${encodeURIComponent(username)}/feeds?page=${page}&size=12`
+      );
+      return toProfileFeedPage(feedPage);
+    },
     enabled: !!username,
+    initialData,
+    staleTime: 1000 * 60 * 5,
   });
 }
 

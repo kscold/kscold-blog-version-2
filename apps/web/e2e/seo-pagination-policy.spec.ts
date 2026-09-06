@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { fetchAllPublicApiPages } from '../src/shared/lib/seo/fetch';
+import { fetchAllPublicApiPages, fetchPublicApi } from '../src/shared/lib/seo/fetch';
 
 test.describe('SEO 페이지 수집 정책', () => {
   test('페이지 크기를 백엔드 상한으로 제한한다', async () => {
@@ -51,5 +51,26 @@ test.describe('SEO 페이지 수집 정책', () => {
     }
 
     expect(requestCount).toBe(500);
+  });
+
+  test('호출자가 전달한 중단 신호를 전역 제한 시간으로 교체하지 않는다', async () => {
+    const controller = new AbortController();
+    const originalFetch = global.fetch;
+    let receivedSignal: AbortSignal | null | undefined;
+    global.fetch = async (_input, init) => {
+      receivedSignal = init?.signal;
+      return Response.json({ data: [] });
+    };
+
+    try {
+      await fetchPublicApi('/signal-check', 60, {
+        signal: controller.signal,
+        timeoutMs: 1,
+      });
+    } finally {
+      global.fetch = originalFetch;
+    }
+
+    expect(receivedSignal).toBe(controller.signal);
   });
 });

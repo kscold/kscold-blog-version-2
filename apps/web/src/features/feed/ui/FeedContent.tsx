@@ -2,11 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import {
-  extractFirstMarkdownHeading,
-  stripFirstMarkdownHeading,
-  stripRichText,
+  type FeedPreview,
   toFeedTitle,
-  toPreviewText,
 } from '@/shared/lib/seo/text';
 import { LinkifiedText } from '@/shared/ui/LinkifiedText';
 
@@ -14,11 +11,10 @@ const MarkdownContent = dynamic(
   () => import('@/shared/ui/MarkdownContent').then(module => module.MarkdownContent)
 );
 
-const FEED_PREVIEW_LENGTH = 320;
-
 interface FeedContentProps {
   authorName: string;
-  content: string;
+  content?: string;
+  preview: FeedPreview;
   linkPreviewTitle?: string;
   variant: 'summary' | 'detail';
 }
@@ -26,14 +22,15 @@ interface FeedContentProps {
 export function FeedContent({
   authorName,
   content,
+  preview,
   linkPreviewTitle,
   variant,
 }: FeedContentProps) {
-  if (!content.trim()) {
-    return null;
-  }
-
   if (variant === 'detail') {
+    if (!content?.trim()) {
+      return null;
+    }
+
     const title = toFeedTitle(content, linkPreviewTitle, `${authorName}의 피드`);
 
     return (
@@ -44,32 +41,30 @@ export function FeedContent({
     );
   }
 
-  // 제목이 있으면 본문에서 떼어내 제목 줄로 세우고, 미리보기는 그 아래 본문만 보여준다.
-  const heading = extractFirstMarkdownHeading(content);
-  const body = heading ? stripFirstMarkdownHeading(content) : content;
-  const plainBody = stripRichText(body);
-  const preview = toPreviewText(body, '', FEED_PREVIEW_LENGTH);
+  if (!preview.heading && !preview.text) {
+    return null;
+  }
 
   return (
     <div className="px-4 py-3 [&_a]:relative [&_a]:z-20">
-      {heading && (
+      {preview.heading && (
         <h2 className="mb-2 text-base font-bold leading-snug tracking-[-0.01em] text-surface-900 sm:text-lg">
-          {heading}
+          {preview.heading}
         </h2>
       )}
-      {preview && (
+      {preview.text && (
         <LinkifiedText
-          text={preview}
+          text={preview.text}
           className="text-sm leading-relaxed text-surface-800"
           // 제목이 서면 카드 상단의 작성자 이름과 겹치므로 이름 접두사를 빼고 본문만 읽히게 둔다.
           prefix={
-            heading ? undefined : (
+            preview.heading ? undefined : (
               <span className="mr-1.5 font-bold text-surface-900">{authorName}</span>
             )
           }
         />
       )}
-      {plainBody.length > FEED_PREVIEW_LENGTH && (
+      {preview.hasMore && (
         <p className="mt-2 text-xs font-semibold text-surface-600">상세에서 계속 읽기</p>
       )}
     </div>

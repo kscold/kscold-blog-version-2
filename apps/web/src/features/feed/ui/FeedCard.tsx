@@ -4,18 +4,36 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Feed } from '@/shared/model/types/social';
+import type { Feed } from '@/shared/model/types/social';
 import { useToggleLike } from '@/features/feed/api/useFeedMutations';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
-import { toFeedTitle } from '@/shared/lib/seo/text';
+import { toFeedPreview, toFeedTitle, type FeedPreview } from '@/shared/lib/seo/text';
 import { filterVisibleTagNames } from '@/shared/lib/tags';
 import { FeedContent } from './FeedContent';
 
+type FeedCardFields = Pick<
+  Feed,
+  | 'id'
+  | 'images'
+  | 'tags'
+  | 'linkPreview'
+  | 'likesCount'
+  | 'commentsCount'
+  | 'isLiked'
+  | 'createdAt'
+> & {
+  author: Pick<Feed['author'], 'username' | 'name' | 'avatar'>;
+  visibility?: Feed['visibility'];
+};
+
+type FeedCardData = FeedCardFields &
+  ({ content: string; preview?: never } | { content?: never; preview: FeedPreview });
+
 interface FeedCardProps {
-  feed: Feed;
+  feed: FeedCardData;
   showCommentLink?: boolean;
   variant?: 'summary' | 'detail';
   imageSizes?: string;
@@ -34,6 +52,7 @@ export function FeedCard({
   const [isLiked, setIsLiked] = useState(feed.isLiked);
   const [likesCount, setLikesCount] = useState(feed.likesCount);
   const visibleTags = filterVisibleTagNames(feed.tags);
+  const contentPreview = feed.preview ?? toFeedPreview(feed.content);
 
   const handleLike = async () => {
     const wasLiked = isLiked;
@@ -49,7 +68,13 @@ export function FeedCard({
   };
 
   const isDetail = variant === 'detail';
-  const feedTitle = toFeedTitle(feed.content, feed.linkPreview?.title, `${feed.author.name}의 피드`);
+  const feedTitle =
+    contentPreview.heading ||
+    toFeedTitle(
+      feed.content ?? contentPreview.text,
+      feed.linkPreview?.title,
+      `${feed.author.name}의 피드`
+    );
   // 상세는 본문 폭에 맞춰 여백을 넓게 쓰고, 목록은 기존 카드 여백을 그대로 둔다.
   const gutter = isDetail ? 'px-5 sm:px-7' : 'px-4';
 
@@ -209,6 +234,7 @@ export function FeedCard({
       <FeedContent
         authorName={feed.author.name}
         content={feed.content}
+        preview={contentPreview}
         linkPreviewTitle={feed.linkPreview?.title}
         variant={variant}
       />

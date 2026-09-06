@@ -1,5 +1,14 @@
 import { SITE_DESCRIPTION } from './constants';
 
+const FEED_PREVIEW_HEADING_LENGTH = 160;
+const FEED_PREVIEW_BODY_LENGTH = 320;
+
+export interface FeedPreview {
+  heading: string | null;
+  text: string;
+  hasMore: boolean;
+}
+
 export function stripRichText(input: string) {
   return input
     .replace(/^---[ \t]*\r?\n[\s\S]*?\r?\n---[ \t]*(?:\r?\n|$)/, ' ')
@@ -46,6 +55,25 @@ export function toPreviewText(input?: string | null, fallback = '', maxLength = 
   }
 
   return `${base.slice(0, maxLength - 3).trim()}...`;
+}
+
+export function toFeedPreview(input?: string | null): FeedPreview {
+  const content = input ?? '';
+  const rawHeading = extractFirstMarkdownHeading(content);
+  const plainHeading = rawHeading ? stripRichText(rawHeading) : '';
+  const heading = rawHeading
+    ? toPreviewText(rawHeading, '', FEED_PREVIEW_HEADING_LENGTH) || null
+    : null;
+  const body = rawHeading ? stripFirstMarkdownHeading(content) : content;
+  const plainBody = stripRichText(body);
+
+  return {
+    heading,
+    text: toPreviewText(body, '', FEED_PREVIEW_BODY_LENGTH),
+    hasMore:
+      plainHeading.length > FEED_PREVIEW_HEADING_LENGTH ||
+      plainBody.length > FEED_PREVIEW_BODY_LENGTH,
+  };
 }
 
 export function toMetaDescription(

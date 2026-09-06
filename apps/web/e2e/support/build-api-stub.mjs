@@ -1,4 +1,11 @@
 import { createServer } from 'node:http';
+import {
+  emptyProfileFeedPage,
+  getProfileFeedPage,
+  getPublicProfileFixture,
+  invalidProfileFeedPage,
+  PROFILE_FEED_SLOW_DELAY_MS,
+} from './profile-feed-fixtures.mjs';
 
 const port = Number(process.env.BUILD_API_PORT || 4100);
 
@@ -17,14 +24,6 @@ const emptyPage = {
   empty: true,
 };
 
-const publicProfile = {
-  id: 'ci-profile',
-  username: 'kscold',
-  displayName: '김승찬',
-  bio: 'CI 빌드 검증용 공개 프로필',
-  socialLinks: {},
-  techStack: ['Spring Boot', 'Next.js', 'Python', 'LangGraph'],
-};
 const featuredPost = {
   id: 'ci-post',
   title: 'CI 프런트엔드 검증 글',
@@ -78,13 +77,21 @@ const vaultTitleIndex = [
   { name: '무관한 노트', slug: 'unrelated-note' },
 ];
 let requestCount = 0;
+const requestCountsByPath = new Map();
 
-function getResponseData(pathname) {
+function getResponseData(requestUrl) {
+  const { pathname, searchParams } = requestUrl;
   if (pathname === '/api/health') {
     return { status: 'UP' };
   }
-  if (pathname === '/api/users/profile/kscold') {
-    return publicProfile;
+  if (pathname.startsWith('/api/users/profile/')) {
+    return getPublicProfileFixture(pathname.slice('/api/users/profile/'.length));
+  }
+  if (pathname === '/api/users/kscold/feeds') {
+    return getProfileFeedPage(Number(searchParams.get('page') ?? 0));
+  }
+  if (pathname === '/api/users/ci-feed-invalid/feeds') {
+    return invalidProfileFeedPage;
   }
   if (
     pathname === '/api/categories' ||
@@ -123,15 +130,45 @@ function getResponseData(pathname) {
 
 const server = createServer((request, response) => {
   const requestUrl = new URL(request.url || '/', `http://127.0.0.1:${port}`);
+  setCorsHeaders(request, response);
+  if (request.method === 'OPTIONS') {
+    response.writeHead(204);
+    response.end();
+    return;
+  }
   if (requestUrl.pathname === '/__request-count') {
+    const pathname = requestUrl.searchParams.get('pathname');
+    const count = pathname ? requestCountsByPath.get(pathname) ?? 0 : requestCount;
     response.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-    response.end(String(requestCount));
+    response.end(String(count));
     return;
   }
   if (requestUrl.pathname !== '/api/health') {
     requestCount += 1;
+    requestCountsByPath.set(
+      requestUrl.pathname,
+      (requestCountsByPath.get(requestUrl.pathname) ?? 0) + 1
+    );
   }
-  const data = getResponseData(requestUrl.pathname);
+
+  if (requestUrl.pathname === '/api/users/ci-feed-failure/feeds') {
+    response.setHeader('Content-Type', 'application/json; charset=utf-8');
+    response.writeHead(503);
+    response.end(JSON.stringify({ success: false }));
+    return;
+  }
+
+  if (requestUrl.pathname === '/api/users/ci-feed-slow/feeds') {
+    setTimeout(() => {
+      if (response.destroyed) return;
+      response.setHeader('Content-Type', 'application/json; charset=utf-8');
+      response.writeHead(200);
+      response.end(JSON.stringify({ success: true, data: emptyProfileFeedPage }));
+    }, PROFILE_FEED_SLOW_DELAY_MS);
+    return;
+  }
+
+  const data = getResponseData(requestUrl);
 
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   if (data === null) {
@@ -143,6 +180,17 @@ const server = createServer((request, response) => {
   response.writeHead(200);
   response.end(JSON.stringify({ success: true, data }));
 });
+
+function setCorsHeaders(request, response) {
+  const origin = request.headers.origin;
+  if (origin) {
+    response.setHeader('Access-Control-Allow-Origin', origin);
+    response.setHeader('Access-Control-Allow-Credentials', 'true');
+    response.setHeader('Vary', 'Origin');
+  }
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  response.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+}
 
 server.listen(port, '127.0.0.1');
 

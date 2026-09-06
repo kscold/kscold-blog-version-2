@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
-import { PublicProfileContainer } from '@/widgets/profile';
+import { loadPublicProfileFeeds, PublicProfileContainer } from '@/widgets/profile';
 import type { PublicProfile } from '@/features/profile';
 import { PROFILE } from '@/entities/profile';
 import {
@@ -67,6 +67,8 @@ export default async function PublicProfilePage({ params }: Props) {
     notFound();
   }
 
+  const profileFeeds = await loadPublicProfileFeeds(username);
+
   const canonicalPath = `/profile/${encodeURIComponent(profile.username)}`;
   const profileName = getProfileName(profile);
   const description = toMetaDescription(
@@ -87,6 +89,14 @@ export default async function PublicProfilePage({ params }: Props) {
             /^https?:\/\//.test(link)
           ),
         };
+  const indexableFeedParts = (profileFeeds?.indexableFeedIds ?? []).map(feedId => {
+    const feedPath = `/feed/${encodeURIComponent(feedId)}`;
+    return {
+      '@type': 'SocialMediaPosting',
+      '@id': `${absoluteUrl(feedPath)}#posting`,
+      url: absoluteUrl(feedPath),
+    };
+  });
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -98,6 +108,7 @@ export default async function PublicProfilePage({ params }: Props) {
         description,
         mainEntity: profileEntity,
         isPartOf: { '@id': `${absoluteUrl('/')}#website` },
+        ...(indexableFeedParts.length > 0 ? { hasPart: indexableFeedParts } : {}),
       },
       buildBreadcrumbJsonLd([
         { name: '홈', path: '/' },
@@ -110,7 +121,11 @@ export default async function PublicProfilePage({ params }: Props) {
   return (
     <>
       <JsonLd id={`profile-${profile.username}`} data={jsonLd} />
-      <PublicProfileContainer username={username} initialProfile={profile} />
+      <PublicProfileContainer
+        username={profile.username}
+        initialProfile={profile}
+        initialFeeds={profileFeeds?.initialPage ?? null}
+      />
     </>
   );
 }

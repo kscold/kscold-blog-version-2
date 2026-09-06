@@ -8,6 +8,11 @@ const DEFAULT_SEO_PAGE_SIZE = 100;
 const MAX_SEO_PAGE_SIZE = 100;
 const MAX_SEO_PAGE_REQUESTS = 500;
 
+interface PublicApiRequestOptions {
+  signal?: AbortSignal;
+  timeoutMs?: number;
+}
+
 function getSeoApiTimeoutMs() {
   const configuredTimeout = Number(process.env.SEO_API_TIMEOUT_MS);
 
@@ -18,14 +23,32 @@ function getSeoApiTimeoutMs() {
     : DEFAULT_SEO_API_TIMEOUT_MS;
 }
 
-export async function fetchPublicApi<T>(path: string, revalidate = 3600): Promise<T | null> {
+export async function fetchPublicApi<T>(
+  path: string,
+  revalidate = 3600,
+  options: PublicApiRequestOptions = {}
+): Promise<T | null> {
+  const signal = options.signal ?? createSeoApiTimeoutSignal(options.timeoutMs);
+
   return fetchSeoApi<T>(
     path,
     {
       next: { revalidate },
+      ...(signal ? { signal } : {}),
     },
     [404]
   );
+}
+
+function createSeoApiTimeoutSignal(timeoutMs?: number) {
+  if (timeoutMs === undefined) {
+    return undefined;
+  }
+  if (!Number.isInteger(timeoutMs) || timeoutMs <= 0 || timeoutMs > MAX_SEO_API_TIMEOUT_MS) {
+    throw new Error('SEO API 호출별 제한 시간이 올바르지 않습니다.');
+  }
+
+  return AbortSignal.timeout(timeoutMs);
 }
 
 export async function fetchAllPublicApiPages<T>(
@@ -103,7 +126,7 @@ async function fetchSeoApi<T>(
   try {
     response = await fetch(requestUrl, {
       ...init,
-      signal: AbortSignal.timeout(getSeoApiTimeoutMs()),
+      signal: init.signal ?? AbortSignal.timeout(getSeoApiTimeoutMs()),
     });
   } catch {
     throw new Error('SEO API에 연결할 수 없습니다.');

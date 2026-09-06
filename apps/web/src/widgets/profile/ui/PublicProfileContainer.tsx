@@ -2,22 +2,38 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { type PublicProfile, usePublicProfile, useUserFeeds } from '@/features/profile';
+import {
+  type ProfileFeedPage,
+  type PublicProfile,
+  usePublicProfile,
+  useUserFeeds,
+} from '@/features/profile';
 import { ProfileHeaderCard } from './ProfileHeaderCard';
 import { ProfileFeedList } from './ProfileFeedList';
 
 interface Props {
   username: string;
   initialProfile: PublicProfile;
+  initialFeeds: ProfileFeedPage | null;
 }
 
-export function PublicProfileContainer({ username, initialProfile }: Props) {
+export function PublicProfileContainer({ username, initialProfile, initialFeeds }: Props) {
   const { data: profile, isLoading: profileLoading, isError } = usePublicProfile(
     username,
     initialProfile
   );
   const [page, setPage] = useState(0);
-  const { data: feedsData, isLoading: feedsLoading } = useUserFeeds(username, page);
+  const {
+    data: feedsData,
+    isLoading: feedsLoading,
+    isError: feedsError,
+  } = useUserFeeds({
+    username,
+    page,
+    initialData: page === 0 ? initialFeeds ?? undefined : undefined,
+  });
+  const feedsUnavailable =
+    feedsError || (page === 0 && initialFeeds === null && !feedsData);
 
   if (profileLoading) {
     return (
@@ -48,6 +64,7 @@ export function PublicProfileContainer({ username, initialProfile }: Props) {
         <ProfileFeedList
           feedsData={feedsData}
           feedsLoading={feedsLoading}
+          feedsUnavailable={feedsUnavailable}
           page={page}
           setPage={setPage}
         />

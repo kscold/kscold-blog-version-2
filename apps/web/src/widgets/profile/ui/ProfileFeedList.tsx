@@ -1,21 +1,32 @@
 'use client';
 
 import { FeedCard } from '@/features/feed';
-import type { PageResponse } from '@/shared/model/types/api';
-import type { Feed } from '@/shared/model/types/social';
+import type { ProfileFeedPage } from '@/features/profile';
 
 interface Props {
-  feedsData?: PageResponse<Feed>;
+  feedsData?: ProfileFeedPage;
   feedsLoading: boolean;
+  feedsUnavailable: boolean;
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export function ProfileFeedList({ feedsData, feedsLoading, page, setPage }: Props) {
+export function ProfileFeedList({
+  feedsData,
+  feedsLoading,
+  feedsUnavailable,
+  page,
+  setPage,
+}: Props) {
   return (
     <div>
       <h2 className="text-sm font-semibold text-surface-500 uppercase tracking-wide mb-4">게시물</h2>
-      {feedsLoading ? (
+      {feedsUnavailable ? (
+        <div className="rounded-2xl border border-surface-200 bg-white px-5 py-10 text-center">
+          <p className="text-sm font-medium text-surface-600">피드를 불러오지 못했습니다.</p>
+          <p className="mt-1 text-xs text-surface-400">프로필은 정상적으로 확인할 수 있습니다.</p>
+        </div>
+      ) : feedsLoading ? (
         <div className="flex justify-center py-12">
           <div className="w-6 h-6 border-2 border-surface-300 border-t-surface-800 rounded-full animate-spin" />
         </div>
