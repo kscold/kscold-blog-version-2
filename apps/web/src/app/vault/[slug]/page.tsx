@@ -19,6 +19,10 @@ const getVaultNote = cache((slug: string) =>
   fetchPublicApi<VaultNote>(`/vault/notes/slug/${slug}`)
 );
 
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({
   params,
 }: {

@@ -27,6 +27,10 @@ const getTagSeoData = cache(async (tagSlug: string) => {
   return { tag, publicPostCount };
 });
 
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({
   params,
 }: {

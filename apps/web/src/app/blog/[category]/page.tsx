@@ -16,6 +16,10 @@ const getCategory = cache((categorySlug: string) =>
   fetchPublicApi<Category>(`/categories/slug/${categorySlug}`)
 );
 
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({
   params,
 }: {
