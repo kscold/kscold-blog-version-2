@@ -30,24 +30,25 @@ public class AuthController {
     private final AuthCookieManager authCookieManager;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<AuthResponse>> register(
+    public ResponseEntity<ApiResponse<AuthSessionResponse>> register(
             @Valid @RequestBody RegisterCommand command, HttpServletResponse response) {
         AuthResponse result = authUseCase.register(command);
         authCookieManager.addAuthenticationCookies(response, result);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(result, "회원가입이 완료되었습니다"));
+                .body(ApiResponse.success(AuthSessionResponse.from(result), "회원가입이 완료되었습니다"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponse>> login(
+    public ResponseEntity<ApiResponse<AuthSessionResponse>> login(
             @Valid @RequestBody LoginCommand command, HttpServletResponse response) {
         AuthResponse result = authUseCase.login(command);
         authCookieManager.addAuthenticationCookies(response, result);
-        return ResponseEntity.ok(ApiResponse.success(result, "로그인에 성공했습니다"));
+        return ResponseEntity.ok(
+                ApiResponse.success(AuthSessionResponse.from(result), "로그인에 성공했습니다"));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<AuthResponse>> refresh(
+    public ResponseEntity<ApiResponse<AuthSessionResponse>> refresh(
             @Valid @RequestBody(required = false) RefreshTokenCommand command,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -55,7 +56,8 @@ public class AuthController {
         String refreshToken = authCookieManager.resolveRefreshToken(request, requestToken);
         AuthResponse result = authUseCase.refresh(refreshToken);
         authCookieManager.addAuthenticationCookies(response, result);
-        return ResponseEntity.ok(ApiResponse.success(result, "토큰이 갱신되었습니다"));
+        return ResponseEntity.ok(
+                ApiResponse.success(AuthSessionResponse.from(result), "토큰이 갱신되었습니다"));
     }
 
     @PostMapping("/logout")
