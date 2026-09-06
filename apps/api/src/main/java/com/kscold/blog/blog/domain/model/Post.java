@@ -24,16 +24,26 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Document(collection = "posts")
 @CompoundIndexes({
-    // 공개 글 목록의 기본 정렬과 인기 글 조회가 컬렉션 전체 스캔으로 커지지 않게 한다.
-    @CompoundIndex(name = "idx_status_publishedAt", def = "{'status': 1, 'publishedAt': -1}"),
-    @CompoundIndex(name = "idx_status_views", def = "{'status': 1, 'views': -1}"),
-    // 카테고리·태그 아카이브의 공개 글 필터와 발행일 정렬을 함께 지원한다.
+    // 공개 목록의 허용 정렬을 고유 식별자로 안정화하고 필터 뒤 정렬까지 인덱스로 처리한다.
     @CompoundIndex(
-            name = "idx_category_status_publishedAt",
-            def = "{'category.id': 1, 'status': 1, 'publishedAt': -1}"),
+            name = "idx_status_publishedAt_id_v2",
+            def = "{'status': 1, 'publishedAt': -1, '_id': -1}"),
     @CompoundIndex(
-            name = "idx_tags_status_publishedAt",
-            def = "{'tags.id': 1, 'status': 1, 'publishedAt': -1}")
+            name = "idx_status_createdAt_id_v2",
+            def = "{'status': 1, 'createdAt': -1, '_id': -1}"),
+    @CompoundIndex(
+            name = "idx_status_updatedAt_id_v2",
+            def = "{'status': 1, 'updatedAt': -1, '_id': -1}"),
+    @CompoundIndex(name = "idx_status_views_id_v2", def = "{'status': 1, 'views': -1, '_id': -1}"),
+    // 카테고리·태그의 중첩 식별자는 실제 BSON 필드명인 _id를 사용한다.
+    @CompoundIndex(
+            name = "idx_category_status_publishedAt_id_v2",
+            def = "{'category._id': 1, 'status': 1, 'publishedAt': -1, '_id': -1}"),
+    @CompoundIndex(
+            name = "idx_tags_status_publishedAt_id_v2",
+            def = "{'tags._id': 1, 'status': 1, 'publishedAt': -1, '_id': -1}"),
+    // 관리자 목록은 상태를 제한하지 않으므로 별도의 생성일 정렬 인덱스를 사용한다.
+    @CompoundIndex(name = "idx_createdAt_id_v2", def = "{'createdAt': -1, '_id': -1}")
 })
 public class Post {
     @Id private String id;

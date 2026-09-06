@@ -9,6 +9,7 @@ import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
 import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Post;
+import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.BoundedPageRequestFactory;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PostController {
 
+    private static final int MAX_PUBLIC_PAGE_INDEX = 499;
     private static final Set<String> PUBLIC_SORT_FIELDS =
             Set.of("publishedAt", "createdAt", "updatedAt", "views");
 
@@ -57,8 +59,7 @@ public class PostController {
         Sort.Direction direction =
                 sortDirection.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         String safeSortBy = PUBLIC_SORT_FIELDS.contains(sortBy) ? sortBy : "publishedAt";
-        Pageable pageable =
-                BoundedPageRequestFactory.of(page, size, Sort.by(direction, safeSortBy));
+        Pageable pageable = publicPageable(page, size, stableSort(direction, safeSortBy));
         Page<Post> posts = postUseCase.getAll(pageable);
         return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
@@ -67,7 +68,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<List<PostResponse>>> getFeaturedPosts(
             @RequestParam(defaultValue = "5") int limit) {
         Pageable pageable =
-                BoundedPageRequestFactory.of(0, limit, Sort.by(Sort.Direction.DESC, "views"));
+                BoundedPageRequestFactory.of(0, limit, stableSort(Sort.Direction.DESC, "views"));
         List<Post> posts = postUseCase.getFeatured(pageable);
         return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
@@ -115,8 +116,7 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable =
-                BoundedPageRequestFactory.of(
-                        page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
+                publicPageable(page, size, stableSort(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByCategory(categoryId, pageable);
         return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
@@ -127,8 +127,7 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable =
-                BoundedPageRequestFactory.of(
-                        page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
+                publicPageable(page, size, stableSort(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.getByTag(tagId, pageable);
         return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
@@ -139,8 +138,7 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable =
-                BoundedPageRequestFactory.of(
-                        page, size, Sort.by(Sort.Direction.DESC, "publishedAt"));
+                publicPageable(page, size, stableSort(Sort.Direction.DESC, "publishedAt"));
         Page<Post> posts = postUseCase.search(PublicSearchQueryNormalizer.normalize(q), pageable);
         return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }
@@ -175,7 +173,8 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable =
-                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+                BoundedPageRequestFactory.of(
+                        page, size, stableSort(Sort.Direction.DESC, "createdAt"));
         Page<Post> posts = postUseCase.getAllAdmin(pageable);
         return ResponseEntity.ok(ApiResponse.success(posts.map(this::toFullPostResponse)));
     }
@@ -199,6 +198,17 @@ public class PostController {
         }
 
         return PostResponse.restricted(post);
+    }
+
+    private Pageable publicPageable(int page, int size, Sort sort) {
+        if (page > MAX_PUBLIC_PAGE_INDEX) {
+            throw InvalidRequestException.invalidInput("공개 포스트 페이지 상한을 초과했습니다.");
+        }
+        return BoundedPageRequestFactory.of(page, size, sort);
+    }
+
+    private Sort stableSort(Sort.Direction direction, String primaryField) {
+        return Sort.by(direction, primaryField, "id");
     }
 
     private Page<PostResponse> toPublicPostResponses(Page<Post> posts) {

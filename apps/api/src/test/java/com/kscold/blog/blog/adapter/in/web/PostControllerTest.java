@@ -30,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -148,7 +149,11 @@ class PostControllerTest {
         Pageable pageable = pageableCaptor.getValue();
         assertThat(pageable.getPageNumber()).isZero();
         assertThat(pageable.getPageSize()).isEqualTo(100);
-        assertThat(pageable.getSort().getOrderFor("publishedAt")).isNotNull();
+        assertThat(pageable.getSort().toList())
+                .extracting(Sort.Order::getProperty)
+                .containsExactly("publishedAt", "id");
+        assertThat(pageable.getSort().getOrderFor("id").getDirection())
+                .isEqualTo(Sort.Direction.ASC);
         assertThat(pageable.getSort().getOrderFor("content")).isNull();
     }
 
