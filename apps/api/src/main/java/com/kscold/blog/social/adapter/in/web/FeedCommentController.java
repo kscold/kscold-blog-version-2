@@ -46,7 +46,7 @@ public class FeedCommentController {
         requireReadable(feedId, userId);
         Pageable pageable =
                 BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
-        Page<FeedComment> comments = feedCommentUseCase.getByFeedId(feedId, pageable, userId);
+        Page<FeedComment> comments = feedCommentUseCase.getByFeedId(feedId, pageable);
         boolean isAdmin = hasAdminRole();
         String identifier = resolveIdentifier(userId, request);
         return ResponseEntity.ok(

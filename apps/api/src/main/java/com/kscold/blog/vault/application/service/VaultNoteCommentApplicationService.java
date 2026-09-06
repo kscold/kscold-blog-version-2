@@ -9,8 +9,6 @@ import com.kscold.blog.vault.application.port.in.VaultNoteCommentUseCase;
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,7 +28,6 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
     @Transactional
     public VaultNoteComment create(String noteId, NoteCommentCreateCommand command, String userId) {
         User user = getAuthenticatedUser(userId);
-        claimAnonymousComments(noteId, user);
 
         VaultNoteComment comment =
                 VaultNoteComment.builder()
@@ -47,20 +44,13 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
         return saved;
     }
 
-    public Page<VaultNoteComment> getByNoteId(
-            String noteId, Pageable pageable, String currentUserId) {
-        if (currentUserId != null && !currentUserId.isBlank()) {
-            userRepository
-                    .findById(currentUserId)
-                    .ifPresent(user -> claimAnonymousComments(noteId, user));
-        }
+    public Page<VaultNoteComment> getByNoteId(String noteId, Pageable pageable) {
         return commentRepository.findByNoteId(noteId, pageable);
     }
 
     @Transactional
     public void delete(String noteId, String commentId, String currentUserId) {
         User user = getAuthenticatedUser(currentUserId);
-        claimAnonymousComments(noteId, user);
 
         VaultNoteComment comment =
                 commentRepository
@@ -85,40 +75,5 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
         return userRepository
                 .findById(userId)
                 .orElseThrow(() -> ResourceNotFoundException.user(userId));
-    }
-
-    private void claimAnonymousComments(String noteId, User user) {
-        List<String> authorNames = candidateAuthorNames(user);
-        if (authorNames.isEmpty()) {
-            return;
-        }
-
-        List<VaultNoteComment> commentsToClaim =
-                commentRepository.findAnonymousByNoteIdAndAuthorNames(noteId, authorNames);
-        if (commentsToClaim.isEmpty()) {
-            return;
-        }
-
-        commentsToClaim.forEach(
-                comment -> {
-                    comment.setUserId(user.getId());
-                    comment.setAuthorRole(user.getRole());
-                    comment.setAuthorPassword(null);
-                    comment.setAuthorName(user.getDisplayName());
-                });
-        commentRepository.saveAll(commentsToClaim);
-    }
-
-    private List<String> candidateAuthorNames(User user) {
-        List<String> names = new ArrayList<>();
-        if (user.getProfile() != null
-                && user.getProfile().getDisplayName() != null
-                && !user.getProfile().getDisplayName().isBlank()) {
-            names.add(user.getProfile().getDisplayName().trim());
-        }
-        if (user.getUsername() != null && !user.getUsername().isBlank()) {
-            names.add(user.getUsername().trim());
-        }
-        return names.stream().distinct().toList();
     }
 }

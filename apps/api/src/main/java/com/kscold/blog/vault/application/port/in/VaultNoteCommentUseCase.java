@@ -9,7 +9,7 @@ public interface VaultNoteCommentUseCase {
 
     VaultNoteComment create(String noteId, NoteCommentCreateCommand command, String userId);
 
-    Page<VaultNoteComment> getByNoteId(String noteId, Pageable pageable, String currentUserId);
+    Page<VaultNoteComment> getByNoteId(String noteId, Pageable pageable);
 
     void delete(String noteId, String commentId, String currentUserId);
 }

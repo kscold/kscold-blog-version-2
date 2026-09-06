@@ -11,15 +11,11 @@ public interface FeedCommentRepository {
 
     FeedComment save(FeedComment comment);
 
-    List<FeedComment> saveAll(List<FeedComment> comments);
-
     void delete(FeedComment comment);
 
     Page<FeedComment> findByFeedId(String feedId, Pageable pageable);
 
     List<String> findDistinctUserIdsByFeedId(String feedId);
-
-    List<FeedComment> findAnonymousByFeedIdAndAuthorNames(String feedId, List<String> authorNames);
 
     void deleteAllByFeedId(String feedId);
 

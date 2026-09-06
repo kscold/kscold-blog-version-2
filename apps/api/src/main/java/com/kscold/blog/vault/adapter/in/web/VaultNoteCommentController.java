@@ -35,7 +35,7 @@ public class VaultNoteCommentController {
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable =
                 BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
-        Page<VaultNoteComment> comments = commentUseCase.getByNoteId(noteId, pageable, userId);
+        Page<VaultNoteComment> comments = commentUseCase.getByNoteId(noteId, pageable);
         boolean isAdmin = hasAdminRole();
         return ResponseEntity.ok(
                 ApiResponse.success(

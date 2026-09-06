@@ -2,7 +2,6 @@ package com.kscold.blog.vault.adapter.out.persistence;
 
 import com.kscold.blog.vault.domain.model.VaultNoteComment;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,11 +21,6 @@ public class VaultNoteCommentRepositoryAdapter implements VaultNoteCommentReposi
     }
 
     @Override
-    public List<VaultNoteComment> saveAll(List<VaultNoteComment> comments) {
-        return mongoRepository.saveAll(comments);
-    }
-
-    @Override
     public Optional<VaultNoteComment> findById(String id) {
         return mongoRepository.findById(id);
     }
@@ -34,12 +28,6 @@ public class VaultNoteCommentRepositoryAdapter implements VaultNoteCommentReposi
     @Override
     public Page<VaultNoteComment> findByNoteId(String noteId, Pageable pageable) {
         return mongoRepository.findByNoteId(noteId, pageable);
-    }
-
-    @Override
-    public List<VaultNoteComment> findAnonymousByNoteIdAndAuthorNames(
-            String noteId, List<String> authorNames) {
-        return mongoRepository.findByNoteIdAndUserIdIsNullAndAuthorNameIn(noteId, authorNames);
     }
 
     @Override

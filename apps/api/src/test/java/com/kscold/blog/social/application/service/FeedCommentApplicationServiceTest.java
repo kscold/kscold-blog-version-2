@@ -3,11 +3,10 @@ package com.kscold.blog.social.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.InvalidRequestException;
@@ -48,36 +47,16 @@ class FeedCommentApplicationServiceTest {
     @InjectMocks private FeedCommentApplicationService feedCommentApplicationService;
 
     @Test
-    @DisplayName("시나리오: 로그인 사용자가 댓글을 작성하면 같은 이름의 익명 댓글이 계정에 귀속되고 새 댓글이 저장된다")
-    void createClaimsAnonymousCommentsAndSavesNewComment() {
+    @DisplayName("시나리오: 로그인 사용자가 댓글을 작성하면 새 댓글만 계정 소유로 저장된다")
+    void createSavesNewAuthenticatedComment() {
         User user = UserFixtures.user("user-1", User.Role.USER, "kscold", "김승찬");
-        FeedComment legacyComment =
-                FeedComment.builder()
-                        .id("legacy-1")
-                        .feedId("feed-1")
-                        .authorName("kscold")
-                        .authorPassword("secret")
-                        .content("예전 익명 댓글")
-                        .build();
         when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
-        when(feedCommentRepository.findAnonymousByFeedIdAndAuthorNames(eq("feed-1"), anyList()))
-                .thenReturn(List.of(legacyComment));
-        when(feedCommentRepository.saveAll(anyList()))
-                .thenAnswer(invocation -> invocation.getArgument(0));
         when(feedCommentRepository.save(any(FeedComment.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         FeedComment saved =
                 feedCommentApplicationService.create(
                         "feed-1", new FeedCommentCreateCommand(null, null, "새 댓글"), "user-1");
-
-        ArgumentCaptor<List<FeedComment>> claimedCaptor = ArgumentCaptor.captor();
-        verify(feedCommentRepository).saveAll(claimedCaptor.capture());
-        FeedComment claimed = claimedCaptor.getValue().get(0);
-        assertThat(claimed.getUserId()).isEqualTo("user-1");
-        assertThat(claimed.getAuthorName()).isEqualTo("김승찬");
-        assertThat(claimed.getAuthorRole()).isEqualTo(User.Role.USER);
-        assertThat(claimed.getAuthorPassword()).isNull();
 
         assertThat(saved.getFeedId()).isEqualTo("feed-1");
         assertThat(saved.getAuthorName()).isEqualTo("김승찬");
@@ -96,34 +75,24 @@ class FeedCommentApplicationServiceTest {
     }
 
     @Test
-    @DisplayName("시나리오: 로그인 사용자가 댓글 목록을 조회하면 예전 익명 댓글 귀속이 먼저 수행된다")
-    void getByFeedIdClaimsAnonymousCommentsBeforeReturningPage() {
-        User user = UserFixtures.user("user-1", User.Role.USER, "kscold", "김승찬");
+    @DisplayName("시나리오: 로그인 사용자가 댓글을 조회해도 같은 이름의 익명 댓글 소유권은 유지된다")
+    void getByFeedIdDoesNotClaimAnonymousCommentByName() {
         FeedComment legacyComment =
                 FeedComment.builder()
                         .id("legacy-1")
                         .feedId("feed-1")
                         .authorName("kscold")
+                        .authorPassword("기존-검증값")
                         .content("예전 익명 댓글")
                         .build();
-        when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
-        when(feedCommentRepository.findAnonymousByFeedIdAndAuthorNames(eq("feed-1"), anyList()))
-                .thenReturn(List.of(legacyComment));
-        when(feedCommentRepository.saveAll(anyList()))
-                .thenAnswer(invocation -> invocation.getArgument(0));
         when(feedCommentRepository.findByFeedId(eq("feed-1"), any()))
                 .thenReturn(new PageImpl<>(List.of(legacyComment)));
 
-        var page =
-                feedCommentApplicationService.getByFeedId(
-                        "feed-1", PageRequest.of(0, 20), "user-1");
+        var page = feedCommentApplicationService.getByFeedId("feed-1", PageRequest.of(0, 20));
 
-        assertThat(page.getContent()).hasSize(1);
-        var inOrder = inOrder(feedCommentRepository);
-        inOrder.verify(feedCommentRepository)
-                .findAnonymousByFeedIdAndAuthorNames(eq("feed-1"), anyList());
-        inOrder.verify(feedCommentRepository).saveAll(anyList());
-        inOrder.verify(feedCommentRepository).findByFeedId(eq("feed-1"), any());
+        assertThat(page.getContent().get(0).getUserId()).isNull();
+        assertThat(page.getContent().get(0).getAuthorPassword()).isEqualTo("기존-검증값");
+        verifyNoInteractions(userRepository);
     }
 
     @Test
@@ -139,8 +108,6 @@ class FeedCommentApplicationServiceTest {
                         .content("댓글")
                         .build();
         when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
-        when(feedCommentRepository.findAnonymousByFeedIdAndAuthorNames(eq("feed-1"), anyList()))
-                .thenReturn(List.of());
         when(feedCommentRepository.findById("comment-1")).thenReturn(Optional.of(comment));
 
         assertThatThrownBy(

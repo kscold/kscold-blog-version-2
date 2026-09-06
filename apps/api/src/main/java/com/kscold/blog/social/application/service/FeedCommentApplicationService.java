@@ -10,7 +10,6 @@ import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
 import com.kscold.blog.social.domain.model.FeedComment;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
 import com.kscold.blog.social.domain.port.out.FeedRepository;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,6 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
     @Transactional
     public FeedComment create(String feedId, FeedCommentCreateCommand command, String userId) {
         User user = getAuthenticatedUser(userId);
-        claimAnonymousComments(feedId, user);
 
         FeedComment comment =
                 FeedComment.builder()
@@ -67,19 +65,13 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
         return mentionResolver.mentionableUsers(feedId);
     }
 
-    public Page<FeedComment> getByFeedId(String feedId, Pageable pageable, String currentUserId) {
-        if (currentUserId != null && !currentUserId.isBlank()) {
-            userRepository
-                    .findById(currentUserId)
-                    .ifPresent(user -> claimAnonymousComments(feedId, user));
-        }
+    public Page<FeedComment> getByFeedId(String feedId, Pageable pageable) {
         return feedCommentRepository.findByFeedId(feedId, pageable);
     }
 
     @Transactional
     public void delete(String feedId, String commentId, String currentUserId) {
         User user = getAuthenticatedUser(currentUserId);
-        claimAnonymousComments(feedId, user);
 
         FeedComment comment =
                 feedCommentRepository
@@ -122,40 +114,5 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
         return userRepository
                 .findById(userId)
                 .orElseThrow(() -> ResourceNotFoundException.user(userId));
-    }
-
-    private void claimAnonymousComments(String feedId, User user) {
-        List<String> authorNames = candidateAuthorNames(user);
-        if (authorNames.isEmpty()) {
-            return;
-        }
-
-        List<FeedComment> commentsToClaim =
-                feedCommentRepository.findAnonymousByFeedIdAndAuthorNames(feedId, authorNames);
-        if (commentsToClaim.isEmpty()) {
-            return;
-        }
-
-        commentsToClaim.forEach(
-                comment -> {
-                    comment.setUserId(user.getId());
-                    comment.setAuthorRole(user.getRole());
-                    comment.setAuthorPassword(null);
-                    comment.setAuthorName(user.getDisplayName());
-                });
-        feedCommentRepository.saveAll(commentsToClaim);
-    }
-
-    private List<String> candidateAuthorNames(User user) {
-        List<String> names = new ArrayList<>();
-        if (user.getProfile() != null
-                && user.getProfile().getDisplayName() != null
-                && !user.getProfile().getDisplayName().isBlank()) {
-            names.add(user.getProfile().getDisplayName().trim());
-        }
-        if (user.getUsername() != null && !user.getUsername().isBlank()) {
-            names.add(user.getUsername().trim());
-        }
-        return names.stream().distinct().toList();
     }
 }

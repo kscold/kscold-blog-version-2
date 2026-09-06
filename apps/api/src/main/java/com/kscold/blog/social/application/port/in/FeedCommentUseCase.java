@@ -11,7 +11,7 @@ public interface FeedCommentUseCase {
 
     FeedComment create(String feedId, FeedCommentCreateCommand command, String userId);
 
-    Page<FeedComment> getByFeedId(String feedId, Pageable pageable, String currentUserId);
+    Page<FeedComment> getByFeedId(String feedId, Pageable pageable);
 
     void delete(String feedId, String commentId, String currentUserId);
 

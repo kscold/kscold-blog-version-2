@@ -27,11 +27,6 @@ public class FeedCommentRepositoryAdapter implements FeedCommentRepository {
     }
 
     @Override
-    public List<FeedComment> saveAll(List<FeedComment> comments) {
-        return mongoFeedCommentRepository.saveAll(comments);
-    }
-
-    @Override
     public Optional<FeedComment> findById(String id) {
         return mongoFeedCommentRepository.findById(id);
     }
@@ -45,13 +40,6 @@ public class FeedCommentRepositoryAdapter implements FeedCommentRepository {
     public List<String> findDistinctUserIdsByFeedId(String feedId) {
         Query query = Query.query(Criteria.where("feedId").is(feedId).and("userId").ne(null));
         return mongoTemplate.findDistinct(query, "userId", FeedComment.class, String.class);
-    }
-
-    @Override
-    public List<FeedComment> findAnonymousByFeedIdAndAuthorNames(
-            String feedId, List<String> authorNames) {
-        return mongoFeedCommentRepository.findByFeedIdAndUserIdIsNullAndAuthorNameIn(
-                feedId, authorNames);
     }
 
     @Override
