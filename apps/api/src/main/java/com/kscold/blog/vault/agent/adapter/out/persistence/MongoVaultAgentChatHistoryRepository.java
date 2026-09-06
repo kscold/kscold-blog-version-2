@@ -5,6 +5,8 @@ import com.kscold.blog.vault.agent.domain.model.AgentChatStage;
 import com.kscold.blog.vault.agent.domain.model.AgentSource;
 import com.kscold.blog.vault.agent.domain.port.out.VaultAgentChatHistoryRepository;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -62,14 +64,18 @@ public class MongoVaultAgentChatHistoryRepository implements VaultAgentChatHisto
     }
 
     @Override
-    public List<AgentChatMessage> findByScopeKey(String scopeKey, int limit) {
+    public List<AgentChatMessage> findLatestByScopeKey(String scopeKey, int limit) {
         Query query =
                 Query.query(Criteria.where("scopeKey").is(scopeKey))
-                        .with(Sort.by(Sort.Direction.ASC, "createdAt"))
+                        .with(Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("_id")))
                         .limit(limit);
-        return mongoTemplate.find(query, Document.class, COLLECTION).stream()
-                .map(this::toMessage)
-                .toList();
+        List<AgentChatMessage> messages =
+                new ArrayList<>(
+                        mongoTemplate.find(query, Document.class, COLLECTION).stream()
+                                .map(this::toMessage)
+                                .toList());
+        Collections.reverse(messages);
+        return List.copyOf(messages);
     }
 
     @SuppressWarnings("unchecked")

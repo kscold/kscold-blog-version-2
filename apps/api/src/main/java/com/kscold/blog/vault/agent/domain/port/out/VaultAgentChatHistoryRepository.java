@@ -7,5 +7,6 @@ public interface VaultAgentChatHistoryRepository {
 
     void save(AgentChatMessage message);
 
-    List<AgentChatMessage> findByScopeKey(String scopeKey, int limit);
+    /** 범위에서 최신 메시지를 선택한 뒤 시간 오름차순으로 반환한다. */
+    List<AgentChatMessage> findLatestByScopeKey(String scopeKey, int limit);
 }

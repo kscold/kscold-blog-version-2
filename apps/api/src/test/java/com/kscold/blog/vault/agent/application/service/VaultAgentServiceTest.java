@@ -58,11 +58,22 @@ class VaultAgentServiceTest {
     @Test
     @DisplayName("시나리오: Spring 익명 principal의 대화 기록은 클라이언트 범위로 격리한다")
     void anonymousPrincipalUsesGuestHistoryScope() {
-        when(chatHistoryRepository.findByScopeKey("guest:client-1:session-1", 80))
+        when(chatHistoryRepository.findLatestByScopeKey("guest:client-1:session-1", 80))
                 .thenReturn(List.of());
 
         vaultAgentService.history("session-1", "anonymousUser", "client-1");
 
-        verify(chatHistoryRepository).findByScopeKey("guest:client-1:session-1", 80);
+        verify(chatHistoryRepository).findLatestByScopeKey("guest:client-1:session-1", 80);
+    }
+
+    @Test
+    @DisplayName("시나리오: 로그인 사용자의 대화 기록은 클라이언트 식별자와 무관한 계정 범위를 사용한다")
+    void authenticatedPrincipalUsesUserHistoryScope() {
+        when(chatHistoryRepository.findLatestByScopeKey("user:user-1:session-1", 80))
+                .thenReturn(List.of());
+
+        vaultAgentService.history("session-1", "user-1", "client-1");
+
+        verify(chatHistoryRepository).findLatestByScopeKey("user:user-1:session-1", 80);
     }
 }

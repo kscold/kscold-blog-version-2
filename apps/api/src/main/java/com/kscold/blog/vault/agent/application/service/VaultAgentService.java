@@ -144,7 +144,7 @@ public class VaultAgentService implements VaultAgentUseCase {
         String sessionId = normalizeSessionId(requestedSessionId);
         String scopeKey = scopeKey(normalize(userId), clientIdentifier, sessionId);
         List<ChatHistoryMessage> messages =
-                chatHistoryRepository.findByScopeKey(scopeKey, HISTORY_LIMIT).stream()
+                chatHistoryRepository.findLatestByScopeKey(scopeKey, HISTORY_LIMIT).stream()
                         .map(this::toHistoryMessage)
                         .toList();
         return new ChatHistoryResponse(sessionId, messages);
