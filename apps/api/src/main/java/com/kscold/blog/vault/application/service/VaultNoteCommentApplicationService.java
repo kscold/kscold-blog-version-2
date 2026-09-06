@@ -56,6 +56,9 @@ public class VaultNoteCommentApplicationService implements VaultNoteCommentUseCa
                 commentRepository
                         .findById(commentId)
                         .orElseThrow(() -> ResourceNotFoundException.vaultComment(commentId));
+        if (!noteId.equals(comment.getNoteId())) {
+            throw InvalidRequestException.invalidInput("이 노트의 댓글이 아닙니다");
+        }
 
         boolean canDelete =
                 user.getRole() == User.Role.ADMIN || user.getId().equals(comment.getUserId());

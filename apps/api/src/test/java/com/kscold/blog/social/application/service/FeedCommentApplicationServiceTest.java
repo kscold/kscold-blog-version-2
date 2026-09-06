@@ -119,6 +119,30 @@ class FeedCommentApplicationServiceTest {
     }
 
     @Test
+    @DisplayName("시나리오: 다른 피드의 댓글 아이디로 삭제하면 댓글과 카운터를 변경하지 않는다")
+    void deleteRejectsCommentFromAnotherFeed() {
+        User user = UserFixtures.user("user-1", User.Role.USER, "kscold", "김승찬");
+        FeedComment comment =
+                FeedComment.builder()
+                        .id("comment-1")
+                        .feedId("feed-2")
+                        .userId("user-1")
+                        .authorName("김승찬")
+                        .content("댓글")
+                        .build();
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
+        when(feedCommentRepository.findById("comment-1")).thenReturn(Optional.of(comment));
+
+        assertThatThrownBy(
+                        () -> feedCommentApplicationService.delete("feed-1", "comment-1", "user-1"))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessageContaining("이 글의 댓글이 아닙니다");
+
+        verify(feedCommentRepository, never()).delete(any());
+        verifyNoInteractions(feedRepository);
+    }
+
+    @Test
     @DisplayName("시나리오: 비로그인 방문자가 댓글 좋아요를 누르면 식별자로 토글되고 갱신된 댓글이 반환된다")
     void toggleLikeUsesIdentifierAndReturnsUpdatedComment() {
         FeedComment before = FeedComment.builder().id("comment-1").feedId("feed-1").build();

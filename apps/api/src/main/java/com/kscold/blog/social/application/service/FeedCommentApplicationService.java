@@ -77,6 +77,9 @@ public class FeedCommentApplicationService implements FeedCommentUseCase {
                 feedCommentRepository
                         .findById(commentId)
                         .orElseThrow(() -> ResourceNotFoundException.feedComment(commentId));
+        if (!feedId.equals(comment.getFeedId())) {
+            throw InvalidRequestException.invalidInput("이 글의 댓글이 아닙니다");
+        }
 
         boolean canDelete =
                 user.getRole() == User.Role.ADMIN || user.getId().equals(comment.getUserId());

@@ -103,4 +103,30 @@ class VaultNoteCommentApplicationServiceTest {
 
         verify(commentRepository, never()).delete(any());
     }
+
+    @Test
+    @DisplayName("시나리오: 다른 노트의 댓글 아이디로 삭제하면 댓글과 카운터를 변경하지 않는다")
+    void deleteRejectsCommentFromAnotherNote() {
+        User user = UserFixtures.user("user-1", User.Role.USER, "kscold", "김승찬");
+        VaultNoteComment comment =
+                VaultNoteComment.builder()
+                        .id("comment-1")
+                        .noteId("note-2")
+                        .userId("user-1")
+                        .authorName("김승찬")
+                        .content("댓글")
+                        .build();
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
+        when(commentRepository.findById("comment-1")).thenReturn(Optional.of(comment));
+
+        assertThatThrownBy(
+                        () ->
+                                vaultNoteCommentApplicationService.delete(
+                                        "note-1", "comment-1", "user-1"))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessageContaining("이 노트의 댓글이 아닙니다");
+
+        verify(commentRepository, never()).delete(any());
+        verifyNoInteractions(vaultNoteRepository);
+    }
 }
