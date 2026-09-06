@@ -91,6 +91,22 @@ class PostIndexCleanupPolicyTest {
                 .isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("시나리오: 구형 중첩 인덱스도 Spring이 저장한 Mongo 식별자 경로를 사용한다")
+    void legacyNestedSpecsUseMongoIdFields() {
+        Map<String, Document> specs = PostIndexCleanupPolicy.legacyIndexSpecs();
+
+        assertThat(specs)
+                .containsEntry(
+                        "idx_category_status_publishedAt",
+                        new Document("category._id", 1)
+                                .append("status", 1)
+                                .append("publishedAt", -1))
+                .containsEntry(
+                        "idx_tags_status_publishedAt",
+                        new Document("tags._id", 1).append("status", 1).append("publishedAt", -1));
+    }
+
     private Map<String, Document> requiredIndexes() {
         return new LinkedHashMap<>(PostIndexCleanupPolicy.requiredIndexSpecs());
     }

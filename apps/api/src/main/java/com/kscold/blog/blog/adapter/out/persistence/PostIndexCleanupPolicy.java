@@ -32,9 +32,9 @@ final class PostIndexCleanupPolicy {
                     "idx_status_views",
                     new Document("status", 1).append("views", -1),
                     "idx_category_status_publishedAt",
-                    legacyNestedIndex("category.id"),
+                    legacyNestedIndex("category._id"),
                     "idx_tags_status_publishedAt",
-                    legacyNestedIndex("tags.id"));
+                    legacyNestedIndex("tags._id"));
 
     private static final List<String> LEGACY_INDEX_ORDER =
             List.of(
