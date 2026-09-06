@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cache, Suspense } from 'react';
-import type { VaultNote } from '@/shared/model/types/vault';
+import { buildVaultTitleSlugMap, extractVaultWikiLinkTitles } from '@/entities/vault';
+import type { VaultNote, VaultNoteTitle } from '@/shared/model/types/vault';
 import { VaultNoteLayout } from '@/widgets/vault/note';
 import {
   absoluteUrl,
@@ -18,6 +19,14 @@ import { VaultNotePageSkeleton } from '@/shared/ui/RouteSkeletons';
 const getVaultNote = cache((slug: string) =>
   fetchPublicApi<VaultNote>(`/vault/notes/slug/${slug}`)
 );
+
+const getVaultTitleIndex = cache(async () => {
+  try {
+    return (await fetchPublicApi<VaultNoteTitle[]>('/vault/notes/title-index')) ?? [];
+  } catch {
+    return [];
+  }
+});
 
 export function generateStaticParams() {
   return [];
@@ -64,6 +73,10 @@ export default async function VaultNotePage({
     notFound();
   }
 
+  const titleIndex = await getVaultTitleIndex();
+  const referencedTitles = extractVaultWikiLinkTitles(note.content);
+  const initialTitleSlugMap = buildVaultTitleSlugMap(titleIndex, referencedTitles);
+
   const canonicalPath = `/vault/${note.slug}`;
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -92,7 +105,11 @@ export default async function VaultNotePage({
     <>
       <JsonLd id={`vault-${note.id}`} data={jsonLd} />
       <Suspense fallback={<VaultNotePageSkeleton />}>
-        <VaultNoteLayout slug={note.slug} initialNote={note} />
+        <VaultNoteLayout
+          slug={note.slug}
+          initialNote={note}
+          initialTitleSlugMap={initialTitleSlugMap}
+        />
       </Suspense>
     </>
   );

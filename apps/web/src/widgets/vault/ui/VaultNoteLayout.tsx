@@ -13,9 +13,14 @@ import type { VaultNote } from '@/shared/model/types/vault';
 interface VaultNoteLayoutProps {
   slug?: string;
   initialNote?: VaultNote;
+  initialTitleSlugMap?: Record<string, string>;
 }
 
-export function VaultNoteLayout({ slug: initialSlug, initialNote }: VaultNoteLayoutProps) {
+export function VaultNoteLayout({
+  slug: initialSlug,
+  initialNote,
+  initialTitleSlugMap,
+}: VaultNoteLayoutProps) {
   const [shouldLoadGraph, setShouldLoadGraph] = useState(false);
   const { theme } = useUiStore();
   const { isTouchDevice, allowRichEffects } = usePerformanceMode();
@@ -41,7 +46,7 @@ export function VaultNoteLayout({ slug: initialSlug, initialNote }: VaultNoteLay
     localGraph,
     colorMap,
     titleSlugMap,
-  } = useVaultNoteData(slug, initialNote, shouldLoadGraph);
+  } = useVaultNoteData(slug, { initialNote, initialTitleSlugMap, shouldLoadGraph });
 
   const handleGraphNearViewport = useCallback(() => {
     setShouldLoadGraph(true);

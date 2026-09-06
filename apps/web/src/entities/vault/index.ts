@@ -2,6 +2,7 @@
 export * from './api/useVault';
 export * from './api/useVaultComments';
 export * from './lib/vault-utils';
+export * from './lib/vaultWikiLinks';
 export * from './ui/VaultNoteContent';
 export * from './ui/BacklinkList';
 
@@ -9,5 +10,10 @@ export * from './ui/BacklinkList';
 export { useAllVaultNotes, useVaultBacklinks, useVaultFolders, useVaultGraph, useVaultNote, useVaultNoteById, useVaultNotes, useVaultStats, useVaultTitleIndex } from './api/useVault';
 export { useVaultComments } from './api/useVaultComments';
 export { buildFolderColorMap, getAggregatedGraph, getLocalGraph } from './lib/vault-utils';
+export {
+  buildVaultTitleSlugMap,
+  extractVaultWikiLinkTitles,
+  processVaultNoteContent,
+} from './lib/vaultWikiLinks';
 export { BacklinkList } from './ui/BacklinkList';
 export { VaultNoteContent } from './ui/VaultNoteContent';

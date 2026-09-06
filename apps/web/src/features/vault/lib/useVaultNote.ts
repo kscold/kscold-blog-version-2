@@ -6,14 +6,17 @@ import {
   useVaultNote as useVaultNoteQuery,
   useVaultTitleIndex,
 } from '@/entities/vault';
-import { buildFolderColorMap, getLocalGraph } from '@/entities/vault';
+import { buildFolderColorMap, buildVaultTitleSlugMap, getLocalGraph } from '@/entities/vault';
 import type { VaultNote } from '@/shared/model/types/vault';
 
-export function useVaultNoteData(
-  slug: string,
-  initialNote?: VaultNote,
-  shouldLoadGraph = false
-) {
+interface UseVaultNoteDataOptions {
+  initialNote?: VaultNote;
+  initialTitleSlugMap?: Record<string, string>;
+  shouldLoadGraph?: boolean;
+}
+
+export function useVaultNoteData(slug: string, options: UseVaultNoteDataOptions = {}) {
+  const { initialNote, initialTitleSlugMap = {}, shouldLoadGraph = false } = options;
   const { data: note, isLoading: isNoteLoading, isError } = useVaultNoteQuery(slug, initialNote);
   const { data: backlinks } = useVaultBacklinks(note?.id || '');
   const { data: folders, isLoading: isFoldersLoading } = useVaultFolders();
@@ -23,19 +26,12 @@ export function useVaultNoteData(
   const { localGraph, colorMap, titleSlugMap } = useMemo(() => {
     const fList = folders || [];
     const cMap = buildFolderColorMap(fList);
-    // 노트 title → slug 매핑 구축 (wiki-link 변환용)
-    const tsMap: Record<string, string> = {};
-    if (titleIndex) {
-      for (const item of titleIndex) {
-        if (item.name && item.slug) {
-          tsMap[item.name] = item.slug;
-        }
-      }
-    }
+    // 첫 렌더는 서버가 선별한 매핑을 사용하고 조회가 끝나면 전체 최신 인덱스로 교체한다.
+    const tsMap = titleIndex ? buildVaultTitleSlugMap(titleIndex) : initialTitleSlugMap;
     if (!graphData || !note) return { localGraph: null, colorMap: cMap, titleSlugMap: tsMap };
     const graph = getLocalGraph(graphData, note, backlinks || []);
     return { localGraph: graph, colorMap: cMap, titleSlugMap: tsMap };
-  }, [folders, graphData, note, backlinks, titleIndex]);
+  }, [folders, graphData, note, backlinks, titleIndex, initialTitleSlugMap]);
 
   return {
     note,

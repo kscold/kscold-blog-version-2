@@ -56,6 +56,27 @@ const featuredPost = {
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
 };
+const vaultWikiLinkNote = {
+  id: 'ci-vault-note',
+  title: 'CI Vault 위키링크 검증',
+  slug: 'ci-vault-wikilink',
+  content: '[[연결 노트|표시 이름]]과 [[없는 노트]]를 함께 확인합니다.',
+  folderId: 'ci-folder',
+  author: {
+    id: 'ci-author',
+    name: '김승찬',
+  },
+  outgoingLinks: [],
+  tags: ['CI'],
+  views: 0,
+  commentsCount: 0,
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z',
+};
+const vaultTitleIndex = [
+  { name: '연결 노트', slug: 'linked-note' },
+  { name: '무관한 노트', slug: 'unrelated-note' },
+];
 let requestCount = 0;
 
 function getResponseData(pathname) {
@@ -90,6 +111,12 @@ function getResponseData(pathname) {
   }
   if (pathname === '/api/feeds') {
     return emptyPage;
+  }
+  if (pathname === '/api/vault/notes/slug/ci-vault-wikilink') {
+    return vaultWikiLinkNote;
+  }
+  if (pathname === '/api/vault/notes/title-index') {
+    return vaultTitleIndex;
   }
   return null;
 }

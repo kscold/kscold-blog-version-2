@@ -1,5 +1,6 @@
 import { VaultNote } from '@/shared/model/types/vault';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
+import { processVaultNoteContent } from '../lib/vaultWikiLinks';
 
 interface VaultNoteContentProps {
   note: VaultNote;
@@ -8,52 +9,7 @@ interface VaultNoteContentProps {
 }
 
 export function VaultNoteContent({ note, theme = 'light', titleSlugMap = {} }: VaultNoteContentProps) {
-  // 옵시디언 마크다운 문법 → 표준 마크다운 변환
-  const processContent = (rawContent: string) => {
-    let content = rawContent;
-
-    // YAML frontmatter 제거 (노트가 직접 삽입된 경우 대비)
-    content = content.replace(/^---[\s\S]*?---\n?/, '');
-
-    // 옵시디언 callout: > [!NOTE] 제목 → > **참고**: 제목
-    const calloutTypeMap: Record<string, string> = {
-      NOTE: '참고', TIP: '팁', INFO: '정보', IMPORTANT: '중요',
-      WARNING: '주의', CAUTION: '주의', DANGER: '위험', BUG: '버그',
-      EXAMPLE: '예시', QUOTE: '인용', SUMMARY: '요약', ABSTRACT: '요약',
-    };
-    content = content.replace(/^> \[!(\w+)\]\+?\s*(.*?)$/gm, (_, type, title) => {
-      const label = calloutTypeMap[type.toUpperCase()] ?? type;
-      return title.trim() ? `> **[${label}]** ${title.trim()}` : `> **[${label}]**`;
-    });
-
-    // ==highlight== → **highlight** (볼드로 대체)
-    content = content.replace(/==([^=\n]+)==/g, '**$1**');
-
-    // ![[이미지.ext]] → 이미지 마크다운으로 변환
-    content = content.replace(
-      /!\[\[([^\]]+\.(png|jpg|jpeg|gif|webp|svg))\]\]/gi,
-      (_, filename) => `![${filename}](${filename})`,
-    );
-
-    // ![[비이미지 embed]] → 제거
-    content = content.replace(/!\[\[([^\]]+)\]\]/g, '');
-
-    // [[link|display]] → [**display**](/vault/slug)
-    content = content.replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, (_, link, display) => {
-      const slug = titleSlugMap[link.trim()];
-      return slug ? `[**${display}**](/vault/${slug})` : `**${display}**`;
-    });
-
-    // [[link]] → [**link**](/vault/slug)
-    content = content.replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
-      const slug = titleSlugMap[title.trim()];
-      return slug ? `[**${title}**](/vault/${slug})` : `**${title}**`;
-    });
-
-    return content;
-  };
-
-  const parsedContent = processContent(note.content);
+  const parsedContent = processVaultNoteContent(note.content, titleSlugMap);
 
   const formattedDate =
     note.updatedAt || note.createdAt
