@@ -79,9 +79,6 @@ test.describe('회원가입 시나리오', () => {
         body: JSON.stringify({
           success: true,
           data: {
-            accessToken: 'access-token',
-            refreshToken: 'refresh-token',
-            tokenType: 'Bearer',
             user: {
               id: 'user-1',
               email: 'korean-register@example.com',
