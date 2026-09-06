@@ -20,6 +20,36 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await expect(page.locator('[data-cy="nav-link-guestbook"]')).toHaveAttribute('href', '/guestbook');
   });
 
+  test('기본 소셜 미리보기는 대형 KSCOLD 공유 카드를 제공한다', async ({ page }) => {
+    for (const route of ['/', '/blog']) {
+      await page.goto(route);
+      await expect(page.locator('head meta[property="og:image"]')).toHaveAttribute(
+        'content',
+        'https://kscold.com/og-default.png'
+      );
+      await expect(page.locator('head meta[property="og:image:width"]')).toHaveAttribute(
+        'content',
+        '1200'
+      );
+      await expect(page.locator('head meta[property="og:image:height"]')).toHaveAttribute(
+        'content',
+        '630'
+      );
+      await expect(page.locator('head meta[property="og:image:type"]')).toHaveAttribute(
+        'content',
+        'image/png'
+      );
+      await expect(page.locator('head meta[name="twitter:image"]')).toHaveAttribute(
+        'content',
+        'https://kscold.com/og-default.png'
+      );
+      await expect(page.locator('head meta[name="twitter:image:alt"]')).toHaveAttribute(
+        'content',
+        'KSCOLD 로고와 AI Agent, Backend, Full-stack 문구가 있는 김승찬 기술 블로그 공유 카드'
+      );
+    }
+  });
+
   test('포퐁 소개는 최신 공식 워드마크를 원래 비율로 표시한다', async ({ page }) => {
     await page.goto('/info/pawpong');
 

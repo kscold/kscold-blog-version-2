@@ -8,6 +8,9 @@ import {
 } from './constants';
 import { toMetaDescription } from './text';
 
+const DEFAULT_SOCIAL_IMAGE_ALT =
+  'KSCOLD 로고와 AI Agent, Backend, Full-stack 문구가 있는 김승찬 기술 블로그 공유 카드';
+
 interface BuildPageMetadataInput {
   title: string;
   description: string;
@@ -39,6 +42,17 @@ export function toOgImage(image?: string | null) {
   }
 }
 
+export function buildSocialImage(image: string | null | undefined, alt: string) {
+  const url = toOgImage(image);
+  const isDefaultImage = url === absoluteUrl(DEFAULT_OG_IMAGE);
+
+  return {
+    url,
+    alt: isDefaultImage ? DEFAULT_SOCIAL_IMAGE_ALT : alt,
+    ...(isDefaultImage ? { width: 1200, height: 630, type: 'image/png' } : {}),
+  };
+}
+
 export function buildPageMetadata({
   title,
   description,
@@ -53,7 +67,7 @@ export function buildPageMetadata({
 }: BuildPageMetadataInput): Metadata {
   const canonical = absoluteUrl(path);
   const metaDescription = toMetaDescription(description, SITE_DESCRIPTION);
-  const ogImage = toOgImage(image);
+  const socialImage = buildSocialImage(image, title);
 
   return {
     title,
@@ -73,12 +87,7 @@ export function buildPageMetadata({
       siteName: SITE_NAME,
       locale: 'ko_KR',
       type,
-      images: [
-        {
-          url: ogImage,
-          alt: title,
-        },
-      ],
+      images: [socialImage],
       ...(publishedTime ? { publishedTime } : {}),
       ...(modifiedTime ? { modifiedTime } : {}),
       ...(authors?.length ? { authors: authors.map(author => author.name) } : {}),
@@ -87,7 +96,7 @@ export function buildPageMetadata({
       card: 'summary_large_image',
       title,
       description: metaDescription,
-      images: [ogImage],
+      images: [socialImage],
     },
     ...(noIndex
       ? {

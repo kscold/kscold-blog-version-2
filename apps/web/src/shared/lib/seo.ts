@@ -21,6 +21,7 @@ export {
 export {
   absoluteUrl,
   buildBreadcrumbJsonLd,
+  buildSocialImage,
   buildPageMetadata,
   flattenCategories,
   toOgImage,

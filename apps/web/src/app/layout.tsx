@@ -6,7 +6,12 @@ import { PROFILE } from '@/entities/profile';
 import { BUSINESS_INFO } from '@/entities/profile';
 import { Footer } from '@/widgets/footer';
 import { ANONYMOUS_VIEWER } from '@/shared/lib/initialViewer';
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, toOgImage } from '@/shared/lib/seo';
+import {
+  buildSocialImage,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from '@/shared/lib/seo';
 import { AnalyticsScripts } from '@/shared/ui/AnalyticsScripts';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import './globals.css';
@@ -70,18 +75,13 @@ export const metadata: Metadata = {
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
     siteName: SITE_NAME,
-    images: [
-      {
-        url: toOgImage(),
-        alt: SITE_NAME,
-      },
-    ],
+    images: [buildSocialImage(undefined, SITE_NAME)],
   },
   twitter: {
     card: 'summary_large_image',
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: [toOgImage()],
+    images: [buildSocialImage(undefined, SITE_NAME)],
   },
   icons: {
     icon: [

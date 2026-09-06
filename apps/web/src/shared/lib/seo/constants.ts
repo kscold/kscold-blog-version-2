@@ -4,7 +4,7 @@ export const SITE_URL = 'https://kscold.com';
 export const SITE_NAME = '김승찬 블로그';
 export const SITE_DESCRIPTION =
   'AI Agent·백엔드·풀스택 개발자 김승찬(kscold)의 기술 블로그. LangGraph·RAG와 Spring Boot·Next.js 기반 서비스의 설계·배포·운영 경험을 기록합니다.';
-export const DEFAULT_OG_IMAGE = '/apple-touch-icon.png';
+export const DEFAULT_OG_IMAGE = '/og-default.png';
 
 /** 피드 상세와 광고 노출에 필요한 최소 본문 길이(글자 수). */
 export const MIN_INDEXABLE_CONTENT_LENGTH = 500;
