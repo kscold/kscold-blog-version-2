@@ -8,9 +8,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.exception.InvalidRequestException;
+import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.dto.command.UpdateProfileCommand;
 import com.kscold.blog.identity.domain.model.User;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -95,5 +97,35 @@ class UserProfileApplicationServiceTest {
         assertThatThrownBy(() -> service.updateMyProfile("user-1", tooManyStacks))
                 .isInstanceOf(InvalidRequestException.class);
         verify(userRepository, never()).save(user);
+    }
+
+    @Test
+    void 탈퇴한_사용자의_공개_프로필을_숨긴다() {
+        User deleted =
+                User.builder()
+                        .id("deleted-1")
+                        .username("deleted")
+                        .deletedAt(LocalDateTime.now())
+                        .build();
+        when(userRepository.findActiveByUsername("deleted")).thenReturn(Optional.of(deleted));
+
+        assertThatThrownBy(() -> service.getPublicProfile("deleted"))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void 기술_스택_목록에서_탈퇴한_사용자를_제외한다() {
+        user.setProfile(User.Profile.builder().techStack(List.of("Spring Boot")).build());
+        User deleted =
+                User.builder()
+                        .id("deleted-1")
+                        .username("deleted")
+                        .deletedAt(LocalDateTime.now())
+                        .profile(User.Profile.builder().techStack(List.of("Retired Stack")).build())
+                        .build();
+        when(userRepository.findAllActive()).thenReturn(List.of(user, deleted));
+
+        assertThat(service.getAllTechStacks()).containsExactly("Spring Boot");
+        verify(userRepository).findAllActive();
     }
 }

@@ -2,6 +2,7 @@ package com.kscold.blog.identity.adapter.out.persistence;
 
 import com.kscold.blog.identity.domain.model.User;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -19,7 +20,14 @@ public interface MongoUserRepository extends MongoRepository<User, String> {
 
     Optional<User> findByEmail(String email);
 
-    Optional<User> findByUsername(String username);
+    @Query("{ 'username': ?0, 'deletedAt': null }")
+    Optional<User> findActiveByUsername(String username);
+
+    @Query("{ '_id': { '$in': ?0 }, 'deletedAt': null }")
+    List<User> findAllActiveById(Collection<String> ids);
+
+    @Query("{ 'deletedAt': null }")
+    List<User> findAllActive();
 
     boolean existsByEmail(String email);
 

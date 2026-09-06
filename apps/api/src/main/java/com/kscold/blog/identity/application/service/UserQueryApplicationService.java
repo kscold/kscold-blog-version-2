@@ -38,8 +38,8 @@ public class UserQueryApplicationService implements UserQueryPort {
     @Override
     public Map<String, UserInfo> getUsersByIds(Collection<String> userIds) {
         Map<String, UserInfo> users = new LinkedHashMap<>();
-        userRepository
-                .findAllById(userIds)
+        userRepository.findAllActiveById(userIds).stream()
+                .filter(user -> !user.isDeleted())
                 .forEach(user -> users.put(user.getId(), toUserInfo(user)));
         return users;
     }

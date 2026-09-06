@@ -41,7 +41,8 @@ public class UserProfileApplicationService implements UserProfileUseCase {
 
     @Override
     public List<String> getAllTechStacks() {
-        return userRepository.findAllOrderByCreatedAtDesc().stream()
+        return userRepository.findAllActive().stream()
+                .filter(user -> !user.isDeleted())
                 .map(User::getProfile)
                 .filter(p -> p != null && p.getTechStack() != null)
                 .flatMap(p -> p.getTechStack().stream())
@@ -54,7 +55,8 @@ public class UserProfileApplicationService implements UserProfileUseCase {
     public PublicProfileResponse getPublicProfile(String username) {
         User user =
                 userRepository
-                        .findByUsername(username)
+                        .findActiveByUsername(username)
+                        .filter(candidate -> !candidate.isDeleted())
                         .orElseThrow(() -> ResourceNotFoundException.user(username));
         return PublicProfileResponse.from(user);
     }

@@ -40,6 +40,11 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
+    public List<User> findAllActiveById(Collection<String> ids) {
+        return mongoUserRepository.findAllActiveById(ids);
+    }
+
+    @Override
     public List<User> findByRole(User.Role role) {
         return mongoUserRepository.findByRole(role);
     }
@@ -50,8 +55,13 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return mongoUserRepository.findByUsername(username);
+    public Optional<User> findActiveByUsername(String username) {
+        return mongoUserRepository.findActiveByUsername(username);
+    }
+
+    @Override
+    public List<User> findAllActive() {
+        return mongoUserRepository.findAllActive();
     }
 
     @Override

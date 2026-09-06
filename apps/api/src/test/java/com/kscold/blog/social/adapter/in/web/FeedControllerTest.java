@@ -87,6 +87,24 @@ class FeedControllerTest {
         verify(clientIdentifierResolver).resolve(request);
     }
 
+    @Test
+    @DisplayName("시나리오: 활성 작성자 정보가 없으면 공개 피드의 저장된 작성자 정보를 유지한다")
+    void publicFeedKeepsAuthorSnapshotWhenActiveProfileIsMissing() {
+        Feed savedFeed = feed("feed-1", "deleted-user");
+        when(feedUseCase.getPublicFeeds(any())).thenReturn(new PageImpl<>(List.of(savedFeed)));
+        when(clientIdentifierResolver.resolve(any())).thenReturn("anonymous");
+        when(userQueryPort.getUsersByIds(any())).thenReturn(Map.of());
+
+        ResponseEntity<ApiResponse<Page<FeedResponse>>> response =
+                controller.getPublicFeeds(0, 12, null, null, mock(HttpServletRequest.class));
+
+        FeedResponse.AuthorInfo author =
+                response.getBody().getData().getContent().getFirst().getAuthor();
+        assertThat(author.getId()).isEqualTo("deleted-user");
+        assertThat(author.getUsername()).isEqualTo("old");
+        assertThat(author.getName()).isEqualTo("저장된 이름");
+    }
+
     private Feed feed(String id, String authorId) {
         return Feed.builder()
                 .id(id)

@@ -15,6 +15,9 @@ public interface UserRepository {
     /** 주어진 id 들을 한 번에 조회함(반복 findById 로 인한 N+1 방지용). */
     List<User> findAllById(Collection<String> ids);
 
+    /** 공개 프로필 보강에 필요한 활성 사용자만 id 목록으로 조회한다. */
+    List<User> findAllActiveById(Collection<String> ids);
+
     /** 특정 권한(예: ADMIN)의 사용자만 조회함. 전체 컬렉션을 훑어 필터링하지 않도록 인덱스 쿼리로 처리함. */
     List<User> findByRole(User.Role role);
 
@@ -26,7 +29,10 @@ public interface UserRepository {
 
     User save(User user);
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findActiveByUsername(String username);
+
+    /** 공용 프로필 집계에 사용할 활성 사용자 목록. */
+    List<User> findAllActive();
 
     long count();
 
