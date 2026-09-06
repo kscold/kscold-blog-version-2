@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
 import { MentionableUser } from '@/shared/model/types/social';
