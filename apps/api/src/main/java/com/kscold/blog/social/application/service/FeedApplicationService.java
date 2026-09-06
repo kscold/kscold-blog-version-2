@@ -3,7 +3,6 @@ package com.kscold.blog.social.application.service;
 import com.kscold.blog.blog.config.InvalidateBlogCatalogCaches;
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
-import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.application.port.in.UserQueryPort.UserInfo;
@@ -11,6 +10,9 @@ import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
 import com.kscold.blog.social.application.dto.response.FeedSitemapResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
+import com.kscold.blog.social.application.service.FeedInputPolicy.LinkUpdate;
+import com.kscold.blog.social.application.service.FeedInputPolicy.PreparedCreate;
+import com.kscold.blog.social.application.service.FeedInputPolicy.PreparedUpdate;
 import com.kscold.blog.social.domain.model.Feed;
 import com.kscold.blog.social.domain.model.LinkPreviewResponse;
 import com.kscold.blog.social.domain.port.out.FeedCommentRepository;
@@ -36,25 +38,18 @@ public class FeedApplicationService implements FeedUseCase {
     private final FeedCommentRepository feedCommentRepository;
     private final UserQueryPort userQueryPort;
     private final LinkScrapingPort linkScrapingPort;
+    private final FeedInputPolicy feedInputPolicy;
 
     @Transactional
     @InvalidateBlogCatalogCaches
     public Feed create(FeedCreateCommand command, String userId) {
-        String content = normalizeContent(command.getContent());
-        List<String> images = normalizeImages(command.getImages());
-        validateCreateContent(content, images);
+        PreparedCreate input = feedInputPolicy.prepareCreate(command);
         UserInfo author = userQueryPort.getUserById(userId);
-
-        Feed.LinkPreview linkPreview = null;
-        if (command.getLinkUrl() != null && !command.getLinkUrl().isBlank()) {
-            LinkPreviewResponse scraped = linkScrapingPort.scrape(command.getLinkUrl());
-            linkPreview = toModel(scraped);
-        }
 
         Feed feed =
                 Feed.builder()
-                        .content(content)
-                        .images(new ArrayList<>(images))
+                        .content(input.content())
+                        .images(new ArrayList<>(input.images()))
                         .author(
                                 Feed.AuthorInfo.builder()
                                         .id(author.id())
@@ -62,11 +57,8 @@ public class FeedApplicationService implements FeedUseCase {
                                         .name(author.displayName())
                                         .avatar(author.avatar())
                                         .build())
-                        .visibility(
-                                command.getVisibility() != null
-                                        ? command.getVisibility()
-                                        : Feed.Visibility.PUBLIC)
-                        .linkPreview(linkPreview)
+                        .visibility(input.visibility())
+                        .linkPreview(scrapeLink(input.linkUrl()))
                         .build();
 
         return feedRepository.save(feed);
@@ -76,24 +68,13 @@ public class FeedApplicationService implements FeedUseCase {
     @InvalidateBlogCatalogCaches
     public Feed update(String id, FeedUpdateCommand command) {
         Feed feed = findById(id);
+        PreparedUpdate input = feedInputPolicy.prepareUpdate(feed, command);
+        Feed.LinkPreview linkPreview = resolveLink(feed.getLinkPreview(), input.linkUpdate());
 
-        if (command.getContent() != null) {
-            feed.setContent(command.getContent());
-        }
-        if (command.getImages() != null) {
-            feed.setImages(command.getImages());
-        }
-        if (command.getVisibility() != null) {
-            feed.setVisibility(command.getVisibility());
-        }
-        if (command.getLinkUrl() != null) {
-            if (command.getLinkUrl().isBlank()) {
-                feed.setLinkPreview(null);
-            } else {
-                LinkPreviewResponse scraped = linkScrapingPort.scrape(command.getLinkUrl());
-                feed.setLinkPreview(toModel(scraped));
-            }
-        }
+        feed.setContent(input.content());
+        feed.setImages(new ArrayList<>(input.images()));
+        feed.setVisibility(input.visibility());
+        feed.setLinkPreview(linkPreview);
 
         return feedRepository.save(feed);
     }
@@ -192,21 +173,19 @@ public class FeedApplicationService implements FeedUseCase {
         return feedRepository.findById(id).orElseThrow(() -> ResourceNotFoundException.feed(id));
     }
 
-    private String normalizeContent(String content) {
-        return content == null || content.isBlank() ? "" : content;
+    private Feed.LinkPreview scrapeLink(String linkUrl) {
+        if (linkUrl == null) {
+            return null;
+        }
+        return toModel(linkScrapingPort.scrape(linkUrl));
     }
 
-    private List<String> normalizeImages(List<String> images) {
-        if (images == null) {
-            return List.of();
-        }
-        return images.stream().filter(image -> image != null && !image.isBlank()).toList();
-    }
-
-    private void validateCreateContent(String content, List<String> images) {
-        if (content.isBlank() && images.isEmpty()) {
-            throw InvalidRequestException.invalidInput("내용 또는 이미지를 입력해주세요");
-        }
+    private Feed.LinkPreview resolveLink(Feed.LinkPreview current, LinkUpdate update) {
+        return switch (update.action()) {
+            case UNCHANGED -> current;
+            case REMOVE -> null;
+            case REPLACE -> scrapeLink(update.url());
+        };
     }
 
     private Feed.LinkPreview toModel(LinkPreviewResponse response) {

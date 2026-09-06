@@ -7,9 +7,9 @@ import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import com.kscold.blog.social.adapter.in.web.dto.request.FeedCreateRequest;
+import com.kscold.blog.social.adapter.in.web.dto.request.FeedUpdateRequest;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
-import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
-import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
 import com.kscold.blog.social.application.dto.response.FeedSitemapResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.application.service.FeedAccessPolicy;
@@ -98,8 +98,8 @@ public class FeedController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<FeedResponse>> createFeed(
-            @Valid @RequestBody FeedCreateCommand command, @AuthenticationPrincipal String userId) {
-        Feed feed = feedUseCase.create(command, userId);
+            @Valid @RequestBody FeedCreateRequest request, @AuthenticationPrincipal String userId) {
+        Feed feed = feedUseCase.create(request.toCommand(), userId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(toResponse(feed, userId), "피드가 생성되었습니다"));
     }
@@ -107,10 +107,10 @@ public class FeedController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<FeedResponse>> updateFeed(
             @PathVariable String id,
-            @Valid @RequestBody FeedUpdateCommand command,
+            @Valid @RequestBody FeedUpdateRequest request,
             @AuthenticationPrincipal String userId) {
         feedUseCase.validateOwnership(id, userId, hasAdminRole());
-        Feed feed = feedUseCase.update(id, command);
+        Feed feed = feedUseCase.update(id, request.toCommand());
         return ResponseEntity.ok(ApiResponse.success(toResponse(feed, userId), "피드가 수정되었습니다"));
     }
 

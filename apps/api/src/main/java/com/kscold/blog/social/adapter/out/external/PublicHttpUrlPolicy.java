@@ -1,5 +1,7 @@
 package com.kscold.blog.social.adapter.out.external;
 
+import static com.kscold.blog.social.application.service.FeedInputPolicy.URL_MAX_LENGTH;
+
 import com.kscold.blog.exception.InvalidRequestException;
 import java.net.InetAddress;
 import java.net.URI;
@@ -12,8 +14,6 @@ import org.springframework.stereotype.Component;
 @Component
 class PublicHttpUrlPolicy {
 
-    private static final int MAX_URL_LENGTH = 4096;
-
     private final HostResolver hostResolver;
 
     PublicHttpUrlPolicy() {
@@ -25,7 +25,7 @@ class PublicHttpUrlPolicy {
     }
 
     URI validate(String url) {
-        if (url == null || url.isBlank() || url.length() > MAX_URL_LENGTH) {
+        if (url == null || url.isBlank() || url.length() > URL_MAX_LENGTH) {
             throw InvalidRequestException.invalidInput("유효한 URL을 입력해주세요");
         }
 

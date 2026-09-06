@@ -72,6 +72,18 @@ class PublicHttpUrlPolicyTest {
     }
 
     @Test
+    void 이천사십팔자주소를허용하고초과주소를차단한다() throws Exception {
+        PublicHttpUrlPolicy policy =
+                new PublicHttpUrlPolicy(
+                        host -> new InetAddress[] {InetAddress.getByName("93.184.216.34")});
+        String boundary = urlWithLength(2_048);
+
+        assertThat(policy.validate(boundary)).isEqualTo(URI.create(boundary));
+        assertThatThrownBy(() -> policy.validate(urlWithLength(2_049)))
+                .isInstanceOf(InvalidRequestException.class);
+    }
+
+    @Test
     void 상대리디렉션도새목적지를검증한다() throws Exception {
         PublicHttpUrlPolicy policy =
                 new PublicHttpUrlPolicy(
@@ -90,5 +102,10 @@ class PublicHttpUrlPolicyTest {
                                         URI.create("https://example.com/a"),
                                         "https://internal.example/private"))
                 .isInstanceOf(InvalidRequestException.class);
+    }
+
+    private String urlWithLength(int length) {
+        String prefix = "https://example.com/";
+        return prefix + "a".repeat(length - prefix.length());
     }
 }

@@ -2,6 +2,7 @@ package com.kscold.blog.social.adapter.in.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -11,7 +12,11 @@ import com.kscold.blog.analytics.application.service.ViewCounter;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import com.kscold.blog.social.adapter.in.web.dto.request.FeedCreateRequest;
+import com.kscold.blog.social.adapter.in.web.dto.request.FeedUpdateRequest;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
+import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
+import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.application.service.FeedAccessPolicy;
 import com.kscold.blog.social.domain.model.Feed;
@@ -103,6 +108,48 @@ class FeedControllerTest {
         assertThat(author.getId()).isEqualTo("deleted-user");
         assertThat(author.getUsername()).isEqualTo("old");
         assertThat(author.getName()).isEqualTo("저장된 이름");
+    }
+
+    @Test
+    @DisplayName("시나리오: 피드 생성 웹 요청을 애플리케이션 명령으로 변환한다")
+    void createFeedMapsRequestToCommand() {
+        FeedCreateRequest request =
+                FeedCreateRequest.builder()
+                        .content("본문")
+                        .images(List.of("https://bucket.kscold.com/blog/feed.png"))
+                        .visibility(Feed.Visibility.PRIVATE)
+                        .linkUrl("https://example.com")
+                        .build();
+        when(feedUseCase.create(any(FeedCreateCommand.class), eq("user-1")))
+                .thenReturn(Feed.builder().content("본문").build());
+
+        controller.createFeed(request, "user-1");
+
+        ArgumentCaptor<FeedCreateCommand> command =
+                ArgumentCaptor.forClass(FeedCreateCommand.class);
+        verify(feedUseCase).create(command.capture(), eq("user-1"));
+        assertThat(command.getValue().getContent()).isEqualTo("본문");
+        assertThat(command.getValue().getImages())
+                .containsExactly("https://bucket.kscold.com/blog/feed.png");
+        assertThat(command.getValue().getVisibility()).isEqualTo(Feed.Visibility.PRIVATE);
+        assertThat(command.getValue().getLinkUrl()).isEqualTo("https://example.com");
+    }
+
+    @Test
+    @DisplayName("시나리오: 피드 수정 웹 요청에서 생략한 필드를 명령에도 유지한다")
+    void updateFeedMapsRequestToCommand() {
+        FeedUpdateRequest request = FeedUpdateRequest.builder().content("수정 본문").build();
+        when(feedUseCase.update(eq("feed-1"), any(FeedUpdateCommand.class)))
+                .thenReturn(Feed.builder().id("feed-1").content("수정 본문").build());
+
+        controller.updateFeed("feed-1", request, "user-1");
+
+        ArgumentCaptor<FeedUpdateCommand> command =
+                ArgumentCaptor.forClass(FeedUpdateCommand.class);
+        verify(feedUseCase).update(eq("feed-1"), command.capture());
+        assertThat(command.getValue().getContent()).isEqualTo("수정 본문");
+        assertThat(command.getValue().getImages()).isNull();
+        assertThat(command.getValue().getLinkUrl()).isNull();
     }
 
     private Feed feed(String id, String authorId) {
