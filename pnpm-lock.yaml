@@ -90,7 +90,7 @@ importers:
         version: 3.31.2
       '@tiptap/react':
         specifier: ^3.31.2
-        version: 3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)(@types/react-dom@19.2.5)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8)
+        version: 3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)(@types/react-dom@19.2.7)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8)
       '@tiptap/starter-kit':
         specifier: ^3.31.2
         version: 3.31.2
@@ -165,8 +165,8 @@ importers:
         specifier: ^19.2.18
         version: 19.2.18
       '@types/react-dom':
-        specifier: ^19.2.5
-        version: 19.2.5(@types/react@19.2.18)
+        specifier: ^19.2.7
+        version: 19.2.7(@types/react@19.2.18)
       '@types/react-syntax-highlighter':
         specifier: ^15.5.13
         version: 15.5.13
@@ -1689,7 +1689,7 @@ packages:
       prosemirror-view: 1.42.3
     dev: false
 
-  /@tiptap/react@3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)(@types/react-dom@19.2.5)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8):
+  /@tiptap/react@3.31.2(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.2)(@tiptap/pm@3.31.2)(@types/react-dom@19.2.7)(@types/react@19.2.18)(react-dom@19.2.8)(react@19.2.8):
     resolution: {integrity: sha512-ZHg1t9zwINlSgK9+Ky6K6bRP2pnX0/Z0W0DOV9B6sRhmxxK1xsUZ7o/spJ0FjKVqPYYi/Py2cQzX72nyiu2knQ==}
     peerDependencies:
       '@tiptap/core': 3.31.2
@@ -1702,7 +1702,7 @@ packages:
       '@tiptap/core': 3.31.2(@tiptap/pm@3.31.2)
       '@tiptap/pm': 3.31.2
       '@types/react': 19.2.18
-      '@types/react-dom': 19.2.5(@types/react@19.2.18)
+      '@types/react-dom': 19.2.7(@types/react@19.2.18)
       '@types/use-sync-external-store': 0.0.6
       fast-equals: 5.4.2
       react: 19.2.8
@@ -2086,8 +2086,8 @@ packages:
     dependencies:
       undici-types: 6.21.0
 
-  /@types/react-dom@19.2.5(@types/react@19.2.18):
-    resolution: {integrity: sha512-fMPwH9v7r/pp43yUd2/Mbiex5KouJwwR3dzHkhLREUC6764VyDsqxhAxv6OFEYR1RhjOyD1naqba8ECDBe7ZQg==}
+  /@types/react-dom@19.2.7(@types/react@19.2.18):
+    resolution: {integrity: sha512-I8bPpDLcHBv1qiIiXDCy71Rt8eQDKJP0sMSWJphDdAcdqiJ1sGpZamavoEIRZmYzjia9LuEb2HlYdDpmoENpvQ==}
     peerDependencies:
       '@types/react': ^19.2.0
     dependencies:
