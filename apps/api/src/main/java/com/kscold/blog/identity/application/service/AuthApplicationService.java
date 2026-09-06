@@ -54,14 +54,13 @@ public class AuthApplicationService implements AuthUseCase {
             throw DuplicateResourceException.username(command.getUsername());
         }
 
-        boolean isFirstUser = userRepository.count() == 0;
-
         User user =
                 User.builder()
                         .email(command.getEmail())
                         .username(command.getUsername())
                         .password(passwordEncoder.encode(command.getPassword()))
-                        .role(isFirstUser ? User.Role.ADMIN : User.Role.USER)
+                        // 공개 회원가입은 데이터베이스 상태와 무관하게 최소 권한만 부여한다.
+                        .role(User.Role.USER)
                         .profile(
                                 User.Profile.builder()
                                         .displayName(

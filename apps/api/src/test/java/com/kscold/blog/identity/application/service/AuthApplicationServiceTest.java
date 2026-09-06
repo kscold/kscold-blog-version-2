@@ -97,7 +97,6 @@ class AuthApplicationServiceTest {
 
         when(userRepository.existsByEmail(command.getEmail())).thenReturn(false);
         when(userRepository.existsByUsername(command.getUsername())).thenReturn(false);
-        when(userRepository.count()).thenReturn(1L);
         when(passwordEncoder.encode(command.getPassword())).thenReturn("encoded-password");
         when(userRepository.save(any(User.class)))
                 .thenAnswer(
@@ -115,6 +114,34 @@ class AuthApplicationServiceTest {
 
         assertThat(result.getUser().getEmail()).isEqualTo(command.getEmail());
         verify(recoveryMailSender).send(welcomeMail);
+    }
+
+    @Test
+    @DisplayName("시나리오: 첫 회원가입도 관리자 권한을 자동으로 얻지 않는다")
+    void registerAlwaysAssignsUserRoleWithoutBootstrapLookup() {
+        RegisterCommand command =
+                new RegisterCommand("first@example.com", "first", "password-123", "첫 사용자");
+
+        when(userRepository.existsByEmail(command.getEmail())).thenReturn(false);
+        when(userRepository.existsByUsername(command.getUsername())).thenReturn(false);
+        when(passwordEncoder.encode(command.getPassword())).thenReturn("encoded-password");
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(
+                        invocation -> {
+                            User user = invocation.getArgument(0);
+                            user.setId("user-1");
+                            return user;
+                        });
+        when(tokenProvider.createAccessToken("user-1", "USER")).thenReturn("access-token");
+        when(tokenProvider.createRefreshToken("user-1", "USER")).thenReturn("refresh-token");
+
+        AuthResponse result = authApplicationService.register(command);
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
+        verify(userRepository, never()).count();
+        assertThat(userCaptor.getValue().getRole()).isEqualTo(User.Role.USER);
+        assertThat(result.getUser().getRole()).isEqualTo(User.Role.USER);
     }
 
     @Test
@@ -229,7 +256,6 @@ class AuthApplicationServiceTest {
 
         when(userRepository.existsByEmail(command.getEmail())).thenReturn(false);
         when(userRepository.existsByUsername(command.getUsername())).thenReturn(false);
-        when(userRepository.count()).thenReturn(1L);
         when(passwordEncoder.encode(command.getPassword())).thenReturn("encoded-password");
         when(userRepository.save(any(User.class)))
                 .thenAnswer(
