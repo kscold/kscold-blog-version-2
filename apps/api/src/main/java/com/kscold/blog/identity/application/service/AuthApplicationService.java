@@ -1,8 +1,6 @@
 package com.kscold.blog.identity.application.service;
 
-import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.DuplicateResourceException;
-import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.dto.command.LoginCommand;
@@ -10,21 +8,15 @@ import com.kscold.blog.identity.application.dto.command.RegisterCommand;
 import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.application.dto.response.PasswordResetTokenResponse;
 import com.kscold.blog.identity.application.port.in.AuthUseCase;
-import com.kscold.blog.identity.domain.model.PasswordResetToken;
 import com.kscold.blog.identity.domain.model.TokenIdentity;
 import com.kscold.blog.identity.domain.model.User;
-import com.kscold.blog.identity.domain.port.out.PasswordResetSettings;
-import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import com.kscold.blog.identity.domain.port.out.UserSessionRevocationPort;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import com.kscold.blog.notification.domain.model.NotificationChannel;
 import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.notification.domain.port.out.MailSender;
-import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
-import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,15 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthApplicationService implements AuthUseCase {
 
     private final UserRepository userRepository;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final MailSender recoveryMailSender;
     private final RecoveryMailComposer recoveryEmailComposer;
-    private final PublicUrlResolver recoveryMailProperties;
-    private final PasswordResetSettings passwordResetSettings;
     private final NotificationUseCase notificationUseCase;
-    private final UserSessionRevocationPort userSessionRevocationPort;
+    private final AccountRecoveryApplicationService accountRecoveryApplicationService;
 
     @Transactional
     public AuthResponse register(RegisterCommand command) {
@@ -118,71 +107,22 @@ public class AuthApplicationService implements AuthUseCase {
 
     @Override
     public void sendUsernameReminder(String email) {
-        ensureRecoveryMailConfigured();
-
-        userRepository
-                .findActiveByEmail(normalizeEmail(email))
-                .ifPresent(
-                        user ->
-                                recoveryMailSender.send(
-                                        recoveryEmailComposer.buildUsernameReminder(user)));
+        accountRecoveryApplicationService.sendUsernameReminder(email);
     }
 
     @Override
     public void requestPasswordReset(String email) {
-        ensureRecoveryMailConfigured();
-
-        userRepository
-                .findActiveByEmail(normalizeEmail(email))
-                .ifPresent(this::sendPasswordResetMail);
+        accountRecoveryApplicationService.requestPasswordReset(email);
     }
 
     @Override
     public PasswordResetTokenResponse validatePasswordResetToken(String token) {
-        if (!PasswordResetTokenCodec.isValidInput(token)) {
-            return new PasswordResetTokenResponse(false, "재설정 링크를 다시 확인해주세요.", null);
-        }
-
-        return passwordResetTokenRepository
-                .findByTokenHash(PasswordResetTokenCodec.hash(token))
-                .filter(savedToken -> !savedToken.isExpired(Instant.now()))
-                .filter(
-                        savedToken ->
-                                userRepository.findActiveById(savedToken.getUserId()).isPresent())
-                .map(
-                        savedToken ->
-                                new PasswordResetTokenResponse(
-                                        true, "유효한 재설정 링크입니다.", savedToken.getExpiresAt()))
-                .orElseGet(
-                        () -> new PasswordResetTokenResponse(false, "만료되었거나 유효하지 않은 링크입니다.", null));
+        return accountRecoveryApplicationService.validatePasswordResetToken(token);
     }
 
     @Override
-    @Transactional(noRollbackFor = InvalidRequestException.class)
     public void resetPassword(String token, String newPassword) {
-        if (!PasswordResetTokenCodec.isValidInput(token)) {
-            throw InvalidRequestException.invalidInput("재설정 링크를 다시 확인해주세요.");
-        }
-
-        PasswordResetToken savedToken =
-                passwordResetTokenRepository
-                        .consumeByTokenHash(PasswordResetTokenCodec.hash(token))
-                        .orElseThrow(
-                                () ->
-                                        InvalidRequestException.invalidInput(
-                                                "만료되었거나 유효하지 않은 링크입니다."));
-
-        if (savedToken.isExpired(Instant.now())) {
-            throw InvalidRequestException.invalidInput("만료되었거나 유효하지 않은 링크입니다.");
-        }
-
-        String encodedPassword = passwordEncoder.encode(newPassword);
-        if (!userRepository.updatePasswordIfActive(savedToken.getUserId(), encodedPassword)) {
-            passwordResetTokenRepository.deleteByUserId(savedToken.getUserId());
-            throw invalidResetLink();
-        }
-        revokeUserSessionsSafely(savedToken.getUserId());
-        passwordResetTokenRepository.deleteByUserId(savedToken.getUserId());
+        accountRecoveryApplicationService.resetPassword(token, newPassword);
     }
 
     private AuthResponse buildAuthResult(User user) {
@@ -197,16 +137,6 @@ public class AuthApplicationService implements AuthUseCase {
                 .build();
     }
 
-    private void revokeUserSessionsSafely(String userId) {
-        try {
-            userSessionRevocationPort.revokeUserSessions(userId);
-        } catch (RuntimeException exception) {
-            log.warn(
-                    "WebSocket session revocation skipped: type={}",
-                    exception.getClass().getSimpleName());
-        }
-    }
-
     private User getActiveUser(String userId) {
         User user =
                 userRepository
@@ -218,42 +148,8 @@ public class AuthApplicationService implements AuthUseCase {
         return user;
     }
 
-    private InvalidRequestException invalidResetLink() {
-        return InvalidRequestException.invalidInput("만료되었거나 유효하지 않은 링크입니다.");
-    }
-
     private InvalidRequestException invalidRefreshToken() {
         return InvalidRequestException.invalidInput("유효하지 않은 리프레시 토큰입니다");
-    }
-
-    private void sendPasswordResetMail(User user) {
-        passwordResetTokenRepository.deleteByUserId(user.getId());
-
-        String rawToken = PasswordResetTokenCodec.generate();
-        Instant expiresAt =
-                Instant.now()
-                        .plusSeconds(passwordResetSettings.getPasswordResetExpiryMinutes() * 60);
-        PasswordResetToken savedToken =
-                PasswordResetToken.builder()
-                        .userId(user.getId())
-                        .email(user.getEmail())
-                        .tokenHash(PasswordResetTokenCodec.hash(rawToken))
-                        .createdAt(Instant.now())
-                        .expiresAt(expiresAt)
-                        .build();
-
-        passwordResetTokenRepository.save(savedToken);
-
-        String resetUrl =
-                recoveryMailProperties.resolvePublicUrl("/login/reset-password?token=" + rawToken);
-        recoveryMailSender.send(recoveryEmailComposer.buildPasswordReset(user, resetUrl));
-    }
-
-    private void ensureRecoveryMailConfigured() {
-        if (!recoveryMailSender.isAvailable()) {
-            throw new BusinessException(
-                    ErrorCode.INTERNAL_SERVER_ERROR, "이메일 발송 설정이 아직 준비되지 않았습니다. SMTP 설정을 확인해주세요.");
-        }
     }
 
     private void sendWelcomeMailSafely(User user) {
@@ -284,9 +180,5 @@ public class AuthApplicationService implements AuthUseCase {
         } catch (Exception exception) {
             log.warn("회원가입 알림 전송을 건너뜁니다: type={}", exception.getClass().getSimpleName());
         }
-    }
-
-    private String normalizeEmail(String email) {
-        return email.trim();
     }
 }

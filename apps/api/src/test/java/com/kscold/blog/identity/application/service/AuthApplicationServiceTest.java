@@ -14,15 +14,12 @@ import com.kscold.blog.identity.application.dto.command.RegisterCommand;
 import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.domain.model.TokenIdentity;
 import com.kscold.blog.identity.domain.model.User;
-import com.kscold.blog.identity.domain.port.out.PasswordResetSettings;
-import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
 import com.kscold.blog.identity.domain.port.out.RecoveryMailComposer;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
-import com.kscold.blog.identity.domain.port.out.UserSessionRevocationPort;
+import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import com.kscold.blog.notification.domain.model.MailMessage;
 import com.kscold.blog.notification.domain.port.out.MailSender;
-import com.kscold.blog.notification.domain.port.out.PublicUrlResolver;
 import com.kscold.blog.support.UserFixtures;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -40,8 +37,6 @@ class AuthApplicationServiceTest {
 
     @Mock private UserRepository userRepository;
 
-    @Mock private PasswordResetTokenRepository passwordResetTokenRepository;
-
     @Mock private PasswordEncoder passwordEncoder;
 
     @Mock private TokenProvider tokenProvider;
@@ -50,11 +45,9 @@ class AuthApplicationServiceTest {
 
     @Mock private RecoveryMailComposer recoveryEmailComposer;
 
-    @Mock private PublicUrlResolver recoveryMailProperties;
+    @Mock private NotificationUseCase notificationUseCase;
 
-    @Mock private PasswordResetSettings passwordResetSettings;
-
-    @Mock private UserSessionRevocationPort userSessionRevocationPort;
+    @Mock private AccountRecoveryApplicationService accountRecoveryApplicationService;
 
     @InjectMocks private AuthApplicationService authApplicationService;
 
@@ -235,5 +228,19 @@ class AuthApplicationServiceTest {
 
         verify(tokenProvider).createAccessToken("user-1", "ADMIN", 3L);
         verify(tokenProvider).createRefreshToken("user-1", "ADMIN", 3L);
+    }
+
+    @Test
+    @DisplayName("시나리오: 계정 복구 계약은 전용 서비스에 위임한다")
+    void delegatesAccountRecoveryContract() {
+        authApplicationService.sendUsernameReminder("user@example.com");
+        authApplicationService.requestPasswordReset("user@example.com");
+        authApplicationService.validatePasswordResetToken("reset-token");
+        authApplicationService.resetPassword("reset-token", "new-password");
+
+        verify(accountRecoveryApplicationService).sendUsernameReminder("user@example.com");
+        verify(accountRecoveryApplicationService).requestPasswordReset("user@example.com");
+        verify(accountRecoveryApplicationService).validatePasswordResetToken("reset-token");
+        verify(accountRecoveryApplicationService).resetPassword("reset-token", "new-password");
     }
 }
