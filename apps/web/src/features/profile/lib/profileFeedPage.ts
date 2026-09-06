@@ -1,6 +1,7 @@
 import type { PageResponse } from '@/shared/model/types/api';
 import type { Feed } from '@/shared/model/types/social';
 import { toFeedPreview, type FeedPreview } from '@/shared/lib/seo/text';
+import { toProfileLinkPreview } from './profileLinkPreview';
 
 type ProfileFeedFields = Pick<
   Feed,
@@ -42,7 +43,7 @@ export function toProfileFeedPage(page: PageResponse<Feed>): ProfileFeedPage {
           name: feed.author.name,
           avatar: feed.author.avatar,
         },
-        linkPreview: feed.linkPreview,
+        linkPreview: toProfileLinkPreview(feed.linkPreview),
         likesCount: feed.likesCount,
         commentsCount: feed.commentsCount,
         isLiked: feed.isLiked,

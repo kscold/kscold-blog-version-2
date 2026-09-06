@@ -19,6 +19,7 @@ const FEED = {
     id: 'author-1',
     username: 'feed-author',
     name: '피드 작성자',
+    avatar: '/apple-touch-icon.png',
   },
   visibility: 'PUBLIC' as const,
   linkPreview: {
@@ -103,6 +104,22 @@ test.describe('피드 카드 링크와 이미지 접근성', () => {
 
     await page.getByRole('link', { name: '접근 가능한 피드 피드 보기' }).click();
     await expect(page).toHaveURL(/\/feed\/feed-accessible$/);
+  });
+
+  test('작성자 아바타는 고정 크기를 유지하고 필요한 해상도만 제공한다', async ({ page }) => {
+    await loadFeedCard(page);
+
+    const avatar = page.locator('article a[href="/profile/feed-author"] img');
+    await expect(avatar).toHaveAttribute('width', '36');
+    await expect(avatar).toHaveAttribute('height', '36');
+    await expect(avatar).not.toHaveAttribute('sizes');
+    const candidates = (await avatar.getAttribute('srcset'))?.split(',').map(value => value.trim());
+    expect(candidates).toHaveLength(2);
+    expect(candidates?.[0]).toMatch(/ 1x$/);
+    expect(candidates?.[1]).toMatch(/ 2x$/);
+    const box = await avatar.boundingBox();
+    expect(box?.width).toBe(36);
+    expect(box?.height).toBe(36);
   });
 
   test('모바일에서도 캐러셀 조작부가 보이고 충분히 크다', async ({ page }) => {

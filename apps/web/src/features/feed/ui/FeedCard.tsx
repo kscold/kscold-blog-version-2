@@ -185,7 +185,7 @@ export function FeedCard({
           >
             <div className="relative w-9 h-9 bg-surface-200 rounded-full flex items-center justify-center overflow-hidden shrink-0">
               {feed.author.avatar ? (
-                <Image src={feed.author.avatar} alt="" fill sizes="36px" className="object-cover" />
+                <Image src={feed.author.avatar} alt="" width={36} height={36} className="h-full w-full object-cover" />
               ) : (
                 <span className="text-sm font-bold text-surface-600">
                   {feed.author.name.charAt(0).toUpperCase()}
@@ -201,7 +201,7 @@ export function FeedCard({
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="relative w-9 h-9 bg-surface-200 rounded-full flex items-center justify-center overflow-hidden shrink-0">
               {feed.author.avatar ? (
-                <Image src={feed.author.avatar} alt="" fill sizes="36px" className="object-cover" />
+                <Image src={feed.author.avatar} alt="" width={36} height={36} className="h-full w-full object-cover" />
               ) : (
                 <span className="text-sm font-bold text-surface-600">
                   {feed.author.name.charAt(0).toUpperCase()}
