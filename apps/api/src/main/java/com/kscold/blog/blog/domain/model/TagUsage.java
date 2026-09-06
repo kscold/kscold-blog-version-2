@@ -8,6 +8,7 @@ package com.kscold.blog.blog.domain.model;
  *
  * @param id 태그 문서 아이디. 아직 등록되지 않은 피드 전용 태그는 null 일 수 있다.
  * @param categoryId 이 태그를 묶은 블로그 카테고리. 분류 전이면 null.
+ * @param publicPostCount 인증 없이 읽을 수 있는 발행 글 수.
  */
 public record TagUsage(
         String id,
@@ -16,6 +17,7 @@ public record TagUsage(
         String categoryId,
         String categoryName,
         long postCount,
+        long publicPostCount,
         long feedCount) {
 
     public long totalCount() {

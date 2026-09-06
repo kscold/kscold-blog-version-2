@@ -14,10 +14,12 @@ import com.kscold.blog.blog.domain.model.Category;
 import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.port.out.CategoryRepository;
 import com.kscold.blog.blog.domain.port.out.PostRepository;
+import com.kscold.blog.blog.domain.port.out.PostRepository.PublishedTagCounts;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,14 +61,15 @@ class BlogCatalogCacheTest {
         Tag tag = Tag.builder().id("tag-1").name("LangGraph").slug("langgraph").build();
         when(categoryRepository.findAll()).thenReturn(List.of(category));
         when(tagRepository.findAll()).thenReturn(List.of(tag));
-        when(postRepository.countPublishedByTagName()).thenReturn(Map.of("LangGraph", 3L));
+        when(postRepository.countPublishedTagCounts(Set.of("category-1")))
+                .thenReturn(Map.of("LangGraph", new PublishedTagCounts(3L, 3L)));
         when(feedUseCase.getFeedTagCounts()).thenReturn(Map.of("LangGraph", 2L));
 
         assertThat(categoryUseCase.getAll()).isSameAs(categoryUseCase.getAll());
         assertThat(tagCatalogUseCase.getIndex()).isSameAs(tagCatalogUseCase.getIndex());
         verify(categoryRepository, org.mockito.Mockito.times(2)).findAll();
         verify(tagRepository).findAll();
-        verify(postRepository).countPublishedByTagName();
+        verify(postRepository).countPublishedTagCounts(Set.of("category-1"));
         verify(feedUseCase).getFeedTagCounts();
 
         Cache categoryCache =

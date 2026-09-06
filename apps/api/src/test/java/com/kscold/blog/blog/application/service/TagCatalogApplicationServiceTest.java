@@ -13,12 +13,14 @@ import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.model.TagUsage;
 import com.kscold.blog.blog.domain.port.out.CategoryRepository;
 import com.kscold.blog.blog.domain.port.out.PostRepository;
+import com.kscold.blog.blog.domain.port.out.PostRepository.PublishedTagCounts;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,24 +50,33 @@ class TagCatalogApplicationServiceTest {
     void indexMergesPostAndFeedCounts() {
         when(tagRepository.findAll())
                 .thenReturn(List.of(tag("t1", "AI", "ai", "c1"), tag("t2", "회고", "회고", null)));
-        when(postRepository.countPublishedByTagName()).thenReturn(Map.of("AI", 6L, "회고", 11L));
+        when(postRepository.countPublishedTagCounts(Set.of("c1")))
+                .thenReturn(
+                        Map.of(
+                                "AI", new PublishedTagCounts(6L, 5L),
+                                "회고", new PublishedTagCounts(11L, 0L)));
         when(feedUseCase.getFeedTagCounts()).thenReturn(Map.of("AI", 31L));
         when(categoryRepository.findAll())
-                .thenReturn(List.of(Category.builder().id("c1").name("컨퍼런스").build()));
+                .thenReturn(
+                        List.of(
+                                Category.builder().id("c1").name("컨퍼런스").build(),
+                                Category.builder().id("c2").name("비공개").restricted(true).build()));
 
         List<TagUsage> index = service.getIndex();
 
         assertThat(index).extracting(TagUsage::name).containsExactly("AI", "회고");
         assertThat(index.get(0).totalCount()).isEqualTo(37);
+        assertThat(index.get(0).publicPostCount()).isEqualTo(5);
         assertThat(index.get(0).categoryName()).isEqualTo("컨퍼런스");
         assertThat(index.get(1).feedCount()).isZero();
+        assertThat(index.get(1).publicPostCount()).isZero();
     }
 
     @Test
     @DisplayName("시나리오: 피드에만 있는 태그도 목록에 나오되 아직 등록되지 않은 것으로 표시된다")
     void indexIncludesFeedOnlyTags() {
         when(tagRepository.findAll()).thenReturn(List.of());
-        when(postRepository.countPublishedByTagName()).thenReturn(Map.of());
+        when(postRepository.countPublishedTagCounts(Set.of())).thenReturn(Map.of());
         when(feedUseCase.getFeedTagCounts()).thenReturn(Map.of("Anthropic", 9L));
         when(categoryRepository.findAll()).thenReturn(List.of());
 
@@ -76,9 +87,22 @@ class TagCatalogApplicationServiceTest {
                 .satisfies(
                         usage -> {
                             assertThat(usage.name()).isEqualTo("Anthropic");
+                            assertThat(usage.publicPostCount()).isZero();
                             assertThat(usage.feedCount()).isEqualTo(9);
                             assertThat(usage.isUnregistered()).isTrue();
                         });
+    }
+
+    @Test
+    @DisplayName("시나리오: 공개 카테고리 정책을 읽지 못하면 태그 공개 수를 추정하지 않는다")
+    void indexFailsClosedWhenCategoryPolicyCannotBeRead() {
+        when(categoryRepository.findAll())
+                .thenThrow(new IllegalStateException("policy unavailable"));
+
+        assertThatThrownBy(service::getIndex).isInstanceOf(IllegalStateException.class);
+
+        verify(postRepository, never()).countPublishedTagCounts(any());
+        verify(feedUseCase, never()).getFeedTagCounts();
     }
 
     @Test

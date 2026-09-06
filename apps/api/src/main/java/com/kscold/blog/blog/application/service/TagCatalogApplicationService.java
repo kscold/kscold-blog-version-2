@@ -9,6 +9,7 @@ import com.kscold.blog.blog.domain.model.Tag;
 import com.kscold.blog.blog.domain.model.TagUsage;
 import com.kscold.blog.blog.domain.port.out.CategoryRepository;
 import com.kscold.blog.blog.domain.port.out.PostRepository;
+import com.kscold.blog.blog.domain.port.out.PostRepository.PublishedTagCounts;
 import com.kscold.blog.blog.domain.port.out.TagRepository;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.exception.ResourceNotFoundException;
@@ -21,6 +22,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -50,9 +53,11 @@ public class TagCatalogApplicationService implements TagCatalogUseCase {
             cacheNames = BlogCatalogCacheConfiguration.TAG_INDEX_CACHE,
             sync = true)
     public List<TagUsage> getIndex() {
-        Map<String, Long> postCounts = postRepository.countPublishedByTagName();
+        List<Category> categories = categoryRepository.findAll();
+        Map<String, PublishedTagCounts> postCounts =
+                postRepository.countPublishedTagCounts(publicCategoryIds(categories));
         Map<String, Long> feedCounts = feedUseCase.getFeedTagCounts();
-        Map<String, String> categoryNames = categoryNamesById();
+        Map<String, String> categoryNames = categoryNamesById(categories);
 
         List<Tag> registered = tagRepository.findAll();
         List<TagUsage> usages = new ArrayList<>();
@@ -61,6 +66,8 @@ public class TagCatalogApplicationService implements TagCatalogUseCase {
 
         for (Tag tag : registered) {
             seen.add(tag.getName());
+            PublishedTagCounts counts =
+                    postCounts.getOrDefault(tag.getName(), new PublishedTagCounts(0L, 0L));
             usages.add(
                     new TagUsage(
                             tag.getId(),
@@ -68,13 +75,14 @@ public class TagCatalogApplicationService implements TagCatalogUseCase {
                             tag.getSlug(),
                             tag.getCategoryId(),
                             categoryNames.get(tag.getCategoryId()),
-                            postCounts.getOrDefault(tag.getName(), 0L),
+                            counts.postCount(),
+                            counts.publicPostCount(),
                             feedCounts.getOrDefault(tag.getName(), 0L)));
         }
         feedCounts.forEach(
                 (name, count) -> {
                     if (seen.contains(name)) return;
-                    usages.add(new TagUsage(null, name, null, null, null, 0L, count));
+                    usages.add(new TagUsage(null, name, null, null, null, 0L, 0L, count));
                 });
 
         usages.sort(
@@ -171,12 +179,20 @@ public class TagCatalogApplicationService implements TagCatalogUseCase {
                 .map(Map.Entry::getKey);
     }
 
-    private Map<String, String> categoryNamesById() {
+    private Map<String, String> categoryNamesById(List<Category> categories) {
         Map<String, String> names = new HashMap<>();
-        for (Category category : categoryRepository.findAll()) {
+        for (Category category : categories) {
             names.put(category.getId(), category.getName());
         }
         return names;
+    }
+
+    private Set<String> publicCategoryIds(List<Category> categories) {
+        return categories.stream()
+                .filter(category -> !Boolean.TRUE.equals(category.getRestricted()))
+                .map(Category::getId)
+                .filter(id -> id != null && !id.isBlank())
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     private Tag findTag(String id) {

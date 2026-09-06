@@ -4,9 +4,11 @@ import com.kscold.blog.blog.domain.model.Post;
 import com.kscold.blog.blog.domain.port.out.PostRepository;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -107,6 +109,22 @@ public class PostRepositoryAdapter implements PostRepository {
         return toCountMap(mongoTemplate.aggregate(aggregation, "posts", Document.class));
     }
 
+    /** 공개 정책까지 반영한 태그별 발행 글 수를 한 번의 집계로 센다. */
+    @Override
+    public Map<String, PublishedTagCounts> countPublishedTagCounts(Set<String> publicCategoryIds) {
+        List<Object> mongoCategoryIds = toMongoIds(publicCategoryIds);
+        Aggregation aggregation =
+                Aggregation.newAggregation(
+                        Aggregation.match(
+                                Criteria.where("status").is(Post.Status.PUBLISHED.name())),
+                        context -> publishedTagProjection(mongoCategoryIds),
+                        Aggregation.unwind("tags"),
+                        context -> publishedTagGrouping());
+        AggregationResults<Document> results =
+                mongoTemplate.aggregate(aggregation, "posts", Document.class);
+        return toPublishedTagCounts(results);
+    }
+
     /** 태그를 합칠 때 글에 박힌 {_id, name, slug} 참조를 통째로 바꾼다. */
     @Override
     public long replaceTagReference(String fromTagId, Post.TagInfo targetTag) {
@@ -186,5 +204,57 @@ public class PostRepositoryAdapter implements PostRepository {
             counts.put(key.toString(), ((Number) document.get("count")).longValue());
         }
         return counts;
+    }
+
+    private Document publishedTagProjection(List<Object> publicCategoryIds) {
+        Document publicPost =
+                new Document(
+                        "$or",
+                        List.of(
+                                new Document("$eq", List.of("$publicOverride", true)),
+                                new Document("$in", List.of("$category._id", publicCategoryIds))));
+        return new Document(
+                "$project",
+                new Document("tags.name", 1)
+                        .append(
+                                "publicIncrement",
+                                new Document("$cond", List.of(publicPost, 1, 0))));
+    }
+
+    private Document publishedTagGrouping() {
+        return new Document(
+                "$group",
+                new Document("_id", "$tags.name")
+                        .append("postCount", new Document("$sum", 1))
+                        .append("publicPostCount", new Document("$sum", "$publicIncrement")));
+    }
+
+    private Map<String, PublishedTagCounts> toPublishedTagCounts(
+            AggregationResults<Document> results) {
+        Map<String, PublishedTagCounts> counts = new HashMap<>();
+        for (Document document : results.getMappedResults()) {
+            Object key = document.get("_id");
+            if (key == null) continue;
+            counts.put(
+                    key.toString(),
+                    new PublishedTagCounts(
+                            number(document, "postCount"), number(document, "publicPostCount")));
+        }
+        return counts;
+    }
+
+    private long number(Document document, String key) {
+        Object value = document.get(key);
+        return value instanceof Number number ? number.longValue() : 0L;
+    }
+
+    private List<Object> toMongoIds(Set<String> ids) {
+        LinkedHashSet<Object> mongoIds = new LinkedHashSet<>();
+        for (String id : ids) {
+            if (id == null || id.isBlank()) continue;
+            mongoIds.add(id);
+            if (ObjectId.isValid(id)) mongoIds.add(new ObjectId(id));
+        }
+        return List.copyOf(mongoIds);
     }
 }

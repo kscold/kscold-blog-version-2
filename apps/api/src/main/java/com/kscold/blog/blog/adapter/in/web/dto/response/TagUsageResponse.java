@@ -20,6 +20,7 @@ public class TagUsageResponse {
     private String categoryId;
     private String categoryName;
     private long postCount;
+    private long publicPostCount;
     private long feedCount;
     private long totalCount;
 
@@ -34,6 +35,7 @@ public class TagUsageResponse {
                 .categoryId(usage.categoryId())
                 .categoryName(usage.categoryName())
                 .postCount(usage.postCount())
+                .publicPostCount(usage.publicPostCount())
                 .feedCount(usage.feedCount())
                 .totalCount(usage.totalCount())
                 .unregistered(usage.isUnregistered())

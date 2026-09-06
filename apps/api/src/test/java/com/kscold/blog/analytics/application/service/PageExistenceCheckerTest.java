@@ -89,7 +89,8 @@ class PageExistenceCheckerTest {
         when(tagCatalogUseCase.getIndex())
                 .thenReturn(
                         java.util.List.of(
-                                new TagUsage("tag-1", "AI Agent", "ai-agent", null, null, 1, 2)));
+                                new TagUsage(
+                                        "tag-1", "AI Agent", "ai-agent", null, null, 1, 1, 2)));
 
         assertThat(checker.exists("/tags/AI%20Agent")).isTrue();
         assertThat(checker.exists("/tags/ai-agent")).isTrue();
