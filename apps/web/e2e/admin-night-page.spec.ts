@@ -38,4 +38,19 @@ test.describe('Admin Night 공개 페이지 시나리오', () => {
 
     await page.screenshot({ path: 'test-results/screenshots/admin-night-page-mobile.png' });
   });
+
+  test('AI Agent Bloom은 확정되지 않은 일정을 이벤트로 선언하지 않는다', async ({ page }) => {
+    await page.goto('/admin-night/ai-agent-bloom');
+
+    const jsonLd = await page.locator('#ai-agent-bloom-page').textContent();
+    expect(jsonLd).not.toBeNull();
+    const schema = JSON.parse(jsonLd || '{}');
+
+    expect(schema['@type']).toBe('Service');
+    expect(schema.serviceType).toContain('AI Agent');
+    expect(schema).not.toHaveProperty('eventStatus');
+    expect(schema).not.toHaveProperty('eventAttendanceMode');
+    expect(schema).not.toHaveProperty('startDate');
+    expect(schema).not.toHaveProperty('location');
+  });
 });

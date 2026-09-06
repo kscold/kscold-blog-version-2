@@ -12,21 +12,21 @@ export const metadata = buildPageMetadata({
 
 const pageJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Event',
-  '@id': `${SITE_URL}/admin-night/ai-agent-bloom#event`,
+  '@type': 'Service',
+  '@id': `${SITE_URL}/admin-night/ai-agent-bloom#service`,
   url: `${SITE_URL}/admin-night/ai-agent-bloom`,
   name: 'AI Agent Bloom: 같이 만들고 피워보는 모임',
   description:
     'AI Agent를 같이 만들고 서로 공유해보는 오프라인 Bloom입니다. 바이브코딩을 적극 활용해 LLM 호출에서 LangGraph, RAG fallback, 평가와 관측까지 이어갑니다.',
-  eventStatus: 'https://schema.org/EventScheduled',
-  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-  organizer: {
+  serviceType: '오프라인 AI Agent 개발 실습과 공유',
+  provider: {
     '@type': 'Person',
     name: 'kscold',
     url: SITE_URL,
   },
-  isPartOf: {
-    '@id': `${SITE_URL}/admin-night#page`,
+  areaServed: {
+    '@type': 'Country',
+    name: '대한민국',
   },
 };
 
