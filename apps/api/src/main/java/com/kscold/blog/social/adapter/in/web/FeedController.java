@@ -10,6 +10,7 @@ import com.kscold.blog.social.application.dto.command.FeedCreateCommand;
 import com.kscold.blog.social.application.dto.command.FeedUpdateCommand;
 import com.kscold.blog.social.application.dto.response.FeedSitemapResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
+import com.kscold.blog.social.application.service.FeedAccessPolicy;
 import com.kscold.blog.social.domain.model.Feed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -40,6 +41,7 @@ public class FeedController {
     private final ClientIdentifierResolver clientIdentifierResolver;
     private final ViewCounter viewCounter;
     private final UserQueryPort userQueryPort;
+    private final FeedAccessPolicy feedAccessPolicy;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<FeedResponse>>> getPublicFeeds(
@@ -84,7 +86,7 @@ public class FeedController {
             @PathVariable String id,
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
-        Feed feed = feedUseCase.getById(id);
+        Feed feed = feedAccessPolicy.requireReadable(id, userId, hasAdminRole());
         String identifier = resolveIdentifier(userId, request);
         if (viewCounter.incrementIfUnique("feeds", feed.getId(), "FEED", identifier)) {
             feed.setViews(feed.getViews() + 1);
@@ -131,6 +133,7 @@ public class FeedController {
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
         String identifier = resolveIdentifier(userId, request);
+        feedAccessPolicy.requireReadable(id, userId, hasAdminRole());
         Feed feed = feedUseCase.toggleLike(id, identifier);
         return ResponseEntity.ok(ApiResponse.success(toResponse(feed, identifier)));
     }

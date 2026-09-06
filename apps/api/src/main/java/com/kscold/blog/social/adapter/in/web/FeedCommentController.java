@@ -7,6 +7,7 @@ import com.kscold.blog.social.adapter.in.web.dto.response.FeedCommentResponse;
 import com.kscold.blog.social.adapter.in.web.dto.response.MentionableUserResponse;
 import com.kscold.blog.social.application.dto.command.FeedCommentCreateCommand;
 import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
+import com.kscold.blog.social.application.service.FeedAccessPolicy;
 import com.kscold.blog.social.domain.model.FeedComment;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -31,6 +32,7 @@ public class FeedCommentController {
 
     private final FeedCommentUseCase feedCommentUseCase;
     private final ClientIdentifierResolver clientIdentifierResolver;
+    private final FeedAccessPolicy feedAccessPolicy;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<FeedCommentResponse>>> getComments(
@@ -39,6 +41,7 @@ public class FeedCommentController {
             HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
+        requireReadable(feedId, userId);
         Pageable pageable =
                 BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
         Page<FeedComment> comments = feedCommentUseCase.getByFeedId(feedId, pageable, userId);
@@ -58,6 +61,7 @@ public class FeedCommentController {
             @AuthenticationPrincipal String userId,
             HttpServletRequest request,
             @Valid @RequestBody FeedCommentCreateCommand command) {
+        requireReadable(feedId, userId);
         FeedComment comment = feedCommentUseCase.create(feedId, command, userId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
@@ -76,6 +80,7 @@ public class FeedCommentController {
             @PathVariable String commentId,
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
+        requireReadable(feedId, userId);
         String identifier = resolveIdentifier(userId, request);
         FeedComment comment = feedCommentUseCase.toggleLike(feedId, commentId, identifier);
         return ResponseEntity.ok(
@@ -85,7 +90,8 @@ public class FeedCommentController {
 
     @GetMapping("/mentionable")
     public ResponseEntity<ApiResponse<List<MentionableUserResponse>>> getMentionableUsers(
-            @PathVariable String feedId) {
+            @PathVariable String feedId, @AuthenticationPrincipal String userId) {
+        requireReadable(feedId, userId);
         List<MentionableUserResponse> users =
                 feedCommentUseCase.getMentionableUsers(feedId).stream()
                         .map(MentionableUserResponse::from)
@@ -98,6 +104,7 @@ public class FeedCommentController {
             @PathVariable String feedId,
             @PathVariable String commentId,
             @AuthenticationPrincipal String userId) {
+        requireReadable(feedId, userId);
         feedCommentUseCase.delete(feedId, commentId, userId);
         return ResponseEntity.noContent().build();
     }
@@ -112,5 +119,9 @@ public class FeedCommentController {
         return auth != null
                 && auth.getAuthorities().stream()
                         .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    private void requireReadable(String feedId, String userId) {
+        feedAccessPolicy.requireReadable(feedId, userId, hasAdminRole());
     }
 }

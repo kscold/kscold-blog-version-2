@@ -13,6 +13,7 @@ import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
+import com.kscold.blog.social.application.service.FeedAccessPolicy;
 import com.kscold.blog.social.domain.model.Feed;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -43,7 +44,8 @@ class FeedControllerTest {
                         feedUseCase,
                         clientIdentifierResolver,
                         mock(ViewCounter.class),
-                        userQueryPort);
+                        userQueryPort,
+                        mock(FeedAccessPolicy.class));
     }
 
     @Test

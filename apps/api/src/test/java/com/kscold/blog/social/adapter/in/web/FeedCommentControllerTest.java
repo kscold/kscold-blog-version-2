@@ -8,6 +8,7 @@ import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedCommentResponse;
 import com.kscold.blog.social.application.port.in.FeedCommentUseCase;
+import com.kscold.blog.social.application.service.FeedAccessPolicy;
 import com.kscold.blog.social.domain.model.FeedComment;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Set;
@@ -26,6 +27,8 @@ class FeedCommentControllerTest {
 
     @Mock private ClientIdentifierResolver clientIdentifierResolver;
 
+    @Mock private FeedAccessPolicy feedAccessPolicy;
+
     @Mock private HttpServletRequest httpServletRequest;
 
     @InjectMocks private FeedCommentController feedCommentController;
@@ -43,6 +46,7 @@ class FeedCommentControllerTest {
         FeedCommentResponse body = response.getBody().getData();
         assertThat(body.getIsLiked()).isTrue();
         assertThat(body.getLikesCount()).isEqualTo(1);
+        verify(feedAccessPolicy).requireReadable("feed-1", null, false);
     }
 
     @Test
@@ -54,6 +58,7 @@ class FeedCommentControllerTest {
         feedCommentController.toggleLike("feed-1", "comment-1", "user-1", httpServletRequest);
 
         verify(feedCommentUseCase).toggleLike("feed-1", "comment-1", "user-1");
+        verify(feedAccessPolicy).requireReadable("feed-1", "user-1", false);
         verify(clientIdentifierResolver, org.mockito.Mockito.never()).resolve(httpServletRequest);
     }
 
