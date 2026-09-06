@@ -38,9 +38,8 @@ public class AdminNightRequestRepositoryAdapter implements AdminNightRequestRepo
 
     @Override
     public List<AdminNightRequest> findApprovedScheduledBetween(LocalDate from, LocalDate to) {
-        return mongoAdminNightRequestRepository
-                .findByStatusAndScheduledSlotDateBetweenOrderByScheduledSlotDateAsc(
-                        AdminNightRequest.Status.APPROVED, from, to);
+        return mongoAdminNightRequestRepository.findScheduledBetweenInclusive(
+                AdminNightRequest.Status.APPROVED, from, to);
     }
 
     @Override

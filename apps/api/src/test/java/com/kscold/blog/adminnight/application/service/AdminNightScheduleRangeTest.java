@@ -11,13 +11,19 @@ import org.junit.jupiter.api.Test;
 class AdminNightScheduleRangeTest {
 
     private static final LocalDate FROM = LocalDate.of(2026, 9, 5);
-    private static final LocalDate TO = LocalDate.of(2026, 9, 12);
+    private static final LocalDate TO = LocalDate.of(2026, 9, 11);
 
     @Test
     @DisplayName("조회 시작일과 종료일이 같은 날이어도 허용한다")
     void acceptsSameBoundaryDate() {
         assertThatCode(() -> AdminNightScheduleRange.validate(FROM, FROM))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("일주일 범위는 허용한다")
+    void acceptsSevenDayRange() {
+        assertThatCode(() -> AdminNightScheduleRange.validate(FROM, TO)).doesNotThrowAnyException();
     }
 
     @Test
@@ -34,5 +40,13 @@ class AdminNightScheduleRangeTest {
         assertThatThrownBy(() -> AdminNightScheduleRange.validate(null, TO))
                 .isInstanceOf(InvalidRequestException.class)
                 .hasMessage("조회 시작일과 종료일이 필요합니다.");
+    }
+
+    @Test
+    @DisplayName("일주일을 넘는 조회 범위는 거부한다")
+    void rejectsRangeLongerThanSevenDays() {
+        assertThatThrownBy(() -> AdminNightScheduleRange.validate(FROM, TO.plusDays(1)))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessage("조회 기간은 최대 7일까지 지정할 수 있습니다.");
     }
 }
