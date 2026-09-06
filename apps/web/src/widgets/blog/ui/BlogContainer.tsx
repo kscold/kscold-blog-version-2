@@ -6,9 +6,14 @@ import type { BlogArchiveProps } from './BlogArchive';
 import BlogPostGrid from './BlogPostGrid';
 import { BlogSearchForm } from './BlogSearchForm';
 
-export function BlogContainer({ page, initialPosts, initialCategories }: BlogArchiveProps) {
+export function BlogContainer({
+  page,
+  initialPosts,
+  initialCategories,
+  categoriesDegraded,
+}: BlogArchiveProps) {
   const filter = useBlogArchiveFilter(initialPosts);
-  const { data: categories } = useCategories(initialCategories);
+  const { data: categories } = useCategories(categoriesDegraded ? undefined : initialCategories);
   return (
     <>
       <BlogSearchForm

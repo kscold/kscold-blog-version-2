@@ -8,6 +8,7 @@ export interface BlogArchiveProps {
   page: number;
   initialPosts: PageResponse<Post>;
   initialCategories: Category[];
+  categoriesDegraded: boolean;
 }
 
 export function BlogArchive(props: BlogArchiveProps) {
