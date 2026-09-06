@@ -227,14 +227,17 @@ public class VaultNoteApplicationService implements VaultNoteUseCase {
                 .toList();
     }
 
-    /** 사이트맵 생성은 그래프 링크를 만들지 않고 slug와 본문 길이만 조회한다. */
+    /** 사이트맵 생성은 그래프 링크를 만들지 않고 색인 판정과 갱신일에 필요한 필드만 조회한다. */
     @Cacheable(
             cacheManager = "vaultCacheManager",
             cacheNames = VaultCacheConfiguration.SITEMAP_INDEX_CACHE,
             sync = true)
     public List<VaultNoteSitemapResponse> getSitemapIndex() {
         return vaultNoteRepository.findAllForSitemap().stream()
-                .map(note -> new VaultNoteSitemapResponse(note.slug(), note.contentLength()))
+                .map(
+                        note ->
+                                new VaultNoteSitemapResponse(
+                                        note.slug(), note.contentLength(), note.updatedAt()))
                 .toList();
     }
 

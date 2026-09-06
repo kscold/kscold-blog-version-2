@@ -13,6 +13,7 @@ import com.kscold.blog.vault.domain.port.out.VaultFolderRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteCommentRepository;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
 import com.kscold.blog.vault.domain.service.BacklinkParsingService;
+import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,19 +79,23 @@ class VaultNoteApplicationServiceTest {
     }
 
     @Test
-    void 사이트맵인덱스는슬러그와본문길이만반환한다() {
+    void 사이트맵인덱스는슬러그본문길이수정일만반환한다() {
+        Instant firstUpdatedAt = Instant.parse("2026-09-01T00:00:00Z");
+        Instant secondUpdatedAt = Instant.parse("2026-09-02T00:00:00Z");
         when(vaultNoteRepository.findAllForSitemap())
                 .thenReturn(
                         List.of(
-                                new VaultNoteRepository.SitemapNote("first-note", 120),
-                                new VaultNoteRepository.SitemapNote("second-note", 80)));
+                                new VaultNoteRepository.SitemapNote(
+                                        "first-note", 120, firstUpdatedAt),
+                                new VaultNoteRepository.SitemapNote(
+                                        "second-note", 80, secondUpdatedAt)));
 
         List<VaultNoteSitemapResponse> response = service.getSitemapIndex();
 
         assertThat(response)
                 .containsExactly(
-                        new VaultNoteSitemapResponse("first-note", 120),
-                        new VaultNoteSitemapResponse("second-note", 80));
+                        new VaultNoteSitemapResponse("first-note", 120, firstUpdatedAt),
+                        new VaultNoteSitemapResponse("second-note", 80, secondUpdatedAt));
     }
 
     @Test

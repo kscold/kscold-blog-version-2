@@ -2,6 +2,8 @@ package com.kscold.blog.vault.adapter.out.persistence;
 
 import com.kscold.blog.vault.domain.model.VaultNote;
 import com.kscold.blog.vault.domain.port.out.VaultNoteRepository;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -171,6 +173,7 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
                                 "$project",
                                 new Document("_id", 0)
                                         .append("slug", 1)
+                                        .append("updatedAt", 1)
                                         .append(
                                                 "contentLength",
                                                 new Document(
@@ -189,8 +192,14 @@ public class VaultNoteRepositoryAdapter implements VaultNoteRepository {
                                         doc.getString("slug"),
                                         doc.get("contentLength") instanceof Number number
                                                 ? number.intValue()
-                                                : 0))
+                                                : 0,
+                                        readInstant(doc, "updatedAt")))
                 .toList();
+    }
+
+    private Instant readInstant(Document document, String field) {
+        Object value = document.get(field);
+        return value instanceof Date date ? date.toInstant() : null;
     }
 
     private List<String> readStringList(Document document, String fieldName) {
