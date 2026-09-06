@@ -4,7 +4,7 @@ import { fetchPublicApi } from '@/shared/lib/seo';
 import { TagPostContainer } from './TagPostContainer';
 
 interface TagArchiveProps {
-  tag: Tag;
+  tag: Pick<Tag, 'id' | 'name' | 'postCount'>;
 }
 
 export async function TagArchive({ tag }: TagArchiveProps) {

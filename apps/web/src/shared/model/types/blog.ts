@@ -72,6 +72,7 @@ export interface TagUsage {
   categoryId: string | null;
   categoryName: string | null;
   postCount: number;
+  publicPostCount?: number;
   feedCount: number;
   totalCount: number;
   unregistered: boolean;

@@ -25,6 +25,11 @@ export function isIndexableVaultContent(content?: string | null) {
   return isIndexableVaultNote(content == null ? null : Array.from(content).length);
 }
 
-export function isIndexableTag(tag: { slug: string; postCount: number }) {
-  return !INTERNAL_TAG_SLUGS.has(tag.slug) && tag.postCount >= MIN_INDEXABLE_TAG_POST_COUNT;
+export function isIndexableTag(tag: { slug: string; publicPostCount?: number | null }) {
+  return (
+    !INTERNAL_TAG_SLUGS.has(tag.slug) &&
+    typeof tag.publicPostCount === 'number' &&
+    Number.isSafeInteger(tag.publicPostCount) &&
+    tag.publicPostCount >= MIN_INDEXABLE_TAG_POST_COUNT
+  );
 }

@@ -11,7 +11,7 @@ import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { Pagination } from '@/shared/ui/Pagination';
 
 interface TagPostContainerProps {
-  tag: Tag;
+  tag: Pick<Tag, 'id' | 'name' | 'postCount'>;
   initialPosts?: PageResponse<Post>;
 }
 

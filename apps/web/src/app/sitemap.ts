@@ -65,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
   const indexableTags = tags
-    .map(tag => ({ ...tag, postCount: publicPostCountsByTagId.get(tag.id) || 0 }))
+    .map(tag => ({ ...tag, publicPostCount: publicPostCountsByTagId.get(tag.id) || 0 }))
     .filter(isIndexableTag);
   // 본문 길이를 확인할 수 있고 독립 문서로 충분한 노트만 사이트맵에 싣는다.
   const vaultNotes = vaultNoteIndex.filter(
