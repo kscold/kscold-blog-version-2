@@ -1,10 +1,14 @@
+import { FEED_INPUT_LIMITS } from '@/entities/feed';
 import type { FeedCopilotStyle } from '../api/feedCopilotApi';
+import { FEED_COPILOT_MEMO_MAX_LENGTH } from '../model/feedCopilotInputPolicy';
 import { feedCopilotStyleOptions } from '../model/feedCopilotStyles';
 
 interface FeedCopilotControlsProps {
   memo: string;
   onMemoChange?: (value: string) => void;
   sourceUrl: string;
+  memoError: string | null;
+  sourceUrlError: string | null;
   onSourceUrlChange: (value: string) => void;
   onExpandComposer?: () => void;
   styles: FeedCopilotStyle[];
@@ -18,6 +22,8 @@ export function FeedCopilotControls({
   memo,
   onMemoChange,
   sourceUrl,
+  memoError,
+  sourceUrlError,
   onSourceUrlChange,
   onExpandComposer,
   styles,
@@ -37,12 +43,43 @@ export function FeedCopilotControls({
           <textarea
             data-cy="feed-copilot-memo"
             value={memo}
+            maxLength={FEED_COPILOT_MEMO_MAX_LENGTH}
             onChange={event => onMemoChange(event.target.value)}
             placeholder="예: 이 글을 보고 지금 만드는 Agent의 검색 흐름을 다시 생각하게 됐어요."
             rows={isChat ? 5 : 4}
+            aria-invalid={Boolean(memoError)}
+            aria-describedby={
+              memoError ? 'feed-copilot-memo-error' : 'feed-copilot-memo-count'
+            }
             className="mt-3 w-full resize-y rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm leading-6 text-surface-700 placeholder:text-surface-400 outline-none transition focus:border-surface-400 focus:ring-4 focus:ring-surface-100"
           />
+          <span className="mt-2 flex items-start justify-between gap-3 text-xs">
+            {memoError ? (
+              <span
+                id="feed-copilot-memo-error"
+                role="alert"
+                className="font-semibold text-red-500"
+              >
+                {memoError}
+              </span>
+            ) : null}
+            <span id="feed-copilot-memo-count" className="ml-auto shrink-0 text-surface-400">
+              {memo.length.toLocaleString('ko-KR')} /{' '}
+              {FEED_COPILOT_MEMO_MAX_LENGTH.toLocaleString('ko-KR')}자
+            </span>
+          </span>
         </label>
+      ) : null}
+
+      {!onMemoChange && memoError ? (
+        <p
+          id="feed-copilot-memo-error"
+          role="alert"
+          data-cy="feed-copilot-memo-error"
+          className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600"
+        >
+          {memoError} 피드 본문은 현재 상태로 게시할 수 있습니다.
+        </p>
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
@@ -55,18 +92,39 @@ export function FeedCopilotControls({
             type="url"
             data-cy="feed-copilot-source-url"
             value={sourceUrl}
+            maxLength={FEED_INPUT_LIMITS.linkUrlLength}
             onChange={event => {
               onSourceUrlChange(event.target.value);
               onExpandComposer?.();
             }}
             placeholder="https://example.com/article"
+            aria-invalid={Boolean(sourceUrlError)}
+            aria-describedby={
+              sourceUrlError ? 'feed-copilot-link-error' : 'feed-copilot-link-count'
+            }
             className="mt-3 w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 outline-none transition focus:border-surface-400 focus:ring-4 focus:ring-surface-100"
           />
+          <span className="mt-2 flex items-start justify-between gap-3 text-xs">
+            {sourceUrlError ? (
+              <span
+                id="feed-copilot-link-error"
+                role="alert"
+                className="font-semibold text-red-500"
+              >
+                {sourceUrlError}
+              </span>
+            ) : null}
+            <span id="feed-copilot-link-count" className="ml-auto shrink-0 text-surface-400">
+              {sourceUrl.length.toLocaleString('ko-KR')} /{' '}
+              {FEED_INPUT_LIMITS.linkUrlLength.toLocaleString('ko-KR')}자
+            </span>
+          </span>
         </label>
         <button
           type="button"
           onClick={onCreatePlan}
-          disabled={isPlanning}
+          disabled={isPlanning || Boolean(memoError) || Boolean(sourceUrlError)}
+          aria-describedby={memoError ? 'feed-copilot-memo-error' : undefined}
           className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-surface-900 px-5 py-3 text-sm font-bold text-white transition hover:bg-surface-800 disabled:cursor-not-allowed disabled:opacity-55 lg:mb-0"
         >
           {isPlanning ? '계획을 정리하는 중...' : '작성 계획 세우기'}

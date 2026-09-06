@@ -1,7 +1,9 @@
 import { useLayoutEffect, useRef } from 'react';
+import { FEED_INPUT_LIMITS } from '@/entities/feed';
 
 interface FeedComposerEditorCardProps {
   content: string;
+  contentError: string | null;
   shouldShowExpanded: boolean;
   onContentChange: (value: string) => void;
   onExpand: () => void;
@@ -11,6 +13,7 @@ interface FeedComposerEditorCardProps {
 
 export function FeedComposerEditorCard({
   content,
+  contentError,
   shouldShowExpanded,
   onContentChange,
   onExpand,
@@ -47,13 +50,15 @@ export function FeedComposerEditorCard({
           </p>
         </div>
         <span className="rounded-full border border-surface-200 bg-surface-50 px-3 py-1 text-xs font-semibold text-surface-500">
-          {content.trim().length}자
+          {content.length.toLocaleString('ko-KR')} /{' '}
+          {FEED_INPUT_LIMITS.contentLength.toLocaleString('ko-KR')}자
         </span>
       </div>
 
       <textarea
         ref={textareaRef}
         value={content}
+        maxLength={FEED_INPUT_LIMITS.contentLength}
         onChange={event => {
           onContentChange(event.target.value);
           onExpand();
@@ -64,12 +69,24 @@ export function FeedComposerEditorCard({
         rows={shouldShowExpanded ? 8 : 3}
         data-cy="feed-composer-content"
         aria-label="피드 본문"
+        aria-invalid={Boolean(contentError)}
+        aria-describedby={contentError ? 'feed-composer-content-error' : undefined}
         className="min-h-[140px] w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-base leading-8 text-surface-900 placeholder:text-surface-300 focus:outline-none sm:min-h-[180px] sm:text-[1.05rem]"
       />
 
-      <p className="mt-4 text-sm leading-6 text-surface-400">
-        이미지는 이 영역에 드래그하거나 붙여넣으면 바로 첨부됩니다.
-      </p>
+      {contentError ? (
+        <p
+          id="feed-composer-content-error"
+          role="alert"
+          className="mt-4 text-sm font-semibold text-red-500"
+        >
+          {contentError}
+        </p>
+      ) : (
+        <p className="mt-4 text-sm leading-6 text-surface-400">
+          이미지는 이 영역에 드래그하거나 붙여넣으면 바로 첨부됩니다.
+        </p>
+      )}
     </div>
   );
 }

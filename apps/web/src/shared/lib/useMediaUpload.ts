@@ -10,23 +10,31 @@ interface UploadResponse {
   url: string;
 }
 
+function validateImageFile(file: File) {
+  if (!file.type.startsWith('image/')) {
+    throw new Error('이미지 파일만 업로드 가능합니다');
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('파일 크기는 10MB 이하여야 합니다');
+  }
+}
+
+async function uploadImageFile(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const result = await apiClient.upload<UploadResponse>('/media/upload', formData);
+  return result.url;
+}
+
 export function useMediaUpload() {
   const [isUploading, setIsUploading] = useState(false);
 
   const uploadFile = async (file: File): Promise<string> => {
-    if (!file.type.startsWith('image/')) {
-      throw new Error('이미지 파일만 업로드 가능합니다');
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      throw new Error('파일 크기는 10MB 이하여야 합니다');
-    }
+    validateImageFile(file);
 
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const result = await apiClient.upload<UploadResponse>('/media/upload', formData);
-      return result.url;
+      return await uploadImageFile(file);
     } finally {
       setIsUploading(false);
     }
@@ -55,12 +63,19 @@ export function useMediaUpload() {
   };
 
   const uploadFiles = async (files: FileList): Promise<string[]> => {
-    const results: string[] = [];
-    for (const file of Array.from(files)) {
-      const url = await uploadFile(file);
-      results.push(url);
+    const selectedFiles = Array.from(files);
+    selectedFiles.forEach(validateImageFile);
+
+    setIsUploading(true);
+    try {
+      const results: string[] = [];
+      for (const file of selectedFiles) {
+        results.push(await uploadImageFile(file));
+      }
+      return results;
+    } finally {
+      setIsUploading(false);
     }
-    return results;
   };
 
   return { uploadFile, uploadVideo, uploadFiles, isUploading };

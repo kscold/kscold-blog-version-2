@@ -1,8 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLinkPreview } from '@/entities/feed';
+import {
+  canSubmitFeed,
+  getFeedContentError,
+  getFeedImageCountError,
+  getFeedLinkUrlError,
+  normalizeFeedLinkUrl,
+  useLinkPreview,
+} from '@/entities/feed';
 import { useCreateFeed, useUpdateFeed } from '@/features/feed/api/useFeedMutations';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 import { useAlert } from '@/shared/model/alertStore';
@@ -27,26 +34,49 @@ export function useFeedEditor({
   const updateFeed = useUpdateFeed();
   const alert = useAlert();
   const { uploadFiles, isUploading } = useMediaUpload();
+  const isImageUploadActiveRef = useRef(false);
 
   const [content, setContent] = useState(initialContent);
   const [images, setImages] = useState<string[]>(initialImages);
   const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>(initialVisibility);
   const [linkUrl, setLinkUrl] = useState(initialLinkUrl);
+  const [imageUploadError, setImageUploadError] = useState<string | null>(null);
 
   const { data: linkPreview } = useLinkPreview(linkUrl);
+  const contentError = getFeedContentError(content);
+  const linkError = getFeedLinkUrlError(linkUrl);
+  const imageCountError = getFeedImageCountError(images.length);
+  const imageError = imageUploadError ?? imageCountError;
+  const canSubmit = canSubmitFeed({ content, imageCount: images.length, linkUrl });
 
   async function handleImageUpload(files: FileList) {
+    const nextImageError = getFeedImageCountError(images.length, files.length);
+    if (nextImageError) {
+      setImageUploadError(nextImageError);
+      alert.warning(nextImageError);
+      return;
+    }
+    if (isImageUploadActiveRef.current) {
+      alert.warning('진행 중인 이미지 업로드가 끝난 뒤 다시 시도해주세요.');
+      return;
+    }
+
+    setImageUploadError(null);
+    isImageUploadActiveRef.current = true;
     try {
       const uploadedUrls = await uploadFiles(files);
       setImages(prev => [...prev, ...uploadedUrls]);
     } catch (err) {
       const message = err instanceof Error ? err.message : '업로드에 실패했습니다';
       alert.error(message);
+    } finally {
+      isImageUploadActiveRef.current = false;
     }
   }
 
   function removeImage(index: number) {
     setImages(prev => prev.filter((_, currentIndex) => currentIndex !== index));
+    setImageUploadError(null);
   }
 
   async function handleSubmit() {
@@ -54,19 +84,29 @@ export function useFeedEditor({
       alert.warning('내용 또는 이미지를 입력해주세요');
       return;
     }
+    const inputError = contentError ?? imageCountError ?? linkError;
+    if (inputError) {
+      alert.warning(inputError);
+      return;
+    }
+    if (isUploading || isImageUploadActiveRef.current) {
+      alert.warning('이미지 업로드가 끝난 뒤 저장해주세요.');
+      return;
+    }
 
     try {
+      const normalizedLinkUrl = normalizeFeedLinkUrl(linkUrl);
       if (feedId) {
         await updateFeed.mutateAsync({
           id: feedId,
-          data: { content, images, visibility, linkUrl: linkUrl || undefined },
+          data: { content, images, visibility, linkUrl: normalizedLinkUrl },
         });
       } else {
         await createFeed.mutateAsync({
           content,
           images,
           visibility,
-          linkUrl: linkUrl || undefined,
+          linkUrl: normalizedLinkUrl || undefined,
         });
       }
 
@@ -110,6 +150,10 @@ export function useFeedEditor({
     visibility,
     linkUrl,
     linkPreview,
+    contentError,
+    imageError,
+    linkError,
+    canSubmit,
     isUploading,
     isPending: feedId ? updateFeed.isPending : createFeed.isPending,
     setContent,

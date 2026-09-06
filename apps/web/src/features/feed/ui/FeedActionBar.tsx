@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { FEED_INPUT_LIMITS } from '@/entities/feed';
 
 interface FeedActionBarProps {
   visibility: 'PUBLIC' | 'PRIVATE';
@@ -48,7 +49,8 @@ export default function FeedActionBar({
               Text
             </p>
             <p className="mt-2 text-xl font-black tracking-tight text-surface-900">
-              {contentLength}
+              {contentLength.toLocaleString('ko-KR')} /{' '}
+              {FEED_INPUT_LIMITS.contentLength.toLocaleString('ko-KR')}
             </p>
           </div>
           <div className="rounded-2xl border border-surface-200 bg-surface-50 px-3 py-3">
@@ -56,7 +58,7 @@ export default function FeedActionBar({
               Image
             </p>
             <p className="mt-2 text-xl font-black tracking-tight text-surface-900">
-              {imageCount}
+              {imageCount} / {FEED_INPUT_LIMITS.imageCount}
             </p>
           </div>
           <div className="rounded-2xl border border-surface-200 bg-surface-50 px-3 py-3">
@@ -73,7 +75,7 @@ export default function FeedActionBar({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           data-cy="feed-editor-upload"
-          disabled={isUploading}
+          disabled={isUploading || imageCount >= FEED_INPUT_LIMITS.imageCount}
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-semibold text-surface-700 transition-colors hover:bg-surface-100 hover:text-surface-900 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -83,14 +85,23 @@ export default function FeedActionBar({
               d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21z"
             />
           </svg>
-          {isUploading ? '이미지 업로드 중...' : '이미지 추가'}
+          {isUploading
+            ? '이미지 업로드 중...'
+            : imageCount >= FEED_INPUT_LIMITS.imageCount
+              ? `이미지 ${FEED_INPUT_LIMITS.imageCount}장 첨부됨`
+              : '이미지 추가'}
         </button>
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
           multiple
-          onChange={e => e.target.files && onImageUpload(e.target.files)}
+          onChange={event => {
+            if (event.target.files) {
+              onImageUpload(event.target.files);
+            }
+            event.target.value = '';
+          }}
           className="hidden"
           data-cy="feed-editor-upload-input"
         />

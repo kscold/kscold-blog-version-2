@@ -1,15 +1,18 @@
+import { FEED_INPUT_LIMITS } from '@/entities/feed';
 import type { LinkPreview } from '@/shared/model/types/social';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
 
 interface FeedEditorLinkPanelProps {
   linkUrl: string;
   linkPreview: LinkPreview | undefined;
+  error: string | null;
   onChange: (value: string) => void;
 }
 
 export function FeedEditorLinkPanel({
   linkUrl,
   linkPreview,
+  error,
   onChange,
 }: FeedEditorLinkPanelProps) {
   return (
@@ -26,11 +29,30 @@ export function FeedEditorLinkPanel({
       <input
         type="url"
         value={linkUrl}
+        maxLength={FEED_INPUT_LIMITS.linkUrlLength}
         onChange={event => onChange(event.target.value)}
         placeholder="https://example.com"
         data-cy="feed-editor-link-input"
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? 'feed-editor-link-error' : 'feed-editor-link-count'}
         className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
       />
+      <div className="mt-2 flex items-start justify-between gap-3 text-xs">
+        {error ? (
+          <p
+            id="feed-editor-link-error"
+            role="alert"
+            data-cy="feed-editor-link-error"
+            className="font-semibold text-red-500"
+          >
+            {error}
+          </p>
+        ) : null}
+        <p id="feed-editor-link-count" className="ml-auto shrink-0 text-surface-400">
+          {linkUrl.length.toLocaleString('ko-KR')} /{' '}
+          {FEED_INPUT_LIMITS.linkUrlLength.toLocaleString('ko-KR')}자
+        </p>
+      </div>
       {linkPreview?.title && (
         <div className="mt-4">
           <LinkPreviewCard preview={linkPreview} />

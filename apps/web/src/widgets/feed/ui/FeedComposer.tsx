@@ -9,6 +9,7 @@ import {
   takeFeedCopilotDraft,
   type FeedCopilotTransferDraft,
 } from '@/features/feed-copilot';
+import { FEED_INPUT_LIMITS } from '@/entities/feed';
 import type { User } from '@/shared/model/types/user';
 import { useFeedComposer } from '@/features/feed';
 import { FeedComposerActions } from './FeedComposerActions';
@@ -26,7 +27,7 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
     content,
     setContent,
     images,
-    setImages,
+    removeImage,
     linkUrl,
     setLinkUrl,
     isExpanded,
@@ -35,6 +36,10 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
     shouldShowExpanded,
     initials,
     linkPreview,
+    contentError,
+    imageError,
+    linkError,
+    canSubmit,
     createFeed,
     isUploading,
     fileInputRef,
@@ -146,6 +151,7 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
           content={content}
           shouldShowExpanded={shouldShowExpanded}
           onContentChange={setContent}
+          contentError={contentError}
           onExpand={() => setIsExpanded(true)}
           onPaste={handlePaste}
           onDrop={handleDrop}
@@ -164,7 +170,9 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
           images={images}
           linkUrl={linkUrl}
           linkPreview={linkPreview}
-          onRemoveImage={index => setImages(prev => prev.filter((_, idx) => idx !== index))}
+          imageError={imageError}
+          linkError={linkError}
+          onRemoveImage={removeImage}
           onLinkUrlChange={setLinkUrl}
           onExpand={() => setIsExpanded(true)}
         />
@@ -172,7 +180,8 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
           hasDraft={hasDraft}
           isUploading={isUploading}
           isSubmitting={createFeed.isPending}
-          canSubmit={Boolean(content.trim() || images.length)}
+          canSubmit={canSubmit && !isUploading}
+          canAddImages={images.length < FEED_INPUT_LIMITS.imageCount}
           fileInputRef={fileInputRef}
           onUploadFiles={handleImageUpload}
           onToggleExpanded={() => setIsExpanded(prev => !prev)}

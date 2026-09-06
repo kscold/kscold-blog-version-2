@@ -87,9 +87,11 @@ test.describe('공개 피드 작성기 시나리오', () => {
 
       const content = page.locator('[data-cy="feed-composer-content"]');
       await expect(content).toBeVisible();
+      await expect(content).toHaveAttribute('maxlength', '10000');
       // content 입력 → hasDraft=true 라 패널이 자동 확장되어 link-input 이 다시 나타난다
       await content.fill('공개 피드 작성기 시나리오를 점검합니다.');
       await expect(linkInput).toBeVisible();
+      await expect(linkInput).toHaveAttribute('maxlength', '2048');
       await linkInput.fill('https://kscold.com/info/team');
       await expect(page.getByText('Colding 소개')).toBeVisible();
       await expect(page.locator('a[href="https://kscold.com/info/team"] img')).toHaveAttribute(
@@ -106,4 +108,100 @@ test.describe('공개 피드 작성기 시나리오', () => {
       await expectNoHorizontalOverflow(page, viewport.width);
     });
   }
+
+  test('잘못된 링크는 미리보기를 요청하지 않고 게시를 차단한다', async ({ page }) => {
+    let previewRequestCount = 0;
+    let submittedLinkUrl: string | undefined;
+    await mockShellApis(page);
+    await mockApi(page, 'GET', '**/api/auth/me', success(FEED_USER));
+    await page.route('**/api/link-preview*', async route => {
+      previewRequestCount += 1;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(LINK_PREVIEW),
+      });
+    });
+    await page.route(/\/api\/feeds(\?|$)/, async route => {
+      if (route.request().method() !== 'POST') {
+        await route.fallback();
+        return;
+      }
+      const body = route.request().postDataJSON();
+      submittedLinkUrl = body.linkUrl;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(success({ id: 'feed-policy-test' })),
+      });
+    });
+
+    await seedSession(page, FEED_USER);
+    await page.goto('/feed');
+
+    await page.locator('[data-cy="feed-composer-content"]').fill('링크 정책을 확인합니다.');
+    const linkInput = page.locator('[data-cy="feed-composer-link-input"]');
+    const submitButton = page.locator('[data-cy="feed-composer-submit"]');
+    await linkInput.fill('httpx://kscold.com/feed');
+
+    await expect(page.locator('[data-cy="feed-composer-link-error"]')).toContainText(
+      'http 또는 https'
+    );
+    await expect(submitButton).toBeDisabled();
+    await page.waitForTimeout(500);
+    expect(previewRequestCount).toBe(0);
+
+    await linkInput.fill('  https://kscold.com/info/team  ');
+    await expect(page.getByText('Colding 소개')).toBeVisible();
+    await expect(submitButton).toBeEnabled();
+    await submitButton.click();
+
+    await expect.poll(() => submittedLinkUrl).toBe('https://kscold.com/info/team');
+  });
+
+  test('기존 이미지와 신규 이미지 합계가 네 장을 넘으면 업로드를 시작하지 않는다', async ({
+    page,
+  }) => {
+    let uploadRequestCount = 0;
+    await mockShellApis(page);
+    await mockApi(page, 'GET', '**/api/auth/me', success(FEED_USER));
+    await page.route('**/api/media/upload', async route => {
+      uploadRequestCount += 1;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(
+          success({ url: `https://bucket.kscold.com/test/feed-${uploadRequestCount}.png` })
+        ),
+      });
+    });
+
+    await seedSession(page, FEED_USER);
+    await page.goto('/feed');
+    await page.locator('[data-cy="feed-composer-content"]').fill('이미지 정책을 확인합니다.');
+
+    const uploadInput = page.locator('[data-cy="feed-composer-upload-input"]');
+    const imageFile = (index: number) => ({
+      name: `feed-${index}.png`,
+      mimeType: 'image/png',
+      buffer: Buffer.from(`image-${index}`),
+    });
+    await uploadInput.setInputFiles([
+      imageFile(0),
+      { name: 'feed-invalid.txt', mimeType: 'text/plain', buffer: Buffer.from('invalid') },
+    ]);
+    await expect(page.getByText('이미지 파일만 업로드 가능합니다')).toBeVisible();
+    expect(uploadRequestCount).toBe(0);
+
+    await uploadInput.setInputFiles([imageFile(1), imageFile(2), imageFile(3)]);
+    await expect(page.getByText('3 / 4장')).toBeVisible();
+    expect(uploadRequestCount).toBe(3);
+
+    await uploadInput.setInputFiles([imageFile(4), imageFile(5)]);
+    await expect(page.locator('[data-cy="feed-composer-image-error"]')).toContainText(
+      '최대 4장'
+    );
+    expect(uploadRequestCount).toBe(3);
+    await expect(page.locator('[data-cy="feed-composer-submit"]')).toBeEnabled();
+  });
 });

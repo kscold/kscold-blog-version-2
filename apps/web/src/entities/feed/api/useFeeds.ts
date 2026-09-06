@@ -1,7 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { apiClient } from '@/shared/api/api-client';
 import { Feed, LinkPreview } from '@/shared/model/types/social';
 import { PageResponse } from '@/shared/model/types/api';
+import { getFeedLinkUrlError, normalizeFeedLinkUrl } from '../lib/feedInputPolicy';
+
+const LINK_PREVIEW_DEBOUNCE_MS = 400;
 
 interface UseFeedsOptions {
   page?: number;
@@ -51,11 +55,37 @@ export function useFeedTags() {
   });
 }
 
+function useDebouncedLinkUrl(url: string): string {
+  const [debouncedUrl, setDebouncedUrl] = useState('');
+
+  useEffect(() => {
+    const normalizedUrl = normalizeFeedLinkUrl(url);
+    if (getFeedLinkUrlError(normalizedUrl)) {
+      setDebouncedUrl('');
+      return;
+    }
+
+    const timeoutId = window.setTimeout(
+      () => setDebouncedUrl(normalizedUrl),
+      LINK_PREVIEW_DEBOUNCE_MS
+    );
+    return () => window.clearTimeout(timeoutId);
+  }, [url]);
+
+  return debouncedUrl;
+}
+
 export function useLinkPreview(url: string) {
+  const normalizedUrl = normalizeFeedLinkUrl(url);
+  const debouncedUrl = useDebouncedLinkUrl(normalizedUrl);
+  const requestedUrl = debouncedUrl === normalizedUrl ? debouncedUrl : '';
+
   return useQuery({
-    queryKey: ['link-preview', url],
-    queryFn: () => apiClient.get<LinkPreview>(`/link-preview?url=${encodeURIComponent(url)}`),
-    enabled: !!url && url.startsWith('http'),
+    queryKey: ['link-preview', requestedUrl],
+    queryFn: () =>
+      apiClient.get<LinkPreview>(`/link-preview?url=${encodeURIComponent(requestedUrl)}`),
+    enabled: Boolean(requestedUrl),
     staleTime: 1000 * 60 * 30,
+    retry: false,
   });
 }

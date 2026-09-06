@@ -121,7 +121,9 @@ test('채팅 모달에서 만든 피드 초안을 작성기로 잃지 않고 전
   await page.getByRole('button', { name: 'KSCOLD 대화 열기' }).click();
   const dialog = page.getByRole('dialog');
   await dialog.getByRole('tab', { name: '피드 초안' }).click();
-  await dialog.locator('[data-cy="feed-copilot-memo"]').fill('모달에서 만든 피드 메모');
+  const memoInput = dialog.locator('[data-cy="feed-copilot-memo"]');
+  await expect(memoInput).toHaveAttribute('maxlength', '4000');
+  await memoInput.fill('모달에서 만든 피드 메모');
   await dialog.getByRole('button', { name: '작성 계획 세우기' }).click();
   await dialog.getByRole('button', { name: '이 방향으로 초안 만들기' }).click();
   await dialog.getByRole('button', { name: '본문에 적용하기' }).click();
@@ -130,4 +132,28 @@ test('채팅 모달에서 만든 피드 초안을 작성기로 잃지 않고 전
   await expect(page.locator('[data-cy="feed-composer-content"]')).toHaveValue(
     new RegExp('28번째 문단')
   );
+});
+
+test('긴 피드 본문은 게시할 수 있지만 Copilot 메모 한도는 이유와 함께 안내한다', async ({
+  page,
+}) => {
+  await mockFeedPage(page);
+  await seedSession(page, USER);
+  await page.goto('/feed');
+
+  const composer = page.locator('[data-cy="feed-composer"]');
+  const contentInput = composer.locator('[data-cy="feed-composer-content"]');
+  const submitButton = composer.locator('[data-cy="feed-composer-submit"]');
+  await expect(async () => {
+    await contentInput.fill('가'.repeat(4_001));
+    await expect(submitButton).toBeEnabled();
+  }).toPass();
+
+  const copilot = composer.locator('[data-cy="feed-copilot"]');
+  await copilot.locator('button').first().click();
+  await expect(copilot.locator('[data-cy="feed-copilot-memo-error"]')).toContainText(
+    '최대 4,000자'
+  );
+  await expect(copilot.getByRole('button', { name: '작성 계획 세우기' })).toBeDisabled();
+  await expect(submitButton).toBeEnabled();
 });

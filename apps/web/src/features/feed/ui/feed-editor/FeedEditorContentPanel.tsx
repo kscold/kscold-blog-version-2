@@ -1,6 +1,9 @@
+import { FEED_INPUT_LIMITS } from '@/entities/feed';
+
 interface FeedEditorContentPanelProps {
   content: string;
   isEditing: boolean;
+  contentError: string | null;
   onChange: (value: string) => void;
   onPaste: (event: React.ClipboardEvent<HTMLTextAreaElement>) => Promise<void>;
   onDrop: (event: React.DragEvent<HTMLDivElement>) => Promise<void>;
@@ -9,6 +12,7 @@ interface FeedEditorContentPanelProps {
 export function FeedEditorContentPanel({
   content,
   isEditing,
+  contentError,
   onChange,
   onPaste,
   onDrop,
@@ -42,24 +46,43 @@ export function FeedEditorContentPanel({
           }}
           onDrop={event => void onDrop(event)}
         >
-          <div className="mb-4">
-            <p className="text-sm font-semibold text-surface-900">본문</p>
-            <p className="mt-1 text-sm text-surface-500">
-              오늘 공유하고 싶은 생각이나 작업 맥락을 자유롭게 적어 주세요.
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-surface-900">본문</p>
+              <p className="mt-1 text-sm text-surface-500">
+                오늘 공유하고 싶은 생각이나 작업 맥락을 자유롭게 적어 주세요.
+              </p>
+            </div>
+            <p className="shrink-0 text-xs font-semibold text-surface-500">
+              {content.length.toLocaleString('ko-KR')} /{' '}
+              {FEED_INPUT_LIMITS.contentLength.toLocaleString('ko-KR')}자
             </p>
           </div>
           <textarea
             value={content}
+            maxLength={FEED_INPUT_LIMITS.contentLength}
             onChange={event => onChange(event.target.value)}
             onPaste={event => void onPaste(event)}
             placeholder="방금 만들고 있는 것, 떠오른 생각, 공유하고 싶은 링크의 맥락을 편하게 적어보세요."
             rows={10}
             data-cy="feed-editor-content"
+            aria-invalid={Boolean(contentError)}
+            aria-describedby={contentError ? 'feed-editor-content-error' : undefined}
             className="min-h-[260px] w-full resize-none border-0 bg-transparent p-0 text-lg leading-8 text-surface-900 placeholder:text-surface-300 focus:outline-none sm:text-[1.15rem]"
           />
-          <p className="mt-4 text-sm text-surface-400">
-            이미지를 이 영역에 드래그하거나 붙여넣으면 바로 첨부됩니다.
-          </p>
+          {contentError ? (
+            <p
+              id="feed-editor-content-error"
+              role="alert"
+              className="mt-4 text-sm font-semibold text-red-500"
+            >
+              {contentError}
+            </p>
+          ) : (
+            <p className="mt-4 text-sm text-surface-400">
+              이미지를 이 영역에 드래그하거나 붙여넣으면 바로 첨부됩니다.
+            </p>
+          )}
         </div>
       </div>
     </section>

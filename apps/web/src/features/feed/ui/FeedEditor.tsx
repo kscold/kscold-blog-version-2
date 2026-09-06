@@ -30,6 +30,10 @@ export default function FeedEditor({
     visibility,
     linkUrl,
     linkPreview,
+    contentError,
+    imageError,
+    linkError,
+    canSubmit,
     isUploading,
     isPending,
     setContent,
@@ -70,15 +74,17 @@ export default function FeedEditor({
             <FeedEditorContentPanel
               content={content}
               isEditing={Boolean(feedId)}
+              contentError={contentError}
               onChange={setContent}
               onPaste={handlePaste}
               onDrop={handleDrop}
             />
             <FeedEditorHighlights />
-            <FeedEditorMediaPanel images={images} onRemove={removeImage} />
+            <FeedEditorMediaPanel images={images} error={imageError} onRemove={removeImage} />
             <FeedEditorLinkPanel
               linkUrl={linkUrl}
               linkPreview={linkPreview}
+              error={linkError}
               onChange={setLinkUrl}
             />
           </div>
@@ -87,8 +93,8 @@ export default function FeedEditor({
             visibility={visibility}
             isUploading={isUploading}
             isPending={isPending}
-            isSubmitDisabled={!content.trim() && images.length === 0}
-            contentLength={content.trim().length}
+            isSubmitDisabled={!canSubmit || isUploading}
+            contentLength={content.length}
             imageCount={images.length}
             hasLink={Boolean(linkUrl.trim())}
             onVisibilityChange={setVisibility}

@@ -1,8 +1,11 @@
+import { FEED_INPUT_LIMITS } from '@/entities/feed';
+
 interface FeedComposerActionsProps {
   hasDraft: boolean;
   isUploading: boolean;
   isSubmitting: boolean;
   canSubmit: boolean;
+  canAddImages: boolean;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   onUploadFiles: (files: FileList) => Promise<void>;
   onToggleExpanded: () => void;
@@ -16,6 +19,7 @@ export function FeedComposerActions({
   isUploading,
   isSubmitting,
   canSubmit,
+  canAddImages,
   fileInputRef,
   onUploadFiles,
   onToggleExpanded,
@@ -30,7 +34,7 @@ export function FeedComposerActions({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           data-cy="feed-composer-upload"
-          disabled={isUploading}
+          disabled={isUploading || !canAddImages}
           className="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-surface-50 px-4 py-2 text-sm font-semibold text-surface-700 transition-colors hover:bg-surface-100 hover:text-surface-900 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -40,14 +44,23 @@ export function FeedComposerActions({
               d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21z"
             />
           </svg>
-          {isUploading ? '이미지 업로드 중...' : '이미지 추가'}
+          {isUploading
+            ? '이미지 업로드 중...'
+            : canAddImages
+              ? '이미지 추가'
+              : `이미지 ${FEED_INPUT_LIMITS.imageCount}장 첨부됨`}
         </button>
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
           multiple
-          onChange={event => event.target.files && void onUploadFiles(event.target.files)}
+          onChange={event => {
+            if (event.target.files) {
+              void onUploadFiles(event.target.files);
+            }
+            event.target.value = '';
+          }}
           className="hidden"
           data-cy="feed-composer-upload-input"
         />

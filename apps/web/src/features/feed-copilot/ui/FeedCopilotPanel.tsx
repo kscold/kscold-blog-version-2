@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
+import { getFeedLinkUrlError } from '@/entities/feed';
 import {
   type FeedCopilotDraft,
   type FeedCopilotPlan,
@@ -13,6 +14,7 @@ import {
   useFeedCopilotPlan,
 } from '@/features/feed-copilot/api/useFeedCopilot';
 import { useAlert } from '@/shared/model/alertStore';
+import { getFeedCopilotMemoError } from '../model/feedCopilotInputPolicy';
 import { FeedCopilotControls } from './FeedCopilotControls';
 import { FeedCopilotDraftCard } from './FeedCopilotDraftCard';
 import { FeedCopilotPlanCard } from './FeedCopilotPlanCard';
@@ -48,6 +50,8 @@ export function FeedCopilotPanel({
   const [planInputKey, setPlanInputKey] = useState('');
   const [draftInputKey, setDraftInputKey] = useState('');
   const [styleReferenceKeys, setStyleReferenceKeys] = useState<string[]>([]);
+  const memoError = getFeedCopilotMemoError(memo);
+  const sourceUrlError = getFeedLinkUrlError(sourceUrl);
 
   const currentInputKey = useMemo(
     () => JSON.stringify({ memo: memo.trim(), sourceUrl: sourceUrl.trim(), styles }),
@@ -88,6 +92,11 @@ export function FeedCopilotPanel({
   async function createPlan() {
     if (!memo.trim() && !sourceUrl.trim()) {
       alert.warning('본문 메모를 적거나 외부 링크를 넣어주세요');
+      return;
+    }
+    const inputError = memoError ?? sourceUrlError;
+    if (inputError) {
+      alert.warning(inputError);
       return;
     }
 
@@ -224,6 +233,8 @@ export function FeedCopilotPanel({
                 memo={memo}
                 onMemoChange={onMemoChange}
                 sourceUrl={sourceUrl}
+                memoError={memoError}
+                sourceUrlError={sourceUrlError}
                 onSourceUrlChange={onSourceUrlChange}
                 onExpandComposer={onExpandComposer}
                 styles={styles}

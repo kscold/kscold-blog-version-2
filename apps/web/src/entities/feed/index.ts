@@ -2,6 +2,15 @@
 export * from './api/useFeeds';
 export * from './api/useFeedComments';
 export * from './api/useMentionableUsers';
+export {
+  FEED_INPUT_LIMITS,
+  canSubmitFeed,
+  getFeedContentError,
+  getFeedImageCountError,
+  getFeedLinkUrlError,
+  isAbsoluteHttpUrl,
+  normalizeFeedLinkUrl,
+} from './lib/feedInputPolicy';
 
 // FSD public API 보강
 export { useFeedComments } from './api/useFeedComments';
