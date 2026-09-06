@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AdminDashboardContainer } from '@/widgets/admin';
+import { AdminDashboardContainer } from '@/widgets/admin/dashboard';
 
 export default function AdminDashboardPage() {
   return (

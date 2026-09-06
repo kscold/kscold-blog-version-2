@@ -1,6 +1,6 @@
 'use client';
 
-import { AdminVaultContainer } from '@/widgets/admin';
+import { AdminVaultContainer } from '@/widgets/admin/vault';
 
 export default function AdminVaultPage() {
   return (

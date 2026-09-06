@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { MessageDeliveryContainer } from '@/widgets/admin';
+import { MessageDeliveryContainer } from '@/widgets/admin/message-delivery';
 
 export default function AdminMessageDeliveriesPage() {
   return (

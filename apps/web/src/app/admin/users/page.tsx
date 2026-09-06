@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AdminUsersContainer } from '@/widgets/admin';
+import { AdminUsersContainer } from '@/widgets/admin/users';
 
 export default function AdminUsersPage() {
   return (

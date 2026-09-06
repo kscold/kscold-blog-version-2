@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { PostEditEditor } from '@/widgets/admin';
+import { PostEditEditor } from '@/widgets/admin/posts/edit';
 
 export default function EditPostPage() {
   const params = useParams();
