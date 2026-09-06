@@ -9,6 +9,9 @@ import java.util.Optional;
 public interface UserRepository {
     Optional<User> findById(String id);
 
+    /** 인증·복구 경로에서 활성 계정만 조회한다. */
+    Optional<User> findActiveById(String id);
+
     /** 인증 경로에서 활성 계정의 현재 역할만 projection으로 조회한다. */
     Optional<User.Role> findActiveRoleById(String id);
 
@@ -22,6 +25,12 @@ public interface UserRepository {
     List<User> findByRole(User.Role role);
 
     Optional<User> findByEmail(String email);
+
+    /** 공개 인증·복구 경로에서 활성 이메일 계정만 조회한다. */
+    Optional<User> findActiveByEmail(String email);
+
+    /** 탈퇴와 경합해도 계정을 되살리지 않도록 활성 계정의 비밀번호만 원자적으로 변경한다. */
+    boolean updatePasswordIfActive(String id, String encodedPassword);
 
     boolean existsByEmail(String email);
 

@@ -3,6 +3,7 @@ package com.kscold.blog.identity.application.service;
 import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.application.port.in.UserManagementUseCase;
 import com.kscold.blog.identity.domain.model.User;
+import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
 import com.kscold.blog.identity.domain.port.out.UserRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserManagementApplicationService implements UserManagementUseCase {
 
     private final UserRepository userRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Override
     @Transactional
@@ -24,6 +26,7 @@ public class UserManagementApplicationService implements UserManagementUseCase {
                 userRepository
                         .findById(userId)
                         .orElseThrow(() -> ResourceNotFoundException.user(userId));
+        passwordResetTokenRepository.deleteByUserId(userId);
         if (user.getDeletedAt() != null) return;
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
@@ -36,6 +39,7 @@ public class UserManagementApplicationService implements UserManagementUseCase {
         if (userRepository.findById(userId).isEmpty()) {
             throw ResourceNotFoundException.user(userId);
         }
+        passwordResetTokenRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
         log.warn("Hard deleted user");
     }

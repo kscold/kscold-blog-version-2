@@ -83,15 +83,11 @@ public class AuthApplicationService implements AuthUseCase {
     public AuthResponse login(LoginCommand command) {
         User user =
                 userRepository
-                        .findByEmail(command.getEmail())
+                        .findActiveByEmail(command.getEmail())
                         .orElseThrow(
                                 () ->
                                         InvalidRequestException.invalidInput(
                                                 "이메일 또는 비밀번호가 올바르지 않습니다"));
-
-        if (user.isDeleted()) {
-            throw InvalidRequestException.invalidInput("비활성화된 계정입니다. 관리자에게 문의하세요");
-        }
 
         if (!passwordEncoder.matches(command.getPassword(), user.getPassword())) {
             throw InvalidRequestException.invalidInput("이메일 또는 비밀번호가 올바르지 않습니다");
@@ -131,7 +127,7 @@ public class AuthApplicationService implements AuthUseCase {
         ensureRecoveryMailConfigured();
 
         userRepository
-                .findByEmail(normalizeEmail(email))
+                .findActiveByEmail(normalizeEmail(email))
                 .ifPresent(
                         user ->
                                 recoveryMailSender.send(
@@ -142,7 +138,9 @@ public class AuthApplicationService implements AuthUseCase {
     public void requestPasswordReset(String email) {
         ensureRecoveryMailConfigured();
 
-        userRepository.findByEmail(normalizeEmail(email)).ifPresent(this::sendPasswordResetMail);
+        userRepository
+                .findActiveByEmail(normalizeEmail(email))
+                .ifPresent(this::sendPasswordResetMail);
     }
 
     @Override
@@ -154,6 +152,9 @@ public class AuthApplicationService implements AuthUseCase {
         return passwordResetTokenRepository
                 .findByTokenHash(PasswordResetTokenCodec.hash(token))
                 .filter(savedToken -> !savedToken.isExpired(Instant.now()))
+                .filter(
+                        savedToken ->
+                                userRepository.findActiveById(savedToken.getUserId()).isPresent())
                 .map(
                         savedToken ->
                                 new PasswordResetTokenResponse(
@@ -163,7 +164,7 @@ public class AuthApplicationService implements AuthUseCase {
     }
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = InvalidRequestException.class)
     public void resetPassword(String token, String newPassword) {
         if (!PasswordResetTokenCodec.isValidInput(token)) {
             throw InvalidRequestException.invalidInput("재설정 링크를 다시 확인해주세요.");
@@ -171,25 +172,22 @@ public class AuthApplicationService implements AuthUseCase {
 
         PasswordResetToken savedToken =
                 passwordResetTokenRepository
-                        .findByTokenHash(PasswordResetTokenCodec.hash(token))
+                        .consumeByTokenHash(PasswordResetTokenCodec.hash(token))
                         .orElseThrow(
                                 () ->
                                         InvalidRequestException.invalidInput(
                                                 "만료되었거나 유효하지 않은 링크입니다."));
 
         if (savedToken.isExpired(Instant.now())) {
-            passwordResetTokenRepository.deleteByUserId(savedToken.getUserId());
             throw InvalidRequestException.invalidInput("만료되었거나 유효하지 않은 링크입니다.");
         }
 
-        User user =
-                userRepository
-                        .findById(savedToken.getUserId())
-                        .orElseThrow(() -> ResourceNotFoundException.user(savedToken.getUserId()));
-
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-        passwordResetTokenRepository.deleteByUserId(user.getId());
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        if (!userRepository.updatePasswordIfActive(savedToken.getUserId(), encodedPassword)) {
+            passwordResetTokenRepository.deleteByUserId(savedToken.getUserId());
+            throw invalidResetLink();
+        }
+        passwordResetTokenRepository.deleteByUserId(savedToken.getUserId());
     }
 
     private AuthResponse buildAuthResult(User user, String accessToken, String refreshToken) {
@@ -210,6 +208,10 @@ public class AuthApplicationService implements AuthUseCase {
             throw InvalidRequestException.invalidInput("비활성화된 계정입니다. 관리자에게 문의하세요");
         }
         return user;
+    }
+
+    private InvalidRequestException invalidResetLink() {
+        return InvalidRequestException.invalidInput("만료되었거나 유효하지 않은 링크입니다.");
     }
 
     private void sendPasswordResetMail(User user) {

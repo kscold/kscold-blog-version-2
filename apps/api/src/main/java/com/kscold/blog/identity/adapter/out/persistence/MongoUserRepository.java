@@ -18,7 +18,13 @@ public interface MongoUserRepository extends MongoRepository<User, String> {
     @Query(value = "{ '_id': ?0, 'deletedAt': null }", fields = "{ 'role': 1 }")
     Optional<ActiveRoleProjection> findActiveRoleById(String id);
 
+    @Query("{ '_id': ?0, 'deletedAt': null }")
+    Optional<User> findActiveById(String id);
+
     Optional<User> findByEmail(String email);
+
+    @Query("{ 'email': ?0, 'deletedAt': null }")
+    Optional<User> findActiveByEmail(String email);
 
     @Query("{ 'username': ?0, 'deletedAt': null }")
     Optional<User> findActiveByUsername(String username);

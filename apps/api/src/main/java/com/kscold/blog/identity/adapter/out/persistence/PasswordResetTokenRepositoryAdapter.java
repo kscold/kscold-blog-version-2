@@ -4,6 +4,9 @@ import com.kscold.blog.identity.domain.model.PasswordResetToken;
 import com.kscold.blog.identity.domain.port.out.PasswordResetTokenRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class PasswordResetTokenRepositoryAdapter implements PasswordResetTokenRepository {
 
     private final MongoPasswordResetTokenRepository mongoPasswordResetTokenRepository;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public PasswordResetToken save(PasswordResetToken token) {
@@ -20,6 +24,12 @@ public class PasswordResetTokenRepositoryAdapter implements PasswordResetTokenRe
     @Override
     public Optional<PasswordResetToken> findByTokenHash(String tokenHash) {
         return mongoPasswordResetTokenRepository.findByTokenHash(tokenHash);
+    }
+
+    @Override
+    public Optional<PasswordResetToken> consumeByTokenHash(String tokenHash) {
+        Query query = Query.query(Criteria.where("tokenHash").is(tokenHash));
+        return Optional.ofNullable(mongoTemplate.findAndRemove(query, PasswordResetToken.class));
     }
 
     @Override

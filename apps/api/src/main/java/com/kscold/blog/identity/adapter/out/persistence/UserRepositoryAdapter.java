@@ -7,6 +7,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 /** UserRepository 포트 구현체 Spring Data MongoDB를 감싸는 어댑터 */
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Component;
 public class UserRepositoryAdapter implements UserRepository {
 
     private final MongoUserRepository mongoUserRepository;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public User save(User user) {
@@ -25,6 +30,11 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public Optional<User> findById(String id) {
         return mongoUserRepository.findById(id);
+    }
+
+    @Override
+    public Optional<User> findActiveById(String id) {
+        return mongoUserRepository.findActiveById(id);
     }
 
     @Override
@@ -52,6 +62,19 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public Optional<User> findByEmail(String email) {
         return mongoUserRepository.findByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findActiveByEmail(String email) {
+        return mongoUserRepository.findActiveByEmail(email);
+    }
+
+    @Override
+    public boolean updatePasswordIfActive(String id, String encodedPassword) {
+        Query query = Query.query(Criteria.where("_id").is(id).and("deletedAt").is(null));
+        Update update =
+                new Update().set("password", encodedPassword).set("updatedAt", LocalDateTime.now());
+        return mongoTemplate.updateFirst(query, update, User.class).getModifiedCount() == 1;
     }
 
     @Override
