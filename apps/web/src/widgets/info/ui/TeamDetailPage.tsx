@@ -18,17 +18,21 @@ export function TeamDetailPage({ team }: { team: TeamProfile }) {
 
         {/* 상단 네비 */}
         <div className="flex items-center gap-3 mb-8">
-          <Link href="/info" className="text-surface-400 hover:text-surface-600 transition-colors">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <Link
+            href="/info"
+            aria-label="팀 소개 목록으로 돌아가기"
+            className="text-surface-600 hover:text-surface-800 transition-colors"
+          >
+            <svg aria-hidden="true" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </Link>
           <TeamBrandBadge team={team} />
           <div className="flex-1">
             <h1 className="text-xl font-black text-surface-900">{team.name}</h1>
-            <p className="text-xs text-surface-400">{team.summary}</p>
+            <p className="text-xs text-surface-600">{team.summary}</p>
           </div>
-          <a href={team.externalUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-surface-400 hover:text-surface-700 transition-colors underline">
+          <a href={team.externalUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-surface-600 hover:text-surface-800 transition-colors underline">
             {team.externalUrl.replace('https://', '')} →
           </a>
         </div>
@@ -40,7 +44,7 @@ export function TeamDetailPage({ team }: { team: TeamProfile }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-xs font-bold text-surface-400 uppercase tracking-wider mb-4">Organization</h2>
+          <h2 className="text-xs font-bold text-surface-600 uppercase tracking-wider mb-4">Organization</h2>
           <OrgChart team={team} />
         </motion.div>
 
@@ -65,12 +69,12 @@ export function TeamDetailPage({ team }: { team: TeamProfile }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <h2 className="text-xs font-bold text-surface-400 uppercase tracking-wider mb-3">Business Info</h2>
+          <h2 className="text-xs font-bold text-surface-600 uppercase tracking-wider mb-3">Business Info</h2>
           <div className="text-sm text-surface-600 space-y-1">
             <p><span className="font-bold text-surface-800">{BUSINESS_INFO.companyName}</span> · 대표 {BUSINESS_INFO.representative}</p>
             <p>사업자등록번호: {BUSINESS_INFO.registrationNumber}</p>
-            <p className="text-xs text-surface-400">{BUSINESS_INFO.address}</p>
-            <p className="text-xs text-surface-400">{BUSINESS_INFO.email}</p>
+            <p className="text-xs text-surface-600">{BUSINESS_INFO.address}</p>
+            <p className="text-xs text-surface-600">{BUSINESS_INFO.email}</p>
           </div>
         </motion.div>
 

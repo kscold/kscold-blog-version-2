@@ -22,13 +22,13 @@ export function PrivateDocsSection({ teamId }: { teamId: string }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
         </svg>
         <span className="text-sm font-bold text-surface-700">팀 내부 문서</span>
-        <span className="text-[10px] text-surface-400 ml-1">서버 · 계정 · .env · 주의사항</span>
+        <span className="text-[10px] text-surface-600 ml-1">서버 · 계정 · .env · 주의사항</span>
       </div>
 
       <AnimatePresence mode="wait">
         {!showPrivate ? (
           <motion.div key="locked" className="p-5 space-y-3" exit={{ opacity: 0 }}>
-            <p className="text-xs text-surface-400">팀원만 열람할 수 있습니다. 비밀번호를 입력해주세요.</p>
+            <p className="text-xs text-surface-600">팀원만 열람할 수 있습니다. 비밀번호를 입력해주세요.</p>
             <div className="flex gap-2">
               <input
                 type="password"

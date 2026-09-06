@@ -32,7 +32,7 @@ export function ProfileHeaderCard({ profile }: Props) {
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-surface-900">{profile.displayName}</h1>
-          <p className="text-sm text-surface-400 mb-2">@{profile.username}</p>
+          <p className="text-sm text-surface-600 mb-2">@{profile.username}</p>
           {profile.bio && (
             <p className="text-sm text-surface-700 whitespace-pre-wrap leading-relaxed">{profile.bio}</p>
           )}

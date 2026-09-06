@@ -9,7 +9,7 @@ export function ProfileTechStack({ techStack }: Props) {
 
   return (
     <div className="mt-4 pt-4 border-t border-surface-100">
-      <p className="text-xs text-surface-400 mb-2 font-medium uppercase tracking-wide">기술 스택</p>
+      <p className="text-xs text-surface-600 mb-2 font-medium uppercase tracking-wide">기술 스택</p>
       <div className="flex flex-wrap gap-1.5">
         {techStack.map(tech => (
           <span
