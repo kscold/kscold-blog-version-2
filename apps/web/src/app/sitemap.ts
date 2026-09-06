@@ -20,6 +20,12 @@ interface FeedSitemapEntry {
   updatedAt?: string;
 }
 
+interface VaultSitemapEntry {
+  slug: string;
+  contentLength?: number;
+  updatedAt?: string;
+}
+
 const updateLatestModified = (dates: Map<string, string>, key: string, value: string) => {
   const latest = latestModifiedAt(dates.get(key), value);
   if (latest) dates.set(key, latest);
@@ -31,8 +37,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchPublicApi<Category[]>('/categories'),
     fetchPublicApi<Tag[]>('/tags'),
     fetchPublicApi<FeedSitemapEntry[]>('/feeds/sitemap-index'),
-    // 전체 그래프를 만들지 않고 검색 노출 판정에 필요한 slug 와 본문 길이만 조회한다.
-    fetchPublicApi<{ slug: string; contentLength?: number }[]>('/vault/notes/sitemap-index'),
+    // 전체 그래프를 만들지 않고 검색 노출 판정과 갱신일에 필요한 필드만 조회한다.
+    fetchPublicApi<VaultSitemapEntry[]>('/vault/notes/sitemap-index'),
   ]);
 
   // 일부 데이터만 빠진 200 응답을 캐시하면 검색엔진에는 대량 URL 삭제로 보인다.
@@ -169,9 +175,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.55,
     })),
-    // 그래프 API 에는 수정일이 없어 lastModified 를 생략한다(부정확한 날짜를 넣는 것보다 낫다).
     ...vaultNotes.map(note => ({
       url: `${SITE_URL}/vault/${encodeURIComponent(note.slug)}`,
+      lastModified: toSitemapDate(note.updatedAt),
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     })),

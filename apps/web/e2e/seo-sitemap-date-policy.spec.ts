@@ -43,7 +43,7 @@ function post(id: string, updatedAt: string, visibility: 'PUBLIC' | 'RESTRICTED'
   };
 }
 
-test('카테고리와 태그 갱신일은 색인 가능한 공개 글의 최신 수정일을 따른다', async () => {
+test('사이트맵 갱신일은 색인 가능한 공개 콘텐츠의 최신 수정일을 따른다', async () => {
   const posts = [
     post('public-1', '2026-01-01T00:30:00', 'PUBLIC'),
     post('public-2', '2026-02-01T00:30:00', 'PUBLIC'),
@@ -68,7 +68,21 @@ test('카테고리와 태그 갱신일은 색인 가능한 공개 글의 최신 
     ['/api/categories', [category]],
     ['/api/tags', [tag]],
     ['/api/feeds/sitemap-index', []],
-    ['/api/vault/notes/sitemap-index', []],
+    [
+      '/api/vault/notes/sitemap-index',
+      [
+        {
+          slug: 'indexed-vault-note',
+          contentLength: 1500,
+          updatedAt: '2026-04-01T15:30:00Z',
+        },
+        {
+          slug: 'thin-vault-note',
+          contentLength: 1499,
+          updatedAt: '2026-09-01T00:00:00Z',
+        },
+      ],
+    ],
   ]);
   const originalFetch = global.fetch;
   global.fetch = async input => {
@@ -84,9 +98,16 @@ test('카테고리와 태그 갱신일은 색인 가능한 공개 글의 최신 
     const tagEntry = entries.find(
       entry => entry.url === 'https://kscold.com/blog/tags/langgraph'
     );
+    const vaultEntry = entries.find(
+      entry => entry.url === 'https://kscold.com/vault/indexed-vault-note'
+    );
 
     expect(categoryEntry?.lastModified).toBe('2026-03-01');
     expect(tagEntry?.lastModified).toBe('2026-03-01');
+    expect(vaultEntry?.lastModified).toBe('2026-04-02');
+    expect(entries).not.toContainEqual(
+      expect.objectContaining({ url: 'https://kscold.com/vault/thin-vault-note' })
+    );
   } finally {
     global.fetch = originalFetch;
   }
