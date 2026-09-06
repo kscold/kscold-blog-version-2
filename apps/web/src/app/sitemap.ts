@@ -9,6 +9,8 @@ import {
   isIndexableFeedLength,
   isIndexableTag,
   isIndexableVaultNote,
+  latestModifiedAt,
+  toSitemapDate,
 } from '@/shared/lib/seo';
 
 interface FeedSitemapEntry {
@@ -18,11 +20,9 @@ interface FeedSitemapEntry {
   updatedAt?: string;
 }
 
-const toLastModified = (value: Date | string | undefined): string | undefined => {
-  if (!value) return undefined;
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? undefined : date.toISOString().split('T')[0];
+const updateLatestModified = (dates: Map<string, string>, key: string, value: string) => {
+  const latest = latestModifiedAt(dates.get(key), value);
+  if (latest) dates.set(key, latest);
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -67,6 +67,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const indexableTags = tags
     .map(tag => ({ ...tag, publicPostCount: publicPostCountsByTagId.get(tag.id) || 0 }))
     .filter(isIndexableTag);
+  const latestPostByCategoryId = new Map<string, string>();
+  const latestPostByTagId = new Map<string, string>();
+  indexablePosts.forEach(post => {
+    const modifiedAt = latestModifiedAt(post.updatedAt, post.publishedAt, post.createdAt);
+    if (!modifiedAt) return;
+
+    updateLatestModified(latestPostByCategoryId, post.category.id, modifiedAt);
+    post.tags.forEach(tag => updateLatestModified(latestPostByTagId, tag.id, modifiedAt));
+  });
   // 본문 길이를 확인할 수 있고 독립 문서로 충분한 노트만 사이트맵에 싣는다.
   const vaultNotes = vaultNoteIndex.filter(
     note => !!note.slug && isIndexableVaultNote(note.contentLength)
@@ -130,25 +139,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     ...categories.map(category => ({
       url: `${SITE_URL}/blog/${category.slug}`,
-      lastModified: toLastModified(category.updatedAt || category.createdAt),
+      lastModified: toSitemapDate(
+        latestModifiedAt(
+          category.updatedAt,
+          category.createdAt,
+          latestPostByCategoryId.get(category.id)
+        )
+      ),
       changeFrequency: 'weekly' as const,
       priority: 0.75,
     })),
     ...indexableTags.map(tag => ({
       url: `${SITE_URL}/blog/tags/${encodeURIComponent(tag.slug)}`,
-      lastModified: toLastModified(tag.createdAt),
+      lastModified: toSitemapDate(
+        latestModifiedAt(tag.createdAt, latestPostByTagId.get(tag.id))
+      ),
       changeFrequency: 'weekly' as const,
       priority: 0.65,
     })),
     ...indexablePosts.map(post => ({
       url: `${SITE_URL}/blog/${post.category.slug}/${post.slug}`,
-      lastModified: toLastModified(post.updatedAt || post.publishedAt || post.createdAt),
+      lastModified: toSitemapDate(post.updatedAt || post.publishedAt || post.createdAt),
       changeFrequency: 'monthly' as const,
       priority: post.featured ? 0.9 : 0.8,
     })),
     ...indexableFeeds.map(feed => ({
       url: `${SITE_URL}/feed/${feed.id}`,
-      lastModified: toLastModified(feed.updatedAt || feed.createdAt),
+      lastModified: toSitemapDate(feed.updatedAt || feed.createdAt),
       changeFrequency: 'weekly' as const,
       priority: 0.55,
     })),

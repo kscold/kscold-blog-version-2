@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test';
 import sharp from 'sharp';
-import { absoluteUrl, buildSocialImage, toOgImage } from '../src/shared/lib/seo/metadata';
+import {
+  absoluteUrl,
+  buildSocialImage,
+  toOgImage,
+} from '../src/shared/lib/seo/metadata';
+import { latestModifiedAt, toSitemapDate } from '../src/shared/lib/seo/date';
 
 test.describe('SEO URL 정책', () => {
   test('canonical 경로는 운영 사이트 출처를 벗어나지 않는다', () => {
@@ -43,5 +48,22 @@ test.describe('SEO URL 정책', () => {
       width: 1200,
       height: 630,
     });
+  });
+
+  test('목록 갱신일은 유효한 후보 중 실제로 가장 최근 시각을 선택한다', () => {
+    expect(
+      latestModifiedAt(
+        '2026-09-01T00:30:00',
+        'invalid-date',
+        '2026-08-31T16:00:00Z'
+      )
+    ).toBe('2026-08-31T16:00:00.000Z');
+    expect(latestModifiedAt(undefined, 'invalid-date')).toBeUndefined();
+  });
+
+  test('오프셋 없는 서비스 시각을 실행 환경과 무관하게 서울 날짜로 출력한다', () => {
+    expect(toSitemapDate('2026-09-01T00:30:00')).toBe('2026-09-01');
+    expect(toSitemapDate('2026-08-31T15:30:00Z')).toBe('2026-09-01');
+    expect(toSitemapDate('invalid-date')).toBeUndefined();
   });
 });
