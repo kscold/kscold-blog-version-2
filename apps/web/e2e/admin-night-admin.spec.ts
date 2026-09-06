@@ -24,6 +24,11 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
     await mockShellApis(page);
     await seedAdminSession(page);
     const slot = buildTodaySlot();
+    const preferredSlot = {
+      ...slot,
+      slotKey: `${slot.slotKey}|19:00-22:00`,
+      timeLabel: '19:00 - 22:00',
+    };
 
     const pending = [
       {
@@ -35,7 +40,7 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
         message: '퇴근 후 밀린 문서를 정리하고 싶어요.',
         participationMode: 'OFFLINE',
         status: 'PENDING',
-        preferredSlot: { ...slot },
+        preferredSlot,
         scheduledSlot: null,
         createdAt: '2026-04-14T12:00:00',
       },
@@ -54,6 +59,7 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
     await page.route('**/api/admin/admin-night/requests/request-1/approve', async route => {
       const body = route.request().postDataJSON();
       expect(body.scheduledSlot.focus).toBeTruthy();
+      expect(body.scheduledSlot.slotKey).toBe(slot.slotKey);
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -67,7 +73,7 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
             message: '퇴근 후 밀린 문서를 정리하고 싶어요.',
             participationMode: 'OFFLINE',
             status: 'APPROVED',
-            preferredSlot: { ...slot },
+            preferredSlot,
             scheduledSlot: body.scheduledSlot,
             createdAt: '2026-04-14T12:00:00',
           })
@@ -78,6 +84,9 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
     await page.goto('/admin/admin-night');
     await expect(page.getByText('문서 정리와 메일 답장')).toBeVisible();
     await expect(page.getByText('진행 방식: 오프라인', { exact: true })).toBeVisible();
+    await expect(page.locator('[data-cy="admin-night-slot-request-1"]')).toHaveValue(
+      slot.slotKey
+    );
 
     const approvePromise = page.waitForResponse('**/api/admin/admin-night/requests/request-1/approve');
     await page.locator('[data-cy="admin-night-approve-request-1"]').click();
@@ -143,5 +152,47 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
     );
     await page.locator('[data-cy="admin-night-request-info-request-2"]').click();
     await infoPromise;
+  });
+
+  test('신청 일정이 만료되면 관리자가 새 일정을 고르기 전까지 승인을 막는다', async ({ page }) => {
+    await mockShellApis(page);
+    await seedAdminSession(page);
+    const pending = [
+      {
+        id: 'request-stale',
+        userId: 'user-stale',
+        requesterName: '지난 신청자',
+        requesterEmail: 'stale@example.com',
+        taskTitle: '지난 일정 다시 잡기',
+        message: '새 일정을 선택해 주세요.',
+        participationMode: 'FLEXIBLE',
+        status: 'PENDING',
+        preferredSlot: {
+          slotKey: '2020-01-01|PR Window|19:00-22:00',
+          date: '2020-01-01',
+          weekday: '수',
+          timeLabel: '19:00 - 22:00',
+          focus: 'PR Window',
+          badgeLabel: 'Open',
+        },
+        scheduledSlot: null,
+        createdAt: '2020-01-01T12:00:00',
+      },
+    ];
+    await page.route('**/api/admin/admin-night/requests?**', async route => {
+      if (route.request().method() !== 'GET') return route.fallback();
+      const status = new URL(route.request().url()).searchParams.get('status');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(success(status === 'PENDING' ? pending : [])),
+      });
+    });
+
+    await page.goto('/admin/admin-night');
+
+    await expect(page.locator('[data-cy="admin-night-slot-request-stale"]')).toHaveValue('');
+    await expect(page.locator('[data-cy="admin-night-slot-request-stale"]')).toBeEnabled();
+    await expect(page.locator('[data-cy="admin-night-approve-request-stale"]')).toBeDisabled();
   });
 });

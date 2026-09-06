@@ -20,6 +20,12 @@ export interface AdminNightSlot {
   badgeLabel: string;
 }
 
+export interface AdminNightSlotReference {
+  slotKey?: string | null;
+  date?: string | null;
+  focus?: string | null;
+}
+
 const WEEKDAY_SLOT_CONFIG: Record<number, { focus: string; timeLabel: string; description: string }> = {
   0: {
     focus: 'Weekend Reset',
@@ -120,6 +126,24 @@ export function buildUpcomingAdminNightSlots(todayKey: string, days = 14) {
   });
 }
 
-export function findAdminNightSlot(slots: AdminNightSlot[], slotKey?: string | null) {
-  return slots.find(slot => slot.slotKey === slotKey) ?? null;
+export function findAdminNightSlot(
+  slots: AdminNightSlot[],
+  reference?: string | AdminNightSlotReference | null
+) {
+  if (typeof reference === 'string') {
+    return slots.find(slot => slot.slotKey === reference) ?? null;
+  }
+  if (!reference) return null;
+
+  const exactSlot = reference.slotKey
+    ? slots.find(slot => slot.slotKey === reference.slotKey)
+    : null;
+  if (exactSlot) return exactSlot;
+  if (!reference.date || !reference.focus) return null;
+
+  return (
+    slots.find(
+      slot => slot.date === reference.date && slot.focus === reference.focus
+    ) ?? null
+  );
 }

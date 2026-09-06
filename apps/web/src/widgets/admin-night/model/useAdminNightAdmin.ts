@@ -8,7 +8,10 @@ import {
   useRequestMoreAdminNightInfo,
 } from '@/features/admin-night';
 import type { AdminNightRequest } from '@/entities/admin-night';
-import { buildUpcomingAdminNightSlots } from '@/widgets/admin-night/lib/adminNight';
+import {
+  buildUpcomingAdminNightSlots,
+  findAdminNightSlot,
+} from '@/widgets/admin-night/lib/adminNight';
 import { useAdminNightDateKey } from './useAdminNightDateKey';
 
 export function useAdminNightAdmin() {
@@ -27,11 +30,17 @@ export function useAdminNightAdmin() {
   const [reviewNoteByRequestId, setReviewNoteByRequestId] = useState<Record<string, string>>({});
 
   const isMutating = approveMutation.isPending || requestInfoMutation.isPending || rejectMutation.isPending;
-  const resolveSlotKey = (request: AdminNightRequest) => slotByRequestId[request.id] ?? request.preferredSlot.slotKey;
+  const resolveSlotKey = (request: AdminNightRequest) => {
+    const selectedKey = slotByRequestId[request.id];
+    const selectedSlot = selectedKey
+      ? findAdminNightSlot(slotOptions, selectedKey)
+      : findAdminNightSlot(slotOptions, request.preferredSlot);
+    return selectedSlot?.slotKey ?? '';
+  };
   const resolveReviewNote = (request: AdminNightRequest) => reviewNoteByRequestId[request.id] ?? request.reviewNote ?? '';
 
   const handleApprove = (request: AdminNightRequest) => {
-    const selectedSlot = slotOptions.find(slot => slot.slotKey === resolveSlotKey(request));
+    const selectedSlot = findAdminNightSlot(slotOptions, resolveSlotKey(request));
     if (!selectedSlot) {
       return;
     }

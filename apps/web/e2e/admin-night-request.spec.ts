@@ -81,6 +81,9 @@ test.describe('Admin Night 신청 시나리오', () => {
         expect(body.requesterName).toBe('류태호');
         expect(body.participationMode).toBe('OFFLINE');
         expect(body.preferredSlot.timeLabel).toBe('19:00 - 22:00');
+        expect(body.preferredSlot.slotKey).toBe(
+          `${body.preferredSlot.date}|${body.preferredSlot.focus}`
+        );
         const created: AdminNightRequest = {
           id: 'request-2',
           userId: 'user-1',
@@ -139,12 +142,12 @@ test.describe('Admin Night 신청 시나리오', () => {
         status: 'INFO_REQUESTED',
         reviewNote: '실명 확인이 어려워서, 어떤 자리에서 같이 보고 싶은지 조금 더 적어 주세요.',
         preferredSlot: {
-          slotKey: '2026-04-15|Body Doubling',
-          date: '2026-04-15',
-          weekday: '화',
+          slotKey: '2020-01-01|PR Window|19:00-22:00',
+          date: '2020-01-01',
+          weekday: '수',
           timeLabel: '21:00 - 22:40',
-          focus: 'Body Doubling',
-          badgeLabel: 'Tonight',
+          focus: 'PR Window',
+          badgeLabel: 'Open',
         },
         scheduledSlot: null,
         createdAt: '2026-04-14T13:00:00',
@@ -171,6 +174,9 @@ test.describe('Admin Night 신청 시나리오', () => {
         expect(body.participationMode).toBe('OFFLINE');
         expect(body.taskTitle).toContain('실명과 일정');
         expect(body.preferredSlot.timeLabel).toBe('19:00 - 22:00');
+        expect(body.preferredSlot.slotKey).toBe(
+          `${body.preferredSlot.date}|${body.preferredSlot.focus}`
+        );
         const updated: AdminNightRequest = {
           id: 'request-2',
           userId: 'user-1',
@@ -201,6 +207,10 @@ test.describe('Admin Night 신청 시나리오', () => {
     await expect(page.getByText('추가 정보 요청됨')).toBeVisible();
     await expect(page.getByText('실명 확인이 어려워서')).toBeVisible();
     await page.locator('[data-cy="admin-night-resubmit-start-request-2"]').click();
+    await expect(page.locator('[data-cy="admin-night-request-submit"]')).toBeDisabled();
+    const selectedDate = page.locator('[data-cy^="admin-night-date-option-"]').first();
+    await selectedDate.click();
+    await expect(selectedDate).toHaveAttribute('aria-pressed', 'true');
     await page.locator('[data-cy="admin-night-request-title"]').fill('실명과 일정 맥락을 보완한 신청');
     await page.locator('[data-cy="admin-night-mode-offline"]').click();
     await setRangeValue(page, '[data-cy="admin-night-range-end"]', '1320');

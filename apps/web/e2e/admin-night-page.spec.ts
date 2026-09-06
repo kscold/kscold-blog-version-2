@@ -110,6 +110,41 @@ test.describe('Admin Night 공개 페이지 시나리오', () => {
     await expect.poll(() => calendarRanges).toContain('2026-09-07|2026-09-13');
   });
 
+  test('기존 시간 포함 슬롯 키의 승인 일정도 해당 날짜 보드에 표시한다', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-09-06T12:00:00.000Z'));
+    await page.route('**/api/admin-night/calendar*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(
+          success([
+            {
+              id: 'legacy-schedule',
+              requesterLabel: '기존 신청자',
+              taskTitle: '시간 포함 키 일정',
+              participationMode: 'ONLINE',
+              scheduledSlot: {
+                slotKey: '2026-09-06|Weekend Reset|19:00-22:00',
+                date: '2026-09-06',
+                weekday: '일',
+                timeLabel: '19:00 - 22:00',
+                focus: 'Weekend Reset',
+                badgeLabel: 'Tonight',
+              },
+              createdAt: '2026-09-05T12:00:00',
+            },
+          ])
+        ),
+      });
+    });
+
+    await page.goto('/admin-night');
+
+    const sundayCard = page.locator('article[data-date="2026-09-06"]');
+    await expect(sundayCard.getByText('기존 신청자')).toBeVisible();
+    await expect(sundayCard.getByText('시간 포함 키 일정')).toBeVisible();
+  });
+
   test('AI Agent Bloom은 확정되지 않은 일정을 이벤트로 선언하지 않는다', async ({ page }) => {
     await page.goto('/admin-night/ai-agent-bloom');
 

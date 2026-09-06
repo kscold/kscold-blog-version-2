@@ -51,6 +51,7 @@ export function useAdminNightPage(initialDateKey: string) {
   }, [requesterName, user?.displayName]);
 
   useEffect(() => {
+    if (!selectedDate) return;
     if (upcomingSlots.some(slot => slot.date === selectedDate)) return;
     const nextSlot = upcomingSlots[0];
     setSelectedDate(nextSlot?.date ?? '');
@@ -134,8 +135,7 @@ export function useAdminNightPage(initialDateKey: string) {
     setParticipationMode(request.participationMode ?? 'FLEXIBLE');
     const slot =
       currentSlots.find(item => item.date === request.preferredSlot.date) ??
-      findAdminNightSlot(currentSlots, request.preferredSlot.slotKey) ??
-      currentSlots[0] ??
+      findAdminNightSlot(currentSlots, request.preferredSlot) ??
       null;
     setSelectedDate(slot?.date ?? '');
     setTimeRange(parseAdminNightTimeRange(request.preferredSlot.timeLabel, parseAdminNightTimeRange(slot?.timeLabel)));

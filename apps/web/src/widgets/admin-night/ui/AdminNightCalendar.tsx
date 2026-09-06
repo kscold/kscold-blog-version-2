@@ -59,7 +59,7 @@ export function AdminNightCalendar({ slots, entries = [] }: AdminNightCalendarPr
 
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {slots.map(slot => {
-          const slotEntries = entries.filter(entry => entry.scheduledSlot?.slotKey === slot.slotKey);
+          const slotEntries = entries.filter(entry => entry.scheduledSlot?.date === slot.date);
 
           return (
             <article

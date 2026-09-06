@@ -46,5 +46,6 @@ export {
 export type {
   AdminNightParticipationMode,
   AdminNightSlot,
+  AdminNightSlotReference,
   AdminNightSlotState,
 } from './adminNightSlots';

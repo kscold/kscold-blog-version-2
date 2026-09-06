@@ -30,10 +30,15 @@ export function AdminNightPendingActions({
     <div className="w-full max-w-sm space-y-3 rounded-[24px] border border-surface-200 bg-white p-4">
       <label className="block text-sm font-bold text-surface-900">merge 할 시간 선택</label>
       <select
+        data-cy={`admin-night-slot-${request.id}`}
         value={slotValue}
         onChange={event => onSlotChange(request.id, event.target.value)}
+        disabled={isPending || slotOptions.length === 0}
         className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 outline-none transition-colors focus:border-surface-900"
       >
+        <option value="" disabled>
+          merge 할 일정을 선택해 주세요
+        </option>
         {slotOptions.map(slot => (
           <option key={slot.slotKey} value={slot.slotKey}>
             {slot.dateLabel} {slot.weekday} · {slot.timeLabel} · {slot.focus}
@@ -57,7 +62,7 @@ export function AdminNightPendingActions({
           type="button"
           data-cy={`admin-night-approve-${request.id}`}
           onClick={() => onApprove(request)}
-          disabled={isPending}
+          disabled={isPending || !slotValue}
           className="inline-flex items-center justify-center rounded-2xl bg-surface-900 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-surface-800 disabled:bg-surface-300"
         >
           Merge 승인

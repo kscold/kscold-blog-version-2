@@ -72,7 +72,7 @@ export function buildAdminNightPreferredSlot(slot: AdminNightSlot, range: AdminN
   );
 
   return {
-    slotKey: `${slot.date}|${slot.focus}|${formatAdminNightTime(normalizedRange.startMinutes)}-${formatAdminNightTime(normalizedRange.endMinutes)}`,
+    slotKey: slot.slotKey,
     date: slot.date,
     weekday: slot.weekday,
     timeLabel,
