@@ -18,6 +18,7 @@ export interface TeamProfile {
   badge: {
     mark: string;
     logoSrc?: string;
+    logoLayout?: 'icon' | 'wordmark';
     backgroundColor: string;
     textColor: string;
   };
@@ -113,9 +114,10 @@ export const TEAM_PROFILES: TeamProfile[] = [
     keywords: ['Pawpong', 'Colding', '팀 소개', '반려동물 플랫폼'],
     badge: {
       mark: 'p',
-      logoSrc: '/images/teams/pawpong-logo.png',
-      backgroundColor: '#4F3B2E',
-      textColor: '#A8C8E8',
+      logoSrc: '/images/teams/pawpong-logo.svg',
+      logoLayout: 'wordmark',
+      backgroundColor: '#FFFFFF',
+      textColor: '#A9835A',
     },
     members: PAWPONG_TEAM_MEMBERS,
   },

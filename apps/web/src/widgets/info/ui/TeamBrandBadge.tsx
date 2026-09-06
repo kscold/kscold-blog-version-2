@@ -7,6 +7,8 @@ interface TeamBrandBadgeProps {
 }
 
 export function TeamBrandBadge({ team, compact = false }: TeamBrandBadgeProps) {
+  const isWordmark = team.badge.logoLayout === 'wordmark';
+
   return (
     <div
       className={`flex flex-shrink-0 items-center gap-2 rounded-full shadow-sm ${
@@ -18,9 +20,13 @@ export function TeamBrandBadge({ team, compact = false }: TeamBrandBadgeProps) {
         <Image
           src={team.badge.logoSrc}
           alt={`${team.name} 로고`}
-          width={24}
-          height={24}
-          className={`${compact ? 'h-5 w-5' : 'h-6 w-6'} rounded-full object-cover`}
+          width={96}
+          height={32}
+          className={
+            isWordmark
+              ? `${compact ? 'h-5' : 'h-7'} w-auto`
+              : `${compact ? 'h-5 w-5' : 'h-6 w-6'} rounded-full object-cover`
+          }
         />
       ) : (
         <span
@@ -31,12 +37,14 @@ export function TeamBrandBadge({ team, compact = false }: TeamBrandBadgeProps) {
           {team.badge.mark}
         </span>
       )}
-      <span
-        className={`${compact ? 'text-sm' : 'text-base'} font-black tracking-tight`}
-        style={{ color: team.badge.textColor }}
-      >
-        {team.shortName}
-      </span>
+      {!isWordmark && (
+        <span
+          className={`${compact ? 'text-sm' : 'text-base'} font-black tracking-tight`}
+          style={{ color: team.badge.textColor }}
+        >
+          {team.shortName}
+        </span>
+      )}
     </div>
   );
 }

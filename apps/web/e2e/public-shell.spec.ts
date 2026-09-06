@@ -20,6 +20,17 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await expect(page.locator('[data-cy="nav-link-guestbook"]')).toHaveAttribute('href', '/guestbook');
   });
 
+  test('포퐁 소개는 최신 공식 워드마크를 원래 비율로 표시한다', async ({ page }) => {
+    await page.goto('/info/pawpong');
+
+    const logo = page.getByRole('img', { name: 'Pawpong Team 로고' });
+    await expect(logo).toHaveAttribute('src', /pawpong-logo\.svg/);
+
+    const logoBox = await logo.boundingBox();
+    expect(logoBox).not.toBeNull();
+    expect((logoBox?.width ?? 0) / (logoBox?.height ?? 1)).toBeGreaterThan(2.5);
+  });
+
   test('방문자는 Blog 링크를 클릭하면 블로그 목록 페이지로 이동한다', async ({ page }) => {
     await mockApi(page, 'GET', '**/api/posts/public*', success(emptyPage()));
 
