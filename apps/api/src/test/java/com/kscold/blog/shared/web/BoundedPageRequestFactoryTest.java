@@ -1,7 +1,9 @@
 package com.kscold.blog.shared.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.kscold.blog.exception.InvalidRequestException;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,5 +34,29 @@ class BoundedPageRequestFactoryTest {
         assertThat(BoundedPageRequestFactory.limit(1_000))
                 .isEqualTo(BoundedPageRequestFactory.MAX_PAGE_SIZE);
         assertThat(BoundedPageRequestFactory.limit(-1)).isEqualTo(1);
+    }
+
+    @Test
+    void 최대페이지경계를허용한다() {
+        Pageable pageable =
+                BoundedPageRequestFactory.of(BoundedPageRequestFactory.MAX_PAGE_INDEX, 10);
+
+        assertThat(pageable.getPageNumber()).isEqualTo(499);
+    }
+
+    @Test
+    void 최대페이지경계를초과하면거부한다() {
+        assertThatThrownBy(() -> BoundedPageRequestFactory.of(500, 10))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessage("페이지 상한을 초과했습니다.");
+    }
+
+    @Test
+    void 정수최댓값페이지도거부한다() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+
+        assertThatThrownBy(() -> BoundedPageRequestFactory.of(Integer.MAX_VALUE, 10, sort))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessage("페이지 상한을 초과했습니다.");
     }
 }

@@ -1,14 +1,17 @@
 package com.kscold.blog.social.adapter.in.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.analytics.application.service.ViewCounter;
+import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
@@ -78,6 +81,18 @@ class FeedControllerTest {
         verify(userQueryPort).getUsersByIds(ids.capture());
         assertThat(ids.getValue()).containsExactly("user-1", "user-2");
         verify(userQueryPort, never()).getUserById(any());
+    }
+
+    @Test
+    @DisplayName("시나리오: 공개 피드 페이지 상한을 넘으면 조회를 실행하지 않는다")
+    void excessivePublicFeedPageIsRejectedBeforeQuery() {
+        assertThatThrownBy(
+                        () ->
+                                controller.getPublicFeeds(
+                                        500, 12, null, null, mock(HttpServletRequest.class)))
+                .isInstanceOf(InvalidRequestException.class);
+
+        verifyNoInteractions(feedUseCase);
     }
 
     @Test
