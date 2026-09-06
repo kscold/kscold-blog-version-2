@@ -1,5 +1,6 @@
 package com.kscold.blog.teamprivate.adapter.in.web.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class PasswordRequest {
+    @NotBlank(message = "비밀번호를 입력해 주세요")
     @Size(max = 256, message = "비밀번호가 너무 깁니다")
     private String password;
 

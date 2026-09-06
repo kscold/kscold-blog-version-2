@@ -8,29 +8,36 @@ import com.kscold.blog.teamprivate.application.port.in.TeamPrivateUseCase;
 import jakarta.validation.Valid;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/team")
-@RequiredArgsConstructor
 public class TeamPrivateController {
 
     private final TeamPrivateUseCase teamPrivateUseCase;
+    private final String privatePassword;
 
-    @Value("${team.private.password}")
-    private String privatePassword;
+    public TeamPrivateController(
+            TeamPrivateUseCase teamPrivateUseCase,
+            @Value("${team.private.password:}") String privatePassword) {
+        this.teamPrivateUseCase = teamPrivateUseCase;
+        this.privatePassword = privatePassword;
+    }
 
     @PostMapping("/private")
     public ResponseEntity<ApiResponse<TeamPrivateDocResponse>> getPrivateDocs(
             @Valid @RequestBody PasswordRequest request) {
+        if (privatePassword == null || privatePassword.isBlank()) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(ApiResponse.error("SERVICE_UNAVAILABLE", "비공개 문서 기능이 설정되지 않았습니다"));
+        }
         if (!MessageDigest.isEqual(
                 privatePassword.getBytes(StandardCharsets.UTF_8),
-                (request.getPassword() != null ? request.getPassword() : "")
-                        .getBytes(StandardCharsets.UTF_8))) {
+                request.getPassword().getBytes(StandardCharsets.UTF_8))) {
             return ResponseEntity.status(403).body(ApiResponse.error("FORBIDDEN", "비밀번호가 틀렸습니다"));
         }
 
