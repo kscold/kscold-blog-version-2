@@ -1,6 +1,8 @@
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
-import { AdminNightPage } from '@/widgets/admin-night';
+import { AdminNightPage, getAdminNightDateKey } from '@/widgets/admin-night';
+
+export const revalidate = 300;
 
 export const metadata = buildPageMetadata({
   title: 'Admin Night',
@@ -24,10 +26,12 @@ const adminNightJsonLd = {
 };
 
 export default function AdminNightRoutePage() {
+  const initialDateKey = getAdminNightDateKey(new Date());
+
   return (
     <>
       <JsonLd id="admin-night-page" data={adminNightJsonLd} />
-      <AdminNightPage />
+      <AdminNightPage initialDateKey={initialDateKey} />
     </>
   );
 }

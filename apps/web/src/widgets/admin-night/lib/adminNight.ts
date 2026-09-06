@@ -34,6 +34,10 @@ export type {
   AdminNightStep,
 } from './adminNightContent';
 export {
+  getAdminNightDateKey,
+  millisecondsUntilNextAdminNightDay,
+} from './adminNightDate';
+export {
   buildAdminNightSlots,
   buildUpcomingAdminNightSlots,
   describeParticipationMode,

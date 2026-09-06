@@ -65,6 +65,7 @@ export function AdminNightCalendar({ slots, entries = [] }: AdminNightCalendarPr
             <article
               key={slot.slotKey}
               data-cy={slot.state === 'tonight' ? 'admin-night-slot-tonight' : undefined}
+              data-date={slot.date}
               className={`rounded-3xl border p-4 transition-colors ${cardTone(slot.state)}`}
             >
               <div className="mb-3 flex items-start justify-between gap-3">

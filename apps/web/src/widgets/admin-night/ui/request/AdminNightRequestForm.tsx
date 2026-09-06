@@ -110,6 +110,7 @@ export function AdminNightRequestForm({
               key={slot.date}
               type="button"
               data-cy={`admin-night-date-option-${slot.date}`}
+              aria-pressed={selectedDate === slot.date}
               onClick={() => onSelectDate(slot.date)}
               className={`rounded-2xl border px-4 py-3 text-left transition-colors ${
                 selectedDate === slot.date

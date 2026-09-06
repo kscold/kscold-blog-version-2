@@ -1,29 +1,21 @@
 import { test, expect } from '@playwright/test';
 import { success, mockShellApis } from './support/api';
 import { seedAdminSession } from './support/auth';
+import {
+  buildUpcomingAdminNightSlots,
+  getAdminNightDateKey,
+} from '../src/widgets/admin-night/lib/adminNight';
 
 function buildTodaySlot() {
-  const now = new Date();
-  const date = `${now.getFullYear()}-${`${now.getMonth() + 1}`.padStart(2, '0')}-${`${now.getDate()}`.padStart(2, '0')}`;
-  const weekday = new Intl.DateTimeFormat('ko-KR', { weekday: 'short' }).format(now);
-  const configByDay = {
-    0: { focus: 'Weekend Reset', timeLabel: '14:00 - 16:30', badgeLabel: 'Weekend' },
-    1: { focus: 'Inbox Sweep', timeLabel: '20:30 - 22:00', badgeLabel: 'Tonight' },
-    2: { focus: 'Body Doubling', timeLabel: '21:00 - 22:40', badgeLabel: 'Tonight' },
-    3: { focus: 'PR Window', timeLabel: '21:30 - 23:00', badgeLabel: 'Tonight' },
-    4: { focus: 'Inbox Sweep', timeLabel: '20:30 - 22:00', badgeLabel: 'Tonight' },
-    5: { focus: 'Body Doubling', timeLabel: '21:00 - 22:40', badgeLabel: 'Tonight' },
-    6: { focus: 'Weekend Reset', timeLabel: '14:00 - 16:30', badgeLabel: 'Weekend' },
-  } as const;
-  const config = configByDay[now.getDay() as keyof typeof configByDay];
+  const slot = buildUpcomingAdminNightSlots(getAdminNightDateKey(new Date()), 1)[0];
 
   return {
-    slotKey: `${date}|${config.focus}`,
-    date,
-    weekday,
-    timeLabel: config.timeLabel,
-    focus: config.focus,
-    badgeLabel: config.badgeLabel,
+    slotKey: slot.slotKey,
+    date: slot.date,
+    weekday: slot.weekday,
+    timeLabel: slot.timeLabel,
+    focus: slot.focus,
+    badgeLabel: slot.badgeLabel,
   };
 }
 

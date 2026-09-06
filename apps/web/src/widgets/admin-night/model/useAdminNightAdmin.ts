@@ -9,9 +9,14 @@ import {
 } from '@/features/admin-night';
 import type { AdminNightRequest } from '@/entities/admin-night';
 import { buildUpcomingAdminNightSlots } from '@/widgets/admin-night/lib/adminNight';
+import { useAdminNightDateKey } from './useAdminNightDateKey';
 
 export function useAdminNightAdmin() {
-  const slotOptions = useMemo(() => buildUpcomingAdminNightSlots(new Date(), 10), []);
+  const todayKey = useAdminNightDateKey();
+  const slotOptions = useMemo(
+    () => (todayKey ? buildUpcomingAdminNightSlots(todayKey, 10) : []),
+    [todayKey]
+  );
   const { data: pendingRequests = [], isLoading } = useAdminNightRequests('PENDING');
   const { data: infoRequestedRequests = [] } = useAdminNightRequests('INFO_REQUESTED');
   const { data: approvedRequests = [] } = useAdminNightRequests('APPROVED');

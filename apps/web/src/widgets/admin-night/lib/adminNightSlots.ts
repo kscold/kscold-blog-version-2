@@ -1,3 +1,10 @@
+import {
+  addAdminNightDays,
+  formatAdminNightDateLabel,
+  formatAdminNightWeekday,
+  getAdminNightWeekdayIndex,
+} from './adminNightDate';
+
 export type AdminNightSlotState = 'tonight' | 'upcoming' | 'weekend';
 export type AdminNightParticipationMode = 'ONLINE' | 'OFFLINE' | 'FLEXIBLE';
 
@@ -58,34 +65,10 @@ export function describeParticipationMode(mode?: AdminNightParticipationMode | n
   return '온라인 / 오프라인 모두 가능';
 }
 
-function formatLocalDateKey(date: Date) {
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, '0');
-  const day = `${date.getDate()}`.padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-function formatDateLabel(date: Date) {
-  return new Intl.DateTimeFormat('ko-KR', { month: 'numeric', day: 'numeric' }).format(date);
-}
-
-function formatWeekday(date: Date) {
-  return new Intl.DateTimeFormat('ko-KR', { weekday: 'short' }).format(date);
-}
-
-function startOfWeek(date: Date) {
-  const next = new Date(date);
-  const day = next.getDay();
+function startOfWeek(dateKey: string) {
+  const day = getAdminNightWeekdayIndex(dateKey);
   const diff = day === 0 ? -6 : 1 - day;
-  next.setDate(next.getDate() + diff);
-  next.setHours(0, 0, 0, 0);
-  return next;
-}
-
-function normalizeDate(date: Date) {
-  const next = new Date(date);
-  next.setHours(0, 0, 0, 0);
-  return next;
+  return addAdminNightDays(dateKey, diff);
 }
 
 function toBadgeLabel(state: AdminNightSlotState) {
@@ -94,21 +77,21 @@ function toBadgeLabel(state: AdminNightSlotState) {
   return 'Open';
 }
 
-function buildSlot(date: Date, today: Date): AdminNightSlot {
-  const config = WEEKDAY_SLOT_CONFIG[date.getDay()];
+function buildSlot(dateKey: string, todayKey: string): AdminNightSlot {
+  const weekdayIndex = getAdminNightWeekdayIndex(dateKey);
+  const config = WEEKDAY_SLOT_CONFIG[weekdayIndex];
   const state: AdminNightSlotState =
-    normalizeDate(date).getTime() === today.getTime()
+    dateKey === todayKey
       ? 'tonight'
-      : date.getDay() === 0 || date.getDay() === 6
+      : weekdayIndex === 0 || weekdayIndex === 6
         ? 'weekend'
         : 'upcoming';
-  const dateKey = formatLocalDateKey(date);
 
   return {
     slotKey: `${dateKey}|${config.focus}`,
     date: dateKey,
-    dateLabel: formatDateLabel(date),
-    weekday: formatWeekday(date),
+    dateLabel: formatAdminNightDateLabel(dateKey),
+    weekday: formatAdminNightWeekday(dateKey),
     timeLabel: config.timeLabel,
     focus: config.focus,
     description: config.description,
@@ -117,23 +100,23 @@ function buildSlot(date: Date, today: Date): AdminNightSlot {
   };
 }
 
-export function buildAdminNightSlots(now: Date) {
-  const weekStart = startOfWeek(now);
-  const today = normalizeDate(now);
+export function buildAdminNightSlots(todayKey: string) {
+  const weekStart = startOfWeek(todayKey);
 
   return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + index);
-    return buildSlot(date, today);
+    const dateKey = addAdminNightDays(weekStart, index);
+    return buildSlot(dateKey, todayKey);
   });
 }
 
-export function buildUpcomingAdminNightSlots(now: Date, days = 14) {
-  const today = normalizeDate(now);
+export function buildUpcomingAdminNightSlots(todayKey: string, days = 14) {
+  if (!Number.isSafeInteger(days) || days < 0) {
+    throw new RangeError('Admin Night 조회 일수는 0 이상의 정수여야 합니다.');
+  }
+
   return Array.from({ length: days }, (_, index) => {
-    const date = new Date(today);
-    date.setDate(today.getDate() + index);
-    return buildSlot(date, today);
+    const dateKey = addAdminNightDays(todayKey, index);
+    return buildSlot(dateKey, todayKey);
   });
 }
 

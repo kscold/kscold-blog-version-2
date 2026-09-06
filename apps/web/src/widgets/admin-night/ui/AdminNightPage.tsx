@@ -6,7 +6,6 @@ import {
   ADMIN_NIGHT_CULTURE_PARAGRAPHS,
   ADMIN_NIGHT_CULTURE_TITLE,
   AI_AGENT_BLOOM_DETAIL_PATH,
-  buildAdminNightSlots,
 } from '@/widgets/admin-night/lib/adminNight';
 import { useAdminNightPage } from '@/widgets/admin-night/model/useAdminNightPage';
 import { AdminNightCalendar } from './AdminNightCalendar';
@@ -14,12 +13,12 @@ import { AdminNightHeroSection } from './AdminNightHeroSection';
 import { AdminNightProcessSection } from './AdminNightProcessSection';
 import { AdminNightRequestPanel } from './AdminNightRequestPanel';
 
-export function AdminNightPage() {
-  const weekSlots = buildAdminNightSlots(new Date());
-  const state = useAdminNightPage({
-    from: weekSlots[0].date,
-    to: weekSlots[weekSlots.length - 1].date,
-  });
+interface AdminNightPageProps {
+  initialDateKey: string;
+}
+
+export function AdminNightPage({ initialDateKey }: AdminNightPageProps) {
+  const state = useAdminNightPage(initialDateKey);
 
   return (
     <main className="min-h-screen px-4 pb-20 pt-28 sm:px-6 lg:px-8">
@@ -60,7 +59,7 @@ export function AdminNightPage() {
           </div>
         </div>
 
-        <AdminNightCalendar slots={weekSlots} entries={state.calendarEntries} />
+        <AdminNightCalendar slots={state.weekSlots} entries={state.calendarEntries} />
 
         <section className="rounded-[28px] border border-surface-200 bg-white p-6 sm:p-8">
           <div className="max-w-4xl space-y-3">

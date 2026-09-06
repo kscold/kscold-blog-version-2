@@ -5,12 +5,28 @@ import { useAdminNightCalendar, useMyAdminNightRequests } from '@/entities/admin
 import { useCreateAdminNightRequest, useResubmitAdminNightRequest } from '@/features/admin-night';
 import type { AdminNightRequest } from '@/entities/admin-night';
 import { useViewer } from '@/entities/user';
-import { buildUpcomingAdminNightSlots, findAdminNightSlot, type AdminNightParticipationMode } from '@/widgets/admin-night/lib/adminNight';
+import {
+  buildAdminNightSlots,
+  buildUpcomingAdminNightSlots,
+  findAdminNightSlot,
+  getAdminNightDateKey,
+  type AdminNightParticipationMode,
+} from '@/widgets/admin-night/lib/adminNight';
 import { buildAdminNightPreferredSlot, parseAdminNightTimeRange } from '@/widgets/admin-night/lib/adminNightTime';
+import { useAdminNightDateKey } from './useAdminNightDateKey';
 
-export function useAdminNightPage(weekDates: { from: string; to: string }) {
+export function useAdminNightPage(initialDateKey: string) {
   const { isAuthenticated, user } = useViewer();
-  const upcomingSlots = useMemo(() => buildUpcomingAdminNightSlots(new Date(), 10), []);
+  const todayKey = useAdminNightDateKey(initialDateKey);
+  const weekSlots = useMemo(() => buildAdminNightSlots(todayKey), [todayKey]);
+  const upcomingSlots = useMemo(
+    () => buildUpcomingAdminNightSlots(todayKey, 10),
+    [todayKey]
+  );
+  const weekDates = useMemo(
+    () => ({ from: weekSlots[0].date, to: weekSlots[weekSlots.length - 1].date }),
+    [weekSlots]
+  );
   const initialRange = useMemo(() => parseAdminNightTimeRange(upcomingSlots[0]?.timeLabel), [upcomingSlots]);
   const hasPrefilledRequesterName = useRef(false);
   const [requesterName, setRequesterName] = useState('');
@@ -34,13 +50,28 @@ export function useAdminNightPage(weekDates: { from: string; to: string }) {
     }
   }, [requesterName, user?.displayName]);
 
+  useEffect(() => {
+    if (upcomingSlots.some(slot => slot.date === selectedDate)) return;
+    const nextSlot = upcomingSlots[0];
+    setSelectedDate(nextSlot?.date ?? '');
+    setTimeRange(parseAdminNightTimeRange(nextSlot?.timeLabel));
+  }, [selectedDate, upcomingSlots]);
+
+  const currentUpcomingSlots = () => {
+    const currentDateKey = getAdminNightDateKey(new Date());
+    return currentDateKey === todayKey
+      ? upcomingSlots
+      : buildUpcomingAdminNightSlots(currentDateKey, 10);
+  };
+
   const resetForm = () => {
+    const currentSlots = currentUpcomingSlots();
     setRequesterName(user?.displayName ?? '');
     setTaskTitle('');
     setMessage('');
     setParticipationMode('FLEXIBLE');
-    setSelectedDate(upcomingSlots[0]?.date ?? '');
-    setTimeRange(parseAdminNightTimeRange(upcomingSlots[0]?.timeLabel));
+    setSelectedDate(currentSlots[0]?.date ?? '');
+    setTimeRange(parseAdminNightTimeRange(currentSlots[0]?.timeLabel));
     setEditingRequestId(null);
   };
 
@@ -50,7 +81,8 @@ export function useAdminNightPage(weekDates: { from: string; to: string }) {
     selectedDate.length > 0;
 
   const handleSubmit = async () => {
-    const selectedSlot = upcomingSlots.find(slot => slot.date === selectedDate) ?? null;
+    const selectedSlot =
+      currentUpcomingSlots().find(slot => slot.date === selectedDate) ?? null;
     if (!requesterName.trim()) {
       setStatusMessage('실제 만남과 일정 안내에 사용할 실명을 먼저 적어주세요.');
       return;
@@ -94,15 +126,16 @@ export function useAdminNightPage(weekDates: { from: string; to: string }) {
   };
 
   const handleStartResubmit = (request: AdminNightRequest) => {
+    const currentSlots = currentUpcomingSlots();
     setEditingRequestId(request.id);
     setRequesterName(request.requesterName);
     setTaskTitle(request.taskTitle);
     setMessage(request.message ?? '');
     setParticipationMode(request.participationMode ?? 'FLEXIBLE');
     const slot =
-      upcomingSlots.find(item => item.date === request.preferredSlot.date) ??
-      findAdminNightSlot(upcomingSlots, request.preferredSlot.slotKey) ??
-      upcomingSlots[0] ??
+      currentSlots.find(item => item.date === request.preferredSlot.date) ??
+      findAdminNightSlot(currentSlots, request.preferredSlot.slotKey) ??
+      currentSlots[0] ??
       null;
     setSelectedDate(slot?.date ?? '');
     setTimeRange(parseAdminNightTimeRange(request.preferredSlot.timeLabel, parseAdminNightTimeRange(slot?.timeLabel)));
@@ -147,5 +180,6 @@ export function useAdminNightPage(weekDates: { from: string; to: string }) {
     taskTitle,
     timeRange,
     upcomingSlots,
+    weekSlots,
   };
 }

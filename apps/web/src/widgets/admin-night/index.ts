@@ -2,3 +2,4 @@
 export { AdminNightPage } from './ui/AdminNightPage';
 export { AdminNightAdminSection } from './ui/admin/AdminNightAdminSection';
 export { AdminNightBloomDetailPage } from './ui/bloom/AdminNightBloomDetailPage';
+export { getAdminNightDateKey } from './lib/adminNight';
