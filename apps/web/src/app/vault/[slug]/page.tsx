@@ -11,6 +11,7 @@ import {
   fetchPublicApi,
   isIndexableVaultContent,
   toMetaDescription,
+  toSeoDateTime,
   uniqueKeywords,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
@@ -56,7 +57,7 @@ export async function generateMetadata({
     type: 'article',
     publishedTime: note.createdAt,
     modifiedTime: note.updatedAt,
-    authors: [{ name: note.author.name }],
+    authors: [{ name: note.author.name, url: absoluteUrl('/info') }],
     noIndex: isThinNote,
   });
 }
@@ -87,8 +88,8 @@ export default async function VaultNotePage({
         url: absoluteUrl(canonicalPath),
         headline: note.title,
         description: toMetaDescription(note.content, note.title),
-        datePublished: note.createdAt,
-        dateModified: note.updatedAt,
+        datePublished: toSeoDateTime(note.createdAt),
+        dateModified: toSeoDateTime(note.updatedAt),
         keywords: uniqueKeywords([note.title, ...note.tags]).join(', '),
         author: { '@id': `${absoluteUrl('/')}#person` },
         mainEntityOfPage: absoluteUrl(canonicalPath),

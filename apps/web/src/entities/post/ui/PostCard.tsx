@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { filterVisibleTagInfos } from '@/shared/lib/tags';
 import { toPreviewText } from '@/shared/lib/seo/text';
+import { formatPublishedDate } from '@/shared/lib/seo/date';
 import type { Post, PostSummary } from '@/shared/model/types/blog';
 
 interface PostCardProps {
@@ -63,14 +64,7 @@ export function PostCard({
   const visibleTags = filterVisibleTagInfos(post.tags);
   const isRestricted = Boolean(post.restricted);
   const previewText = toPreviewText(post.excerpt || post.content, post.title, featured ? 220 : 160);
-  const formattedDate = post.publishedAt
-    ? new Date(post.publishedAt).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        timeZone: 'Asia/Seoul',
-      })
-    : '';
+  const formattedDate = formatPublishedDate(post.publishedAt);
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
 
   if (titleOnly) {

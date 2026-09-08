@@ -2,6 +2,7 @@ import type { PostSummary } from '@/shared/model/types/blog';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from './constants';
 import { absoluteUrl } from './metadata';
 import { toPreviewText } from './text';
+import { toSeoDateTime } from './date';
 
 const RSS_URL = `${SITE_URL}/rss.xml`;
 
@@ -15,8 +16,9 @@ function escapeXml(value: string): string {
 }
 
 function toTimestamp(value?: string): number {
-  if (!value) return 0;
-  const timestamp = new Date(value).getTime();
+  const normalized = toSeoDateTime(value);
+  if (!normalized) return 0;
+  const timestamp = new Date(normalized).getTime();
   return Number.isFinite(timestamp) ? timestamp : 0;
 }
 

@@ -49,3 +49,20 @@ export function toSitemapDate(value: DateValue): string | undefined {
   );
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
+
+/** 검색 메타데이터와 브라우저가 같은 순간을 해석하도록 시간대를 명시한다. */
+export function toSeoDateTime(value: DateValue): string | undefined {
+  return parseServiceDate(value)?.toISOString();
+}
+
+export function formatPublishedDate(value: DateValue): string {
+  const date = parseServiceDate(value);
+  return date
+    ? new Intl.DateTimeFormat('ko-KR', {
+        timeZone: SEOUL_TIME_ZONE,
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }).format(date)
+    : '';
+}

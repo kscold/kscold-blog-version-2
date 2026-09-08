@@ -4,6 +4,7 @@ import { cache } from 'react';
 import type { Feed } from '@/shared/model/types/social';
 import type { PageResponse } from '@/shared/model/types/api';
 import { FeedDetail } from '@/widgets/feed/detail';
+import { PROFILE } from '@/entities/profile';
 import {
   absoluteUrl,
   buildBreadcrumbJsonLd,
@@ -15,6 +16,7 @@ import {
   toFeedTitle,
   toMetaDescription,
   toOgImage,
+  toSeoDateTime,
   uniqueKeywords,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
@@ -61,7 +63,14 @@ export async function generateMetadata({
     image,
     publishedTime: feed.createdAt,
     modifiedTime: feed.updatedAt,
-    authors: [{ name: feed.author.name }],
+    authors: [{
+      name: feed.author.username === PROFILE.handle ? PROFILE.name : feed.author.name,
+      url: feed.author.username === PROFILE.handle
+        ? absoluteUrl('/info')
+        : feed.author.username
+          ? absoluteUrl(`/profile/${encodeURIComponent(feed.author.username)}`)
+          : undefined,
+    }],
     noIndex: !isIndexableFeed(feed.content),
   });
 }
@@ -91,8 +100,8 @@ export default async function FeedDetailPage({
         '@id': `${absoluteUrl(canonicalPath)}#posting`,
         url: absoluteUrl(canonicalPath),
         headline,
-        datePublished: feed.createdAt,
-        dateModified: feed.updatedAt,
+        datePublished: toSeoDateTime(feed.createdAt),
+        dateModified: toSeoDateTime(feed.updatedAt),
         author: feed.author.username === 'kscold'
           ? { '@id': `${absoluteUrl('/')}#person` }
           : {

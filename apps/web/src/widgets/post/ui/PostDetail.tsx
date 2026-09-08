@@ -1,4 +1,5 @@
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
+import { formatPublishedDate } from '@/shared/lib/seo/date';
 import type { Post } from '@/shared/model/types/blog';
 import { PostCommentSection } from './PostCommentSection';
 import { PostHeader } from './PostHeader';
@@ -6,16 +7,6 @@ import { RestrictedPostDetail } from './RestrictedPostDetail';
 
 interface PostDetailProps {
   post: Post;
-}
-
-function formatPublishedDate(publishedAt?: string | null) {
-  return publishedAt
-    ? new Date(publishedAt).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : '';
 }
 
 export function PostDetail({ post }: PostDetailProps) {

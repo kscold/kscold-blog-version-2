@@ -19,7 +19,7 @@ export async function generateMetadata({
   }
 
   return buildPageMetadata({
-    title: team.name,
+    title: `${team.name} · 김승찬의 개발 프로젝트`,
     description: team.description,
     path: `/info/${team.id}`,
     keywords: team.keywords,
@@ -52,11 +52,13 @@ export default async function Page({ params }: { params: Promise<{ teamId: strin
         '@id': `${SITE_URL}/info/${team.id}#organization`,
         name: team.name,
         url: team.externalUrl,
+        ...(team.badge.logoSrc ? { logo: `${SITE_URL}${team.badge.logoSrc}` } : {}),
         parentOrganization: {
           '@id': `${SITE_URL}/#organization`,
         },
         member: team.members.map(member => ({
           '@type': 'Person',
+          ...(member.name === '김승찬' ? { '@id': `${SITE_URL}/#person` } : {}),
           name: member.name,
           jobTitle: member.position,
         })),

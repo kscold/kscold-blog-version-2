@@ -125,7 +125,9 @@ export function PostHeader({
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <span>{author.name}</span>
+              <Link href="/info" rel="author" className="hover:text-surface-900">
+                {author.name}
+              </Link>
             </div>
 
             <div className="flex items-center gap-2 text-sm text-surface-500">

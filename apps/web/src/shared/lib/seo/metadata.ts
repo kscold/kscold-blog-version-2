@@ -7,6 +7,7 @@ import {
   SITE_URL,
 } from './constants';
 import { toMetaDescription } from './text';
+import { toSeoDateTime } from './date';
 
 const DEFAULT_SOCIAL_IMAGE_ALT =
   'KSCOLD 로고와 AI Agent, Backend, Full-stack 문구가 있는 김승찬 기술 블로그 공유 카드';
@@ -88,8 +89,8 @@ export function buildPageMetadata({
       locale: 'ko_KR',
       type,
       images: [socialImage],
-      ...(publishedTime ? { publishedTime } : {}),
-      ...(modifiedTime ? { modifiedTime } : {}),
+      ...(publishedTime ? { publishedTime: toSeoDateTime(publishedTime) } : {}),
+      ...(modifiedTime ? { modifiedTime: toSeoDateTime(modifiedTime) } : {}),
       ...(authors?.length ? { authors: authors.map(author => author.name) } : {}),
     },
     twitter: {

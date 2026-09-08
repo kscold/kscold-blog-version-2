@@ -11,6 +11,7 @@ import {
   fetchViewerApi,
   toMetaDescription,
   toOgImage,
+  toSeoDateTime,
   uniqueKeywords,
 } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
@@ -60,7 +61,7 @@ export async function generateMetadata({
     image: post.coverImage,
     publishedTime: post.publishedAt || post.createdAt,
     modifiedTime: post.updatedAt,
-    authors: [{ name: post.author.name }],
+    authors: [{ name: post.author.name, url: absoluteUrl('/info') }],
     noIndex: Boolean(post.restricted),
   });
 }
@@ -93,8 +94,8 @@ export default async function PostPage({
         description,
         url: absoluteUrl(canonicalPath),
         image: [toOgImage(post.coverImage)],
-        datePublished: post.publishedAt || post.createdAt,
-        dateModified: post.updatedAt,
+        datePublished: toSeoDateTime(post.publishedAt || post.createdAt),
+        dateModified: toSeoDateTime(post.updatedAt),
         articleSection: post.category.name,
         keywords: uniqueKeywords([...(post.seo?.keywords || []), ...post.tags.map(tag => tag.name)]).join(', '),
         isAccessibleForFree: !post.restricted,

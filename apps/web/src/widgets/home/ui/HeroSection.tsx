@@ -30,15 +30,13 @@ export function HeroSection() {
           <h1
             className="text-[14vw] md:text-[10vw] lg:text-[8rem] xl:text-[9.5rem] font-sans font-black tracking-tighter leading-none select-none relative z-10 text-surface-900"
           >
-            {/* 검색·접근성용 제목 (시각적으로는 KSCOLD 로고 노출) */}
-            <span className="sr-only">
-              김승찬의 기술 블로그 KSCOLD — AI Agent·백엔드·풀스택 개발자 김승찬(kscold)
-            </span>
             <span
-              aria-hidden="true"
               className="hero-logo-shimmer bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] bg-[size:200%_auto]"
             >
               KSCOLD
+            </span>
+            <span className="mt-5 block text-xl font-semibold tracking-tight sm:text-2xl">
+              김승찬의 기술 블로그
             </span>
           </h1>
           <div className="hero-logo-glow absolute inset-x-0 top-1/2 -translate-y-1/2 h-full bg-surface-200 blur-[60px] z-0 opacity-0 transition-opacity duration-1000 pointer-events-none" />
@@ -58,7 +56,7 @@ export function HeroSection() {
           AI Agent부터 서버·웹까지
           <br />
           <span className="text-surface-900 font-semibold relative after:absolute after:bottom-1 after:left-0 after:w-full after:h-2 after:bg-blue-100 after:-z-10 px-1">
-            문제를 서비스로 풀어내는 김승찬
+            문제를 서비스로 풀어내는 <Link href="/info">김승찬</Link>
           </span>
           입니다.
         </p>

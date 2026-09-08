@@ -26,7 +26,7 @@ export {
   flattenCategories,
   toOgImage,
 } from './seo/metadata';
-export { latestModifiedAt, toSitemapDate } from './seo/date';
+export { formatPublishedDate, latestModifiedAt, toSeoDateTime, toSitemapDate } from './seo/date';
 export {
   extractFirstMarkdownHeading,
   extractFirstMarkdownImage,
