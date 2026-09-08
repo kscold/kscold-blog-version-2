@@ -21,7 +21,8 @@ const feedJsonLd = {
   },
 };
 
-export const dynamic = 'force-static';
+// 게시 직후 검색봇과 새 방문자에게도 최신 목록을 제공한다.
+export const dynamic = 'force-dynamic';
 
 export default function FeedPage() {
   return (

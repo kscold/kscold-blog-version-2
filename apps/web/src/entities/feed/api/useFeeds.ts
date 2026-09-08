@@ -25,6 +25,9 @@ export function useFeeds(options: UseFeedsOptions = {}) {
     queryKey: ['feeds', { page, size, tag }],
     queryFn: () => apiClient.get<PageResponse<Feed>>(`/feeds?${params.toString()}`),
     initialData,
+    // 다른 탭에서 작성한 글도 목록에 다시 진입하거나 포커스하면 갱신한다.
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 }
 
