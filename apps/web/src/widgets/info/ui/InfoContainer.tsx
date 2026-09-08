@@ -40,6 +40,10 @@ export function InfoContainer() {
         </section>
 
         <SkillsSection />
+        <p className="mb-10 text-sm text-surface-600">
+          기술별 개념과 구현 기록은{' '}
+          <Link href="/notes" className="underline">개발 지식 노트</Link>에서 찾아볼 수 있습니다.
+        </p>
         <ContactSection />
 
         {/* 팀 소개 섹션 */}

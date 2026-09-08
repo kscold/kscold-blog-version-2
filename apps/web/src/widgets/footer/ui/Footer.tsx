@@ -16,6 +16,7 @@ export function Footer() {
       { label: 'Product', href: '/product' },
       { label: 'Admin Night', href: '/admin-night' },
       { label: 'Vault', href: '/vault' },
+      { label: '개발 지식 노트', href: '/notes' },
       { label: 'Guestbook', href: '/guestbook' },
       { label: 'Info', href: '/info' },
     ],
