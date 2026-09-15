@@ -1,6 +1,7 @@
 package com.kscold.blog.blog.adapter.in.web;
 
 import com.kscold.blog.analytics.application.service.ViewCounter;
+import com.kscold.blog.blog.adapter.in.web.dto.request.TagArchiveRequest;
 import com.kscold.blog.blog.adapter.in.web.dto.response.PostResponse;
 import com.kscold.blog.blog.application.dto.command.PostCreateCommand;
 import com.kscold.blog.blog.application.dto.command.PostUpdateCommand;
@@ -123,11 +124,12 @@ public class PostController {
 
     @GetMapping("/tag/{tagId}")
     public ResponseEntity<ApiResponse<Page<PostResponse>>> getPostsByTag(
-            @PathVariable String tagId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @PathVariable String tagId, @ModelAttribute TagArchiveRequest request) {
         Pageable pageable =
-                publicPageable(page, size, stableSort(Sort.Direction.DESC, "publishedAt"));
+                publicPageable(
+                        request.pageIndex(),
+                        request.pageSize(),
+                        stableSort(Sort.Direction.DESC, request.sortField()));
         Page<Post> posts = postUseCase.getByTag(tagId, pageable);
         return ResponseEntity.ok(ApiResponse.success(toPublicPostResponses(posts)));
     }

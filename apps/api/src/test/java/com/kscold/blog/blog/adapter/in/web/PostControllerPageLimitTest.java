@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.analytics.application.service.ViewCounter;
+import com.kscold.blog.blog.adapter.in.web.dto.request.TagArchiveRequest;
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
@@ -69,7 +70,10 @@ class PostControllerPageLimitTest {
     @Test
     @DisplayName("시나리오: 태그 목록의 깊은 페이지는 조회 전에 거부한다")
     void tagPostsRejectExcessivePage() {
-        assertThatThrownBy(() -> postController.getPostsByTag("tag-1", 500, 10))
+        assertThatThrownBy(
+                        () ->
+                                postController.getPostsByTag(
+                                        "tag-1", new TagArchiveRequest(500, 10, null)))
                 .isInstanceOf(InvalidRequestException.class);
 
         verify(postUseCase, never()).getByTag(any(), any());

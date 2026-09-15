@@ -42,6 +42,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
     @CompoundIndex(
             name = "idx_tags_status_publishedAt_id_v2",
             def = "{'tags._id': 1, 'status': 1, 'publishedAt': -1, '_id': -1}"),
+    @CompoundIndex(
+            name = "idx_tags_status_views_id_v2",
+            def = "{'tags._id': 1, 'status': 1, 'views': -1, '_id': -1}"),
     // 관리자 목록은 상태를 제한하지 않으므로 별도의 생성일 정렬 인덱스를 사용한다.
     @CompoundIndex(name = "idx_createdAt_id_v2", def = "{'createdAt': -1, '_id': -1}")
 })

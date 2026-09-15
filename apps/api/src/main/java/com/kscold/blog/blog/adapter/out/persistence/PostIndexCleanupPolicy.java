@@ -22,6 +22,11 @@ final class PostIndexCleanupPolicy {
                     nestedIndex("category._id"),
                     "idx_tags_status_publishedAt_id_v2",
                     nestedIndex("tags._id"),
+                    "idx_tags_status_views_id_v2",
+                    new Document("tags._id", 1)
+                            .append("status", 1)
+                            .append("views", -1)
+                            .append("_id", -1),
                     "idx_createdAt_id_v2",
                     new Document("createdAt", -1).append("_id", -1));
 

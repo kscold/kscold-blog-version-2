@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.analytics.application.service.ViewCounter;
+import com.kscold.blog.blog.adapter.in.web.dto.request.TagArchiveRequest;
 import com.kscold.blog.blog.application.port.in.AccessRequestUseCase;
 import com.kscold.blog.blog.application.port.in.CategoryUseCase;
 import com.kscold.blog.blog.application.port.in.PostUseCase;
@@ -53,7 +54,7 @@ class PostControllerStableSortTest {
         when(postUseCase.getByTag(any(), any())).thenReturn(Page.empty());
         when(categoryUseCase.getAll()).thenReturn(List.of());
 
-        postController.getPostsByTag("tag-1", 0, 10);
+        postController.getPostsByTag("tag-1", new TagArchiveRequest(0, 10, null));
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
         verify(postUseCase).getByTag(eq("tag-1"), captor.capture());
@@ -71,6 +72,30 @@ class PostControllerStableSortTest {
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
         verify(postUseCase).search(eq("검색어"), captor.capture());
         assertStableSort(captor.getValue(), "publishedAt", Sort.Direction.DESC);
+    }
+
+    @Test
+    @DisplayName("시나리오: 태그 인기순 HTTP 요청을 바인딩하고 조회수와 식별자로 정렬한다")
+    void tagPopularRequestUsesStableSort() throws Exception {
+        when(postUseCase.getByTag(any(), any()))
+                .thenAnswer(invocation -> Page.empty(invocation.getArgument(1)));
+        when(categoryUseCase.getAll()).thenReturn(List.of());
+        org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup(postController)
+                .build()
+                .perform(
+                        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(
+                                        "/posts/tag/tag-1")
+                                .param("sort", "popular")
+                                .param("page", "1")
+                                .param("size", "12"))
+                .andExpect(
+                        org.springframework.test.web.servlet.result.MockMvcResultMatchers.status()
+                                .isOk());
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(postUseCase).getByTag(eq("tag-1"), captor.capture());
+        assertStableSort(captor.getValue(), "views", Sort.Direction.DESC);
+        assertThat(captor.getValue().getPageNumber()).isEqualTo(1);
+        assertThat(captor.getValue().getPageSize()).isEqualTo(12);
     }
 
     @Test
