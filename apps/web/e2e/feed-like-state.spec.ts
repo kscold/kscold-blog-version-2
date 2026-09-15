@@ -88,6 +88,7 @@ test('로그인 전환 시 비회원 피드 캐시를 계정 상태로 재사용
     await route.fulfill({ json: success(null) });
   });
   await page.getByRole('button', { name: 'Logout', exact: true }).click();
+  await expect(page).toHaveURL(/\/login(?:\?|$)/);
   await expect(page.getByRole('link', { name: 'LOGIN', exact: true })).toBeVisible();
   await page.goto('/feed');
   await expect(page.getByRole('button', { name: '좋아요 9개', exact: true })).toBeEnabled();
