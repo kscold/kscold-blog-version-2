@@ -113,8 +113,12 @@ test.describe('피드 카드 링크와 이미지 접근성', () => {
     const like = page.getByRole('button', { name: '좋아요 4개' });
     await expect(like).toHaveText('좋아요 4');
     expect((await body.boundingBox())!.y).toBeLessThan((await preview.boundingBox())!.y);
-    const previewBox = (await preview.boundingBox())!;
-    expect((await like.boundingBox())!.y).toBeGreaterThanOrEqual(previewBox.y + previewBox.height);
+    // 이미지 로딩으로 카드 높이가 바뀌어도 두 요소의 좌표는 같은 프레임에서 비교한다.
+    await expect.poll(() => like.evaluate(element => {
+      const attachment = element.closest('article')?.querySelector('a[href="https://example.com/resource"]');
+      if (!attachment) return -1;
+      return element.getBoundingClientRect().top - attachment.getBoundingClientRect().bottom;
+    })).toBeGreaterThanOrEqual(0);
     expect((await like.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   });
 
