@@ -9,6 +9,7 @@ interface ArchivePaginationProps {
   page: number;
   totalPages: number;
   ariaLabel: string;
+  showSinglePage?: boolean;
 }
 
 const LINK_CLASS =
@@ -17,13 +18,13 @@ const LINK_CLASS =
 // 서버 페이지 교체로 컴포넌트가 다시 마운트되어도 클릭한 목적지를 한 번만 처리한다.
 let pendingPagePath: string | null = null;
 
-export function ArchivePagination({ basePath, page, totalPages, ariaLabel }: ArchivePaginationProps) {
+export function ArchivePagination({ basePath, page, totalPages, ariaLabel, showSinglePage = false }: ArchivePaginationProps) {
   useLayoutEffect(() => {
     if (pendingPagePath !== getArchivePagePath(basePath, page)) return;
     pendingPagePath = null;
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [basePath, page]);
-  if (totalPages <= 1) return null;
+  if (totalPages < 1 || (totalPages === 1 && !showSinglePage)) return null;
   const lastPage = Math.min(totalPages, MAX_ARCHIVE_PAGES);
   const start = Math.max(1, Math.min(page - 2, lastPage - 4));
   const pages = Array.from({ length: Math.min(5, lastPage) }, (_, index) => start + index);

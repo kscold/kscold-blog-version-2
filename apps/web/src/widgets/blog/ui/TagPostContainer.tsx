@@ -6,8 +6,10 @@ import { PostCard } from '@/entities/post';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import type { TagArchiveData } from '../lib/loadTagArchive';
 import { ArchivePagination } from './ArchivePagination';
+import { TagArchiveToolbar } from './TagArchiveToolbar';
 
-export function TagPostContainer({ page, basePath, tag, initialPosts }: TagArchiveData) {
+export function TagPostContainer(archive: TagArchiveData) {
+  const { page, basePath, tag, initialPosts, sort } = archive;
   const { allowRichEffects } = usePerformanceMode();
   const posts = initialPosts.content;
 
@@ -43,6 +45,7 @@ export function TagPostContainer({ page, basePath, tag, initialPosts }: TagArchi
           </p>
         </motion.div>
 
+        <TagArchiveToolbar {...archive} />
         {/* 포스트 그리드 */}
         {posts.length > 0 ? (
           <>
@@ -69,7 +72,8 @@ export function TagPostContainer({ page, basePath, tag, initialPosts }: TagArchi
             </motion.div>
 
             <ArchivePagination
-              basePath={basePath}
+              showSinglePage
+              basePath={sort === 'popular' ? `${basePath}?sort=popular` : basePath}
               page={page}
               totalPages={initialPosts.totalPages}
               ariaLabel={`${tag.name} 태그 페이지`}

@@ -7,18 +7,18 @@ import {
 
 interface TagPageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ page?: string | string[] }>;
+  searchParams: Promise<{ page?: string | string[]; sort?: string | string[] }>;
 }
 
 export async function generateMetadata({ params, searchParams }: TagPageProps): Promise<Metadata> {
-  const [{ slug }, { page }] = await Promise.all([params, searchParams]);
-  const archive = await loadTagArchive(slug, page);
+  const [{ slug }, { page, sort }] = await Promise.all([params, searchParams]);
+  const archive = await loadTagArchive(slug, page, sort);
   return buildTagArchiveMetadata(archive);
 }
 
 export default async function TagPage({ params, searchParams }: TagPageProps) {
-  const [{ slug }, { page }] = await Promise.all([params, searchParams]);
-  const archive = await loadTagArchive(slug, page);
+  const [{ slug }, { page, sort }] = await Promise.all([params, searchParams]);
+  const archive = await loadTagArchive(slug, page, sort);
   return <TagArchive {...archive} />;
 }
 

@@ -94,8 +94,10 @@ function getScopedArchivePage(featuredPost, searchParams, fixture) {
     slug: `${fixture.prefix.toLowerCase().replaceAll(' ', '-')}-${index + 1}`,
     category: fixture.category,
     tags: [fixture.tag],
+    views: index + 1,
     featured: false,
   }));
+  if (searchParams.get('sort') === 'popular') posts.sort((a, b) => b.views - a.views);
   const content = posts.slice(number * size, (number + 1) * size);
   const totalPages = Math.ceil(posts.length / size);
   return {

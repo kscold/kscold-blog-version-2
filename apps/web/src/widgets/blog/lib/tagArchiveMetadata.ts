@@ -14,7 +14,7 @@ export function buildTagArchiveMetadata(archive: TagArchiveData) {
     description: `${archive.tag.name} 태그로 묶인 포스트 모음입니다.`,
     path: getArchivePagePath(archive.basePath, archive.page),
     keywords: [archive.tag.name, '태그', '기술 블로그'],
-    noIndex: !isIndexableTag(archive.tag),
+    noIndex: archive.sort === 'popular' || !isIndexableTag(archive.tag),
   });
 }
 

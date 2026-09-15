@@ -10,5 +10,5 @@ export function parseArchivePage(value: string | string[] | undefined): number |
 }
 
 export function getArchivePagePath(basePath: string, page: number) {
-  return page === 1 ? basePath : `${basePath}?page=${page}`;
+  return page === 1 ? basePath : `${basePath}${basePath.includes('?') ? '&' : '?'}page=${page}`;
 }

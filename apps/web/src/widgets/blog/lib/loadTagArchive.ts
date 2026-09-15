@@ -16,6 +16,7 @@ import { validateArchiveResponse } from './archiveResponse';
 type RegisteredTagUsage = TagUsage & { id: string; slug: string };
 
 export interface TagArchiveData {
+  sort: 'latest' | 'popular';
   page: number;
   basePath: string;
   tag: RegisteredTagUsage;
@@ -34,22 +35,24 @@ const getTagUsage = cache(async (tagSlug: string) => {
 });
 
 export const loadTagArchive = cache(
-  async (rawSlug: string, value: string | string[] | undefined): Promise<TagArchiveData> => {
+  async (rawSlug: string, value: string | string[] | undefined, sortValue?: string | string[]): Promise<TagArchiveData> => {
+    if (sortValue !== undefined && sortValue !== 'latest' && sortValue !== 'popular') notFound();
+    const sort = sortValue === 'popular' ? 'popular' : 'latest';
     const page = parseArchivePage(value);
     if (page === null) notFound();
     const decodedSlug = safeDecodeURIComponent(rawSlug);
     const requestedPath = `/blog/tags/${encodeURIComponent(decodedSlug)}`;
-    if (value === '1') permanentRedirect(requestedPath);
+    if (value === '1') permanentRedirect(`${requestedPath}${sort === 'popular' ? '?sort=popular' : ''}`);
 
     const tag = await getTagUsage(decodedSlug);
     if (!tag) notFound();
     const basePath = `/blog/tags/${encodeURIComponent(tag.slug)}`;
     const initialPosts = await fetchPublicApi<PageResponse<PostSummary>>(
-      `/posts/tag/${encodeURIComponent(tag.id)}?page=${page - 1}&size=${ARCHIVE_PAGE_SIZE}`,
+      `/posts/tag/${encodeURIComponent(tag.id)}?page=${page - 1}&size=${ARCHIVE_PAGE_SIZE}&sort=${sort}`,
       300
     );
     if (initialPosts === null) throw new Error('태그 포스트를 불러올 수 없습니다.');
     if (!validateArchiveResponse(initialPosts, page, isPostSummary)) notFound();
-    return { page, basePath, tag, initialPosts };
+    return { page, basePath, tag, initialPosts, sort };
   }
 );
