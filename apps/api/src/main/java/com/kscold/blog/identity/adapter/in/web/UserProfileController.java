@@ -8,6 +8,7 @@ import com.kscold.blog.identity.application.port.in.UserProfileUseCase;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.BoundedPageRequestFactory;
+import com.kscold.blog.shared.web.RequestViewerIdentifier;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.port.in.FeedUseCase;
 import com.kscold.blog.social.domain.model.Feed;
@@ -36,6 +37,7 @@ public class UserProfileController {
     private final UserProfileUseCase userProfileUseCase;
     private final UserManagementUseCase userManagementUseCase;
     private final FeedUseCase feedUseCase;
+    private final RequestViewerIdentifier viewerIdentifier;
 
     @PatchMapping("/me/profile")
     @PreAuthorize("isAuthenticated()")
@@ -86,7 +88,9 @@ public class UserProfileController {
                         profile.getAvatar(),
                         false,
                         null);
+        String identifier = viewerIdentifier.resolve();
         return ResponseEntity.ok(
-                ApiResponse.success(feeds.map(feed -> FeedResponse.from(feed, null, author))));
+                ApiResponse.success(
+                        feeds.map(feed -> FeedResponse.from(feed, identifier, author))));
     }
 }

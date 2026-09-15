@@ -13,6 +13,7 @@ import org.bson.Document;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -133,25 +134,26 @@ public class FeedRepositoryAdapter implements FeedRepository {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 좋아요 토글 — 두 번의 atomic update로 race-free. 1) $addToSet + $inc(+1) : likedBy에 identifier가 없을 때만
-     * 추가, 같이 count 증가 2) 실패하면 이미 좋아요 상태 → $pull + $inc(-1)
-     *
-     * @return 추가됐으면 true, 취소됐으면 false
-     */
+    /** 이전 클라이언트의 토글 요청도 두 번의 갱신 대신 한 번의 원자적 갱신으로 처리한다. */
     @Override
     public boolean toggleLike(String feedId, String identifier) {
-        Query notLikedYet =
-                Query.query(Criteria.where("_id").is(feedId).and("likedBy").ne(identifier));
-        Update addLike = new Update().addToSet("likedBy", identifier).inc("likesCount", 1);
-        long added = mongoTemplate.updateFirst(notLikedYet, addLike, Feed.class).getModifiedCount();
-        if (added > 0) return true;
+        Feed updated =
+                mongoTemplate.findAndModify(
+                        Query.query(Criteria.where("id").is(feedId)),
+                        FeedLikeUpdate.create(identifier, null),
+                        FindAndModifyOptions.options().returnNew(true),
+                        Feed.class);
+        return updated != null && updated.getLikedBy().contains(identifier);
+    }
 
-        Query alreadyLiked =
-                Query.query(Criteria.where("_id").is(feedId).and("likedBy").is(identifier));
-        Update removeLike = new Update().pull("likedBy", identifier).inc("likesCount", -1);
-        mongoTemplate.updateFirst(alreadyLiked, removeLike, Feed.class);
-        return false;
+    @Override
+    public Optional<Feed> setLike(String feedId, String identifier, boolean liked) {
+        return Optional.ofNullable(
+                mongoTemplate.findAndModify(
+                        Query.query(Criteria.where("id").is(feedId)),
+                        FeedLikeUpdate.create(identifier, liked),
+                        FindAndModifyOptions.options().returnNew(true),
+                        Feed.class));
     }
 
     /** 이름이 같은 태그 문자열을 바꾼다. 이미 바꿀 이름을 가진 피드는 중복되지 않도록 기존 태그만 지운다. */

@@ -8,6 +8,7 @@ import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.BoundedPageRequestFactory;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.social.adapter.in.web.dto.request.FeedCreateRequest;
+import com.kscold.blog.social.adapter.in.web.dto.request.FeedLikeRequest;
 import com.kscold.blog.social.adapter.in.web.dto.request.FeedUpdateRequest;
 import com.kscold.blog.social.adapter.in.web.dto.response.FeedResponse;
 import com.kscold.blog.social.application.dto.response.FeedSitemapResponse;
@@ -140,7 +141,23 @@ public class FeedController {
         return ResponseEntity.ok(ApiResponse.success(toResponse(feed, identifier)));
     }
 
-    /** 로그인 유저 → userId, 비로그인 → IP */
+    @PutMapping("/{id}/like")
+    public ResponseEntity<ApiResponse<FeedResponse>> setLike(
+            @PathVariable String id,
+            @Valid @RequestBody FeedLikeRequest body,
+            HttpServletRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userId =
+                auth != null && auth.getPrincipal() instanceof String principal
+                        ? normalize(principal)
+                        : null;
+        String identifier = resolveIdentifier(userId, request);
+        feedAccessPolicy.requireReadable(id, userId, hasAdminRole());
+        Feed feed = feedUseCase.setLike(id, identifier, body.getLiked());
+        return ResponseEntity.ok(ApiResponse.success(toResponse(feed, identifier)));
+    }
+
+    /** 로그인은 계정 식별자, 비로그인은 IP와 브라우저 정보를 해시한 식별자를 쓴다. */
     private String resolveIdentifier(String userId, HttpServletRequest request) {
         String authenticatedUserId = normalize(userId);
         return authenticatedUserId != null

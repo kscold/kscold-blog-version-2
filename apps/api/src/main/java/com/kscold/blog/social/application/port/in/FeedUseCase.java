@@ -31,6 +31,8 @@ public interface FeedUseCase {
 
     Feed toggleLike(String feedId, String identifier);
 
+    Feed setLike(String feedId, String identifier, boolean liked);
+
     void incrementCommentCount(String feedId);
 
     void decrementCommentCount(String feedId);

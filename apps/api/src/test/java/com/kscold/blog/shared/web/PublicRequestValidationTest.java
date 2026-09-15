@@ -31,6 +31,20 @@ class PublicRequestValidationTest {
     }
 
     @Test
+    void requiresExplicitLikeIntentIncludingFalse() {
+        assertThat(
+                        validator.validate(
+                                new com.kscold.blog.social.adapter.in.web.dto.request
+                                        .FeedLikeRequest(null)))
+                .isNotEmpty();
+        assertThat(
+                        validator.validate(
+                                new com.kscold.blog.social.adapter.in.web.dto.request
+                                        .FeedLikeRequest(false)))
+                .isEmpty();
+    }
+
+    @Test
     void rejectsOversizedPageVisitPath() {
         PageVisitRequest request = PageVisitRequest.builder().path("/" + "a".repeat(2048)).build();
 

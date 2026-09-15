@@ -30,6 +30,9 @@ public interface FeedRepository {
     /** 좋아요 토글 - atomic. 좋아요 추가했으면 true, 취소했으면 false */
     boolean toggleLike(String feedId, String identifier);
 
+    /** 같은 상태를 반복 요청해도 한 번만 반영하고 갱신 직후의 문서를 반환한다. */
+    Optional<Feed> setLike(String feedId, String identifier, boolean liked);
+
     /** 특정 작성자의 공개 피드 */
     Page<Feed> findByAuthorIdAndVisibility(
             String authorId, Feed.Visibility visibility, Pageable pageable);

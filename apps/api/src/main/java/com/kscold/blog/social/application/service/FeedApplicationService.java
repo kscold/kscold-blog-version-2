@@ -126,6 +126,13 @@ public class FeedApplicationService implements FeedUseCase {
         return findById(feedId);
     }
 
+    @Override
+    public Feed setLike(String feedId, String identifier, boolean liked) {
+        return feedRepository
+                .setLike(feedId, identifier, liked)
+                .orElseThrow(() -> ResourceNotFoundException.feed(feedId));
+    }
+
     public List<Map<String, Object>> getFeedTags() {
         return feedRepository.aggregateTags();
     }

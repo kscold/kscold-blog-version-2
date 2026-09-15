@@ -57,7 +57,10 @@ public class FeedResponse {
     }
 
     public static FeedResponse from(Feed feed, String requestIdentifier) {
-        boolean liked = requestIdentifier != null && feed.getLikedBy().contains(requestIdentifier);
+        boolean liked =
+                requestIdentifier != null
+                        && feed.getLikedBy() != null
+                        && feed.getLikedBy().contains(requestIdentifier);
 
         return FeedResponse.builder()
                 .id(feed.getId())

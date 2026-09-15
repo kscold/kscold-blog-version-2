@@ -92,6 +92,8 @@ public class SecurityConfig {
                                         // 피드 쓰기 공개 엔드포인트
                                         .requestMatchers(HttpMethod.POST, "/feeds/*/like")
                                         .permitAll()
+                                        .requestMatchers(HttpMethod.PUT, "/feeds/*/like")
+                                        .permitAll()
                                         // 댓글 좋아요는 피드 좋아요와 같이 비로그인도 허용
                                         .requestMatchers(
                                                 HttpMethod.POST, "/feeds/*/comments/*/like")
