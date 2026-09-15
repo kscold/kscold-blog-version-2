@@ -54,7 +54,15 @@ public class FeedController {
             @AuthenticationPrincipal String userId,
             HttpServletRequest request) {
         Pageable pageable =
-                BoundedPageRequestFactory.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+                BoundedPageRequestFactory.of(
+                        page,
+                        size,
+                        Sort.by(
+                                Sort.Direction.DESC,
+                                "popular".equals(request.getParameter("sort"))
+                                        ? "views"
+                                        : "createdAt",
+                                "id"));
         Page<Feed> feeds =
                 (tag != null && !tag.isBlank())
                         ? feedUseCase.getPublicFeedsByTag(tag, pageable)

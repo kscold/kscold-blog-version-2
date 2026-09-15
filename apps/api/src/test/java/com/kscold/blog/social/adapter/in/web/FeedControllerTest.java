@@ -96,6 +96,27 @@ class FeedControllerTest {
     }
 
     @Test
+    @DisplayName("시나리오: 태그 인기순은 공개 피드만 조회수와 식별자로 안정 정렬한다")
+    void tagFeedsUsePopularStableSort() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getParameter("sort")).thenReturn("popular");
+        when(feedUseCase.getPublicFeedsByTag(eq("AI"), any()))
+                .thenReturn(new PageImpl<>(List.of()));
+        controller.getPublicFeeds(1, 12, "AI", null, request);
+        ArgumentCaptor<org.springframework.data.domain.Pageable> captor =
+                ArgumentCaptor.forClass(org.springframework.data.domain.Pageable.class);
+        verify(feedUseCase).getPublicFeedsByTag(eq("AI"), captor.capture());
+        assertThat(captor.getValue().getSort())
+                .isEqualTo(
+                        org.springframework.data.domain.Sort.by(
+                                org.springframework.data.domain.Sort.Direction.DESC,
+                                "views",
+                                "id"));
+        assertThat(captor.getValue().getPageNumber()).isEqualTo(1);
+        verify(feedUseCase, never()).getPublicFeeds(any());
+    }
+
+    @Test
     @DisplayName("시나리오: Spring 익명 principal은 피드 좋아요 식별자로 사용하지 않는다")
     void anonymousPrincipalUsesClientIdentifier() {
         HttpServletRequest request = mock(HttpServletRequest.class);

@@ -34,6 +34,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
     @CompoundIndex(
             name = "idx_visibility_tags_createdAt",
             def = "{'visibility': 1, 'tags': 1, 'createdAt': -1}"),
+    @CompoundIndex(
+            name = "idx_visibility_tags_createdAt_id",
+            def = "{'visibility': 1, 'tags': 1, 'createdAt': -1, '_id': -1}"),
+    @CompoundIndex(
+            name = "idx_visibility_tags_views_id",
+            def = "{'visibility': 1, 'tags': 1, 'views': -1, '_id': -1}"),
     // GET /users/{username}/feeds — findByAuthorIdAndVisibility(...) + createdAt DESC 정렬
     @CompoundIndex(
             name = "idx_author_visibility_createdAt",
