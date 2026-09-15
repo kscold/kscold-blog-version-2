@@ -79,18 +79,19 @@ export function usePostsByCategory(options: UsePostsByCategoryOptions) {
 
 interface UsePostsByTagOptions {
   tagId: string;
+  sort?: 'latest' | 'popular';
   page?: number;
   size?: number;
   initialData?: PageResponse<PostSummary>;
 }
 
 export function usePostsByTag(options: UsePostsByTagOptions) {
-  const { tagId, page = 0, size = 10, initialData } = options;
+  const { tagId, page = 0, size = 10, sort = 'latest', initialData } = options;
 
   return useQuery({
-    queryKey: ['posts', 'tag', tagId, { page, size }],
+    queryKey: ['posts', 'tag', tagId, { page, size, sort }],
     queryFn: () =>
-      apiClient.get<PageResponse<PostSummary>>(`/posts/tag/${tagId}?page=${page}&size=${size}`),
+      apiClient.get<PageResponse<PostSummary>>(`/posts/tag/${tagId}?page=${page}&size=${size}&sort=${sort}`),
     enabled: !!tagId,
     initialData,
   });

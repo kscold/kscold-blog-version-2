@@ -31,8 +31,8 @@ export const tagArchiveTag = {
   categoryName: categoryArchiveCategory.name,
   postCount: 19,
   publicPostCount: 19,
-  feedCount: 0,
-  totalCount: 19,
+  feedCount: 25,
+  totalCount: 44,
   unregistered: false,
 };
 

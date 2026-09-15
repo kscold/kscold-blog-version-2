@@ -12,10 +12,13 @@ import {
   isTagUsage,
 } from './archiveGuards';
 import { validateArchiveResponse } from './archiveResponse';
+import { getTagViewPath, type TagArchiveQuery, type TagArchiveType } from './tagArchiveView';
 
 type RegisteredTagUsage = TagUsage & { id: string; slug: string };
 
 export interface TagArchiveData {
+  type: TagArchiveType;
+  feedPage: number;
   sort: 'latest' | 'popular';
   page: number;
   basePath: string;
@@ -35,14 +38,19 @@ const getTagUsage = cache(async (tagSlug: string) => {
 });
 
 export const loadTagArchive = cache(
-  async (rawSlug: string, value: string | string[] | undefined, sortValue?: string | string[]): Promise<TagArchiveData> => {
+  async (rawSlug: string, value: string | string[] | undefined, query: TagArchiveQuery = {}): Promise<TagArchiveData> => {
+    const sortValue = query.sort;
     if (sortValue !== undefined && sortValue !== 'latest' && sortValue !== 'popular') notFound();
+    if (query.type !== undefined && query.type !== 'all' && query.type !== 'blog' && query.type !== 'feed') notFound();
+    const type = query.type ?? 'all';
+    const feedPage = parseArchivePage(query.feedPage);
+    if (feedPage === null) notFound();
     const sort = sortValue === 'popular' ? 'popular' : 'latest';
     const page = parseArchivePage(value);
     if (page === null) notFound();
     const decodedSlug = safeDecodeURIComponent(rawSlug);
     const requestedPath = `/blog/tags/${encodeURIComponent(decodedSlug)}`;
-    if (value === '1') permanentRedirect(`${requestedPath}${sort === 'popular' ? '?sort=popular' : ''}`);
+    if (value === '1') permanentRedirect(getTagViewPath(requestedPath, { sort, type, feedPage }));
 
     const tag = await getTagUsage(decodedSlug);
     if (!tag) notFound();
@@ -53,6 +61,6 @@ export const loadTagArchive = cache(
     );
     if (initialPosts === null) throw new Error('태그 포스트를 불러올 수 없습니다.');
     if (!validateArchiveResponse(initialPosts, page, isPostSummary)) notFound();
-    return { page, basePath, tag, initialPosts, sort };
+    return { page, basePath, tag, initialPosts, sort, type, feedPage };
   }
 );

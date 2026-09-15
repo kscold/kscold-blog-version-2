@@ -1,100 +1,40 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { PostCard } from '@/entities/post';
-import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import type { TagArchiveData } from '../lib/loadTagArchive';
-import { ArchivePagination } from './ArchivePagination';
 import { TagArchiveToolbar } from './TagArchiveToolbar';
+import { TagArchiveTabs } from './TagArchiveTabs';
+import { TagFeedSection } from './TagFeedSection';
+import { TagBlogSection } from './TagBlogSection';
 
 export function TagPostContainer(archive: TagArchiveData) {
-  const { page, basePath, tag, initialPosts, sort } = archive;
-  const { allowRichEffects } = usePerformanceMode();
-  const posts = initialPosts.content;
-
+  const { tag, initialPosts, type } = archive;
   return (
     <div className="min-h-screen bg-surface-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* 브레드크럼 */}
-        <motion.nav
+        <nav
           className="mb-8 flex items-center gap-2 text-sm text-surface-500"
-          initial={allowRichEffects ? { opacity: 0, y: -10 } : false}
-          animate={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
-          transition={allowRichEffects ? { duration: 0.4 } : undefined}
+          aria-label="태그 경로"
         >
           <Link href="/blog" className="hover:text-surface-900 transition-colors">
             Blog
           </Link>
           <span className="text-surface-300">/</span>
           <span className="text-surface-900 font-medium">#{tag.name}</span>
-        </motion.nav>
-
-        {/* 헤더 */}
-        <motion.div
-          className="mb-12"
-          initial={allowRichEffects ? { opacity: 0, y: 20 } : false}
-          animate={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
-          transition={allowRichEffects ? { duration: 0.6 } : undefined}
-        >
+        </nav>
+        <header className="mb-8">
           <h1 className="text-5xl font-sans font-black tracking-tight text-surface-900 mb-2">
             #{tag.name}
           </h1>
-          <p className="text-sm text-surface-400">
-            {initialPosts.totalElements}개의 포스트
+          <p className="text-sm text-surface-500">
+            전체 {initialPosts.totalElements + tag.feedCount}개 · 블로그{' '}
+            {initialPosts.totalElements}편 · 피드 {tag.feedCount}개
           </p>
-        </motion.div>
-
+        </header>
+        <TagArchiveTabs {...archive} />
         <TagArchiveToolbar {...archive} />
-        {/* 포스트 그리드 */}
-        {posts.length > 0 ? (
-          <>
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
-              initial={allowRichEffects ? 'hidden' : false}
-              animate={allowRichEffects ? 'visible' : undefined}
-              variants={allowRichEffects ? {
-                visible: { transition: { staggerChildren: 0.1 } },
-              } : undefined}
-            >
-              {posts.map(post => (
-                <motion.div
-                  key={post.id}
-                  variants={allowRichEffects ? {
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0 },
-                  } : undefined}
-                  transition={allowRichEffects ? { duration: 0.5 } : undefined}
-                >
-                  <PostCard post={post} headingLevel={2} />
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <ArchivePagination
-              showSinglePage
-              basePath={sort === 'popular' ? `${basePath}?sort=popular` : basePath}
-              page={page}
-              totalPages={initialPosts.totalPages}
-              ariaLabel={`${tag.name} 태그 페이지`}
-            />
-          </>
-        ) : (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-black text-surface-900 mb-2">
-              아직 포스트가 없습니다
-            </h2>
-            <p className="text-surface-500 mb-6">
-              이 태그에는 작성된 포스트가 없습니다.
-            </p>
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-surface-900 text-white rounded-lg hover:bg-surface-700 transition-colors font-medium"
-            >
-              모든 포스트 보기
-            </Link>
-          </div>
-        )}
+        {type !== 'feed' && <TagBlogSection {...archive} />}
+        {type !== 'blog' && <TagFeedSection {...archive} />}
       </div>
     </div>
   );

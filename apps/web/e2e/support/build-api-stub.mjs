@@ -147,6 +147,17 @@ function getResponseData(requestUrl) {
     return getTagArchivePage(featuredPostSummary, searchParams);
   }
   if (pathname === '/api/feeds') {
+    if (searchParams.get('tag') === 'Public') {
+      const number = Number(searchParams.get('page') || 0);
+      const size = Number(searchParams.get('size') || 12);
+      const feeds = Array.from({ length: 25 }, (_, index) => ({ ...likeFeed,
+        id: `ci-tag-feed-${index + 1}`, content: `# 태그 피드 ${index + 1}\n공개 태그 피드입니다.`,
+        tags: ['Public'], views: index + 1 }));
+      if (searchParams.get('sort') === 'popular') feeds.reverse();
+      const content = feeds.slice(number * size, (number + 1) * size);
+      return { content, number, size, totalElements: 25, totalPages: Math.ceil(25 / size),
+        first: number === 0, last: (number + 1) * size >= 25, empty: content.length === 0 };
+    }
     return emptyPage;
   }
   if (pathname === '/api/feeds/ci-like-feed') {

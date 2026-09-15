@@ -11,10 +11,10 @@ export function buildTagArchiveMetadata(archive: TagArchiveData) {
   const pageSuffix = archive.page === 1 ? '' : ` · ${archive.page}페이지`;
   return buildPageMetadata({
     title: `#${archive.tag.name}${pageSuffix}`,
-    description: `${archive.tag.name} 태그로 묶인 포스트 모음입니다.`,
+    description: `${archive.tag.name} 태그의 블로그와 피드를 함께 모아보세요.`,
     path: getArchivePagePath(archive.basePath, archive.page),
     keywords: [archive.tag.name, '태그', '기술 블로그'],
-    noIndex: archive.sort === 'popular' || !isIndexableTag(archive.tag),
+    noIndex: archive.sort === 'popular' || archive.type !== 'all' || archive.feedPage > 1 || !isIndexableTag(archive.tag),
   });
 }
 
@@ -31,7 +31,7 @@ export function buildTagArchiveJsonLd(archive: TagArchiveData) {
         '@id': `${url}#collection`,
         url,
         name,
-        description: `${archive.tag.name} 태그로 묶인 포스트 모음입니다.`,
+        description: `${archive.tag.name} 태그의 블로그와 피드 모음입니다.`,
         isPartOf: { '@id': `${SITE_URL}/#website` },
       },
       buildBreadcrumbJsonLd([

@@ -14,17 +14,19 @@ interface UseFeedsOptions {
   page?: number;
   size?: number;
   tag?: string;
+  sort?: 'latest' | 'popular';
   initialData?: PageResponse<Feed>;
 }
 
 export function useFeeds(options: UseFeedsOptions = {}) {
   const viewer = useSessionIdentity();
-  const { page = 0, size = 12, tag, initialData } = options;
+  const { page = 0, size = 12, tag, sort, initialData } = options;
   const params = new URLSearchParams({ page: String(page), size: String(size) });
   if (tag) params.set('tag', tag);
+  if (sort) params.set('sort', sort);
 
   return useQuery({
-    queryKey: ['feeds', { page, size, tag }, viewer],
+    queryKey: ['feeds', { page, size, tag, ...(sort ? { sort } : {}) }, viewer],
     queryFn: ({ signal }) => apiClient.get<PageResponse<Feed>>(`/feeds?${params.toString()}`, { signal }),
     initialData: viewer === 'anonymous' ? initialData : undefined,
     initialDataUpdatedAt: 0,
