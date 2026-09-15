@@ -27,6 +27,18 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      like-test-mongo:
+        image: mongo:7@sha256:b6421fd6d1c5ded6377b397d8983e2f82e2100dc5123332dcfda2065a472be5b
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping:1})'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      FEED_LIKE_TEST_MONGO_URI: mongodb://127.0.0.1:27017
     steps:
       - name: 소스 체크아웃
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
