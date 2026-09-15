@@ -43,7 +43,7 @@ async function mockFeedCard(page: Page) {
   await mockApi(page, 'POST', '**/api/feeds', success(FEED));
   await mockApi(
     page,
-    'POST',
+    'PUT',
     '**/api/feeds/feed-accessible/like',
     success({ ...FEED, isLiked: true, likesCount: 5 })
   );

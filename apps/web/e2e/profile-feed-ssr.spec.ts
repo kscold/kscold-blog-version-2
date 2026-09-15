@@ -77,7 +77,7 @@ test.describe('공개 프로필 피드 SSR', () => {
     expect(elapsedMs).toBeLessThan(3_500);
   });
 
-  test('초기 데이터 hydration은 피드 첫 페이지를 다시 요청하지 않는다', async ({
+  test('초기 HTML 이후 실제 방문자의 좋아요 상태를 다시 조회한다', async ({
     page,
   }) => {
     const browserFeedRequests: string[] = [];
@@ -91,7 +91,7 @@ test.describe('공개 프로필 피드 SSR', () => {
     await expect(page.locator('a[href="/feed/ci-indexable-feed"]').first()).toBeVisible();
     await page.waitForTimeout(500);
 
-    expect(browserFeedRequests).toHaveLength(0);
+    expect(browserFeedRequests).toHaveLength(1);
   });
 
   test('다음 버튼은 두 번째 페이지를 조회해 새 피드 카드를 표시한다', async ({ page }) => {

@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/shared/api/api-client';
+import { useSessionIdentity } from '@/shared/model/SessionIdentity';
 import { Feed, LinkPreview } from '@/shared/model/types/social';
 import { PageResponse } from '@/shared/model/types/api';
 import { getFeedLinkUrlError, normalizeFeedLinkUrl } from '../lib/feedInputPolicy';
@@ -17,14 +18,16 @@ interface UseFeedsOptions {
 }
 
 export function useFeeds(options: UseFeedsOptions = {}) {
+  const viewer = useSessionIdentity();
   const { page = 0, size = 12, tag, initialData } = options;
   const params = new URLSearchParams({ page: String(page), size: String(size) });
   if (tag) params.set('tag', tag);
 
   return useQuery({
-    queryKey: ['feeds', { page, size, tag }],
-    queryFn: () => apiClient.get<PageResponse<Feed>>(`/feeds?${params.toString()}`),
-    initialData,
+    queryKey: ['feeds', { page, size, tag }, viewer],
+    queryFn: ({ signal }) => apiClient.get<PageResponse<Feed>>(`/feeds?${params.toString()}`, { signal }),
+    initialData: viewer === 'anonymous' ? initialData : undefined,
+    initialDataUpdatedAt: 0,
     // 다른 탭에서 작성한 글도 목록에 다시 진입하거나 포커스하면 갱신한다.
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -32,11 +35,15 @@ export function useFeeds(options: UseFeedsOptions = {}) {
 }
 
 export function useFeed(id: string, initialData?: Feed) {
+  const viewer = useSessionIdentity();
   return useQuery({
-    queryKey: ['feeds', id],
-    queryFn: () => apiClient.get<Feed>(`/feeds/${id}`),
+    queryKey: ['feeds', id, viewer],
+    queryFn: ({ signal }) => apiClient.get<Feed>(`/feeds/${id}`, { signal }),
     enabled: !!id,
-    initialData,
+    initialData: viewer === 'anonymous' ? initialData : undefined,
+    initialDataUpdatedAt: 0,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 }
 

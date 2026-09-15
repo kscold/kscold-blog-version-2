@@ -36,15 +36,3 @@ export function useDeleteFeed() {
     },
   });
 }
-
-export function useToggleLike() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (feedId: string) => apiClient.post<Feed>(`/feeds/${feedId}/like`),
-    onSuccess: (_, feedId) => {
-      queryClient.invalidateQueries({ queryKey: ['feeds'] });
-      queryClient.invalidateQueries({ queryKey: ['feeds', feedId] });
-    },
-  });
-}

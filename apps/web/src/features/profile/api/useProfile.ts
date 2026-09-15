@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/shared/api/api-client';
+import { useSessionIdentity } from '@/shared/model/SessionIdentity';
 import { User } from '@/shared/model/types/user';
 import { Feed } from '@/shared/model/types/social';
 import { PageResponse } from '@/shared/model/types/api';
@@ -92,17 +93,20 @@ interface UseUserFeedsOptions {
 }
 
 export function useUserFeeds({ username, page = 0, initialData }: UseUserFeedsOptions) {
+  const viewer = useSessionIdentity();
   return useQuery<ProfileFeedPage>({
-    queryKey: ['users', username, 'feeds', page],
-    queryFn: async () => {
+    queryKey: ['users', username, 'feeds', page, viewer],
+    queryFn: async ({ signal }) => {
       const feedPage = await apiClient.get<PageResponse<Feed>>(
-        `/users/${encodeURIComponent(username)}/feeds?page=${page}&size=12`
+        `/users/${encodeURIComponent(username)}/feeds?page=${page}&size=12`, { signal }
       );
       return toProfileFeedPage(feedPage);
     },
     enabled: !!username,
-    initialData,
-    staleTime: 1000 * 60 * 5,
+    initialData: viewer === 'anonymous' ? initialData : undefined,
+    initialDataUpdatedAt: 0,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 }
 

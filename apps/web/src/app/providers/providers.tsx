@@ -9,6 +9,7 @@ import { hasLegacyAuthTokens } from '@/shared/lib/authTokenStorage';
 import { subscribeAuthSessionBridge } from '@/shared/model/authSessionBridge';
 import type { User } from '@/shared/model/types/user';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
+import { SessionIdentityContext } from '@/shared/model/SessionIdentity';
 
 const ReactQueryDevtools =
   process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_QUERY_DEVTOOLS !== 'false'
@@ -19,6 +20,7 @@ const ReactQueryDevtools =
   : () => null;
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const viewerId = useAuthStore(state => state.user?.id ?? 'anonymous');
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -70,7 +72,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <SessionIdentityContext.Provider value={viewerId}>
+          {children}
+        </SessionIdentityContext.Provider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ErrorBoundary>

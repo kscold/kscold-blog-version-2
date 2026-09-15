@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Feed } from '@/shared/model/types/social';
-import { useToggleLike } from '@/features/feed/api/useFeedMutations';
+import { useFeedLike } from '../api/useFeedLike';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { ImageCarousel } from '@/shared/ui/ImageCarousel';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';
@@ -48,24 +47,11 @@ export function FeedCard({
   imageSizes = DEFAULT_IMAGE_SIZES,
 }: FeedCardProps) {
   const { allowRichEffects, reduceMotion } = usePerformanceMode();
-  const toggleLike = useToggleLike();
-  const [isLiked, setIsLiked] = useState(feed.isLiked);
-  const [likesCount, setLikesCount] = useState(feed.likesCount);
+  const reaction = useFeedLike(feed.id);
+  const isLiked = Boolean(feed.isLiked);
+  const likesCount = feed.likesCount;
   const visibleTags = filterVisibleTagNames(feed.tags);
   const contentPreview = feed.preview ?? toFeedPreview(feed.content);
-
-  const handleLike = async () => {
-    const wasLiked = isLiked;
-    setIsLiked(!wasLiked);
-    setLikesCount(wasLiked ? likesCount - 1 : likesCount + 1);
-
-    try {
-      await toggleLike.mutateAsync(feed.id);
-    } catch {
-      setIsLiked(wasLiked);
-      setLikesCount(feed.likesCount);
-    }
-  };
 
   const isDetail = variant === 'detail';
   const feedTitle =
@@ -87,8 +73,9 @@ export function FeedCard({
           type="button"
           aria-label={`${isLiked ? '좋아요 취소' : '좋아요'} ${likesCount}개`}
           aria-pressed={isLiked}
-          onClick={() => void handleLike()}
-          disabled={toggleLike.isPending}
+          onClick={() => void reaction.submit(!isLiked)}
+          disabled={reaction.isPending}
+          aria-busy={reaction.isPending}
           className="relative z-20 inline-flex min-h-11 items-center gap-2 rounded-xl px-3 font-bold text-surface-700 hover:bg-surface-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-surface-900 disabled:opacity-50"
         >
           <motion.svg
@@ -158,6 +145,11 @@ export function FeedCard({
           </span>
         )}
       </div>
+      {reaction.hasError && (
+        <p role="status" className="mt-2 text-sm text-surface-600">
+          좋아요 처리 결과를 확인하지 못했습니다. 상태를 다시 확인한 뒤 시도해주세요.
+        </p>
+      )}
     </div>
   );
 

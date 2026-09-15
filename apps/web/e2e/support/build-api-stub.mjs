@@ -1,4 +1,5 @@
 import { createServer } from 'node:http';
+import { likeFeed } from './feed-like-fixture.mjs';
 import {
   blogArchiveCategory,
   categoryArchiveCategory,
@@ -147,6 +148,9 @@ function getResponseData(requestUrl) {
   }
   if (pathname === '/api/feeds') {
     return emptyPage;
+  }
+  if (pathname === '/api/feeds/ci-like-feed') {
+    return likeFeed;
   }
   if (pathname === '/api/vault/notes/slug/ci-vault-wikilink') {
     return vaultWikiLinkNote;
