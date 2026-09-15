@@ -1,3 +1,6 @@
+'use client';
+
+import { useLayoutEffect } from 'react';
 import Link from 'next/link';
 import { getArchivePagePath, MAX_ARCHIVE_PAGES } from '../lib/archivePage';
 
@@ -11,7 +14,15 @@ interface ArchivePaginationProps {
 const LINK_CLASS =
   'rounded-xl border border-surface-200 bg-white px-3 py-2 text-sm font-bold text-surface-600 hover:border-surface-400 hover:text-surface-900';
 
+// 서버 페이지 교체로 컴포넌트가 다시 마운트되어도 클릭한 목적지를 한 번만 처리한다.
+let pendingPagePath: string | null = null;
+
 export function ArchivePagination({ basePath, page, totalPages, ariaLabel }: ArchivePaginationProps) {
+  useLayoutEffect(() => {
+    if (pendingPagePath !== getArchivePagePath(basePath, page)) return;
+    pendingPagePath = null;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [basePath, page]);
   if (totalPages <= 1) return null;
   const lastPage = Math.min(totalPages, MAX_ARCHIVE_PAGES);
   const start = Math.max(1, Math.min(page - 2, lastPage - 4));
@@ -81,7 +92,12 @@ function ArchivePageLink({
   rel?: 'prev' | 'next';
 }) {
   return (
-    <Link href={getArchivePagePath(basePath, number)} prefetch={false} aria-label={label} className={LINK_CLASS} rel={rel}>
+    <Link href={getArchivePagePath(basePath, number)} prefetch={false} scroll={false}
+      onNavigate={() => {
+        pendingPagePath = getArchivePagePath(basePath, number);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }}
+      aria-label={label} className={LINK_CLASS} rel={rel}>
       {label === '이전 페이지' || label === '다음 페이지' ? label : number}
     </Link>
   );

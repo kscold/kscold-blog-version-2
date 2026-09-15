@@ -4,6 +4,7 @@ import type { Post } from '@/shared/model/types/blog';
 import { PostCommentSection } from './PostCommentSection';
 import { PostHeader } from './PostHeader';
 import { RestrictedPostDetail } from './RestrictedPostDetail';
+import { PostNavigation } from './PostNavigation';
 
 interface PostDetailProps {
   post: Post;
@@ -40,6 +41,7 @@ export function PostDetail({ post }: PostDetailProps) {
         </div>
 
         <PostCommentSection tags={post.tags} />
+        {post.status === 'PUBLISHED' && <PostNavigation slug={post.slug} />}
       </article>
     </div>
   );

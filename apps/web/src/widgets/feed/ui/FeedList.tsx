@@ -7,6 +7,7 @@ import { FeedCard } from '@/features/feed';
 import { FeedComposer } from './FeedComposer';
 import { useAuth } from '@/features/auth';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
+import { usePaginationScroll } from '@/shared/model/usePaginationScroll';
 import { Pagination } from '@/shared/ui/Pagination';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 import { isIndexableFeed } from '@/shared/lib/seo/indexability';
@@ -30,6 +31,7 @@ export function FeedList({ initialFeeds }: FeedListProps = {}) {
 
   const feeds = feedsData?.content || [];
   const totalPages = feedsData?.totalPages || 0;
+  const changePage = usePaginationScroll(page, isLoading);
 
   if (isLoading) {
     return (
@@ -102,7 +104,7 @@ export function FeedList({ initialFeeds }: FeedListProps = {}) {
       </motion.div>
 
       <div className="mt-8">
-        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        <Pagination page={page} totalPages={totalPages} onPageChange={next => changePage(next, setPage)} />
       </div>
     </>
   );

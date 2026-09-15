@@ -124,6 +124,15 @@ function getResponseData(requestUrl) {
   if (pathname === '/api/posts/featured') {
     return [featuredPostSummary];
   }
+  if (pathname === '/api/posts/slug/ci-frontend-verification/navigation') {
+    return { previous: { title: 'CI 이전 글', slug: 'ci-older', categorySlug: 'engineering' }, next: null };
+  }
+  if (pathname === '/api/posts/slug/ci-older/navigation') {
+    return { previous: null, next: { title: featuredPost.title, slug: featuredPost.slug, categorySlug: 'engineering' } };
+  }
+  if (pathname === '/api/posts/slug/ci-older') {
+    return { ...featuredPost, id: 'ci-older', title: 'CI 이전 글', slug: 'ci-older' };
+  }
   if (pathname === '/api/posts/slug/ci-frontend-verification') {
     return featuredPost;
   }

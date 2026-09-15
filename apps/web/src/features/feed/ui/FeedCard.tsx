@@ -88,7 +88,8 @@ export function FeedCard({
           aria-label={`${isLiked ? '좋아요 취소' : '좋아요'} ${likesCount}개`}
           aria-pressed={isLiked}
           onClick={() => void handleLike()}
-          className="relative z-20 flex items-center gap-1.5 group"
+          disabled={toggleLike.isPending}
+          className="relative z-20 inline-flex min-h-11 items-center gap-2 rounded-xl px-3 font-bold text-surface-700 hover:bg-surface-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-surface-900 disabled:opacity-50"
         >
           <motion.svg
             className={`w-6 h-6 transition-colors ${isLiked ? 'text-red-500 fill-red-500' : 'text-surface-700'}`}
@@ -107,7 +108,7 @@ export function FeedCard({
             />
           </motion.svg>
           <span className={`text-sm font-bold ${isLiked ? 'text-red-500' : 'text-surface-700'}`}>
-            {likesCount}
+            좋아요 {likesCount}
           </span>
         </button>
 

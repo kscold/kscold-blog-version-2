@@ -106,6 +106,18 @@ test.describe('피드 카드 링크와 이미지 접근성', () => {
     await expect(page).toHaveURL(/\/feed\/feed-accessible$/);
   });
 
+  test('본문과 첨부 링크 뒤에 이름이 표시된 좋아요 버튼이 배치된다', async ({ page }) => {
+    await loadFeedCard(page);
+    const body = page.getByRole('heading', { name: '접근 가능한 피드' });
+    const preview = page.getByRole('link', { name: /외부 참고 자료/ });
+    const like = page.getByRole('button', { name: '좋아요 4개' });
+    await expect(like).toHaveText('좋아요 4');
+    expect((await body.boundingBox())!.y).toBeLessThan((await preview.boundingBox())!.y);
+    const previewBox = (await preview.boundingBox())!;
+    expect((await like.boundingBox())!.y).toBeGreaterThanOrEqual(previewBox.y + previewBox.height);
+    expect((await like.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  });
+
   test('작성자 아바타는 고정 크기를 유지하고 필요한 해상도만 제공한다', async ({ page }) => {
     await loadFeedCard(page);
 

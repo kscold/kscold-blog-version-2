@@ -1,6 +1,7 @@
 'use client';
 
 import { Pagination } from '@/shared/ui/Pagination';
+import { usePaginationScroll } from '@/shared/model/usePaginationScroll';
 import { CategoryFilter } from './CategoryFilter';
 import { ArchivePagination } from './ArchivePagination';
 import { BlogPostResults } from './BlogPostResults';
@@ -31,6 +32,7 @@ export default function BlogPostGrid({
   onPageChange,
   onCategoryChange,
 }: BlogPostGridProps) {
+  const changePage = usePaginationScroll(page, isLoading);
   return (
     <>
       <CategoryFilter
@@ -50,7 +52,7 @@ export default function BlogPostGrid({
             ariaLabel="블로그 페이지"
           />
         ) : (
-          <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} />
+          <Pagination page={page} totalPages={totalPages} onPageChange={next => changePage(next, onPageChange)} />
         ))}
     </>
   );
