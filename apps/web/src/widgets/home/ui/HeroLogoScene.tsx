@@ -30,6 +30,8 @@ const SCALE = WORLD_SIZE / HERO_LOGO_VIEWBOX;
 /** 선 그대로 굵기면 금속 반사가 잘 안 보여서 조금 두껍게 만든다. */
 const THICKEN = 1.95;
 const MAX_PIXEL_RATIO = 1.75;
+const MOBILE_PIXEL_RATIO = 1.5;
+const MOBILE_FRAME_INTERVAL = 1000 / 30;
 
 interface HeroLogoSceneProps {
   /** 입체 로고를 맞춰 올릴 자리. 정적 로고를 감싼 상자다. */
@@ -110,7 +112,7 @@ export default function HeroLogoScene({
         canvas,
         alpha: true,
         antialias: true,
-        powerPreference: 'high-performance',
+        powerPreference: interactive ? 'high-performance' : 'low-power',
       });
     } catch {
       callbacks.current.onError();
@@ -118,7 +120,7 @@ export default function HeroLogoScene({
     }
 
     renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, interactive ? MAX_PIXEL_RATIO : MOBILE_PIXEL_RATIO));
     renderer.outputColorSpace = SRGBColorSpace;
     renderer.toneMapping = ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
@@ -161,7 +163,6 @@ export default function HeroLogoScene({
     const base = { x: 0, y: 0 };
     const target = { x: 0, y: 0 };
     const current = { x: 0, y: 0 };
-    let scrollProgress = 0;
 
     const fit = () => {
       const bounds = container.getBoundingClientRect();
@@ -184,6 +185,7 @@ export default function HeroLogoScene({
     };
 
     const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
       const x = event.clientX / window.innerWidth - 0.5;
       const y = event.clientY / window.innerHeight - 0.5;
       target.y = x * 1.3;
@@ -193,31 +195,35 @@ export default function HeroLogoScene({
       sky.position.y = 2.5 - y * 6;
     };
 
-    const onScroll = () => {
-      const scrollScene = container.closest('[data-scroll-scene]');
-      if (!scrollScene || scrollScene.getAttribute('data-enhanced') !== 'true') {
-        scrollProgress = 0;
-        return;
-      }
-      const bounds = scrollScene.getBoundingClientRect();
-      scrollProgress = Math.min(Math.max((64 - bounds.top) / Math.max(1, bounds.height - innerHeight + 64), 0), 1);
-    };
-
     let frame = 0;
     let readyFired = false;
     let visible = true;
-    const started = performance.now();
+    let elapsedTime = 0;
+    let lastRenderTime = 0;
 
     const step = (now: number) => {
-      const time = (now - started) / 1000;
-      current.x += (target.x - current.x) * 0.06;
-      current.y += (target.y - current.y) * 0.06;
+      const delta = lastRenderTime ? Math.min((now - lastRenderTime) / 1000, 0.1) : 0;
+      lastRenderTime = now;
+      elapsedTime += delta;
+      const time = elapsedTime;
+      const easing = 1 - Math.exp(-3.7 * delta);
+      current.x += (target.x - current.x) * easing;
+      current.y += (target.y - current.y) * easing;
 
-      pivot.position.set(base.x * (1 - scrollProgress), base.y + Math.sin(time * 0.9) * 0.06, 0);
-      pivot.rotation.x = current.x + Math.sin(time * 0.45) * 0.05 + scrollProgress * 0.55;
-      pivot.rotation.y = -0.18 + current.y + Math.sin(time * 0.5) * 0.12 + scrollProgress * 0.65;
-      pivot.rotation.z = -0.08 - scrollProgress * 0.35;
-      pivot.scale.setScalar(1 + scrollProgress * 1.8);
+      // 터치에서는 손가락을 쫓지 않고 공중에 매달린 조형물처럼 천천히 호흡한다.
+      pivot.position.set(
+        base.x + (interactive ? 0 : Math.sin(time * 0.32) * 0.04),
+        base.y + Math.sin(time * 0.72) * (interactive ? 0.06 : 0.12),
+        0,
+      );
+      pivot.rotation.x = current.x + Math.sin(time * 0.42) * (interactive ? 0.05 : 0.1);
+      pivot.rotation.y = -0.18 + current.y + Math.sin(time * 0.46) * (interactive ? 0.12 : 0.24);
+      pivot.rotation.z = -0.08 + (interactive ? 0 : Math.sin(time * 0.34) * 0.045);
+
+      if (!interactive) {
+        sky.position.x = -4 + Math.sin(time * 0.35) * 1.2;
+        sky.position.y = 2.5 + Math.sin(time * 0.28) * 0.7;
+      }
 
       renderer.render(scene, camera);
       if (!readyFired) {
@@ -228,6 +234,7 @@ export default function HeroLogoScene({
 
     const loop = (now: number) => {
       frame = requestAnimationFrame(loop);
+      if (!interactive && lastRenderTime && now - lastRenderTime < MOBILE_FRAME_INTERVAL - 0.5) return;
       step(now);
     };
     const start = () => {
@@ -236,6 +243,8 @@ export default function HeroLogoScene({
     const stop = () => {
       cancelAnimationFrame(frame);
       frame = 0;
+      // 다시 보일 때 숨겨진 시간만큼 회전이 건너뛰지 않게 이어서 재생한다.
+      lastRenderTime = 0;
     };
 
     // 화면 밖이거나 탭이 가려지면 그리기를 멈춘다.
@@ -257,9 +266,7 @@ export default function HeroLogoScene({
     };
 
     fit();
-    onScroll();
     if (interactive) window.addEventListener('pointermove', onPointerMove, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('visibilitychange', onVisibilityChange);
     canvas.addEventListener('webglcontextlost', onContextLost);
     start();
@@ -269,7 +276,6 @@ export default function HeroLogoScene({
       visibility.disconnect();
       resize.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('scroll', onScroll);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       canvas.removeEventListener('webglcontextlost', onContextLost);
       geometry.dispose();

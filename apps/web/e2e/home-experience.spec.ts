@@ -44,8 +44,8 @@ test('움직임 줄이기에서는 3D와 고정 연출 없이 모든 탐색 단�
   await expect(page.getByRole('button', { name: '흐르는 문구 일시정지' })).toBeHidden();
 });
 
-for (const width of [390, 768, 1440]) {
-  test(`홈 콘텐츠와 가로 카드가 문서 가로 넘침을 만들지 않는다: ${width}`, async ({ page }) => {
+for (const width of [320, 390, 440, 768, 1024, 1280, 1440]) {
+  test(`홈 콘텐츠가 문서 가로 넘침을 만들지 않는다: ${width}`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/');
     await page.getByRole('link', { name: 'Admin Night 보러 가기' }).scrollIntoViewIfNeeded();
@@ -62,4 +62,14 @@ test('모바일 메뉴와 홈 주요 링크를 계속 사용할 수 있다', asy
   await page.goto('/');
   await page.locator('[data-cy="sidebar-toggle"]').click();
   await expect(page.locator('aside:visible')).toHaveCount(1);
+});
+
+test('모바일 아트와 소개는 겹치지 않고 주요 버튼까지 첫 화면에 표시한다', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  const artwork = await page.getByTestId('hero-artwork').boundingBox();
+  const title = await page.getByRole('heading', { level: 1 }).boundingBox();
+  expect(artwork!.y + artwork!.height).toBeLessThan(title!.y);
+  await expect(page.locator('[data-cy="hero-primary-cta"]')).toBeInViewport();
+  await expect(page.locator('[data-cy="hero-secondary-cta"]')).toBeInViewport();
 });
