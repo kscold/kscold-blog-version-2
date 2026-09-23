@@ -48,18 +48,18 @@ export function HeroLogo() {
     <div className="pointer-events-none absolute inset-0" aria-hidden="true">
       <div
         ref={anchorRef}
-        className="absolute left-1/2 top-1/2 aspect-square w-[min(78vw,360px)] -translate-x-1/2 -translate-y-1/2 lg:left-[57%] lg:top-[45%] lg:w-[clamp(300px,min(56vh,34vw),540px)]"
+        className="absolute left-1/2 top-1/2 aspect-square w-[min(82vw,380px)] -translate-x-1/2 -translate-y-1/2 lg:left-[66%] lg:top-[42%] lg:w-[clamp(340px,min(64vh,42vw),640px)]"
       >
         {/* 떠 있는 물체가 바닥에 닿지 않게 옅은 그림자를 깔아준다. */}
         <div className="hero-logo-shadow absolute inset-x-[18%] -bottom-[6%] h-[9%] rounded-[50%] bg-surface-900/10 blur-2xl" />
         <HeroLogoMark
           className={`hero-logo-float h-full w-full transition-opacity duration-700 ${
-            ready ? 'opacity-0' : 'opacity-100'
+            ready && allowRichEffects ? 'opacity-0' : 'opacity-100'
           }`}
         />
       </div>
 
-      {enabled && (
+      {enabled && allowRichEffects && (
         <HeroLogoScene
           anchorRef={anchorRef}
           interactive={supportsHover}

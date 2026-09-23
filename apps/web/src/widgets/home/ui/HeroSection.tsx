@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { HeroClock } from './HeroClock';
 import { HeroLogo } from './HeroLogo';
+import { ScrollScene } from './ScrollScene';
+import { HomeArrival } from './HomeArrival';
+import styles from './homeExperience.module.css';
 
 // 흐르는 곡선. 가운데 로고 쪽으로 모였다가 퍼지게 그린다.
 const FLOW_LINES = Array.from({ length: 8 }, (_, index) => {
@@ -47,8 +50,10 @@ function HeroBackdrop() {
 
 export function HeroSection() {
   return (
+    <ScrollScene className={styles.heroScene}>
     <section className="relative isolate flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden px-5 pb-24 pt-6 sm:px-8 sm:pb-10 lg:px-12 lg:pb-10 lg:pt-10">
       <HeroBackdrop />
+      <HomeArrival />
 
       {/* 모서리 라벨 */}
       <div className="relative z-10 flex items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-[0.24em] text-surface-400">
@@ -64,7 +69,7 @@ export function HeroSection() {
 
       {/* 가운데 줄: 왼쪽 소개, 오른쪽 스크롤 안내 */}
       <div className="relative z-10 flex flex-1 items-center justify-between gap-10">
-        <div className="max-w-md">
+        <div data-hero-copy className="max-w-md">
           <p className="text-2xl font-bold leading-snug tracking-tight text-surface-900 sm:text-[1.7rem]">
             지식을 기록하고,
             <br />
@@ -131,5 +136,6 @@ export function HeroSection() {
         </h1>
       </div>
     </section>
+    </ScrollScene>
   );
 }

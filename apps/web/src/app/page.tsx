@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { HeroSection } from '@/widgets/home';
 import { FeaturedPostsSection } from '@/widgets/home';
-import { AdminNightPromoSection } from '@/widgets/home';
+import { HomeManifesto, HomeJourney, HomeFeatures, HomeConnections } from '@/widgets/home';
 import { StatsSection } from '@/widgets/home';
 import { SITE_NAME, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
@@ -37,12 +37,12 @@ export default function HomePage() {
       <AdSenseScript />
       <main className="min-h-screen text-surface-900">
         <HeroSection />
-
+        <HomeManifesto />
+        <HomeJourney />
+        <HomeFeatures />
         <FeaturedPostsSection />
-
-        <AdminNightPromoSection />
-
         <StatsSection />
+        <HomeConnections />
       </main>
     </>
   );

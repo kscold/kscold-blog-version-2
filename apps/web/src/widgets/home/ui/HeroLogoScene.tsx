@@ -28,7 +28,7 @@ import { HERO_LOGO_SEGMENTS, HERO_LOGO_VIEWBOX } from '../lib/heroLogoShape';
 const WORLD_SIZE = 6;
 const SCALE = WORLD_SIZE / HERO_LOGO_VIEWBOX;
 /** 선 그대로 굵기면 금속 반사가 잘 안 보여서 조금 두껍게 만든다. */
-const THICKEN = 1.55;
+const THICKEN = 1.95;
 const MAX_PIXEL_RATIO = 1.75;
 
 interface HeroLogoSceneProps {
@@ -125,19 +125,21 @@ export default function HeroLogoScene({
 
     const scene = new Scene();
     const pmrem = new PMREMGenerator(renderer);
-    const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    scene.environment = environment;
+    const room = new RoomEnvironment();
+    const environment = pmrem.fromScene(room, 0.04);
+    room.dispose();
+    scene.environment = environment.texture;
 
     const camera = new PerspectiveCamera(26, 1, 0.1, 200);
 
     const geometry = buildLogoGeometry();
     const material = new MeshPhysicalMaterial({
-      color: new Color('#64748b'),
+      color: new Color('#94a3b8'),
       metalness: 1,
-      roughness: 0.16,
+      roughness: 0.12,
       clearcoat: 1,
       clearcoatRoughness: 0.06,
-      iridescence: 0.38,
+      iridescence: 0.18,
       iridescenceIOR: 1.3,
       iridescenceThicknessRange: [220, 520],
       envMapIntensity: 1.15,
@@ -192,8 +194,13 @@ export default function HeroLogoScene({
     };
 
     const onScroll = () => {
-      const height = container.getBoundingClientRect().height || 1;
-      scrollProgress = Math.min(Math.max(window.scrollY / height, 0), 1);
+      const scrollScene = container.closest('[data-scroll-scene]');
+      if (!scrollScene || scrollScene.getAttribute('data-enhanced') !== 'true') {
+        scrollProgress = 0;
+        return;
+      }
+      const bounds = scrollScene.getBoundingClientRect();
+      scrollProgress = Math.min(Math.max((64 - bounds.top) / Math.max(1, bounds.height - innerHeight + 64), 0), 1);
     };
 
     let frame = 0;
@@ -206,11 +213,11 @@ export default function HeroLogoScene({
       current.x += (target.x - current.x) * 0.06;
       current.y += (target.y - current.y) * 0.06;
 
-      pivot.position.set(base.x, base.y + Math.sin(time * 0.9) * 0.06, 0);
-      pivot.rotation.x = current.x + Math.sin(time * 0.45) * 0.05 + scrollProgress * 0.35;
-      pivot.rotation.y = current.y + Math.sin(time * 0.5) * 0.18;
-      pivot.rotation.z = -scrollProgress * 0.5;
-      pivot.scale.setScalar(1 - scrollProgress * 0.14);
+      pivot.position.set(base.x * (1 - scrollProgress), base.y + Math.sin(time * 0.9) * 0.06, 0);
+      pivot.rotation.x = current.x + Math.sin(time * 0.45) * 0.05 + scrollProgress * 0.55;
+      pivot.rotation.y = -0.18 + current.y + Math.sin(time * 0.5) * 0.12 + scrollProgress * 0.65;
+      pivot.rotation.z = -0.08 - scrollProgress * 0.35;
+      pivot.scale.setScalar(1 + scrollProgress * 1.8);
 
       renderer.render(scene, camera);
       if (!readyFired) {

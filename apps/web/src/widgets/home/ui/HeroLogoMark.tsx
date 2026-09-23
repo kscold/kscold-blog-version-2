@@ -28,6 +28,7 @@ export function HeroLogoMark({ className }: HeroLogoMarkProps) {
         {HERO_LOGO_SEGMENTS.map((segment, index) => (
           <line
             key={index}
+            pathLength={1}
             x1={segment.from[0]}
             y1={segment.from[1]}
             x2={segment.to[0]}

@@ -26,6 +26,7 @@ interface ClientLayoutProps {
 export function ClientLayout({ children, footer, initialViewer }: ClientLayoutProps) {
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
+  const isHomePage = pathname === '/';
 
   return (
     <ViewerProvider initialViewer={initialViewer}>
@@ -37,7 +38,7 @@ export function ClientLayout({ children, footer, initialViewer }: ClientLayoutPr
           <Sidebar />
           <main
             className={`flex-1 flex flex-col w-full relative ${
-              !isVaultPage ? 'lg:pl-64 min-h-[calc(100vh-4rem)]' : 'h-full'
+              isVaultPage ? 'h-full' : `${isHomePage ? '' : 'lg:pl-64'} min-h-[calc(100vh-4rem)]`
             }`}
           >
             {isVaultPage ? (

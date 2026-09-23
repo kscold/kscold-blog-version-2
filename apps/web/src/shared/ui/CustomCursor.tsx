@@ -109,7 +109,7 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
   return (
     <motion.div
       className={`fixed top-0 left-0 z-[9999] h-[80px] w-[80px] rounded-full pointer-events-none ${
-        useHomeContrast ? 'mix-blend-normal' : 'mix-blend-difference'
+        useHomeContrast ? 'mix-blend-difference border border-white' : 'mix-blend-difference'
       }`}
       style={{
         x: cursorX,
@@ -125,9 +125,7 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
       animate={{
         scale: isHovering ? 1 : 0.4,
         backgroundColor: useHomeContrast
-          ? isHovering
-            ? 'rgba(71, 71, 71, 0.72)'
-            : 'rgba(71, 71, 71, 0.46)'
+          ? 'rgba(255, 255, 255, 0.04)'
           : isHovering
             ? 'rgba(255, 255, 255, 1)'
             : 'rgba(255, 255, 255, 0.4)',
