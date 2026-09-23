@@ -49,7 +49,7 @@ function HeroBackdrop() {
 
 export function HeroSection() {
   return (
-    <div className={styles.heroScene}>
+    <div className={`${styles.heroScene} [container-type:inline-size]`}>
     <section className="relative isolate flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden px-5 pb-24 pt-6 sm:px-8 sm:pb-10 lg:px-12 lg:pb-10 lg:pt-10">
       <HeroBackdrop />
       <HomeArrival />
@@ -126,7 +126,7 @@ export function HeroSection() {
           <span className="mb-4 block text-xs font-bold tracking-[0.2em] text-surface-500">
             김승찬의 기술 블로그
           </span>{' '}
-          <span className="block text-[clamp(4.25rem,16.5vw,16rem)] font-black leading-[0.78] tracking-[-0.065em] text-surface-900">
+          <span className="block text-[clamp(4.25rem,16.5cqw,16rem)] font-black leading-[0.78] tracking-[-0.065em] text-surface-900">
             KSCOLD
             <span aria-hidden="true" className="text-accent">
               .

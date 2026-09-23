@@ -18,7 +18,7 @@ test('홈 장식은 클릭을 가로채지 않고 주요 버튼으로 이동할 
   }
 });
 
-test('홈의 소개와 탐색 링크는 서버 HTML에 있고 데스크톱 사이드바는 홈에서만 숨긴다', async ({ page, request }) => {
+test('홈의 소개와 탐색 링크는 서버 HTML에 있고 데스크톱 사이드바도 표시한다', async ({ page, request }) => {
   const html = await (await request.get('/')).text();
   expect(html).toContain('김승찬의 기술 블로그');
   expect(html).not.toContain('home-manifesto');
@@ -26,7 +26,7 @@ test('홈의 소개와 탐색 링크는 서버 HTML에 있고 데스크톱 사�
   expect(html).toContain('Featured');
   expect(html).toContain('Admin Night 보러 가기');
   await page.goto('/');
-  await expect(page.locator('aside:visible')).toHaveCount(0);
+  await expect(page.locator('aside:visible')).toHaveCount(1);
   await expect(page.locator('[data-cy="hero-primary-cta"]')).toHaveAttribute('href', '/blog');
   await expect(page.locator('[data-cy="hero-secondary-cta"]')).toHaveAttribute('href', '/feed');
   await expect(page.getByLabel('블로그 기능 탐색')).toHaveCount(0);

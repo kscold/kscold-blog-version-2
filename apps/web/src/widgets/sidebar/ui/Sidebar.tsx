@@ -19,8 +19,7 @@ export function Sidebar() {
   const { isTouchDevice, isDesktopViewport, allowRichEffects } = usePerformanceMode();
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
-  const isHomePage = pathname === '/';
-  const shouldLoadSidebarData = sidebarOpen || (isDesktopViewport && !isVaultPage && !isHomePage);
+  const shouldLoadSidebarData = sidebarOpen || (isDesktopViewport && !isVaultPage);
   const { data: categories } = useCategories(undefined, shouldLoadSidebarData);
   const { data: tagIndex, isLoading: isTagsLoading } = useTagIndex(
     undefined,
@@ -97,8 +96,8 @@ export function Sidebar() {
         )}
       </AnimatePresence>
 
-      {/* 홈은 전체 폭의 소개 화면으로, 블로그 목록부터 카테고리 탐색을 제공한다. */}
-      {!isVaultPage && !isHomePage && (
+      {/* 데스크톱 사이드바는 Vault 페이지를 제외하고 표시한다. */}
+      {!isVaultPage && (
         <aside className={`${asideBaseClass} hidden lg:block`}>{innerContent}</aside>
       )}
     </>
