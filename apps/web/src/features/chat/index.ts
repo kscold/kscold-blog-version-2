@@ -4,6 +4,7 @@
 export * from './api/vaultAgentApi';
 export * from './lib/agentConstants';
 export * from './lib/agentSession';
+export * from './lib/agentEntry';
 export * from './lib/ownerChatConstants';
 export * from './lib/useChatAdmin';
 export * from './lib/useChatSocket';

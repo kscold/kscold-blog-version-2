@@ -25,9 +25,10 @@ interface ChatModalProps {
   isOpen: boolean;
   isElevated?: boolean;
   onClose: () => void;
+  initialQuestion?: string;
 }
 
-export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatModalProps) {
+export default function ChatModal({ isOpen, isElevated = false, onClose, initialQuestion }: ChatModalProps) {
   const { user } = useAuthStore();
   const router = useRouter();
   const [inputMessage, setInputMessage] = useState('');
@@ -48,7 +49,17 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
     setIsSuggestionsOpen,
     startNewChat,
     canStartNewChat,
+    cancelAgentResponse,
+    retryLastQuestion,
+    canRetryLastQuestion,
   } = useAgentChat(isOpen);
+
+  useEffect(() => {
+    if (!isOpen || !initialQuestion) return;
+    setMode('agent');
+    setAgentInput(initialQuestion);
+    setIsSuggestionsOpen(false);
+  }, [initialQuestion, isOpen, setAgentInput, setIsSuggestionsOpen]);
 
   const username = user?.displayName || user?.username || '';
   const { messages, isConnected, sendMessage } = useChatSocket({
@@ -163,6 +174,10 @@ export default function ChatModal({ isOpen, isElevated = false, onClose }: ChatM
                   />
                   <AgentComposer
                     value={agentInput}
+                    isThinking={isAgentThinking}
+                    onStop={cancelAgentResponse}
+                    onRetry={() => void retryLastQuestion()}
+                    canRetry={canRetryLastQuestion}
                     disabled={
                       !agentInput.trim() || isAgentThinking || isAgentHistoryLoading
                     }

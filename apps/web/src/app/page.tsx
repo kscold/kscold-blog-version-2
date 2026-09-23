@@ -37,9 +37,11 @@ export default function HomePage() {
       <AdSenseScript />
       <main className="min-h-screen text-surface-900">
         <HeroSection />
-        <FeaturedPostsSection />
-        <AdminNightPromoSection />
-        <StatsSection />
+        <div id="home-content" className="scroll-mt-20">
+          <FeaturedPostsSection />
+          <AdminNightPromoSection />
+          <StatsSection />
+        </div>
       </main>
     </>
   );

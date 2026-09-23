@@ -7,7 +7,7 @@ import {
   linkAgentSourceCitations,
   sourceHref,
   type AgentMessage,
-} from '@/features/chat/lib/agentConstants';
+} from '@/features/chat';
 
 export function AgentMessageList({
   messages,
@@ -115,6 +115,13 @@ export function AgentMessageList({
                 {message.content}
               </p>
             )}
+            {(message.responseStatus === 'error' || message.responseStatus === 'interrupted') && (
+              <p role="status" className="mt-3 border-t border-surface-200 pt-2 text-xs font-medium text-surface-600">
+                {message.responseStatus === 'error'
+                  ? '연결이 끊겨 답변을 마치지 못했어요. 아래에서 같은 질문을 다시 보낼 수 있습니다.'
+                  : '답변 수신을 멈췄어요. 위 내용은 완성된 답변이 아닐 수 있습니다.'}
+              </p>
+            )}
             {visibleStages.length > 0 && message.role === 'assistant' && (
               <div className="mt-3 grid gap-1.5">
                 {visibleStages.map(stage => (
@@ -139,6 +146,8 @@ export function AgentMessageList({
                     <Link
                       key={`${source.type}-${source.id}`}
                       href={sourceHref(source)}
+                      target={sourceHref(source).startsWith('https://') ? '_blank' : undefined}
+                      rel={sourceHref(source).startsWith('https://') ? 'noopener noreferrer' : undefined}
                       className="group block min-w-0 rounded-xl border border-surface-200 bg-surface-50 px-3 py-2.5 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:bg-white hover:text-surface-900"
                     >
                       <span className="flex min-w-0 items-center justify-between gap-2">

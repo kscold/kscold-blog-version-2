@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useAuthStore } from '@/entities/user';
 import {
+  AGENT_QUESTION_MAX_LENGTH,
   AGENT_SESSION_STORAGE_KEY,
   createInitialAgentMessages,
   fetchVaultAgentContentScope,
@@ -25,6 +27,9 @@ import {
 import { useAgentStreamBuffer } from './useAgentStreamBuffer';
 
 export function useAgentChat(isOpen: boolean) {
+  const viewerId = useAuthStore(state => state.user?.id ?? null);
+  const historyViewerRef = useRef(viewerId);
+  const isViewerCurrent = historyViewerRef.current === viewerId;
   const [agentInput, setAgentInput] = useState('');
   const [agentSessionId, setAgentSessionId] = useState('');
   const [isAgentThinking, setIsAgentThinking] = useState(false);
@@ -35,6 +40,8 @@ export function useAgentChat(isOpen: boolean) {
     createInitialAgentMessages()
   );
   const streamAbortControllerRef = useRef<AbortController | undefined>(undefined);
+  const historyVersionRef = useRef(0);
+  const lastQuestionRef = useRef('');
   const { flushPendingDelta, queueDelta, resetBuffer } = useAgentStreamBuffer(setAgentMessages);
 
   const lastAgentMessage = agentMessages[agentMessages.length - 1];
@@ -45,7 +52,24 @@ export function useAgentChat(isOpen: boolean) {
   const hasUserAsked = agentMessages.some(message => message.role === 'user');
   const isFollowUp = dynamicFollowUps.length > 0;
   const suggestions = isFollowUp ? dynamicFollowUps : hasUserAsked ? [] : starterPrompts;
-  const isAgentHistoryLoading = isOpen && !hasLoadedAgentHistory;
+  const isAgentHistoryLoading = isOpen && (!hasLoadedAgentHistory || !isViewerCurrent);
+
+  useEffect(() => {
+    if (historyViewerRef.current === viewerId) return;
+    historyViewerRef.current = viewerId;
+    historyVersionRef.current += 1;
+    streamAbortControllerRef.current?.abort('identity');
+    streamAbortControllerRef.current = undefined;
+    resetBuffer();
+    lastQuestionRef.current = '';
+    setAgentSessionId(resetAgentSessionId());
+    setHasLoadedAgentHistory(false);
+    setAgentContentScope(undefined);
+    setAgentMessages(createInitialAgentMessages());
+    setAgentInput('');
+    setIsAgentThinking(false);
+    setIsSuggestionsOpen(true);
+  }, [viewerId, resetBuffer]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -70,7 +94,7 @@ export function useAgentChat(isOpen: boolean) {
     return () => {
       isCurrent = false;
     };
-  }, [isOpen]);
+  }, [isOpen, viewerId]);
 
   useEffect(() => {
     if (!isOpen || hasLoadedAgentHistory) {
@@ -78,10 +102,12 @@ export function useAgentChat(isOpen: boolean) {
     }
 
     const sessionId = getOrCreateAgentSessionId();
+    const historyVersion = ++historyVersionRef.current;
     setAgentSessionId(sessionId);
 
     void fetchVaultAgentHistory(sessionId)
       .then(history => {
+        if (historyVersion !== historyVersionRef.current) return;
         if (isValidAgentSessionId(history.sessionId) && history.sessionId !== sessionId) {
           window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, history.sessionId);
           setAgentSessionId(history.sessionId);
@@ -100,25 +126,33 @@ export function useAgentChat(isOpen: boolean) {
         }
       })
       .catch(() => undefined)
-      .finally(() => setHasLoadedAgentHistory(true));
-  }, [hasLoadedAgentHistory, isOpen]);
+      .finally(() => {
+        if (historyVersion === historyVersionRef.current) setHasLoadedAgentHistory(true);
+      });
+    return () => {
+      historyVersionRef.current += 1;
+    };
+  }, [hasLoadedAgentHistory, isOpen, viewerId]);
 
   useEffect(() => {
     if (isOpen) {
       return;
     }
-    streamAbortControllerRef.current?.abort();
+    streamAbortControllerRef.current?.abort('closed');
   }, [isOpen]);
 
   useEffect(() => {
     return () => {
-      streamAbortControllerRef.current?.abort();
+      streamAbortControllerRef.current?.abort('closed');
     };
   }, []);
 
   const submitAgentQuestion = async (rawQuestion: string) => {
     const question = rawQuestion.trim();
-    if (!question || isAgentThinking || !hasLoadedAgentHistory) {
+    if (
+      !question || question.length > AGENT_QUESTION_MAX_LENGTH ||
+      streamAbortControllerRef.current || !hasLoadedAgentHistory || !isViewerCurrent
+    ) {
       return;
     }
 
@@ -127,9 +161,9 @@ export function useAgentChat(isOpen: boolean) {
     const abortController = new AbortController();
     let completedResponse: VaultAgentChatResponse | undefined;
 
-    streamAbortControllerRef.current?.abort();
     resetBuffer();
     streamAbortControllerRef.current = abortController;
+    lastQuestionRef.current = question;
     setAgentSessionId(sessionId);
     setAgentMessages(previous => [
       ...previous,
@@ -155,6 +189,7 @@ export function useAgentChat(isOpen: boolean) {
         question,
         sessionId,
         onEvent: event => {
+          if (abortController.signal.aborted) return;
           if (event.type === 'stage') {
             setAgentMessages(previous =>
               addAgentStage(previous, assistantMessageId, event.stage)
@@ -190,14 +225,16 @@ export function useAgentChat(isOpen: boolean) {
         signal: abortController.signal,
       });
 
-      if (!completedResponse && !abortController.signal.aborted) {
+      if (!completedResponse) {
         throw new Error('Agent 응답이 끝까지 전달되지 않았습니다.');
       }
     } catch (error) {
       flushPendingDelta(assistantMessageId);
       setAgentMessages(previous =>
         abortController.signal.aborted
-          ? interruptAgentMessage(previous, assistantMessageId)
+          ? interruptAgentMessage(
+              previous, assistantMessageId, abortController.signal.reason === 'user'
+            )
           : failAgentMessage(
               previous,
               assistantMessageId,
@@ -216,9 +253,11 @@ export function useAgentChat(isOpen: boolean) {
   };
 
   const startNewChat = () => {
-    if (isAgentThinking) {
+    if (streamAbortControllerRef.current) {
       return;
     }
+    historyVersionRef.current += 1;
+    lastQuestionRef.current = '';
     const newSessionId = resetAgentSessionId();
     setAgentSessionId(newSessionId);
     setAgentMessages(createInitialAgentMessages(agentContentScope));
@@ -228,20 +267,30 @@ export function useAgentChat(isOpen: boolean) {
   };
 
   const canStartNewChat = agentMessages.some(message => message.role === 'user');
+  const canRetryLastQuestion = !isAgentThinking && !isAgentHistoryLoading &&
+    Boolean(lastQuestionRef.current) &&
+    (lastAgentMessage?.responseStatus === 'error' || lastAgentMessage?.responseStatus === 'interrupted');
+  const cancelAgentResponse = () => streamAbortControllerRef.current?.abort('user');
+  const retryLastQuestion = () => {
+    if (canRetryLastQuestion) void submitAgentQuestion(lastQuestionRef.current);
+  };
 
   return {
-    agentMessages,
-    agentContentScope,
-    isAgentThinking,
+    agentMessages: isViewerCurrent ? agentMessages : createInitialAgentMessages(),
+    agentContentScope: isViewerCurrent ? agentContentScope : undefined,
+    isAgentThinking: isViewerCurrent && isAgentThinking,
     isAgentHistoryLoading,
-    agentInput,
+    agentInput: isViewerCurrent ? agentInput : '',
     setAgentInput,
     submitAgentQuestion,
-    suggestions,
+    suggestions: isViewerCurrent ? suggestions : starterPrompts,
     isFollowUp,
     isSuggestionsOpen,
     setIsSuggestionsOpen,
     startNewChat,
-    canStartNewChat,
+    canStartNewChat: isViewerCurrent && canStartNewChat,
+    cancelAgentResponse,
+    retryLastQuestion,
+    canRetryLastQuestion: isViewerCurrent && canRetryLastQuestion,
   };
 }

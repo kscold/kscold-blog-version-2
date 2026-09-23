@@ -1,0 +1,32 @@
+.artwork {
+  --hero-art-progress: 0;
+  transform: translate3d(0, calc(var(--hero-art-progress) * -24px), 0) rotate(calc(var(--hero-art-progress) * -2deg));
+  transform-origin: 50% 65%;
+}
+
+.artwork[data-motion='true'] { will-change: transform; }
+
+.cue {
+  display: inline-flex;
+  align-items: center;
+  gap: theme('spacing.3');
+  min-height: theme('spacing.11');
+  color: theme('colors.surface.500');
+  font-size: theme('fontSize.xs');
+  white-space: nowrap;
+  transition: color .2s;
+}
+
+.cue:hover { color: theme('colors.primary.700'); }
+.cue:focus-visible { outline: 2px solid theme('colors.primary.600'); outline-offset: 5px; border-radius: theme('borderRadius.sm'); }
+.arrow { display: inline-flex; color: theme('colors.primary.600'); animation: invite 1.8s ease-in-out 2; }
+
+@keyframes invite {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artwork { transform: none; }
+  .arrow { animation: none; }
+}

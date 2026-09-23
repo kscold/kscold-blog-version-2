@@ -35,20 +35,28 @@ export function completeAgentMessage(
     sources: response.sources,
     followUps: response.followUps,
     isStreaming: false,
+    responseStatus: 'complete',
   }));
 }
 
-export function interruptAgentMessage(messages: AgentMessage[], messageId: string) {
+export function interruptAgentMessage(
+  messages: AgentMessage[],
+  messageId: string,
+  isUserStopped = false
+) {
   return updateAgentMessage(messages, messageId, message => ({
     ...message,
     content:
       message.content ||
-      '답변 수신이 중단되었습니다. 같은 질문을 다시 보내면 새 답변을 받을 수 있어요.',
+      '답변 수신을 멈췄어요. 원하면 같은 질문으로 다시 답변을 받을 수 있습니다.',
     stages: withFinalStage(message.stages, {
       name: '응답 중단',
-      detail: '대화창이 닫혀 답변 수신을 멈췄습니다.',
+      detail: isUserStopped
+        ? '요청에 따라 답변 수신을 멈췄습니다. 일부 내용은 완성되지 않았을 수 있습니다.'
+        : '대화창이 닫혀 답변 수신을 멈췄습니다. 일부 내용은 완성되지 않았을 수 있습니다.',
     }),
     isStreaming: false,
+    responseStatus: 'interrupted',
   }));
 }
 
@@ -59,9 +67,10 @@ export function failAgentMessage(
 ) {
   return updateAgentMessage(messages, messageId, message => ({
     ...message,
-    content: '지금은 답변을 이어갈 수 없어요. 잠시 뒤 다시 물어봐 주세요.',
+    content: message.content || '지금은 답변을 이어갈 수 없어요. 잠시 뒤 다시 물어봐 주세요.',
     stages: withFinalStage(message.stages, { name: '연결 확인', detail }),
     isStreaming: false,
+    responseStatus: 'error',
   }));
 }
 

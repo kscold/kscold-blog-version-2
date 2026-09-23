@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import FloatingChatButton from './FloatingChatButton';
+import { getAgentEntryQuestion } from '@/features/chat';
 
 const ChatModal = dynamic(() => import('./ChatModal'), { ssr: false });
 
@@ -14,11 +15,13 @@ export default function FloatingChat() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isVaultPage = pathname.startsWith('/vault');
+  const initialQuestion = getAgentEntryQuestion(searchParams.get('agentTopic'));
 
   useEffect(() => {
-    if (searchParams.get('chat') === 'open') {
+    const shouldOpen = searchParams.get('chat') === 'open';
+    setIsOpen(shouldOpen);
+    if (shouldOpen) {
       setShouldLoadModal(true);
-      setIsOpen(true);
     }
   }, [searchParams]);
 
@@ -29,6 +32,7 @@ export default function FloatingChat() {
 
     const next = new URLSearchParams(searchParams.toString());
     next.delete('chat');
+    next.delete('agentTopic');
     const query = next.toString();
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
@@ -61,7 +65,7 @@ export default function FloatingChat() {
         <FloatingChatButton onClick={handleOpen} unreadCount={0} />
       </div>
       {shouldLoadModal && (
-        <ChatModal isOpen={isOpen} isElevated={isVaultPage} onClose={handleClose} />
+        <ChatModal isOpen={isOpen} isElevated={isVaultPage} onClose={handleClose} initialQuestion={initialQuestion} />
       )}
     </>
   );

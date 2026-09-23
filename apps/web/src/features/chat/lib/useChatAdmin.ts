@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { applyAdminSocketEvent, mergeRestRooms, patchRoom, type Rooms } from '@/entities/chat';
 import type { AdminMessage } from '@/entities/chat';
