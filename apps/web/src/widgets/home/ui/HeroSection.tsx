@@ -1,117 +1,134 @@
 import Link from 'next/link';
+import { HeroClock } from './HeroClock';
+import { HeroLogo } from './HeroLogo';
 
-export function HeroSection() {
+// 흐르는 곡선. 가운데 로고 쪽으로 모였다가 퍼지게 그린다.
+const FLOW_LINES = Array.from({ length: 8 }, (_, index) => {
+  const offset = index * 46;
+  return `M -80 ${120 + offset} C 320 ${40 + offset * 0.6}, 760 ${620 - offset * 0.9}, 1280 ${260 + offset * 0.7}`;
+});
+
+/** 배경: 기존 도트 그리드 위에 흐르는 곡선과 옅은 스카이·시안 빛을 깐다. 전부 CSS/SVG 라 가볍다. */
+function HeroBackdrop() {
   return (
-    <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
-      {/* 에디토리얼 무드의 미세 도트 그리드 — 순수 CSS라 성능 부담 없음 */}
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none opacity-[0.5]"
+        className="absolute inset-0 opacity-50"
         style={{
           backgroundImage: 'radial-gradient(circle, rgb(148 163 184 / 0.22) 1px, transparent 1px)',
           backgroundSize: '28px 28px',
-          maskImage: 'radial-gradient(ellipse 70% 60% at 50% 42%, black 30%, transparent 75%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 42%, black 30%, transparent 75%)',
+          maskImage: 'radial-gradient(ellipse 75% 65% at 55% 45%, black 30%, transparent 78%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 75% 65% at 55% 45%, black 30%, transparent 78%)',
         }}
       />
-      <div
-        className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-8 sm:gap-12 text-center my-12 sm:my-16"
+      <div className="hero-glow absolute left-[57%] top-[45%] h-[44rem] w-[44rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgb(186_230_253/0.55),transparent_62%)]" />
+      <div className="hero-glow-soft absolute left-[70%] top-[62%] h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgb(165_243_252/0.4),transparent_65%)]" />
+      <svg
+        className="hero-flow absolute inset-0 h-full w-full"
+        viewBox="0 0 1200 800"
+        preserveAspectRatio="none"
       >
-        <div className="inline-block">
-          <span className="flex max-w-full items-center gap-1.5 rounded-full border border-surface-200/60 bg-white/60 px-3 py-2.5 text-[10px] font-bold tracking-[0.12em] text-surface-900 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] backdrop-blur-md cursor-default sm:gap-2 sm:px-5 sm:text-xs sm:tracking-[0.2em]">
-            <span
-              className="hero-status-dot w-1.5 h-1.5 rounded-full bg-surface-900 shadow-[0_0_8px_rgba(15,23,42,0.4)]"
-            />
-            AI AGENT · BACKEND · FULL-STACK
-          </span>
-        </div>
+        {FLOW_LINES.map((d, index) => (
+          <path
+            key={index}
+            d={d}
+            fill="none"
+            stroke="#94a3b8"
+            strokeOpacity={0.14 + (index % 3) * 0.06}
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+      </svg>
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-surface-50" />
+    </div>
+  );
+}
 
-        <div className="relative group w-full flex justify-center">
-          <h1
-            className="text-[14vw] md:text-[10vw] lg:text-[8rem] xl:text-[9.5rem] font-sans font-black tracking-tighter leading-none select-none relative z-10 text-surface-900"
+export function HeroSection() {
+  return (
+    <section className="relative isolate flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden px-5 pb-24 pt-6 sm:px-8 sm:pb-10 lg:px-12 lg:pb-10 lg:pt-10">
+      <HeroBackdrop />
+
+      {/* 모서리 라벨 */}
+      <div className="relative z-10 flex items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-[0.24em] text-surface-400">
+        <span>(01) Engineering Journal</span>
+        <span className="hidden md:inline">AI Agent · Backend · Full-stack</span>
+        <HeroClock />
+      </div>
+
+      {/* 입체 로고. 모바일은 글 사이에 자리를 차지하고, 데스크톱은 섹션 전체에 깔린다. */}
+      <div className="relative -mx-5 h-[88vw] max-h-[440px] sm:-mx-8 lg:absolute lg:inset-0 lg:mx-0 lg:h-auto lg:max-h-none">
+        <HeroLogo />
+      </div>
+
+      {/* 가운데 줄: 왼쪽 소개, 오른쪽 스크롤 안내 */}
+      <div className="relative z-10 flex flex-1 items-center justify-between gap-10">
+        <div className="max-w-md">
+          <p className="text-2xl font-bold leading-snug tracking-tight text-surface-900 sm:text-[1.7rem]">
+            지식을 기록하고,
+            <br />
+            연결을 공유합니다.
+          </p>
+          <p
+            data-cy="hero-tagline"
+            className="mt-4 max-w-sm text-sm leading-7 text-surface-500 sm:text-[0.95rem]"
           >
-            <span
-              className="hero-logo-shimmer bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 inline-block px-[0.05em] bg-[size:200%_auto]"
+            러닝커브를 즐기는 개발자, AI Agent부터 서버·웹까지 문제를 서비스로 풀어내는{' '}
+            <Link
+              href="/info"
+              className="font-semibold text-surface-900 underline decoration-primary-200 decoration-2 underline-offset-4 transition-colors hover:decoration-primary-400"
             >
-              KSCOLD
-            </span>
-            <span className="mt-5 block text-xl font-semibold tracking-tight sm:text-2xl">
-              김승찬의 기술 블로그
-            </span>
-          </h1>
-          <div className="hero-logo-glow absolute inset-x-0 top-1/2 -translate-y-1/2 h-full bg-surface-200 blur-[60px] z-0 opacity-0 transition-opacity duration-1000 pointer-events-none" />
-        </div>
-
-        <div className="h-px w-24 bg-gradient-to-r from-transparent via-surface-300 to-transparent mx-auto opacity-70" />
-
-        <p
-          data-cy="hero-tagline"
-          className="mt-6 text-lg sm:text-2xl text-surface-500 font-light max-w-2xl mx-auto leading-relaxed text-balance tracking-tight"
-        >
-          <span className="text-surface-900 font-semibold">러닝커브</span>를 즐기는{' '}
-          <span className="text-surface-900 font-semibold relative after:absolute after:bottom-1 after:left-0 after:w-full after:h-2 after:bg-blue-100 after:-z-10 px-1">
-            개발자
-          </span>
-          ,<br />
-          AI Agent부터 서버·웹까지
-          <br />
-          <span className="text-surface-900 font-semibold relative after:absolute after:bottom-1 after:left-0 after:w-full after:h-2 after:bg-blue-100 after:-z-10 px-1">
-            문제를 서비스로 풀어내는 <Link href="/info">김승찬</Link>
-          </span>
-          입니다.
-        </p>
-
-        <div className="w-[1px] h-[5rem] sm:h-[8rem] bg-gradient-to-b from-surface-200/0 via-surface-300 to-surface-200/0 mx-auto mt-6 sm:mt-12 origin-top" />
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-6 sm:pt-12 pb-12 sm:pb-20 w-full max-w-3xl mx-auto">
-          <Link
-            href="/blog"
-            data-cy="hero-primary-cta"
-            className="group relative flex items-center justify-center w-full sm:w-auto px-10 py-4 bg-surface-900 text-white font-bold rounded-2xl overflow-hidden transition-all duration-300 shadow-[0_8px_20px_-8px_rgba(15,23,42,0.6)] active:scale-95"
-          >
-            <div className="absolute inset-0 bg-surface-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="absolute inset-x-0 top-0 h-px bg-white/20" />
-            <span className="relative z-10 flex items-center justify-center gap-2">
+              김승찬
+            </Link>
+            입니다.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-2.5">
+            <Link
+              href="/blog"
+              data-cy="hero-primary-cta"
+              className="group inline-flex items-center gap-2 rounded-full bg-surface-900 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(15,23,42,0.7)] transition-all hover:bg-surface-800 active:scale-95"
+            >
               블로그 구경하기
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </span>
-          </Link>
-          <Link
-            href="/feed"
-            data-cy="hero-secondary-cta"
-            className="group flex items-center justify-center w-full sm:w-auto px-10 py-4 text-surface-600 bg-white border border-surface-200 hover:border-surface-900 hover:text-surface-900 transition-all duration-300 rounded-2xl hover:shadow-sm active:scale-95"
-          >
-            <span className="font-bold tracking-wide">피드 보기</span>
-          </Link>
-          <Link
-            href="/?chat=open"
-            className="group flex items-center justify-center w-full sm:w-auto px-10 py-4 text-surface-600 bg-white border border-surface-200 hover:border-surface-900 hover:text-surface-900 transition-all duration-300 rounded-2xl hover:shadow-sm active:scale-95"
-          >
-            <span className="font-bold tracking-wide">Agent에게 묻기</span>
-          </Link>
+              <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+                →
+              </span>
+            </Link>
+            <Link
+              href="/feed"
+              data-cy="hero-secondary-cta"
+              className="inline-flex items-center rounded-full border border-surface-200 bg-white/70 px-5 py-2.5 text-sm font-semibold text-surface-600 backdrop-blur-sm transition-all hover:border-surface-900 hover:text-surface-900 active:scale-95"
+            >
+              피드 보기
+            </Link>
+            <Link
+              href="/?chat=open"
+              className="inline-flex items-center rounded-full border border-surface-200 bg-white/70 px-5 py-2.5 text-sm font-semibold text-surface-600 backdrop-blur-sm transition-all hover:border-surface-900 hover:text-surface-900 active:scale-95"
+            >
+              Agent에게 묻기
+            </Link>
+          </div>
         </div>
 
-        {/* 외부 링크 */}
-        <div className="hero-social-links flex items-center justify-center gap-10 pt-12 opacity-80">
-          {[
-            { label: 'Github', href: 'https://github.com/kscold' },
-            { label: 'Instagram', href: 'https://www.instagram.com/ks_cold' },
-            { label: 'Email', href: 'mailto:contact@coldcraft.dev' },
-          ].map(social => (
-            <a
-              key={social.label}
-              href={social.href}
-              target={social.href.startsWith('http') ? '_blank' : undefined}
-              rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              className="text-xs text-surface-500 hover:text-surface-900 transition-all hover:scale-110 uppercase tracking-[0.3em] font-bold relative group"
-            >
-              {social.label}
-              <span className="absolute -bottom-2 left-0 w-full h-[1px] bg-surface-900 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
-            </a>
-          ))}
+        <div className="hidden flex-col items-center gap-4 text-[10px] font-bold uppercase tracking-[0.3em] text-surface-400 lg:flex">
+          <span className="[writing-mode:vertical-rl]">Scroll to dive in</span>
+          <span className="hero-scroll-line h-16 w-px origin-top bg-gradient-to-b from-surface-400 to-transparent" />
         </div>
+      </div>
+
+      {/* 하단 워드마크 */}
+      <div className="relative z-10 mt-10">
+        <h1 className="select-none">
+          <span className="mb-4 block text-xs font-bold tracking-[0.2em] text-surface-500">
+            김승찬의 기술 블로그
+          </span>{' '}
+          <span className="block text-[clamp(4.25rem,16.5vw,16rem)] font-black leading-[0.78] tracking-[-0.065em] text-surface-900">
+            KSCOLD
+            <span aria-hidden="true" className="text-accent">
+              .
+            </span>
+          </span>
+        </h1>
       </div>
     </section>
   );
