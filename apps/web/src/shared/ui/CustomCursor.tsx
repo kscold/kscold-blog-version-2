@@ -23,7 +23,7 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
     const mediaQuery = window.matchMedia(
       '(hover: hover) and (pointer: fine) and (min-width: 768px)'
     );
-    const shouldUseCustomCursor = () => allowRichEffects && mediaQuery.matches;
+    const shouldUseCustomCursor = () => !useHomeContrast && allowRichEffects && mediaQuery.matches;
     let animationFrame: number | null = null;
     let nextPosition = { x: -100, y: -100 };
 
@@ -102,7 +102,7 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
       html.removeEventListener('mouseenter', handleMouseEnter);
       mediaQuery.removeEventListener('change', syncCursorMode);
     };
-  }, [allowRichEffects, cursorX, cursorY]);
+  }, [allowRichEffects, cursorX, cursorY, useHomeContrast]);
 
   if (!isVisible) return null;
 

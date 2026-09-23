@@ -3,6 +3,22 @@ import { mockShellApis } from './support/api';
 
 test.beforeEach(async ({ page }) => { await mockShellApis(page); });
 
+test('홈 장식은 클릭을 가로채지 않고 주요 버튼으로 이동할 수 있다', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  for (const [selector, path] of [
+    ['[data-cy="hero-primary-cta"]', '/blog'],
+    ['[data-cy="hero-secondary-cta"]', '/feed'],
+    ['main a[href="/?chat=open"]', '/?chat=open'],
+  ]) {
+    await page.goto('/');
+    await expect(page.locator('html')).not.toHaveClass(/custom-cursor-active/);
+    const button = page.locator(selector);
+    await expect(button).toBeVisible();
+    await button.click();
+    await expect(page).toHaveURL(url => `${url.pathname}${url.search}` === path);
+  }
+});
+
 test('홈의 소개와 탐색 링크는 서버 HTML에 있고 데스크톱 사이드바는 홈에서만 숨긴다', async ({ page, request }) => {
   const html = await (await request.get('/')).text();
   expect(html).toContain('김승찬의 기술 블로그');

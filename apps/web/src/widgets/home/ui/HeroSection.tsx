@@ -62,7 +62,7 @@ export function HeroSection() {
       </div>
 
       {/* 입체 로고. 모바일은 글 사이에 자리를 차지하고, 데스크톱은 섹션 전체에 깔린다. */}
-      <div className="relative -mx-5 h-[88vw] max-h-[440px] sm:-mx-8 lg:absolute lg:inset-0 lg:mx-0 lg:h-auto lg:max-h-none">
+      <div aria-hidden="true" className="pointer-events-none relative -mx-5 h-[88vw] max-h-[440px] sm:-mx-8 lg:absolute lg:inset-0 lg:mx-0 lg:h-auto lg:max-h-none">
         <HeroLogo />
       </div>
 
