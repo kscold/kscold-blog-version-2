@@ -17,7 +17,7 @@
 .eyebrow { display: flex; align-items: center; gap: theme('spacing.2'); margin-bottom: theme('spacing.6'); color: theme('colors.surface.500'); font-size: theme('fontSize.xs'); font-weight: 500; letter-spacing: .08em; }
 .eyebrow > span { width: theme('spacing.1'); height: theme('spacing.1'); border-radius: 50%; background: theme('colors.accent.DEFAULT'); }
 .title { font-size: clamp(1.75rem, 3.65cqw, 3.25rem); line-height: 1.4; letter-spacing: -.055em; font-weight: 600; white-space: nowrap; }
-.title > span { color: theme('colors.surface.500'); }
+.title > span { color: inherit; }
 .description { margin-top: theme('spacing.6'); color: theme('colors.surface.500'); font-size: theme('fontSize.sm'); line-height: 1.9; word-break: keep-all; }
 .description a { color: theme('colors.surface.800'); text-decoration: underline; text-decoration-color: theme('colors.primary.200'); text-underline-offset: 4px; }
 .mobileBreak { display: none; }
