@@ -24,13 +24,13 @@ function HeroIntroduction() {
     <div className={styles.copy}>
       <p className={styles.eyebrow}><span /> <span><strong>김승찬</strong>의 기술 블로그</span></p>
       <h1 className={styles.title}>
-        지식을 <strong className={styles.recordEmphasis}>기록</strong>하고,<br />
-        <strong className={styles.connectEmphasis}>연결</strong>을 공유합니다.
+        지식을 기록하고,<br />
+        연결을 공유합니다.
       </h1>
       <p data-cy="hero-tagline" className={styles.description}>
-        <strong>러닝커브</strong>를 즐기는 개발자{' '}
+        러닝커브를 즐기는 개발자{' '}
         <Link href="/info">김승찬</Link>입니다.<br />
-        <strong className={styles.agentEmphasis}>AI Agent</strong>부터 <strong>서버·웹</strong>까지,<br className={styles.mobileBreak} /> 문제를 서비스로 풀어냅니다.
+        AI Agent부터 서버·웹까지,<br className={styles.mobileBreak} /> 문제를 서비스로 풀어냅니다.
       </p>
       <div className={styles.actions}>
         <Link href="/blog" data-cy="hero-primary-cta" className={styles.primary}>
