@@ -55,7 +55,7 @@ export function ClientLayout({ children, footer, initialViewer }: ClientLayoutPr
           <FloatingChatWidget />
         </Suspense>
         <AlertToast />
-        <CustomCursor useHomeContrast={pathname === '/'} />
+        <CustomCursor />
       </div>
     </ViewerProvider>
   );

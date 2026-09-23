@@ -6,11 +6,7 @@ import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 const ACTIVE_CURSOR_CLASS = 'custom-cursor-active';
 
-interface CustomCursorProps {
-  useHomeContrast?: boolean;
-}
-
-export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
+export function CustomCursor() {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
   const { allowRichEffects } = usePerformanceMode();
@@ -23,7 +19,7 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
     const mediaQuery = window.matchMedia(
       '(hover: hover) and (pointer: fine) and (min-width: 768px)'
     );
-    const shouldUseCustomCursor = () => !useHomeContrast && allowRichEffects && mediaQuery.matches;
+    const shouldUseCustomCursor = () => allowRichEffects && mediaQuery.matches;
     let animationFrame: number | null = null;
     let nextPosition = { x: -100, y: -100 };
 
@@ -102,15 +98,15 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
       html.removeEventListener('mouseenter', handleMouseEnter);
       mediaQuery.removeEventListener('change', syncCursorMode);
     };
-  }, [allowRichEffects, cursorX, cursorY, useHomeContrast]);
+  }, [allowRichEffects, cursorX, cursorY]);
 
   if (!isVisible) return null;
 
   return (
     <motion.div
-      className={`fixed top-0 left-0 z-[9999] h-[80px] w-[80px] rounded-full pointer-events-none ${
-        useHomeContrast ? 'mix-blend-difference border border-white' : 'mix-blend-difference'
-      }`}
+      data-testid="custom-cursor"
+      aria-hidden="true"
+      className="fixed top-0 left-0 z-[9999] h-[80px] w-[80px] rounded-full pointer-events-none mix-blend-difference"
       style={{
         x: cursorX,
         y: cursorY,
@@ -124,9 +120,7 @@ export function CustomCursor({ useHomeContrast = false }: CustomCursorProps) {
       }}
       animate={{
         scale: isHovering ? 1 : 0.4,
-        backgroundColor: useHomeContrast
-          ? 'rgba(255, 255, 255, 0.04)'
-          : isHovering
+        backgroundColor: isHovering
             ? 'rgba(255, 255, 255, 1)'
             : 'rgba(255, 255, 255, 0.4)',
       }}

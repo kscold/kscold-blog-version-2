@@ -11,7 +11,6 @@ test('홈 장식은 클릭을 가로채지 않고 주요 버튼으로 이동할 
     ['main a[href="/?chat=open"]', '/?chat=open'],
   ]) {
     await page.goto('/');
-    await expect(page.locator('html')).not.toHaveClass(/custom-cursor-active/);
     const button = page.locator(selector);
     await expect(button).toBeVisible();
     await button.click();
