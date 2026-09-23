@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
-import { CountUp } from './CountUp';
 
 interface Stat {
   label: string;
@@ -31,7 +30,7 @@ export function StatsGrid({ stats }: Props) {
           <div className="my-1.5 sm:my-2 flex items-end gap-1">
             {stat.value !== null && stat.value > 0 ? (
               <>
-                <span className="text-2xl sm:text-4xl font-black tabular-nums text-surface-900"><CountUp value={stat.value} /></span>
+                <span className="text-2xl sm:text-4xl font-black tabular-nums text-surface-900">{stat.value.toLocaleString()}</span>
                 {stat.suffix && <span className="mb-0.5 sm:mb-1 text-sm sm:text-lg font-bold text-surface-400">{stat.suffix}</span>}
               </>
             ) : (

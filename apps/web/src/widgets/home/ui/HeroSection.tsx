@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { HeroClock } from './HeroClock';
 import { HeroLogo } from './HeroLogo';
-import { ScrollScene } from './ScrollScene';
 import { HomeArrival } from './HomeArrival';
 import styles from './homeExperience.module.css';
 
@@ -50,7 +49,7 @@ function HeroBackdrop() {
 
 export function HeroSection() {
   return (
-    <ScrollScene className={styles.heroScene}>
+    <div className={styles.heroScene}>
     <section className="relative isolate flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden px-5 pb-24 pt-6 sm:px-8 sm:pb-10 lg:px-12 lg:pb-10 lg:pt-10">
       <HeroBackdrop />
       <HomeArrival />
@@ -116,7 +115,7 @@ export function HeroSection() {
         </div>
 
         <div className="hidden flex-col items-center gap-4 text-[10px] font-bold uppercase tracking-[0.3em] text-surface-400 lg:flex">
-          <span className="[writing-mode:vertical-rl]">Scroll to dive in</span>
+          <span className="[writing-mode:vertical-rl]">Scroll to explore</span>
           <span className="hero-scroll-line h-16 w-px origin-top bg-gradient-to-b from-surface-400 to-transparent" />
         </div>
       </div>
@@ -136,6 +135,6 @@ export function HeroSection() {
         </h1>
       </div>
     </section>
-    </ScrollScene>
+    </div>
   );
 }
