@@ -2,7 +2,7 @@
 
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 declare global {
   interface Window {
@@ -45,9 +45,13 @@ function buildAnalyticsLocation(pathname: string, searchParams: URLSearchParams)
 export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/');
 
-  useEffect(() => {
-    if (!gaId || !window.gtag) return;
+  useLayoutEffect(() => {
+    if (!gaId) return;
+    // 공개 화면에서 이미 로드한 GA도 관리자 페이지에서는 이벤트를 전송하지 않는다.
+    Object.assign(window, { [`ga-disable-${gaId}`]: isAdminPage });
+    if (isAdminPage || !window.gtag) return;
     const { pagePath, pageLocation } = buildAnalyticsLocation(
       pathname,
       new URLSearchParams(searchParams.toString())
@@ -57,9 +61,9 @@ export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
       page_location: pageLocation,
       page_title: document.title,
     });
-  }, [gaId, pathname, searchParams]);
+  }, [gaId, isAdminPage, pathname, searchParams]);
 
-  if (!gaId) return null;
+  if (!gaId || isAdminPage) return null;
 
   return (
     <>
@@ -70,6 +74,7 @@ export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
       <Script id="ga-init" strategy="lazyOnload">
         {`
           window.dataLayer = window.dataLayer || [];
+          window['ga-disable-${gaId}'] = /^\\/admin(?:\\/|$)/.test(window.location.pathname);
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', '${gaId}', { send_page_view: false });

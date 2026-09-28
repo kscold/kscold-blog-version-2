@@ -59,6 +59,13 @@ export function Sidebar() {
       {/* 모바일 네비게이션 링크 */}
       <SidebarMobileNav links={mobileLinks} />
 
+      {role === 'ADMIN' && (
+        <nav aria-label="관리자 메뉴" className="space-y-2 border-b border-surface-200 pb-6">
+          <p className="text-xs font-semibold tracking-wide text-surface-500">ADMIN</p>
+          <a href="/admin/documents" data-cy="admin-documents-sidebar-link" aria-current={pathname === '/admin/documents' ? 'page' : undefined} className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${pathname === '/admin/documents' ? 'bg-surface-900 text-white' : 'text-surface-600 hover:bg-surface-50 hover:text-surface-900'}`}>개인 문서함</a>
+        </nav>
+      )}
+
       <SidebarCategories categories={categories} />
 
       <SidebarTags tags={tags} isLoading={isTagsLoading} />

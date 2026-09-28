@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/api/useAuth';
 import { useAuthStore } from '@/entities/user';
@@ -74,21 +74,31 @@ export function useLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { loginAsync, registerAsync, isLoggingIn, isRegistering, currentUser } = useAuth();
-  const { setUser } = useAuthStore();
+  const hasHydrated = useAuthStore(state => state.hasHydrated);
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState<LoginFormData>(DEFAULT_FORM_DATA);
   const [error, setError] = useState('');
 
-  const isLoading = isLoggingIn || isRegistering;
+  const isLoading = !hasHydrated || isLoggingIn || isRegistering;
   const redirect = useMemo(() => searchParams.get('redirect') || '/admin', [searchParams]);
+  const navigate = useCallback((path: string, replace = false) => {
+    // 개인 문서는 공개 화면에서 로드했던 광고 스크립트와 브라우저 문서를 공유하지 않는다.
+    if (/^\/admin\/documents(?:[/?#]|$)/.test(path)) {
+      if (replace) window.location.replace(path);
+      else window.location.assign(path);
+      return;
+    }
+    if (replace) router.replace(path);
+    else router.push(path);
+  }, [router]);
 
   useEffect(() => {
     if (!currentUser) {
       return;
     }
 
-    router.replace(resolveSafeRedirect(redirect, currentUser.role));
-  }, [currentUser, redirect, router]);
+    navigate(resolveSafeRedirect(redirect, currentUser.role), true);
+  }, [currentUser, redirect, navigate]);
 
   const updateField = <K extends keyof LoginFormData>(key: K, value: LoginFormData[K]) => {
     if (error) {
@@ -108,7 +118,7 @@ export function useLoginForm() {
           password: formData.password,
         });
 
-        router.push(resolveSafeRedirect(redirect, result.user.role));
+        navigate(resolveSafeRedirect(redirect, result.user.role));
         return;
       }
 
@@ -125,7 +135,7 @@ export function useLoginForm() {
         displayName: formData.displayName.trim(),
       });
 
-      router.push(resolveSafeRedirect(redirect, result.user.role));
+      navigate(resolveSafeRedirect(redirect, result.user.role));
     } catch (err) {
       const message = err instanceof Error ? err.message : '로그인에 실패했습니다.';
       setError(message);

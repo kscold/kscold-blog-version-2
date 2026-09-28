@@ -36,6 +36,12 @@ export const scenarioLinks = [
     dataCy: 'admin-qa-scenario-admin-chat',
   },
   {
+    title: '개인 문서함',
+    description: '관리자 전용 이력서 업로드와 비공개 문서 정리를 확인합니다.',
+    href: '/admin/documents',
+    dataCy: 'admin-qa-scenario-admin-documents',
+  },
+  {
     title: '스토리지 관리',
     description: 'MinIO blog 버킷 탐색과 파일 관리 흐름을 확인합니다.',
     href: '/admin/storage',

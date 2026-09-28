@@ -23,6 +23,14 @@ interface DashboardStatsProps {
   recentPosts: Post[];
 }
 
+function QuickActionLink({ action }: { action: QuickAction }) {
+  const className = 'flex min-h-[106px] items-start gap-3 rounded-2xl bg-surface-900 p-4 text-white transition-colors hover:bg-surface-800 group';
+  const content = <><div className="min-w-0 flex-1 space-y-1"><h3 className="text-sm font-bold leading-5">{action.name}</h3><p className="text-xs leading-5 text-surface-400 [overflow-wrap:anywhere]">{action.description}</p></div><svg aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-surface-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg></>;
+  // 개인 문서로 진입할 때 공개 페이지의 외부 스크립트를 이어받지 않는다.
+  if (action.link === '/admin/documents') return <a href={action.link} data-cy={action.dataCy} className={className}>{content}</a>;
+  return <Link href={action.link} data-cy={action.dataCy} className={className}>{content}</Link>;
+}
+
 export function DashboardStats({ stats, quickActions, recentPosts }: DashboardStatsProps) {
   return (
     <>
@@ -60,21 +68,7 @@ export function DashboardStats({ stats, quickActions, recentPosts }: DashboardSt
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 + index * 0.05 }}
             >
-              <Link
-                href={action.link}
-                data-cy={action.dataCy}
-                className="flex min-h-[106px] items-start gap-3 rounded-2xl bg-surface-900 p-4 text-white transition-colors hover:bg-surface-800 group"
-              >
-                <div className="min-w-0 flex-1 space-y-1">
-                  <h3 className="text-sm font-bold leading-5">{action.name}</h3>
-                  <p className="text-xs leading-5 text-surface-400 [overflow-wrap:anywhere]">
-                    {action.description}
-                  </p>
-                </div>
-                <svg className="mt-1 h-4 w-4 shrink-0 text-surface-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
+              <QuickActionLink action={action} />
             </motion.div>
           ))}
         </div>

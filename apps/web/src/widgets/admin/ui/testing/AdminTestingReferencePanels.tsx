@@ -1,5 +1,12 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { commands, scenarioLinks } from '@/widgets/admin/lib/adminTesting';
+
+function ScenarioLink({ link, children }: { link: typeof scenarioLinks[number]; children: ReactNode }) {
+  const className = 'group rounded-2xl border border-surface-200 bg-white p-5 hover:border-surface-300 hover:shadow-sm transition-all';
+  if (link.href === '/admin/documents') return <a href={link.href} data-cy={link.dataCy} className={className}>{children}</a>;
+  return <Link href={link.href} data-cy={link.dataCy} className={className}>{children}</Link>;
+}
 
 export function AdminTestingReferencePanels() {
   return (
@@ -11,11 +18,9 @@ export function AdminTestingReferencePanels() {
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {scenarioLinks.map(link => (
-            <Link
+            <ScenarioLink
               key={link.href}
-              href={link.href}
-              data-cy={link.dataCy}
-              className="group rounded-2xl border border-surface-200 bg-white p-5 hover:border-surface-300 hover:shadow-sm transition-all"
+              link={link}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 space-y-2">
@@ -27,7 +32,7 @@ export function AdminTestingReferencePanels() {
                 </span>
               </div>
               <div className="mt-4 text-xs font-mono text-surface-400">{link.href}</div>
-            </Link>
+            </ScenarioLink>
           ))}
         </div>
       </section>
