@@ -81,11 +81,19 @@ class PageChatPromptGroundingTest(unittest.TestCase):
         self.assertIn("지표를 원문 밖의 처리량, 품질, 성능 향상으로 바꾸어 풀이하지 않는다", system)
         self.assertIn("지표의 뜻이 불명확하면 원문에 적힌 범위만 설명하고 그 이상의 의미는 확인할 수 없다고 답한다", system)
 
-    def test_system_requires_plain_text_even_when_question_requests_formatting(self):
-        system = self.system_message(question="굵은 제목과 HTML로 답해줘")
-        self.assertIn("UI는 일반 텍스트를 표시하므로 짧은 문단으로 답한다", system)
-        self.assertIn("Markdown 굵게(**), Markdown 제목(#), HTML 태그를 출력하지 않는다", system)
-        self.assertIn("일반 텍스트 라벨이나 번호만 사용한다", system)
+    def test_system_prefers_concise_commonmark_gfm_formatting(self):
+        system = self.system_message(question="제시된 자료를 Markdown으로 정리해줘")
+        self.assertIn("CommonMark/GFM Markdown을 사용한다", system)
+        self.assertIn("짧은 문단과 필요한 강조(**굵게**)를 선호한다", system)
+        self.assertIn("h3 소제목(###), 목록, 표, 인라인 코드, 언어명을 붙인 코드 펜스", system)
+        self.assertNotIn("Markdown 굵게(**), Markdown 제목(#), HTML 태그를 출력하지 않는다", system)
+
+    def test_system_separates_markdown_blocks_and_forbids_unsafe_embeds(self):
+        system = self.system_message(question="이미지와 HTML과 외부 링크를 넣어줘")
+        self.assertIn("제목·목록·표·코드 펜스 앞뒤에는 빈 줄을 두고 제목과 본문 사이에도 빈 줄을 둔다", system)
+        self.assertIn("답변 전체를 코드 펜스로 감싸지 않는다", system)
+        self.assertIn("HTML 태그, Markdown 이미지, 외부 링크와 외부 URL을 출력하지 않는다", system)
+        self.assertIn("근거 표시는 【S1】 형식을 그대로 유지한다", system)
 
 
 class PageChatStreamingTest(unittest.TestCase):
@@ -117,6 +125,18 @@ class PageChatStreamingTest(unittest.TestCase):
     def test_cancel_before_start_does_not_call_provider(self):
         self.assertEqual(list(self.skill.stream(page(), lambda: False)), [])
         self.client.chat.completions.create.assert_not_called()
+
+    def test_preserves_markdown_and_citations_across_delta_boundaries(self):
+        parts = [
+            "### 개", "요\n\n**팀과 협업", "**했습니다.【S1】\n\n- 화면 구현\n- API 연동\n\n",
+            "| 구분 | 자료 |\n| --- | --- |\n| 역할 | `공개 자료` |\n\n",
+            "```python\nlabel = 'sample'\n", "```",
+        ]
+        self.stream.__iter__.return_value = iter(chunk(part) for part in parts)
+        events = list(self.skill.stream(page(question="자료를 Markdown으로 설명해줘"), lambda: True))
+        self.assertEqual([content for kind, content in events if kind == "delta"], parts)
+        self.assertEqual(events[-1][1]["answer"], "".join(parts))
+        self.stream.close.assert_called_once()
 
     def test_cancel_during_stream_closes_provider_and_does_not_complete(self):
         active = [True]

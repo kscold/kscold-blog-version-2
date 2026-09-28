@@ -27,7 +27,7 @@ class PageChatInput:
         _bounded(self.path, 160)
         if not re.fullmatch(r"/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*/?", self.path):
             raise ValueError("페이지 경로 형식이 올바르지 않습니다.")
-        if not 1 <= len(self.sections) <= 6:
+        if not 1 <= len(self.sections) <= 7:
             raise ValueError("페이지 자료 개수가 올바르지 않습니다.")
         if len({section.id for section in self.sections}) != len(self.sections):
             raise ValueError("페이지 자료 앵커가 중복됩니다.")
