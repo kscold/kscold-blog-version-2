@@ -7,6 +7,7 @@ from agent.graph.state.vault_chat_state import AgentStage, AgentState
 from agent.graph.workflow.vault_rag_workflow import VaultRagGraph
 from agent.skills.feed_writing.models import ExternalSource, FeedCopilotDraft, FeedCopilotPlan
 from agent.skills.feed_writing.workflow import FeedCopilotGraph
+from agent.skills.page_chat.workflow import PageChatSkill
 from agent.tools.models import ContentAccessScope, SearchHit, SearchOptions
 
 
@@ -16,6 +17,7 @@ class VaultAgentApplication:
     def __init__(self, config: AgentConfig):
         self.rag_graph = VaultRagGraph(config)
         self.feed_writing = FeedCopilotGraph(config, self.rag_graph.store)
+        self.page_chat = PageChatSkill(config.openai_chat_model, self.rag_graph.store.openai)
 
     def chat(
         self,

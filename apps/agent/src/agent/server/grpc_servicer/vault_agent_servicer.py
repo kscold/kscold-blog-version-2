@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import grpc
+
 from agent.application import VaultAgentApplication
 from agent.config import AgentConfig
 from agent.grpc import vault_agent_pb2, vault_agent_pb2_grpc
 from agent.skills.feed_writing.models import ExternalSource
+from agent.skills.page_chat import PageChatInput, PageSection
 from agent.tools.models import ContentAccessScope, SearchHit, SearchOptions
 
 
@@ -67,6 +70,38 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
         return vault_agent_pb2.SearchResponse(
             sources=[self._source_note(hit, request.query) for hit in hits]
         )
+
+    def PageChatStream(self, request, context):
+        data = PageChatInput(
+            question=request.message,
+            title=request.page_context.title,
+            path=request.page_context.path,
+            sections=tuple(PageSection(item.id, item.title, item.content) for item in request.page_context.sections),
+            conversation=tuple((item.role, item.content) for item in request.conversation),
+        )
+        try:
+            yield from self._page_chat_events(data, context)
+        except ValueError:
+            context.abort(grpc.StatusCode.INVALID_ARGUMENT, "페이지 질문 자료 형식이 올바르지 않습니다.")
+        except Exception:
+            if context.is_active():
+                context.abort(grpc.StatusCode.UNAVAILABLE, "페이지 Agent 응답을 완료하지 못했습니다.")
+
+    def _page_chat_events(self, data, context):
+        for event_type, payload in self.application.page_chat.stream(data, context.is_active, context.add_callback):
+            if event_type == "stage":
+                yield vault_agent_pb2.ChatStreamEvent(stage=vault_agent_pb2.AgentStage(**payload))
+            elif event_type == "delta":
+                yield vault_agent_pb2.ChatStreamEvent(delta=payload)
+            elif event_type == "completed":
+                yield vault_agent_pb2.ChatStreamEvent(completed=vault_agent_pb2.ChatCompleted(
+                    answer=payload["answer"],
+                    stages=[vault_agent_pb2.AgentStage(**stage) for stage in payload["stages"]],
+                    sources=[vault_agent_pb2.SourceNote(
+                        id=f"page:{index}", title=section.title, slug=section.id, score=1.0,
+                        type="page", path=f"{data.path}#{section.id}", excerpt=section.content[:220],
+                    ) for index, section in enumerate(data.sections, start=1)],
+                ))
 
     def CreateFeedPlan(self, request, context):
         source = self._external_source(request.external_source)
