@@ -26,14 +26,29 @@ interface ClientLayoutProps {
 export function ClientLayout({ children, footer, initialViewer }: ClientLayoutProps) {
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
+  const isPrivatePdfPage = /^\/admin\/documents\/[^/]+\/view\/?$/.test(pathname);
+
+  // 비공개 문서는 별도 읽기 화면에서 열고, 공개 Agent와 장식 커서는 붙이지 않는다.
+  if (isPrivatePdfPage) {
+    return (
+      <ViewerProvider initialViewer={initialViewer}>
+        {children}
+        <AlertToast />
+      </ViewerProvider>
+    );
+  }
 
   return (
     <ViewerProvider initialViewer={initialViewer}>
-      <div className={`flex flex-col relative z-0 ${isVaultPage ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'}`}>
+      <div
+        className={`flex flex-col relative z-0 ${isVaultPage ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'}`}
+      >
         <PageVisitTracker />
         <ScrollProgress />
         <Header />
-        <div className={`flex flex-1 w-full ${isVaultPage ? 'mt-16 h-[calc(100dvh-4rem)] overflow-hidden' : 'pt-16'}`}>
+        <div
+          className={`flex flex-1 w-full ${isVaultPage ? 'mt-16 h-[calc(100dvh-4rem)] overflow-hidden' : 'pt-16'}`}
+        >
           <Sidebar />
           <main
             className={`flex-1 flex flex-col w-full relative ${

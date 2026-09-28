@@ -1,4 +1,21 @@
 const linkPreviewImagePolicy = require('./src/shared/config/link-preview-images.json');
+require('./scripts/prepare-pdf-assets.cjs')();
+// 개발용 HMR만 eval·웹소켓을 허용하고 운영 문서 화면은 외부 자원을 차단한다.
+const IS_PDF_DEVELOPMENT = process.env.NODE_ENV === 'development';
+const DOCUMENTS_CSP = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${IS_PDF_DEVELOPMENT ? " 'unsafe-eval'" : ''}`,
+  "worker-src 'self' blob:",
+  `connect-src 'self'${IS_PDF_DEVELOPMENT ? ' ws: wss:' : ''}`,
+  "img-src 'self' data: blob:",
+  "font-src 'self' data: blob:",
+  "style-src 'self' 'unsafe-inline'",
+  "object-src 'none'",
+  "frame-src 'none'",
+  "base-uri 'none'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join('; ');
 
 const SITEMAP_CACHE_CONTROL =
   'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
@@ -48,6 +65,14 @@ const nextConfig = {
 
   async headers() {
     return [
+      {
+        source: '/admin/documents/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'private, no-store' },
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+          { key: 'Content-Security-Policy', value: DOCUMENTS_CSP },
+        ],
+      },
       {
         source: '/sitemap.xml',
         headers: [{ key: 'Cache-Control', value: SITEMAP_CACHE_CONTROL }],

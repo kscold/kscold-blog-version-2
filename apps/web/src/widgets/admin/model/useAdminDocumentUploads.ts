@@ -10,7 +10,10 @@ interface StartUploadOptions {
   description: string;
 }
 
-export function useAdminDocumentUploads(onStored: () => void) {
+export function useAdminDocumentUploads(
+  onStored: () => void,
+  fixedCategory?: AdminDocumentCategory
+) {
   const [items, setItems] = useState<DocumentUploadItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
@@ -73,7 +76,11 @@ export function useAdminDocumentUploads(onStored: () => void) {
     try {
       for (const item of pendingItems) {
         if (controller.signal.aborted) break;
-        await uploadItem(item, options, controller.signal);
+        await uploadItem(
+          item,
+          { ...options, category: fixedCategory ?? options.category },
+          controller.signal
+        );
       }
     } finally {
       if (!controller.signal.aborted) {

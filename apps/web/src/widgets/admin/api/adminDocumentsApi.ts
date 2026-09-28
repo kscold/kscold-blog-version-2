@@ -56,6 +56,10 @@ export function deleteAdminDocument(id: string, signal: AbortSignal) {
   return apiClient.delete<null>(`/admin/documents/${encodeURIComponent(id)}`, { signal });
 }
 
+export function fetchAdminDocument(id: string, signal: AbortSignal) {
+  return apiClient.get<AdminDocument>(`/admin/documents/${encodeURIComponent(id)}`, { signal });
+}
+
 export async function verifyAdminDocumentSession(signal: AbortSignal): Promise<User> {
   // 세션 진단 실패를 자동 새로고침·로그인 리다이렉트로 이어 붙이지 않는다.
   const response = await fetch(`${resolveApiBaseUrl()}/auth/me`, {

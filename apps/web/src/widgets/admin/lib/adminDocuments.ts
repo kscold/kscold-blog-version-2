@@ -1,14 +1,18 @@
-import type { AdminDocumentCategory } from '../model/adminDocumentTypes';
+import type { AdminDocument, AdminDocumentCategory } from '../model/adminDocumentTypes';
 
 export const DOCUMENT_CATEGORIES: { value: AdminDocumentCategory; label: string }[] = [
   { value: 'RESUME', label: '이력서' },
-  { value: 'CAREER', label: '경력 자료' },
+  { value: 'CAREER', label: '경력 소스' },
+  { value: 'STORY', label: '스토리' },
   { value: 'PERSONAL', label: '개인 자료' },
   { value: 'OTHER', label: '기타' },
 ];
 
 export const DOCUMENT_MAX_BYTES = 10 * 1024 * 1024;
 export const DOCUMENT_PAGE_SIZE = 12;
+export function isPdfDocument(document: AdminDocument): boolean {
+  return document.fileName.toLowerCase().endsWith('.pdf');
+}
 export const DOCUMENT_ACCEPT =
   '.pdf,.md,.txt,.html,.htm,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.json,.zip,.7z,.png,.jpg,.jpeg,.webp,.gif,.svg,.hwp,.hwpx';
 

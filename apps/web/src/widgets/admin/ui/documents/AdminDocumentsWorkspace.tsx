@@ -3,16 +3,20 @@
 import { useState } from 'react';
 import { useAdminDocuments } from '../../model/useAdminDocuments';
 import { useAdminDocumentUploads } from '../../model/useAdminDocumentUploads';
-import type { AdminDocument, AdminDocumentFilter } from '../../model/adminDocumentTypes';
+import type {
+  AdminDocument,
+  AdminDocumentFilter,
+  AdminDocumentSpaceDetails,
+} from '../../model/adminDocumentTypes';
 import { AdminDocumentEditForm } from './AdminDocumentEditForm';
 import { AdminDocumentsFilter } from './AdminDocumentsFilter';
 import { AdminDocumentsHeader } from './AdminDocumentsHeader';
 import { AdminDocumentsList } from './AdminDocumentsList';
 import { AdminDocumentsUploadPanel } from './AdminDocumentsUploadPanel';
 
-export function AdminDocumentsWorkspace() {
-  const documents = useAdminDocuments();
-  const uploads = useAdminDocumentUploads(documents.refresh);
+export function AdminDocumentsWorkspace({ space }: { space: AdminDocumentSpaceDetails }) {
+  const documents = useAdminDocuments(space.fixedCategory);
+  const uploads = useAdminDocumentUploads(documents.refresh, space.fixedCategory);
   const [editingDocument, setEditingDocument] = useState<AdminDocument | null>(null);
   const isBusy = documents.isMutating || uploads.isUploading;
   function applyFilter(filter: Pick<AdminDocumentFilter, 'category' | 'query'>) {
@@ -30,6 +34,7 @@ export function AdminDocumentsWorkspace() {
       className="mx-auto w-full min-w-0 max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
     >
       <AdminDocumentsHeader
+        space={space}
         disabled={documents.isLoading || isBusy}
         onRefresh={documents.refresh}
       />
@@ -39,9 +44,14 @@ export function AdminDocumentsWorkspace() {
           className="min-w-0 rounded-2xl border border-surface-200 bg-white p-5 sm:p-6"
         >
           <h2 id="document-list-heading" className="mb-5 text-lg font-bold text-surface-900">
-            보관한 문서
+            {space.listHeading}
           </h2>
-          <AdminDocumentsFilter filter={documents.filter} disabled={isBusy} onApply={applyFilter} />
+          <AdminDocumentsFilter
+            filter={documents.filter}
+            disabled={isBusy}
+            fixedCategory={space.fixedCategory}
+            onApply={applyFilter}
+          />
           {editingDocument && (
             <AdminDocumentEditForm
               key={editingDocument.id}
@@ -58,7 +68,11 @@ export function AdminDocumentsWorkspace() {
             disabled={isBusy}
             error={documents.error}
             notice={documents.notice}
-            hasFilter={!!(documents.filter.query || documents.filter.category)}
+            hasFilter={!!(
+              documents.filter.query || (!space.fixedCategory && documents.filter.category)
+            )}
+            emptyDescription={space.uploadGuide}
+            isCategoryLocked={!!space.fixedCategory}
             onRefresh={documents.refresh}
             onEdit={setEditingDocument}
             onDelete={document => {
@@ -70,6 +84,7 @@ export function AdminDocumentsWorkspace() {
           />
         </section>
         <AdminDocumentsUploadPanel
+          space={space}
           items={uploads.items}
           isUploading={uploads.isUploading}
           disabled={documents.isMutating}

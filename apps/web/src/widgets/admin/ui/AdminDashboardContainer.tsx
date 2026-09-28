@@ -54,7 +54,7 @@ export function AdminDashboardContainer() {
     { name: '새 피드 작성', description: '일상 피드를 작성합니다', link: '/admin/feed/new' },
     { name: '새 노트 작성', description: 'Vault 노트를 작성합니다', link: '/admin/vault/new' },
     { name: '채팅 관리', description: '방문자 실시간 채팅을 관리합니다', link: '/admin/chat' },
-    { name: '개인 문서함', description: '비공개 이력서와 경력 자료, 개인 파일을 보관합니다', link: '/admin/documents', dataCy: 'admin-documents-link' },
+    { name: '개인 문서함', description: '이력서·경력 소스·스토리를 각각의 비공개 관리 공간에 보관합니다', link: '/admin/documents', dataCy: 'admin-documents-link' },
     { name: '스토리지 관리', description: 'blog 버킷 파일과 폴더를 관리합니다', link: '/admin/storage', dataCy: 'admin-storage-link' },
     { name: 'Stack Share 알림', description: '공동 구독 분담금을 계산하고 알림톡을 발송합니다', link: '/admin/stack-share' },
     { name: '알림 발송 로그', description: '알림톡·이메일이 실제로 도착했는지 확인합니다', link: '/admin/message-deliveries' },

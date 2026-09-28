@@ -3,16 +3,22 @@
 import { useState } from 'react';
 import Button from '@/shared/ui/Button';
 import Input from '@/shared/ui/Input';
-import type { AdminDocumentFilter } from '../../model/adminDocumentTypes';
+import type { AdminDocumentCategory, AdminDocumentFilter } from '../../model/adminDocumentTypes';
 import { DocumentCategorySelect } from './DocumentCategorySelect';
 
 interface AdminDocumentsFilterProps {
   filter: AdminDocumentFilter;
   disabled: boolean;
+  fixedCategory?: AdminDocumentCategory;
   onApply: (filter: Pick<AdminDocumentFilter, 'category' | 'query'>) => void;
 }
 
-export function AdminDocumentsFilter({ filter, disabled, onApply }: AdminDocumentsFilterProps) {
+export function AdminDocumentsFilter({
+  filter,
+  disabled,
+  fixedCategory,
+  onApply,
+}: AdminDocumentsFilterProps) {
   const [query, setQuery] = useState(filter.query);
   return (
     <form
@@ -62,8 +68,8 @@ export function AdminDocumentsFilter({ filter, disabled, onApply }: AdminDocumen
       <DocumentCategorySelect
         id="document-filter-category"
         value={filter.category}
-        allowAll
-        disabled={disabled}
+        allowAll={!fixedCategory}
+        disabled={disabled || !!fixedCategory}
         onChange={category => onApply({ category, query: filter.query })}
       />
     </form>

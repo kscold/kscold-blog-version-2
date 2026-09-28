@@ -11,6 +11,8 @@ interface AdminDocumentsListProps {
   error: string;
   notice: string;
   hasFilter: boolean;
+  emptyDescription: string;
+  isCategoryLocked: boolean;
   onRefresh: () => void;
   onEdit: (document: AdminDocument) => void;
   onDelete: (document: AdminDocument) => void;
@@ -78,8 +80,10 @@ export function AdminDocumentsList(props: AdminDocumentsListProps) {
             </p>
             <p className="mt-2 text-sm leading-6 text-surface-500">
               {hasFilter
-                ? '검색어나 분류를 변경해 보세요.'
-                : '이력서 PDF와 원본 파일을 함께 올려 보세요.'}
+                ? props.isCategoryLocked
+                  ? '검색어를 바꾸거나 검색을 초기화해 보세요.'
+                  : '검색어나 분류를 변경해 보세요.'
+                : props.emptyDescription}
             </p>
           </div>
         )

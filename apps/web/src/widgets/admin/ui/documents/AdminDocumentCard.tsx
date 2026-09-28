@@ -3,6 +3,7 @@ import {
   documentCategoryLabel,
   formatDocumentDate,
   formatDocumentSize,
+  isPdfDocument,
 } from '../../lib/adminDocuments';
 import type { AdminDocument } from '../../model/adminDocumentTypes';
 
@@ -60,6 +61,15 @@ export function AdminDocumentCard({
         )}
       </dl>
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-surface-100 pt-3">
+        {isPdfDocument(document) && (
+          <a
+            href={`/admin/documents/${encodeURIComponent(document.id)}/view`}
+            className="rounded-lg bg-surface-900 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-surface-700 focus:outline-none focus:ring-2 focus:ring-surface-900 focus:ring-offset-2"
+            data-cy={`admin-document-preview-${document.id}`}
+          >
+            바로 보기
+          </a>
+        )}
         <a
           href={`/api/admin/documents/${encodeURIComponent(document.id)}/download`}
           download={document.fileName}

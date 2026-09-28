@@ -4,3 +4,9 @@
 /playwright-report/
 /blob-report/
 /.next-e2e/
+
+# PDF.js 배포 자산은 설치된 의존성으로 빌드할 때 생성한다.
+/public/pdfjs/
+!/scripts/
+/scripts/*
+!/scripts/prepare-pdf-assets.cjs

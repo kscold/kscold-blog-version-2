@@ -62,7 +62,26 @@ export function Sidebar() {
       {role === 'ADMIN' && (
         <nav aria-label="관리자 메뉴" className="space-y-2 border-b border-surface-200 pb-6">
           <p className="text-xs font-semibold tracking-wide text-surface-500">ADMIN</p>
-          <a href="/admin/documents" data-cy="admin-documents-sidebar-link" aria-current={pathname === '/admin/documents' ? 'page' : undefined} className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${pathname === '/admin/documents' ? 'bg-surface-900 text-white' : 'text-surface-600 hover:bg-surface-50 hover:text-surface-900'}`}>개인 문서함</a>
+          {[
+            { href: '/admin/documents', label: '개인 문서함', key: 'documents' },
+            { href: '/admin/documents/resumes', label: '이력서 관리', key: 'resumes' },
+            { href: '/admin/documents/sources', label: '경력 소스 관리', key: 'sources' },
+            { href: '/admin/documents/stories', label: '스토리 관리', key: 'stories' },
+          ].map(link => (
+            <a
+              key={link.href}
+              href={link.href}
+              data-cy={`admin-${link.key}-sidebar-link`}
+              aria-current={pathname === link.href ? 'page' : undefined}
+              className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                pathname === link.href
+                  ? 'bg-surface-900 text-white'
+                  : 'text-surface-600 hover:bg-surface-50 hover:text-surface-900'
+              }`}
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
       )}
 

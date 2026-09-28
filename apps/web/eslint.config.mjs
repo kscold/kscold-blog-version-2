@@ -21,7 +21,8 @@ export default defineConfig([
           paths: [
             {
               name: '@/widgets/admin',
-              message: '관리자 화면은 라우트별 공개 진입점(@/widgets/admin/<route>)으로 가져오세요.',
+              message:
+                '관리자 화면은 라우트별 공개 진입점(@/widgets/admin/<route>)으로 가져오세요.',
             },
           ],
         },
@@ -37,5 +38,6 @@ export default defineConfig([
     'cypress/screenshots/**',
     'cypress/videos/**',
     'coverage/**',
+    'public/pdfjs/**',
   ]),
 ]);

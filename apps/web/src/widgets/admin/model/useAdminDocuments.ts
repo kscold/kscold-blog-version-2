@@ -9,13 +9,18 @@ import {
 import { documentErrorMessage } from '../lib/adminDocuments';
 import type {
   AdminDocument,
+  AdminDocumentCategory,
   AdminDocumentDetails,
   AdminDocumentFilter,
   AdminDocumentPage,
 } from './adminDocumentTypes';
 
-export function useAdminDocuments() {
-  const [filter, setFilter] = useState<AdminDocumentFilter>({ category: '', query: '', page: 0 });
+export function useAdminDocuments(fixedCategory?: AdminDocumentCategory) {
+  const [filter, setFilter] = useState<AdminDocumentFilter>({
+    category: fixedCategory ?? '',
+    query: '',
+    page: 0,
+  });
   const [listing, setListing] = useState<AdminDocumentPage | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMutating, setIsMutating] = useState(false);
@@ -51,10 +56,13 @@ export function useAdminDocuments() {
 
   useEffect(() => () => mutationController.current?.abort(), []);
 
-  const changeFilter = useCallback((next: Pick<AdminDocumentFilter, 'category' | 'query'>) => {
-    setFilter({ ...next, query: next.query.trim(), page: 0 });
-    setNotice('');
-  }, []);
+  const changeFilter = useCallback(
+    (next: Pick<AdminDocumentFilter, 'category' | 'query'>) => {
+      setFilter({ category: fixedCategory ?? next.category, query: next.query.trim(), page: 0 });
+      setNotice('');
+    },
+    [fixedCategory]
+  );
 
   const changePage = useCallback((page: number) => {
     setFilter(value => ({ ...value, page }));
@@ -84,11 +92,17 @@ export function useAdminDocuments() {
     }
   }
 
-  const saveDocument = (document: AdminDocument, details: AdminDocumentDetails) =>
-    mutate(
+  async function saveDocument(document: AdminDocument, details: AdminDocumentDetails) {
+    const isMovingToAnotherSpace = !!fixedCategory && details.category !== fixedCategory;
+    const saved = await mutate(
       signal => updateAdminDocument(document.id, details, signal),
-      '문서 정보를 저장했습니다.'
+      isMovingToAnotherSpace
+        ? '다른 관리 공간으로 문서를 이동했습니다.'
+        : '문서 정보를 저장했습니다.'
     );
+    if (saved && isMovingToAnotherSpace) setListing(null);
+    return saved;
+  }
 
   async function removeDocument(document: AdminDocument) {
     if (

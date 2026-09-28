@@ -6,7 +6,7 @@ export interface MockPrivateDocument {
   title: string;
   fileName: string;
   description: string;
-  category: 'RESUME' | 'CAREER' | 'PERSONAL' | 'OTHER';
+  category: 'RESUME' | 'CAREER' | 'STORY' | 'PERSONAL' | 'OTHER';
   size: number;
   contentType: string;
   createdAt: string;
@@ -106,6 +106,15 @@ export async function mockPrivateDocuments(page: Page, options: MockDocumentOpti
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(success(null)),
+      });
+      return;
+    }
+    if (method === 'GET' && id) {
+      const document = documents.find(item => item.id === id);
+      await route.fulfill({
+        status: document ? 200 : 404,
+        contentType: 'application/json',
+        body: JSON.stringify(document ? success(document) : failure('문서를 찾을 수 없습니다.')),
       });
       return;
     }

@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 import Button from '@/shared/ui/Button';
-import type { AdminDocumentCategory, DocumentUploadItem } from '../../model/adminDocumentTypes';
+import type {
+  AdminDocumentCategory,
+  AdminDocumentSpaceDetails,
+  DocumentUploadItem,
+} from '../../model/adminDocumentTypes';
 import { DocumentCategorySelect } from './DocumentCategorySelect';
 import { DocumentFileDropzone } from './DocumentFileDropzone';
 import { DocumentUploadResults } from './DocumentUploadResults';
@@ -14,6 +18,7 @@ interface AdminDocumentsUploadPanelProps {
   onFiles: (files: File[]) => void;
   onUpload: (options: { category: AdminDocumentCategory; description: string }) => Promise<void>;
   onClear: () => void;
+  space: AdminDocumentSpaceDetails;
 }
 
 export function AdminDocumentsUploadPanel({
@@ -23,8 +28,9 @@ export function AdminDocumentsUploadPanel({
   onFiles,
   onUpload,
   onClear,
+  space,
 }: AdminDocumentsUploadPanelProps) {
-  const [category, setCategory] = useState<AdminDocumentCategory>('RESUME');
+  const [category, setCategory] = useState<AdminDocumentCategory>(space.fixedCategory ?? 'RESUME');
   const [description, setDescription] = useState('');
   const pendingCount = items.filter(item => item.status === 'queued').length;
   return (
@@ -34,18 +40,18 @@ export function AdminDocumentsUploadPanel({
     >
       <div className="mb-5 space-y-1">
         <h2 id="document-upload-heading" className="text-lg font-bold text-surface-900">
-          원본 파일 업로드
+          {space.uploadHeading}
         </h2>
         <p className="text-xs leading-5 text-surface-500">
-          PDF·Markdown·HTML을 함께 보관해도 좋습니다.
+          {space.uploadGuide}
         </p>
       </div>
       <div className="space-y-5">
         <DocumentFileDropzone disabled={disabled || isUploading} onFiles={onFiles} />
         <DocumentCategorySelect
           id="document-upload-category"
-          value={category}
-          disabled={disabled || isUploading}
+          value={space.fixedCategory ?? category}
+          disabled={disabled || isUploading || !!space.fixedCategory}
           onChange={value => {
             if (value) setCategory(value);
           }}
@@ -64,7 +70,7 @@ export function AdminDocumentsUploadPanel({
             onChange={event => setDescription(event.target.value)}
             maxLength={2000}
             disabled={disabled || isUploading}
-            placeholder="예: 2026년 9월 경력 정리 최종본"
+            placeholder={space.descriptionPlaceholder}
             rows={3}
             className="block w-full resize-y rounded-lg border border-surface-200 bg-white px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900 disabled:opacity-50"
           />
@@ -77,7 +83,12 @@ export function AdminDocumentsUploadPanel({
             className="flex-1"
             isLoading={isUploading}
             disabled={disabled || !pendingCount}
-            onClick={() => void onUpload({ category, description: description.trim() })}
+            onClick={() =>
+              void onUpload({
+                category: space.fixedCategory ?? category,
+                description: description.trim(),
+              })
+            }
             data-cy="admin-documents-upload-submit"
           >
             {isUploading
