@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 
 class PageChatCommandValidationTest {
@@ -17,6 +18,32 @@ class PageChatCommandValidationTest {
     @Test
     void acceptsBoundedPageSourcesWithoutSessionOrIdentity() {
         assertThat(validator.validate(valid())).isEmpty();
+    }
+
+    @Test
+    void acceptsSevenPageSections() {
+        var sections =
+                IntStream.range(0, 7)
+                        .mapToObj(
+                                index ->
+                                        new PageChatCommand.Section(
+                                                "section-" + index, "자료", "공개 내용"))
+                        .toList();
+        var context = new PageChatCommand.PageContext("문서", "/work-sample", sections);
+        assertThat(validator.validate(new PageChatCommand("질문", context, List.of()))).isEmpty();
+    }
+
+    @Test
+    void rejectsEightPageSections() {
+        var sections =
+                IntStream.range(0, 8)
+                        .mapToObj(
+                                index ->
+                                        new PageChatCommand.Section(
+                                                "section-" + index, "자료", "공개 내용"))
+                        .toList();
+        var context = new PageChatCommand.PageContext("문서", "/work-sample", sections);
+        assertThat(validator.validate(new PageChatCommand("질문", context, List.of()))).isNotEmpty();
     }
 
     @Test

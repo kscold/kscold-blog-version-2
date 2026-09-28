@@ -44,7 +44,7 @@ public record PageChatCommand(
                     @Pattern(regexp = "^/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*/?$")
                     @JsonDeserialize(using = StrictPageChatStringDeserializer.class)
                     String path,
-            @NotNull @Size(min = 1, max = 6) List<@NotNull @Valid Section> sections) {
+            @NotNull @Size(min = 1, max = 7) List<@NotNull @Valid Section> sections) {
 
         @AssertTrue(message = "페이지 자료는 전체 16000자 이하여야 합니다.")
         public boolean isContentBounded() {
