@@ -74,6 +74,12 @@ class PageChatPromptGroundingTest(unittest.TestCase):
         system = self.system_message(sections=(source("동료가 제공한 API를 연결해 안내 화면을 구현했다."),))
         self.assertIn("특정 화면이나 기능에서의 팀 분담을 전체 프로젝트나 전체 API의 분담으로 확대하지 않는다", system)
         self.assertIn("역할 설명은 원문에 명시된 화면·기능 범위로 한정한다", system)
+        self.assertIn("역할을 설명하는 문장마다 대상 화면·기능 이름을 함께 적는다", system)
+
+    def test_system_keeps_metric_date_denominator_and_scope_when_summarizing(self):
+        system = self.system_message(sections=(source("특정 시점에 사용 중인 요청의 일부를 전환했다."),))
+        self.assertIn("원문에 기준 시점·분모·대상 범위가 있으면 같은 문장에 함께 적고 요약에서도 생략하지 않는다", system)
+        self.assertIn("약·이상·미만 같은 수치 한정어를 유지하고 범위나 하한을 정확한 단일 수치로 바꾸지 않는다", system)
 
     def test_system_does_not_reinterpret_metrics_as_throughput_quality_or_speed(self):
         system = self.system_message(sections=(source("검증한 입력 사례 수를 기록했다."),), question="이 지표가 처리량과 성능 향상을 뜻해?")
