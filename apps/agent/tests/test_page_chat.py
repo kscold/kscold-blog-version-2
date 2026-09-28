@@ -87,6 +87,12 @@ class PageChatPromptGroundingTest(unittest.TestCase):
         self.assertIn("지표를 원문 밖의 처리량, 품질, 성능 향상으로 바꾸어 풀이하지 않는다", system)
         self.assertIn("지표의 뜻이 불명확하면 원문에 적힌 범위만 설명하고 그 이상의 의미는 확인할 수 없다고 답한다", system)
 
+    def test_system_distinguishes_registered_items_from_executable_items(self):
+        system = self.system_message(sections=(source("등록 항목 중 일부는 실행에서 제외한다."),))
+        self.assertIn("실행 제외 항목을 실행 대상 개수에 더하지 않는다", system)
+        self.assertIn("N개는 전체 등록 수이고 E개만 실행 대상이며 X개는 실행 제외", system)
+        self.assertIn("실행 제외가 특정 상황에서만 적용된다고 추측하지 않는다", system)
+
     def test_system_prefers_concise_commonmark_gfm_formatting(self):
         system = self.system_message(question="제시된 자료를 Markdown으로 정리해줘")
         self.assertIn("CommonMark/GFM Markdown을 사용한다", system)
