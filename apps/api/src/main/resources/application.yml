@@ -26,7 +26,7 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
-      max-request-size: 10MB
+      max-request-size: 12MB
 
 server:
   port: 8081
@@ -69,6 +69,7 @@ minio:
   access-key: ${MINIO_ACCESS_KEY:}
   secret-key: ${MINIO_SECRET_KEY:}
   bucket: ${MINIO_BUCKET:blog}
+  private-documents-bucket: ${MINIO_PRIVATE_DOCUMENTS_BUCKET:blog-private-documents}
   public-url: ${MINIO_PUBLIC_URL:https://bucket.kscold.com}
 
 # 외부 결제·알림 API가 응답하지 않을 때 요청 스레드가 무기한 점유되지 않도록 제한한다.

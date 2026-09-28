@@ -24,6 +24,7 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /** 전역 예외 처리 핸들러 모든 컨트롤러에서 발생하는 예외를 일관된 형식으로 변환하여 응답 */
@@ -67,6 +68,17 @@ public class GlobalExceptionHandler {
         log.warn("InvalidRequestException: code={}", e.getErrorCode().getCode());
         ApiResponse<Void> response = ApiResponse.error(e.getErrorCode().getCode(), e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /** multipart 용량 제한은 서버 장애가 아니라 파일을 줄여 재시도할 수 있는 413 응답이다. */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleMaxUploadSize(
+            MaxUploadSizeExceededException exception) {
+        ApiResponse<Void> response =
+                ApiResponse.error(
+                        ErrorCode.INVALID_INPUT_VALUE.getCode(),
+                        "업로드 용량 제한을 초과했습니다. 파일 크기를 확인해주세요.");
+        return new ResponseEntity<>(response, HttpStatus.PAYLOAD_TOO_LARGE);
     }
 
     /** Validation 예외 처리 (@Valid 실패) DTO 필드 검증 실패 시 발생 */

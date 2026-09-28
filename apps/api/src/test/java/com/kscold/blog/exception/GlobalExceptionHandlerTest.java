@@ -3,6 +3,7 @@ package com.kscold.blog.exception;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Logger;
@@ -28,8 +29,23 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 class GlobalExceptionHandlerTest {
+
+    @Test
+    void oversizedMultipartReturns413WithoutSendingAnErrorNotification() {
+        NotificationUseCase notifications = mock(NotificationUseCase.class);
+        GlobalExceptionHandler handler = new GlobalExceptionHandler(notifications);
+
+        ResponseEntity<ApiResponse<Void>> response =
+                handler.handleMaxUploadSize(new MaxUploadSizeExceededException(10 * 1024 * 1024));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.PAYLOAD_TOO_LARGE);
+        assertThat(response.getBody().getErrorCode())
+                .isEqualTo(ErrorCode.INVALID_INPUT_VALUE.getCode());
+        verifyNoInteractions(notifications);
+    }
 
     @Test
     void convertsRateLimitFailureToTooManyRequests() {
