@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { AgentMarkdown } from '@/shared/ui/AgentMarkdown';
 import { usePageAgent } from '../model/usePageAgent';
 import type { PageContext, PageMessage } from '../model/pageAgentTypes';
 import styles from './PageAgent.module.css';
@@ -15,7 +16,9 @@ function MessageList({ messages, context }: { messages: PageMessage[]; context: 
       {messages.map(message => (
         <article key={message.id} className={message.role === 'user' ? styles.question : styles.answer}>
           <span>{message.role === 'user' ? '질문' : 'KSCOLD PAGE AGENT'}</span>
-          <p>{message.content || '답변을 준비하고 있습니다…'}</p>
+          {message.role === 'assistant' && message.content ? (
+            <AgentMarkdown content={message.content} sectionIds={context.sections.map(section => section.id)} onSourceClick={() => (end.current?.closest('dialog') as HTMLDialogElement | null)?.close()} />
+          ) : <p>{message.content || '답변을 준비하고 있습니다…'}</p>}
           {!!message.sourceIds?.length && <nav aria-label="답변 근거" className={styles.sources}>{context.sections.filter(section => message.sourceIds?.includes(section.id)).map(section => <a key={section.id} href={`#${section.id}`} onClick={() => (end.current?.closest('dialog') as HTMLDialogElement | null)?.close()}>{section.title} ↗</a>)}</nav>}
         </article>
       ))}
@@ -42,7 +45,7 @@ export function PageAgentDialog({ context, onClose }: { context: PageContext; on
   return (
     <dialog ref={dialog} className={styles.dialog} onClose={onClose} aria-labelledby="page-agent-title">
       <div className={styles.panel}>
-        <header><div><span>ON THIS PAGE ONLY</span><h2 id="page-agent-title">포트폴리오에 물어보세요.</h2></div><button type="button" onClick={() => dialog.current?.close()} aria-label="Agent 닫기">×</button></header>
+        <header><div><span>ON THIS PAGE ONLY</span><h2 id="page-agent-title">포트폴리오에 물어보세요</h2></div><button type="button" onClick={() => dialog.current?.close()} aria-label="Agent 닫기">×</button></header>
         <p className={styles.scope}>이 페이지의 공개한 자료만 근거로 답합니다.<br />비공개 경력 원문이나 블로그 Vault는 검색하지 않습니다.</p>
         {!agent.messages.length && <div className={styles.suggestions}><span>이렇게 물어보세요</span>{QUESTIONS.map(question => <button type="button" key={question} onClick={() => void agent.send(question)}>{question} <span aria-hidden="true">↗</span></button>)}</div>}
         <MessageList messages={agent.messages} context={context} />
