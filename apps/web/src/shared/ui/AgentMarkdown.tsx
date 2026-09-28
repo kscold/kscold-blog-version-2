@@ -24,7 +24,7 @@ export function AgentMarkdown({ content, sectionIds, onSourceClick }: AgentMarkd
   return (
     <div className="prose prose-sm min-w-0 max-w-none break-words text-surface-700 prose-headings:font-sans prose-headings:font-semibold prose-headings:text-surface-900 prose-h3:mb-2 prose-h3:mt-5 prose-h3:text-base prose-h4:text-sm prose-p:my-2 prose-p:whitespace-normal prose-p:leading-7 prose-strong:text-surface-900 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-blockquote:border-primary-300 prose-blockquote:bg-primary-50 prose-blockquote:py-1 prose-blockquote:pl-4 prose-blockquote:not-italic prose-code:rounded prose-code:bg-surface-100 prose-code:px-1 prose-code:py-0.5 prose-code:font-mono prose-code:text-surface-800 prose-code:before:content-none prose-code:after:content-none prose-pre:rounded-lg prose-pre:border prose-pre:border-surface-200 prose-pre:bg-surface-50 prose-pre:text-surface-800 prose-hr:border-surface-200 [&>:first-child]:mt-0 [&>:last-child]:mb-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkLooseStrong]}
+        remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkLooseStrong]}
         allowedElements={ALLOWED_ELEMENTS}
         skipHtml
         urlTransform={(url, key) => key === 'href' && isPageAnchor(url, sectionIds) ? url : ''}

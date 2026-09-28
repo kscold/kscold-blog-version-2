@@ -23,6 +23,16 @@ test('답변의 제목·강조·목록·표·인라인 코드·코드 블록을 
   expect(html).toContain('<blockquote>');
 });
 
+test('단일 물결표로 표시한 숫자 범위를 취소선 없이 그대로 유지한다', () => {
+  const html = render('10~20개와 30~40개');
+  expect(html).toContain('<p>10~20개와 30~40개</p>');
+});
+
+test('명시적인 두 물결표 취소선은 유지한다', () => {
+  const html = render('~~취소선~~');
+  expect(html).toContain('<del>취소선</del>');
+});
+
 test('페이지의 실제 앵커만 링크로 남긴다', () => {
   const html = render('[근거](#sample) [없는 근거](#unknown) [외부](https://example.invalid)');
   expect(html).toContain('href="#sample"');
