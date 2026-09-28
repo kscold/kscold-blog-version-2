@@ -14,4 +14,6 @@ public class VaultAgentProperties {
     private String host = "localhost";
     private int port = 9090;
     private long deadlineMillis = 60000;
+    private String pageChatTrustedProxyAddresses = "";
+    private int pageChatDailyRequestLimit = 200;
 }

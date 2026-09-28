@@ -110,6 +110,9 @@ public class SecurityConfig {
                                                 HttpMethod.POST, "/vault/agent/chat/stream")
                                         .permitAll()
                                         .requestMatchers(
+                                                HttpMethod.POST, "/vault/agent/page/chat/stream")
+                                        .permitAll()
+                                        .requestMatchers(
                                                 "/auth/login",
                                                 "/auth/register",
                                                 "/auth/refresh",

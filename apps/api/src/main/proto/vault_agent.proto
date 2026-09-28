@@ -9,6 +9,7 @@ option java_outer_classname = "VaultAgentProto";
 service VaultAgentService {
   rpc Chat(ChatRequest) returns (ChatResponse);
   rpc ChatStream(ChatRequest) returns (stream ChatStreamEvent);
+  rpc PageChatStream(PageChatRequest) returns (stream ChatStreamEvent);
   rpc Search(SearchRequest) returns (SearchResponse);
   rpc CreateFeedPlan(FeedCopilotPlanRequest) returns (FeedCopilotPlanResponse);
   rpc CreateFeedDraft(FeedCopilotDraftRequest) returns (FeedCopilotDraftResponse);
@@ -30,6 +31,29 @@ message ChatRequest {
   string message = 1;
   string active_folder_name = 2;
   ContentAccessScope content_access_scope = 3;
+}
+
+message PageChatRequest {
+  string message = 1;
+  PageContext page_context = 2;
+  repeated PageConversationMessage conversation = 3;
+}
+
+message PageContext {
+  string title = 1;
+  string path = 2;
+  repeated PageSection sections = 3;
+}
+
+message PageSection {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+}
+
+message PageConversationMessage {
+  string role = 1;
+  string content = 2;
 }
 
 message ContentAccessScope {
@@ -57,6 +81,7 @@ message ChatCompleted {
   string answer = 1;
   repeated SourceNote sources = 2;
   repeated string follow_ups = 3;
+  repeated AgentStage stages = 4;
 }
 
 message AgentStage {
