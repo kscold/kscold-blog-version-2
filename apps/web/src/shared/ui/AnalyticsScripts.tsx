@@ -1,8 +1,9 @@
 'use client';
 
 import Script from 'next/script';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams, useParams } from 'next/navigation';
 import { useLayoutEffect } from 'react';
+import { isStandalonePage } from '@/shared/config/standalonePages';
 
 declare global {
   interface Window {
@@ -44,14 +45,16 @@ function buildAnalyticsLocation(pathname: string, searchParams: URLSearchParams)
 
 export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
   const pathname = usePathname();
+  const params = useParams();
   const searchParams = useSearchParams();
   const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/');
+  const isTrackingExcluded = isAdminPage || isStandalonePage(params);
 
   useLayoutEffect(() => {
     if (!gaId) return;
     // 공개 화면에서 이미 로드한 GA도 관리자 페이지에서는 이벤트를 전송하지 않는다.
-    Object.assign(window, { [`ga-disable-${gaId}`]: isAdminPage });
-    if (isAdminPage || !window.gtag) return;
+    Object.assign(window, { [`ga-disable-${gaId}`]: isTrackingExcluded });
+    if (isTrackingExcluded || !window.gtag) return;
     const { pagePath, pageLocation } = buildAnalyticsLocation(
       pathname,
       new URLSearchParams(searchParams.toString())
@@ -61,9 +64,9 @@ export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
       page_location: pageLocation,
       page_title: document.title,
     });
-  }, [gaId, isAdminPage, pathname, searchParams]);
+  }, [gaId, isTrackingExcluded, pathname, searchParams]);
 
-  if (!gaId || isAdminPage) return null;
+  if (!gaId || isTrackingExcluded) return null;
 
   return (
     <>

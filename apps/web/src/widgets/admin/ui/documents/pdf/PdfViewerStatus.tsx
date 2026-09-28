@@ -1,4 +1,5 @@
 import Button from '@/shared/ui/Button';
+import Link from 'next/link';
 
 export function PdfViewerStatus({ error, onRetry }: { error?: string; onRetry?: () => void }) {
   return (
@@ -22,12 +23,13 @@ export function PdfViewerStatus({ error, onRetry }: { error?: string; onRetry?: 
         </Button>
       )}
       {error && (
-        <a
+        <Link
           href="/admin/documents"
+          prefetch={false}
           className="text-sm font-semibold text-surface-900 underline underline-offset-4"
         >
           개인 문서함으로 돌아가기
-        </a>
+        </Link>
       )}
     </div>
   );
