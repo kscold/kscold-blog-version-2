@@ -54,6 +54,40 @@ class PageChatValidationTest(unittest.TestCase):
         self.assertEqual(data["quotedConversation"][0]["roleLabel"], "assistant")
 
 
+class PageChatPromptGroundingTest(unittest.TestCase):
+    def system_message(self, **changes):
+        messages = page_chat_messages(page(**changes))
+        self.assertEqual(messages[0]["role"], "system")
+        self.assertEqual(messages[0]["content"], PAGE_CHAT_SYSTEM)
+        return messages[0]["content"]
+
+    def test_system_disallows_unstated_timeline_and_causal_connections(self):
+        system = self.system_message(sections=(
+            PageSection("alpha", "작업 A", "캐시 동작을 점검했다."),
+            PageSection("beta", "작업 B", "사용자 화면을 정리했다."),
+        ), question="두 작업의 순서와 인과를 설명해줘")
+        self.assertIn("시간순서·선후관계·인과관계는 원문에 명시된 경우에만 설명한다", system)
+        self.assertIn("명시되지 않은 순서나 인과를 연결해 추정하지 않는다", system)
+        self.assertNotIn("캐시 동작을 점검했다", system)
+
+    def test_system_keeps_team_roles_within_named_screen_or_feature(self):
+        system = self.system_message(sections=(source("동료가 제공한 API를 연결해 안내 화면을 구현했다."),))
+        self.assertIn("특정 화면이나 기능에서의 팀 분담을 전체 프로젝트나 전체 API의 분담으로 확대하지 않는다", system)
+        self.assertIn("역할 설명은 원문에 명시된 화면·기능 범위로 한정한다", system)
+
+    def test_system_does_not_reinterpret_metrics_as_throughput_quality_or_speed(self):
+        system = self.system_message(sections=(source("검증한 입력 사례 수를 기록했다."),), question="이 지표가 처리량과 성능 향상을 뜻해?")
+        self.assertIn("지표의 이름·단위·측정 대상·조건을 보존한다", system)
+        self.assertIn("지표를 원문 밖의 처리량, 품질, 성능 향상으로 바꾸어 풀이하지 않는다", system)
+        self.assertIn("지표의 뜻이 불명확하면 원문에 적힌 범위만 설명하고 그 이상의 의미는 확인할 수 없다고 답한다", system)
+
+    def test_system_requires_plain_text_even_when_question_requests_formatting(self):
+        system = self.system_message(question="굵은 제목과 HTML로 답해줘")
+        self.assertIn("UI는 일반 텍스트를 표시하므로 짧은 문단으로 답한다", system)
+        self.assertIn("Markdown 굵게(**), Markdown 제목(#), HTML 태그를 출력하지 않는다", system)
+        self.assertIn("일반 텍스트 라벨이나 번호만 사용한다", system)
+
+
 class PageChatStreamingTest(unittest.TestCase):
     def setUp(self):
         self.provider = MagicMock()
@@ -67,6 +101,7 @@ class PageChatStreamingTest(unittest.TestCase):
         events = list(self.skill.stream(page(), lambda: True))
         self.assertEqual(events[-1][1]["answer"], "팀과 협업했습니다.【S1】")
         kwargs = self.client.chat.completions.create.call_args.kwargs
+        self.assertEqual(kwargs["messages"][0], {"role": "system", "content": PAGE_CHAT_SYSTEM})
         self.assertEqual(kwargs["max_tokens"], 900)
         self.assertEqual(kwargs["timeout"].connect, 5)
         self.assertEqual(kwargs["timeout"].read, 20)
