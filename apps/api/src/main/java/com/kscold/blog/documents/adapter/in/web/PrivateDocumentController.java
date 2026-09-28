@@ -55,6 +55,14 @@ public class PrivateDocumentController {
                                         .map(PrivateDocumentResponse::from)));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<PrivateDocumentResponse>> get(
+            @AuthenticationPrincipal String ownerId, @PathVariable String id) {
+        return ResponseEntity.ok()
+                .headers(privateHeaders())
+                .body(ApiResponse.success(PrivateDocumentResponse.from(useCase.get(ownerId, id))));
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PrivateDocumentResponse>> upload(
             @AuthenticationPrincipal String ownerId,

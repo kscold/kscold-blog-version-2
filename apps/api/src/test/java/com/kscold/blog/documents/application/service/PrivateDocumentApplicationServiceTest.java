@@ -75,6 +75,46 @@ class PrivateDocumentApplicationServiceTest {
     }
 
     @Test
+    void readsOwnedMetadataWithoutOpeningStoredFile() {
+        PrivateDocument expected = document();
+        when(repository.findByIdAndOwnerId(ID, "owner")).thenReturn(Optional.of(expected));
+        assertThat(service.get("owner", ID)).isSameAs(expected);
+        verifyNoInteractions(storage);
+    }
+
+    @Test
+    void cannotReadAnotherOwnersMetadata() {
+        when(repository.findByIdAndOwnerId(ID, "other-owner")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.get("other-owner", ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("문서를 찾을 수 없습니다.");
+        verifyNoInteractions(storage);
+    }
+
+    @Test
+    void missingMetadataUsesSameNotFoundResponse() {
+        when(repository.findByIdAndOwnerId(ID, "owner")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.get("owner", ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("문서를 찾을 수 없습니다.");
+        verifyNoInteractions(storage);
+    }
+
+    @Test
+    void rejectsInvalidMetadataIdBeforeRepositoryAccess() {
+        assertThatThrownBy(() -> service.get("owner", "../private-document"))
+                .isInstanceOf(ResourceNotFoundException.class);
+        verifyNoInteractions(repository, storage);
+    }
+
+    @Test
+    void rejectsAnonymousMetadataReadBeforeRepositoryAccess() {
+        assertThatThrownBy(() -> service.get("anonymousUser", ID))
+                .isInstanceOf(BusinessException.class);
+        verifyNoInteractions(repository, storage);
+    }
+
+    @Test
     void cannotDownloadAnotherOwnersDocument() {
         when(repository.findByIdAndOwnerId(ID, "other-owner")).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.download("other-owner", ID))

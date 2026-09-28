@@ -11,6 +11,8 @@ public interface PrivateDocumentUseCase {
 
     Page<PrivateDocument> search(SearchPrivateDocumentsCommand command);
 
+    PrivateDocument get(String ownerId, String id);
+
     PrivateDocument upload(UploadPrivateDocumentCommand command);
 
     PrivateDocument update(String ownerId, String id, PrivateDocumentMetadata metadata);

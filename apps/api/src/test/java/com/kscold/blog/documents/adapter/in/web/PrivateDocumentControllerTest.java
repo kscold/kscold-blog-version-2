@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.kscold.blog.documents.application.port.in.PrivateDocumentUseCase;
+import com.kscold.blog.documents.domain.model.PrivateDocument;
+import com.kscold.blog.documents.domain.model.PrivateDocumentCategory;
 import com.kscold.blog.documents.domain.model.PrivateDocumentDownload;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,6 +21,28 @@ import org.springframework.http.MediaType;
 class PrivateDocumentControllerTest {
 
     @Mock private PrivateDocumentUseCase useCase;
+
+    @Test
+    void metadataReadReturnsProtectedResponse() {
+        when(useCase.get("owner", "document-id"))
+                .thenReturn(
+                        PrivateDocument.builder()
+                                .id("document-id")
+                                .ownerId("owner")
+                                .objectKey("documents/private-key")
+                                .title("경력 정리")
+                                .fileName("경력 정리.pdf")
+                                .category(PrivateDocumentCategory.RESUME)
+                                .contentType("application/pdf")
+                                .size(3)
+                                .build());
+        var response = new PrivateDocumentController(useCase).get("owner", "document-id");
+        assertThat(response.getBody().getData().getFileName()).isEqualTo("경력 정리.pdf");
+        assertThat(response.getHeaders().getCacheControl()).isEqualTo("no-store");
+        assertThat(response.getHeaders().getPragma()).isEqualTo("no-cache");
+        assertThat(response.getHeaders().getFirst("X-Robots-Tag"))
+                .isEqualTo("noindex, nofollow, noarchive");
+    }
 
     @Test
     void streamsEvenHtmlAsProtectedAttachmentAndClosesResource() throws Exception {

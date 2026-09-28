@@ -24,10 +24,14 @@ import com.kscold.blog.documents.application.dto.UploadPrivateDocumentCommand;
 import com.kscold.blog.documents.application.port.in.PrivateDocumentUseCase;
 import com.kscold.blog.documents.domain.model.PrivateDocument;
 import com.kscold.blog.documents.domain.model.PrivateDocumentCategory;
+import com.kscold.blog.exception.ErrorCode;
+import com.kscold.blog.exception.GlobalExceptionHandler;
+import com.kscold.blog.exception.ResourceNotFoundException;
 import com.kscold.blog.identity.adapter.in.web.CookieCsrfProtectionFilter;
 import com.kscold.blog.identity.adapter.in.web.JwtAuthenticationFilter;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
+import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,6 +110,48 @@ class PrivateDocumentSecurityTest {
     }
 
     @Test
+    void adminMetadataUsesAuthenticatedOwnerAndDoesNotExposeStorageKeys() throws Exception {
+        when(useCase.get("owner-id", ID))
+                .thenReturn(
+                        PrivateDocument.builder()
+                                .id(ID)
+                                .ownerId("owner-id")
+                                .objectKey("documents/private-key")
+                                .title("이력서")
+                                .fileName("이력서.pdf")
+                                .category(PrivateDocumentCategory.RESUME)
+                                .size(3)
+                                .contentType("application/pdf")
+                                .build());
+        mvc.perform(
+                        get("/admin/documents/" + ID)
+                                .param("ownerId", "other-owner")
+                                .with(authentication(principal("ADMIN"))))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(header().string("Pragma", "no-cache"))
+                .andExpect(header().string("X-Robots-Tag", "noindex, nofollow, noarchive"))
+                .andExpect(jsonPath("$.data.id").value(ID))
+                .andExpect(jsonPath("$.data.fileName").value("이력서.pdf"))
+                .andExpect(jsonPath("$.data.contentType").value("application/pdf"))
+                .andExpect(jsonPath("$.data.ownerId").doesNotExist())
+                .andExpect(jsonPath("$.data.objectKey").doesNotExist())
+                .andExpect(jsonPath("$.data.publicUrl").doesNotExist());
+        verify(useCase).get("owner-id", ID);
+    }
+
+    @Test
+    void missingOrUnownedMetadataReturnsNotFound() throws Exception {
+        when(useCase.get("owner-id", ID))
+                .thenThrow(
+                        new ResourceNotFoundException(
+                                ErrorCode.RESOURCE_NOT_FOUND, "문서를 찾을 수 없습니다."));
+        mvc.perform(get("/admin/documents/" + ID).with(authentication(principal("ADMIN"))))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("문서를 찾을 수 없습니다."));
+    }
+
+    @Test
     void multipartBindsCategoryAndExcludesPrivateKeysFromResponse() throws Exception {
         when(useCase.upload(any()))
                 .thenReturn(
@@ -140,6 +186,8 @@ class PrivateDocumentSecurityTest {
         return List.of(
                 get("/admin/documents"),
                 head("/admin/documents"),
+                get("/admin/documents/" + ID),
+                head("/admin/documents/" + ID),
                 get("/admin/documents/" + ID + "/download"),
                 head("/admin/documents/" + ID + "/download"),
                 multipart("/admin/documents").file(file()),
@@ -160,12 +208,17 @@ class PrivateDocumentSecurityTest {
 
     @Configuration
     @EnableWebMvc
-    @Import({SecurityConfig.class, PrivateDocumentController.class})
+    @Import({SecurityConfig.class, PrivateDocumentController.class, GlobalExceptionHandler.class})
     static class TestConfiguration {
 
         @Bean
         PrivateDocumentUseCase useCase() {
             return mock(PrivateDocumentUseCase.class);
+        }
+
+        @Bean
+        NotificationUseCase notificationUseCase() {
+            return mock(NotificationUseCase.class);
         }
 
         @Bean

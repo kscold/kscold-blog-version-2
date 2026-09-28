@@ -49,6 +49,11 @@ public class PrivateDocumentApplicationService implements PrivateDocumentUseCase
     }
 
     @Override
+    public PrivateDocument get(String ownerId, String id) {
+        return getOwnedDocument(ownerId, id);
+    }
+
+    @Override
     public PrivateDocument upload(UploadPrivateDocumentCommand command) {
         String ownerId = requireOwner(command.ownerId());
         PrivateDocumentPolicy.validateFile(command.file());
