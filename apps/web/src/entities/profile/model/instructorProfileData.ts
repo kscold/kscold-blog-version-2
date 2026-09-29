@@ -108,7 +108,7 @@ export const INSTRUCTOR_PROFILE = {
     'OpenAI × 조코딩 × 프라이머 AI 해커톤 본선 진출 (2026)',
     '융합클러스터 2.0 세종DX 해커톤 대상 (2024)',
     'ICT 학점연계 프로젝트 인턴십 우수성과 (2025)',
-    'INHA SW NET-Zero 공동해커톤 AWS 부문 수상 (2024)',
+    'INHA SW NET-Zero 공동해커톤 우수상 (2024)',
   ],
   education: '상명대학교 소프트웨어학과 졸업',
   contacts: {
