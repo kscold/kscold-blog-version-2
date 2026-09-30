@@ -60,9 +60,9 @@ test.describe('어드민 스토리지 시나리오', () => {
     });
 
     await page.goto('/admin');
-    await expect(page.locator('[data-cy="admin-storage-link"]')).toHaveCount(1);
+    await expect(page.locator('[data-cy="admin-storage-link"]:visible')).toHaveCount(1);
 
-    const link = page.locator('[data-cy="admin-storage-link"]');
+    const link = page.locator('[data-cy="admin-storage-link"]:visible');
     await expect(link).toHaveAttribute('href', '/admin/storage');
     await link.click();
     await expect(page).toHaveURL(/\/admin\/storage/);

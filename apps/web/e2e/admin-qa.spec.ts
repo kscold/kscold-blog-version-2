@@ -20,7 +20,7 @@ test.describe('어드민 QA 진입 시나리오', () => {
 
     await page.goto('/admin');
 
-    const qaLink = page.locator('[data-cy="admin-qa-link"]');
+    const qaLink = page.locator('[data-cy="admin-qa-link"]:visible');
     await expect(qaLink).toHaveCount(1);
     await expect(qaLink).toHaveAttribute('href', '/admin/testing');
     await qaLink.click();

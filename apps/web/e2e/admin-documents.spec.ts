@@ -50,7 +50,7 @@ test.describe('관리자 개인 문서함', () => {
       (window as Window & { documentNavigationMarker?: string }).documentNavigationMarker =
         'old-page';
     });
-    const shortcut = page.locator('[data-cy="admin-documents-link"]');
+    const shortcut = page.locator('[data-cy="admin-documents-link"]:visible');
     await expect(shortcut).toHaveCount(1);
     await expect(shortcut).toHaveAttribute('href', '/admin/documents');
     await shortcut.click();
