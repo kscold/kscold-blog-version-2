@@ -236,3 +236,26 @@ test('반복 실행은 이미 정리된 컨테이너를 다시 삭제하지 않�
   assert.deepEqual(report.candidates, []);
   assert.deepEqual(calls, [['rm', 'old']]);
 });
+
+test('무보관 모드는 최근 두 복구본도 삭제하되 운영 컨테이너는 보존함', () => {
+  const { client, calls } = clientWith();
+  const report = runRetention({ client, now: NOW, apply: true, removeAllStopped: true });
+  assert.deepEqual(report.keep, []);
+  assert.deepEqual(calls, [
+    ['rm', 'newest'],
+    ['rm', 'previous'],
+    ['rm', 'old'],
+  ]);
+  assert.deepEqual(
+    client.snapshot().map(item => item.Id),
+    ['active']
+  );
+});
+
+test('무보관 모드도 24시간 유예와 볼륨 보호를 우회하지 않음', () => {
+  const containers = [active(), backup('recent', 1), backup('data')];
+  containers[2].Mounts = [{ Type: 'volume' }];
+  const { client, calls } = clientWith(containers);
+  runRetention({ client, now: NOW, apply: true, removeAllStopped: true });
+  assert.deepEqual(calls, []);
+});

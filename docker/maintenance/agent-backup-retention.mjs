@@ -31,7 +31,7 @@ function isStatelessBackup(container) {
   );
 }
 
-export function planRetention(containers, now = Date.now()) {
+export function planRetention(containers, now = Date.now(), removeAllStopped = false) {
   const active = containers.find(container => container.Name === ACTIVE_NAME);
   const safe =
     active?.Config?.Image?.startsWith(IMAGE_PREFIX) &&
@@ -59,9 +59,9 @@ export function planRetention(containers, now = Date.now()) {
   return {
     active,
     blocked: null,
-    keep: backups.slice(0, KEEP),
+    keep: backups.slice(0, removeAllStopped ? 0 : KEEP),
     remove: backups
-      .slice(KEEP)
+      .slice(removeAllStopped ? 0 : KEEP)
       .filter(container => elapsed(container.State.FinishedAt, now) >= MIN_AGE_MS),
   };
 }
@@ -135,10 +135,11 @@ export function runRetention({
   client,
   apply = false,
   pruneImages = false,
+  removeAllStopped = false,
   now = Date.now(),
   record = () => {},
 }) {
-  const initial = planRetention(client.snapshot(), now);
+  const initial = planRetention(client.snapshot(), now, removeAllStopped);
   const report = {
     dryRun: !apply,
     blocked: initial.blocked,
@@ -151,7 +152,7 @@ export function runRetention({
   const images = new Set();
   for (const candidate of initial.remove) {
     // 삭제 직전 재조회하며 배포 또는 롤백이 시작되었으면 남은 정리를 중단한다.
-    const current = planRetention(client.snapshot(), now);
+    const current = planRetention(client.snapshot(), now, removeAllStopped);
     if (current.blocked || !sameRuntime(initial.active, current.active)) {
       report.blocked = '운영 Agent 상태가 변경되어 정리 중단';
       return report;
@@ -178,9 +179,9 @@ export function runRetention({
 
 function main() {
   const args = process.argv.slice(2);
-  if (args.some(arg => !['--apply', '--prune-images'].includes(arg))) {
+  if (args.some(arg => !['--apply', '--prune-images', '--remove-all-stopped'].includes(arg))) {
     throw new Error(
-      '사용법: node docker/maintenance/agent-backup-retention.mjs [--apply] [--prune-images]'
+      '사용법: node docker/maintenance/agent-backup-retention.mjs [--apply] [--prune-images] [--remove-all-stopped]'
     );
   }
   const auditDirectory = join(homedir(), '.local/state/kscold-agent-retention');
@@ -197,6 +198,7 @@ function main() {
     client: dockerClient(process.env.DOCKER_BIN),
     apply: args.includes('--apply'),
     pruneImages: args.includes('--prune-images'),
+    removeAllStopped: args.includes('--remove-all-stopped'),
     record,
   });
   console.log(JSON.stringify(report, null, 2));
