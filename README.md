@@ -168,6 +168,28 @@ kscold-blog-version-2/
 
 - `POST /api/media/upload` - 파일 업로드 (ADMIN)
 
+## Agent 백업 자동 정리
+
+Agent의 교체 배포 복구본은 `docker/maintenance/agent-backup-retention.mjs`로 관리합니다.
+기본 실행은 미리보기이며, 실제 적용은 `--apply --prune-images`를 지정합니다.
+
+```bash
+node docker/maintenance/agent-backup-retention.mjs
+node --test docker/maintenance/agent-backup-retention.test.mjs
+node docker/maintenance/agent-backup-retention.mjs --apply --prune-images
+```
+
+- Colima의 운영 Agent가 healthy이고 기동 후 15분이 지났을 때만 정리합니다.
+- 최신 중지 복구본 2개와 중지 후 24시간 미만 백업은 보존합니다.
+- 실행 중이거나 볼륨이 있거나 쓰기 데이터가 1MiB를 초과하는 컨테이너는 건드리지 않습니다.
+- 삭제 직전 상태를 재확인하고 배포/롤백 감지 시 중단합니다. 강제 삭제와 볼륨 삭제는 하지 않습니다.
+- 이미지 정리는 이번에 삭제한 백업의 전용 미사용 이미지에 한정합니다.
+  공유 이미지, 다른 저장소 태그 또는 복수 별칭이 있는 이미지는 보존합니다.
+- `~/.local/state/kscold-agent-retention/audit.jsonl`에는 키 값 없이 ID와 정리 결과만 기록합니다.
+- 운영 Mac의 하루 간격 자동 실행 설정은 `docker/com.kscold.agent-backup-retention.plist`입니다.
+  LaunchAgents에 설치할 때 로그 디렉터리를 먼저 생성하고 Node 절대 경로를 확인해야 합니다.
+  중지는 `launchctl bootout gui/$(id -u)/com.kscold.agent-backup-retention`으로 합니다.
+
 ## 라이선스
 
 이 프로젝트는 MIT 라이선스가 아닙니다.  

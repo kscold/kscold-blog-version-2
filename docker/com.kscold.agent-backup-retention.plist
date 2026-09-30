@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.kscold.agent-backup-retention</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/kscold/.nvm/versions/node/v25.6.0/bin/node</string>
+    <string>/Users/kscold/Desktop/kscold-blog-version-2/docker/maintenance/agent-backup-retention.mjs</string>
+    <string>--apply</string>
+    <string>--prune-images</string>
+  </array>
+  <key>StartInterval</key><integer>86400</integer>
+  <key>ProcessType</key><string>Background</string>
+  <key>EnvironmentVariables</key>
+  <dict><key>HOME</key><string>/Users/kscold</string></dict>
+  <key>StandardOutPath</key><string>/Users/kscold/.local/state/kscold-agent-retention/launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/kscold/.local/state/kscold-agent-retention/launchd.error.log</string>
+</dict>
+</plist>

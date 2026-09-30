@@ -1,0 +1,23 @@
+name: Agent Backup Retention CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docker/maintenance/agent-backup-retention*'
+      - 'docker/com.kscold.agent-backup-retention.plist'
+      - '.github/workflows/agent-retention-ci.yml'
+  pull_request:
+    paths:
+      - 'docker/maintenance/agent-backup-retention*'
+      - 'docker/com.kscold.agent-backup-retention.plist'
+      - '.github/workflows/agent-retention-ci.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Agent 백업 정리 안전장치 테스트
+        run: node --test docker/maintenance/agent-backup-retention.test.mjs
