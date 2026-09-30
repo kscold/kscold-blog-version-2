@@ -149,7 +149,7 @@ test.describe('어드민 라이브 스모크', () => {
     await page.screenshot({ path: `${SHOT_DIR}/01-dashboard.png` });
 
     await page.goto('/admin/posts');
-    await expect(page.getByText('포스트 관리')).toBeVisible();
+    await expect(page.getByRole('heading', { name: '포스트 관리' })).toBeVisible();
     await page.screenshot({ path: `${SHOT_DIR}/02-posts.png` });
 
     await page.goto('/admin/categories');
@@ -157,11 +157,12 @@ test.describe('어드민 라이브 스모크', () => {
     await page.screenshot({ path: `${SHOT_DIR}/03-categories.png` });
 
     await page.goto('/admin/chat');
+    await expect(page.getByText('방문자 채팅')).toHaveCount(1);
     await expect(page.getByText('방문자 채팅')).toBeVisible();
     await page.screenshot({ path: `${SHOT_DIR}/04-chat.png` });
 
     await page.goto('/admin/testing');
-    await expect(page.getByText('QA / E2E')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'QA / E2E' })).toBeVisible();
     await page.screenshot({ path: `${SHOT_DIR}/05-testing.png` });
 
     await page.goto('/admin/access-requests');

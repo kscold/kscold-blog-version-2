@@ -22,6 +22,8 @@ test.describe('피드 에디터 반응형 시나리오', () => {
       await page.goto('/admin/feed/new');
       await page.reload();
 
+      // 스트리밍된 SSR 임시 복제본이 제거된 뒤 실제 편집기를 조작한다.
+      await expect(page.locator('[data-cy="feed-editor-surface"]')).toHaveCount(1);
       await expect(page.locator('[data-cy="feed-editor-surface"]')).toBeVisible();
       const content = page.locator('[data-cy="feed-editor-content"]');
       const submitButton = page.locator('[data-cy="feed-editor-submit"]');

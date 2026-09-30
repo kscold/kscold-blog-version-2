@@ -51,6 +51,7 @@ test.describe('관리자 개인 문서함', () => {
         'old-page';
     });
     const shortcut = page.locator('[data-cy="admin-documents-link"]');
+    await expect(shortcut).toHaveCount(1);
     await expect(shortcut).toHaveAttribute('href', '/admin/documents');
     await shortcut.click();
     await expect(page).toHaveURL(/\/admin\/documents$/);

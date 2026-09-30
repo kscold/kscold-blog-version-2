@@ -89,11 +89,13 @@ jobs:
         run: |
           node apps/web/e2e/support/build-api-stub.mjs &
           stub_pid=$!
-          pnpm --dir apps/web exec next start -p 3101 &
+          pnpm --dir apps/web exec next start --hostname 127.0.0.1 -p 3102 &
           web_pid=$!
-          trap 'kill "${web_pid}" "${stub_pid}"' EXIT
+          node apps/web/e2e/support/ci-web-proxy.mjs &
+          proxy_pid=$!
+          trap 'kill "${proxy_pid}" "${web_pid}" "${stub_pid}"' EXIT
           for attempt in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:4100/api/health >/dev/null \
+            if curl --fail --silent http://127.0.0.1:3101/api/health >/dev/null \
               && curl --fail --silent http://127.0.0.1:3101/ >/dev/null; then
               break
             fi

@@ -21,6 +21,7 @@ test.describe('어드민 QA 진입 시나리오', () => {
     await page.goto('/admin');
 
     const qaLink = page.locator('[data-cy="admin-qa-link"]');
+    await expect(qaLink).toHaveCount(1);
     await expect(qaLink).toHaveAttribute('href', '/admin/testing');
     await qaLink.click();
 
@@ -35,6 +36,7 @@ test.describe('어드민 QA 진입 시나리오', () => {
 
     await page.goto('/admin/testing');
 
+    await expect(page.locator('[data-cy="admin-qa-page"]')).toHaveCount(1);
     await expect(page.locator('[data-cy="admin-qa-scenario-home"]')).toHaveAttribute('href', '/');
     await expect(page.locator('[data-cy="admin-qa-scenario-guestbook"]')).toHaveAttribute(
       'href',

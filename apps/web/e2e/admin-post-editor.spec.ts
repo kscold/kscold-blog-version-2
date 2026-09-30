@@ -29,6 +29,7 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto('/admin/posts/new');
 
+      await expect(page.locator('[data-cy="post-editor-surface"]')).toHaveCount(1);
       await expect(page.locator('[data-cy="post-editor-surface"]')).toBeVisible();
       await expect(page.locator('[data-cy="post-editor-cover"]')).toBeVisible();
       await expect(page.locator('[data-cy="post-editor-title"]')).toBeVisible();
@@ -54,6 +55,7 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/admin/posts/new');
 
+    await expect(page.locator('[data-cy="post-editor-surface"]')).toHaveCount(1);
     await page.locator('[data-cy="post-editor-category"]').selectOption('cat-1');
     await expect(page.getByText('현재 제한 카테고리라서 기본적으로 열람 요청이 필요합니다.')).toBeVisible();
     await page.locator('[data-cy="post-editor-public-override"]').check({ force: true });

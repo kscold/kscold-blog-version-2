@@ -60,6 +60,7 @@ test.describe('어드민 스토리지 시나리오', () => {
     });
 
     await page.goto('/admin');
+    await expect(page.locator('[data-cy="admin-storage-link"]')).toHaveCount(1);
 
     const link = page.locator('[data-cy="admin-storage-link"]');
     await expect(link).toHaveAttribute('href', '/admin/storage');
@@ -123,11 +124,13 @@ test.describe('어드민 스토리지 시나리오', () => {
     });
 
     await page.goto('/admin/storage');
+    await expect(page.locator('[data-cy="admin-storage-page"]')).toHaveCount(1);
 
     await page.locator('[data-cy="admin-storage-folder-images"]').click();
     await expect(page.getByText('logo.png').first()).toBeVisible();
 
     await page.goto('/admin/storage');
+    await expect(page.locator('[data-cy="admin-storage-page"]')).toHaveCount(1);
 
     await page.locator('[data-cy="admin-storage-folder-input"]').fill('banners');
     await page.locator('[data-cy="admin-storage-folder-submit"]').click();
