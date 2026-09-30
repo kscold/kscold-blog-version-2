@@ -147,7 +147,9 @@ async function fetchSeoApi<T>(
   missingStatuses: readonly number[]
 ): Promise<T | null> {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  const requestUrl = `${API_BASE_URL}${normalizedPath}`;
+  // 서버의 내부 API 주소를 브라우저 공개 주소 및 문서 CSP와 분리한다.
+  const apiBaseUrl = process.env.API_INTERNAL_URL || API_BASE_URL;
+  const requestUrl = `${apiBaseUrl}${normalizedPath}`;
   let response: Response;
 
   try {
