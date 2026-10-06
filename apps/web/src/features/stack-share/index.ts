@@ -1,4 +1,5 @@
 export {
+  useChangeStackShareSettlementSettled,
   useDeleteStackShareGroup,
   useDeleteStackShareParticipant,
   useSaveStackShareAccount,

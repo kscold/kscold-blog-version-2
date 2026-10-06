@@ -74,3 +74,11 @@ export function useSendStackShareSettlement() {
     },
   });
 }
+
+export function useChangeStackShareSettlementSettled() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: stackShareApi.changeSettlementSettled,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: SETTLEMENTS_KEY }),
+  });
+}

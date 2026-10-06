@@ -96,3 +96,71 @@ test.describe('공동 구독 정산 작성기', () => {
     await expect(page.getByText('2명의 발송 요청을 접수했습니다.')).toBeVisible();
   });
 });
+
+test.describe('공동 구독 정산 기록', () => {
+  test('입금이 끝난 정산을 완료로 표시한다', async ({ page }) => {
+    const settlement = {
+      id: 'settlement-1',
+      toolName: 'OpenAI',
+      billingPeriod: '10월',
+      totalAmount: 20000,
+      dueDate: '10월 10일',
+      accountText: account.displayText,
+      contactText: account.contactText,
+      shareCount: 2,
+      includeOwner: false,
+      ownerAmount: 0,
+      status: 'SENT',
+      sentAt: '2026-10-06T13:22:11',
+      createdAt: '2026-10-06T13:22:10',
+      recipients: participants.map(participant => ({
+        participantId: participant.id,
+        name: participant.name,
+        phoneNumber: participant.phoneNumber,
+        amount: 10000,
+      })),
+    };
+    let settledAt: string | null = null;
+
+    await mockStackShareApis(page);
+    // 완료로 표시한 뒤 목록을 다시 불러오면 바뀐 상태가 내려오도록, 빈 목록 목 위에 덧씌운다.
+    await page.route(/\/api\/admin\/stack-share\/settlements(?:\?|$)/, async route => {
+      if (route.request().method() !== 'GET') {
+        await route.fallback();
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(success([{ ...settlement, settledAt }])),
+      });
+    });
+    await page.route('**/api/admin/stack-share/settlements/settled', async route => {
+      settledAt = '2026-10-06T14:00:00';
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(success({ ...settlement, settledAt })),
+      });
+    });
+    await seedAdminSession(page);
+    await page.goto('/admin/stack-share');
+
+    const history = page.locator('section').filter({
+      has: page.getByRole('heading', { name: '최근 정산 기록' }),
+    });
+    await expect(history.getByText('발송 완료')).toBeVisible();
+    await history.getByText('OpenAI').click();
+
+    const requestPromise = page.waitForRequest(
+      request =>
+        request.method() === 'POST' &&
+        request.url().includes('/api/admin/stack-share/settlements/settled')
+    );
+    await history.getByRole('button', { name: '정산 완료로 표시' }).click();
+
+    expect((await requestPromise).postDataJSON()).toEqual({ id: 'settlement-1', settled: true });
+    await expect(history.getByText('정산 완료', { exact: true })).toBeVisible();
+    await expect(history.getByRole('button', { name: '완료 표시 되돌리기' })).toBeVisible();
+  });
+});

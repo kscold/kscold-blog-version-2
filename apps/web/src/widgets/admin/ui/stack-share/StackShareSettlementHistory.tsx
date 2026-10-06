@@ -1,11 +1,30 @@
 'use client';
 
-import { formatWon, useStackShareSettlements } from '@/features/stack-share';
+import {
+  formatWon,
+  useChangeStackShareSettlementSettled,
+  useStackShareSettlements,
+} from '@/features/stack-share';
+import type { StackShareSettlement } from '@/features/stack-share';
+import Button from '@/shared/ui/Button';
+import { useAlert } from '@/shared/model/alertStore';
 
 const STATUS_LABEL = { DRAFT: '대기', SENT: '발송 완료', FAILED: '발송 실패' } as const;
 
 export function StackShareSettlementHistory() {
+  const alerts = useAlert();
   const settlements = useStackShareSettlements();
+  const changeSettled = useChangeStackShareSettlementSettled();
+
+  const handleSettledChange = async (settlement: StackShareSettlement) => {
+    const settled = !settlement.settledAt;
+    try {
+      await changeSettled.mutateAsync({ id: settlement.id, settled });
+      alerts.success(settled ? '정산 완료로 표시했습니다.' : '정산 완료 표시를 되돌렸습니다.');
+    } catch (error) {
+      alerts.error(error instanceof Error ? error.message : '정산 상태를 바꾸지 못했습니다.');
+    }
+  };
 
   return (
     <section className="rounded-3xl border border-surface-200 bg-white p-6 sm:p-8">
@@ -25,8 +44,13 @@ export function StackShareSettlementHistory() {
                 <strong className="block text-sm text-surface-900">
                   {formatWon(settlement.totalAmount)}
                 </strong>
-                <span className="text-xs text-surface-400">
-                  {STATUS_LABEL[settlement.status]}
+                {/* 입금까지 끝난 정산은 알림톡 발송 상태 대신 완료 여부를 보여준다. */}
+                <span
+                  className={`text-xs ${
+                    settlement.settledAt ? 'font-bold text-emerald-600' : 'text-surface-400'
+                  }`}
+                >
+                  {settlement.settledAt ? '정산 완료' : STATUS_LABEL[settlement.status]}
                 </span>
               </div>
             </summary>
@@ -55,6 +79,21 @@ export function StackShareSettlementHistory() {
                   <strong>{formatWon(recipient.amount)}</strong>
                 </div>
               ))}
+            </div>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-surface-100 pt-4">
+              <p className="text-xs text-surface-500">
+                {settlement.settledAt
+                  ? `${new Date(settlement.settledAt).toLocaleDateString('ko-KR')}에 정산 완료로 표시했습니다.`
+                  : '입금을 모두 확인했다면 정산 완료로 표시해두세요.'}
+              </p>
+              <Button
+                size="sm"
+                variant={settlement.settledAt ? 'minimal' : 'primary'}
+                isLoading={changeSettled.isPending && changeSettled.variables?.id === settlement.id}
+                onClick={() => handleSettledChange(settlement)}
+              >
+                {settlement.settledAt ? '완료 표시 되돌리기' : '정산 완료로 표시'}
+              </Button>
             </div>
           </details>
         ))}

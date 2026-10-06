@@ -87,6 +87,8 @@ export interface StackShareSettlement {
   ownerAmount?: number;
   status: 'DRAFT' | 'SENT' | 'FAILED';
   sentAt?: string;
+  /** 입금까지 끝나 정산 완료로 표시한 시각. 없으면 아직 정산 중 */
+  settledAt?: string;
   createdAt?: string;
   recipients: Array<{
     participantId: string;

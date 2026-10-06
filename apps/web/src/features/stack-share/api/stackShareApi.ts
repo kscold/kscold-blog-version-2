@@ -30,4 +30,6 @@ export const stackShareApi = {
     apiClient.get<StackShareSettlement[]>('/admin/stack-share/settlements'),
   sendSettlement: (payload: StackShareSettlementPayload) =>
     apiClient.post<StackShareSendResult>('/admin/stack-share/settlements/send', payload),
+  changeSettlementSettled: (input: { id: string; settled: boolean }) =>
+    apiClient.post<StackShareSettlement>('/admin/stack-share/settlements/settled', input),
 };
