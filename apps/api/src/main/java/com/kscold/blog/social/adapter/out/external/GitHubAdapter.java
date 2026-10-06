@@ -1,7 +1,5 @@
 package com.kscold.blog.social.adapter.out.external;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.exception.InvalidRequestException;
 import com.kscold.blog.social.domain.model.GitHubContributionDay;
 import com.kscold.blog.social.domain.model.GitHubRepositorySummary;
@@ -20,6 +18,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Component
@@ -39,11 +39,11 @@ public class GitHubAdapter implements GitHubPort {
         try {
             JsonNode root = readJson("https://api.github.com/users/" + username);
             return new GitHubProfileSnapshot(
-                    root.path("login").asText(username),
-                    root.path("name").asText(root.path("login").asText(username)),
-                    root.path("avatar_url").asText(""),
-                    root.path("html_url").asText("https://github.com/" + username),
-                    root.path("bio").asText(""),
+                    root.path("login").asString(username),
+                    root.path("name").asString(root.path("login").asString(username)),
+                    root.path("avatar_url").asString(""),
+                    root.path("html_url").asString("https://github.com/" + username),
+                    root.path("bio").asString(""),
                     root.path("followers").asInt(0),
                     root.path("following").asInt(0),
                     root.path("public_repos").asInt(0));
@@ -115,12 +115,12 @@ public class GitHubAdapter implements GitHubPort {
                     .map(
                             node ->
                                     new GitHubRepositorySummary(
-                                            node.path("name").asText(),
-                                            node.path("html_url").asText(),
-                                            node.path("description").asText(""),
-                                            node.path("language").asText(""),
+                                            node.path("name").asString(""),
+                                            node.path("html_url").asString(""),
+                                            node.path("description").asString(""),
+                                            node.path("language").asString(""),
                                             node.path("stargazers_count").asInt(0),
-                                            node.path("updated_at").asText("")))
+                                            node.path("updated_at").asString("")))
                     .sorted(Comparator.comparingInt(GitHubRepositorySummary::stars).reversed())
                     .limit(3)
                     .toList();

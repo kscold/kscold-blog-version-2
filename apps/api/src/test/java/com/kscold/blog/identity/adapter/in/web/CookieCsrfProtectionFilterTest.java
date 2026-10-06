@@ -2,8 +2,8 @@ package com.kscold.blog.identity.adapter.in.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.config.CorsOriginPolicy;
+import com.kscold.blog.support.TestJson;
 import jakarta.servlet.http.Cookie;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +19,7 @@ class CookieCsrfProtectionFilterTest {
     void setUp() {
         filter =
                 new CookieCsrfProtectionFilter(
-                        new CorsOriginPolicy("https://kscold.com"),
-                        new ObjectMapper().findAndRegisterModules());
+                        new CorsOriginPolicy("https://kscold.com"), TestJson.mapper());
     }
 
     @Test

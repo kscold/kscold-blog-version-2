@@ -2,15 +2,16 @@ package com.kscold.blog.identity.adapter.in.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.identity.application.dto.response.AuthResponse;
 import com.kscold.blog.identity.domain.model.User;
+import com.kscold.blog.support.TestJson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 class AuthSessionResponseTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+    private final ObjectMapper objectMapper = TestJson.mapper();
 
     @Test
     @DisplayName("시나리오: 인증 응답을 직렬화해도 JWT는 본문에 포함되지 않는다")

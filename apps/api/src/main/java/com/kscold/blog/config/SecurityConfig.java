@@ -1,6 +1,5 @@
 package com.kscold.blog.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.identity.adapter.in.web.CookieCsrfProtectionFilter;
 import com.kscold.blog.identity.adapter.in.web.JwtAuthenticationFilter;
@@ -23,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSecurity

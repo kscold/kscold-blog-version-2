@@ -1,7 +1,5 @@
 package com.kscold.blog.vault.agent.adapter.in.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.vault.agent.application.dto.response.AgentStage;
 import com.kscold.blog.vault.agent.application.dto.response.ChatResponse;
 import com.kscold.blog.vault.agent.application.dto.response.SourceNote;
@@ -9,6 +7,8 @@ import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
 import java.io.IOException;
 import java.util.Map;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 final class PageAgentSseWriter {
 
@@ -63,7 +63,7 @@ final class PageAgentSseWriter {
     private void send(String name, Object payload) {
         try {
             emitter.send(SseEmitter.event().name(name).data(mapper.writeValueAsString(payload)));
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             throw new IllegalStateException("페이지 Agent 응답 형식 오류입니다.");
         } catch (IOException exception) {
             throw new IllegalStateException("페이지 Agent 연결이 종료되었습니다.");

@@ -1,6 +1,5 @@
 package com.kscold.blog.vault.agent.adapter.in.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.servlet.FilterChain;
@@ -16,6 +15,7 @@ import java.util.Arrays;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import tools.jackson.databind.ObjectMapper;
 
 /** 청크 전송도 제한하여 JSON 역직렬화 전에 페이지 질문의 메모리 사용을 제한한다. */
 @Component

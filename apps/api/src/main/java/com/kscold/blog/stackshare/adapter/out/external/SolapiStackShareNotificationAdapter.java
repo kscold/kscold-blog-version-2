@@ -1,6 +1,5 @@
 package com.kscold.blog.stackshare.adapter.out.external;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.stackshare.config.SolapiProperties;
@@ -15,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import tools.jackson.databind.JsonNode;
 
 @Slf4j
 @Component
@@ -86,7 +86,7 @@ public class SolapiStackShareNotificationAdapter implements StackShareNotificati
         if (response == null) {
             throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR, "SOLAPI 응답이 비어 있습니다.");
         }
-        String groupId = response.path("groupInfo").path("groupId").asText("");
+        String groupId = response.path("groupInfo").path("groupId").asString("");
         int failedCount = response.path("failedMessageList").size();
         return new StackShareSendResult(groupId, requestedCount, requestedCount - failedCount);
     }

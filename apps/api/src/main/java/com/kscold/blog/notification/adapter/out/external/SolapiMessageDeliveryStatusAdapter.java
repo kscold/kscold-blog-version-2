@@ -1,12 +1,10 @@
 package com.kscold.blog.notification.adapter.out.external;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.kscold.blog.notification.domain.model.MessageDeliveryStatus;
 import com.kscold.blog.notification.domain.port.out.MessageDeliveryStatusPort;
 import com.kscold.blog.stackshare.adapter.out.external.SolapiAuthenticationHeaderFactory;
 import com.kscold.blog.stackshare.config.SolapiProperties;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 솔라피에 실제 도달 상태를 물어보는 어댑터.
@@ -77,21 +76,19 @@ public class SolapiMessageDeliveryStatusAdapter implements MessageDeliveryStatus
         if (response == null) return statuses;
 
         JsonNode messageList = response.path("messageList");
-        Iterator<String> ids = messageList.fieldNames();
-        while (ids.hasNext()) {
-            String messageId = ids.next();
+        for (String messageId : messageList.propertyNames()) {
             JsonNode message = messageList.path(messageId);
             statuses.add(
                     new MessageDeliveryStatus(
                             messageId,
                             groupId,
-                            message.path("to").asText(""),
-                            message.path("statusCode").asText(""),
-                            message.path("status").asText(""),
-                            DELIVERED_CODE.equals(message.path("statusCode").asText("")),
-                            message.path("text").asText(""),
-                            message.path("dateCreated").asText(""),
-                            message.path("dateReceived").asText(""),
+                            message.path("to").asString(""),
+                            message.path("statusCode").asString(""),
+                            message.path("status").asString(""),
+                            DELIVERED_CODE.equals(message.path("statusCode").asString("")),
+                            message.path("text").asString(""),
+                            message.path("dateCreated").asString(""),
+                            message.path("dateReceived").asString(""),
                             toLogLines(message.path("log"))));
         }
         return statuses;
@@ -103,9 +100,9 @@ public class SolapiMessageDeliveryStatusAdapter implements MessageDeliveryStatus
         logNode.forEach(
                 entry ->
                         lines.add(
-                                entry.path("createAt").asText("")
+                                entry.path("createAt").asString("")
                                         + " "
-                                        + entry.path("message").asText("")));
+                                        + entry.path("message").asString("")));
         return lines;
     }
 }

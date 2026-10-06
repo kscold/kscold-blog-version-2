@@ -2,7 +2,7 @@ package com.kscold.blog.config;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.web.client.RestClientCustomizer;
+import org.springframework.boot.restclient.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;

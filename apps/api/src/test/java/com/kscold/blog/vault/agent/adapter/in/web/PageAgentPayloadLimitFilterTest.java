@@ -2,7 +2,7 @@ package com.kscold.blog.vault.agent.adapter.in.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kscold.blog.support.TestJson;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class PageAgentPayloadLimitFilterTest {
                 };
         request.setContent(("mock-private-payload".repeat(6000)).getBytes(StandardCharsets.UTF_8));
         var response = new MockHttpServletResponse();
-        var filter = new PageAgentPayloadLimitFilter(new ObjectMapper().findAndRegisterModules());
+        var filter = new PageAgentPayloadLimitFilter(TestJson.mapper());
         AtomicBoolean invoked = new AtomicBoolean();
         filter.doFilter(request, response, (ignoredRequest, ignoredResponse) -> invoked.set(true));
         assertThat(response.getStatus()).isEqualTo(413);
@@ -36,7 +36,7 @@ class PageAgentPayloadLimitFilterTest {
         var request = new MockHttpServletRequest("POST", "/vault/agent/chat/stream");
         request.setContent("일반 질문".getBytes(StandardCharsets.UTF_8));
         var response = new MockHttpServletResponse();
-        var filter = new PageAgentPayloadLimitFilter(new ObjectMapper());
+        var filter = new PageAgentPayloadLimitFilter(TestJson.mapper());
         AtomicBoolean invoked = new AtomicBoolean();
         filter.doFilter(
                 request,

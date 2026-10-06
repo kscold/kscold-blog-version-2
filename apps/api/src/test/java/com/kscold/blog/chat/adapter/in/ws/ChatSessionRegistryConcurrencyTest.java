@@ -11,10 +11,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
+import com.kscold.blog.support.TestJson;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import tools.jackson.databind.ObjectMapper;
 
 class ChatSessionRegistryConcurrencyTest {
 
@@ -49,7 +50,7 @@ class ChatSessionRegistryConcurrencyTest {
                 .thenAnswer(
                         invocation ->
                                 Optional.ofNullable(currentUsers.get(invocation.getArgument(0))));
-        objectMapper = new ObjectMapper();
+        objectMapper = TestJson.mapper();
         sessionRegistry = new ChatSessionRegistry(userQueryPort);
         handler = new ChatWebSocketHandler(chatUseCase, objectMapper, sessionRegistry);
     }

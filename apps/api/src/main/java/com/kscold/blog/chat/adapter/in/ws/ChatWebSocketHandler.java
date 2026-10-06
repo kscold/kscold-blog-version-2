@@ -1,6 +1,5 @@
 package com.kscold.blog.chat.adapter.in.ws;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.chat.application.model.ChatMessageInputPolicy;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
@@ -19,6 +18,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 방문자·관리자 WebSocket 어댑터. 외부 알림(디스코드)은 직접 호출하지 않고 {@link ChatUseCase}를 통해서만 흐른다(인바운드 어댑터가 아웃바운드 어댑터를

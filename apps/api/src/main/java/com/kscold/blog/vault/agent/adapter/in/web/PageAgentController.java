@@ -1,6 +1,5 @@
 package com.kscold.blog.vault.agent.adapter.in.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.exception.RateLimitExceededException;
 import com.kscold.blog.vault.agent.application.dto.command.PageChatCommand;
 import com.kscold.blog.vault.agent.application.port.in.PageAgentUseCase;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tools.jackson.databind.ObjectMapper;
 
 /** 로그인 상태를 질의 계약에 포함하지 않는 일회성 페이지 Agent 경계다. */
 @RestController

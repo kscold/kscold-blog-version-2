@@ -3,13 +3,15 @@ package com.kscold.blog.vault.agent.application.dto.command;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kscold.blog.support.TestJson;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 class PageChatCommandValidationTest {
 
@@ -131,7 +133,9 @@ class PageChatCommandValidationTest {
     @Test
     void rejectsUnknownFieldsEvenWhenGlobalMapperIgnoresThem() {
         ObjectMapper mapper =
-                new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+                JsonMapper.builderWithJackson2Defaults()
+                        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                        .build();
         String base =
                 "{\"message\":\"질문\",\"pageContext\":{\"title\":\"문서\",\"path\":\"/work-sample\",\"sections\":[{\"id\":\"one\",\"title\":\"자료\",\"content\":\"공개 설명\"}]}}";
         assertThatThrownBy(
@@ -141,7 +145,7 @@ class PageChatCommandValidationTest {
                                                 "\"message\":",
                                                 "\"userId\":\"administrator\",\"message\":"),
                                         PageChatCommand.class))
-                .isInstanceOf(com.fasterxml.jackson.core.JsonProcessingException.class);
+                .isInstanceOf(tools.jackson.core.JacksonException.class);
         assertThatThrownBy(
                         () ->
                                 mapper.readValue(
@@ -149,7 +153,7 @@ class PageChatCommandValidationTest {
                                                 "\"title\":\"문서\"",
                                                 "\"fullContentAccess\":true,\"title\":\"문서\""),
                                         PageChatCommand.class))
-                .isInstanceOf(com.fasterxml.jackson.core.JsonProcessingException.class);
+                .isInstanceOf(tools.jackson.core.JacksonException.class);
         assertThatThrownBy(
                         () ->
                                 mapper.readValue(
@@ -157,7 +161,7 @@ class PageChatCommandValidationTest {
                                                 "\"id\":\"one\"",
                                                 "\"instructions\":\"권한 상승\",\"id\":\"one\""),
                                         PageChatCommand.class))
-                .isInstanceOf(com.fasterxml.jackson.core.JsonProcessingException.class);
+                .isInstanceOf(tools.jackson.core.JacksonException.class);
     }
 
     static PageChatCommand valid() {
@@ -167,7 +171,7 @@ class PageChatCommandValidationTest {
 
     @Test
     void rejectsNumbersAndBooleansInsteadOfCoercingThemToText() {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = TestJson.mapper();
         String base =
                 "{\"message\":\"질문\",\"pageContext\":{\"title\":\"문서\",\"path\":\"/work-sample\",\"sections\":[{\"id\":\"one\",\"title\":\"자료\",\"content\":\"공개 설명\"}]}}";
         assertThatThrownBy(
@@ -175,13 +179,13 @@ class PageChatCommandValidationTest {
                                 mapper.readValue(
                                         base.replace("\"message\":\"질문\"", "\"message\":123"),
                                         PageChatCommand.class))
-                .isInstanceOf(com.fasterxml.jackson.core.JsonProcessingException.class);
+                .isInstanceOf(tools.jackson.core.JacksonException.class);
         assertThatThrownBy(
                         () ->
                                 mapper.readValue(
                                         base.replace("\"title\":\"자료\"", "\"title\":true"),
                                         PageChatCommand.class))
-                .isInstanceOf(com.fasterxml.jackson.core.JsonProcessingException.class);
+                .isInstanceOf(tools.jackson.core.JacksonException.class);
     }
 
     private static PageChatCommand.PageContext context(String path, String content) {

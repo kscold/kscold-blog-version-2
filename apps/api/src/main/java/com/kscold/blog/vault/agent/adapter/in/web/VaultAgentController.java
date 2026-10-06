@@ -1,7 +1,5 @@
 package com.kscold.blog.vault.agent.adapter.in.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.shared.web.ApiResponse;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
@@ -38,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @RestController
@@ -190,7 +190,7 @@ public class VaultAgentController {
                     SseEmitter.event()
                             .name(eventName)
                             .data(objectMapper.writeValueAsString(payload)));
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             throw new IllegalStateException("Vault Agent SSE 응답을 직렬화하지 못했습니다.", exception);
         } catch (IOException exception) {
             throw new IllegalStateException("Vault Agent SSE 연결이 종료되었습니다.", exception);

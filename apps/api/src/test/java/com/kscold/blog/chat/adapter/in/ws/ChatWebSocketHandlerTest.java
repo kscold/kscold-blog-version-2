@@ -13,11 +13,11 @@ import static org.mockito.Mockito.when;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.chat.application.port.in.ChatUseCase;
 import com.kscold.blog.chat.domain.model.ChatMessage;
 import com.kscold.blog.exception.RateLimitExceededException;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
+import com.kscold.blog.support.TestJson;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -52,12 +52,12 @@ class ChatWebSocketHandlerTest {
         when(session.isOpen()).thenReturn(true);
         ChatWebSocketHandler handler =
                 new ChatWebSocketHandler(
-                        chatUseCase, new ObjectMapper(), new ChatSessionRegistry(visitorQuery()));
+                        chatUseCase, TestJson.mapper(), new ChatSessionRegistry(visitorQuery()));
         handler.afterConnectionEstablished(session);
         clearInvocations(chatUseCase);
 
         String payload =
-                new ObjectMapper()
+                TestJson.mapper()
                         .writeValueAsString(Map.of("type", "message", "content", "가".repeat(1001)));
         handler.handleTextMessage(session, new TextMessage(payload));
 
@@ -101,13 +101,12 @@ class ChatWebSocketHandlerTest {
                         anyBoolean());
         ChatWebSocketHandler handler =
                 new ChatWebSocketHandler(
-                        chatUseCase, new ObjectMapper(), new ChatSessionRegistry(visitorQuery()));
+                        chatUseCase, TestJson.mapper(), new ChatSessionRegistry(visitorQuery()));
         handler.afterConnectionEstablished(session);
         clearInvocations(session);
 
         String payload =
-                new ObjectMapper()
-                        .writeValueAsString(Map.of("type", "message", "content", "안녕하세요"));
+                TestJson.mapper().writeValueAsString(Map.of("type", "message", "content", "안녕하세요"));
         handler.handleTextMessage(session, new TextMessage(payload));
 
         verify(session)
@@ -231,9 +230,7 @@ class ChatWebSocketHandlerTest {
                                         new UserQueryPort.AuthenticationInfo(
                                                 invocation.getArgument(0), "관리자", true, 0L)));
         return new ChatWebSocketHandler(
-                mock(ChatUseCase.class),
-                new ObjectMapper(),
-                new ChatSessionRegistry(userQueryPort));
+                mock(ChatUseCase.class), TestJson.mapper(), new ChatSessionRegistry(userQueryPort));
     }
 
     private UserQueryPort visitorQuery() {

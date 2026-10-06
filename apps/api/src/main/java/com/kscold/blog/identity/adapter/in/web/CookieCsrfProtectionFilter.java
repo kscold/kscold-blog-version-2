@@ -1,6 +1,5 @@
 package com.kscold.blog.identity.adapter.in.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.config.CorsOriginPolicy;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -17,6 +16,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor

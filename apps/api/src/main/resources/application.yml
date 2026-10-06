@@ -5,10 +5,23 @@ spring:
   application:
     name: kscold-blog-api
 
+  # Spring Boot 4부터 접속 정보는 spring.mongodb, Spring Data 동작은 spring.data.mongodb 아래에 둔다.
+  mongodb:
+    uri: ${MONGODB_URI:}
+
   data:
     mongodb:
-      uri: ${MONGODB_URI:}
       auto-index-creation: true
+
+  jackson:
+    # Jackson 3로 올린 뒤에도 응답 필드 순서, 원시 타입의 null 허용, enum 표기 같은 기본 동작이
+    # 이전과 달라지지 않도록 Jackson 2 때의 기본값을 유지한다.
+    use-jackson2-defaults: true
+
+  web:
+    error:
+      include-message: never
+      include-binding-errors: never
 
   mail:
     host: ${SMTP_HOST:}
@@ -32,9 +45,6 @@ server:
   port: 8081
   servlet:
     context-path: /api
-  error:
-    include-message: never
-    include-binding-errors: never
 
 github:
   token: ${GITHUB_TOKEN:}

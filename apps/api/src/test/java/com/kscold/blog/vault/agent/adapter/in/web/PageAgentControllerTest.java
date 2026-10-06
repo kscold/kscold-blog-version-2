@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.config.CorsOriginPolicy;
 import com.kscold.blog.config.SecurityConfig;
 import com.kscold.blog.exception.GlobalExceptionHandler;
@@ -28,6 +27,7 @@ import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.domain.model.TokenIdentity;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
+import com.kscold.blog.support.TestJson;
 import com.kscold.blog.vault.agent.application.port.in.PageAgentUseCase;
 import com.kscold.blog.vault.agent.config.VaultAgentProperties;
 import com.kscold.blog.vault.agent.domain.model.AgentChatResult;
@@ -52,6 +52,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import tools.jackson.databind.ObjectMapper;
 
 class PageAgentControllerTest {
     private static final String ENDPOINT = "/vault/agent/page/chat/stream";
@@ -71,9 +72,7 @@ class PageAgentControllerTest {
         mvc =
                 MockMvcBuilders.webAppContextSetup(context)
                         .apply(springSecurity())
-                        .addFilters(
-                                new PageAgentPayloadLimitFilter(
-                                        new ObjectMapper().findAndRegisterModules()))
+                        .addFilters(new PageAgentPayloadLimitFilter(TestJson.mapper()))
                         .build();
         when(useCase.reserve(any())).thenAnswer(ignored -> new PageAgentStreamSession(() -> {}));
         doAnswer(
@@ -216,7 +215,7 @@ class PageAgentControllerTest {
 
         @Bean
         ObjectMapper mapper() {
-            return new ObjectMapper().findAndRegisterModules();
+            return TestJson.mapper();
         }
 
         @Bean

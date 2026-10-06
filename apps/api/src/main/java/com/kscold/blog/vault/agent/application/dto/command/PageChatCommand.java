@@ -1,7 +1,6 @@
 package com.kscold.blog.vault.agent.application.dto.command;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 /** 페이지 자료는 인용할 데이터일 뿐 권한이나 시스템 지시로 사용하지 않는다. */
 public record PageChatCommand(

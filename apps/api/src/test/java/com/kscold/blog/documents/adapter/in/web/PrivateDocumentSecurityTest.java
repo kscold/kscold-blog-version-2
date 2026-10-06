@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.config.CorsOriginPolicy;
 import com.kscold.blog.config.SecurityConfig;
 import com.kscold.blog.documents.application.dto.SearchPrivateDocumentsCommand;
@@ -32,6 +31,7 @@ import com.kscold.blog.identity.adapter.in.web.JwtAuthenticationFilter;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
+import com.kscold.blog.support.TestJson;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,10 +47,11 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import tools.jackson.databind.ObjectMapper;
 
 class PrivateDocumentSecurityTest {
 
@@ -76,7 +77,7 @@ class PrivateDocumentSecurityTest {
 
     @Test
     void anonymousCannotReadOrMutateAnyDocumentEndpoint() throws Exception {
-        for (MockHttpServletRequestBuilder request : protectedRequests()) {
+        for (AbstractMockHttpServletRequestBuilder<?> request : protectedRequests()) {
             mvc.perform(request).andExpect(status().isUnauthorized());
         }
         verifyNoInteractions(useCase);
@@ -84,7 +85,7 @@ class PrivateDocumentSecurityTest {
 
     @Test
     void ordinaryUserCannotReadOrMutateAnyDocumentEndpoint() throws Exception {
-        for (MockHttpServletRequestBuilder request : protectedRequests()) {
+        for (AbstractMockHttpServletRequestBuilder<?> request : protectedRequests()) {
             mvc.perform(request.with(authentication(principal("USER"))))
                     .andExpect(status().isForbidden());
         }
@@ -182,7 +183,7 @@ class PrivateDocumentSecurityTest {
                 .isEqualTo(PrivateDocumentCategory.CAREER);
     }
 
-    private List<MockHttpServletRequestBuilder> protectedRequests() {
+    private List<AbstractMockHttpServletRequestBuilder<?>> protectedRequests() {
         return List.of(
                 get("/admin/documents"),
                 head("/admin/documents"),
@@ -223,7 +224,7 @@ class PrivateDocumentSecurityTest {
 
         @Bean
         ObjectMapper objectMapper() {
-            return new ObjectMapper().findAndRegisterModules();
+            return TestJson.mapper();
         }
 
         @Bean

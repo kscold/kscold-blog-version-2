@@ -1,6 +1,5 @@
 package com.kscold.blog.payment.adapter.out.external;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.kscold.blog.exception.BusinessException;
 import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.payment.config.PortOnePaymentProperties;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import tools.jackson.databind.JsonNode;
 
 @Slf4j
 @Component
@@ -26,10 +26,10 @@ public class PortOnePaymentProviderAdapter implements PortOnePaymentProvider {
         JsonNode payment = fetchPayment(paymentId);
         JsonNode selectedChannel = payment.path("selectedChannel");
         return new PortOnePaymentDetails(
-                payment.path("status").asText(""),
+                payment.path("status").asString(""),
                 resolvePaidAmount(payment),
-                selectedChannel.path("type").asText(""),
-                selectedChannel.path("key").asText(""));
+                selectedChannel.path("type").asString(""),
+                selectedChannel.path("key").asString(""));
     }
 
     private JsonNode fetchPayment(String paymentId) {

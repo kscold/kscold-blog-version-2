@@ -11,8 +11,8 @@ import static org.mockito.Mockito.when;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kscold.blog.shared.web.ClientIdentifierResolver;
+import com.kscold.blog.support.TestJson;
 import com.kscold.blog.vault.agent.application.dto.command.ChatCommand;
 import com.kscold.blog.vault.agent.application.port.in.VaultAgentUseCase;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +37,7 @@ class VaultAgentControllerTest {
         Executor directExecutor = Runnable::run;
         VaultAgentController controller =
                 new VaultAgentController(
-                        useCase, identifierResolver, new ObjectMapper(), directExecutor);
+                        useCase, identifierResolver, TestJson.mapper(), directExecutor);
         Logger logger = (Logger) LoggerFactory.getLogger(VaultAgentController.class);
         ListAppender<ILoggingEvent> appender = new ListAppender<>();
         appender.start();
