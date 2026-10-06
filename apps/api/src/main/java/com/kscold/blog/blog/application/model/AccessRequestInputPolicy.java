@@ -1,7 +1,7 @@
 package com.kscold.blog.blog.application.model;
 
 import com.kscold.blog.exception.InvalidRequestException;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 public final class AccessRequestInputPolicy {

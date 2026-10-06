@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -114,7 +114,7 @@ public class AccessRequestApplicationService implements AccessRequestUseCase {
     }
 
     @Override
-    public AccessRequest approve(String requestId, @Nullable AccessRequest.GrantScope grantScope) {
+    public AccessRequest approve(String requestId, AccessRequest.@Nullable GrantScope grantScope) {
         AccessRequest request =
                 accessRequestRepository
                         .findById(requestId)
@@ -208,7 +208,7 @@ public class AccessRequestApplicationService implements AccessRequestUseCase {
     }
 
     private AccessRequest.GrantScope resolveGrantScope(
-            AccessRequest request, @Nullable AccessRequest.GrantScope requestedScope) {
+            AccessRequest request, AccessRequest.@Nullable GrantScope requestedScope) {
         AccessRequest.GrantScope scope =
                 requestedScope != null ? requestedScope : request.getGrantScope();
         if (scope == null) {

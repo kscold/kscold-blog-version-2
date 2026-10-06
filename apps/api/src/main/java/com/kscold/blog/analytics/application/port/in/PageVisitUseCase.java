@@ -4,7 +4,7 @@ import com.kscold.blog.analytics.domain.model.DailyStat;
 import com.kscold.blog.analytics.domain.model.PathStat;
 import com.kscold.blog.analytics.domain.model.VisitEntry;
 import java.util.List;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /** 페이지 방문 집계 유스케이스 (방문 기록 + 어드민 조회) */
 public interface PageVisitUseCase {

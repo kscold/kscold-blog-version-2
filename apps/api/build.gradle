@@ -53,6 +53,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    // 널 허용 여부 표기(JSpecify). 스프링의 org.springframework.lang 애너테이션을 대체한다.
+    implementation 'org.jspecify:jspecify'
+
     // AWS S3 SDK (MinIO S3 호환)
     implementation 'software.amazon.awssdk:s3:2.54.10'
 

@@ -1,6 +1,6 @@
 package com.kscold.blog.shared.security;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 /** Spring Security의 익명 principal을 실제 사용자 식별자로 오인하지 않도록 정규화한다. */

@@ -10,7 +10,7 @@ import com.kscold.blog.vault.agent.application.dto.response.SourceNote;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
 import java.util.List;
 import java.util.function.Consumer;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface VaultAgentUseCase {
 

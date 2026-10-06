@@ -2,7 +2,7 @@ package com.kscold.blog.blog.application.port.in;
 
 import com.kscold.blog.blog.domain.model.AccessRequest;
 import java.util.List;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface AccessRequestUseCase {
 
@@ -16,7 +16,7 @@ public interface AccessRequestUseCase {
 
     List<AccessRequest> getMyRequests(String userId);
 
-    AccessRequest approve(String requestId, @Nullable AccessRequest.GrantScope grantScope);
+    AccessRequest approve(String requestId, AccessRequest.@Nullable GrantScope grantScope);
 
     AccessRequest reject(String requestId);
 }
