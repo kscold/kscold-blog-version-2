@@ -3,7 +3,7 @@ import { JsonLd } from '@/shared/ui/JsonLd';
 import { FeedPageView } from './FeedPageView';
 
 const FEED_DESCRIPTION =
-  '개발자 김승찬이 AI Agent·서버·웹을 만들며 얻은 생각과 링크, 짧은 작업 기록을 남기는 피드입니다. 새 모델과 도구 소식, 일하면서 배운 점을 가볍게 공유합니다.';
+  '일상, 개발, 그리고 생각의 조각들을 짧은 글과 링크로 남기는 피드입니다. 개발자 김승찬이 AI Agent·서버·웹을 만들며 접한 새 모델과 도구 소식, 일하면서 배운 점을 가볍게 공유합니다.';
 
 export const metadata = buildPageMetadata({
   title: '피드',

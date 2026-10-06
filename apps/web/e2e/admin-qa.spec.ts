@@ -36,20 +36,24 @@ test.describe('어드민 QA 진입 시나리오', () => {
 
     await page.goto('/admin/testing');
 
+    // 스트리밍 중에는 서버가 보낸 숨은 사본이 잠깐 함께 남으므로, 실제로 보이는 요소만 검사한다.
     await expect(page.locator('[data-cy="admin-qa-page"]')).toHaveCount(1);
-    await expect(page.locator('[data-cy="admin-qa-scenario-home"]')).toHaveAttribute('href', '/');
-    await expect(page.locator('[data-cy="admin-qa-scenario-guestbook"]')).toHaveAttribute(
+    await expect(page.locator('[data-cy="admin-qa-scenario-home"]:visible')).toHaveAttribute(
+      'href',
+      '/'
+    );
+    await expect(page.locator('[data-cy="admin-qa-scenario-guestbook"]:visible')).toHaveAttribute(
       'href',
       '/guestbook'
     );
-    await expect(page.locator('[data-cy="admin-qa-scenario-admin-chat"]')).toHaveAttribute(
+    await expect(page.locator('[data-cy="admin-qa-scenario-admin-chat"]:visible')).toHaveAttribute(
       'href',
       '/admin/chat'
     );
-    await expect(page.locator('[data-cy="admin-qa-command-run"]')).toContainText(
+    await expect(page.locator('[data-cy="admin-qa-command-run"]:visible')).toContainText(
       'pnpm --dir apps/web test:e2e'
     );
-    await expect(page.locator('[data-cy="admin-qa-command-open"]')).toContainText(
+    await expect(page.locator('[data-cy="admin-qa-command-open"]:visible')).toContainText(
       'pnpm --dir apps/web'
     );
   });
