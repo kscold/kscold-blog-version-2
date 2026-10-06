@@ -51,6 +51,11 @@ test.describe('열람 요청 관리 시나리오', () => {
     const req1 = page.locator('[data-cy="access-request-req-1"]');
     await expect(req1).toContainText('reader-one');
     await expect(req1).toContainText('권한 모델 정리');
+    // 요청받은 글을 바로 열어 확인할 수 있어야 한다. 글 없이 카테고리만 요청한 건에는 링크가 없다.
+    const postLink = page.locator('[data-cy="access-request-req-1-post-link"]');
+    await expect(postLink).toHaveAttribute('href', '/admin/preview/access-model');
+    await expect(postLink).toHaveAttribute('target', '_blank');
+    await expect(page.locator('[data-cy="access-request-req-2-post-link"]')).toHaveCount(0);
 
     const scopeCategory = page.locator('[data-cy="access-request-req-1-scope-category"]');
     await scopeCategory.click();

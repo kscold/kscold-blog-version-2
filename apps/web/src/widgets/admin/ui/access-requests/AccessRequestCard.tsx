@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { AccessRequest, GrantScope } from '@/widgets/admin/model/useAccessRequests';
 
 interface AccessRequestCardProps {
@@ -27,14 +28,37 @@ export function AccessRequestCard({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-surface-100 bg-surface-50 px-4 py-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-surface-400">
-              글
-            </p>
-            <p className="mt-2 text-sm font-medium leading-6 text-surface-800 [overflow-wrap:anywhere]">
-              {request.postTitle || '기존 카테고리 요청'}
-            </p>
-          </div>
+          {request.postSlug ? (
+            // 어떤 글에 대한 요청인지 바로 열어 확인하고 승인 범위를 정할 수 있게 한다.
+            // 제한 글도 관리자는 미리보기 주소로 볼 수 있고, 검토 중인 화면을 벗어나지 않도록 새 탭으로 연다.
+            <Link
+              href={`/admin/preview/${encodeURIComponent(request.postSlug)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              prefetch={false}
+              data-cy={`access-request-${request.id}-post-link`}
+              className="group rounded-xl border border-surface-100 bg-surface-50 px-4 py-3 transition-colors hover:border-surface-400 hover:bg-white"
+            >
+              <span className="flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-surface-400">
+                글
+                <span className="normal-case tracking-normal text-surface-500 group-hover:text-surface-900">
+                  글 열어보기
+                </span>
+              </span>
+              <span className="mt-2 block text-sm font-bold leading-6 text-surface-900 underline-offset-4 group-hover:underline [overflow-wrap:anywhere]">
+                {request.postTitle || request.postSlug}
+              </span>
+            </Link>
+          ) : (
+            <div className="rounded-xl border border-surface-100 bg-surface-50 px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-surface-400">
+                글
+              </p>
+              <p className="mt-2 text-sm font-medium leading-6 text-surface-800 [overflow-wrap:anywhere]">
+                {request.postTitle || '기존 카테고리 요청'}
+              </p>
+            </div>
+          )}
           <div className="rounded-xl border border-surface-100 bg-surface-50 px-4 py-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-surface-400">
               카테고리
