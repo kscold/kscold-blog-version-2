@@ -1,16 +1,22 @@
 'use client';
 
-import { useAdminPosts } from '@/entities/post';
-import { useCategories } from '@/entities/category';
-import { useFeeds } from '@/entities/feed';
-import { useAllVaultNotes } from '@/entities/vault';
-import { useTags } from '@/entities/tag';
-import { fetchChatRooms } from '@/entities/chat';
 import { useQuery } from '@tanstack/react-query';
+import { useCategories } from '@/entities/category';
+import { fetchChatRooms } from '@/entities/chat';
+import { useFeeds } from '@/entities/feed';
+import { useAdminPosts } from '@/entities/post';
+import { useTags } from '@/entities/tag';
 import { useViewer } from '@/entities/user';
-import { DashboardStats } from './analytics/DashboardStats';
-import { AdminUserStatsSection } from './analytics/AdminUserStatsSection';
+import { useAllVaultNotes } from '@/entities/vault';
+import { AdminActionLink, AdminPage, AdminPageHeader } from '@/shared/ui/AdminPage';
 import { AdminPageVisitSection } from './analytics/AdminPageVisitSection';
+import { AdminUserStatsSection } from './analytics/AdminUserStatsSection';
+import { DashboardAttention } from './dashboard/DashboardAttention';
+import { DashboardRecentPosts } from './dashboard/DashboardRecentPosts';
+import { DashboardShortcuts } from './dashboard/DashboardShortcuts';
+import { DashboardStatGrid } from './dashboard/DashboardStatGrid';
+
+const SECTION_TITLE = 'text-lg font-black text-surface-900';
 
 export function AdminDashboardContainer() {
   const { user, role } = useViewer();
@@ -26,87 +32,72 @@ export function AdminDashboardContainer() {
     refetchInterval: 30000,
   });
 
-  const posts = postsData?.content || [];
-  const totalPosts = allPostsData?.totalElements || 0;
-  const totalFeeds = feedsData?.totalElements || 0;
-  const totalVaultNotes = vaultData?.totalElements || 0;
-  const totalTags = tagsData?.length || 0;
-  const totalChatRooms = chatRooms?.length || 0;
-  const totalMessages = chatRooms?.reduce((sum, r) => sum + r.messageCount, 0) || 0;
   const viewerName =
     user?.displayName ||
     user?.username ||
     (role === 'ADMIN' ? '관리자' : role === 'USER' ? '회원' : '');
 
   const stats = [
-    { name: '전체 포스트', value: totalPosts, link: '/admin/posts' },
+    { name: '전체 포스트', value: allPostsData?.totalElements || 0, link: '/admin/posts' },
     { name: '카테고리', value: categories?.length || 0, link: '/admin/categories' },
-    { name: '피드', value: totalFeeds, link: '/admin/feed' },
-    { name: 'Vault 노트', value: totalVaultNotes, link: '/admin/vault' },
-    { name: '태그', value: totalTags, link: '/admin/tags' },
-    { name: '채팅 방', value: totalChatRooms, link: '/admin/chat' },
-    { name: '총 메시지', value: totalMessages, link: '/admin/chat' },
-  ];
-
-  const quickActions = [
-    { name: '사용자 관리', description: '전체 사용자 프로필을 조회하고 관리합니다', link: '/admin/users' },
-    { name: '새 포스트 작성', description: '블로그 포스트를 작성합니다', link: '/admin/posts/new' },
-    { name: '새 피드 작성', description: '일상 피드를 작성합니다', link: '/admin/feed/new' },
-    { name: '새 노트 작성', description: 'Vault 노트를 작성합니다', link: '/admin/vault/new' },
-    { name: '채팅 관리', description: '방문자 실시간 채팅을 관리합니다', link: '/admin/chat' },
-    { name: '개인 문서함', description: '이력서·경력 소스·스토리를 각각의 비공개 관리 공간에 보관합니다', link: '/admin/documents', dataCy: 'admin-documents-link' },
-    { name: '스토리지 관리', description: 'blog 버킷 파일과 폴더를 관리합니다', link: '/admin/storage', dataCy: 'admin-storage-link' },
-    { name: 'Stack Share 알림', description: '공동 구독 분담금을 계산하고 알림톡을 발송합니다', link: '/admin/stack-share' },
-    { name: '알림 발송 로그', description: '알림톡·이메일이 실제로 도착했는지 확인합니다', link: '/admin/message-deliveries' },
-    { name: 'Admin Night 관리', description: '참가 신청을 승인하고 일정을 merge 합니다', link: '/admin/admin-night' },
-    { name: '결제 경로 캡처', description: '카카오페이 심사용 상품·결제 화면을 확인합니다', link: '/admin/payment-preview' },
-    { name: '카테고리 관리', description: '카테고리를 관리합니다', link: '/admin/categories' },
-    { name: '태그 관리', description: '태그를 생성하고 관리합니다', link: '/admin/tags' },
-    { name: '열람 요청 관리', description: '글 열람 권한 요청을 승인/거절합니다', link: '/admin/access-requests' },
+    { name: '피드', value: feedsData?.totalElements || 0, link: '/admin/feed' },
+    { name: 'Vault 노트', value: vaultData?.totalElements || 0, link: '/admin/vault' },
+    { name: '태그', value: tagsData?.length || 0, link: '/admin/tags' },
+    { name: '채팅 방', value: chatRooms?.length || 0, link: '/admin/chat' },
     {
-      name: 'QA / E2E',
-      description: '시나리오 링크와 Playwright 실행 명령을 확인합니다',
-      link: '/admin/testing',
-      dataCy: 'admin-qa-link',
+      name: '총 메시지',
+      value: chatRooms?.reduce((sum, room) => sum + room.messageCount, 0) || 0,
+      link: '/admin/chat',
     },
   ];
 
   return (
-    <>
-      <div className="mb-10 space-y-3">
-        <h1 className="text-3xl font-sans font-black tracking-tighter text-surface-900 sm:text-4xl">
-          Dashboard
-        </h1>
-        <p className="text-sm leading-6 text-surface-500 sm:text-base">
-          {viewerName}
-        </p>
-      </div>
-
-      <DashboardStats
-        stats={stats}
-        quickActions={quickActions}
-        recentPosts={posts}
+    <AdminPage width="wide">
+      <AdminPageHeader
+        eyebrow="Dashboard"
+        title="관리자 대시보드"
+        description={
+          viewerName
+            ? `${viewerName}님, 확인이 필요한 일부터 살펴보세요.`
+            : '확인이 필요한 일부터 살펴보세요.'
+        }
+        actions={
+          <>
+            <AdminActionLink href="/admin/posts/new">새 포스트</AdminActionLink>
+            <AdminActionLink href="/admin/feed/new" variant="secondary">
+              새 피드
+            </AdminActionLink>
+            <AdminActionLink href="/admin/vault/new" variant="secondary">
+              새 노트
+            </AdminActionLink>
+          </>
+        }
       />
 
-      <div className="mt-12 space-y-4">
+      <DashboardAttention />
+      <DashboardStatGrid stats={stats} />
+      <DashboardRecentPosts posts={postsData?.content || []} />
+      <DashboardShortcuts />
+
+      <section className="space-y-4">
         <div className="space-y-1">
-          <h2 className="text-lg font-bold text-surface-900">가입자 현황</h2>
+          <h2 className={SECTION_TITLE}>가입자 현황</h2>
           <p className="text-sm leading-6 text-surface-500">
             최근 가입 흐름과 신규 사용자 목록을 한눈에 확인할 수 있습니다.
           </p>
         </div>
         <AdminUserStatsSection />
-      </div>
+      </section>
 
-      <div className="mt-12 space-y-4">
+      <section className="space-y-4">
         <div className="space-y-1">
-          <h2 className="text-lg font-bold text-surface-900">페이지 방문 추이</h2>
+          <h2 className={SECTION_TITLE}>페이지 방문 추이</h2>
           <p className="text-sm leading-6 text-surface-500">
-            방문자들이 어떤 페이지를 보는지 일별/페이지별로 집계합니다.
+            방문자들이 어떤 페이지를 보는지 일별, 페이지별로 집계합니다.
           </p>
         </div>
         <AdminPageVisitSection />
-      </div>
-    </>
+      </section>
+    </AdminPage>
   );
 }
