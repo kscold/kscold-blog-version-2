@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.kscold.blog-qa-runner</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>@NODE@</string>
+    <string>@HOME@/.local/share/kscold-blog-qa/runner/qa-runner.mjs</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>10</integer>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key><string>@HOME@</string>
+    <key>PATH</key><string>/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>BLOG_QA_RUNNER_WEB_DIR</key><string>@HOME@/.local/share/kscold-blog-qa/web</string>
+    <key>BLOG_QA_RUNNER_AUTH_URL</key><string>http://127.0.0.1:8083/api/auth/me</string>
+  </dict>
+  <key>StandardOutPath</key><string>@HOME@/.local/state/kscold-blog-qa/launchd.log</string>
+  <key>StandardErrorPath</key><string>@HOME@/.local/state/kscold-blog-qa/launchd.error.log</string>
+</dict>
+</plist>

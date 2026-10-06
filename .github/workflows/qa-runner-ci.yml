@@ -1,0 +1,29 @@
+name: QA Runner CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docker/maintenance/qa-runner*'
+      - 'docker/maintenance/qa-runner/**'
+      - 'docker/maintenance/install-qa-runner.sh'
+      - 'docker/com.kscold.blog-qa-runner.plist'
+      - '.github/workflows/qa-runner-ci.yml'
+  pull_request:
+    paths:
+      - 'docker/maintenance/qa-runner*'
+      - 'docker/maintenance/qa-runner/**'
+      - 'docker/maintenance/install-qa-runner.sh'
+      - 'docker/com.kscold.blog-qa-runner.plist'
+      - '.github/workflows/qa-runner-ci.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: QA 러너 로직 테스트
+        run: node --test docker/maintenance/qa-runner*.test.mjs
+      - name: 설치 스크립트 문법 확인
+        run: bash -n docker/maintenance/install-qa-runner.sh

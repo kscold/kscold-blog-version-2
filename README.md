@@ -218,6 +218,30 @@ node docker/maintenance/seo-watch.mjs --apply
   점검 스크립트를 고친 뒤에는 설치를 다시 실행해야 예약 작업에 반영됩니다.
   중지는 `launchctl bootout gui/$(id -u)/com.kscold.seo-watch`으로 합니다.
 
+## 어드민 QA 러너
+
+어드민의 QA / E2E 화면(`/admin/testing`)에서 누르는 "테스트 실행"은 운영 Mac에서 도는 러너 `docker/maintenance/qa-runner.mjs`가 받습니다.
+러너는 Playwright로 `apps/web/e2e/admin-smoke.spec.ts`를 운영 주소에 대고 실행하고, 진행 로그와 화면별 스크린샷을 어드민에 돌려줍니다.
+
+```bash
+bash docker/maintenance/install-qa-runner.sh
+node --test docker/maintenance/qa-runner*.test.mjs
+pnpm qa:runner
+```
+
+- 스모크 스펙은 API 응답을 모두 준비된 값으로 채웁니다. 준비하지 않은 요청과 채팅 웹소켓은 브라우저 안에서 막아
+  운영 백엔드와 DB에 닿지 않습니다.
+- 러너는 `127.0.0.1:3305`에서만 접속을 받고, 요청마다 실린 관리자 토큰을 블로그 백엔드(`/api/auth/me`)에 다시 확인합니다.
+  화면 서버가 넘겨준 토큰이 실제 관리자 것이 아니면 실행하지 않습니다.
+- 실행 결과는 `~/.local/state/kscold-blog-qa/artifacts`에 최근 20회분을 두고, `~/.config/kscold-blog-qa/env`에
+  `MINIO_ENDPOINT`·`MINIO_ACCESS_KEY`·`MINIO_SECRET_KEY`가 있으면 `blog` 버킷의 `qa-artifacts/`에도 올립니다.
+- 설치 스크립트는 러너와 스모크 스펙, 저장소와 같은 판의 Playwright를 `~/.local/share/kscold-blog-qa`에 두고
+  `com.kscold.blog-qa-runner` 서비스로 등록합니다(로그인 시 자동 시작, 죽으면 재시작).
+  macOS는 예약 작업이 데스크탑 폴더의 파일을 열면 화면에서 허용을 누를 때까지 멈추기 때문에 저장소 밖에서 실행합니다.
+- 스펙은 설치 시점의 사본입니다. 프런트엔드를 배포한 뒤에는 설치를 다시 실행해 운영 화면과 스펙을 맞춥니다.
+  `pnpm qa:runner`는 설치 없이 저장소의 스펙으로 바로 띄워볼 때 씁니다.
+- 중지는 `launchctl bootout gui/$(id -u)/com.kscold.blog-qa-runner`로 합니다.
+
 ## 라이선스
 
 이 프로젝트는 MIT 라이선스가 아닙니다.  
