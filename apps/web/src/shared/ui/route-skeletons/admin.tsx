@@ -1,65 +1,6 @@
 import { Skeleton } from '../Skeleton';
 import { SurfaceCard } from './base';
 
-export function AdminPageSkeleton() {
-  return (
-    <div className="min-h-screen bg-surface-50">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 space-y-3">
-          <Skeleton className="h-12 w-44" />
-          <Skeleton className="h-4 w-24" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <SurfaceCard key={index} className="px-4 py-4">
-              <Skeleton className="h-8 w-16" />
-              <Skeleton className="mt-3 h-4 w-20" />
-            </SurfaceCard>
-          ))}
-        </div>
-
-        <div className="mt-10">
-          <Skeleton className="h-6 w-24" />
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <Skeleton key={index} className="h-20 w-full rounded-xl bg-surface-900/90" />
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-10">
-          <Skeleton className="h-6 w-28" />
-          <SurfaceCard className="mt-4 overflow-hidden">
-            <div className="divide-y divide-surface-100">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <div key={index} className="space-y-3 px-5 py-4">
-                  <Skeleton className="h-4 w-3/5" />
-                  <div className="flex gap-3">
-                    <Skeleton className="h-3 w-16" />
-                    <Skeleton className="h-3 w-16" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SurfaceCard>
-        </div>
-
-        <div className="mt-10">
-          <Skeleton className="h-6 w-24" />
-          <SurfaceCard className="mt-4 px-5 py-5">
-            <div className="grid gap-4 md:grid-cols-2">
-              <Skeleton className="h-44 w-full" />
-              <Skeleton className="h-44 w-full" />
-            </div>
-          </SurfaceCard>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function AdminEditorSkeleton() {
   return (
     <div className="min-h-screen bg-surface-50 px-4 py-8 sm:px-6 lg:px-8">
