@@ -10,8 +10,12 @@ group = 'com.kscold'
 version = '2.0.0'
 
 ext {
-    // JWT·디스코드 라이브러리가 쓰는 Jackson 2를 보안 수정 버전(CVE-2026-89407·89425·91776·91777)으로 맞춘다.
-    // 애플리케이션 코드와 스프링은 Jackson 3를 쓰며, 그 버전은 Spring Boot가 관리한다.
+    // Spring Boot 4.1.1이 관리하는 버전에 남아 있는 취약점을 수정 버전으로 올린다.
+    // Tomcat: CVE-2026-65182·65905·68525 (11.0.25에서 수정)
+    set('tomcat.version', '11.0.26')
+    // Jackson 3(애플리케이션과 스프링이 사용): CVE-2026-68497·89407·89425·91776·91777 (3.1.7에서 수정)
+    set('jackson-bom.version', '3.1.7')
+    // Jackson 2(JWT·디스코드 라이브러리가 사용): 같은 취약점의 2.x 수정 버전
     set('jackson-2-bom.version', '2.21.7')
     grpcVersion = '1.84.0'
     protobufVersion = '3.25.9'
