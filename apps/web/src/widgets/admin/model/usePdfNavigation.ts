@@ -10,7 +10,7 @@ interface PdfPageScrollOptions {
 
 function scrollPdfPage({ container, requested, pageCount }: PdfPageScrollOptions) {
   const page = Math.max(1, Math.min(pageCount, Math.trunc(requested)));
-  const target = container?.querySelector<HTMLElement>(`[data-cy="pdf-page-${page}"]`);
+  const target = container?.querySelector<HTMLElement>(`[data-pdf-page="${page}"]`);
   if (!container || !target || !Number.isFinite(requested)) return null;
   container.scrollTo({
     top:
