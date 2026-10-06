@@ -74,3 +74,4 @@ jobs:
           ignore-unfixed: true
           vuln-type: os,library
           severity: HIGH,CRITICAL
+          trivyignores: apps/api/.trivyignore.yaml
