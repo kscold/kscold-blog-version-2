@@ -122,19 +122,22 @@ test.describe('어드민 QA 진입 시나리오', () => {
     await seedAdminSession(page);
     await page.goto('/admin/testing');
 
+    // "실행 중"은 "실행 중지" 버튼 글자에도 들어 있어, 상태는 문구 검색이 아니라 배지를 직접 본다.
+    const status = page.locator('[data-cy="admin-qa-status"]');
     const runButton = page.locator('[data-cy="admin-qa-run-button"]');
+    await expect(status).toHaveText('대기 중');
     await expect(runButton).toBeEnabled();
     // 버튼 글자가 좁은 칸에서 세로로 줄바꿈되던 문제를 막는다. 한 줄 높이를 넘으면 안 된다.
     expect((await runButton.boundingBox())?.height).toBeLessThan(44);
     await runButton.click();
 
-    await expect(page.getByText('실행 중')).toBeVisible();
+    await expect(status).toHaveText('실행 중');
     expect(startBody).toEqual({ suiteId: 'admin_smoke' });
     await expect(runButton).toBeDisabled();
     await expect(page.locator('[data-cy="admin-qa-stop-button"]')).toBeEnabled();
 
     current = completedSession;
-    await expect(page.getByText('통과', { exact: true })).toBeVisible();
+    await expect(status).toHaveText('통과');
     await expect(page.locator('[data-cy="admin-qa-log-panel"]')).toContainText(
       '통과 · 01 대시보드'
     );
@@ -157,7 +160,7 @@ test.describe('어드민 QA 진입 시나리오', () => {
     await page.goto('/admin/testing');
 
     await expect(page.getByText('QA 러너에 연결하지 못했습니다.', { exact: false })).toBeVisible();
-    await expect(page.getByText('대기 중')).toBeVisible();
+    await expect(page.locator('[data-cy="admin-qa-status"]')).toHaveText('대기 중');
     await expect(page.locator('[data-cy="admin-qa-delete-button"]')).toBeDisabled();
   });
 });

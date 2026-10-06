@@ -29,6 +29,7 @@ export function AdminTestingRunPanel({
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-surface-900">실행 패널</h2>
               <span
+                data-cy="admin-qa-status"
                 className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusTone(currentStatus)}`}
               >
                 {statusLabel(currentStatus)}
