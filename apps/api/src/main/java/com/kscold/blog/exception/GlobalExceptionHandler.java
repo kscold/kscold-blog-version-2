@@ -1,8 +1,6 @@
 package com.kscold.blog.exception;
 
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
-import com.kscold.blog.notification.domain.model.NotificationChannel;
-import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -10,6 +8,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,6 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
@@ -44,12 +45,12 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = e.getErrorCode();
         // DB·외부 API 실패처럼 5xx 로 나가는 건 실제 장애이므로 알림 대상에 포함한다.
         if (errorCode.getStatus().is5xxServerError()) {
-            notifyError(e, request);
+            ServerErrorAlert.send(notificationUseCase, e, request);
         }
 
         ApiResponse<Void> response = ApiResponse.error(errorCode.getCode(), e.getMessage());
 
-        return new ResponseEntity<>(response, errorCode.getStatus());
+        return json(errorCode.getStatus(), response);
     }
 
     /** DuplicateResourceException 처리 리소스 중복 시 HTTP 409 Conflict 응답 */
@@ -58,7 +59,7 @@ public class GlobalExceptionHandler {
             DuplicateResourceException e) {
         log.warn("DuplicateResourceException: code={}", e.getErrorCode().getCode());
         ApiResponse<Void> response = ApiResponse.error(e.getErrorCode().getCode(), e.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        return json(HttpStatus.CONFLICT, response);
     }
 
     /** InvalidRequestException 처리 잘못된 요청 시 HTTP 400 Bad Request 응답 */
@@ -66,7 +67,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ApiResponse<Void>> handleInvalidRequest(InvalidRequestException e) {
         log.warn("InvalidRequestException: code={}", e.getErrorCode().getCode());
         ApiResponse<Void> response = ApiResponse.error(e.getErrorCode().getCode(), e.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return json(HttpStatus.BAD_REQUEST, response);
     }
 
     /** multipart 용량 제한은 서버 장애가 아니라 파일을 줄여 재시도할 수 있는 413 응답이다. */
@@ -77,7 +78,7 @@ public class GlobalExceptionHandler {
                 ApiResponse.error(
                         ErrorCode.INVALID_INPUT_VALUE.getCode(),
                         "업로드 용량 제한을 초과했습니다. 파일 크기를 확인해주세요.");
-        return new ResponseEntity<>(response, HttpStatus.PAYLOAD_TOO_LARGE);
+        return json(HttpStatus.PAYLOAD_TOO_LARGE, response);
     }
 
     /** Validation 예외 처리 (@Valid 실패) DTO 필드 검증 실패 시 발생 */
@@ -94,7 +95,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return json(HttpStatus.BAD_REQUEST, response);
     }
 
     /** Bind 예외 처리 요청 파라미터 바인딩 실패 시 발생 */
@@ -110,7 +111,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return json(HttpStatus.BAD_REQUEST, response);
     }
 
     /** 컨트롤러 메서드 파라미터 검증 실패를 400 응답으로 변환한다. */
@@ -123,7 +124,7 @@ public class GlobalExceptionHandler {
 
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return json(HttpStatus.BAD_REQUEST, response);
     }
 
     /** Type Mismatch 예외 처리 요청 파라미터 타입 불일치 시 발생 */
@@ -144,7 +145,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_TYPE_VALUE.getCode(), errorMessage);
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return json(HttpStatus.BAD_REQUEST, response);
     }
 
     private static List<String> validationFieldNames(BindingResult bindingResult) {
@@ -164,7 +165,7 @@ public class GlobalExceptionHandler {
                 ApiResponse.error(
                         ErrorCode.MISSING_INPUT_VALUE.getCode(),
                         ErrorCode.MISSING_INPUT_VALUE.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return json(HttpStatus.BAD_REQUEST, response);
     }
 
     /** 비어 있거나 형식이 깨진 JSON 본문을 서버 오류가 아닌 400 응답으로 변환한다. */
@@ -174,7 +175,7 @@ public class GlobalExceptionHandler {
         log.warn("HttpMessageNotReadableException");
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), "요청 본문 형식이 올바르지 않습니다.");
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return json(HttpStatus.BAD_REQUEST, response);
     }
 
     /** 지원하지 않는 HTTP 메서드 예외 처리 (405) 브라우저나 잘못된 호출이 POST 전용 엔드포인트를 GET으로 두드릴 때 내부 오류처럼 보이지 않게 처리 */
@@ -186,7 +187,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED.getCode(), "지원하지 않는 요청 방식입니다.");
 
-        return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+        return json(HttpStatus.METHOD_NOT_ALLOWED, response);
     }
 
     /** 인증 실패 예외 처리 (401) JWT 토큰 없음, 만료 등 인증 관련 예외 */
@@ -195,7 +196,7 @@ public class GlobalExceptionHandler {
         log.warn("AuthenticationException: type={}", e.getClass().getSimpleName());
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.UNAUTHORIZED.getCode(), "인증이 필요합니다. 다시 로그인해주세요.");
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        return json(HttpStatus.UNAUTHORIZED, response);
     }
 
     /** 접근 권한 없음 예외 처리 (403) @PreAuthorize 등 권한 검사 실패 시 발생 */
@@ -204,7 +205,7 @@ public class GlobalExceptionHandler {
         log.warn("AccessDeniedException: type={}", e.getClass().getSimpleName());
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.FORBIDDEN.getCode(), "접근 권한이 없습니다.");
-        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+        return json(HttpStatus.FORBIDDEN, response);
     }
 
     /** 존재하지 않는 정적 리소스 요청 처리 (404) socket.io 등 불필요한 요청에 의한 ERROR 로그 노이즈 방지 */
@@ -213,44 +214,36 @@ public class GlobalExceptionHandler {
         log.debug("NoResourceFoundException");
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.RESOURCE_NOT_FOUND.getCode(), "요청한 리소스를 찾을 수 없습니다.");
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        return json(HttpStatus.NOT_FOUND, response);
     }
 
     /** 기타 모든 예외 처리 예상하지 못한 서버 오류 */
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ApiResponse<Void>> handleException(
             Exception e, HttpServletRequest request) {
+        // 지원하지 않는 본문·응답 형식처럼 스프링이 이미 4xx 로 정해 둔 요청 오류는 서버 장애가 아니다.
+        if (e instanceof ErrorResponse rejected && rejected.getStatusCode().is4xxClientError()) {
+            log.warn(
+                    "요청 오류: type={}, status={}",
+                    e.getClass().getSimpleName(),
+                    rejected.getStatusCode().value());
+            return StatusErrorResponse.of(rejected.getStatusCode(), rejected.getHeaders());
+        }
+
         log.error("Unexpected exception occurred: type={}", e.getClass().getSimpleName());
-        notifyError(e, request);
+        ServerErrorAlert.send(notificationUseCase, e, request);
 
-        ApiResponse<Void> response =
-                ApiResponse.error(
-                        ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
-                        "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return StatusErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    /** 예상치 못한 서버 오류를 디스코드 알림 채널로 알림. 알림 실패가 응답을 방해하지 않도록 예외를 삼킨다. */
-    private void notifyError(Exception exception, HttpServletRequest request) {
-        if (!ErrorAlertPolicy.shouldNotify(exception)) {
-            log.debug("클라이언트 연결 종료 예외는 오류 알림에서 제외합니다.");
-            return;
-        }
-
-        try {
-            String where =
-                    request != null ? request.getMethod() + " " + request.getRequestURI() : "-";
-            String detail = exception.getClass().getSimpleName();
-
-            notificationUseCase.notify(
-                    new NotificationMessage(
-                            NotificationChannel.ERROR,
-                            "서버 오류가 발생했어요",
-                            detail,
-                            List.of(new NotificationMessage.Field("요청", where))));
-        } catch (Exception notifyFailure) {
-            log.warn("오류 알림 전송을 건너뜁니다: type={}", notifyFailure.getClass().getSimpleName());
-        }
+    /**
+     * 오류 본문의 형식을 JSON 으로 정해 둔다.
+     *
+     * <p>스트리밍 엔드포인트는 text/event-stream 만 받겠다고 요청한다. 형식을 정해 두지 않으면 오류 본문을 쓰지 못해, 요청 제한(429)이나 검증
+     * 실패(400)가 엉뚱한 오류로 바뀌어 나간다.
+     */
+    private static ResponseEntity<ApiResponse<Void>> json(
+            HttpStatusCode status, ApiResponse<Void> body) {
+        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(body);
     }
 }

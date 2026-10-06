@@ -4,6 +4,7 @@ import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.identity.adapter.in.web.CookieCsrfProtectionFilter;
 import com.kscold.blog.identity.adapter.in.web.JwtAuthenticationFilter;
 import com.kscold.blog.shared.web.ApiResponse;
+import jakarta.servlet.DispatcherType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -78,6 +80,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth ->
                                 auth
+                                        // 오류 경로로 넘기는 내부 전달을 막으면 실제 상태 코드 대신 401 이 나간다.
+                                        // 이 경로는 상태 코드에 맞는 표준 오류 본문만 돌려준다.
+                                        .dispatcherTypeMatchers(DispatcherType.ERROR)
+                                        .permitAll()
                                         // 공개 포스트 와일드카드보다 먼저 관리자 조회 경로를 잠근다.
                                         .requestMatchers(HttpMethod.GET, ADMIN_POST_READ_PATHS)
                                         .hasRole("ADMIN")
@@ -152,6 +158,17 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 방화벽이 걸러낸 요청(정의되지 않은 HTTP 메서드, 세미콜론이 든 경로 등)에 표준 형식의 400 을 바로 돌려준다.
+     *
+     * <p>기본 처리기는 걸러진 요청을 서블릿의 오류 경로로 넘겨 필터를 다시 지나게 하는데, 그 결과가 서블릿 컨테이너 버전에 따라 달라진다.
+     */
+    @Bean
+    public RequestRejectedHandler requestRejectedHandler() {
+        return (request, response, exception) ->
+                writeErrorResponse(response, ErrorCode.INVALID_INPUT_VALUE, "잘못된 요청입니다.");
     }
 
     @Bean
