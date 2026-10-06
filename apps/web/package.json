@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "type-check": "next typegen && tsc --noEmit",
     "test:e2e": "start-server-and-test './scripts/run-e2e-dev.sh' http://127.0.0.1:3101 'playwright test'",
+    "test:e2e:ci": "./scripts/run-e2e-ci.sh",
     "test:e2e:ui": "start-server-and-test './scripts/run-e2e-dev.sh' http://127.0.0.1:3101 'playwright test --ui'",
     "test:e2e:headed": "start-server-and-test './scripts/run-e2e-dev.sh' http://127.0.0.1:3101 'playwright test --headed'"
   },
