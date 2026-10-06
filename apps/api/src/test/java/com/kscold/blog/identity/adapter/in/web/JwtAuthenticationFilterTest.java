@@ -18,6 +18,7 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 
 @ExtendWith(MockitoExtension.class)
 class JwtAuthenticationFilterTest {
@@ -54,6 +55,30 @@ class JwtAuthenticationFilterTest {
         assertThat(SecurityContextHolder.getContext().getAuthentication().getAuthorities())
                 .extracting("authority")
                 .containsExactly("ROLE_USER");
+    }
+
+    @Test
+    void keepsTheAuthenticationForLaterPassesOfTheSameRequest() throws Exception {
+        MockHttpServletRequest request = authenticatedRequest();
+        when(tokenProvider.parseAccessToken("access-token"))
+                .thenReturn(Optional.of(new TokenIdentity("admin-1", 0L)));
+        when(userQueryPort.findAuthenticationById("admin-1"))
+                .thenReturn(
+                        Optional.of(
+                                new UserQueryPort.AuthenticationInfo("admin-1", "관리자", true, 0L)));
+
+        filter.doFilter(request, new MockHttpServletResponse(), new MockFilterChain());
+        SecurityContextHolder.clearContext();
+
+        // 스트리밍 응답이 끝난 뒤의 재진입에서는 이 필터가 다시 돌지 않고, 보안 필터가 요청에 남은 인증 결과를 꺼내 쓴다.
+        assertThat(
+                        new RequestAttributeSecurityContextRepository()
+                                .loadDeferredContext(request)
+                                .get()
+                                .getAuthentication()
+                                .getAuthorities())
+                .extracting("authority")
+                .containsExactly("ROLE_ADMIN");
     }
 
     @Test
