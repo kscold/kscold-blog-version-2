@@ -24,8 +24,8 @@ export function AdminTestingRunPanel({
   return (
     <section className="mb-10 grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_1fr]">
       <div className="rounded-2xl border border-surface-200 bg-white p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="max-w-2xl space-y-2">
+        <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
+          <div className="min-w-0 flex-1 basis-64 space-y-2">
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-surface-900">실행 패널</h2>
               <span
@@ -39,10 +39,12 @@ export function AdminTestingRunPanel({
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          {/* 칸이 좁아지면 버튼을 찌그러뜨리지 않고 설명 아래 줄로 내린다. */}
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
             <Button
               type="button"
               size="sm"
+              className="whitespace-nowrap"
               isLoading={isRunningAction && activeAction === 'start'}
               disabled={isLoading || isRunningAction || currentStatus === 'running'}
               onClick={() => void onAction('start')}
@@ -54,6 +56,7 @@ export function AdminTestingRunPanel({
               type="button"
               size="sm"
               variant="ghost"
+              className="whitespace-nowrap"
               isLoading={isRunningAction && activeAction === 'stop'}
               disabled={isLoading || isRunningAction || currentStatus !== 'running'}
               onClick={() => void onAction('stop')}
@@ -65,7 +68,7 @@ export function AdminTestingRunPanel({
               type="button"
               size="sm"
               variant="ghost"
-              className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+              className="whitespace-nowrap border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
               isLoading={isRunningAction && activeAction === 'delete'}
               disabled={isLoading || isRunningAction || !session || currentStatus === 'running'}
               onClick={() => void onAction('delete')}
@@ -120,7 +123,10 @@ export function AdminTestingRunPanel({
         <h2 className="text-lg font-bold text-surface-900">실행 개요</h2>
         <ul className="mt-3 space-y-2 text-sm leading-6 text-surface-500">
           <li>실행은 호스트 QA 러너가 맡고, 어드민에서는 세션 상태만 제어합니다.</li>
-          <li>현재는 라이브 `kscold.com` 기준 어드민 UI 테스트 실행 흐름을 제공합니다.</li>
+          <li>
+            운영 중인 `kscold.com` 화면을 Playwright로 차례로 열어 확인합니다. 데이터는 준비된 응답으로 채워
+            실제 DB에는 닿지 않습니다.
+          </li>
           <li>실패가 나면 로그와 마지막 스크린샷부터 먼저 보면 원인 파악이 빠릅니다.</li>
         </ul>
       </div>

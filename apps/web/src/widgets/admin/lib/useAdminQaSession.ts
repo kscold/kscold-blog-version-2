@@ -1,11 +1,29 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { apiClient } from '@/shared/api/api-client';
 import { useAlert } from '@/shared/model/alertStore';
 import type { QaSession, QaSessionResponse } from './adminTesting';
 
 type QaSessionStatus = QaSession['status'] | 'idle';
 type QaAction = 'start' | 'stop' | 'delete';
+
+/**
+ * QA 경로를 호출한다. 화면을 오래 열어 두면 액세스 토큰이 만료돼 401이 오는데,
+ * 공용 클라이언트로 내 정보를 한 번 조회해 토큰 갱신을 태운 뒤 같은 요청을 다시 보낸다.
+ */
+async function requestQa(input: string, init: RequestInit): Promise<Response> {
+  const options: RequestInit = { ...init, cache: 'no-store', credentials: 'same-origin' };
+  const response = await fetch(input, options);
+  if (response.status !== 401) return response;
+
+  try {
+    await apiClient.get('/auth/me');
+  } catch {
+    return response;
+  }
+  return fetch(input, options);
+}
 
 export function useAdminQaSession() {
   const alerts = useAlert();
@@ -26,11 +44,7 @@ export function useAdminQaSession() {
       }
 
       try {
-        const response = await fetch('/admin/testing/session', {
-          method: 'GET',
-          cache: 'no-store',
-          credentials: 'same-origin',
-        });
+        const response = await requestQa('/admin/testing/session', { method: 'GET' });
         const data: QaSessionResponse = await response.json();
 
         if (!active) return;
@@ -40,7 +54,7 @@ export function useAdminQaSession() {
         latestStatusRef.current = data.session?.status || 'idle';
       } catch {
         if (!active) return;
-        setRunnerMessage('QA 러너가 아직 실행되지 않았습니다.');
+        setRunnerMessage('실행 상태를 불러오지 못했습니다. 잠시 뒤 다시 확인합니다.');
         setSession(null);
         latestStatusRef.current = 'idle';
       } finally {
@@ -90,14 +104,12 @@ export function useAdminQaSession() {
             ? { sessionId: session?.id }
             : undefined;
 
-      const response = await fetch(endpoint, {
+      const response = await requestQa(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: body ? JSON.stringify(body) : undefined,
-        cache: 'no-store',
-        credentials: 'same-origin',
       });
 
       const data: QaSessionResponse = await response
@@ -120,8 +132,8 @@ export function useAdminQaSession() {
         alerts.error(data.message || 'QA 세션 요청에 실패했습니다.');
       }
     } catch {
-      setRunnerMessage('QA 러너가 아직 실행되지 않았습니다.');
-      alerts.error('QA 러너에 연결하지 못했습니다.');
+      setRunnerMessage('요청을 보내지 못했습니다. 네트워크 상태를 확인해 주세요.');
+      alerts.error('QA 요청을 보내지 못했습니다.');
     } finally {
       setIsRunningAction(false);
       setActiveAction(null);

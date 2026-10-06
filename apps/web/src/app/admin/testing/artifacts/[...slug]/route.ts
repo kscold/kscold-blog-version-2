@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ensureAdmin, fetchQaRunner, runnerUnavailableResponse } from '../../_lib';
+import { readAdminToken } from '@/shared/lib/server/adminGuard';
+import { adminRequiredResponse, fetchQaRunner, runnerUnavailableResponse } from '../../_lib';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,34 +11,29 @@ interface RouteContext {
 }
 
 export async function GET(_request: NextRequest, context: RouteContext) {
-  const denied = await ensureAdmin();
-  if (denied) return denied;
+  const token = await readAdminToken();
+  if (!token) return adminRequiredResponse();
 
   try {
-    const params = await context.params;
-    const slug = params.slug ?? [];
-    const pathname = `/artifacts/${slug.map(encodeURIComponent).join('/')}`;
-
-    const response = await fetchQaRunner(pathname, {
-      cache: 'no-store',
-    });
+    const { slug = [] } = await context.params;
+    const response = await fetchQaRunner(
+      `/artifacts/${slug.map(encodeURIComponent).join('/')}`,
+      token
+    );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Artifact not found' }));
+      const error = await response.json().catch(() => ({ message: '스크린샷을 찾지 못했습니다.' }));
       return NextResponse.json(error, { status: response.status });
     }
 
-    const contentType = response.headers.get('content-type') || 'application/octet-stream';
-    const buffer = Buffer.from(await response.arrayBuffer());
-
-    return new NextResponse(buffer, {
+    return new NextResponse(Buffer.from(await response.arrayBuffer()), {
       status: response.status,
       headers: {
-        'Content-Type': contentType,
+        'Content-Type': response.headers.get('content-type') || 'application/octet-stream',
         'Cache-Control': 'no-store',
       },
     });
-  } catch (error) {
-    return runnerUnavailableResponse(error);
+  } catch {
+    return runnerUnavailableResponse();
   }
 }

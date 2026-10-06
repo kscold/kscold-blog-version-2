@@ -35,8 +35,6 @@ export default defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
-    'cypress/screenshots/**',
-    'cypress/videos/**',
     'coverage/**',
     'public/pdfjs/**',
   ]),

@@ -57,14 +57,19 @@ export const scenarioLinks = [
 
 export const commands = [
   {
-    title: 'QA 러너 실행',
-    command: 'pnpm qa:runner',
+    title: 'QA 러너 설치 · 재시작',
+    command: './docker/maintenance/install-qa-runner.sh',
     dataCy: 'admin-qa-command-runner',
   },
   {
     title: '전체 E2E 실행',
     command: 'pnpm --dir apps/web test:e2e',
     dataCy: 'admin-qa-command-run',
+  },
+  {
+    title: 'CI와 같은 구성으로 전체 E2E 실행',
+    command: 'pnpm --dir apps/web test:e2e:ci',
+    dataCy: 'admin-qa-command-ci',
   },
   {
     title: 'Playwright UI 모드 열기',
@@ -106,15 +111,7 @@ export function formatSessionId(value: string | null) {
 }
 
 export function formatLogOutput(lines: string[]) {
-  return lines
-    .map(line =>
-      line
-        .replace(/admin-smoke\.spec\.ts/gi, 'admin-test.spec.ts')
-        .replace(/admin_smoke/gi, 'qa-session')
-        .replace(/admin-smoke/gi, 'qa-session')
-        .replace(/\bsmoke\b/gi, 'test')
-    )
-    .join('\n');
+  return lines.join('\n');
 }
 
 export function formatScreenshotLabel(name: string) {
@@ -127,19 +124,10 @@ export function formatScreenshotLabel(name: string) {
     '04-chat.png': '04 채팅 관리',
     '05-testing.png': '05 QA / E2E',
     '06-access-requests.png': '06 열람 요청 관리',
+    '99-failure.png': '실패한 순간의 화면',
   };
 
-  if (labels[fileName]) {
-    return labels[fileName];
-  }
-
-  if (fileName.includes('(failed)')) {
-    return '실패 시점 캡처';
-  }
-
-  return fileName
-    .replace(/admin-smoke/gi, 'admin-test')
-    .replace(/\.png$/i, '');
+  return labels[fileName] ?? fileName.replace(/\.png$/i, '');
 }
 
 export function formatTime(value: string | null) {
