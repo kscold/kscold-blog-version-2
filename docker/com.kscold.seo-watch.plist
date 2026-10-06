@@ -6,7 +6,7 @@
   <key>ProgramArguments</key>
   <array>
     <string>/Users/kscold/.nvm/versions/node/v25.6.0/bin/node</string>
-    <string>/Users/kscold/Desktop/kscold-blog-version-2/docker/maintenance/seo-watch.mjs</string>
+    <string>/Users/kscold/.local/share/kscold-seo-watch/docker/maintenance/seo-watch.mjs</string>
     <string>--apply</string>
   </array>
   <key>StartCalendarInterval</key>
@@ -18,7 +18,6 @@
   <key>EnvironmentVariables</key>
   <dict>
     <key>HOME</key><string>/Users/kscold</string>
-    <key>SEO_WATCH_REPORT_DIR</key><string>/Users/kscold/Desktop/server-logs/seo-reports</string>
   </dict>
   <key>StandardOutPath</key><string>/Users/kscold/.local/state/kscold-seo-watch/launchd.log</string>
   <key>StandardErrorPath</key><string>/Users/kscold/.local/state/kscold-seo-watch/launchd.error.log</string>

@@ -212,8 +212,10 @@ node docker/maintenance/seo-watch.mjs --apply
   `GOOGLE_CSE_KEY`·`GOOGLE_CSE_CX`(Google Programmable Search)를 넣으면 기록하고, 없으면 건너뜁니다.
 - 결과는 `SEO_WATCH_REPORT_DIR`(기본 `~/.local/state/kscold-seo-watch/reports`)에 날짜별 마크다운으로,
   추이는 `~/.local/state/kscold-seo-watch/history.jsonl`에 한 줄씩 남습니다.
-- 운영 Mac의 매일 07:30 자동 실행 설정은 `docker/com.kscold.seo-watch.plist`입니다.
-  LaunchAgents에 설치할 때 로그 디렉터리를 먼저 생성하고 Node 절대 경로를 확인해야 합니다.
+- 운영 Mac의 매일 07:30 자동 실행은 `bash docker/maintenance/install-seo-watch.sh`로 설치합니다.
+  macOS는 예약 작업이 데스크탑 폴더의 파일을 열면 화면에서 허용을 누를 때까지 멈추므로,
+  설치 스크립트가 점검에 필요한 파일만 `~/.local/share/kscold-seo-watch`로 복사해 거기서 실행합니다.
+  점검 스크립트를 고친 뒤에는 설치를 다시 실행해야 예약 작업에 반영됩니다.
   중지는 `launchctl bootout gui/$(id -u)/com.kscold.seo-watch`으로 합니다.
 
 ## 라이선스
