@@ -3,6 +3,9 @@ package com.kscold.blog.stackshare.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -28,6 +31,7 @@ import com.kscold.blog.stackshare.domain.port.out.StackShareGroupRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareNotificationSender;
 import com.kscold.blog.stackshare.domain.port.out.StackShareParticipantRepository;
 import com.kscold.blog.stackshare.domain.port.out.StackShareSettlementRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -199,6 +203,45 @@ class StackShareManagementApplicationServiceTest {
                 .extracting(MessageDeliveryLog::getFailureReason)
                 .containsOnly("IllegalStateException")
                 .noneMatch(sensitiveFailureReason::equals);
+    }
+
+    @Test
+    void 정산_완료로_표시하면_기록을_다시_저장하지_않고_완료_시각만_고친다() {
+        when(settlementRepository.updateSettledAt(eq("settlement-1"), notNull()))
+                .thenAnswer(
+                        invocation ->
+                                Optional.of(
+                                        StackShareSettlement.builder()
+                                                .id("settlement-1")
+                                                .settledAt(invocation.getArgument(1))
+                                                .build()));
+
+        StackShareSettlement settlement = service.changeSettled(" settlement-1 ", true);
+
+        assertThat(settlement.isSettled()).isTrue();
+        verify(settlementRepository).updateSettledAt(eq("settlement-1"), notNull());
+        verify(settlementRepository, never()).save(any());
+    }
+
+    @Test
+    void 정산_완료를_되돌리면_완료_시각을_지운다() {
+        when(settlementRepository.updateSettledAt(eq("settlement-1"), isNull()))
+                .thenReturn(Optional.of(StackShareSettlement.builder().id("settlement-1").build()));
+
+        StackShareSettlement settlement = service.changeSettled("settlement-1", false);
+
+        assertThat(settlement.isSettled()).isFalse();
+        verify(settlementRepository).updateSettledAt("settlement-1", null);
+    }
+
+    @Test
+    void 없는_정산_기록은_완료로_표시할_수_없다() {
+        when(settlementRepository.updateSettledAt(any(), any(LocalDateTime.class)))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.changeSettled("missing", true))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("정산 기록");
     }
 
     /** 발송이 성공하는 최소 스텁 묶음. 계좌·기한 검증 테스트가 공유한다. */

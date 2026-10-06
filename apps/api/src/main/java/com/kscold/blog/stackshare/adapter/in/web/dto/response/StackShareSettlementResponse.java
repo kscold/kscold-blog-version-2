@@ -37,6 +37,10 @@ public class StackShareSettlementResponse {
 
     private StackShareSettlement.Status status;
     private LocalDateTime sentAt;
+
+    /** 정산 완료로 표시한 시각. 비어 있으면 아직 정산 중이다. */
+    private LocalDateTime settledAt;
+
     private LocalDateTime createdAt;
     private List<RecipientResponse> recipients;
 
@@ -54,6 +58,7 @@ public class StackShareSettlementResponse {
                 .ownerAmount(settlement.getOwnerAmount())
                 .status(settlement.getStatus())
                 .sentAt(settlement.getSentAt())
+                .settledAt(settlement.getSettledAt())
                 .createdAt(settlement.getCreatedAt())
                 .recipients(
                         settlement.getRecipients().stream().map(RecipientResponse::from).toList())

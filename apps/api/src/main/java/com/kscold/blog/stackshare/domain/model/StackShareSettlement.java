@@ -49,7 +49,14 @@ public class StackShareSettlement {
     private String messageGroupId;
     private LocalDateTime sentAt;
 
+    /** 입금까지 끝나 정산을 마무리한 시각. 비어 있으면 아직 정산 중이다. 알림톡 발송 상태(status)와는 별개로 관리한다. */
+    private LocalDateTime settledAt;
+
     @CreatedDate private LocalDateTime createdAt;
+
+    public boolean isSettled() {
+        return settledAt != null;
+    }
 
     public enum Status {
         DRAFT,

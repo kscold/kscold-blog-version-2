@@ -1,6 +1,7 @@
 package com.kscold.blog.stackshare.adapter.in.web;
 
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.stackshare.adapter.in.web.dto.request.ChangeStackShareSettledRequest;
 import com.kscold.blog.stackshare.adapter.in.web.dto.request.SaveStackShareAccountRequest;
 import com.kscold.blog.stackshare.adapter.in.web.dto.request.SaveStackShareGroupRequest;
 import com.kscold.blog.stackshare.adapter.in.web.dto.request.SaveStackShareParticipantRequest;
@@ -123,6 +124,16 @@ public class AdminStackShareController {
         var settlements =
                 useCase.getSettlements().stream().map(StackShareSettlementResponse::from).toList();
         return ResponseEntity.ok(ApiResponse.success(settlements));
+    }
+
+    @PostMapping("/settlements/settled")
+    public ResponseEntity<ApiResponse<StackShareSettlementResponse>> changeSettled(
+            @Valid @RequestBody ChangeStackShareSettledRequest request) {
+        var settlement = useCase.changeSettled(request.getId(), request.isSettled());
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        StackShareSettlementResponse.from(settlement),
+                        request.isSettled() ? "정산 완료로 표시했습니다." : "정산 완료 표시를 되돌렸습니다."));
     }
 
     @PostMapping("/settlements/send")

@@ -33,5 +33,8 @@ public interface StackShareManagementUseCase {
 
     List<StackShareSettlement> getSettlements();
 
+    /** 입금이 모두 끝난 정산을 완료로 표시하거나, 잘못 표시한 완료를 되돌린다. */
+    StackShareSettlement changeSettled(String id, boolean settled);
+
     StackShareSendResult createAndSend(SendStackShareNotificationsCommand command);
 }

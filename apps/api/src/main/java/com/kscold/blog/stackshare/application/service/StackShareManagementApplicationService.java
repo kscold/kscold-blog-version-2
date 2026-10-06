@@ -140,6 +140,17 @@ public class StackShareManagementApplicationService implements StackShareManagem
     }
 
     @Override
+    public StackShareSettlement changeSettled(String id, boolean settled) {
+        LocalDateTime settledAt = settled ? LocalDateTime.now() : null;
+        return settlementRepository
+                .updateSettledAt(normalizeText(id), settledAt)
+                .orElseThrow(
+                        () ->
+                                new BusinessException(
+                                        ErrorCode.RESOURCE_NOT_FOUND, "정산 기록을 찾지 못했습니다."));
+    }
+
+    @Override
     public StackShareSendResult createAndSend(SendStackShareNotificationsCommand command) {
         validateSettlement(command);
         AlimtalkTemplate template = templateUseCase.getTemplate(TEMPLATE_KEY);
