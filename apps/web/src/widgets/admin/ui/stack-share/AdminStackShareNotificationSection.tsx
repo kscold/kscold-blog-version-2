@@ -1,3 +1,8 @@
+'use client';
+
+import { useState } from 'react';
+import { AdminPage, AdminPageHeader } from '@/shared/ui/AdminPage';
+import { AdminTabs } from '@/shared/ui/AdminTabs';
 import { AlimtalkTemplateManager } from './AlimtalkTemplateManager';
 import { StackShareAccountPanel } from './StackShareAccountPanel';
 import { StackShareGroupPanel } from './StackShareGroupPanel';
@@ -5,28 +10,46 @@ import { StackShareParticipantPanel } from './StackShareParticipantPanel';
 import { StackShareSettlementComposer } from './StackShareSettlementComposer';
 import { StackShareSettlementHistory } from './StackShareSettlementHistory';
 
+type StackShareTab = 'settlement' | 'people' | 'settings';
+
+const TABS = [
+  { key: 'settlement', label: '정산' },
+  { key: 'people', label: '참여자·그룹' },
+  { key: 'settings', label: '계좌·알림톡' },
+] as const;
+
 export function AdminStackShareNotificationSection() {
+  const [tab, setTab] = useState<StackShareTab>('settlement');
+
   return (
-    <main className="min-h-screen bg-surface-50 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl space-y-6">
-        <header className="space-y-3 py-4">
-          <p className="text-xs font-bold uppercase tracking-[0.28em] text-surface-400">
-            Stack Share
-          </p>
-          <h1 className="text-3xl font-black tracking-tight text-surface-900 sm:text-4xl">
-            공동 구독 정산 알림
-          </h1>
-          <p className="max-w-2xl text-sm leading-6 text-surface-500">
-            함께 결제하는 툴의 분담금을 자동 계산하고, 참여자와 발송 기록을 관리자 전용으로 관리합니다.
-          </p>
-        </header>
-        <StackShareAccountPanel />
-        <StackShareParticipantPanel />
-        <StackShareGroupPanel />
-        <StackShareSettlementComposer />
-        <StackShareSettlementHistory />
-        <AlimtalkTemplateManager />
-      </div>
-    </main>
+    <AdminPage>
+      <AdminPageHeader
+        eyebrow="Stack Share"
+        title="공동 구독 정산"
+        description="함께 결제하는 툴의 분담금을 계산해 알림톡으로 정산을 요청하고, 입금이 끝난 건은 정산 완료로 정리합니다."
+      />
+
+      {/* 매달 하는 일(정산 보내기·기록 확인)을 먼저 두고, 가끔 손보는 설정은 탭 뒤로 보낸다. */}
+      <AdminTabs label="정산 관리 구역" tabs={TABS} active={tab} onChange={setTab} />
+
+      {tab === 'settlement' && (
+        <>
+          <StackShareSettlementComposer />
+          <StackShareSettlementHistory />
+        </>
+      )}
+      {tab === 'people' && (
+        <>
+          <StackShareGroupPanel />
+          <StackShareParticipantPanel />
+        </>
+      )}
+      {tab === 'settings' && (
+        <>
+          <StackShareAccountPanel />
+          <AlimtalkTemplateManager />
+        </>
+      )}
+    </AdminPage>
   );
 }
