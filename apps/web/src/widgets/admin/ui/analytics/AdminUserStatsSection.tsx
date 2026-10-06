@@ -21,8 +21,8 @@ export function AdminUserStatsSection() {
   const summaryCards = [
     { label: '전체 가입자', value: stats.totalUsers, accent: 'text-surface-900' },
     { label: '오늘 신규', value: stats.newUsersToday, accent: 'text-emerald-600' },
-    { label: '이번 주', value: stats.newUsersThisWeek, accent: 'text-blue-600' },
-    { label: '이번 달', value: stats.newUsersThisMonth, accent: 'text-violet-600' },
+    { label: '이번 주', value: stats.newUsersThisWeek, accent: 'text-surface-900' },
+    { label: '이번 달', value: stats.newUsersThisMonth, accent: 'text-surface-900' },
   ];
 
   return (
@@ -55,11 +55,11 @@ export function AdminUserStatsSection() {
         <h3 className="text-sm font-bold text-surface-900 mb-4">신규 가입 추이 (최근 7일)</h3>
         <div className="flex items-end gap-1.5" style={{ height: 72 }}>
           {stats.dailySignups.map(day => (
-            <div key={day.date} className="flex flex-col items-center gap-1 flex-1">
+            <div key={day.date} className="flex h-full flex-1 flex-col items-center gap-1">
               <span className="text-[10px] font-bold text-surface-700 tabular-nums leading-none">
                 {day.count > 0 ? day.count : ''}
               </span>
-              <div className="w-full bg-surface-100 rounded-sm overflow-hidden flex-1">
+              <div className="flex w-full flex-1 items-end overflow-hidden rounded-sm bg-surface-100">
                 <div
                   className="w-full bg-surface-800 rounded-sm transition-all duration-700"
                   style={{

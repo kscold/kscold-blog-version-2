@@ -25,11 +25,11 @@ export function DailyVisitsChart({ daily, isLoading }: Props) {
       ) : (
         <div className="flex items-end gap-1" style={{ height: 96 }}>
           {daily.map(d => (
-            <div key={d.date} className="flex flex-col items-center gap-1 flex-1 min-w-0">
+            <div key={d.date} className="flex h-full min-w-0 flex-1 flex-col items-center gap-1">
               <span className="text-[9px] font-bold text-surface-700 tabular-nums leading-none">
                 {d.visits > 0 ? d.visits : ''}
               </span>
-              <div className="w-full bg-surface-100 rounded-sm overflow-hidden flex-1">
+              <div className="flex w-full flex-1 items-end overflow-hidden rounded-sm bg-surface-100">
                 <div
                   className="w-full bg-surface-800 rounded-sm transition-all duration-500"
                   style={{
