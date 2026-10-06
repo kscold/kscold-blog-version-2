@@ -16,7 +16,6 @@
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
     "@portone/browser-sdk": "^0.1.9",
-    "@tailwindcss/typography": "^0.5.20",
     "@tanstack/react-query": "^5.102.8",
     "@tanstack/react-query-devtools": "^5.102.8",
     "@tiptap/extension-bubble-menu": "^3.31.2",
@@ -53,6 +52,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
+    "@tailwindcss/typography": "^0.5.20",
     "@types/d3-force": "^3.0.10",
     "@types/node": "^22.20.1",
     "@types/react": "^19.2.18",
