@@ -16,14 +16,14 @@ test.describe('회원가입 시나리오', () => {
     });
 
     await page.goto('/login');
-    await page.locator('[data-cy="auth-toggle-register"]').click();
+    await page.locator('[data-testid="auth-toggle-register"]').click();
 
-    await page.locator('[data-cy="register-email-input"]').fill('short-password@example.com');
-    await page.locator('[data-cy="register-username-input"]').fill('gom');
-    await page.locator('[data-cy="register-display-name-input"]').fill('ㄱㄱㅁ');
-    const passwordInput = page.locator('[data-cy="register-password-input"]');
+    await page.locator('[data-testid="register-email-input"]').fill('short-password@example.com');
+    await page.locator('[data-testid="register-username-input"]').fill('gom');
+    await page.locator('[data-testid="register-display-name-input"]').fill('ㄱㄱㅁ');
+    const passwordInput = page.locator('[data-testid="register-password-input"]');
     await passwordInput.fill('1234');
-    await page.locator('[data-cy="register-submit"]').click();
+    await page.locator('[data-testid="register-submit"]').click();
 
     // 짧은 비밀번호는 HTML5 minLength 검증에서 막혀 서버 요청 자체가 가지 않는다
     const isInvalid = await passwordInput.evaluate(
@@ -51,15 +51,15 @@ test.describe('회원가입 시나리오', () => {
     });
 
     await page.goto('/login');
-    await page.locator('[data-cy="auth-toggle-register"]').click();
+    await page.locator('[data-testid="auth-toggle-register"]').click();
 
-    await page.locator('[data-cy="register-email-input"]').fill('server-validation@example.com');
-    await page.locator('[data-cy="register-username-input"]').fill('gom');
-    await page.locator('[data-cy="register-display-name-input"]').fill('ㄱㄱㅁ');
-    await page.locator('[data-cy="register-password-input"]').fill('12345678');
-    await page.locator('[data-cy="register-submit"]').click();
+    await page.locator('[data-testid="register-email-input"]').fill('server-validation@example.com');
+    await page.locator('[data-testid="register-username-input"]').fill('gom');
+    await page.locator('[data-testid="register-display-name-input"]').fill('ㄱㄱㅁ');
+    await page.locator('[data-testid="register-password-input"]').fill('12345678');
+    await page.locator('[data-testid="register-submit"]').click();
 
-    const errorBox = page.locator('[data-cy="auth-form-error"]');
+    const errorBox = page.locator('[data-testid="auth-form-error"]');
     await expect(errorBox).toContainText('비밀번호는 최소 8자 이상이어야 합니다');
     await expect(errorBox).not.toContainText('Request failed with status code 400');
   });
@@ -95,13 +95,13 @@ test.describe('회원가입 시나리오', () => {
     });
 
     await page.goto('/login');
-    await page.locator('[data-cy="auth-toggle-register"]').click();
+    await page.locator('[data-testid="auth-toggle-register"]').click();
 
-    await page.locator('[data-cy="register-email-input"]').fill('korean-register@example.com');
-    await page.locator('[data-cy="register-username-input"]').fill('gom');
-    await page.locator('[data-cy="register-display-name-input"]').fill('ㄱㄱㅁ');
-    await page.locator('[data-cy="register-password-input"]').fill('validpass123');
-    await page.locator('[data-cy="register-submit"]').click();
+    await page.locator('[data-testid="register-email-input"]').fill('korean-register@example.com');
+    await page.locator('[data-testid="register-username-input"]').fill('gom');
+    await page.locator('[data-testid="register-display-name-input"]').fill('ㄱㄱㅁ');
+    await page.locator('[data-testid="register-password-input"]').fill('validpass123');
+    await page.locator('[data-testid="register-submit"]').click();
 
     await expect(page).toHaveURL(`${baseURL}/`);
     await expect

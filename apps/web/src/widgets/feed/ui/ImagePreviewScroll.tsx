@@ -5,14 +5,14 @@ import Image from 'next/image';
 interface ImagePreviewScrollProps {
   images: string[];
   onRemove: (index: number) => void;
-  dataCy?: string;
+  testId?: string;
 }
 
-export function ImagePreviewScroll({ images, onRemove, dataCy }: ImagePreviewScrollProps) {
+export function ImagePreviewScroll({ images, onRemove, testId }: ImagePreviewScrollProps) {
   if (images.length === 0) return null;
 
   return (
-    <div data-cy={dataCy} className="space-y-4">
+    <div data-testid={testId} className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-surface-900">이미지 첨부</p>

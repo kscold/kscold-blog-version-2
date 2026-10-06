@@ -27,16 +27,16 @@ function HeroIntroduction() {
         지식을 기록하고,<br />
         연결을 공유합니다.
       </h1>
-      <p data-cy="hero-tagline" className={styles.description}>
+      <p data-testid="hero-tagline" className={styles.description}>
         러닝커브를 즐기는 개발자{' '}
         <Link href="/info">김승찬</Link>입니다.<br />
         AI Agent부터 서버·웹까지,<br className={styles.mobileBreak} /> 문제를 서비스로 풀어냅니다.
       </p>
       <div className={styles.actions}>
-        <Link href="/blog" data-cy="hero-primary-cta" className={styles.primary}>
+        <Link href="/blog" data-testid="hero-primary-cta" className={styles.primary}>
           블로그 구경하기 <span aria-hidden="true">↗</span>
         </Link>
-        <Link href="/feed" data-cy="hero-secondary-cta" className={styles.secondary}>
+        <Link href="/feed" data-testid="hero-secondary-cta" className={styles.secondary}>
           피드 보기 <span aria-hidden="true">→</span>
         </Link>
       </div>

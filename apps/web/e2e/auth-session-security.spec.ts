@@ -39,7 +39,7 @@ test('기존 브라우저 토큰을 쿠키 세션으로 승격한 뒤 localStora
 
   await page.goto('/');
 
-  await expect(page.locator('[data-cy="admin-header-link"]')).toBeVisible();
+  await expect(page.locator('[data-testid="admin-header-link"]')).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(() => ({

@@ -16,7 +16,7 @@ export function EditorContentArea({ editor, mobileButtons }: EditorContentAreaPr
       <EditorContent editor={editor} />
 
       <div className="border-t border-surface-200 bg-surface-50 px-3 py-3 sm:hidden">
-        <TiptapToolbar buttons={mobileButtons} dataCy="post-editor-mobile-actions" />
+        <TiptapToolbar buttons={mobileButtons} testId="post-editor-mobile-actions" />
       </div>
     </>
   );

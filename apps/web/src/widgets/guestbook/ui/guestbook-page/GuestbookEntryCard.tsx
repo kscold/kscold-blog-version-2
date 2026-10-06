@@ -35,7 +35,7 @@ export function GuestbookEntryCard({
 
   return (
     <article
-      data-cy="guestbook-entry"
+      data-testid="guestbook-entry"
       className="rounded-3xl border border-surface-200 bg-surface-50 px-5 py-4 shadow-[0_8px_30px_-24px_rgba(15,23,42,0.45)]"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -56,7 +56,7 @@ export function GuestbookEntryCard({
         {entry.canDelete && (
           <button
             onClick={() => onDelete(entry.id)}
-            data-cy="guestbook-delete"
+            data-testid="guestbook-delete"
             className="rounded-full border border-surface-200 px-3 py-1.5 text-xs font-semibold text-surface-500 transition-colors hover:border-red-200 hover:text-red-500"
           >
             삭제
@@ -115,7 +115,7 @@ export function GuestbookEntryCard({
           ) : (
             <button
               onClick={() => setIsComposerOpen(true)}
-              data-cy="guestbook-reply-open"
+              data-testid="guestbook-reply-open"
               className="rounded-full border border-surface-200 px-3 py-1.5 text-xs font-semibold text-surface-500 transition-colors hover:border-surface-900 hover:text-surface-900"
             >
               답글 남기기

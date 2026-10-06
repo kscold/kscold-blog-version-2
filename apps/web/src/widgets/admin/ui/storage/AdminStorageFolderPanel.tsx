@@ -27,14 +27,14 @@ export function AdminStorageFolderPanel({
           placeholder="예: hero-images"
           helperText="현재 경로 아래에 새 폴더를 만듭니다."
           disabled={isMutating}
-          data-cy="admin-storage-folder-input"
+          data-testid="admin-storage-folder-input"
         />
         <Button
           type="submit"
           size="sm"
           disabled={isMutating || !folderName.trim()}
           isLoading={isCreatingFolder}
-          data-cy="admin-storage-folder-submit"
+          data-testid="admin-storage-folder-submit"
         >
           폴더 생성
         </Button>

@@ -24,7 +24,7 @@ export function PostEditorSidebar({
   }, []);
 
   return (
-    <aside data-cy="post-editor-sidebar" className="space-y-4 xl:sticky xl:top-24 xl:self-start">
+    <aside data-testid="post-editor-sidebar" className="space-y-4 xl:sticky xl:top-24 xl:self-start">
       <PostEditorPublishPanel
         categories={categories}
         form={form}

@@ -33,7 +33,7 @@ export function FeedComposerActions({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          data-cy="feed-composer-upload"
+          data-testid="feed-composer-upload"
           disabled={isUploading || !canAddImages}
           className="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-surface-50 px-4 py-2 text-sm font-semibold text-surface-700 transition-colors hover:bg-surface-100 hover:text-surface-900 disabled:cursor-not-allowed disabled:opacity-60"
         >
@@ -62,13 +62,13 @@ export function FeedComposerActions({
             event.target.value = '';
           }}
           className="hidden"
-          data-cy="feed-composer-upload-input"
+          data-testid="feed-composer-upload-input"
         />
 
         <button
           type="button"
           onClick={onToggleExpanded}
-          data-cy="feed-composer-toggle"
+          data-testid="feed-composer-toggle"
           className="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-white px-4 py-2 text-sm font-semibold text-surface-500 transition-colors hover:text-surface-900"
         >
           {shouldShowExpanded ? '링크와 이미지 패널 닫기' : '링크와 이미지 더하기'}
@@ -78,7 +78,7 @@ export function FeedComposerActions({
           <button
             type="button"
             onClick={onReset}
-            data-cy="feed-composer-reset"
+            data-testid="feed-composer-reset"
             className="inline-flex items-center gap-2 rounded-full border border-surface-200 bg-white px-4 py-2 text-sm font-semibold text-surface-400 transition-colors hover:text-surface-700"
           >
             초안 비우기
@@ -89,7 +89,7 @@ export function FeedComposerActions({
       <button
         type="button"
         onClick={() => void onSubmit()}
-        data-cy="feed-composer-submit"
+        data-testid="feed-composer-submit"
         disabled={isSubmitting || !canSubmit}
         className="inline-flex items-center justify-center rounded-full bg-surface-900 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-surface-800 disabled:cursor-not-allowed disabled:opacity-50"
       >

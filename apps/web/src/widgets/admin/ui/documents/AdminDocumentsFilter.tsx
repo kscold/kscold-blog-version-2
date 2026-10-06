@@ -45,7 +45,7 @@ export function AdminDocumentsFilter({
             variant="secondary"
             size="sm"
             disabled={disabled}
-            data-cy="admin-documents-search-submit"
+            data-testid="admin-documents-search-submit"
           >
             검색
           </Button>

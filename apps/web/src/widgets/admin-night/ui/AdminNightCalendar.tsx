@@ -64,7 +64,7 @@ export function AdminNightCalendar({ slots, entries = [] }: AdminNightCalendarPr
           return (
             <article
               key={slot.slotKey}
-              data-cy={slot.state === 'tonight' ? 'admin-night-slot-tonight' : undefined}
+              data-testid={slot.state === 'tonight' ? 'admin-night-slot-tonight' : undefined}
               data-date={slot.date}
               className={`rounded-3xl border p-4 transition-colors ${cardTone(slot.state)}`}
             >

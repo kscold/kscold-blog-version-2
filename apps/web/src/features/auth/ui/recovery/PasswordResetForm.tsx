@@ -123,7 +123,7 @@ export function PasswordResetForm() {
 
           <Input
             type="password"
-            data-cy="reset-password-input"
+            data-testid="reset-password-input"
             label="새 비밀번호"
             placeholder="8자 이상, 기억하기 쉬운 새 비밀번호"
             value={newPassword}
@@ -135,7 +135,7 @@ export function PasswordResetForm() {
 
           <Input
             type="password"
-            data-cy="reset-password-confirm-input"
+            data-testid="reset-password-confirm-input"
             label="새 비밀번호 확인"
             placeholder="같은 비밀번호를 한 번 더 입력해 주세요"
             value={confirmPassword}
@@ -146,14 +146,14 @@ export function PasswordResetForm() {
           />
 
           {error ? (
-            <p data-cy="reset-password-error" className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
+            <p data-testid="reset-password-error" className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
               {error}
             </p>
           ) : null}
 
           {successMessage ? (
             <p
-              data-cy="reset-password-success"
+              data-testid="reset-password-success"
               className="rounded-[12px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-700"
             >
               {successMessage}
@@ -166,7 +166,7 @@ export function PasswordResetForm() {
             size="lg"
             isLoading={passwordReset.isPending}
             className="w-full"
-            data-cy="reset-password-submit"
+            data-testid="reset-password-submit"
           >
             새 비밀번호 저장하기
           </Button>

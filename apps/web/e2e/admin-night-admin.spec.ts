@@ -84,12 +84,12 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
     await page.goto('/admin/admin-night');
     await expect(page.getByText('문서 정리와 메일 답장')).toBeVisible();
     await expect(page.getByText('진행 방식: 오프라인', { exact: true })).toBeVisible();
-    await expect(page.locator('[data-cy="admin-night-slot-request-1"]')).toHaveValue(
+    await expect(page.locator('[data-testid="admin-night-slot-request-1"]')).toHaveValue(
       slot.slotKey
     );
 
     const approvePromise = page.waitForResponse('**/api/admin/admin-night/requests/request-1/approve');
-    await page.locator('[data-cy="admin-night-approve-request-1"]').click();
+    await page.locator('[data-testid="admin-night-approve-request-1"]').click();
     await approvePromise;
   });
 
@@ -144,13 +144,13 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
 
     await page.goto('/admin/admin-night');
     await page
-      .locator('[data-cy="admin-night-review-note-request-2"]')
+      .locator('[data-testid="admin-night-review-note-request-2"]')
       .fill('실명 확인이 어려워서, 자기소개 링크나 함께 보고 싶은 맥락을 조금 더 남겨주세요.');
 
     const infoPromise = page.waitForResponse(
       '**/api/admin/admin-night/requests/request-2/request-info'
     );
-    await page.locator('[data-cy="admin-night-request-info-request-2"]').click();
+    await page.locator('[data-testid="admin-night-request-info-request-2"]').click();
     await infoPromise;
   });
 
@@ -191,8 +191,8 @@ test.describe('Admin Night 관리자 승인 시나리오', () => {
 
     await page.goto('/admin/admin-night');
 
-    await expect(page.locator('[data-cy="admin-night-slot-request-stale"]')).toHaveValue('');
-    await expect(page.locator('[data-cy="admin-night-slot-request-stale"]')).toBeEnabled();
-    await expect(page.locator('[data-cy="admin-night-approve-request-stale"]')).toBeDisabled();
+    await expect(page.locator('[data-testid="admin-night-slot-request-stale"]')).toHaveValue('');
+    await expect(page.locator('[data-testid="admin-night-slot-request-stale"]')).toBeEnabled();
+    await expect(page.locator('[data-testid="admin-night-approve-request-stale"]')).toBeDisabled();
   });
 });

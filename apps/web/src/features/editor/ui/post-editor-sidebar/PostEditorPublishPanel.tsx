@@ -38,7 +38,7 @@ export function PostEditorPublishPanel({
           <select
             value={form.status}
             onChange={event => onUpdateForm('status', event.target.value as PostEditorSidebarProps['form']['status'])}
-            data-cy="post-editor-status"
+            data-testid="post-editor-status"
             className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
           >
             <option value="DRAFT">초안</option>
@@ -73,7 +73,7 @@ export function PostEditorPublishPanel({
             type="checkbox"
             checked={form.publicOverride}
             onChange={event => onUpdateForm('publicOverride', event.target.checked)}
-            data-cy="post-editor-public-override"
+            data-testid="post-editor-public-override"
             className="h-4 w-4 rounded border-surface-300 text-surface-900 focus:ring-surface-900"
           />
         </label>
@@ -85,7 +85,7 @@ export function PostEditorPublishPanel({
           <select
             value={form.categoryId}
             onChange={event => onUpdateForm('categoryId', event.target.value)}
-            data-cy="post-editor-category"
+            data-testid="post-editor-category"
             className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
             required
           >

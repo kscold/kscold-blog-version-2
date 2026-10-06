@@ -77,9 +77,9 @@ test('로그인 전환 시 비회원 피드 캐시를 계정 상태로 재사용
   await page.goto('/feed');
   await expect(page.getByRole('button', { name: '좋아요 3개', exact: true })).toBeEnabled();
   await page.getByRole('link', { name: 'LOGIN', exact: true }).click();
-  await page.locator('[data-cy="login-email-input"]').fill(user.email);
-  await page.locator('[data-cy="login-password-input"]').fill('test-password');
-  await page.locator('[data-cy="login-submit"]').click();
+  await page.locator('[data-testid="login-email-input"]').fill(user.email);
+  await page.locator('[data-testid="login-password-input"]').fill('test-password');
+  await page.locator('[data-testid="login-submit"]').click();
   await expect(page).not.toHaveURL(/\/login/);
   await page.getByRole('link', { name: 'Feed', exact: true }).first().click();
   await expect(page.getByRole('button', { name: '좋아요 취소 9개', exact: true })).toBeEnabled();

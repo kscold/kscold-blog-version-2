@@ -23,7 +23,7 @@ export function AdminTestingArtifactsPanel({
           </div>
           <div className="mt-4 rounded-2xl bg-surface-950 text-surface-100 p-4 min-h-[280px] max-h-[420px] overflow-auto">
             <pre
-              data-cy="admin-qa-log-panel"
+              data-testid="admin-qa-log-panel"
               className="text-[11px] sm:text-xs leading-6 whitespace-pre-wrap break-words font-mono"
             >
               {session?.logs.length

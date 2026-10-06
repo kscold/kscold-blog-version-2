@@ -43,7 +43,7 @@ export function AdminStorageBrowser({
             size="sm"
             onClick={() => onNavigate(listing?.parentPrefix || '')}
             disabled={isLoading || isMutating}
-            data-cy="admin-storage-up"
+            data-testid="admin-storage-up"
           >
             상위로
           </Button>
@@ -63,7 +63,7 @@ export function AdminStorageBrowser({
                   type="button"
                   onClick={() => onNavigate(folder.key)}
                   className="w-full text-left"
-                  data-cy={`admin-storage-folder-${folder.name}`}
+                  data-testid={`admin-storage-folder-${folder.name}`}
                 >
                   <div className="text-sm font-semibold leading-6 text-surface-900 [overflow-wrap:anywhere]">
                     {folder.name}
@@ -83,7 +83,7 @@ export function AdminStorageBrowser({
                     className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
                     disabled={isMutating}
                     onClick={() => void onDeleteEntry(folder.key, folder.name)}
-                    data-cy={`admin-storage-delete-folder-${folder.name}`}
+                    data-testid={`admin-storage-delete-folder-${folder.name}`}
                   >
                     삭제
                   </Button>
@@ -127,7 +127,7 @@ export function AdminStorageBrowser({
                       type="button"
                       onClick={() => onSelectObject(object.key)}
                       className="text-left"
-                      data-cy={`admin-storage-object-${object.name}`}
+                      data-testid={`admin-storage-object-${object.name}`}
                     >
                       <div className="text-sm font-semibold leading-6 text-surface-900 [overflow-wrap:anywhere]">
                         {object.name}
@@ -159,7 +159,7 @@ export function AdminStorageBrowser({
                         type="button"
                         onClick={() => void onDeleteEntry(object.key, object.name)}
                         className="text-sm font-semibold text-red-600 hover:text-red-700"
-                        data-cy={`admin-storage-delete-object-${object.name}`}
+                        data-testid={`admin-storage-delete-object-${object.name}`}
                       >
                         삭제
                       </button>

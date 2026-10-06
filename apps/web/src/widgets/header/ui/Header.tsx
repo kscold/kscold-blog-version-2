@@ -62,7 +62,7 @@ export function Header() {
           <div className="flex items-center gap-3 sm:gap-8 min-w-0">
             <button
               onClick={toggleSidebar}
-              data-cy="sidebar-toggle"
+              data-testid="sidebar-toggle"
               className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-surface-100 transition-colors text-surface-900"
               aria-label="Toggle sidebar"
             >
@@ -94,7 +94,7 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  data-cy={`nav-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  data-testid={`nav-link-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
                   className="relative px-4 py-2 text-sm font-medium text-surface-500 hover:text-surface-900 transition-colors group overflow-hidden rounded-full"
                 >
                   <span className="relative z-10">{item.label}</span>
@@ -109,7 +109,7 @@ export function Header() {
             {!isReady ? (
               <div
                 className="h-9 w-[76px]"
-                data-cy="header-auth-loading"
+                data-testid="header-auth-loading"
                 aria-hidden="true"
               />
             ) : isAuthenticated ? (
@@ -117,7 +117,7 @@ export function Header() {
                 {role === 'ADMIN' && (
                   <Link
                     href="/admin"
-                    data-cy="admin-header-link"
+                    data-testid="admin-header-link"
                     className="hidden sm:inline-flex items-center rounded-full border border-surface-200 px-3 py-1.5 text-xs font-semibold text-surface-900 hover:bg-surface-100 transition-colors sm:px-4 sm:py-2 sm:text-sm"
                   >
                     Admin
@@ -142,7 +142,7 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                data-cy="header-login-btn"
+                data-testid="header-login-btn"
                 className="px-5 py-2 text-xs sm:text-sm font-bold text-white bg-surface-900 hover:bg-surface-800 transition-colors rounded-full"
               >
                 LOGIN

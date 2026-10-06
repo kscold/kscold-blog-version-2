@@ -21,10 +21,10 @@ test.describe('계정 복구 시나리오', () => {
   }) => {
     await page.goto('/login');
 
-    await page.locator('[data-cy="login-find-username"]').click();
+    await page.locator('[data-testid="login-find-username"]').click();
     await expect(page).toHaveURL(/\/login\/recovery\?tab=username/);
 
-    await page.locator('[data-cy="recovery-tab-password"]').click();
+    await page.locator('[data-testid="recovery-tab-password"]').click();
     await expect(page).toHaveURL(/\/login\/recovery\?tab=password/);
   });
 
@@ -39,10 +39,10 @@ test.describe('계정 복구 시나리오', () => {
     });
 
     await page.goto('/login/recovery?tab=username');
-    await page.locator('[data-cy="recovery-email-input"]').fill('hello@kscold.com');
-    await page.locator('[data-cy="recovery-submit"]').click();
+    await page.locator('[data-testid="recovery-email-input"]').fill('hello@kscold.com');
+    await page.locator('[data-testid="recovery-submit"]').click();
 
-    await expect(page.locator('[data-cy="recovery-success"]')).toContainText(
+    await expect(page.locator('[data-testid="recovery-success"]')).toContainText(
       '가입한 이메일로 아이디 안내를 보냈습니다'
     );
   });
@@ -56,13 +56,13 @@ test.describe('계정 복구 시나리오', () => {
     );
 
     await page.goto('/login/recovery?tab=password');
-    await page.locator('[data-cy="recovery-email-input"]').fill('notregistered@example.com');
-    await page.locator('[data-cy="recovery-submit"]').click();
+    await page.locator('[data-testid="recovery-email-input"]').fill('notregistered@example.com');
+    await page.locator('[data-testid="recovery-submit"]').click();
 
-    await expect(page.locator('[data-cy="recovery-success"]')).toContainText(
+    await expect(page.locator('[data-testid="recovery-success"]')).toContainText(
       '비밀번호 재설정 링크를 이메일로 보냈습니다'
     );
-    await expect(page.locator('[data-cy="recovery-error"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="recovery-error"]')).toHaveCount(0);
   });
 
   test('비밀번호 재설정 탭은 메일함으로 링크를 보내고 성공 상태를 보여준다', async ({ page }) => {
@@ -76,10 +76,10 @@ test.describe('계정 복구 시나리오', () => {
     });
 
     await page.goto('/login/recovery?tab=password');
-    await page.locator('[data-cy="recovery-email-input"]').fill('hello@kscold.com');
-    await page.locator('[data-cy="recovery-submit"]').click();
+    await page.locator('[data-testid="recovery-email-input"]').fill('hello@kscold.com');
+    await page.locator('[data-testid="recovery-submit"]').click();
 
-    await expect(page.locator('[data-cy="recovery-success"]')).toContainText(
+    await expect(page.locator('[data-testid="recovery-success"]')).toContainText(
       '비밀번호 재설정 링크를 이메일로 보냈습니다'
     );
   });
@@ -112,11 +112,11 @@ test.describe('계정 복구 시나리오', () => {
 
     await expect(page).toHaveURL('/login/reset-password');
 
-    await page.locator('[data-cy="reset-password-input"]').fill('new-password-123');
-    await page.locator('[data-cy="reset-password-confirm-input"]').fill('new-password-123');
-    await page.locator('[data-cy="reset-password-submit"]').click();
+    await page.locator('[data-testid="reset-password-input"]').fill('new-password-123');
+    await page.locator('[data-testid="reset-password-confirm-input"]').fill('new-password-123');
+    await page.locator('[data-testid="reset-password-submit"]').click();
 
-    await expect(page.locator('[data-cy="reset-password-success"]')).toContainText(
+    await expect(page.locator('[data-testid="reset-password-success"]')).toContainText(
       '새 비밀번호로 다시 로그인할 수 있습니다.'
     );
   });

@@ -68,7 +68,7 @@ export function AccountRecoveryForm() {
       <div className="grid grid-cols-2 gap-2 rounded-[14px] border border-surface-200 bg-surface-50 p-1">
         <button
           type="button"
-          data-cy="recovery-tab-username"
+          data-testid="recovery-tab-username"
           onClick={() => switchTab('username')}
           className={`rounded-[10px] px-4 py-3 text-sm font-semibold transition ${
             activeTab === 'username'
@@ -80,7 +80,7 @@ export function AccountRecoveryForm() {
         </button>
         <button
           type="button"
-          data-cy="recovery-tab-password"
+          data-testid="recovery-tab-password"
           onClick={() => switchTab('password')}
           className={`rounded-[10px] px-4 py-3 text-sm font-semibold transition ${
             activeTab === 'password'
@@ -95,7 +95,7 @@ export function AccountRecoveryForm() {
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <Input
           type="email"
-          data-cy="recovery-email-input"
+          data-testid="recovery-email-input"
           label="가입 이메일"
           placeholder="가입에 사용한 이메일을 입력해 주세요"
           value={email}
@@ -116,14 +116,14 @@ export function AccountRecoveryForm() {
         </div>
 
         {error ? (
-          <p data-cy="recovery-error" className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
+          <p data-testid="recovery-error" className="rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-500">
             {error}
           </p>
         ) : null}
 
         {successMessage ? (
           <p
-            data-cy="recovery-success"
+            data-testid="recovery-success"
             className="rounded-[12px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-700"
           >
             {successMessage}
@@ -136,7 +136,7 @@ export function AccountRecoveryForm() {
           size="lg"
           isLoading={isLoading}
           className="w-full"
-          data-cy="recovery-submit"
+          data-testid="recovery-submit"
         >
           {activeTab === 'username' ? '아이디 안내 메일 보내기' : '재설정 링크 보내기'}
         </Button>

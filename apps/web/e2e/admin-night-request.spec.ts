@@ -110,15 +110,15 @@ test.describe('Admin Night 신청 시나리오', () => {
 
     await page.goto('/admin-night');
 
-    await page.locator('[data-cy="admin-night-request-name"]').fill('류태호');
-    await page.locator('[data-cy="admin-night-request-title"]').fill('작은 버그 수정과 블로그 초안 정리');
-    await page.locator('[data-cy="admin-night-mode-offline"]').click();
-    await setRangeValue(page, '[data-cy="admin-night-range-end"]', '1320');
-    await expect(page.locator('[data-cy="admin-night-range-summary"]')).toContainText('19:00 - 22:00');
+    await page.locator('[data-testid="admin-night-request-name"]').fill('류태호');
+    await page.locator('[data-testid="admin-night-request-title"]').fill('작은 버그 수정과 블로그 초안 정리');
+    await page.locator('[data-testid="admin-night-mode-offline"]').click();
+    await setRangeValue(page, '[data-testid="admin-night-range-end"]', '1320');
+    await expect(page.locator('[data-testid="admin-night-range-summary"]')).toContainText('19:00 - 22:00');
     await page
-      .locator('[data-cy="admin-night-request-message"]')
+      .locator('[data-testid="admin-night-request-message"]')
       .fill('퇴근 후 몰입해서 문서와 작은 버그를 같이 정리하고 싶어요.');
-    await page.locator('[data-cy="admin-night-request-submit"]').click();
+    await page.locator('[data-testid="admin-night-request-submit"]').click();
 
     await expect(page.getByText('신청 PR을 보냈습니다')).toBeVisible();
     await expect(page.getByText('작은 버그 수정과 블로그 초안 정리')).toBeVisible();
@@ -206,19 +206,19 @@ test.describe('Admin Night 신청 시나리오', () => {
 
     await expect(page.getByText('추가 정보 요청됨')).toBeVisible();
     await expect(page.getByText('실명 확인이 어려워서')).toBeVisible();
-    await page.locator('[data-cy="admin-night-resubmit-start-request-2"]').click();
-    await expect(page.locator('[data-cy="admin-night-request-submit"]')).toBeDisabled();
-    const selectedDate = page.locator('[data-cy^="admin-night-date-option-"]').first();
+    await page.locator('[data-testid="admin-night-resubmit-start-request-2"]').click();
+    await expect(page.locator('[data-testid="admin-night-request-submit"]')).toBeDisabled();
+    const selectedDate = page.locator('[data-testid^="admin-night-date-option-"]').first();
     await selectedDate.click();
     await expect(selectedDate).toHaveAttribute('aria-pressed', 'true');
-    await page.locator('[data-cy="admin-night-request-title"]').fill('실명과 일정 맥락을 보완한 신청');
-    await page.locator('[data-cy="admin-night-mode-offline"]').click();
-    await setRangeValue(page, '[data-cy="admin-night-range-end"]', '1320');
-    await expect(page.locator('[data-cy="admin-night-range-summary"]')).toContainText('19:00 - 22:00');
+    await page.locator('[data-testid="admin-night-request-title"]').fill('실명과 일정 맥락을 보완한 신청');
+    await page.locator('[data-testid="admin-night-mode-offline"]').click();
+    await setRangeValue(page, '[data-testid="admin-night-range-end"]', '1320');
+    await expect(page.locator('[data-testid="admin-night-range-summary"]')).toContainText('19:00 - 22:00');
     await page
-      .locator('[data-cy="admin-night-request-message"]')
+      .locator('[data-testid="admin-night-request-message"]')
       .fill('오프라인으로 만나서 블로그 초안과 밀린 메일을 같이 끝내고 싶어요.');
-    await page.locator('[data-cy="admin-night-request-submit"]').click();
+    await page.locator('[data-testid="admin-night-request-submit"]').click();
 
     await expect(page.getByText('보완한 신청을 다시 보냈습니다')).toBeVisible();
     await expect(page.getByText('실명과 일정 맥락을 보완한 신청')).toBeVisible();

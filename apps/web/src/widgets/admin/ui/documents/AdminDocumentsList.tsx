@@ -22,7 +22,7 @@ interface AdminDocumentsListProps {
 export function AdminDocumentsList(props: AdminDocumentsListProps) {
   const { listing, isLoading, disabled, error, notice, hasFilter } = props;
   return (
-    <div className="space-y-4" aria-busy={isLoading} data-cy="admin-documents-list">
+    <div className="space-y-4" aria-busy={isLoading} data-testid="admin-documents-list">
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-surface-500">
         <p>
           {listing

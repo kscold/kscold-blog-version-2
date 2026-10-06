@@ -67,7 +67,7 @@ export function FeedComposerEditorCard({
         onPaste={event => void onPaste(event)}
         placeholder="지금 하고 있는 작업, 막 떠오른 생각, 링크를 보고 든 생각을 편하게 남겨보세요."
         rows={shouldShowExpanded ? 8 : 3}
-        data-cy="feed-composer-content"
+        data-testid="feed-composer-content"
         aria-label="피드 본문"
         aria-invalid={Boolean(contentError)}
         aria-describedby={contentError ? 'feed-composer-content-error' : undefined}

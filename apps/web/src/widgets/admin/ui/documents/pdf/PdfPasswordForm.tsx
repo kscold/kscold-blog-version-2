@@ -47,7 +47,7 @@ export function PdfPasswordForm({ request }: { request: PdfPasswordRequest }) {
           value={password}
           onChange={event => setPassword(event.target.value)}
           aria-label="PDF 암호"
-          data-cy="pdf-viewer-password"
+          data-testid="pdf-viewer-password"
           className="mt-2 h-11 w-full rounded-lg border border-surface-200 px-3 focus:outline-none focus:ring-2 focus:ring-surface-900"
         />
       </label>
@@ -55,7 +55,7 @@ export function PdfPasswordForm({ request }: { request: PdfPasswordRequest }) {
         type="submit"
         className="w-full"
         disabled={!password}
-        data-cy="pdf-viewer-password-submit"
+        data-testid="pdf-viewer-password-submit"
       >
         PDF 열기
       </Button>

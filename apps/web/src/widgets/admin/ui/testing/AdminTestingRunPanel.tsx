@@ -29,7 +29,7 @@ export function AdminTestingRunPanel({
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold text-surface-900">실행 패널</h2>
               <span
-                data-cy="admin-qa-status"
+                data-testid="admin-qa-status"
                 className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusTone(currentStatus)}`}
               >
                 {statusLabel(currentStatus)}
@@ -49,7 +49,7 @@ export function AdminTestingRunPanel({
               isLoading={isRunningAction && activeAction === 'start'}
               disabled={isLoading || isRunningAction || currentStatus === 'running'}
               onClick={() => void onAction('start')}
-              data-cy="admin-qa-run-button"
+              data-testid="admin-qa-run-button"
             >
               테스트 실행
             </Button>
@@ -61,7 +61,7 @@ export function AdminTestingRunPanel({
               isLoading={isRunningAction && activeAction === 'stop'}
               disabled={isLoading || isRunningAction || currentStatus !== 'running'}
               onClick={() => void onAction('stop')}
-              data-cy="admin-qa-stop-button"
+              data-testid="admin-qa-stop-button"
             >
               실행 중지
             </Button>
@@ -73,7 +73,7 @@ export function AdminTestingRunPanel({
               isLoading={isRunningAction && activeAction === 'delete'}
               disabled={isLoading || isRunningAction || !session || currentStatus === 'running'}
               onClick={() => void onAction('delete')}
-              data-cy="admin-qa-delete-button"
+              data-testid="admin-qa-delete-button"
             >
               결과 삭제
             </Button>

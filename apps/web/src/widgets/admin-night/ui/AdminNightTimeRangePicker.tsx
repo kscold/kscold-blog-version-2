@@ -52,7 +52,7 @@ export function AdminNightTimeRangePicker({
           </p>
         </div>
         <span
-          data-cy="admin-night-range-summary"
+          data-testid="admin-night-range-summary"
           className="inline-flex items-center rounded-full border border-surface-200 bg-white px-3 py-1.5 text-sm font-bold text-surface-900"
         >
           {formatAdminNightTimeRange(startMinutes, endMinutes)}
@@ -76,7 +76,7 @@ export function AdminNightTimeRangePicker({
             max={ADMIN_NIGHT_REQUEST_END_MINUTES}
             step={ADMIN_NIGHT_REQUEST_STEP_MINUTES}
             value={endMinutes}
-            data-cy="admin-night-range-end"
+            data-testid="admin-night-range-end"
             onInput={handleEndInput}
             onChange={handleEndInput}
             onPointerDown={() => setIsDragging(true)}

@@ -110,7 +110,7 @@ export default function TiptapEditor({
 
   return (
     <div
-      data-cy="post-editor-document"
+      data-testid="post-editor-document"
       className="overflow-hidden rounded-[28px] border border-surface-200 bg-white shadow-sm"
     >
       <EditorSurfaceHeader

@@ -17,7 +17,7 @@ interface AdminPageProps {
 /** 관리자 화면의 공통 바탕과 본문 폭. 화면마다 여백과 폭이 달라 보이지 않게 한다. */
 export function AdminPage({ children, width = 'default', testId }: AdminPageProps) {
   return (
-    <div data-cy={testId} className="min-h-screen bg-surface-50 px-4 py-8 sm:px-6 lg:px-8">
+    <div data-testid={testId} className="min-h-screen bg-surface-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className={`mx-auto ${WIDTH_CLASS[width]} space-y-6`}>{children}</div>
     </div>
   );
@@ -74,7 +74,7 @@ export function AdminActionLink({
   testId,
 }: AdminActionLinkProps) {
   return (
-    <Link href={href} data-cy={testId} className={`${ACTION_BASE} ${ACTION_VARIANT[variant]}`}>
+    <Link href={href} data-testid={testId} className={`${ACTION_BASE} ${ACTION_VARIANT[variant]}`}>
       {children}
     </Link>
   );

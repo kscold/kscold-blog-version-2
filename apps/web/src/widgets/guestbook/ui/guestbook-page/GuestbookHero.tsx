@@ -10,7 +10,7 @@ export function GuestbookHero({ isAuthenticated, totalEntries }: GuestbookHeroPr
         Guestbook
       </p>
       <h1 className="mt-3 max-w-[10ch] break-keep text-[2.6rem] font-sans font-black leading-[1.05] tracking-[-0.04em] text-surface-900 sm:text-[3.2rem]">
-        <span data-cy="guestbook-title">방명록을 남겨주세요!</span>
+        <span data-testid="guestbook-title">방명록을 남겨주세요!</span>
       </h1>
       <p className="mt-4 max-w-2xl break-keep text-sm leading-7 text-surface-600 sm:text-base">
         지나간 자리에서 떠오른 생각 한 줄이면 충분합니다. 짧은 인사도 좋고, 읽고 간 글에 대한 감상,

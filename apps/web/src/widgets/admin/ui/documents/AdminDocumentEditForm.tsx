@@ -39,7 +39,7 @@ export function AdminDocumentEditForm({
     <section
       aria-labelledby="document-edit-heading"
       className="mb-5 space-y-4 rounded-xl border border-surface-300 bg-surface-50 p-4 sm:p-5"
-      data-cy="admin-document-edit-form"
+      data-testid="admin-document-edit-form"
     >
       <div>
         <h3 id="document-edit-heading" className="text-base font-bold text-surface-900">
@@ -99,7 +99,7 @@ export function AdminDocumentEditForm({
             size="sm"
             isLoading={isSaving}
             disabled={!details.title.trim()}
-            data-cy="admin-document-edit-save"
+            data-testid="admin-document-edit-save"
           >
             저장
           </Button>

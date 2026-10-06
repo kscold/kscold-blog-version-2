@@ -16,7 +16,7 @@ export function PdfReaderContent({ state, onRetry }: PdfReaderContentProps) {
       onScroll={state.navigation.onScroll}
       tabIndex={0}
       aria-label="PDF 본문"
-      data-cy="pdf-viewer-scroll"
+      data-testid="pdf-viewer-scroll"
       data-scale={state.scale}
       data-rotation={state.rotation}
       className="relative min-h-0 min-w-0 flex-1 overflow-auto overscroll-contain focus:outline-none"

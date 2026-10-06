@@ -2,14 +2,14 @@ import type { ToolbarButtonConfig } from '@/features/editor/model/tiptapToolbar'
 
 export function TiptapToolbar({
   buttons,
-  dataCy,
+  testId,
 }: {
   buttons: ToolbarButtonConfig[];
-  dataCy: string;
+  testId: string;
 }) {
   return (
     <div
-      data-cy={dataCy}
+      data-testid={testId}
       className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       {buttons.map(button => (

@@ -23,7 +23,7 @@ async function visitAsAdmin(page: Page, width: number, height: number) {
   await seedAdminSession(page);
   await page.setViewportSize({ width, height });
   await page.goto('/');
-  await expect(page.locator('[data-cy="header-auth-loading"]')).toHaveCount(0);
+  await expect(page.locator('[data-testid="header-auth-loading"]')).toHaveCount(0);
 }
 
 test.describe('관리자 진입 반응형 시나리오', () => {
@@ -44,10 +44,10 @@ test.describe('관리자 진입 반응형 시나리오', () => {
       expect(layout.scrollWidth, JSON.stringify(layout.overflowingElements)).toBeLessThanOrEqual(width);
 
       // 사이드바는 데스크탑·모바일 두 벌이 렌더되어 CSS 로 숨겨지므로 :visible 로 좁힌다
-      await expectWithinViewport(page, '[data-cy="sidebar-toggle"]:visible', width);
-      await page.locator('[data-cy="sidebar-toggle"]:visible').click();
-      await expectWithinViewport(page, '[data-cy="sidebar-link-admin"]:visible', width);
-      await page.locator('[data-cy="sidebar-link-admin"]:visible').click();
+      await expectWithinViewport(page, '[data-testid="sidebar-toggle"]:visible', width);
+      await page.locator('[data-testid="sidebar-toggle"]:visible').click();
+      await expectWithinViewport(page, '[data-testid="sidebar-link-admin"]:visible', width);
+      await page.locator('[data-testid="sidebar-link-admin"]:visible').click();
 
       await expect(page).toHaveURL(/\/admin/, { timeout: 20_000 });
       await expect(page.getByText('Dashboard').first()).toBeVisible();
@@ -61,8 +61,8 @@ test.describe('관리자 진입 반응형 시나리오', () => {
       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(scrollWidth).toBeLessThanOrEqual(width);
 
-      await expectWithinViewport(page, '[data-cy="admin-header-link"]', width);
-      await page.locator('[data-cy="admin-header-link"]').click();
+      await expectWithinViewport(page, '[data-testid="admin-header-link"]', width);
+      await page.locator('[data-testid="admin-header-link"]').click();
 
       await expect(page).toHaveURL(/\/admin/, { timeout: 20_000 });
       await expect(page.getByText('Dashboard').first()).toBeVisible();

@@ -4,8 +4,8 @@ import { commands, scenarioLinks } from '@/widgets/admin/lib/adminTesting';
 
 function ScenarioLink({ link, children }: { link: typeof scenarioLinks[number]; children: ReactNode }) {
   const className = 'group rounded-2xl border border-surface-200 bg-white p-5 hover:border-surface-300 hover:shadow-sm transition-all';
-  if (link.href === '/admin/documents') return <a href={link.href} data-cy={link.dataCy} className={className}>{children}</a>;
-  return <Link href={link.href} data-cy={link.dataCy} className={className}>{children}</Link>;
+  if (link.href === '/admin/documents') return <a href={link.href} data-testid={link.testId} className={className}>{children}</a>;
+  return <Link href={link.href} data-testid={link.testId} className={className}>{children}</Link>;
 }
 
 export function AdminTestingReferencePanels() {
@@ -44,7 +44,7 @@ export function AdminTestingReferencePanels() {
             {commands.map(item => (
               <div
                 key={item.command}
-                data-cy={item.dataCy}
+                data-testid={item.testId}
                 className="rounded-xl border border-surface-100 bg-surface-50 px-4 py-3"
               >
                 <div className="text-sm font-semibold text-surface-900">{item.title}</div>

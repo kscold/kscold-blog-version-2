@@ -9,7 +9,7 @@ export function AdminDocumentSpaceNavigation({ active }: { active: AdminDocument
           key={space.id}
           href={space.href}
           aria-current={space.id === active ? 'page' : undefined}
-          data-cy={`admin-document-space-${space.id}`}
+          data-testid={`admin-document-space-${space.id}`}
           className={`flex min-h-12 items-center justify-center rounded-xl border px-3 py-3 text-center text-sm font-semibold transition-colors ${
             space.id === active
               ? 'border-surface-900 bg-surface-900 text-white'

@@ -23,32 +23,32 @@ test.describe('피드 에디터 반응형 시나리오', () => {
       await page.reload();
 
       // 스트리밍된 SSR 임시 복제본이 제거된 뒤 실제 편집기를 조작한다.
-      await expect(page.locator('[data-cy="feed-editor-surface"]')).toHaveCount(1);
-      await expect(page.locator('[data-cy="feed-editor-surface"]')).toBeVisible();
-      const content = page.locator('[data-cy="feed-editor-content"]');
-      const submitButton = page.locator('[data-cy="feed-editor-submit"]');
+      await expect(page.locator('[data-testid="feed-editor-surface"]')).toHaveCount(1);
+      await expect(page.locator('[data-testid="feed-editor-surface"]')).toBeVisible();
+      const content = page.locator('[data-testid="feed-editor-content"]');
+      const submitButton = page.locator('[data-testid="feed-editor-submit"]');
       await expect(content).toBeVisible();
       await expect(content).toHaveAttribute('maxlength', '10000');
       await expect(async () => {
         await content.fill('노션형 피드 작성기 흐름 점검');
         await expect(submitButton).toBeEnabled();
       }).toPass();
-      await expect(page.locator('[data-cy="feed-editor-images"]')).toBeVisible();
+      await expect(page.locator('[data-testid="feed-editor-images"]')).toBeVisible();
 
-      const linkInput = page.locator('[data-cy="feed-editor-link-input"]');
+      const linkInput = page.locator('[data-testid="feed-editor-link-input"]');
       await expect(linkInput).toBeVisible();
       await expect(linkInput).toHaveAttribute('maxlength', '2048');
       await linkInput.fill('httpx://kscold.com/info/team');
-      await expect(page.locator('[data-cy="feed-editor-link-error"]')).toContainText(
+      await expect(page.locator('[data-testid="feed-editor-link-error"]')).toContainText(
         'http 또는 https'
       );
       await expect(submitButton).toBeDisabled();
       await linkInput.fill('https://kscold.com/info/team');
       await expect(page.getByText('Colding 소개')).toBeVisible();
 
-      await expect(page.locator('[data-cy="feed-editor-sidebar"]')).toBeVisible();
-      await expect(page.locator('[data-cy="feed-editor-upload"]')).toBeAttached();
-      await expect(page.locator('[data-cy="feed-editor-visibility"]')).toBeVisible();
+      await expect(page.locator('[data-testid="feed-editor-sidebar"]')).toBeVisible();
+      await expect(page.locator('[data-testid="feed-editor-upload"]')).toBeAttached();
+      await expect(page.locator('[data-testid="feed-editor-visibility"]')).toBeVisible();
       await expect(submitButton).toBeAttached();
 
       await expectNoHorizontalOverflow(page, viewport.width);
@@ -89,10 +89,10 @@ test.describe('피드 에디터 반응형 시나리오', () => {
     });
 
     await page.goto('/admin/feed/feed-edit/edit');
-    const linkInput = page.locator('[data-cy="feed-editor-link-input"]');
+    const linkInput = page.locator('[data-testid="feed-editor-link-input"]');
     await expect(linkInput).toHaveValue('https://kscold.com/info/team');
     await linkInput.fill('');
-    await page.locator('[data-cy="feed-editor-submit"]').click();
+    await page.locator('[data-testid="feed-editor-submit"]').click();
 
     await expect.poll(() => updateBody?.linkUrl).toBe('');
   });

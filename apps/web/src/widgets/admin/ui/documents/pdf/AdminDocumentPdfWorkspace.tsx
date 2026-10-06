@@ -24,7 +24,7 @@ export function AdminDocumentPdfWorkspace({ id }: { id: string }) {
     <section
       className="fixed inset-0 z-[100] flex h-dvh min-w-0 flex-col bg-surface-100"
       aria-label="비공개 PDF 뷰어"
-      data-cy="admin-document-viewer"
+      data-testid="admin-document-viewer"
     >
       <PdfViewerHeader document={resource?.document} />
       {resource ? (

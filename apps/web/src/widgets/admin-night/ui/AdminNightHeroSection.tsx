@@ -25,14 +25,14 @@ export function AdminNightHeroSection() {
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href="#admin-night-request"
-            data-cy="admin-night-hero-primary"
+            data-testid="admin-night-hero-primary"
             className="inline-flex items-center justify-center rounded-2xl bg-surface-900 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-surface-800"
           >
             Admin Night 신청 보내기
           </Link>
           <Link
             href="/guestbook"
-            data-cy="admin-night-hero-secondary"
+            data-testid="admin-night-hero-secondary"
             className="inline-flex items-center justify-center rounded-2xl border border-surface-200 bg-white px-6 py-3 text-sm font-bold text-surface-900 transition-colors hover:bg-surface-50"
           >
             방명록에 한 줄 남기기

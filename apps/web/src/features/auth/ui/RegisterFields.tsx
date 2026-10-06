@@ -24,7 +24,7 @@ export function RegisterFields({
         onChange={e => onDisplayNameChange(e.target.value)}
         helperText="실명 또는 닉네임을 입력해 주세요. 피드·댓글에 표시됩니다."
         autoComplete="name"
-        data-cy="register-display-name-input"
+        data-testid="register-display-name-input"
         maxLength={30}
         required
       />
@@ -37,7 +37,7 @@ export function RegisterFields({
           onChange={e => onUsernameChange(e.target.value)}
           helperText="영문 소문자·숫자·밑줄(_) 3-20자 · 프로필 URL에 사용됩니다."
           autoComplete="username"
-          data-cy="register-username-input"
+          data-testid="register-username-input"
           minLength={3}
           maxLength={20}
           required

@@ -16,13 +16,13 @@ function ShortcutLink({ item }: { item: AdminNavItem }) {
   // 개인 문서로 들어갈 때는 공개 화면의 외부 스크립트를 이어받지 않도록 전체 페이지 이동으로 연다.
   if (item.hardNavigation) {
     return (
-      <a href={item.href} data-cy={item.dashboardTestId} className={LINK_CLASS}>
+      <a href={item.href} data-testid={item.dashboardTestId} className={LINK_CLASS}>
         {content}
       </a>
     );
   }
   return (
-    <Link href={item.href} data-cy={item.dashboardTestId} className={LINK_CLASS}>
+    <Link href={item.href} data-testid={item.dashboardTestId} className={LINK_CLASS}>
       {content}
     </Link>
   );

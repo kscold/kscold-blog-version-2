@@ -21,7 +21,7 @@ export function AdminDocumentAccessGate({
   }
   if (user?.role !== 'ADMIN') {
     return (
-      <div className="p-8 text-sm text-surface-600" data-cy="admin-documents-auth-required">
+      <div className="p-8 text-sm text-surface-600" data-testid="admin-documents-auth-required">
         <p role={error ? 'alert' : undefined}>
           {error || '개인 문서는 관리자 로그인 후 이용할 수 있습니다.'}
         </p>
@@ -32,7 +32,7 @@ export function AdminDocumentAccessGate({
             size="sm"
             className="mt-4 mr-3"
             onClick={verifyAgain}
-            data-cy="admin-documents-verify-session"
+            data-testid="admin-documents-verify-session"
           >
             로그인 상태 다시 확인
           </Button>

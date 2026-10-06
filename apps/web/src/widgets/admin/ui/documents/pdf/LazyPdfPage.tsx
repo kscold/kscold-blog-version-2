@@ -43,7 +43,7 @@ export function LazyPdfPage(props: LazyPageProps) {
   return (
     <div
       ref={state.pageRef}
-      data-cy={`pdf-page-${pageNumber}`}
+      data-testid={`pdf-page-${pageNumber}`}
       data-pdf-page={pageNumber}
       className="relative shrink-0 overflow-hidden bg-white shadow-sm"
       style={{ width, minHeight: state.height }}

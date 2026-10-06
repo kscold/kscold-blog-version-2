@@ -33,7 +33,7 @@ export default function FeedActionBar({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <aside data-cy="feed-editor-sidebar" className="space-y-4 xl:sticky xl:top-24 xl:self-start">
+    <aside data-testid="feed-editor-sidebar" className="space-y-4 xl:sticky xl:top-24 xl:self-start">
       <div className="rounded-[28px] border border-surface-200 bg-white p-5 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-surface-400">
           Compose
@@ -74,7 +74,7 @@ export default function FeedActionBar({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          data-cy="feed-editor-upload"
+          data-testid="feed-editor-upload"
           disabled={isUploading || imageCount >= FEED_INPUT_LIMITS.imageCount}
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-semibold text-surface-700 transition-colors hover:bg-surface-100 hover:text-surface-900 disabled:cursor-not-allowed disabled:opacity-60"
         >
@@ -103,7 +103,7 @@ export default function FeedActionBar({
             event.target.value = '';
           }}
           className="hidden"
-          data-cy="feed-editor-upload-input"
+          data-testid="feed-editor-upload-input"
         />
 
         <div className="mt-5">
@@ -111,7 +111,7 @@ export default function FeedActionBar({
             Visibility
           </p>
           <div
-            data-cy="feed-editor-visibility"
+            data-testid="feed-editor-visibility"
             className="inline-flex w-full rounded-full border border-surface-200 bg-surface-50 p-1"
           >
             {(['PUBLIC', 'PRIVATE'] as const).map(option => (
@@ -147,7 +147,7 @@ export default function FeedActionBar({
         <button
           type="button"
           onClick={onSubmit}
-          data-cy="feed-editor-submit"
+          data-testid="feed-editor-submit"
           disabled={isPending || isSubmitDisabled}
           className="mt-5 w-full rounded-full bg-white px-6 py-3 font-semibold text-surface-900 transition-colors hover:bg-surface-100 disabled:cursor-not-allowed disabled:opacity-60"
         >

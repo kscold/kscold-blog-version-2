@@ -10,7 +10,7 @@ export function AdminNightRequestGuestPrompt() {
       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
         <Link
           href="/login?redirect=%2Fadmin-night"
-          data-cy="admin-night-request-login"
+          data-testid="admin-night-request-login"
           className="inline-flex items-center justify-center rounded-2xl bg-surface-900 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-surface-800"
         >
           로그인하고 신청하기

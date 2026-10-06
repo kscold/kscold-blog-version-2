@@ -17,10 +17,10 @@ export function FeedEditorMediaPanel({ images, error, onRemove }: FeedEditorMedi
         </p>
       </div>
       {images.length > 0 ? (
-        <ImagePreviewGrid images={images} onRemove={onRemove} dataCy="feed-editor-images" />
+        <ImagePreviewGrid images={images} onRemove={onRemove} testId="feed-editor-images" />
       ) : (
         <div
-          data-cy="feed-editor-images"
+          data-testid="feed-editor-images"
           className="rounded-[24px] border border-dashed border-surface-200 bg-white px-5 py-8 text-center"
         >
           <p className="text-base font-semibold text-surface-900">아직 첨부된 이미지가 없습니다</p>
@@ -33,7 +33,7 @@ export function FeedEditorMediaPanel({ images, error, onRemove }: FeedEditorMedi
       {error ? (
         <p
           role="alert"
-          data-cy="feed-editor-image-error"
+          data-testid="feed-editor-image-error"
           className="mt-3 text-sm font-semibold text-red-500"
         >
           {error}

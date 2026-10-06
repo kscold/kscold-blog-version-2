@@ -159,7 +159,7 @@ export function FeedCopilotPanel({
 
   return (
     <section
-      data-cy="feed-copilot"
+      data-testid="feed-copilot"
       className={`overflow-hidden rounded-[28px] border border-surface-200 bg-white shadow-[0_18px_48px_rgba(15,23,42,0.05)] ${
         isChat ? 'shadow-none' : ''
       }`}

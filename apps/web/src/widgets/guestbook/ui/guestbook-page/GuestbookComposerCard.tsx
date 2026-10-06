@@ -33,7 +33,7 @@ export function GuestbookComposerCard({
           </p>
           <form onSubmit={onSubmit} className="mt-4 space-y-3">
             <textarea
-              data-cy="guestbook-textarea"
+              data-testid="guestbook-textarea"
               value={content}
               onChange={event => onChangeContent(event.target.value)}
               placeholder="잘 보고 갑니다, 다음 글도 기대할게요, 이 부분은 조금 어색했어요 같은 짧은 메모면 충분해요."
@@ -46,7 +46,7 @@ export function GuestbookComposerCard({
               <p className="text-xs text-white/55">{remainingCharacters}자 남음</p>
               <button
                 type="submit"
-                data-cy="guestbook-submit"
+                data-testid="guestbook-submit"
                 disabled={isSubmitting || !content.trim()}
                 className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-surface-900 transition-colors hover:bg-surface-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -62,7 +62,7 @@ export function GuestbookComposerCard({
           </p>
           <Link
             href="/login?redirect=%2Fguestbook"
-            data-cy="guestbook-login-cta"
+            data-testid="guestbook-login-cta"
             className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-surface-900 transition-colors hover:bg-surface-100"
           >
             로그인하고 남기기

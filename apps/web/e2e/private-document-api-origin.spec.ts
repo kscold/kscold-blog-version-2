@@ -28,7 +28,7 @@ test('비공개 문서 인증과 조회는 CSP를 완화하지 않고 같은 출
   await seedAdminSession(page);
   await mockPrivateDocuments(page);
   const response = await page.goto('/admin/documents');
-  await expect(page.locator('[data-cy="admin-documents-page"]')).toBeVisible();
+  await expect(page.locator('[data-testid="admin-documents-page"]')).toBeVisible();
   await expect(page.getByText('아직 보관한 문서가 없습니다.')).toBeVisible();
   expect(apiOrigins).toEqual(new Set([new URL(page.url()).origin]));
   const policy = response?.headers()['content-security-policy'] ?? '';

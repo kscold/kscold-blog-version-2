@@ -29,21 +29,21 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto('/admin/posts/new');
 
-      await expect(page.locator('[data-cy="post-editor-surface"]')).toHaveCount(1);
-      await expect(page.locator('[data-cy="post-editor-surface"]')).toBeVisible();
-      await expect(page.locator('[data-cy="post-editor-cover"]')).toBeVisible();
-      await expect(page.locator('[data-cy="post-editor-title"]')).toBeVisible();
-      await expect(page.locator('[data-cy="post-editor-slug"]')).toBeVisible();
-      await expect(page.locator('[data-cy="post-editor-document"]')).toBeVisible({ timeout: 20000 });
-      await expect(page.locator('[data-cy="post-editor-toolbar"]')).toBeAttached({ timeout: 20000 });
-      await expect(page.locator('[data-cy="post-editor-quick-actions"]')).toBeAttached({
+      await expect(page.locator('[data-testid="post-editor-surface"]')).toHaveCount(1);
+      await expect(page.locator('[data-testid="post-editor-surface"]')).toBeVisible();
+      await expect(page.locator('[data-testid="post-editor-cover"]')).toBeVisible();
+      await expect(page.locator('[data-testid="post-editor-title"]')).toBeVisible();
+      await expect(page.locator('[data-testid="post-editor-slug"]')).toBeVisible();
+      await expect(page.locator('[data-testid="post-editor-document"]')).toBeVisible({ timeout: 20000 });
+      await expect(page.locator('[data-testid="post-editor-toolbar"]')).toBeAttached({ timeout: 20000 });
+      await expect(page.locator('[data-testid="post-editor-quick-actions"]')).toBeAttached({
         timeout: 20000,
       });
 
-      await page.locator('[data-cy="post-editor-title"]').fill('노션형 작성기 테스트');
-      await expect(page.locator('[data-cy="post-editor-category"]')).toBeVisible();
-      await expect(page.locator('[data-cy="post-editor-public-override"]')).toBeVisible();
-      await expect(page.locator('[data-cy="post-editor-submit"]')).toBeAttached();
+      await page.locator('[data-testid="post-editor-title"]').fill('노션형 작성기 테스트');
+      await expect(page.locator('[data-testid="post-editor-category"]')).toBeVisible();
+      await expect(page.locator('[data-testid="post-editor-public-override"]')).toBeVisible();
+      await expect(page.locator('[data-testid="post-editor-submit"]')).toBeAttached();
 
       await expectNoHorizontalOverflow(page, viewport.width);
     });
@@ -55,10 +55,10 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/admin/posts/new');
 
-    await expect(page.locator('[data-cy="post-editor-surface"]')).toHaveCount(1);
-    await page.locator('[data-cy="post-editor-category"]').selectOption('cat-1');
+    await expect(page.locator('[data-testid="post-editor-surface"]')).toHaveCount(1);
+    await page.locator('[data-testid="post-editor-category"]').selectOption('cat-1');
     await expect(page.getByText('현재 제한 카테고리라서 기본적으로 열람 요청이 필요합니다.')).toBeVisible();
-    await page.locator('[data-cy="post-editor-public-override"]').check({ force: true });
+    await page.locator('[data-testid="post-editor-public-override"]').check({ force: true });
     await expect(
       page.getByText('현재 제한 카테고리지만, 이 글은 완전 공개로 우선 적용됩니다.')
     ).toBeVisible();
@@ -82,7 +82,7 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
     await page.getByRole('button', { name: '언어', exact: true }).click();
     await expect(page.getByRole('button', { name: 'TS', exact: true })).toBeVisible();
 
-    await page.locator('[data-cy="post-editor-view-preview"]').click();
+    await page.locator('[data-testid="post-editor-view-preview"]').click();
     const codeBlock = page.locator('[data-code-language="ts"]');
     await expect(codeBlock).toBeVisible({ timeout: 10000 });
     await expect(codeBlock).toContainText('TypeScript');
@@ -106,7 +106,7 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
     await page.getByRole('button', { name: '언어', exact: true }).click();
     await expect(page.getByRole('button', { name: 'MERMAID', exact: true })).toBeVisible();
 
-    await page.locator('[data-cy="post-editor-view-preview"]').click();
+    await page.locator('[data-testid="post-editor-view-preview"]').click();
     await expect(page.locator('[data-code-language="mermaid"]')).toBeVisible({ timeout: 10000 });
     await expect(page.locator('[data-mermaid-status="rendered"]')).toBeVisible({ timeout: 20000 });
     await expect(page.locator('.mermaid-diagram svg')).toBeVisible({ timeout: 20000 });

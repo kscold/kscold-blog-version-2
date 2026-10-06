@@ -13,23 +13,23 @@ for (const width of [390, 440]) {
     await seedAdminSession(page);
     await mockPrivatePdf(page);
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
     for (const control of ['next', 'previous', 'zoom-in', 'zoom-out', 'fit', 'rotate']) {
-      await expect(page.locator(`[data-cy="pdf-viewer-${control}"]`)).toBeVisible();
+      await expect(page.locator(`[data-testid="pdf-viewer-${control}"]`)).toBeVisible();
     }
-    await expect(page.locator('[data-cy="pdf-viewer-page-input"]')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-viewer-page-input"]')).toBeVisible();
     await expect.poll(() => page.evaluate(() =>
       document.documentElement.scrollWidth <= window.innerWidth
     )).toBe(true);
-    await page.locator('[data-cy="pdf-viewer-next"]').click();
-    await expect(page.locator('[data-cy="pdf-viewer-page-input"]')).toHaveValue('2');
-    await page.locator('[data-cy="pdf-viewer-zoom-in"]').click();
+    await page.locator('[data-testid="pdf-viewer-next"]').click();
+    await expect(page.locator('[data-testid="pdf-viewer-page-input"]')).toHaveValue('2');
+    await page.locator('[data-testid="pdf-viewer-zoom-in"]').click();
     await expect.poll(() => page.evaluate(() =>
       document.documentElement.scrollWidth <= window.innerWidth
     )).toBe(true);
-    await page.locator('[data-cy="pdf-viewer-fit"]').click();
-    await page.locator('[data-cy="pdf-viewer-rotate"]').click();
-    await expect(page.locator('[data-cy="pdf-viewer-scroll"]')).toHaveAttribute('data-rotation', '90');
+    await page.locator('[data-testid="pdf-viewer-fit"]').click();
+    await page.locator('[data-testid="pdf-viewer-rotate"]').click();
+    await expect(page.locator('[data-testid="pdf-viewer-scroll"]')).toHaveAttribute('data-rotation', '90');
     await expect.poll(() => page.evaluate(() =>
       document.documentElement.scrollWidth <= window.innerWidth
     )).toBe(true);
@@ -42,8 +42,8 @@ test('모바일 두 손가락 확대는 페이지 안에서 적용하고 화면 
   await seedAdminSession(page);
   await mockPrivatePdf(page);
   await page.goto('/admin/documents/doc-1/view');
-  await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
-  const scroll = page.locator('[data-cy="pdf-viewer-scroll"]');
+  await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
+  const scroll = page.locator('[data-testid="pdf-viewer-scroll"]');
   await expect(scroll).toHaveAttribute('data-scale', '1');
   await scroll.evaluate(container => {
     const touch = (identifier: number, clientX: number) => new Touch({
@@ -58,10 +58,10 @@ test('모바일 두 손가락 확대는 페이지 안에서 적용하고 화면 
     container.dispatchEvent(new TouchEvent('touchend', { touches: [], bubbles: true }));
   });
   await expect(scroll).toHaveAttribute('data-scale', '1.5');
-  await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
+  await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
   await expect.poll(() => page.evaluate(() =>
     document.documentElement.scrollWidth <= window.innerWidth
   )).toBe(true);
-  await page.locator('[data-cy="pdf-viewer-fit"]').click();
+  await page.locator('[data-testid="pdf-viewer-fit"]').click();
   await expect(scroll).toHaveAttribute('data-scale', '1');
 });

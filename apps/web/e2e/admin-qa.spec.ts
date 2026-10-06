@@ -61,13 +61,13 @@ test.describe('어드민 QA 진입 시나리오', () => {
 
     await page.goto('/admin');
 
-    const qaLink = page.locator('[data-cy="admin-qa-link"]:visible');
+    const qaLink = page.locator('[data-testid="admin-qa-link"]:visible');
     await expect(qaLink).toHaveCount(1);
     await expect(qaLink).toHaveAttribute('href', '/admin/testing');
     await qaLink.click();
 
     await expect(page).toHaveURL(/\/admin\/testing/);
-    await expect(page.locator('[data-cy="admin-qa-page"]')).toContainText('QA / E2E');
+    await expect(page.locator('[data-testid="admin-qa-page"]')).toContainText('QA / E2E');
   });
 
   test('관리자는 QA / E2E 페이지에서 주요 시나리오 링크와 실행 명령을 확인할 수 있다', async ({
@@ -78,26 +78,26 @@ test.describe('어드민 QA 진입 시나리오', () => {
     await page.goto('/admin/testing');
 
     // 스트리밍 중에는 서버가 보낸 숨은 사본이 잠깐 함께 남으므로, 실제로 보이는 요소만 검사한다.
-    await expect(page.locator('[data-cy="admin-qa-page"]')).toHaveCount(1);
-    await expect(page.locator('[data-cy="admin-qa-scenario-home"]:visible')).toHaveAttribute(
+    await expect(page.locator('[data-testid="admin-qa-page"]')).toHaveCount(1);
+    await expect(page.locator('[data-testid="admin-qa-scenario-home"]:visible')).toHaveAttribute(
       'href',
       '/'
     );
-    await expect(page.locator('[data-cy="admin-qa-scenario-guestbook"]:visible')).toHaveAttribute(
+    await expect(page.locator('[data-testid="admin-qa-scenario-guestbook"]:visible')).toHaveAttribute(
       'href',
       '/guestbook'
     );
-    await expect(page.locator('[data-cy="admin-qa-scenario-admin-chat"]:visible')).toHaveAttribute(
+    await expect(page.locator('[data-testid="admin-qa-scenario-admin-chat"]:visible')).toHaveAttribute(
       'href',
       '/admin/chat'
     );
-    await expect(page.locator('[data-cy="admin-qa-command-run"]:visible')).toContainText(
+    await expect(page.locator('[data-testid="admin-qa-command-run"]:visible')).toContainText(
       'pnpm --dir apps/web test:e2e'
     );
-    await expect(page.locator('[data-cy="admin-qa-command-open"]:visible')).toContainText(
+    await expect(page.locator('[data-testid="admin-qa-command-open"]:visible')).toContainText(
       'pnpm --dir apps/web'
     );
-    await expect(page.locator('[data-cy="admin-qa-command-runner"]:visible')).toContainText(
+    await expect(page.locator('[data-testid="admin-qa-command-runner"]:visible')).toContainText(
       'install-qa-runner.sh'
     );
   });
@@ -123,8 +123,8 @@ test.describe('어드민 QA 진입 시나리오', () => {
     await page.goto('/admin/testing');
 
     // "실행 중"은 "실행 중지" 버튼 글자에도 들어 있어, 상태는 문구 검색이 아니라 배지를 직접 본다.
-    const status = page.locator('[data-cy="admin-qa-status"]');
-    const runButton = page.locator('[data-cy="admin-qa-run-button"]');
+    const status = page.locator('[data-testid="admin-qa-status"]');
+    const runButton = page.locator('[data-testid="admin-qa-run-button"]');
     await expect(status).toHaveText('대기 중');
     await expect(runButton).toBeEnabled();
     // 버튼 글자가 좁은 칸에서 세로로 줄바꿈되던 문제를 막는다. 한 줄 높이를 넘으면 안 된다.
@@ -134,16 +134,16 @@ test.describe('어드민 QA 진입 시나리오', () => {
     await expect(status).toHaveText('실행 중');
     expect(startBody).toEqual({ suiteId: 'admin_smoke' });
     await expect(runButton).toBeDisabled();
-    await expect(page.locator('[data-cy="admin-qa-stop-button"]')).toBeEnabled();
+    await expect(page.locator('[data-testid="admin-qa-stop-button"]')).toBeEnabled();
 
     current = completedSession;
     await expect(status).toHaveText('통과');
-    await expect(page.locator('[data-cy="admin-qa-log-panel"]')).toContainText(
+    await expect(page.locator('[data-testid="admin-qa-log-panel"]')).toContainText(
       '통과 · 01 대시보드'
     );
     await expect(page.getByText('1 captured')).toBeVisible();
     await expect(page.getByText('01 대시보드', { exact: true })).toBeVisible();
-    await expect(page.locator('[data-cy="admin-qa-delete-button"]')).toBeEnabled();
+    await expect(page.locator('[data-testid="admin-qa-delete-button"]')).toBeEnabled();
   });
 
   test('러너에 연결되지 않으면 이유를 안내하고 실행 결과는 비워 둔다', async ({ page }) => {
@@ -160,7 +160,7 @@ test.describe('어드민 QA 진입 시나리오', () => {
     await page.goto('/admin/testing');
 
     await expect(page.getByText('QA 러너에 연결하지 못했습니다.', { exact: false })).toBeVisible();
-    await expect(page.locator('[data-cy="admin-qa-status"]')).toHaveText('대기 중');
-    await expect(page.locator('[data-cy="admin-qa-delete-button"]')).toBeDisabled();
+    await expect(page.locator('[data-testid="admin-qa-status"]')).toHaveText('대기 중');
+    await expect(page.locator('[data-testid="admin-qa-delete-button"]')).toBeDisabled();
   });
 });

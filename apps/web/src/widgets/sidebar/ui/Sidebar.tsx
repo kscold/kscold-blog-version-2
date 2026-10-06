@@ -83,7 +83,7 @@ export function Sidebar() {
                 <a
                   key={link.href}
                   href={link.href}
-                  data-cy={`admin-${link.key}-sidebar-link`}
+                  data-testid={`admin-${link.key}-sidebar-link`}
                   aria-current={pathname === link.href ? 'page' : undefined}
                   className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                     pathname === link.href

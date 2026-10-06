@@ -6,7 +6,7 @@ export function PdfViewerStatus({ error, onRetry }: { error?: string; onRetry?: 
     <div
       className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-16 text-center"
       role={error ? 'alert' : 'status'}
-      data-cy={error ? 'pdf-viewer-error' : 'pdf-viewer-loading'}
+      data-testid={error ? 'pdf-viewer-error' : 'pdf-viewer-loading'}
     >
       {!error && (
         <span
@@ -18,7 +18,7 @@ export function PdfViewerStatus({ error, onRetry }: { error?: string; onRetry?: 
         {error || '비공개 PDF를 준비하고 있습니다.'}
       </p>
       {error && onRetry && (
-        <Button onClick={onRetry} size="sm" data-cy="pdf-viewer-retry">
+        <Button onClick={onRetry} size="sm" data-testid="pdf-viewer-retry">
           다시 시도
         </Button>
       )}

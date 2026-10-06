@@ -69,7 +69,7 @@ export function LoginForm() {
                   onChange={e => updateField('email', e.target.value)}
                   autoComplete="email"
                   maxLength={AUTH_INPUT_LIMITS.email}
-                  data-cy={isLogin ? 'login-email-input' : 'register-email-input'}
+                  data-testid={isLogin ? 'login-email-input' : 'register-email-input'}
                   required
                 />
 
@@ -89,7 +89,7 @@ export function LoginForm() {
                   onChange={e => updateField('password', e.target.value)}
                   helperText={!isLogin ? '비밀번호는 최소 8자 이상이어야 합니다.' : undefined}
                   autoComplete={isLogin ? 'current-password' : 'new-password'}
-                  data-cy={isLogin ? 'login-password-input' : 'register-password-input'}
+                  data-testid={isLogin ? 'login-password-input' : 'register-password-input'}
                   minLength={isLogin ? undefined : 8}
                   maxLength={AUTH_INPUT_LIMITS.password}
                   required
@@ -103,7 +103,7 @@ export function LoginForm() {
                   size="lg"
                   isLoading={isLoading}
                   className="w-full mt-6"
-                  data-cy={isLogin ? 'login-submit' : 'register-submit'}
+                  data-testid={isLogin ? 'login-submit' : 'register-submit'}
                 >
                   {isLogin ? '로그인' : '회원가입'}
                 </Button>

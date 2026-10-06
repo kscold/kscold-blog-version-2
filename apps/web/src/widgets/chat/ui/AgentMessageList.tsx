@@ -61,7 +61,7 @@ export function AgentMessageList({
   return (
     <div
       ref={scrollContainerRef}
-      data-cy="agent-message-list"
+      data-testid="agent-message-list"
       onScroll={handleScroll}
       className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-surface-50 p-3 custom-scrollbar sm:p-4"
     >

@@ -51,8 +51,8 @@ async function mockFeedCard(page: Page) {
 
 async function loadFeedCard(page: Page) {
   await page.goto('/feed');
-  await page.locator('[data-cy="feed-composer-content"]').fill('피드 카드 회귀 테스트');
-  await page.locator('[data-cy="feed-composer-submit"]').click();
+  await page.locator('[data-testid="feed-composer-content"]').fill('피드 카드 회귀 테스트');
+  await page.locator('[data-testid="feed-composer-submit"]').click();
   await expect(page.getByRole('link', { name: '접근 가능한 피드 피드 보기' })).toBeVisible();
 }
 

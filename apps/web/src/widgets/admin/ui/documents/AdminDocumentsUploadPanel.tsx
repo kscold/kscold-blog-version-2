@@ -89,7 +89,7 @@ export function AdminDocumentsUploadPanel({
                 description: description.trim(),
               })
             }
-            data-cy="admin-documents-upload-submit"
+            data-testid="admin-documents-upload-submit"
           >
             {isUploading
               ? '업로드 중'

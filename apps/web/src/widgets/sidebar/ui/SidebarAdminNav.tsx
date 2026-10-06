@@ -18,7 +18,7 @@ function navLinkClass(active: boolean) {
 
 function AdminNavLink({ item, active }: { item: AdminNavItem; active: boolean }) {
   const shared = {
-    'data-cy': item.sidebarTestId ?? `admin-nav-${item.key}`,
+    'data-testid': item.sidebarTestId ?? `admin-nav-${item.key}`,
     'aria-current': active ? ('page' as const) : undefined,
     className: navLinkClass(active),
   };

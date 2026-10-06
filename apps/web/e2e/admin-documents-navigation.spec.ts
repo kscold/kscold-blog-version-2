@@ -41,16 +41,16 @@ test('개인 문서 로그인 복귀는 공개 화면의 스크립트 상태를 
   });
 
   await page.goto('/login?redirect=%2Fadmin%2Fdocuments');
-  await expect(page.locator('[data-cy="login-submit"]')).toBeEnabled({ timeout: 30000 });
+  await expect(page.locator('[data-testid="login-submit"]')).toBeEnabled({ timeout: 30000 });
   await page.evaluate(() => {
     Object.assign(window, { privateNavigationSentinel: true });
   });
-  await page.locator('[data-cy="login-email-input"]').fill('admin@example.test');
-  await page.locator('[data-cy="login-password-input"]').fill('test-only-password');
-  await page.locator('[data-cy="login-submit"]').click();
+  await page.locator('[data-testid="login-email-input"]').fill('admin@example.test');
+  await page.locator('[data-testid="login-password-input"]').fill('test-only-password');
+  await page.locator('[data-testid="login-submit"]').click();
 
   await expect(page).toHaveURL(/\/admin\/documents$/);
-  await expect(page.locator('[data-cy="admin-documents-page"]')).toBeVisible();
+  await expect(page.locator('[data-testid="admin-documents-page"]')).toBeVisible();
   const retainedState = await page.evaluate(() => 'privateNavigationSentinel' in window);
   expect(retainedState).toBe(false);
 });
@@ -91,7 +91,7 @@ test('쿠키만 남은 관리자는 서버 권한 확인 뒤에 개인 문서를
     });
   });
   await page.goto('/admin/documents');
-  await expect(page.locator('[data-cy="admin-documents-page"]')).toBeVisible();
+  await expect(page.locator('[data-testid="admin-documents-page"]')).toBeVisible();
   expect(verified).toBe(true);
 });
 
@@ -135,11 +135,11 @@ test('세션 확인 실패는 개인 문서를 열지 않으며 명시적으로 
     });
   });
   await page.goto('/admin/documents');
-  await expect(page.locator('[data-cy="admin-documents-auth-required"]')).toBeVisible();
+  await expect(page.locator('[data-testid="admin-documents-auth-required"]')).toBeVisible();
   expect(listRequests).toBe(0);
   await expect(page).toHaveURL(/\/admin\/documents$/);
   isAllowed = true;
-  await page.locator('[data-cy="admin-documents-verify-session"]').click();
-  await expect(page.locator('[data-cy="admin-documents-page"]')).toBeVisible();
+  await page.locator('[data-testid="admin-documents-verify-session"]').click();
+  await expect(page.locator('[data-testid="admin-documents-page"]')).toBeVisible();
   expect(listRequests).toBeGreaterThan(0);
 });

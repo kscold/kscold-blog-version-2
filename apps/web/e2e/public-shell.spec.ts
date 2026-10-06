@@ -9,15 +9,15 @@ test.describe('공개 페이지 핵심 시나리오', () => {
   test('방문자는 메인에서 새 소개 문구와 주요 CTA를 확인할 수 있다', async ({ page }) => {
     await page.goto('/');
 
-    const tagline = page.locator('[data-cy="hero-tagline"]');
+    const tagline = page.locator('[data-testid="hero-tagline"]');
     await expect(tagline).toContainText('러닝커브를 즐기는 개발자');
     await expect(tagline).toContainText('AI Agent부터 서버·웹까지');
     await expect(tagline).toContainText('문제를 서비스로 풀어냅니다.');
     await expect(tagline).toContainText('김승찬입니다.');
 
-    await expect(page.locator('[data-cy="hero-primary-cta"]')).toHaveAttribute('href', '/blog');
-    await expect(page.locator('[data-cy="hero-secondary-cta"]')).toHaveAttribute('href', '/feed');
-    await expect(page.locator('[data-cy="nav-link-guestbook"]')).toHaveAttribute('href', '/guestbook');
+    await expect(page.locator('[data-testid="hero-primary-cta"]')).toHaveAttribute('href', '/blog');
+    await expect(page.locator('[data-testid="hero-secondary-cta"]')).toHaveAttribute('href', '/feed');
+    await expect(page.locator('[data-testid="nav-link-guestbook"]')).toHaveAttribute('href', '/guestbook');
   });
 
   test('기본 소셜 미리보기는 대형 KSCOLD 공유 카드를 제공한다', async ({ page }) => {
@@ -65,7 +65,7 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await mockApi(page, 'GET', '**/api/posts/public*', success(emptyPage()));
 
     await page.goto('/');
-    const blogLink = page.locator('[data-cy="hero-primary-cta"]');
+    const blogLink = page.locator('[data-testid="hero-primary-cta"]');
     await expect(blogLink).toBeVisible();
     await blogLink.click();
 
@@ -89,7 +89,7 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await mockApi(page, 'GET', /\/api\/feeds(\?|$)/, success(emptyPage()));
 
     await page.goto('/');
-    const feedLink = page.locator('[data-cy="hero-secondary-cta"]');
+    const feedLink = page.locator('[data-testid="hero-secondary-cta"]');
     await expect(feedLink).toBeVisible();
     await feedLink.click();
 
@@ -194,8 +194,8 @@ test.describe('공개 페이지 핵심 시나리오', () => {
   test('비로그인 상태에서는 헤더에 LOGIN 버튼이 노출된다', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.locator('[data-cy="header-auth-loading"]')).toHaveCount(0);
-    const loginBtn = page.locator('[data-cy="header-login-btn"]');
+    await expect(page.locator('[data-testid="header-auth-loading"]')).toHaveCount(0);
+    const loginBtn = page.locator('[data-testid="header-login-btn"]');
     await expect(loginBtn).toBeVisible();
     await expect(loginBtn).toContainText('LOGIN');
   });
@@ -216,7 +216,7 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await page.waitForTimeout(300);
     expect(sidebarApiCalls).toBe(0);
 
-    await page.locator('[data-cy="sidebar-toggle"]').click();
+    await page.locator('[data-testid="sidebar-toggle"]').click();
     await expect.poll(() => sidebarApiCalls).toBe(2);
   });
 
@@ -261,11 +261,11 @@ test.describe('공개 페이지 핵심 시나리오', () => {
     await mockApi(page, 'GET', '**/api/guestbook*', success(emptyPage(12)));
 
     await page.goto('/');
-    await page.locator('[data-cy="nav-link-guestbook"]').click();
+    await page.locator('[data-testid="nav-link-guestbook"]').click();
 
     await expect(page).toHaveURL(/\/guestbook/);
-    await expect(page.locator('[data-cy="guestbook-title"]')).toContainText('방명록을 남겨주세요');
-    await expect(page.locator('[data-cy="guestbook-empty-state"]')).toContainText(
+    await expect(page.locator('[data-testid="guestbook-title"]')).toContainText('방명록을 남겨주세요');
+    await expect(page.locator('[data-testid="guestbook-empty-state"]')).toContainText(
       '첫 번째 인사를 남겨주세요.'
     );
   });

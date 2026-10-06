@@ -17,7 +17,7 @@ export function FeedEditorLinkPanel({
 }: FeedEditorLinkPanelProps) {
   return (
     <div
-      data-cy="feed-editor-link"
+      data-testid="feed-editor-link"
       className="rounded-[28px] border border-surface-200 bg-surface-50/70 p-5 sm:p-6"
     >
       <div className="mb-3">
@@ -32,7 +32,7 @@ export function FeedEditorLinkPanel({
         maxLength={FEED_INPUT_LIMITS.linkUrlLength}
         onChange={event => onChange(event.target.value)}
         placeholder="https://example.com"
-        data-cy="feed-editor-link-input"
+        data-testid="feed-editor-link-input"
         aria-invalid={Boolean(error)}
         aria-describedby={error ? 'feed-editor-link-error' : 'feed-editor-link-count'}
         className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
@@ -42,7 +42,7 @@ export function FeedEditorLinkPanel({
           <p
             id="feed-editor-link-error"
             role="alert"
-            data-cy="feed-editor-link-error"
+            data-testid="feed-editor-link-error"
             className="font-semibold text-red-500"
           >
             {error}

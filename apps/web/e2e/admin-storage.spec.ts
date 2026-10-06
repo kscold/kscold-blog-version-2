@@ -60,13 +60,13 @@ test.describe('어드민 스토리지 시나리오', () => {
     });
 
     await page.goto('/admin');
-    await expect(page.locator('[data-cy="admin-storage-link"]:visible')).toHaveCount(1);
+    await expect(page.locator('[data-testid="admin-storage-link"]:visible')).toHaveCount(1);
 
-    const link = page.locator('[data-cy="admin-storage-link"]:visible');
+    const link = page.locator('[data-testid="admin-storage-link"]:visible');
     await expect(link).toHaveAttribute('href', '/admin/storage');
     await link.click();
     await expect(page).toHaveURL(/\/admin\/storage/);
-    await expect(page.locator('[data-cy="admin-storage-page"]')).toContainText('Storage');
+    await expect(page.locator('[data-testid="admin-storage-page"]')).toContainText('Storage');
   });
 
   test('관리자는 폴더 탐색과 폴더 생성, 파일 삭제 흐름을 확인할 수 있다', async ({ page }) => {
@@ -124,21 +124,21 @@ test.describe('어드민 스토리지 시나리오', () => {
     });
 
     await page.goto('/admin/storage');
-    await expect(page.locator('[data-cy="admin-storage-page"]')).toHaveCount(1);
+    await expect(page.locator('[data-testid="admin-storage-page"]')).toHaveCount(1);
 
-    await page.locator('[data-cy="admin-storage-folder-images"]').click();
+    await page.locator('[data-testid="admin-storage-folder-images"]').click();
     await expect(page.getByText('logo.png').first()).toBeVisible();
 
     await page.goto('/admin/storage');
-    await expect(page.locator('[data-cy="admin-storage-page"]')).toHaveCount(1);
+    await expect(page.locator('[data-testid="admin-storage-page"]')).toHaveCount(1);
 
-    await page.locator('[data-cy="admin-storage-folder-input"]').fill('banners');
-    await page.locator('[data-cy="admin-storage-folder-submit"]').click();
+    await page.locator('[data-testid="admin-storage-folder-input"]').fill('banners');
+    await page.locator('[data-testid="admin-storage-folder-submit"]').click();
     await expect(page.getByText('banners').first()).toBeVisible();
 
     // 삭제 확인 dialog 자동 수락
     page.on('dialog', dialog => dialog.accept());
-    await page.locator('[data-cy="admin-storage-delete-object-hero.png"]').click();
+    await page.locator('[data-testid="admin-storage-delete-object-hero.png"]').click();
     await expect(page.getByText('현재 경로에 파일이 없습니다.')).toBeVisible();
   });
 });

@@ -16,7 +16,7 @@ export function AccessRequestCard({
 }: AccessRequestCardProps) {
   return (
     <div
-      data-cy={`access-request-${request.id}`}
+      data-testid={`access-request-${request.id}`}
       className="grid gap-4 rounded-2xl border border-surface-200 bg-white p-5 lg:grid-cols-[minmax(0,1fr)_320px]"
     >
       <div className="min-w-0 space-y-3">
@@ -36,7 +36,7 @@ export function AccessRequestCard({
               target="_blank"
               rel="noopener noreferrer"
               prefetch={false}
-              data-cy={`access-request-${request.id}-post-link`}
+              data-testid={`access-request-${request.id}-post-link`}
               className="group rounded-xl border border-surface-100 bg-surface-50 px-4 py-3 transition-colors hover:border-surface-400 hover:bg-white"
             >
               <span className="flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-surface-400">
@@ -87,7 +87,7 @@ export function AccessRequestCard({
           <div className="grid gap-2">
             <button
               type="button"
-              data-cy={`access-request-${request.id}-scope-post`}
+              data-testid={`access-request-${request.id}-scope-post`}
               onClick={() => onSelectScope(request.id, 'POST')}
               disabled={!request.postId}
               className={[
@@ -107,7 +107,7 @@ export function AccessRequestCard({
             </button>
             <button
               type="button"
-              data-cy={`access-request-${request.id}-scope-category`}
+              data-testid={`access-request-${request.id}-scope-category`}
               onClick={() => onSelectScope(request.id, 'CATEGORY')}
               className={[
                 'rounded-xl px-4 py-3 text-left text-sm font-semibold transition-colors',
@@ -130,14 +130,14 @@ export function AccessRequestCard({
 
         <div className="grid grid-cols-2 gap-2 pt-1">
           <button
-            data-cy={`access-request-${request.id}-approve`}
+            data-testid={`access-request-${request.id}-approve`}
             onClick={() => onHandle(request, 'approve')}
             className="rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-green-700"
           >
             승인
           </button>
           <button
-            data-cy={`access-request-${request.id}-reject`}
+            data-testid={`access-request-${request.id}-reject`}
             onClick={() => onHandle(request, 'reject')}
             className="rounded-xl bg-surface-200 px-4 py-3 text-sm font-semibold text-surface-700 transition-colors hover:bg-surface-300"
           >

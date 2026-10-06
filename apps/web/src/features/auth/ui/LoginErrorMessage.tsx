@@ -13,7 +13,7 @@ export function LoginErrorMessage({ error }: LoginErrorMessageProps) {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <p data-cy="auth-form-error" className="text-sm text-red-400 text-center">{error}</p>
+      <p data-testid="auth-form-error" className="text-sm text-red-400 text-center">{error}</p>
     </motion.div>
   );
 }

@@ -14,7 +14,7 @@ export function DocumentFileDropzone({ disabled, onFiles }: DocumentFileDropzone
   const [isDragging, setIsDragging] = useState(false);
   return (
     <div
-      data-cy="admin-documents-dropzone"
+      data-testid="admin-documents-dropzone"
       onDragOver={event => {
         event.preventDefault();
         if (!disabled) setIsDragging(true);
@@ -41,7 +41,7 @@ export function DocumentFileDropzone({ disabled, onFiles }: DocumentFileDropzone
         disabled={disabled}
         className="sr-only"
         aria-label="개인 문서 파일 선택"
-        data-cy="admin-documents-file-input"
+        data-testid="admin-documents-file-input"
         onChange={event => {
           if (event.target.files?.length) onFiles(Array.from(event.target.files));
           event.target.value = '';

@@ -38,7 +38,7 @@ export function GuestbookEntriesSection({
   if (entries.length === 0) {
     return (
       <div className="rounded-3xl border border-dashed border-surface-200 bg-surface-50 px-6 py-12 text-center">
-        <div data-cy="guestbook-empty-state">
+        <div data-testid="guestbook-empty-state">
           <p className="text-sm font-semibold text-surface-700">첫 번째 인사를 남겨주세요.</p>
           <p className="mt-2 text-sm text-surface-500">
             길게 쓰지 않아도 괜찮아요. 짧은 감상이나 반가운 한 줄이면 충분합니다.

@@ -19,7 +19,7 @@ export function FeedEditorContentPanel({
 }: FeedEditorContentPanelProps) {
   return (
     <section
-      data-cy="feed-editor-surface"
+      data-testid="feed-editor-surface"
       className="overflow-hidden rounded-[32px] border border-surface-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.06)]"
     >
       <div className="border-b border-surface-200 bg-surface-50/80 px-5 py-5 sm:px-8">
@@ -65,7 +65,7 @@ export function FeedEditorContentPanel({
             onPaste={event => void onPaste(event)}
             placeholder="방금 만들고 있는 것, 떠오른 생각, 공유하고 싶은 링크의 맥락을 편하게 적어보세요."
             rows={10}
-            data-cy="feed-editor-content"
+            data-testid="feed-editor-content"
             aria-invalid={Boolean(contentError)}
             aria-describedby={contentError ? 'feed-editor-content-error' : undefined}
             className="min-h-[260px] w-full resize-none border-0 bg-transparent p-0 text-lg leading-8 text-surface-900 placeholder:text-surface-300 focus:outline-none sm:text-[1.15rem]"

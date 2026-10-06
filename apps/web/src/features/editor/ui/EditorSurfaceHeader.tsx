@@ -33,8 +33,8 @@ export function EditorSurfaceHeader({
           </div>
         </div>
 
-        <TiptapToolbar buttons={primaryButtons} dataCy="post-editor-toolbar" />
-        <TiptapToolbar buttons={blockButtons} dataCy="post-editor-quick-actions" />
+        <TiptapToolbar buttons={primaryButtons} testId="post-editor-toolbar" />
+        <TiptapToolbar buttons={blockButtons} testId="post-editor-quick-actions" />
       </div>
     </div>
   );

@@ -6,8 +6,8 @@ test.beforeEach(async ({ page }) => { await mockShellApis(page); });
 test('홈 장식은 클릭을 가로채지 않고 주요 버튼으로 이동할 수 있다', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   for (const [selector, path] of [
-    ['[data-cy="hero-primary-cta"]', '/blog'],
-    ['[data-cy="hero-secondary-cta"]', '/feed'],
+    ['[data-testid="hero-primary-cta"]', '/blog'],
+    ['[data-testid="hero-secondary-cta"]', '/feed'],
     ['main a[href="/?chat=open"]', '/?chat=open'],
   ]) {
     await page.goto('/');
@@ -27,8 +27,8 @@ test('홈의 소개와 탐색 링크는 서버 HTML에 있고 데스크톱 사�
   expect(html).toContain('Admin Night 보러 가기');
   await page.goto('/');
   await expect(page.locator('aside:visible')).toHaveCount(1);
-  await expect(page.locator('[data-cy="hero-primary-cta"]')).toHaveAttribute('href', '/blog');
-  await expect(page.locator('[data-cy="hero-secondary-cta"]')).toHaveAttribute('href', '/feed');
+  await expect(page.locator('[data-testid="hero-primary-cta"]')).toHaveAttribute('href', '/blog');
+  await expect(page.locator('[data-testid="hero-secondary-cta"]')).toHaveAttribute('href', '/feed');
   await expect(page.getByLabel('블로그 기능 탐색')).toHaveCount(0);
   await expect(page.locator('[data-scroll-scene]')).toHaveCount(0);
   await page.goto('/blog');
@@ -60,7 +60,7 @@ for (const width of [320, 390, 440, 768, 1024, 1280, 1440]) {
 test('모바일 메뉴와 홈 주요 링크를 계속 사용할 수 있다', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await page.locator('[data-cy="sidebar-toggle"]').click();
+  await page.locator('[data-testid="sidebar-toggle"]').click();
   await expect(page.locator('aside:visible')).toHaveCount(1);
 });
 
@@ -70,6 +70,6 @@ test('모바일 아트와 소개는 겹치지 않고 주요 버튼까지 첫 화
   const artwork = await page.getByTestId('hero-artwork').boundingBox();
   const title = await page.getByRole('heading', { level: 1 }).boundingBox();
   expect(artwork!.y + artwork!.height).toBeLessThan(title!.y);
-  await expect(page.locator('[data-cy="hero-primary-cta"]')).toBeInViewport();
-  await expect(page.locator('[data-cy="hero-secondary-cta"]')).toBeInViewport();
+  await expect(page.locator('[data-testid="hero-primary-cta"]')).toBeInViewport();
+  await expect(page.locator('[data-testid="hero-secondary-cta"]')).toBeInViewport();
 });

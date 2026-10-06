@@ -33,7 +33,7 @@ function PdfZoomControls({ isDisabled, scale, onScale }: PdfZoomControlProps) {
         size="sm"
         className={CONTROL_CLASS}
         aria-label="PDF 축소"
-        data-cy="pdf-viewer-zoom-out"
+        data-testid="pdf-viewer-zoom-out"
         disabled={isDisabled || scale <= 0.5}
         onClick={() => onScale(clampPdfScale(scale - 0.25))}
       >
@@ -47,7 +47,7 @@ function PdfZoomControls({ isDisabled, scale, onScale }: PdfZoomControlProps) {
         size="sm"
         className={CONTROL_CLASS}
         aria-label="PDF 확대"
-        data-cy="pdf-viewer-zoom-in"
+        data-testid="pdf-viewer-zoom-in"
         disabled={isDisabled || scale >= 2.5}
         onClick={() => onScale(clampPdfScale(scale + 0.25))}
       >
@@ -66,7 +66,7 @@ function PdfPageViewControls({ isDisabled, onScale, onRotate }: PdfPageViewContr
         className={CONTROL_CLASS}
         disabled={isDisabled}
         onClick={() => onScale(1)}
-        data-cy="pdf-viewer-fit"
+        data-testid="pdf-viewer-fit"
       >
         화면 맞춤
       </Button>
@@ -77,7 +77,7 @@ function PdfPageViewControls({ isDisabled, onScale, onRotate }: PdfPageViewContr
         aria-label="PDF 90도 회전"
         disabled={isDisabled}
         onClick={onRotate}
-        data-cy="pdf-viewer-rotate"
+        data-testid="pdf-viewer-rotate"
       >
         회전
       </Button>

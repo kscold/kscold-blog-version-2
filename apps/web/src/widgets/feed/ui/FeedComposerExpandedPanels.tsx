@@ -48,11 +48,11 @@ export function FeedComposerExpandedPanels({
               <ImagePreviewScroll
                 images={images}
                 onRemove={onRemoveImage}
-                dataCy="feed-composer-images"
+                testId="feed-composer-images"
               />
             ) : (
               <div
-                data-cy="feed-composer-images"
+                data-testid="feed-composer-images"
                 className="rounded-[24px] border border-dashed border-surface-200 bg-white px-5 py-8 text-center"
               >
                 <p className="text-base font-semibold text-surface-900">아직 첨부된 이미지가 없습니다</p>
@@ -64,7 +64,7 @@ export function FeedComposerExpandedPanels({
             {imageError ? (
               <p
                 role="alert"
-                data-cy="feed-composer-image-error"
+                data-testid="feed-composer-image-error"
                 className="mt-3 text-sm font-semibold text-red-500"
               >
                 {imageError}
@@ -73,7 +73,7 @@ export function FeedComposerExpandedPanels({
           </div>
 
           <div
-            data-cy="feed-composer-link"
+            data-testid="feed-composer-link"
             className="rounded-[28px] border border-surface-200 bg-surface-50/70 p-5 sm:p-6"
           >
             <div className="mb-3">
@@ -91,7 +91,7 @@ export function FeedComposerExpandedPanels({
                 onExpand();
               }}
               placeholder="링크를 붙여 넣으면 미리보기가 바로 준비됩니다."
-              data-cy="feed-composer-link-input"
+              data-testid="feed-composer-link-input"
               aria-invalid={Boolean(linkError)}
               aria-describedby={
                 linkError ? 'feed-composer-link-error' : 'feed-composer-link-count'
@@ -103,7 +103,7 @@ export function FeedComposerExpandedPanels({
                 <p
                   id="feed-composer-link-error"
                   role="alert"
-                  data-cy="feed-composer-link-error"
+                  data-testid="feed-composer-link-error"
                   className="font-semibold text-red-500"
                 >
                   {linkError}

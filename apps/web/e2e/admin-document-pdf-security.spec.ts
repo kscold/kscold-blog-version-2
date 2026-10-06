@@ -17,7 +17,7 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
     await page.goto('/admin/documents/doc-1/view');
     await expect(page).toHaveURL(/\/login/);
     expect(requests).toBe(0);
-    await expect(page.locator('[data-cy="admin-document-viewer"] canvas')).toHaveCount(0);
+    await expect(page.locator('[data-testid="admin-document-viewer"] canvas')).toHaveCount(0);
   });
 
   test('일반 회원은 PDF 메타데이터와 원본을 요청하지 않는다', async ({ page }) => {
@@ -50,7 +50,7 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
     });
     await mockPrivatePdf(page, { onRequest: () => { expect(isVerified).toBe(true); } });
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
     expect(isVerified).toBe(true);
   });
 
@@ -60,9 +60,9 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
       buffer: Buffer.from('<html><script>window.privatePdfExecuted = true</script>private raw error</html>'),
     });
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-viewer-error"]')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-viewer-error"]')).toBeVisible();
     await expect(page.locator('iframe, object, embed')).toHaveCount(0);
-    await expect(page.locator('[data-cy="admin-document-viewer"] canvas')).toHaveCount(0);
+    await expect(page.locator('[data-testid="admin-document-viewer"] canvas')).toHaveCount(0);
     expect(await page.evaluate(() => 'privatePdfExecuted' in window)).toBe(false);
     await expect(page.locator('body')).not.toContainText('private raw error');
   });
@@ -71,8 +71,8 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
     await seedAdminSession(page);
     await mockPrivatePdf(page, { buffer: Buffer.from('%PDF-1.4\nprivate malformed PDF secret') });
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-viewer-error"]')).toBeVisible();
-    await expect(page.locator('[data-cy="admin-document-viewer"] canvas')).toHaveCount(0);
+    await expect(page.locator('[data-testid="pdf-viewer-error"]')).toBeVisible();
+    await expect(page.locator('[data-testid="admin-document-viewer"] canvas')).toHaveCount(0);
     await expect(page.locator('body')).not.toContainText('private malformed PDF secret');
   });
 
@@ -84,7 +84,7 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
       onRequest: request => { if (request.url().endsWith('/download')) downloads += 1; },
     });
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-viewer-error"]')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-viewer-error"]')).toBeVisible();
     expect(downloads).toBe(0);
     await expect(page.locator('iframe, object, embed')).toHaveCount(0);
   });
@@ -93,10 +93,10 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
     await seedAdminSession(page);
     await mockPrivatePdf(page, { failDownloadOnce: true });
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-viewer-error"]')).toBeVisible();
-    await page.locator('[data-cy="pdf-viewer-retry"]').click();
-    await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
-    await expect(page.locator('[data-cy="pdf-viewer-error"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="pdf-viewer-error"]')).toBeVisible();
+    await page.locator('[data-testid="pdf-viewer-retry"]').click();
+    await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-viewer-error"]')).toHaveCount(0);
   });
 
   test('삭제되었거나 접근할 수 없는 문서는 원본을 가져오지 않는다', async ({ page }) => {
@@ -107,7 +107,7 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
       onRequest: request => { if (request.url().endsWith('/download')) downloads += 1; },
     });
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-viewer-error"]')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-viewer-error"]')).toBeVisible();
     expect(downloads).toBe(0);
     await expect(page.locator('body')).not.toContainText(PRIVATE_PDF_TITLE);
   });
@@ -116,7 +116,7 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
     await seedAdminSession(page);
     await mockPrivatePdf(page);
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-page-1"]')).toContainText(PRIVATE_PDF_TEXT);
+    await expect(page.locator('[data-testid="pdf-page-1"]')).toContainText(PRIVATE_PDF_TEXT);
     const storage = await page.evaluate(() => ({
       local: Object.values(localStorage).join('\n'),
       session: Object.values(sessionStorage).join('\n'),
@@ -143,9 +143,9 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
       }
     });
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-page-1"]')).toContainText(PRIVATE_PDF_TEXT);
-    await page.locator('[data-cy="pdf-viewer-next"]').click();
-    await expect(page.locator('[data-cy="pdf-page-2"]')).toContainText(PRIVATE_PDF_TEXT);
+    await expect(page.locator('[data-testid="pdf-page-1"]')).toContainText(PRIVATE_PDF_TEXT);
+    await page.locator('[data-testid="pdf-viewer-next"]').click();
+    await expect(page.locator('[data-testid="pdf-page-2"]')).toContainText(PRIVATE_PDF_TEXT);
     expect(externalHosts).toEqual([]);
   });
 
@@ -153,7 +153,7 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
     await seedAdminSession(page);
     await mockPrivatePdf(page);
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
     await page.evaluate(() => {
       const loggedOut = JSON.stringify({ state: { user: null }, version: 0 });
       localStorage.setItem('auth-storage', loggedOut);
@@ -161,9 +161,9 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
         key: 'auth-storage', newValue: loggedOut, storageArea: localStorage,
       }));
     });
-    await expect(page.locator('[data-cy="admin-document-viewer"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="admin-document-viewer"]')).toHaveCount(0);
     await expect(page.locator('canvas')).toHaveCount(0);
-    await expect(page.locator('[data-cy="admin-documents-auth-required"]')).toBeVisible();
+    await expect(page.locator('[data-testid="admin-documents-auth-required"]')).toBeVisible();
     const storage = await page.evaluate(() => Object.values(localStorage).join('\n'));
     expect(storage).not.toContain(PRIVATE_PDF_TEXT);
   });
@@ -175,7 +175,7 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
       if (request.url().endsWith('/download')) downloads += 1;
     } });
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
     await page.evaluate(() => {
       const changedAccount = JSON.stringify({
         state: { user: { id: 'other-admin', role: 'ADMIN' } }, version: 0,
@@ -185,9 +185,9 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
         key: 'auth-storage', newValue: changedAccount, storageArea: localStorage,
       }));
     });
-    await expect(page.locator('[data-cy="admin-document-viewer"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="admin-document-viewer"]')).toHaveCount(0);
     await expect(page.locator('canvas')).toHaveCount(0);
-    await expect(page.locator('[data-cy="admin-documents-auth-required"]')).toBeVisible();
+    await expect(page.locator('[data-testid="admin-documents-auth-required"]')).toBeVisible();
     expect(downloads).toBe(1);
   });
 
@@ -195,11 +195,11 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
     await seedAdminSession(page);
     await mockPrivatePdf(page);
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
     await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true })));
-    await expect(page.locator('[data-cy="admin-document-viewer"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="admin-document-viewer"]')).toHaveCount(0);
     await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
-    await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
   });
 
   test('복귀할 때 만료된 세션은 이전 PDF를 재표시하지 않는다', async ({ page }) => {
@@ -209,14 +209,14 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
       if (request.url().endsWith('/download')) downloads += 1;
     } });
     await page.goto('/admin/documents/doc-1/view');
-    await expect(page.locator('[data-cy="pdf-page-1"] canvas')).toBeVisible();
+    await expect(page.locator('[data-testid="pdf-page-1"] canvas')).toBeVisible();
     expect(downloads).toBe(1);
     await page.route('**/api/auth/me', route => route.fulfill({
       status: 401, contentType: 'application/json', body: '{"success":false}',
     }));
     await page.evaluate(() => window.dispatchEvent(new Event('focus')));
-    await expect(page.locator('[data-cy="pdf-viewer-error"]')).toBeVisible();
-    await expect(page.locator('[data-cy="admin-document-viewer"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="pdf-viewer-error"]')).toBeVisible();
+    await expect(page.locator('[data-testid="admin-document-viewer"]')).toHaveCount(0);
     await expect(page.locator('canvas')).toHaveCount(0);
     expect(downloads).toBe(1);
   });

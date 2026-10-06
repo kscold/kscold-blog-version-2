@@ -73,19 +73,19 @@ test.describe('공개 피드 작성기 시나리오', () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto('/feed');
 
-      await expect(page.locator('[data-cy="feed-composer"]')).toBeVisible();
+      await expect(page.locator('[data-testid="feed-composer"]')).toBeVisible();
       await expect(page.getByText('지금 흐름 남기기')).toBeVisible();
       await expect(page.getByText('이미지 바로 첨부')).toBeVisible();
       await expect(page.getByText('계획부터 함께 정리')).toBeVisible();
 
-      const linkInput = page.locator('[data-cy="feed-composer-link-input"]');
+      const linkInput = page.locator('[data-testid="feed-composer-link-input"]');
       await expect(linkInput).toHaveCount(0);
       await page.getByText('링크와 이미지 더하기').click();
       await expect(linkInput).toBeVisible();
       await page.getByText('링크와 이미지 패널 닫기').click();
       await expect(linkInput).toHaveCount(0);
 
-      const content = page.locator('[data-cy="feed-composer-content"]');
+      const content = page.locator('[data-testid="feed-composer-content"]');
       await expect(content).toBeVisible();
       await expect(content).toHaveAttribute('maxlength', '10000');
       // content 입력 → hasDraft=true 라 패널이 자동 확장되어 link-input 이 다시 나타난다
@@ -99,8 +99,8 @@ test.describe('공개 피드 작성기 시나리오', () => {
         /\/_next\/image\?/
       );
 
-      await expect(page.locator('[data-cy="feed-composer-upload"]')).toBeAttached();
-      await page.locator('[data-cy="feed-composer-submit"]').click();
+      await expect(page.locator('[data-testid="feed-composer-upload"]')).toBeAttached();
+      await page.locator('[data-testid="feed-composer-submit"]').click();
 
       await expect(content).toHaveValue('');
       await expect(linkInput).toHaveCount(0);
@@ -139,12 +139,12 @@ test.describe('공개 피드 작성기 시나리오', () => {
     await seedSession(page, FEED_USER);
     await page.goto('/feed');
 
-    await page.locator('[data-cy="feed-composer-content"]').fill('링크 정책을 확인합니다.');
-    const linkInput = page.locator('[data-cy="feed-composer-link-input"]');
-    const submitButton = page.locator('[data-cy="feed-composer-submit"]');
+    await page.locator('[data-testid="feed-composer-content"]').fill('링크 정책을 확인합니다.');
+    const linkInput = page.locator('[data-testid="feed-composer-link-input"]');
+    const submitButton = page.locator('[data-testid="feed-composer-submit"]');
     await linkInput.fill('httpx://kscold.com/feed');
 
-    await expect(page.locator('[data-cy="feed-composer-link-error"]')).toContainText(
+    await expect(page.locator('[data-testid="feed-composer-link-error"]')).toContainText(
       'http 또는 https'
     );
     await expect(submitButton).toBeDisabled();
@@ -178,9 +178,9 @@ test.describe('공개 피드 작성기 시나리오', () => {
 
     await seedSession(page, FEED_USER);
     await page.goto('/feed');
-    await page.locator('[data-cy="feed-composer-content"]').fill('이미지 정책을 확인합니다.');
+    await page.locator('[data-testid="feed-composer-content"]').fill('이미지 정책을 확인합니다.');
 
-    const uploadInput = page.locator('[data-cy="feed-composer-upload-input"]');
+    const uploadInput = page.locator('[data-testid="feed-composer-upload-input"]');
     const imageFile = (index: number) => ({
       name: `feed-${index}.png`,
       mimeType: 'image/png',
@@ -198,10 +198,10 @@ test.describe('공개 피드 작성기 시나리오', () => {
     expect(uploadRequestCount).toBe(3);
 
     await uploadInput.setInputFiles([imageFile(4), imageFile(5)]);
-    await expect(page.locator('[data-cy="feed-composer-image-error"]')).toContainText(
+    await expect(page.locator('[data-testid="feed-composer-image-error"]')).toContainText(
       '최대 4장'
     );
     expect(uploadRequestCount).toBe(3);
-    await expect(page.locator('[data-cy="feed-composer-submit"]')).toBeEnabled();
+    await expect(page.locator('[data-testid="feed-composer-submit"]')).toBeEnabled();
   });
 });

@@ -122,7 +122,7 @@ test.describe('UI 레이아웃 캡처 시나리오', () => {
     });
     await page.goto('/login?redirect=%2Fguestbook');
     // 비로그인 login 폼 진입 확인 (문구 대신 안정적인 폼 요소로)
-    await expect(page.locator('[data-cy="login-submit"]')).toBeVisible();
+    await expect(page.locator('[data-testid="login-submit"]')).toBeVisible();
     await expectNoOverflow(page, 390);
     await page.screenshot({ path: `${SHOT_DIR}/layout-audit-login-mobile.png` });
   });

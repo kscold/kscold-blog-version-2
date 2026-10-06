@@ -22,7 +22,7 @@ export function AuthToggle({ isLogin, onToggle }: AuthToggleProps) {
         <button
           type="button"
           onClick={() => onToggle(true)}
-          data-cy="auth-toggle-login"
+          data-testid="auth-toggle-login"
           className={`relative z-10 px-6 py-2 text-sm font-semibold transition-colors duration-300 ${
             isLogin ? 'text-surface-900' : 'text-surface-500'
           }`}
@@ -32,7 +32,7 @@ export function AuthToggle({ isLogin, onToggle }: AuthToggleProps) {
         <button
           type="button"
           onClick={() => onToggle(false)}
-          data-cy="auth-toggle-register"
+          data-testid="auth-toggle-register"
           className={`relative z-10 px-6 py-2 text-sm font-semibold transition-colors duration-300 ${
             !isLogin ? 'text-surface-900' : 'text-surface-500'
           }`}

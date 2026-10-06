@@ -65,7 +65,7 @@ test.describe('방명록 사용자 시나리오', () => {
 
     await page.goto('/guestbook');
 
-    const cta = page.locator('[data-cy="guestbook-login-cta"]');
+    const cta = page.locator('[data-testid="guestbook-login-cta"]');
     await expect(cta).toContainText('로그인하고 남기기');
     await cta.click();
     await expect(page).toHaveURL(/\/login\?redirect=%2Fguestbook/);
@@ -128,13 +128,13 @@ test.describe('방명록 사용자 시나리오', () => {
 
     await page.goto('/guestbook');
 
-    await page.locator('[data-cy="guestbook-textarea"]').fill('방명록 시나리오 테스트입니다.');
-    await page.locator('[data-cy="guestbook-submit"]').click();
+    await page.locator('[data-testid="guestbook-textarea"]').fill('방명록 시나리오 테스트입니다.');
+    await page.locator('[data-testid="guestbook-submit"]').click();
 
-    const entryList = page.locator('[data-cy="guestbook-entry"]');
+    const entryList = page.locator('[data-testid="guestbook-entry"]');
     await expect(entryList.first()).toContainText('방명록 시나리오 테스트입니다.');
 
-    await entryList.first().locator('[data-cy="guestbook-delete"]').click();
+    await entryList.first().locator('[data-testid="guestbook-delete"]').click();
 
     await expect(entryList).toHaveCount(1);
     await expect(entryList.first()).toContainText('먼저 남긴 인사입니다.');
@@ -172,8 +172,8 @@ test.describe('방명록 사용자 시나리오', () => {
 
     await page.goto('/guestbook');
 
-    const entryList = page.locator('[data-cy="guestbook-entry"]');
-    await expect(entryList.nth(0).locator('[data-cy="guestbook-delete"]')).toHaveCount(0);
-    await expect(entryList.nth(1).locator('[data-cy="guestbook-delete"]')).toHaveCount(1);
+    const entryList = page.locator('[data-testid="guestbook-entry"]');
+    await expect(entryList.nth(0).locator('[data-testid="guestbook-delete"]')).toHaveCount(0);
+    await expect(entryList.nth(1).locator('[data-testid="guestbook-delete"]')).toHaveCount(1);
   });
 });

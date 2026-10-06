@@ -35,7 +35,7 @@ export function PostEditorSubmitPanel({
         <button
           type="submit"
           disabled={isSubmitting}
-          data-cy="post-editor-submit"
+          data-testid="post-editor-submit"
           className="w-full rounded-full bg-white px-6 py-3 font-semibold text-surface-900 transition-colors hover:bg-surface-100 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? '저장 중...' : mode === 'create' ? '포스트 저장' : '변경사항 저장'}

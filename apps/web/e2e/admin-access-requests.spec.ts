@@ -48,23 +48,23 @@ test.describe('열람 요청 관리 시나리오', () => {
 
     await page.goto('/admin/access-requests');
 
-    const req1 = page.locator('[data-cy="access-request-req-1"]');
+    const req1 = page.locator('[data-testid="access-request-req-1"]');
     await expect(req1).toContainText('reader-one');
     await expect(req1).toContainText('권한 모델 정리');
     // 요청받은 글을 바로 열어 확인할 수 있어야 한다. 글 없이 카테고리만 요청한 건에는 링크가 없다.
-    const postLink = page.locator('[data-cy="access-request-req-1-post-link"]');
+    const postLink = page.locator('[data-testid="access-request-req-1-post-link"]');
     await expect(postLink).toHaveAttribute('href', '/admin/preview/access-model');
     await expect(postLink).toHaveAttribute('target', '_blank');
-    await expect(page.locator('[data-cy="access-request-req-2-post-link"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="access-request-req-2-post-link"]')).toHaveCount(0);
 
-    const scopeCategory = page.locator('[data-cy="access-request-req-1-scope-category"]');
+    const scopeCategory = page.locator('[data-testid="access-request-req-1-scope-category"]');
     await scopeCategory.click();
     await expect(scopeCategory).toContainText('카테고리 전체 승인');
     await expect(scopeCategory).toContainText('같은 카테고리의 제한 글 전체를 열람할 수 있게');
 
-    await page.locator('[data-cy="access-request-req-1-approve"]').click();
+    await page.locator('[data-testid="access-request-req-1-approve"]').click();
 
     await expect(req1).toHaveCount(0);
-    await expect(page.locator('[data-cy="access-request-req-2-scope-post"]')).toBeDisabled();
+    await expect(page.locator('[data-testid="access-request-req-2-scope-post"]')).toBeDisabled();
   });
 });

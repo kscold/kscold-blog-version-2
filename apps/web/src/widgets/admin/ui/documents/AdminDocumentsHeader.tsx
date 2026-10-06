@@ -49,7 +49,7 @@ export function AdminDocumentsHeader({ disabled, onRefresh, space }: AdminDocume
           type="button"
           disabled={disabled}
           onClick={onRefresh}
-          data-cy="admin-documents-refresh"
+          data-testid="admin-documents-refresh"
         >
           새로고침
         </Button>

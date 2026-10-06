@@ -19,7 +19,7 @@ export function DocumentUploadResults({ items, isUploading }: DocumentUploadResu
   const successes = items.filter(item => item.status === 'success').length;
   const errors = items.filter(item => item.status === 'error').length;
   return (
-    <div className="space-y-3" data-cy="admin-documents-upload-results">
+    <div className="space-y-3" data-testid="admin-documents-upload-results">
       <p role="status" aria-live="polite" className="text-xs font-medium text-surface-600">
         선택 {items.length}개 · 완료 {successes}개 · 실패 {errors}개
         {isUploading ? ' · 순서대로 업로드 중' : ''}
@@ -29,7 +29,7 @@ export function DocumentUploadResults({ items, isUploading }: DocumentUploadResu
           <li
             key={item.id}
             className="min-w-0 space-y-1.5 rounded-lg bg-white p-3"
-            data-cy="admin-document-upload-result"
+            data-testid="admin-document-upload-result"
           >
             <p className="break-all text-sm font-medium text-surface-900">{item.file.name}</p>
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-surface-500">

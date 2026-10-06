@@ -65,7 +65,7 @@ test('이전 대화를 불러온 뒤 긴 Agent 답변의 마지막까지 자동�
   await expect(lastSentence).toBeInViewport();
   await expect
     .poll(() =>
-      dialog.locator('[data-cy="agent-message-list"]').evaluate(element => element.scrollTop)
+      dialog.locator('[data-testid="agent-message-list"]').evaluate(element => element.scrollTop)
     )
     .toBeGreaterThan(0);
 });

@@ -40,7 +40,7 @@ export function PostEditorHeader({
 }: PostEditorHeaderProps) {
   return (
     <section
-      data-cy="post-editor-surface"
+      data-testid="post-editor-surface"
       className="overflow-hidden rounded-[32px] border border-surface-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.06)]"
     >
       <div className="border-b border-surface-200 bg-surface-50/80 px-5 py-5 sm:px-8">
@@ -66,7 +66,7 @@ export function PostEditorHeader({
                 key={vm}
                 type="button"
                 onClick={() => onViewModeChange(vm)}
-                data-cy={`post-editor-view-${vm}`}
+                data-testid={`post-editor-view-${vm}`}
                 className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors sm:flex-none ${
                   viewMode === vm
                     ? 'bg-surface-900 text-white'
@@ -88,7 +88,7 @@ export function PostEditorHeader({
         )}
 
         <div
-          data-cy="post-editor-cover"
+          data-testid="post-editor-cover"
           className="rounded-[28px] border border-surface-200 bg-surface-50/70 p-4 sm:p-5"
         >
           <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
@@ -105,7 +105,7 @@ export function PostEditorHeader({
           <ImageUpload
             currentImage={form.coverImage || undefined}
             onUploadSuccess={onCoverImageChange}
-            dataCy="post-editor-cover-upload"
+            testId="post-editor-cover-upload"
           />
         </div>
 
@@ -116,7 +116,7 @@ export function PostEditorHeader({
               value={form.title}
               onChange={e => onTitleChange(e.target.value)}
               placeholder="제목 없음"
-              data-cy="post-editor-title"
+              data-testid="post-editor-title"
               className="w-full border-0 bg-transparent p-0 text-3xl font-black tracking-tight text-surface-900 placeholder:text-surface-300 focus:outline-none sm:text-5xl"
               required
             />
@@ -134,7 +134,7 @@ export function PostEditorHeader({
                     onSlugEdited();
                   }}
                   placeholder="url-friendly-slug"
-                  data-cy="post-editor-slug"
+                  data-testid="post-editor-slug"
                   className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
                 />
               </div>
@@ -185,7 +185,7 @@ export function PostEditorHeader({
             onChange={e => onExcerptChange(e.target.value)}
             placeholder="포스트 요약을 입력하세요"
             rows={4}
-            data-cy="post-editor-excerpt"
+            data-testid="post-editor-excerpt"
             className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-4 text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
           />
         </div>

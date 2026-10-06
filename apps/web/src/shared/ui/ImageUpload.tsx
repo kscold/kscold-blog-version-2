@@ -8,10 +8,10 @@ import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 interface ImageUploadProps {
   onUploadSuccess: (url: string) => void;
   currentImage?: string;
-  dataCy?: string;
+  testId?: string;
 }
 
-export function ImageUpload({ onUploadSuccess, currentImage, dataCy }: ImageUploadProps) {
+export function ImageUpload({ onUploadSuccess, currentImage, testId }: ImageUploadProps) {
   const { uploadFile, isUploading } = useMediaUpload();
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const [error, setError] = useState<string | null>(null);
@@ -81,13 +81,13 @@ export function ImageUpload({ onUploadSuccess, currentImage, dataCy }: ImageUplo
         accept="image/*"
         onChange={handleFileSelect}
         className="hidden"
-        data-cy={dataCy ? `${dataCy}-input` : undefined}
+        data-testid={testId ? `${testId}-input` : undefined}
       />
 
       {preview ? (
         <div
           className="relative overflow-hidden rounded-[28px] border border-surface-200 bg-surface-900/5"
-          data-cy={dataCy}
+          data-testid={testId}
         >
           <div className="relative aspect-[16/8] sm:aspect-[16/7]">
           <Image src={preview} alt="Preview" fill sizes="100vw" className="object-cover" />
@@ -132,7 +132,7 @@ export function ImageUpload({ onUploadSuccess, currentImage, dataCy }: ImageUplo
           onDragLeave={() => setIsDragging(false)}
           onDrop={event => void handleDrop(event)}
           disabled={isUploading}
-          data-cy={dataCy}
+          data-testid={testId}
           className={`w-full rounded-[28px] border border-dashed px-6 py-10 text-left transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
             isDragging
               ? 'border-surface-900 bg-surface-100 shadow-[0_18px_40px_rgba(15,23,42,0.08)]'

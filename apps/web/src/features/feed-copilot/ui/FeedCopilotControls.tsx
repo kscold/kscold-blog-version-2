@@ -41,7 +41,7 @@ export function FeedCopilotControls({
             생각의 조각만 적어도 됩니다. 초안은 직접 확인한 뒤에만 피드로 가져갑니다.
           </span>
           <textarea
-            data-cy="feed-copilot-memo"
+            data-testid="feed-copilot-memo"
             value={memo}
             maxLength={FEED_COPILOT_MEMO_MAX_LENGTH}
             onChange={event => onMemoChange(event.target.value)}
@@ -75,7 +75,7 @@ export function FeedCopilotControls({
         <p
           id="feed-copilot-memo-error"
           role="alert"
-          data-cy="feed-copilot-memo-error"
+          data-testid="feed-copilot-memo-error"
           className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600"
         >
           {memoError} 피드 본문은 현재 상태로 게시할 수 있습니다.
@@ -90,7 +90,7 @@ export function FeedCopilotControls({
           </span>
           <input
             type="url"
-            data-cy="feed-copilot-source-url"
+            data-testid="feed-copilot-source-url"
             value={sourceUrl}
             maxLength={FEED_INPUT_LIMITS.linkUrlLength}
             onChange={event => {

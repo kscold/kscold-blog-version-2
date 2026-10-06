@@ -24,7 +24,7 @@ export function AdminDocumentCard({
   return (
     <article
       className="min-w-0 rounded-xl border border-surface-200 bg-white p-4 sm:p-5"
-      data-cy={`admin-document-${document.id}`}
+      data-testid={`admin-document-${document.id}`}
     >
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <span className="rounded-md bg-surface-900 px-2.5 py-1 font-mono text-xs font-bold text-white">
@@ -65,7 +65,7 @@ export function AdminDocumentCard({
           <a
             href={`/admin/documents/${encodeURIComponent(document.id)}/view`}
             className="rounded-lg bg-surface-900 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-surface-700 focus:outline-none focus:ring-2 focus:ring-surface-900 focus:ring-offset-2"
-            data-cy={`admin-document-preview-${document.id}`}
+            data-testid={`admin-document-preview-${document.id}`}
           >
             바로 보기
           </a>
@@ -74,7 +74,7 @@ export function AdminDocumentCard({
           href={`/api/admin/documents/${encodeURIComponent(document.id)}/download`}
           download={document.fileName}
           className="rounded-lg border border-surface-200 px-3 py-2 text-xs font-semibold text-surface-900 transition-colors hover:bg-surface-50 focus:outline-none focus:ring-2 focus:ring-surface-900"
-          data-cy={`admin-document-download-${document.id}`}
+          data-testid={`admin-document-download-${document.id}`}
         >
           다운로드
         </a>
@@ -84,7 +84,7 @@ export function AdminDocumentCard({
           size="sm"
           disabled={disabled}
           onClick={onEdit}
-          data-cy={`admin-document-edit-${document.id}`}
+          data-testid={`admin-document-edit-${document.id}`}
         >
           정보 수정
         </Button>
@@ -95,7 +95,7 @@ export function AdminDocumentCard({
           className="ml-auto text-red-600 hover:text-red-700"
           disabled={disabled}
           onClick={onDelete}
-          data-cy={`admin-document-delete-${document.id}`}
+          data-testid={`admin-document-delete-${document.id}`}
         >
           삭제
         </Button>

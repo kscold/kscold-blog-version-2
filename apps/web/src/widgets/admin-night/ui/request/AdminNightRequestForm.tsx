@@ -56,7 +56,7 @@ export function AdminNightRequestForm({
         </label>
         <input
           id="admin-night-requester-name"
-          data-cy="admin-night-request-name"
+          data-testid="admin-night-request-name"
           value={requesterName}
           onChange={event => onRequesterNameChange(event.target.value)}
           required
@@ -71,7 +71,7 @@ export function AdminNightRequestForm({
         </label>
         <input
           id="admin-night-task-title"
-          data-cy="admin-night-request-title"
+          data-testid="admin-night-request-title"
           value={taskTitle}
           onChange={event => onTaskTitleChange(event.target.value)}
           required
@@ -87,7 +87,7 @@ export function AdminNightRequestForm({
             <button
               key={option.value}
               type="button"
-              data-cy={`admin-night-mode-${option.value.toLowerCase()}`}
+              data-testid={`admin-night-mode-${option.value.toLowerCase()}`}
               onClick={() => onParticipationModeChange(option.value)}
               className={`rounded-2xl border px-4 py-3 text-left transition-colors ${
                 participationMode === option.value
@@ -109,7 +109,7 @@ export function AdminNightRequestForm({
             <button
               key={slot.date}
               type="button"
-              data-cy={`admin-night-date-option-${slot.date}`}
+              data-testid={`admin-night-date-option-${slot.date}`}
               aria-pressed={selectedDate === slot.date}
               onClick={() => onSelectDate(slot.date)}
               className={`rounded-2xl border px-4 py-3 text-left transition-colors ${
@@ -139,7 +139,7 @@ export function AdminNightRequestForm({
         </label>
         <textarea
           id="admin-night-message"
-          data-cy="admin-night-request-message"
+          data-testid="admin-night-request-message"
           value={message}
           onChange={event => onMessageChange(event.target.value)}
           placeholder="왜 이걸 지금 끝내고 싶은지, 어디까지 마무리하고 싶은지 짧게 남겨 주세요."
@@ -150,7 +150,7 @@ export function AdminNightRequestForm({
       <div className="flex flex-col gap-3 sm:flex-row">
         <button
           type="button"
-          data-cy="admin-night-request-submit"
+          data-testid="admin-night-request-submit"
           onClick={onSubmit}
           disabled={isSubmitting || !canSubmit}
           className="inline-flex items-center justify-center rounded-2xl bg-surface-900 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-surface-800 disabled:cursor-not-allowed disabled:bg-surface-300"

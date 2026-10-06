@@ -20,7 +20,7 @@ export function AdminStorageHeader({ bucket, disabled, onRefresh }: AdminStorage
           size="sm"
           disabled={disabled}
           onClick={() => onRefresh()}
-          data-cy="admin-storage-refresh"
+          data-testid="admin-storage-refresh"
         >
           새로고침
         </Button>

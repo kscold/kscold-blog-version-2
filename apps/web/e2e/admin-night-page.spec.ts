@@ -19,12 +19,12 @@ test.describe('Admin Night 공개 페이지 시나리오', () => {
   test('헤더 네비게이션에서 공개 Admin Night 페이지로 이동할 수 있다', async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 1200 });
     await page.goto('/');
-    await page.locator('[data-cy="nav-link-admin-night"]').click();
+    await page.locator('[data-testid="nav-link-admin-night"]').click();
 
     await expect(page).toHaveURL(/\/admin-night/);
     await expect(page.getByText('퇴근 후, 각자 할 일을 끝내는 밤')).toBeVisible();
     await expect(page.getByText('신청 PR ➔ Merge / Meet')).toBeVisible();
-    await expect(page.locator('[data-cy="admin-night-hero-primary"]')).toHaveAttribute(
+    await expect(page.locator('[data-testid="admin-night-hero-primary"]')).toHaveAttribute(
       'href',
       '#admin-night-request'
     );
@@ -40,7 +40,7 @@ test.describe('Admin Night 공개 페이지 시나리오', () => {
     await page.goto('/admin-night');
 
     await expect(page.getByText('각자 할 일을 끝내는 밤')).toBeVisible();
-    await expect(page.locator('[data-cy="admin-night-slot-tonight"]')).toBeAttached();
+    await expect(page.locator('[data-testid="admin-night-slot-tonight"]')).toBeAttached();
 
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(scrollWidth).toBeLessThanOrEqual(390);
@@ -58,7 +58,7 @@ test.describe('Admin Night 공개 페이지 시나리오', () => {
 
     await page.goto('/admin-night');
 
-    await expect(page.locator('[data-cy="admin-night-slot-tonight"]')).toHaveAttribute(
+    await expect(page.locator('[data-testid="admin-night-slot-tonight"]')).toHaveAttribute(
       'data-date',
       '2026-09-07'
     );
@@ -86,11 +86,11 @@ test.describe('Admin Night 공개 페이지 시나리오', () => {
     await page.clock.pauseAt(new Date('2026-09-06T14:59:59.000Z'));
     await page.evaluate(() => window.dispatchEvent(new Event('focus')));
 
-    await expect(page.locator('[data-cy="admin-night-slot-tonight"]')).toHaveAttribute(
+    await expect(page.locator('[data-testid="admin-night-slot-tonight"]')).toHaveAttribute(
       'data-date',
       '2026-09-06'
     );
-    await expect(page.locator('[data-cy="admin-night-date-option-2026-09-06"]')).toHaveAttribute(
+    await expect(page.locator('[data-testid="admin-night-date-option-2026-09-06"]')).toHaveAttribute(
       'aria-pressed',
       'true'
     );
@@ -98,15 +98,15 @@ test.describe('Admin Night 공개 페이지 시나리오', () => {
 
     await page.clock.runFor(2_100);
 
-    await expect(page.locator('[data-cy="admin-night-slot-tonight"]')).toHaveAttribute(
+    await expect(page.locator('[data-testid="admin-night-slot-tonight"]')).toHaveAttribute(
       'data-date',
       '2026-09-07'
     );
-    await expect(page.locator('[data-cy="admin-night-date-option-2026-09-07"]')).toHaveAttribute(
+    await expect(page.locator('[data-testid="admin-night-date-option-2026-09-07"]')).toHaveAttribute(
       'aria-pressed',
       'true'
     );
-    await expect(page.locator('[data-cy="admin-night-date-option-2026-09-06"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="admin-night-date-option-2026-09-06"]')).toHaveCount(0);
     await expect.poll(() => calendarRanges).toContain('2026-09-07|2026-09-13');
   });
 
