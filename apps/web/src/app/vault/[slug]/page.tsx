@@ -14,6 +14,7 @@ import {
   toSeoDateTime,
   uniqueKeywords,
 } from '@/shared/lib/seo';
+import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { VaultNotePageSkeleton } from '@/shared/ui/RouteSkeletons';
 
@@ -105,6 +106,8 @@ export default async function VaultNotePage({
   return (
     <>
       <JsonLd id={`vault-${note.id}`} data={jsonLd} />
+      {/* 용어 스텁처럼 분량이 적은 노트는 색인에서 빼는 것과 같은 기준으로 광고도 붙이지 않는다. */}
+      {isIndexableVaultContent(note.content) && <AdSenseScript />}
       <Suspense fallback={<VaultNotePageSkeleton />}>
         <VaultNoteLayout
           slug={note.slug}

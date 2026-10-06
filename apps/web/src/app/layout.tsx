@@ -16,6 +16,8 @@ import { AnalyticsScripts } from '@/shared/ui/AnalyticsScripts';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import './globals.css';
 
+const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID;
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -107,6 +109,8 @@ export const metadata: Metadata = {
       'naver-site-verification': ['1dac7b194ac38f7dea77dcad259828346ccc564f'],
     },
   },
+  // 애드센스 사이트 소유 확인용 표식. 광고를 싣는 코드가 아니라 계정 연결만 알리므로 모든 화면에 둔다.
+  ...(adsenseId ? { other: { 'google-adsense-account': adsenseId } } : {}),
 };
 
 const gaId = process.env.NEXT_PUBLIC_GA_ID;

@@ -15,6 +15,11 @@ import Script from 'next/script';
  * 반려됐다. 그래서 "경로 기준"을 버리고, 실제 콘텐츠가 확정된 페이지/분기에서만
  * 이 컴포넌트를 직접 렌더해 "콘텐츠 기준"으로 광고를 로드함.
  *
+ * 로드 시점은 afterInteractive 다. 하이드레이션이 시작된 뒤에 실행되므로 자동 광고가
+ * DOM 을 바꿔도 하이드레이션과 부딪히지 않고, 서버가 그린 HTML 에는 게시자 ID 가 담긴
+ * preload 링크가 남아 페이지가 다 뜨기를 기다리지 않아도 광고 요청이 나간다.
+ * (사이트 소유 확인은 루트 레이아웃의 google-adsense-account 메타 태그가 맡는다.)
+ *
  * next/script 는 동일 id 를 중복 렌더해도 한 번만 로드하므로, 여러 콘텐츠
  * 지점에서 마운트해도 안전함.
  */
@@ -29,7 +34,7 @@ export function AdSenseScript({ clientId }: { clientId?: string } = {}) {
       async
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${resolvedClientId}`}
       crossOrigin="anonymous"
-      strategy="lazyOnload"
+      strategy="afterInteractive"
     />
   );
 }
