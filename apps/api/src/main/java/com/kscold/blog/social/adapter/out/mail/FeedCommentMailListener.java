@@ -53,7 +53,7 @@ public class FeedCommentMailListener {
         this.feedCommentMailExecutor = feedCommentMailExecutor;
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handle(FeedCommentCreatedEvent event) {
         try {
             // 댓글 저장 요청은 기다리지 않고, 커밋이 끝난 뒤 메일 작업만 전용 큐에 등록함.

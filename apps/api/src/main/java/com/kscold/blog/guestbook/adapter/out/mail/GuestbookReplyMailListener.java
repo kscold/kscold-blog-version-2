@@ -28,7 +28,7 @@ public class GuestbookReplyMailListener {
         this.guestbookReplyMailExecutor = guestbookReplyMailExecutor;
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handle(GuestbookReplyCreatedEvent event) {
         try {
             guestbookReplyMailExecutor.execute(() -> send(event));

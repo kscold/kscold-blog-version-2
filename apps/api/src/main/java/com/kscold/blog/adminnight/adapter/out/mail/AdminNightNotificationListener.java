@@ -22,7 +22,7 @@ public class AdminNightNotificationListener {
     private final AdminNightProgramVoteMailComposer programVoteMailComposer;
     private final AdminNightProperties adminNightProperties;
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handle(AdminNightNotificationEvent event) {
         if (!recoveryMailSender.isAvailable()) {
             return;
@@ -64,7 +64,7 @@ public class AdminNightNotificationListener {
         }
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void handle(AdminNightProgramVoteNotificationEvent event) {
         if (!recoveryMailSender.isAvailable()) {
             return;
