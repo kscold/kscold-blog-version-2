@@ -11,6 +11,7 @@ import { ScrollProgress } from '@/shared/ui/ScrollProgress';
 import { ViewerProvider } from '@/shared/model/ViewerProvider';
 import type { InitialViewer } from '@/shared/lib/initialViewer';
 import { PageVisitTracker } from '@/shared/analytics/PageVisitTracker';
+import { isAdminPath } from '@/shared/config/adminNavigation';
 import { isStandalonePage } from '@/shared/config/standalonePages';
 
 const FloatingChatWidget = dynamic(
@@ -28,6 +29,8 @@ export function ClientLayout({ children, footer, initialViewer }: ClientLayoutPr
   const pathname = usePathname();
   const params = useParams();
   const isVaultPage = pathname.startsWith('/vault');
+  // 관리자 화면은 작업 공간이라 공개 푸터와 방문자용 채팅 버튼을 붙이지 않는다.
+  const isAdminPage = isAdminPath(pathname);
   const isPrivatePdfPage = /^\/admin\/documents\/[^/]+\/view\/?$/.test(pathname);
 
   // 지원용 정적 화면에는 공개 메뉴·방문 추적·전역 검색 Agent를 붙이지 않는다.
@@ -65,14 +68,16 @@ export function ClientLayout({ children, footer, initialViewer }: ClientLayoutPr
             ) : (
               <>
                 <div className="flex-1 flex flex-col">{children}</div>
-                {footer}
+                {!isAdminPage && footer}
               </>
             )}
           </main>
         </div>
-        <Suspense fallback={null}>
-          <FloatingChatWidget />
-        </Suspense>
+        {!isAdminPage && (
+          <Suspense fallback={null}>
+            <FloatingChatWidget />
+          </Suspense>
+        )}
         <AlertToast />
         <CustomCursor />
       </div>

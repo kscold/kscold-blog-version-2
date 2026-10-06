@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { useCategories } from '@/entities/category';
@@ -9,9 +10,13 @@ import { useUiStore } from '@/shared/model/uiStore';
 import { useViewer } from '@/entities/user';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { isSystemTagName } from '@/shared/lib/tags';
+import { isAdminPath } from '@/shared/config/adminNavigation';
 import { SidebarMobileNav } from '@/widgets/sidebar/ui/SidebarMobileNav';
 import { SidebarCategories } from '@/widgets/sidebar/ui/SidebarCategories';
 import { SidebarTags } from '@/widgets/sidebar/ui/SidebarTags';
+
+// 관리 메뉴는 관리자가 관리자 화면에 들어왔을 때만 내려받아 공개 화면 번들에 싣지 않는다.
+const SidebarAdminNav = dynamic(() => import('@/widgets/sidebar/ui/SidebarAdminNav'));
 
 export function Sidebar() {
   const { sidebarOpen, setSidebarOpen } = useUiStore();
@@ -19,7 +24,10 @@ export function Sidebar() {
   const { isTouchDevice, isDesktopViewport, allowRichEffects } = usePerformanceMode();
   const pathname = usePathname();
   const isVaultPage = pathname.startsWith('/vault');
-  const shouldLoadSidebarData = sidebarOpen || (isDesktopViewport && !isVaultPage);
+  const showAdminNav = role === 'ADMIN' && isAdminPath(pathname);
+  // 관리자 화면에서는 공개 카테고리·태그를 그리지 않으므로 불러오지도 않는다.
+  const shouldLoadSidebarData =
+    !showAdminNav && (sidebarOpen || (isDesktopViewport && !isVaultPage));
   const { data: categories } = useCategories(undefined, shouldLoadSidebarData);
   const { data: tagIndex, isLoading: isTagsLoading } = useTagIndex(
     undefined,
@@ -59,35 +67,41 @@ export function Sidebar() {
       {/* 모바일 네비게이션 링크 */}
       <SidebarMobileNav links={mobileLinks} />
 
-      {role === 'ADMIN' && (
-        <nav aria-label="관리자 메뉴" className="space-y-2 border-b border-surface-200 pb-6">
-          <p className="text-xs font-semibold tracking-wide text-surface-500">ADMIN</p>
-          {[
-            { href: '/admin/documents', label: '개인 문서함', key: 'documents' },
-            { href: '/admin/documents/resumes', label: '이력서 관리', key: 'resumes' },
-            { href: '/admin/documents/sources', label: '경력 소스 관리', key: 'sources' },
-            { href: '/admin/documents/stories', label: '스토리 관리', key: 'stories' },
-          ].map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              data-cy={`admin-${link.key}-sidebar-link`}
-              aria-current={pathname === link.href ? 'page' : undefined}
-              className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                pathname === link.href
-                  ? 'bg-surface-900 text-white'
-                  : 'text-surface-600 hover:bg-surface-50 hover:text-surface-900'
-              }`}
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
+      {showAdminNav ? (
+        <SidebarAdminNav pathname={pathname} />
+      ) : (
+        <>
+          {role === 'ADMIN' && (
+            <nav aria-label="관리자 메뉴" className="space-y-2 border-b border-surface-200 pb-6">
+              <p className="text-xs font-semibold tracking-wide text-surface-500">ADMIN</p>
+              {[
+                { href: '/admin/documents', label: '개인 문서함', key: 'documents' },
+                { href: '/admin/documents/resumes', label: '이력서 관리', key: 'resumes' },
+                { href: '/admin/documents/sources', label: '경력 소스 관리', key: 'sources' },
+                { href: '/admin/documents/stories', label: '스토리 관리', key: 'stories' },
+              ].map(link => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  data-cy={`admin-${link.key}-sidebar-link`}
+                  aria-current={pathname === link.href ? 'page' : undefined}
+                  className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    pathname === link.href
+                      ? 'bg-surface-900 text-white'
+                      : 'text-surface-600 hover:bg-surface-50 hover:text-surface-900'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+          )}
+
+          <SidebarCategories categories={categories} />
+
+          <SidebarTags tags={tags} isLoading={isTagsLoading} />
+        </>
       )}
-
-      <SidebarCategories categories={categories} />
-
-      <SidebarTags tags={tags} isLoading={isTagsLoading} />
     </div>
   );
 
