@@ -1,6 +1,7 @@
 'use client';
 
 import { useAccessRequests } from '@/widgets/admin/model/useAccessRequests';
+import { AdminPage } from '@/shared/ui/AdminPage';
 import { AccessRequestCard } from './AccessRequestCard';
 import { AccessRequestsEmpty } from './AccessRequestsEmpty';
 import { AccessRequestsHeader } from './AccessRequestsHeader';
@@ -10,7 +11,7 @@ export function AdminAccessRequestsSection() {
   const { requests, scopeById, loading, handleRequest, selectScope } = useAccessRequests();
 
   return (
-    <div className="space-y-6">
+    <AdminPage>
       <AccessRequestsHeader requestCount={requests.length} />
 
       {loading ? (
@@ -30,6 +31,6 @@ export function AdminAccessRequestsSection() {
           ))}
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }

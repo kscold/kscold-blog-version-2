@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAdminUsers, AdminUser } from '@/features/profile';
 import { useSoftDeleteUser, useHardDeleteUser } from '@/features/user';
 import { useAlert } from '@/shared/model/alertStore';
+import { AdminPage } from '@/shared/ui/AdminPage';
 import { UserListHeader } from './UserListHeader';
 import { UserRow } from './UserRow';
 import { UserEditModal } from './UserEditModal';
@@ -37,7 +38,7 @@ export function AdminUsersContainer() {
   };
 
   return (
-    <div>
+    <AdminPage>
       <UserListHeader total={users?.length ?? 0} search={search} onSearchChange={setSearch} />
 
       {isLoading ? (
@@ -61,6 +62,6 @@ export function AdminUsersContainer() {
       )}
 
       {editUser && <UserEditModal user={editUser} onClose={() => setEditUser(null)} />}
-    </div>
+    </AdminPage>
   );
 }

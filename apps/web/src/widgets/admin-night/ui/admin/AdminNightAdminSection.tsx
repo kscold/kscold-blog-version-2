@@ -2,6 +2,7 @@
 
 import { describeParticipationMode } from '@/widgets/admin-night/lib/adminNight';
 import { useAdminNightAdmin } from '@/widgets/admin-night/model/useAdminNightAdmin';
+import { AdminPage, AdminPageHeader } from '@/shared/ui/AdminPage';
 import { AdminNightPendingActions } from './AdminNightPendingActions';
 import { AdminNightProgramVoteSection } from './AdminNightProgramVoteSection';
 import { AdminNightRequestMeta } from './AdminNightRequestMeta';
@@ -11,15 +12,12 @@ export function AdminNightAdminSection() {
   const state = useAdminNightAdmin();
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-surface-400">Admin Night</p>
-        <h1 className="text-3xl font-black tracking-tight text-surface-900">Admin Night 신청 관리</h1>
-        <p className="max-w-3xl text-sm leading-7 text-surface-500 sm:text-[15px]">
-          참가 신청 PR을 확인하고, 승인되면 같은 시간대의 실제 일정으로 merge 합니다. 실명이나 맥락이 더 필요한 경우에는
-          메모와 함께 추가 정보를 요청하고, 신청자가 보완본을 다시 보내면 다시 review 합니다.
-        </p>
-      </div>
+    <AdminPage width="wide">
+      <AdminPageHeader
+        eyebrow="Admin Night"
+        title="Admin Night 신청 관리"
+        description="참가 신청 PR을 확인하고, 승인되면 같은 시간대의 실제 일정으로 merge 합니다. 실명이나 맥락이 더 필요하면 메모와 함께 추가 정보를 요청하고, 보완본이 오면 다시 review 합니다."
+      />
 
       <AdminNightProgramVoteSection />
 
@@ -115,6 +113,6 @@ export function AdminNightAdminSection() {
           )}
         </div>
       </AdminNightStatusSection>
-    </div>
+    </AdminPage>
   );
 }

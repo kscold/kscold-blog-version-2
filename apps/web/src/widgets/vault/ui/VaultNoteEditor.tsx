@@ -113,14 +113,14 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
   const submitLabel = mode === 'create' ? '노트 저장' : '노트 수정';
 
   return (
-    <div className="min-h-screen bg-secondary-beige dark:bg-gray-950">
+    <div className="min-h-screen bg-surface-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-4xl font-serif font-bold text-gray-900 dark:text-white">{pageTitle}</h1>
+            <h1 className="text-4xl font-black tracking-tight text-surface-900">{pageTitle}</h1>
             <button
               onClick={() => setShowPreview(!showPreview)}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="px-4 py-2 bg-surface-900 text-white rounded-lg hover:bg-surface-800 transition-colors"
             >
               {showPreview ? '에디터' : '프리뷰'}
             </button>
@@ -130,36 +130,36 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">제목 *</label>
+                  <label className="block text-sm font-medium text-surface-900 mb-2">제목 *</label>
                   <input
                     type="text"
                     value={title}
                     onChange={e => setTitle(e.target.value)}
                     placeholder="노트 제목을 입력하세요"
-                    className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                    className="w-full px-4 py-3 bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">{slugLabel}</label>
+                  <label className="block text-sm font-medium text-surface-900 mb-2">{slugLabel}</label>
                   <input
                     type="text"
                     value={slug}
                     onChange={e => setSlug(e.target.value)}
                     placeholder="url-friendly-slug"
-                    className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                    className="w-full px-4 py-3 bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  <label className="block text-sm font-medium text-surface-900 mb-2">
                     내용 * (Markdown, [[백링크]] 지원)
                   </label>
                   {showPreview ? (
-                    <div className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-6 min-h-[600px] overflow-auto">
+                    <div className="bg-white border border-surface-300 rounded-lg p-6 min-h-[600px] overflow-auto">
                       <MarkdownContent content={content} />
                     </div>
                   ) : (
-                    <div className="border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <div className="border border-surface-300 rounded-lg overflow-hidden">
                       <Editor
                         height="600px"
                         defaultLanguage="markdown"

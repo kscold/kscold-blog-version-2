@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTags } from '@/entities/tag';
 import { useCreateTag, useUpdateTag, useDeleteTag } from '@/entities/tag';
 import type { Tag } from '@/shared/model/types/blog';
+import { AdminPage, AdminPageHeader } from '@/shared/ui/AdminPage';
 import { TagCatalogPanel } from './TagCatalogPanel';
 import { TagManagementTable } from './TagManagementTable';
 
@@ -34,26 +35,28 @@ export function TagManagementContainer() {
   };
 
   return (
-    <>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        총 {tags.length}개 태그
-      </p>
+    <AdminPage>
+      <AdminPageHeader
+        eyebrow="Tags"
+        title="태그 관리"
+        description={`총 ${tags.length}개 태그. 새 태그를 만들고, 쓰임이 겹치는 태그는 하나로 합칠 수 있습니다.`}
+      />
 
       {/* 새 태그 폼 */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-6">
-        <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">새 태그 추가</h2>
+      <div className="rounded-3xl border border-surface-200 bg-white p-5">
+        <h2 className="text-sm font-semibold text-surface-900 mb-3">새 태그 추가</h2>
         <form onSubmit={handleCreate} className="flex flex-col gap-2 sm:flex-row">
           <input
             type="text"
             value={newTagName}
             onChange={e => setNewTagName(e.target.value)}
             placeholder="태그 이름 입력"
-            className="flex-1 px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-600"
+            className="flex-1 px-3 py-2 text-sm bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-400 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
           />
           <button
             type="submit"
             disabled={createTag.isPending || !newTagName.trim()}
-            className="w-full rounded-lg bg-purple-600 px-4 py-2 text-sm text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="w-full rounded-[10px] bg-surface-900 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-surface-800 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {createTag.isPending ? '추가 중...' : '추가'}
           </button>
@@ -71,6 +74,6 @@ export function TagManagementContainer() {
         onDelete={handleDelete}
         isDeleting={deleteTag.isPending}
       />
-    </>
+    </AdminPage>
   );
 }

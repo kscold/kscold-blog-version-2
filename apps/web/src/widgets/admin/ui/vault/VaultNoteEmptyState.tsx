@@ -4,10 +4,10 @@ interface VaultNoteEmptyStateProps {
 
 export function VaultNoteEmptyState({ onCreate }: VaultNoteEmptyStateProps) {
   return (
-    <div className="rounded-lg bg-white py-20 text-center dark:bg-gray-900">
-      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+    <div className="rounded-3xl border border-surface-200 bg-white py-20 text-center">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-100">
         <svg
-          className="h-8 w-8 text-gray-400"
+          className="h-8 w-8 text-surface-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -20,11 +20,11 @@ export function VaultNoteEmptyState({ onCreate }: VaultNoteEmptyStateProps) {
           />
         </svg>
       </div>
-      <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">노트가 없습니다</h2>
-      <p className="mb-6 text-gray-600 dark:text-gray-400">첫 번째 Vault 노트를 작성해보세요</p>
+      <h2 className="mb-2 text-xl font-black text-surface-900">노트가 없습니다</h2>
+      <p className="mb-6 text-sm text-surface-500">첫 번째 Vault 노트를 작성해보세요</p>
       <button
         onClick={onCreate}
-        className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 text-white transition-all hover:shadow-lg"
+        className="inline-flex items-center gap-2 rounded-[10px] bg-surface-900 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-surface-800"
       >
         새 노트 작성
       </button>

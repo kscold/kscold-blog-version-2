@@ -5,10 +5,7 @@ export function TagManagementSkeleton() {
     <>
       <div className="space-y-3 sm:hidden">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900"
-          >
+          <div key={index} className="rounded-2xl border border-surface-200 bg-white p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1 space-y-2">
                 <Skeleton className="h-6 w-24 rounded-full" />
@@ -27,7 +24,7 @@ export function TagManagementSkeleton() {
         ))}
       </div>
 
-      <div className="hidden overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 sm:block">
+      <div className="hidden overflow-hidden rounded-3xl border border-surface-200 bg-white sm:block">
         <div className="space-y-4 px-4 py-4">
           <div className="grid grid-cols-[1.2fr_1.2fr_0.6fr_0.8fr_0.8fr] gap-4">
             <Skeleton className="h-4 w-16 rounded-md" />
@@ -39,7 +36,7 @@ export function TagManagementSkeleton() {
           {Array.from({ length: 5 }).map((_, index) => (
             <div
               key={index}
-              className="grid grid-cols-[1.2fr_1.2fr_0.6fr_0.8fr_0.8fr] gap-4 border-t border-gray-100 pt-4 dark:border-gray-800"
+              className="grid grid-cols-[1.2fr_1.2fr_0.6fr_0.8fr_0.8fr] gap-4 border-t border-surface-100 pt-4"
             >
               <Skeleton className="h-6 w-24 rounded-full" />
               <Skeleton className="h-4 w-28 rounded-md" />

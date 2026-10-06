@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { AdminPage, AdminPageHeader } from '@/shared/ui/AdminPage';
+import Button from '@/shared/ui/Button';
 import { CategoryTree } from './CategoryTree';
 import { CategoryModal } from './CategoryModal';
 import { useAdminCategories } from '../../api/useAdminCategories';
@@ -21,60 +22,35 @@ export function AdminCategoriesSection() {
   } = useAdminCategories();
 
   return (
-    <div className="min-h-screen bg-secondary-beige dark:bg-gray-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-serif font-bold text-gray-900 dark:text-white sm:text-4xl">
-                카테고리 관리
-              </h1>
-              <p className="max-w-2xl text-sm leading-6 text-gray-600 dark:text-gray-400">
-                최대 5단계까지 계층 구조를 만들고, 제한 카테고리 운영에 필요한 흐름도 이 화면에서 함께 관리할 수 있습니다.
-              </p>
-            </div>
-            <button
-              onClick={openCreateModal}
-              className="w-full rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 text-sm font-medium text-white transition-all hover:shadow-lg sm:w-auto"
-            >
-              새 카테고리 추가
-            </button>
-          </div>
+    <AdminPage>
+      <AdminPageHeader
+        eyebrow="Categories"
+        title="카테고리 관리"
+        description="최대 5단계까지 계층 구조를 만들고, 제한 카테고리 운영에 필요한 흐름도 이 화면에서 함께 관리할 수 있습니다."
+        actions={
+          <Button size="sm" onClick={openCreateModal}>
+            새 카테고리 추가
+          </Button>
+        }
+      />
 
-          {isLoading ? (
-            <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-24 bg-white dark:bg-gray-900 rounded-lg animate-pulse" />
-              ))}
-            </div>
-          ) : categories && categories.length > 0 ? (
-            <CategoryTree
-              categories={categories}
-              onEdit={openEditModal}
-              onDelete={handleDelete}
-            />
-          ) : (
-            <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-lg">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                카테고리가 없습니다
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                첫 번째 카테고리를 만들어보세요!
-              </p>
-              <button
-                onClick={openCreateModal}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
-              >
-                새 카테고리 추가
-              </button>
-            </div>
-          )}
-        </motion.div>
-      </div>
+      {isLoading ? (
+        <div className="space-y-3">
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="h-20 animate-pulse rounded-2xl bg-white" />
+          ))}
+        </div>
+      ) : categories && categories.length > 0 ? (
+        <CategoryTree categories={categories} onEdit={openEditModal} onDelete={handleDelete} />
+      ) : (
+        <div className="rounded-3xl border border-surface-200 bg-white py-20 text-center">
+          <h2 className="text-xl font-black text-surface-900">카테고리가 없습니다</h2>
+          <p className="mb-6 mt-2 text-sm text-surface-500">첫 번째 카테고리를 만들어보세요.</p>
+          <Button size="sm" onClick={openCreateModal}>
+            새 카테고리 추가
+          </Button>
+        </div>
+      )}
 
       <CategoryModal
         isOpen={isModalOpen}
@@ -85,6 +61,6 @@ export function AdminCategoriesSection() {
         onSubmit={handleSubmit}
         onClose={closeModal}
       />
-    </div>
+    </AdminPage>
   );
 }

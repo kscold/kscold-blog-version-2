@@ -71,11 +71,11 @@ export function TagCatalogPanel() {
   };
 
   return (
-    <section className="mb-6 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+    <section className="rounded-3xl border border-surface-200 bg-white p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">태그 인덱스</h2>
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <h2 className="text-sm font-semibold text-surface-900">태그 인덱스</h2>
+          <p className="mt-1 text-xs text-surface-500">
             글 {tags.reduce((sum, tag) => sum + tag.postCount, 0)}건 · 피드{' '}
             {tags.reduce((sum, tag) => sum + tag.feedCount, 0)}건에 쓰인 태그 {tags.length}개
             {unregistered > 0 && ` · 미등록 ${unregistered}개`}
@@ -86,23 +86,23 @@ export function TagCatalogPanel() {
           type="button"
           onClick={handleReindex}
           disabled={reindexTags.isPending}
-          className="rounded-lg bg-gray-900 px-4 py-2 text-sm text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-lg bg-surface-900 px-4 py-2 text-sm text-white transition-colors hover:bg-surface-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {reindexTags.isPending ? '정리 중...' : '재색인'}
         </button>
       </div>
 
       {isLoading ? (
-        <p className="mt-4 text-sm text-gray-400">불러오는 중...</p>
+        <p className="mt-4 text-sm text-surface-400">불러오는 중...</p>
       ) : error ? (
         <p className="mt-4 text-sm text-red-600">태그 인덱스를 불러오지 못했습니다.</p>
       ) : tags.length === 0 ? (
-        <p className="mt-4 text-sm text-gray-400">사용 중인 태그가 없습니다.</p>
+        <p className="mt-4 text-sm text-surface-400">사용 중인 태그가 없습니다.</p>
       ) : (
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">
             <thead>
-              <tr className="border-b border-gray-200 text-left text-xs text-gray-400 dark:border-gray-700">
+              <tr className="border-b border-surface-200 text-left text-xs text-surface-400">
                 <th className="py-2 pr-3 font-medium">태그</th>
                 <th className="py-2 pr-3 font-medium">글</th>
                 <th className="py-2 pr-3 font-medium">피드</th>
@@ -113,23 +113,18 @@ export function TagCatalogPanel() {
             </thead>
             <tbody>
               {tags.map(tag => (
-                <tr
-                  key={tag.name}
-                  className="border-b border-gray-100 last:border-0 dark:border-gray-800"
-                >
+                <tr key={tag.name} className="border-b border-surface-100 last:border-0">
                   <td className="py-2 pr-3">
-                    <span className="font-medium text-gray-900 dark:text-white">#{tag.name}</span>
+                    <span className="font-medium text-surface-900">#{tag.name}</span>
                     {tag.unregistered && (
                       <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
                         미등록
                       </span>
                     )}
                   </td>
-                  <td className="py-2 pr-3 text-gray-500">{tag.postCount}</td>
-                  <td className="py-2 pr-3 text-gray-500">{tag.feedCount}</td>
-                  <td className="py-2 pr-3 font-bold text-gray-900 dark:text-white">
-                    {tag.totalCount}
-                  </td>
+                  <td className="py-2 pr-3 text-surface-500">{tag.postCount}</td>
+                  <td className="py-2 pr-3 text-surface-500">{tag.feedCount}</td>
+                  <td className="py-2 pr-3 font-bold text-surface-900">{tag.totalCount}</td>
                   <td className="py-2 pr-3">
                     {tag.id ? (
                       <select
@@ -137,7 +132,7 @@ export function TagCatalogPanel() {
                         onChange={event =>
                           handleCategoryChange(tag.id!, tag.name, event.target.value)
                         }
-                        className="rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800"
+                        className="rounded border border-surface-300 bg-white px-2 py-1 text-xs"
                       >
                         <option value="">{UNCATEGORIZED}</option>
                         {categories.map(category => (
@@ -147,7 +142,7 @@ export function TagCatalogPanel() {
                         ))}
                       </select>
                     ) : (
-                      <span className="text-xs text-gray-400">재색인 필요</span>
+                      <span className="text-xs text-surface-400">재색인 필요</span>
                     )}
                   </td>
                   <td className="py-2">
@@ -161,7 +156,7 @@ export function TagCatalogPanel() {
                               [tag.id!]: event.target.value,
                             }))
                           }
-                          className="rounded border border-gray-300 bg-white px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800"
+                          className="rounded border border-surface-300 bg-white px-2 py-1 text-xs"
                         >
                           <option value="">합칠 태그 선택</option>
                           {tags
@@ -176,13 +171,13 @@ export function TagCatalogPanel() {
                           type="button"
                           disabled={!mergeTargets[tag.id] || mergeTags.isPending}
                           onClick={() => handleMerge(tag.id!, tag.name)}
-                          className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 transition-colors hover:border-gray-900 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-300"
+                          className="rounded border border-surface-300 px-2 py-1 text-xs text-surface-600 transition-colors hover:border-surface-900 hover:text-surface-900 disabled:cursor-not-allowed disabled:opacity-40"
                         >
                           합치기
                         </button>
                       </div>
                     ) : (
-                      <span className="text-xs text-gray-400">—</span>
+                      <span className="text-xs text-surface-400">—</span>
                     )}
                   </td>
                 </tr>

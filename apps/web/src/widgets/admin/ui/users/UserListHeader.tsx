@@ -1,5 +1,7 @@
 'use client';
 
+import { AdminPageHeader } from '@/shared/ui/AdminPage';
+
 interface Props {
   total: number;
   search: string;
@@ -8,17 +10,19 @@ interface Props {
 
 export function UserListHeader({ total, search, onSearchChange }: Props) {
   return (
-    <div className="flex items-center justify-between mb-6">
-      <div>
-        <h1 className="text-2xl font-black tracking-tight text-surface-900">전체 사용자</h1>
-        <p className="text-sm text-surface-500 mt-0.5">총 {total}명</p>
-      </div>
-      <input
-        value={search}
-        onChange={e => onSearchChange(e.target.value)}
-        placeholder="이름, 이메일 검색"
-        className="px-3 py-2 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400 w-52"
-      />
-    </div>
+    <AdminPageHeader
+      eyebrow="Users"
+      title="사용자 관리"
+      description={`가입한 사용자 ${total}명의 프로필과 계정 상태를 관리합니다.`}
+      actions={
+        <input
+          value={search}
+          onChange={event => onSearchChange(event.target.value)}
+          placeholder="이름, 이메일 검색"
+          aria-label="사용자 검색"
+          className="w-56 rounded-[10px] border border-surface-200 bg-white px-3 py-2.5 text-sm focus:border-surface-400 focus:outline-none"
+        />
+      }
+    />
   );
 }

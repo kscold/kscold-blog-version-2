@@ -93,13 +93,13 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
   return (
     <div className="relative">
       <div
-        className="min-h-[42px] flex flex-wrap gap-1.5 items-center px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg cursor-text focus-within:ring-2 focus-within:ring-purple-600"
+        className="min-h-[42px] flex flex-wrap gap-1.5 items-center px-3 py-2 bg-white border border-surface-300 rounded-lg cursor-text focus-within:ring-2 focus-within:ring-surface-900/40"
         onClick={() => inputRef.current?.focus()}
       >
         {selectedTags.map(tag => (
           <span
             key={tag.id}
-            className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 text-xs rounded-full"
+            className="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-100 text-surface-700 text-xs rounded-full"
           >
             {tag.name}
             <button
@@ -108,7 +108,7 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
                 e.stopPropagation();
                 removeTag(tag.id);
               }}
-              className="hover:text-purple-600 dark:hover:text-purple-200 leading-none"
+              className="hover:text-surface-900 leading-none"
             >
               x
             </button>
@@ -126,24 +126,24 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={selectedTagIds.length === 0 ? '태그 검색 또는 생성...' : ''}
-          className="flex-1 min-w-[120px] bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none"
+          className="flex-1 min-w-[120px] bg-transparent text-sm text-surface-900 placeholder-surface-400 outline-none"
         />
       </div>
 
       {isOpen && (inputValue.length > 0 || filteredTags.length > 0) && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+          className="absolute z-50 w-full mt-1 bg-white border border-surface-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
         >
           {filteredTags.map(tag => (
             <button
               key={tag.id}
               type="button"
               onClick={() => selectTag(tag)}
-              className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 text-left"
+              className="w-full flex items-center justify-between px-3 py-2 text-sm text-surface-900 hover:bg-surface-50 text-left"
             >
               <span>{tag.name}</span>
-              <span className="text-xs text-gray-400">{tag.postCount}개 포스트</span>
+              <span className="text-xs text-surface-400">{tag.postCount}개 포스트</span>
             </button>
           ))}
 
@@ -152,7 +152,7 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
               type="button"
               onClick={handleCreateTag}
               disabled={createTag.isPending}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 text-left"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-surface-900 hover:bg-surface-50 text-left"
             >
               <span className="font-medium">+</span>
               <span>
@@ -162,7 +162,7 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
           )}
 
           {filteredTags.length === 0 && !showCreateOption && (
-            <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+            <div className="px-3 py-2 text-sm text-surface-500">
               검색 결과 없음
             </div>
           )}

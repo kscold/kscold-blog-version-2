@@ -32,17 +32,15 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="min-h-screen flex items-center justify-center bg-surface-50">
           <div className="text-center p-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              오류가 발생했습니다
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <h2 className="text-2xl font-bold text-surface-900 mb-2">오류가 발생했습니다</h2>
+            <p className="text-surface-600 mb-4">
               요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all"
+              className="px-6 py-2.5 bg-surface-900 hover:bg-surface-800 text-white rounded-lg hover:shadow-lg transition-all"
             >
               다시 시도
             </button>

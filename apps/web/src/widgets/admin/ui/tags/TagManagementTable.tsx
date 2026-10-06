@@ -44,10 +44,8 @@ export function TagManagementTable({
 
   if (tags.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          등록된 태그가 없습니다.
-        </div>
+      <div className="overflow-hidden rounded-3xl border border-surface-200 bg-white">
+        <div className="text-center py-12 text-surface-500">등록된 태그가 없습니다.</div>
       </div>
     );
   }

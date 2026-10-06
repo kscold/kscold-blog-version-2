@@ -6,6 +6,7 @@ import { useAdminStorage } from '@/widgets/admin/lib/useAdminStorage';
 import { AdminStorageBrowser } from './AdminStorageBrowser';
 import { AdminStorageFolderPanel } from './AdminStorageFolderPanel';
 import { AdminStorageGuidePanel } from './AdminStorageGuidePanel';
+import { AdminPage } from '@/shared/ui/AdminPage';
 import { AdminStorageHeader } from './AdminStorageHeader';
 import { AdminStorageOverview } from './AdminStorageOverview';
 import { AdminStoragePreviewPanel } from './AdminStoragePreviewPanel';
@@ -74,7 +75,7 @@ export function AdminStorageSection() {
   };
 
   return (
-    <div data-cy="admin-storage-page" className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <AdminPage testId="admin-storage-page">
       <AdminStorageHeader
         bucket={listing?.bucket}
         disabled={isLoading || isMutating}
@@ -122,6 +123,6 @@ export function AdminStorageSection() {
       </section>
 
       <AdminStorageGuidePanel />
-    </div>
+    </AdminPage>
   );
 }

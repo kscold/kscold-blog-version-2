@@ -10,39 +10,39 @@ export function VaultNoteDesktopTable({
     <div className="hidden overflow-x-auto sm:block">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/50">
-            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+          <tr className="border-b border-surface-200 bg-surface-50">
+            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-surface-500">
               제목
             </th>
-            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-surface-500">
               태그
             </th>
-            <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-surface-500">
               조회수
             </th>
-            <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-surface-500">
               댓글
             </th>
-            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-surface-500">
               날짜
             </th>
-            <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-surface-500">
               액션
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+        <tbody className="divide-y divide-surface-200">
           {notes.map(note => (
             <tr
               key={note.id}
-              className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+              className="transition-colors hover:bg-surface-50"
             >
               <td className="px-6 py-4">
                 <div>
-                  <p className="max-w-xs truncate text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="max-w-xs truncate text-sm font-medium text-surface-900">
                     {note.title}
                   </p>
-                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">/{note.slug}</p>
+                  <p className="mt-0.5 text-xs text-surface-500">/{note.slug}</p>
                 </div>
               </td>
               <td className="px-6 py-4">
@@ -50,42 +50,42 @@ export function VaultNoteDesktopTable({
                   {note.tags.slice(0, 3).map(tag => (
                     <span
                       key={tag}
-                      className="rounded bg-purple-100 px-2 py-0.5 text-[10px] text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                      className="rounded bg-surface-900 px-2 py-0.5 text-[10px] text-surface-900"
                     >
                       {tag}
                     </span>
                   ))}
                   {note.tags.length > 3 && (
-                    <span className="text-[10px] text-gray-400">+{note.tags.length - 3}</span>
+                    <span className="text-[10px] text-surface-400">+{note.tags.length - 3}</span>
                   )}
                 </div>
               </td>
-              <td className="px-6 py-4 text-center text-sm text-gray-600 dark:text-gray-400">
+              <td className="px-6 py-4 text-center text-sm text-surface-600">
                 {note.views}
               </td>
-              <td className="px-6 py-4 text-center text-sm text-gray-600 dark:text-gray-400">
+              <td className="px-6 py-4 text-center text-sm text-surface-600">
                 {note.commentsCount}
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+              <td className="px-6 py-4 text-sm text-surface-600">
                 {formatVaultNoteDate(note.createdAt)}
               </td>
               <td className="px-6 py-4 text-right">
                 <div className="flex items-center justify-end gap-2">
                   <button
                     onClick={() => onView(note.slug)}
-                    className="px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                    className="px-3 py-1.5 text-xs font-medium text-surface-600 transition-colors hover:text-surface-900"
                   >
                     보기
                   </button>
                   <button
                     onClick={() => onEdit(note.id)}
-                    className="px-3 py-1.5 text-xs font-medium text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    className="px-3 py-1.5 text-xs font-medium text-surface-900 transition-colors hover:underline"
                   >
                     수정
                   </button>
                   <button
                     onClick={() => onDelete(note)}
-                    className="px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                    className="px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:text-red-700"
                   >
                     삭제
                   </button>

@@ -37,7 +37,7 @@ export function VaultNoteList({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+    <div className="overflow-hidden rounded-3xl border border-surface-200 bg-white">
       <VaultNoteMobileList notes={notes} {...actions} />
       <VaultNoteDesktopTable notes={notes} {...actions} />
       <VaultNotePagination
