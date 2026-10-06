@@ -61,18 +61,27 @@ async function checkHealth({ fetcher, entries, key }) {
   return health;
 }
 
-async function requestIndexing({ plan, key, apply, fetcher }) {
+async function requestIndexing({ plan, key, apply, fetcher, retryDelayMs }) {
   const summary = { changed: plan.changed.length, urls: plan.urls, dryRun: !apply, responses: [] };
   if (!apply || plan.urls.length === 0) return { ...summary, accepted: false };
   if (!key) {
     return { ...summary, accepted: false, responses: [{ endpoint: '-', outcome: '키 파일 없음' }] };
   }
-  const outcome = await submitIndexNow({ urls: plan.urls, site: SITE, key, fetcher });
+  const outcome = await submitIndexNow({ urls: plan.urls, site: SITE, key, fetcher, retryDelayMs });
   return { ...summary, ...outcome };
 }
 
 /** 하루 한 번 도는 점검의 본체. 외부와 닿는 부분은 모두 주입받아 테스트에서 바꿔 끼운다. */
-export async function runWatch({ apply, fetcher, readLog, env, submitted, key, now = Date.now() }) {
+export async function runWatch({
+  apply,
+  fetcher,
+  readLog,
+  env,
+  submitted,
+  key,
+  now = Date.now(),
+  retryDelayMs,
+}) {
   const sitemap = await fetchText(fetcher, `${SITE}/sitemap.xml`);
   const entries = parseSitemap(sitemap.body);
   const indexNow = await requestIndexing({
@@ -80,6 +89,7 @@ export async function runWatch({ apply, fetcher, readLog, env, submitted, key, n
     key,
     apply,
     fetcher,
+    retryDelayMs,
   });
   const logText = readLog();
   return {

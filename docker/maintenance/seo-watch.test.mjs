@@ -57,6 +57,7 @@ const watch = (web, overrides = {}) =>
     submitted: {},
     key: KEY,
     now: NOW,
+    retryDelayMs: 0,
     ...overrides,
   });
 
@@ -216,6 +217,25 @@ test('미리보기 실행은 색인 요청을 보내지 않는다', async () => 
   assert.equal(web.posts.length, 0);
   assert.equal(result.indexNow.dryRun, true);
   assert.match(renderReport(result), /미리보기 실행이라 요청하지 않음/);
+});
+
+test('키를 처음 쓸 때 온 403은 잠깐 뒤 한 번 더 보내 복구한다', async () => {
+  const statuses = [403, 200, 403, 403];
+  const fetcher = async () => ({ status: statuses.shift() });
+
+  const outcome = await submitIndexNow({
+    urls: [`${SITE}/`],
+    site: SITE,
+    key: KEY,
+    fetcher,
+    retryDelayMs: 0,
+  });
+
+  assert.equal(outcome.accepted, true);
+  assert.deepEqual(
+    outcome.responses.map(response => response.outcome),
+    ['HTTP 200', 'HTTP 403']
+  );
 });
 
 test('색인 요청은 받아들인 곳이 하나라도 있으면 성공으로 본다', async () => {

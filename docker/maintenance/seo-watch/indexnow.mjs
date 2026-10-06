@@ -5,6 +5,8 @@ import { join } from 'node:path';
 const ENDPOINTS = ['https://api.indexnow.org/indexnow', 'https://searchadvisor.naver.com/indexnow'];
 const KEY_FILE = /^([a-f0-9]{32})\.txt$/;
 const BATCH_SIZE = 5000;
+const KEY_CHECK_PENDING = 403;
+const RETRY_DELAY_MS = 5000;
 
 /**
  * 사이트가 공개하는 소유 확인 키를 찾는다. 키는 `<키>.txt` 파일로 배포되고 내용도 키와 같아야 한다.
@@ -31,13 +33,24 @@ async function post(fetcher, endpoint, payload) {
   }
 }
 
+/**
+ * 키를 처음 쓰는 순간에는 수신 측이 키 파일을 확인하는 중이라 403이 올 수 있다.
+ * 잠깐 뒤 한 번만 더 보내 첫 전송이 통째로 버려지지 않게 한다.
+ */
+async function postWithRetry({ fetcher, endpoint, payload, retryDelayMs }) {
+  const first = await post(fetcher, endpoint, payload);
+  if (first.status !== KEY_CHECK_PENDING) return first;
+  await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+  return post(fetcher, endpoint, payload);
+}
+
 const accepted = status => status === 200 || status === 202;
 
 /**
  * 바뀐 URL을 검색엔진에 알린다. 한 곳이라도 받아들이면 성공으로 본다.
  * 받아들인 곳이 없으면 다음 실행에서 같은 URL을 다시 보내도록 실패로 돌려준다.
  */
-export async function submitIndexNow({ urls, site, key, fetcher }) {
+export async function submitIndexNow({ urls, site, key, fetcher, retryDelayMs = RETRY_DELAY_MS }) {
   const { host, origin } = new URL(site);
   const responses = [];
   for (let offset = 0; offset < urls.length; offset += BATCH_SIZE) {
@@ -47,7 +60,9 @@ export async function submitIndexNow({ urls, site, key, fetcher }) {
       keyLocation: `${origin}/${key}.txt`,
       urlList: urls.slice(offset, offset + BATCH_SIZE),
     };
-    for (const endpoint of ENDPOINTS) responses.push(await post(fetcher, endpoint, payload));
+    for (const endpoint of ENDPOINTS) {
+      responses.push(await postWithRetry({ fetcher, endpoint, payload, retryDelayMs }));
+    }
   }
   return {
     accepted: responses.some(response => accepted(response.status)),
