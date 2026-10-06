@@ -1,0 +1,25 @@
+name: SEO Watch CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docker/maintenance/seo-watch*'
+      - 'docker/maintenance/seo-watch/**'
+      - 'docker/com.kscold.seo-watch.plist'
+      - '.github/workflows/seo-watch-ci.yml'
+  pull_request:
+    paths:
+      - 'docker/maintenance/seo-watch*'
+      - 'docker/maintenance/seo-watch/**'
+      - 'docker/com.kscold.seo-watch.plist'
+      - '.github/workflows/seo-watch-ci.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: 검색 노출 점검 로직 테스트
+        run: node --test docker/maintenance/seo-watch.test.mjs

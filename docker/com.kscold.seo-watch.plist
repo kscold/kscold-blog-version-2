@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.kscold.seo-watch</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/kscold/.nvm/versions/node/v25.6.0/bin/node</string>
+    <string>/Users/kscold/Desktop/kscold-blog-version-2/docker/maintenance/seo-watch.mjs</string>
+    <string>--apply</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>7</integer>
+    <key>Minute</key><integer>30</integer>
+  </dict>
+  <key>ProcessType</key><string>Background</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key><string>/Users/kscold</string>
+    <key>SEO_WATCH_REPORT_DIR</key><string>/Users/kscold/Desktop/server-logs/seo-reports</string>
+  </dict>
+  <key>StandardOutPath</key><string>/Users/kscold/.local/state/kscold-seo-watch/launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/kscold/.local/state/kscold-seo-watch/launchd.error.log</string>
+</dict>
+</plist>

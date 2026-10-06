@@ -191,6 +191,31 @@ node docker/maintenance/agent-backup-retention.mjs --apply --prune-images
   LaunchAgents에 설치할 때 로그 디렉터리를 먼저 생성하고 Node 절대 경로를 확인해야 합니다.
   중지는 `launchctl bootout gui/$(id -u)/com.kscold.agent-backup-retention`으로 합니다.
 
+## 검색 노출 점검 자동화
+
+검색엔진과 광고 심사 크롤러가 사이트를 제대로 읽고 있는지는 `docker/maintenance/seo-watch.mjs`로 하루 한 번 확인합니다.
+기본 실행은 미리보기이며, 색인 요청과 기록 저장은 `--apply`를 지정했을 때만 합니다.
+
+```bash
+node docker/maintenance/seo-watch.mjs
+node --test docker/maintenance/seo-watch.test.mjs
+node docker/maintenance/seo-watch.mjs --apply
+```
+
+- 상태 점검: 주요 화면과 최근에 고친 글의 title·description·canonical·구조화 데이터, 그리고
+  `robots.txt`·`sitemap.xml`·`rss.xml`·`ads.txt`·`llms.txt`가 살아 있는지 확인합니다. 문제가 있으면 종료 코드 1로 끝납니다.
+- 색인 요청: 사이트맵에서 새로 생겼거나 수정 시각이 바뀐 URL만 IndexNow로 알립니다(Bing·네이버 등).
+  소유 확인 키는 `apps/web/public/<키>.txt`에서 읽으므로 스크립트에 따로 적지 않습니다.
+- 크롤러 방문: Nginx 접근 로그의 `crawler` 필드로 지난 24시간 동안 다녀간 검색·AI·광고 크롤러를 종류별로 셉니다.
+- 검색 순위: 검색 화면을 긁지 않고 공식 검색 API만 씁니다. `~/.config/kscold-seo-watch/env`에
+  `NAVER_SEARCH_CLIENT_ID`·`NAVER_SEARCH_CLIENT_SECRET`(네이버 검색 API) 또는
+  `GOOGLE_CSE_KEY`·`GOOGLE_CSE_CX`(Google Programmable Search)를 넣으면 기록하고, 없으면 건너뜁니다.
+- 결과는 `SEO_WATCH_REPORT_DIR`(기본 `~/.local/state/kscold-seo-watch/reports`)에 날짜별 마크다운으로,
+  추이는 `~/.local/state/kscold-seo-watch/history.jsonl`에 한 줄씩 남습니다.
+- 운영 Mac의 매일 07:30 자동 실행 설정은 `docker/com.kscold.seo-watch.plist`입니다.
+  LaunchAgents에 설치할 때 로그 디렉터리를 먼저 생성하고 Node 절대 경로를 확인해야 합니다.
+  중지는 `launchctl bootout gui/$(id -u)/com.kscold.seo-watch`으로 합니다.
+
 ## 라이선스
 
 이 프로젝트는 MIT 라이선스가 아닙니다.  
