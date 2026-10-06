@@ -109,7 +109,8 @@ export function AdminStorageBrowser({
           </div>
 
           {listing?.objects.length ? (
-            <div className="divide-y divide-surface-100 bg-white">
+            // 파일이 수백 개면 화면이 끝없이 길어져 업로드·미리보기 패널과 멀어지므로, 목록 안에서만 스크롤한다.
+            <div className="max-h-[640px] divide-y divide-surface-100 overflow-y-auto bg-white">
               {listing.objects.map(object => {
                 const previewUrl = `/api/admin/storage/object?key=${encodeURIComponent(object.key)}`;
                 const downloadUrl = `${previewUrl}&download=1`;
