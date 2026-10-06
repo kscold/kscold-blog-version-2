@@ -15,6 +15,7 @@ import com.mongodb.client.result.UpdateResult;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -56,6 +57,27 @@ class FeedRepositoryAdapterTest {
                 .extracting(document -> document.keySet().iterator().next())
                 .containsExactly("$match", "$project");
         assertThat(pipeline.get(1).toJson()).contains("$strLenCP", "$trim", "$ifNull");
+    }
+
+    @Test
+    void tagAggregationOrdersEqualCountsByName() {
+        MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+        when(mongoTemplate.aggregate(any(Aggregation.class), eq("feeds"), eq(Document.class)))
+                .thenReturn(
+                        new AggregationResults<>(
+                                List.of(new Document("name", "spring").append("count", 3)),
+                                new Document()));
+        FeedRepositoryAdapter adapter =
+                new FeedRepositoryAdapter(mock(MongoFeedRepository.class), mongoTemplate);
+
+        assertThat(adapter.aggregateTags()).containsExactly(Map.of("name", "spring", "count", 3));
+
+        ArgumentCaptor<Aggregation> aggregation = ArgumentCaptor.forClass(Aggregation.class);
+        verify(mongoTemplate).aggregate(aggregation.capture(), eq("feeds"), eq(Document.class));
+        List<Document> pipeline = aggregation.getValue().toPipeline(Aggregation.DEFAULT_CONTEXT);
+        // 건수가 같은 태그끼리도 이름 순서가 정해져 있어야 화면의 태그 순서가 요청마다 바뀌지 않는다.
+        assertThat(pipeline.get(pipeline.size() - 1).toJson())
+                .isEqualTo("{\"$sort\": {\"count\": -1, \"name\": 1}}");
     }
 
     @Test

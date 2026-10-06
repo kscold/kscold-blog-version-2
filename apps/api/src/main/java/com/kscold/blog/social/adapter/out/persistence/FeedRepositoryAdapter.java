@@ -120,7 +120,9 @@ public class FeedRepositoryAdapter implements FeedRepository {
                         Aggregation.unwind("tags"),
                         Aggregation.group("tags").count().as("count"),
                         Aggregation.project("count").and("_id").as("name"),
-                        Aggregation.sort(Sort.Direction.DESC, "count"));
+                        // 건수만으로 정렬하면 같은 건수끼리의 순서가 요청마다 달라져 화면의 태그 순서가 흔들린다.
+                        Aggregation.sort(
+                                Sort.by(Sort.Order.desc("count"), Sort.Order.asc("name"))));
         AggregationResults<Document> results =
                 mongoTemplate.aggregate(agg, "feeds", Document.class);
         return results.getMappedResults().stream()

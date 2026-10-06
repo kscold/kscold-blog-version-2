@@ -40,8 +40,12 @@ class MongoPageVisitLogAdapterTest {
                         aggregation.capture(),
                         eq("page_visit_logs"),
                         eq(MongoPageVisitLogAdapter.RawPathStat.class));
-        assertThat(aggregation.getValue().toPipeline(Aggregation.DEFAULT_CONTEXT))
+        List<Document> pipeline = aggregation.getValue().toPipeline(Aggregation.DEFAULT_CONTEXT);
+        assertThat(pipeline)
                 .extracting(document -> document.keySet().iterator().next())
                 .containsExactly("$match", "$group", "$group", "$sort", "$limit");
+        // 방문수가 같은 경로끼리도 순서가 정해져 있어야 상위 N개에 드는 경로가 요청마다 바뀌지 않는다.
+        assertThat(pipeline.get(3).toJson())
+                .isEqualTo("{\"$sort\": {\"visits\": -1, \"uniqueVisitors\": -1, \"_id\": 1}}");
     }
 }

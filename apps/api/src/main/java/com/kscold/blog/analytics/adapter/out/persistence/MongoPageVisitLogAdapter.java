@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.Fields;
@@ -42,7 +43,7 @@ public class MongoPageVisitLogAdapter implements PageVisitLogRepository {
 
         org.springframework.data.mongodb.core.query.Query query =
                 new org.springframework.data.mongodb.core.query.Query(criteria)
-                        .with(org.springframework.data.domain.Sort.by(DESC, "createdAt"))
+                        .with(Sort.by(DESC, "createdAt"))
                         .limit(Math.min(Math.max(limit, 1), 200));
 
         return mongoTemplate.find(query, PageVisitLog.class).stream()
@@ -63,7 +64,12 @@ public class MongoPageVisitLogAdapter implements PageVisitLogRepository {
                                 .as("visits")
                                 .count()
                                 .as("uniqueVisitors"),
-                        sort(DESC, "visits"),
+                        // 방문수가 같은 경로끼리도 순서를 정해 둬야, 상위 N개로 자를 때 포함되는 경로가 요청마다 바뀌지 않는다.
+                        sort(
+                                Sort.by(
+                                        Sort.Order.desc("visits"),
+                                        Sort.Order.desc("uniqueVisitors"),
+                                        Sort.Order.asc("_id"))),
                         Aggregation.limit(limit));
         return mongoTemplate
                 .aggregate(agg, "page_visit_logs", RawPathStat.class)
