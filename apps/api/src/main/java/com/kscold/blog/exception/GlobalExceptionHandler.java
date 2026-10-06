@@ -7,7 +7,6 @@ import com.kscold.blog.shared.web.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -90,10 +89,7 @@ public class GlobalExceptionHandler {
                 e.getBindingResult().getErrorCount(),
                 validationFieldNames(e.getBindingResult()));
 
-        String errorMessage =
-                e.getBindingResult().getFieldErrors().stream()
-                        .map(FieldError::getDefaultMessage)
-                        .collect(Collectors.joining(", "));
+        String errorMessage = ValidationMessages.join(e.getBindingResult());
 
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);
@@ -109,10 +105,7 @@ public class GlobalExceptionHandler {
                 e.getBindingResult().getErrorCount(),
                 validationFieldNames(e.getBindingResult()));
 
-        String errorMessage =
-                e.getBindingResult().getFieldErrors().stream()
-                        .map(FieldError::getDefaultMessage)
-                        .collect(Collectors.joining(", "));
+        String errorMessage = ValidationMessages.join(e.getBindingResult());
 
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);
@@ -126,11 +119,7 @@ public class GlobalExceptionHandler {
             ConstraintViolationException e) {
         log.warn("ConstraintViolationException: violations={}", e.getConstraintViolations().size());
 
-        String errorMessage =
-                e.getConstraintViolations().stream()
-                        .map(violation -> violation.getMessage())
-                        .distinct()
-                        .collect(Collectors.joining(", "));
+        String errorMessage = ValidationMessages.join(e.getConstraintViolations());
 
         ApiResponse<Void> response =
                 ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.getCode(), errorMessage);

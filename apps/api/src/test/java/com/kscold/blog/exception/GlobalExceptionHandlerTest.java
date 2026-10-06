@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.kscold.blog.identity.application.dto.command.RegisterCommand;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.shared.web.ApiResponse;
@@ -22,12 +23,16 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
@@ -79,6 +84,26 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody().getErrorCode())
                 .isEqualTo(ErrorCode.INVALID_INPUT_VALUE.getCode());
         assertThat(response.getBody().getMessage()).isEqualTo("세션 값이 너무 깁니다.");
+    }
+
+    @Test
+    void validationMessagesFollowTheOrderOfTheRequestFields() throws Exception {
+        RegisterCommand request = RegisterCommand.builder().build();
+        BeanPropertyBindingResult errors =
+                new BeanPropertyBindingResult(request, "registerCommand");
+        new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator())
+                .validate(request, errors);
+        GlobalExceptionHandler handler =
+                new GlobalExceptionHandler(mock(NotificationUseCase.class));
+
+        ResponseEntity<ApiResponse<Void>> response =
+                handler.handleMethodArgumentNotValidException(
+                        new MethodArgumentNotValidException(registerParameter(), errors));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage())
+                .isEqualTo("이메일은 필수입니다, 사용자명은 필수입니다, 비밀번호는 필수입니다");
     }
 
     @Test
@@ -198,4 +223,14 @@ class GlobalExceptionHandlerTest {
             appender.stop();
         }
     }
+
+    private static MethodParameter registerParameter() throws NoSuchMethodException {
+        return new MethodParameter(
+                GlobalExceptionHandlerTest.class.getDeclaredMethod(
+                        "register", RegisterCommand.class),
+                0);
+    }
+
+    @SuppressWarnings("unused")
+    private static void register(RegisterCommand command) {}
 }
