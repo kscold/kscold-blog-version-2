@@ -8,9 +8,9 @@ const workers =
   Number.isInteger(configuredWorkers) && configuredWorkers > 0 ? configuredWorkers : defaultWorkers;
 
 /**
- * Cypress → Playwright 전환 설정.
- * - 기존 Cypress 의 viewport(1440x960)·defaultCommandTimeout(10s) 를 계승
- * - e2e: 목(route) 기반 스펙, live: 실제 백엔드 대상 스모크
+ * 브라우저 E2E 설정.
+ * - 기본 화면 크기는 1440x960, 동작 하나의 대기 한도는 10초
+ * - 스펙은 API를 목(route)으로 채워 돌린다. 어드민 QA 러너는 PLAYWRIGHT_BASE_URL 을 운영 주소로 바꿔 같은 스펙을 실행한다.
  */
 export default defineConfig({
   testDir: './e2e',

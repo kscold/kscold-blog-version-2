@@ -46,7 +46,6 @@ async function mockCurrentUser(page: Page, user: SessionUser) {
 }
 
 /**
- * cy 의 seedAdminSession() 대응.
  * auth-token 쿠키 + localStorage(auth-storage)를 심어 어드민 로그인 상태를 만든다.
  * page.goto 전에 호출해야 하므로 addInitScript 로 localStorage 를 주입한다.
  */
@@ -113,7 +112,7 @@ function createAccessToken(user: SessionUser): string {
   return `${header}.${payload}.signature`;
 }
 
-/** 임의 사용자(USER/ADMIN) 세션 시드 — cy 의 seedUserSession 대응 */
+/** 임의 사용자(USER/ADMIN) 세션 시드 */
 export async function seedSession(page: Page, user: SessionUser): Promise<string> {
   const accessToken = createAccessToken(user);
   const persistedAuth = JSON.stringify({
@@ -142,7 +141,7 @@ export async function seedSession(page: Page, user: SessionUser): Promise<string
   return accessToken;
 }
 
-/** auth-token 쿠키 제거 (cy.clearCookie 대응) */
+/** auth-token 쿠키 제거 */
 export async function clearAuthCookie(page: Page): Promise<void> {
   await page.context().clearCookies({ name: 'auth-token' });
 }
