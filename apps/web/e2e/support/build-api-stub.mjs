@@ -82,9 +82,21 @@ const vaultWikiLinkNote = {
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
 };
+const vaultKoreanSlugNote = {
+  ...vaultWikiLinkNote,
+  id: 'ci-vault-korean-note',
+  title: 'CI 한글 주소 노트',
+  slug: '한글-주소노트',
+  content: '한글 주소로 열리는 노트입니다.',
+};
 const vaultTitleIndex = [
   { name: '연결 노트', slug: 'linked-note' },
   { name: '무관한 노트', slug: 'unrelated-note' },
+  { name: vaultWikiLinkNote.title, slug: vaultWikiLinkNote.slug },
+  { name: vaultKoreanSlugNote.title, slug: vaultKoreanSlugNote.slug },
+  // 하이픈을 빼면 같아지는 두 노트. 예전 주소가 어느 쪽인지 정할 수 없는 경우를 만든다.
+  { name: '쌍둥이 노트 A', slug: 'ci-twin-note' },
+  { name: '쌍둥이 노트 B', slug: 'ci-twinnote' },
 ];
 let requestCount = 0;
 const requestCountsByPath = new Map();
@@ -165,6 +177,9 @@ function getResponseData(requestUrl) {
   }
   if (pathname === '/api/vault/notes/slug/ci-vault-wikilink') {
     return vaultWikiLinkNote;
+  }
+  if (pathname === `/api/vault/notes/slug/${encodeURIComponent(vaultKoreanSlugNote.slug)}`) {
+    return vaultKoreanSlugNote;
   }
   if (pathname === '/api/vault/notes/title-index') {
     return vaultTitleIndex;
