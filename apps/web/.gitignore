@@ -10,3 +10,4 @@
 !/scripts/
 /scripts/*
 !/scripts/prepare-pdf-assets.cjs
+!/scripts/sync-hansalim-downloads.mjs

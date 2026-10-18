@@ -34,7 +34,7 @@ export function ClientLayout({ children, footer, initialViewer }: ClientLayoutPr
   const isPrivatePdfPage = /^\/admin\/documents\/[^/]+\/view\/?$/.test(pathname);
 
   // 지원용 정적 화면에는 공개 메뉴·방문 추적·전역 검색 Agent를 붙이지 않는다.
-  if (isStandalonePage(params)) return children;
+  if (isStandalonePage(params, pathname)) return children;
 
   // 비공개 문서는 별도 읽기 화면에서 열고, 공개 Agent와 장식 커서는 붙이지 않는다.
   if (isPrivatePdfPage) {

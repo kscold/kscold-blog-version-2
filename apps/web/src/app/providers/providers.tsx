@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/entities/user';
 import { apiClient } from '@/shared/api/api-client';
@@ -15,16 +15,17 @@ import { isStandalonePage } from '@/shared/config/standalonePages';
 
 const ReactQueryDevtools =
   process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_QUERY_DEVTOOLS !== 'false'
-  ? dynamic(
-      () => import('@tanstack/react-query-devtools').then(module => module.ReactQueryDevtools),
-      { ssr: false }
-    )
-  : () => null;
+    ? dynamic(
+        () => import('@tanstack/react-query-devtools').then(module => module.ReactQueryDevtools),
+        { ssr: false }
+      )
+    : () => null;
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const params = useParams();
+  const pathname = usePathname();
   // 별도 공유 페이지는 저장된 계정이 있어도 세션 복구·전역 구독을 시작하지 않는다.
-  if (isStandalonePage(params)) return children;
+  if (isStandalonePage(params, pathname)) return children;
   return <ApplicationProviders>{children}</ApplicationProviders>;
 }
 

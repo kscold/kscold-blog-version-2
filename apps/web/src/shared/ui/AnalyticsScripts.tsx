@@ -48,7 +48,7 @@ export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
   const params = useParams();
   const searchParams = useSearchParams();
   const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/');
-  const isTrackingExcluded = isAdminPage || isStandalonePage(params);
+  const isTrackingExcluded = isAdminPage || isStandalonePage(params, pathname);
 
   useLayoutEffect(() => {
     if (!gaId) return;
