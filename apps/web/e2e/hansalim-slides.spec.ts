@@ -19,6 +19,13 @@ test.describe('한살림 강의 슬라이드 보기', () => {
     await expect(page).toHaveURL(/#2$/);
     await page.keyboard.press('ArrowLeft');
     await expect(current).toHaveAttribute('data-slide', '1');
+    // 버튼을 누른 뒤에도 방향키가 먹고, 버튼에서 누른 Enter는 한 장만 넘긴다.
+    await page.getByRole('button', { name: '다음 슬라이드' }).click();
+    await expect(current).toHaveAttribute('data-slide', '2');
+    await page.keyboard.press('ArrowRight');
+    await expect(current).toHaveAttribute('data-slide', '3');
+    await page.keyboard.press('Enter');
+    await expect(current).toHaveAttribute('data-slide', '4');
     await page.keyboard.press('End');
     await expect(page.getByTestId('slideshow')).toContainText(/(\d+) \/ \1/);
   });

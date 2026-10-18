@@ -68,13 +68,12 @@ interface SlideKeyOptions {
 export function useSlideKeys({ goTo, slide, slideCount, toggleFullscreen }: SlideKeyOptions) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.target instanceof HTMLInputElement ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.altKey
-      )
-        return;
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('input')) return;
+      // 버튼·링크에서 누른 Enter·스페이스는 그 요소의 동작으로 두어 두 장씩 넘어가지 않게 한다.
+      // 방향키는 버튼을 누른 뒤 포커스가 남아 있어도 그대로 넘긴다.
+      if (target?.closest('button, a') && (event.key === 'Enter' || event.key === ' ')) return;
       const forward = ['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter', 'n'];
       const backward = ['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace', 'p'];
       if (forward.includes(event.key)) goTo(slide + 1);
