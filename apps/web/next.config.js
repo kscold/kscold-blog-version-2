@@ -88,6 +88,17 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/inicis/payment-path', destination: '/kakaopay/payment-path', permanent: true },
+      // 교육 자료 주소를 잘못 친 경우(실제 접속 기록의 /hansailm 등)와 한글 주소를 자료 페이지로 보낸다.
+      // Next의 주소 비교는 대소문자를 가리지 않으므로 /hansalim의 대소문자 변형은 넣지 않는다(자기 자신으로 무한 이동).
+      { source: '/hansailm', destination: '/hansalim', permanent: false },
+      { source: '/hanslim', destination: '/hansalim', permanent: false },
+      { source: '/hansallim', destination: '/hansalim', permanent: false },
+      { source: '/hansalrim', destination: '/hansalim', permanent: false },
+      { source: '/hansarim', destination: '/hansalim', permanent: false },
+      { source: '/hanssalim', destination: '/hansalim', permanent: false },
+      { source: '/hansalm', destination: '/hansalim', permanent: false },
+      { source: '/hansaim', destination: '/hansalim', permanent: false },
+      { source: '/%ED%95%9C%EC%82%B4%EB%A6%BC', destination: '/hansalim', permanent: false },
       { source: '/blog/conference/aws-summit-seoul-2026-ai-agent-고도화-방향', destination: '/blog/conference/aws-summit-seoul-2026-ai-agent-key-principles', permanent: true },
       { source: '/blog/dev-story/이상1', destination: '/blog/dev-story/reflection-1', permanent: true },
       { source: '/blog/conference/EBAABDEAB3A0-db-ECBBA8ED8DBCEB9FB0EC8AA4', destination: '/blog/conference/mongodb-conference', permanent: true },

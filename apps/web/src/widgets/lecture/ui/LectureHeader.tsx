@@ -24,8 +24,8 @@ export function LectureHeader() {
         {lecture.firstStep}
       </p>
       <p className="mt-4 text-sm text-surface-500">
-        강사 <strong className="text-surface-900">김승찬</strong> · 자료는 로그인 없이 바로 내려받을
-        수 있습니다.
+        강사 <strong className="text-surface-900">김승찬</strong> · 로그인하지 않아도 바로 받을 수
+        있습니다.
       </p>
     </header>
   );

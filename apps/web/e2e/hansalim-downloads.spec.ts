@@ -71,6 +71,18 @@ test.describe('한살림 교육 다운로드 페이지', () => {
     }
   });
 
+  test('주소를 잘못 치거나 한글로 쳐도 자료 페이지로 간다', async ({ request }) => {
+    // 자료 페이지 자체는 이동 없이 바로 열려야 한다(대소문자 변형을 넣으면 자기 자신으로 무한 이동했다).
+    const self = await request.get('/hansalim', { maxRedirects: 0 });
+    expect(self.status()).toBe(200);
+
+    for (const path of ['/hansailm', '/hanslim', '/hansarim', `/${encodeURIComponent('한살림')}`]) {
+      const response = await request.get(path, { maxRedirects: 0 });
+      expect(response.status(), path).toBe(307);
+      expect(response.headers().location, path).toBe('/hansalim');
+    }
+  });
+
   test('예전 강사 프로필 주소는 더 이상 열리지 않는다', async ({ request }) => {
     const response = await request.get('/info/instructor', { maxRedirects: 0 });
     expect(response.status()).toBe(404);

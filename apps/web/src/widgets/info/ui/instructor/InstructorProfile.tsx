@@ -69,7 +69,7 @@ export function InstructorProfile() {
       <section className="border-y border-surface-200 bg-surface-900 p-6 text-white sm:p-10 lg:p-12 print:bg-white print:text-surface-900">
         <SectionLabel dark>AX in Practice</SectionLabel>
         <h2 className="max-w-2xl break-keep text-3xl font-black tracking-tight sm:text-4xl">
-          AI를 실제 업무와 운영에 연결해 왔습니다.
+          AI를 실제 업무에 붙여 써 왔습니다.
         </h2>
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
           {profile.axCases.map(item => (
@@ -93,7 +93,7 @@ export function InstructorProfile() {
         <div>
           <SectionLabel>For Every Team</SectionLabel>
           <h2 className="break-keep text-2xl font-black tracking-tight">
-            비전공 부서의 언어로 바꿔 설명합니다.
+            개발이 본업이 아닌 부서의 말로 풀어 설명합니다.
           </h2>
           <div className="mt-6 divide-y divide-surface-200 border-y border-surface-200">
             {profile.audienceExamples.map(([team, example]) => (
@@ -107,7 +107,7 @@ export function InstructorProfile() {
         <div>
           <SectionLabel>Teaching Style</SectionLabel>
           <h2 className="break-keep text-2xl font-black tracking-tight">
-            화면을 보며 함께 나아가는 실습형 강의
+            같은 화면을 보며 따라 하는 실습 강의
           </h2>
           <ul className="mt-6 space-y-4">
             {profile.teaching.map((item, index) => (

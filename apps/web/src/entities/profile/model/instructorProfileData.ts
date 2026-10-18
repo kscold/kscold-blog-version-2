@@ -5,9 +5,9 @@ export const INSTRUCTOR_PROFILE = {
   role: '씨에스리 AI기술연구소 연구원 · AI Agent/풀스택 개발자',
   company: '콜딩(Colding) 대표 · Pawpong 운영',
   introduction: [
-    'B2B 워크플로우 자동화와 AI Agent를 실무에서 개발하고 있습니다. Codex와 생성형 AI를 단순 시연 도구가 아니라 기획, 개발, 검증, 운영까지 이어지는 업무 도구로 사용합니다.',
-    '커머스 전환, SKT 연계 이벤트, 외부 서비스 납품, 기술 커뮤니티 운영까지 서로 다른 환경의 일을 해왔습니다. 모든 과정에서 AI를 빠르게 만드는 도구에 그치지 않고 요구사항을 정리하고 결과를 검증하는 협업 도구로 활용했습니다.',
-    '강의에서는 정답을 외우게 하기보다 각자의 업무를 어떻게 잘게 나누고, AI에게 맡기고, 결과를 검증할지 함께 화면을 보며 익힙니다. 사업·인사·총무·기획처럼 개발이 본업이 아닌 분도 바로 써볼 수 있는 사례를 중심으로 진행합니다.',
+    '회사에서 B2B 업무 자동화와 AI Agent를 만들고 있습니다. Codex 같은 생성형 AI는 시연할 때만 꺼내지 않고, 기획부터 개발·검증·운영까지 실제 일에 씁니다.',
+    '커머스 서비스 전환, SKT와 함께한 이벤트, 외부 납품, 개발 커뮤니티 운영처럼 성격이 다른 일을 두루 해 왔습니다. 그때마다 AI에게 빨리 만들게 하는 데서 끝내지 않고 요구사항을 정리하고 결과를 확인하는 일까지 같이 맡겼습니다.',
+    '강의에서는 정답을 외우는 대신 내 업무를 작게 나눠 AI에게 맡기고 결과를 확인하는 과정을 같은 화면을 보며 해 봅니다. 사업·인사·총무·기획처럼 개발이 본업이 아닌 분도 바로 따라 할 수 있는 예시로 진행합니다.',
   ],
   highlights: [
     {
@@ -20,49 +20,57 @@ export const INSTRUCTOR_PROFILE = {
     },
     {
       value: 'AI 기반 대규모 리팩토링',
-      label: 'Payment 도메인 4,552줄을 540줄로 줄인 사례처럼 복잡한 레거시 코드를 AI와 함께 분석·재설계·검증',
+      label: '결제(Payment) 코드 4,552줄을 AI와 함께 뜯어보고 다시 설계해 540줄로 줄였습니다',
     },
   ],
   axCases: [
     {
       category: '현업 AI Agent',
       title: '빅데이터 솔루션 AI Agent 개발',
-      description: 'LangGraph, RAG, LLM 연동을 활용해 빅데이터 솔루션의 AI Agent를 개발하고, 사용자가 데이터를 자연어로 탐색하는 바이브 분석 경험을 제공하고 있습니다.',
+      description:
+        'LangGraph·RAG·LLM으로 빅데이터 솔루션에 들어가는 AI Agent를 만들고 있습니다. 데이터를 말로 물어보며 살펴보는 「바이브 분석」 기능입니다.',
     },
     {
       category: '국책 연구개발',
       title: '비정형 데이터 암호화 파이프라인',
-      description: '문서·이미지 수집부터 개인정보 보호, 임베딩, 동형암호 벡터 색인까지 이어지는 처리 흐름을 설계·구현하고 있습니다.',
+      description:
+        '문서와 이미지를 모으는 단계부터 개인정보 보호, 임베딩, 동형암호 벡터 색인까지 이어지는 처리 과정을 설계하고 만들고 있습니다.',
     },
     {
       category: '서비스 전환',
       title: '식후경 Eatbuy 2.0 전환',
-      description: 'Strapi CMS의 약 400개 테이블을 NestJS 약 45개 도메인 모듈로 재설계하고, 프런트엔드 API의 90% 이상을 단계적으로 전환했습니다.',
+      description:
+        'Strapi CMS 테이블 약 400개를 NestJS 도메인 모듈 약 45개로 다시 설계했고, 프런트엔드가 쓰는 API의 90% 이상을 단계적으로 옮겼습니다.',
     },
     {
       category: '외주 프로젝트',
       title: '바람부는날에도 성형외과 사이트 리뉴얼',
-      description: 'Next.js와 MongoDB Atlas로 어드민을 포함한 풀스택 사이트를 개발하고 한국어·일본어 지원과 운영 설명서, 프로젝트 이관까지 맡았습니다.',
+      description:
+        'Next.js와 MongoDB Atlas로 관리자 화면까지 갖춘 사이트를 만들었습니다. 한국어·일본어 지원과 운영 설명서, 프로젝트 인계까지 맡았습니다.',
     },
     {
       category: '외주 프로젝트',
       title: '한국기타가와 한국지사 사이트 리뉴얼',
-      description: 'NestJS와 MongoDB Atlas로 백엔드를 구축하고 일본 본사 사이트의 데이터를 수집·정제해 GCP Cloud Run 환경에 배포했습니다.',
+      description:
+        'NestJS와 MongoDB Atlas로 백엔드를 만들고, 일본 본사 사이트의 데이터를 가져와 정리한 뒤 GCP Cloud Run에 배포했습니다.',
     },
     {
       category: '서비스 운영',
       title: 'SKT × 식후경 이벤트 개발',
-      description: '푼타컴퍼니에서 SKT와 식후경이 함께한 이벤트의 개발과 운영에 참여하며 외부 파트너 연동과 실제 사용자가 몰리는 서비스 흐름을 다뤘습니다.',
+      description:
+        '푼타컴퍼니에서 SKT와 식후경이 함께한 이벤트를 개발하고 운영했습니다. 외부 파트너와 연동하고 사용자가 한꺼번에 몰리는 상황을 직접 겪었습니다.',
     },
     {
       category: '기술 협업',
       title: 'MongoDB·Google Cloud 엔지니어 협업',
-      description: '데이터 모델과 클라우드 운영 문제를 제품 관점에서 정리하고, MongoDB와 Google Cloud 엔지니어와 기술 검토 및 협업을 진행했습니다.',
+      description:
+        '데이터 모델과 클라우드 운영 문제를 서비스 입장에서 정리해 MongoDB·Google Cloud 엔지니어와 함께 검토했습니다.',
     },
     {
       category: 'AI 네이티브 서비스',
       title: 'Pawpong 기획·개발·운영',
-      description: '개인사업자로 반려동물 플랫폼 Pawpong을 운영하며 기획, 콘텐츠, 개발, 운영 전반에 AI를 자연스럽게 연결하고 있습니다.',
+      description:
+        '개인사업자로 반려동물 플랫폼 Pawpong을 운영합니다. 기획·콘텐츠·개발·운영 어디에든 AI를 붙여 쓰고 있습니다.',
     },
   ],
   audienceExamples: [
@@ -72,28 +80,30 @@ export const INSTRUCTOR_PROFILE = {
     ['운영·CS', 'FAQ 검색, 답변 초안, 알림과 후속 업무 연결'],
   ],
   teaching: [
-    'PPT를 읽는 발표형 강의가 아니라 실제 화면에서 직접 만들고 수정하는 실습을 중심으로 진행합니다.',
-    '좋은 요청 작성법뿐 아니라 틀린 결과를 발견하고 고치는 검증 습관까지 함께 다룹니다.',
-    '사내 데이터와 개인정보를 어디까지 넣어도 되는지 현실적인 보안 기준을 함께 설명합니다.',
+    '슬라이드를 읽어 드리기보다 화면에서 직접 만들고 고쳐 보는 시간이 대부분입니다.',
+    '요청을 잘 쓰는 법과 함께 AI가 틀린 곳을 찾아 고치는 습관도 같이 익힙니다.',
+    '회사 자료와 개인정보를 어디까지 넣어도 되는지 현장에서 지킬 수 있는 기준으로 설명합니다.',
   ],
   experience: [
     {
       period: '2026.01 — 현재',
       organization: '씨에스리 AI기술연구소',
       role: '연구원(사원) · AI Agent/풀스택 개발자',
-      description: 'AI Agent 개발을 중심으로 서버·웹 애플리케이션 개발',
+      description: 'AI Agent를 주로 만들고 서버와 웹 서비스도 개발',
     },
     {
       period: '2024.08 — 2026.01',
       organization: '푼타컴퍼니',
       role: '백엔드 개발자',
-      description: '식후경 Eatbuy 2.0 백엔드 개발, 커머스 도메인 재설계, API 90% 이상 전환, 무중단 배포와 업무 자동화 구축',
+      description:
+        '식후경 Eatbuy 2.0 백엔드 개발, 커머스 도메인 재설계, API 90% 이상 전환, 무중단 배포와 업무 자동화 구축',
     },
     {
       period: '개인사업',
       organization: '콜딩(Colding)',
       role: '대표 · kscold.com·Pawpong 운영',
-      description: 'AI Agent 실습 세션, 개발자 커뮤니티 프로그램, AI 네이티브 반려동물 플랫폼 기획·개발·운영',
+      description:
+        'AI Agent 실습 세션, 개발자 커뮤니티 프로그램, AI 네이티브 반려동물 플랫폼 기획·개발·운영',
     },
   ],
   teachingExperience: [

@@ -35,8 +35,8 @@ export function LectureDownloads() {
         ))}
       </div>
       <p className="mt-6 text-sm leading-6 text-surface-500">
-        슬라이드를 보기만 하실 분은 PDF가 가장 편합니다. PPT는 PowerPoint에서 고쳐 쓰실 때
-        내려받으세요.
+        슬라이드는 「슬라이드로 보기」에서 내려받지 않고 바로 넘겨 볼 수 있습니다. PPT는
+        PowerPoint에서 고쳐 쓰실 분만 받으시면 됩니다.
       </p>
     </section>
   );
