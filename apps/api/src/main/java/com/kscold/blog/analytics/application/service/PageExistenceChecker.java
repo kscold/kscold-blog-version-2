@@ -45,7 +45,6 @@ public class PageExistenceChecker {
                     "/login/reset-password",
                     "/privacy",
                     "/product",
-                    "/info/instructor",
                     "/info/pawpong",
                     "/info/gole");
 
