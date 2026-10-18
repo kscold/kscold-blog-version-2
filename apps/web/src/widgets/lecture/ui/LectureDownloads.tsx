@@ -85,7 +85,7 @@ function DownloadCard({ item }: { item: HansalimDownload }) {
             href="#download-font"
             className="font-bold text-primary-700 underline underline-offset-4"
           >
-            글꼴 받으러 가기
+            편집용 글꼴 보기
           </a>
         </Note>
       )}

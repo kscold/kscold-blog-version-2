@@ -29,7 +29,7 @@ test.describe('한살림 교육 다운로드 페이지', () => {
     const cards = page.locator('[data-testid^="lecture-download-"]');
     await expect(cards.first()).toHaveAttribute('data-testid', 'lecture-download-lab');
 
-    await page.getByRole('link', { name: '글꼴 받으러 가기' }).click();
+    await page.getByRole('link', { name: '편집용 글꼴 보기' }).click();
     await expect(page).toHaveURL(/#download-font$/);
     await expect(page.locator('#download-font')).toBeInViewport();
   });
