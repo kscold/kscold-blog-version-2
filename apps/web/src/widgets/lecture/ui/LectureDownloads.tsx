@@ -1,10 +1,16 @@
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { HANSALIM_DOWNLOADS, type HansalimDownload } from '../model/hansalimDownloads';
 
 const FILE_BASE = '/hansalim/files/';
+const SLIDES_HREF = '/hansalim/slides';
+
+export function lectureFileHref(file: string) {
+  return `${FILE_BASE}${encodeURIComponent(file)}`;
+}
 
 function fileHref(item: HansalimDownload) {
-  return `${FILE_BASE}${encodeURIComponent(item.file)}`;
+  return lectureFileHref(item.file);
 }
 
 export function LectureDownloads() {
@@ -84,6 +90,15 @@ function DownloadCard({ item }: { item: HansalimDownload }) {
         </Note>
       )}
       <FileMeta item={item} />
+      {item.key === 'pdf' && (
+        <Link
+          href={SLIDES_HREF}
+          data-testid="lecture-slides-link"
+          className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-primary-600 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-primary-700 print:hidden"
+        >
+          슬라이드로 보기 (전체 화면)
+        </Link>
+      )}
       <DownloadButton item={item} />
     </article>
   );

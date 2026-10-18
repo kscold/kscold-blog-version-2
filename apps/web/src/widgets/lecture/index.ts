@@ -4,3 +4,5 @@ export { LectureDownloads } from './ui/LectureDownloads';
 export { LectureReviewSection } from './ui/LectureReviewSection';
 export { HANSALIM_LECTURE } from './model/hansalimLecture';
 export { HANSALIM_DOWNLOADS } from './model/hansalimDownloads';
+export { LectureSlideShow } from './ui/slideshow/LectureSlideShow';
+export { lectureFileHref } from './ui/LectureDownloads';
