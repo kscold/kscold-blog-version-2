@@ -13,6 +13,17 @@ const DATA_FILE = path.join(APP_DIR, 'src/widgets/lecture/model/hansalimDownload
 // 공개 페이지에 올리면 안 되는 자료가 이름으로 섞여 들어오는 것을 막는다.
 const FORBIDDEN_NAME = /강사|대본|답안|시연키트|연결표|instructor|answer/i;
 
+// 글꼴은 내려받기의 선행 조건이 아니다. 재동기화해도 PPT 이용자에게만 설치를 안내한다.
+const FONT_GUIDANCE = {
+  pptx: {
+    note: '자료를 내려받는 데 글꼴 설치는 필요 없습니다. Noto Sans KR이 없는 PC에서 PPT를 열거나 편집할 때만 아래 글꼴을 설치하세요.',
+  },
+  font: {
+    title: 'PPT 편집용 글꼴 (선택)',
+    description: 'PPT를 열거나 편집할 PC에 Noto Sans KR이 없을 때만 설치하세요. PDF·웹 슬라이드·실습 자료에는 필요 없습니다.',
+  },
+};
+
 const sourceDir = process.argv[2];
 if (!sourceDir) {
   console.error('사용법: node apps/web/scripts/sync-hansalim-downloads.mjs <downloads 폴더>');
@@ -44,6 +55,7 @@ for (const item of files) {
 
 const data = files.map(({ order, key, primary, title, description, note, file, bytes, size, format, sha256 }) => ({
   order, key, primary: Boolean(primary), title, description, ...(note ? { note } : {}), file, bytes, size, format, sha256,
+  ...FONT_GUIDANCE[key],
 }));
 fs.writeFileSync(
   DATA_FILE,
