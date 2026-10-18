@@ -32,14 +32,14 @@ export default function SlideShow({ file, title, backHref }: SlideShowProps) {
   const [aspectRatio, setAspectRatio] = useState(16 / 9);
   const [error, setError] = useState(false);
   const navigation = useSlideNavigation();
-  const { slide, slideCount, goTo } = navigation;
+  const { slide, slideCount, goTo, move } = navigation;
   const fullscreen = useFullscreen(rootRef);
   const fit = useStageFit(stageRef, aspectRatio);
 
-  useSlideKeys({ goTo, slide, slideCount, toggleFullscreen: fullscreen.toggle });
+  useSlideKeys({ goTo, move, slideCount, toggleFullscreen: fullscreen.toggle });
   useSwipe(
     stageRef,
-    useCallback(direction => goTo(slide + direction), [goTo, slide])
+    useCallback(direction => move(direction), [move])
   );
 
   const onLoad = (pdf: PDFDocumentProxy) => {
@@ -53,7 +53,7 @@ export default function SlideShow({ file, title, backHref }: SlideShowProps) {
   // 화면 왼쪽 1/3을 누르면 앞으로, 나머지를 누르면 다음 장으로 간다.
   const onStageClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const { left, width } = event.currentTarget.getBoundingClientRect();
-    goTo(event.clientX - left < width / 3 ? slide - 1 : slide + 1);
+    move(event.clientX - left < width / 3 ? -1 : 1);
   };
 
   const pixelRatio = fit.width ? limitedPixelRatio(fit.width, fit.height) : 1;
@@ -121,6 +121,7 @@ export default function SlideShow({ file, title, backHref }: SlideShowProps) {
         slide={slide}
         slideCount={slideCount}
         goTo={goTo}
+        move={move}
         isFullscreen={fullscreen.isFullscreen}
         canFullscreen={fullscreen.isSupported}
         onToggleFullscreen={fullscreen.toggle}

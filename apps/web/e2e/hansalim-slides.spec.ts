@@ -30,6 +30,21 @@ test.describe('한살림 강의 슬라이드 보기', () => {
     await expect(page.getByTestId('slideshow')).toContainText(/(\d+) \/ \1/);
   });
 
+  test('키를 빠르게 여러 번 눌러도 누른 만큼 넘어간다', async ({ page }) => {
+    await page.goto('/hansalim/slides');
+    const current = page.getByTestId('slideshow-current');
+    await expect(current).toHaveAttribute('data-slide', '1', { timeout: 20_000 });
+
+    // 화면이 다시 그려지기를 기다리지 않고 연달아 누른다.
+    await page.evaluate(() => {
+      for (let i = 0; i < 3; i += 1) {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+      }
+    });
+    await expect(current).toHaveAttribute('data-slide', '4');
+    await expect(page).toHaveURL(/#4$/);
+  });
+
   test('주소의 번호에서 시작하고, 슬라이드가 화면 안에 비율대로 들어간다', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/hansalim/slides#3');

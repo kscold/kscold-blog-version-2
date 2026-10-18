@@ -11,31 +11,39 @@ function slideFromHash() {
 export function useSlideNavigation() {
   const [slide, setSlide] = useState(1);
   const [slideCount, setSlideCount] = useState(0);
+  // 주소의 번호를 읽기 전에 1번으로 주소를 덮어쓰지 않도록, 읽은 뒤부터 주소에 반영한다.
+  const [hashRead, setHashRead] = useState(false);
 
   useEffect(() => {
     setSlide(slideFromHash());
+    setHashRead(true);
     const onHashChange = () => setSlide(slideFromHash());
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  const goTo = useCallback(
-    (target: number) => {
-      const last = slideCount || target;
-      const next = Math.min(Math.max(1, Math.trunc(target)), last);
-      setSlide(next);
-      // 넘길 때마다 방문 기록을 쌓지 않도록 현재 기록만 바꾼다.
-      window.history.replaceState(null, '', `#${next}`);
-    },
+  useEffect(() => {
+    // 넘길 때마다 방문 기록을 쌓지 않도록 현재 기록만 바꾼다.
+    if (hashRead) window.history.replaceState(null, '', `#${slide}`);
+  }, [hashRead, slide]);
+
+  const clamp = useCallback(
+    (target: number) =>
+      Math.min(Math.max(1, Math.trunc(target)), slideCount || Math.max(1, target)),
     [slideCount]
   );
+
+  const goTo = useCallback((target: number) => setSlide(clamp(target)), [clamp]);
+
+  // 키를 빠르게 여러 번 눌러도 매번 바로 앞 결과에서 한 장씩 움직이게 한다.
+  const move = useCallback((delta: number) => setSlide(current => clamp(current + delta)), [clamp]);
 
   const onLoaded = useCallback((count: number) => {
     setSlideCount(count);
     setSlide(current => Math.min(current, count));
   }, []);
 
-  return { slide, slideCount, goTo, onLoaded };
+  return { slide, slideCount, goTo, move, onLoaded };
 }
 
 /** 화면에 꽉 차게, 비율은 유지한 채 슬라이드 폭을 정한다. */
@@ -59,13 +67,13 @@ export function useStageFit(stageRef: RefObject<HTMLDivElement | null>, aspectRa
 
 interface SlideKeyOptions {
   goTo: (slide: number) => void;
-  slide: number;
+  move: (delta: number) => void;
   slideCount: number;
   toggleFullscreen: () => void;
 }
 
 /** PowerPoint 슬라이드 쇼와 같은 키로 넘긴다. */
-export function useSlideKeys({ goTo, slide, slideCount, toggleFullscreen }: SlideKeyOptions) {
+export function useSlideKeys({ goTo, move, slideCount, toggleFullscreen }: SlideKeyOptions) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -76,8 +84,8 @@ export function useSlideKeys({ goTo, slide, slideCount, toggleFullscreen }: Slid
       if (target?.closest('button, a') && (event.key === 'Enter' || event.key === ' ')) return;
       const forward = ['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter', 'n'];
       const backward = ['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace', 'p'];
-      if (forward.includes(event.key)) goTo(slide + 1);
-      else if (backward.includes(event.key)) goTo(slide - 1);
+      if (forward.includes(event.key)) move(1);
+      else if (backward.includes(event.key)) move(-1);
       else if (event.key === 'Home') goTo(1);
       else if (event.key === 'End' && slideCount) goTo(slideCount);
       else if (event.key === 'f' || event.key === 'F') toggleFullscreen();
@@ -86,7 +94,7 @@ export function useSlideKeys({ goTo, slide, slideCount, toggleFullscreen }: Slid
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [goTo, slide, slideCount, toggleFullscreen]);
+  }, [goTo, move, slideCount, toggleFullscreen]);
 }
 
 /** 휴대폰에서는 옆으로 밀어 넘긴다. */

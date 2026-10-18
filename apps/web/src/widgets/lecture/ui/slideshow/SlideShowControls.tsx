@@ -6,6 +6,7 @@ interface SlideShowControlsProps {
   slide: number;
   slideCount: number;
   goTo: (slide: number) => void;
+  move: (delta: number) => void;
   isFullscreen: boolean;
   canFullscreen: boolean;
   onToggleFullscreen: () => void;
@@ -30,7 +31,7 @@ export function SlideShowControls(props: SlideShowControlsProps) {
     <footer className="flex flex-wrap items-center justify-center gap-2 px-4 pb-4 pt-2">
       <button
         type="button"
-        onClick={() => goTo(slide - 1)}
+        onClick={() => props.move(-1)}
         disabled={slide <= 1}
         className={`${BUTTON} bg-white/10 hover:bg-white/20`}
         aria-label="이전 슬라이드"
@@ -56,7 +57,7 @@ export function SlideShowControls(props: SlideShowControlsProps) {
       </form>
       <button
         type="button"
-        onClick={() => goTo(slide + 1)}
+        onClick={() => props.move(1)}
         disabled={!slideCount || slide >= slideCount}
         className={`${BUTTON} bg-white text-surface-900 hover:bg-primary-100`}
         aria-label="다음 슬라이드"
