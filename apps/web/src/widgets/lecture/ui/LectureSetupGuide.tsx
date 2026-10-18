@@ -54,7 +54,7 @@ function SetupPlatformCard({
   return (
     <article
       data-testid={`lecture-setup-${platform.key}`}
-      className="rounded-2xl border border-surface-200 bg-white p-5 sm:p-6"
+      className="min-w-0 rounded-2xl border border-surface-200 bg-white p-5 sm:p-6"
       aria-label={`${platform.label} 실습 준비`}
     >
       <h3 className="text-lg font-black tracking-tight">{platform.label}</h3>
@@ -116,20 +116,38 @@ function SetupStep({
   );
 }
 
-/** 「파일 › 폴더 열기」처럼 메뉴를 따라가는 순서는 구분 기호를 흐리게 보여 눌러야 할 이름이 먼저 읽히게 한다. */
+// 이 길이를 넘는 조각은 메뉴 이름이 아니라 설명 문장으로 보고 줄바꿈을 허용한다.
+const MENU_NAME_MAX = 16;
+
+/**
+ * 「파일 › 폴더 열기」처럼 메뉴를 따라가는 순서는 구분 기호를 흐리게 보여 눌러야 할 이름이 먼저 읽히게 한다.
+ * 짧은 메뉴 이름은 한 덩어리로 두고 구분 기호에서만 줄을 바꿔, 휴대폰에서도 「모두 압축 풀기」가 둘로 갈라지지 않게 한다.
+ * 문장처럼 긴 조각은 묶으면 좁은 화면을 넘치므로 평소처럼 줄을 바꾼다.
+ */
 function MenuPath({ text }: { text: string }) {
   const parts = text.split(' › ');
   return (
     <>
       {parts.map((part, index) => (
         <Fragment key={`${index}-${part}`}>
+          {/* 구분 기호 앞뒤의 공백이 줄을 바꿀 자리다. 없으면 묶인 메뉴 이름 전체가 한 줄로 이어져 좁은 화면을 넘친다. */}
           {index > 0 && (
-            <span className="mx-1 text-surface-300" aria-hidden>
-              ›
-            </span>
+            <>
+              {' '}
+              <span className="text-surface-300" aria-hidden>
+                ›
+              </span>
+              <span className="sr-only">, 다음</span>{' '}
+            </>
           )}
-          {index > 0 && <span className="sr-only">, 다음 </span>}
-          <span data-menu-part className={parts.length > 1 ? 'font-semibold text-surface-800' : ''}>
+          <span
+            data-menu-part
+            className={
+              parts.length > 1
+                ? `font-semibold text-surface-800 ${part.length <= MENU_NAME_MAX ? 'whitespace-nowrap' : ''}`
+                : ''
+            }
+          >
             {part}
           </span>
         </Fragment>
