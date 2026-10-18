@@ -14,15 +14,19 @@ test('공개 강의 파일은 목록과 일치하고 모든 크기와 지문이 
   }
 });
 
-test('글꼴 설치를 다운로드의 필수 조건이 아닌 PPT 이용자용 선택 사항으로 안내한다', async ({ page }) => {
+test('글꼴 설치를 다운로드의 필수 조건이 아닌 PPT 이용자용 선택 사항으로 안내한다', async ({
+  page,
+}) => {
   await page.goto('/hansalim');
   const font = page.getByTestId('lecture-download-font');
   await expect(font.getByRole('heading')).toContainText('선택');
-  await expect(font).toContainText('PDF·웹 슬라이드·실습 자료에는 필요 없습니다.');
+  await expect(font).toContainText('PDF·웹 슬라이드 보기와 ZIP 다운로드에는 필요 없습니다.');
+  await expect(font).toContainText('실습에서 만든 PPT');
   await expect(page.getByTestId('lecture-download-pptx')).toContainText(
     '자료를 내려받는 데 글꼴 설치는 필요 없습니다.'
   );
   await expect(font.getByRole('link', { name: /ZIP 내려받기/ })).toHaveAttribute(
-    'download', '글꼴_NotoSansKR.zip'
+    'download',
+    '글꼴_NotoSansKR.zip'
   );
 });

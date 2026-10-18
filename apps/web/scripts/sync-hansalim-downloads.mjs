@@ -16,11 +16,11 @@ const FORBIDDEN_NAME = /강사|대본|답안|시연키트|연결표|instructor|a
 // 글꼴은 내려받기의 선행 조건이 아니다. 재동기화해도 PPT 이용자에게만 설치를 안내한다.
 const FONT_GUIDANCE = {
   pptx: {
-    note: '자료를 내려받는 데 글꼴 설치는 필요 없습니다. Noto Sans KR이 없는 PC에서 PPT를 열거나 편집할 때만 아래 글꼴을 설치하세요.',
+    note: '자료를 내려받는 데 글꼴 설치는 필요 없습니다. 이 PPT나 실습에서 만든 PPT를 열 PC에 Noto Sans KR이 없을 때만 아래 글꼴을 설치하세요.',
   },
   font: {
-    title: 'PPT 편집용 글꼴 (선택)',
-    description: 'PPT를 열거나 편집할 PC에 Noto Sans KR이 없을 때만 설치하세요. PDF·웹 슬라이드·실습 자료에는 필요 없습니다.',
+    title: 'PPT용 글꼴 (선택)',
+    description: '제공된 PPT나 실습에서 만든 PPT를 열 PC에 Noto Sans KR이 없을 때 설치하세요. PDF·웹 슬라이드 보기와 ZIP 다운로드에는 필요 없습니다.',
   },
 };
 
