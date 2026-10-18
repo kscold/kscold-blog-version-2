@@ -2,6 +2,7 @@
 export { LectureHeader } from './ui/LectureHeader';
 export { LectureDownloads } from './ui/LectureDownloads';
 export { LectureReviewSection } from './ui/LectureReviewSection';
+export { LectureSetupGuide } from './ui/LectureSetupGuide';
 export { HANSALIM_LECTURE } from './model/hansalimLecture';
 export { HANSALIM_DOWNLOADS } from './model/hansalimDownloads';
 export { LectureSlideShow } from './ui/slideshow/LectureSlideShow';

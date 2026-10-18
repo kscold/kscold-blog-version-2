@@ -5,6 +5,7 @@ import {
   LectureDownloads,
   LectureHeader,
   LectureReviewSection,
+  LectureSetupGuide,
 } from '@/widgets/lecture';
 
 const pageTitle = `${HANSALIM_LECTURE.organization} ${HANSALIM_LECTURE.title} · ${HANSALIM_LECTURE.dateLabel}`;
@@ -23,6 +24,7 @@ export default function HansalimLecturePage() {
       <article className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-surface-200 bg-white shadow-sm print:max-w-none print:rounded-none print:border-0 print:shadow-none">
         <LectureHeader />
         <LectureDownloads />
+        <LectureSetupGuide />
         <LectureReviewSection />
         <InstructorProfile />
       </article>

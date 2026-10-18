@@ -29,9 +29,46 @@ test.describe('한살림 교육 다운로드 페이지', () => {
     const cards = page.locator('[data-testid^="lecture-download-"]');
     await expect(cards.first()).toHaveAttribute('data-testid', 'lecture-download-lab');
 
-    await page.getByRole('link', { name: '편집용 글꼴 보기' }).click();
+    await page.getByRole('link', { name: 'PPT용 글꼴 보기' }).click();
     await expect(page).toHaveURL(/#download-font$/);
     await expect(page.locator('#download-font')).toBeInViewport();
+  });
+
+  test('Windows·Mac 실습 준비 순서를 나란히 보여 주고 글꼴 단계는 선택으로 표시한다', async ({
+    page,
+  }) => {
+    await page.goto('/hansalim');
+
+    await page.getByRole('link', { name: 'Windows·Mac 순서 보기' }).click();
+    await expect(page).toHaveURL(/#setup$/);
+    await expect(page.getByTestId('lecture-setup')).toBeInViewport();
+
+    const windows = page.getByTestId('lecture-setup-windows');
+    const mac = page.getByTestId('lecture-setup-mac');
+    await expect(windows.getByRole('listitem')).toHaveCount(4);
+    await expect(mac.getByRole('listitem')).toHaveCount(4);
+    await expect(windows).toContainText('모두 압축 풀기');
+    // 메뉴 사이에는 화면 낭독기용 「, 다음」이 들어가므로 보이는 메뉴 이름만 순서대로 확인한다.
+    await expect(windows.getByRole('listitem').nth(2).locator('[data-menu-part]')).toHaveText([
+      '파일',
+      '폴더 열기',
+      '바탕 화면',
+      '한살림_AI실습',
+      '폴더 선택',
+    ]);
+    await expect(mac.getByRole('listitem').nth(2).locator('[data-menu-part]')).toHaveText([
+      '파일',
+      '폴더 열기',
+      '데스크탑',
+      '한살림_AI실습',
+      '열기',
+    ]);
+    await expect(mac).toContainText('서체 관리자에서 설치');
+    await expect(windows.getByRole('listitem').last()).toContainText('선택');
+    await expect(page.getByTestId('lecture-setup')).toContainText('신뢰를 누릅니다');
+
+    await windows.getByRole('link', { name: 'PPT용 글꼴 받기' }).click();
+    await expect(page).toHaveURL(/#download-font$/);
   });
 
   test('사이트 공통 틀과 추적 없이 강사 소개를 함께 보여 준다', async ({ page }) => {
