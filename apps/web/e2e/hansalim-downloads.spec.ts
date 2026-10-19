@@ -141,6 +141,7 @@ test.describe('한살림 교육 다운로드 페이지', () => {
     await expect(setup).toContainText('이 페이지에서 받은 수업 폴더인지 확인한 뒤');
     const tree = page.getByTestId('lecture-folder-tree');
     await expect(tree).toContainText('NotoSansKR-Regular.ttf');
+    await expect(tree).toContainText('실습길잡이.pdf');
     await expect(tree).toContainText('복사해서 보낼 요청문');
   });
 

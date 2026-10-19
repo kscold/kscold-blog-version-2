@@ -44,7 +44,9 @@ const SETUP_STEPS: Record<LecturePlatform, string[]> = {
   ],
 };
 
+// 실습길잡이는 ZIP의 먼저읽기.txt가 「처음 시작할 때 여세요」라고 안내하는 오늘 순서·확인 기준 문서다.
 const SETUP_NOTES = [
+  '준비가 되면 실습 폴더의 「실습길잡이.pdf」부터 여세요. 오늘 실습 순서와 확인 기준이 들어 있습니다.',
   'ZIP 안에서 바로 열지 말고, 압축을 푼 「한살림_AI실습」 폴더를 여세요.',
   'VS Code가 「이 폴더 작성자를 신뢰합니까?」라고 물으면 이 페이지에서 받은 수업 폴더인지 확인한 뒤 신뢰를 누릅니다.',
 ];
@@ -55,6 +57,7 @@ const FOLDER_TREE: FolderTreeItem = {
   folder: true,
   children: [
     { name: '먼저읽기.txt' },
+    { name: '실습길잡이.pdf', note: '오늘 순서와 확인 기준' },
     { name: 'AGENTS.md' },
     { name: '입력자료', folder: true, note: '교육용 가상 자료' },
     { name: '프롬프트', folder: true, note: '복사해서 보낼 요청문' },
