@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { expect, test } from '@playwright/test';
 import ts from 'typescript';
-import { isStandalonePage } from '../src/shared/config/standalonePages';
+import { isStandalonePage, isUntrackedPage } from '../src/shared/config/standalonePages';
 
 declare global {
   interface Window {
@@ -36,7 +36,14 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('공유 페이지와 강의·슬라이드는 모두 공통 추적 제외 대상으로 판별한다', () => {
-  expect(isStandalonePage({}, '/hansalim')).toBe(true);
+  expect(isUntrackedPage({}, '/hansalim')).toBe(true);
+  expect(isUntrackedPage({}, '/hansalim/slides/')).toBe(true);
+  expect(isUntrackedPage({ applicationPage: 'private-example' }, '/private-example')).toBe(true);
+  expect(isUntrackedPage({}, '/blog')).toBe(false);
+});
+
+test('강의 자료 페이지는 블로그 틀 안에 두고 슬라이드와 공유 페이지만 단독으로 연다', () => {
+  expect(isStandalonePage({}, '/hansalim')).toBe(false);
   expect(isStandalonePage({}, '/hansalim/slides/')).toBe(true);
   expect(isStandalonePage({ applicationPage: 'private-example' }, '/private-example')).toBe(true);
   expect(isStandalonePage({}, '/blog')).toBe(false);

@@ -18,16 +18,22 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };
 
+// 블로그 틀(메뉴·사이드바·푸터) 안에 들어가는 화면이다. GA·방문 기록은 shared/config/standalonePages에서 끈다.
 export default function HansalimLecturePage() {
   return (
-    <main className="min-h-screen bg-surface-50 px-4 py-6 text-surface-900 sm:px-6 sm:py-10 print:bg-white print:p-0">
-      <article className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-surface-200 bg-white shadow-sm print:max-w-none print:rounded-none print:border-0 print:shadow-none">
+    <div className="px-4 pb-20 pt-8 text-surface-900 sm:px-6 sm:pt-10 lg:px-8 lg:pt-14 print:p-0">
+      <article className="mx-auto max-w-5xl space-y-14 sm:space-y-16">
         <LectureHeader />
         <LectureDownloads />
         <LectureSetupGuide />
         <LectureReviewSection />
-        <InstructorProfile />
+        <section
+          aria-label="강사 소개"
+          className="overflow-hidden rounded-[28px] border border-surface-200 bg-white print:border-0"
+        >
+          <InstructorProfile />
+        </section>
       </article>
-    </main>
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { HANSALIM_LECTURE } from '../model/hansalimLecture';
 import { CopyPageLinkButton } from './CopyPageLinkButton';
 
@@ -6,17 +5,11 @@ export function LectureHeader() {
   const lecture = HANSALIM_LECTURE;
 
   return (
-    <header className="border-b border-surface-200 p-6 sm:p-10 lg:p-12">
-      <div className="mb-8 flex items-center justify-between gap-4">
-        <Link href="/" className="font-black tracking-tight text-surface-900 print:hidden">
-          KSCOLD
-        </Link>
-        <CopyPageLinkButton />
-      </div>
-      <p className="mb-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-primary-600">
+    <header className="rounded-[28px] border border-surface-200 bg-white p-6 sm:p-8 xl:p-10 print:border-0 print:p-0">
+      <p className="text-[11px] font-black uppercase tracking-[0.28em] text-primary-600">
         Lecture · {lecture.dateLabel}
       </p>
-      <h1 className="max-w-3xl break-keep text-[1.75rem] font-black leading-[1.18] tracking-tight sm:text-4xl lg:text-5xl">
+      <h1 className="mt-4 max-w-3xl break-keep text-[1.75rem] font-black leading-[1.18] tracking-tight sm:text-4xl xl:text-5xl">
         <span className="block">{lecture.organization}</span>
         <span className="mt-1 block sm:mt-2">{lecture.title}</span>
       </h1>
@@ -29,10 +22,13 @@ export function LectureHeader() {
           Windows·Mac 순서 보기
         </a>
       </p>
-      <p className="mt-4 break-keep text-sm text-surface-500">
-        강사 <strong className="text-surface-900">김승찬</strong> · 로그인하지 않아도 바로 받을 수
-        있습니다.
-      </p>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+        <p className="break-keep text-sm text-surface-500">
+          강사 <strong className="text-surface-900">김승찬</strong> · 로그인하지 않아도 바로 받을 수
+          있습니다.
+        </p>
+        <CopyPageLinkButton />
+      </div>
     </header>
   );
 }

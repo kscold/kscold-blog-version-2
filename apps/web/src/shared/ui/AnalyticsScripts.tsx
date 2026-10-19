@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams, useParams } from 'next/navigation';
 import { useLayoutEffect } from 'react';
-import { isStandalonePage } from '@/shared/config/standalonePages';
+import { isUntrackedPage } from '@/shared/config/standalonePages';
 import { scheduleAnalyticsLoad, trackAnalyticsPage } from '@/shared/lib/analytics';
 
 declare global {
@@ -23,7 +23,7 @@ export function AnalyticsScripts({ gaId }: AnalyticsScriptsProps) {
   const searchParams = useSearchParams();
   const query = searchParams.toString();
   const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/');
-  const isTrackingExcluded = isAdminPage || isStandalonePage(params, pathname);
+  const isTrackingExcluded = isAdminPage || isUntrackedPage(params, pathname);
 
   useLayoutEffect(() => {
     if (!gaId) return;

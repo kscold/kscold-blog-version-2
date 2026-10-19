@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { HANSALIM_LECTURE, type LectureSetupStep } from '../model/hansalimLecture';
+import { LectureSectionHeading } from './LectureSectionHeading';
 
 const PLATFORMS = [
   { key: 'windows', label: 'Windows' },
@@ -14,26 +15,20 @@ export function LectureSetupGuide() {
     <section
       id="setup"
       data-testid="lecture-setup"
-      className="scroll-mt-6 border-t border-surface-200 p-6 sm:p-10 lg:p-12"
+      className="scroll-mt-24"
       aria-labelledby="setup-title"
     >
-      <p className="mb-4 font-mono text-xs font-bold uppercase tracking-[0.24em] text-surface-400">
-        Setup
-      </p>
-      <h2 id="setup-title" className="break-keep text-2xl font-black tracking-tight sm:text-3xl">
-        실습 준비
-      </h2>
-      <p className="mt-3 break-keep text-sm leading-6 text-surface-500">
+      <LectureSectionHeading id="setup-title" label="Setup" title="실습 준비">
         압축을 풀고 VS Code에서 폴더를 여는 순서입니다. 쓰시는 컴퓨터에 맞는 쪽만 따라 하세요.
-      </p>
+      </LectureSectionHeading>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         {PLATFORMS.map(platform => (
           <SetupPlatformCard key={platform.key} platform={platform} steps={steps} />
         ))}
       </div>
 
-      <ul className="mt-6 space-y-2 rounded-2xl bg-surface-50 p-5 text-sm leading-6 text-surface-600 ring-1 ring-inset ring-surface-200">
+      <ul className="mt-4 space-y-2 rounded-2xl border border-surface-200 bg-white p-5 text-sm leading-6 text-surface-600">
         {notes.map(note => (
           <li key={note} className="break-keep">
             — {note}

@@ -71,10 +71,20 @@ test.describe('한살림 교육 다운로드 페이지', () => {
     await expect(page).toHaveURL(/#download-font$/);
   });
 
-  test('사이트 공통 틀과 추적 없이 강사 소개를 함께 보여 준다', async ({ page }) => {
-    await page.goto('/hansalim');
+  test('블로그 틀 안에서 GA·방문 기록 없이 강사 소개를 함께 보여 준다', async ({ page }) => {
+    const visits: string[] = [];
+    await page.route('**/analytics/page-visit', route => {
+      visits.push(route.request().postData() ?? '');
+      return route.fulfill({ contentType: 'application/json', body: '{"success":true}' });
+    });
+    // 대조용: 다른 공개 화면은 방문 기록을 보낸다. 로그인 버튼이 보이면 화면의 effect가 다 돈 뒤다.
+    await page.goto('/privacy');
+    await expect(page.getByTestId('header-login-btn')).toBeVisible();
+    await expect.poll(() => visits.length).toBe(1);
 
-    await expect(page.getByTestId('sidebar-toggle')).toHaveCount(0);
+    await page.goto('/hansalim');
+    await expect(page.getByTestId('header-login-btn')).toBeVisible();
+    await expect(page.getByText('개발자 김승찬이 운영하는 기술 블로그입니다.')).toBeAttached();
     await expect(page.locator('script[src*="googletagmanager"]')).toHaveCount(0);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
     await expect(page.locator('#instructor')).toContainText('김승찬');
@@ -88,6 +98,13 @@ test.describe('한살림 교육 다운로드 페이지', () => {
     } else {
       await expect(review).toHaveCount(0);
     }
+
+    // 블로그 메뉴로 옮겨 가면 그 화면만 기록된다. 사이에 한살림 방문 기록이 끼면 실패한다.
+    await page.getByTestId('nav-link-blog').click();
+    await expect(page).toHaveURL(/\/blog$/);
+    await expect
+      .poll(() => visits.map(body => JSON.parse(body).path))
+      .toEqual(['/privacy', '/blog']);
   });
 
   test('휴대폰 폭에서 가로로 넘치지 않고 버튼이 한 줄씩 보인다', async ({ page }) => {

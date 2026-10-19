@@ -8,6 +8,8 @@ test.describe('한살림 강의 슬라이드 보기', () => {
     await page.goto('/hansalim');
     await page.getByTestId('lecture-slides-link').click();
     await expect(page).toHaveURL(/\/hansalim\/slides/);
+    // 슬라이드는 발표 화면이라 블로그 메뉴 없이 단독으로 연다.
+    await expect(page.getByTestId('nav-link-blog')).toHaveCount(0);
 
     const current = page.getByTestId('slideshow-current');
     await expect(current.locator('canvas')).toBeVisible({ timeout: 20_000 });

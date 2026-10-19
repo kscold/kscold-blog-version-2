@@ -2,18 +2,21 @@ import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { INSTRUCTOR_PROFILE } from '@/entities/profile';
 
-/** 강의 페이지에 붙이는 강사 소개. 바깥 틀(카드·여백)은 붙이는 페이지가 정한다. */
+/**
+ * 강의 페이지에 붙이는 강사 소개. 바깥 틀(카드·여백)은 붙이는 페이지가 정한다.
+ * 블로그 사이드바만큼 본문이 좁아지므로 여러 칸 배치와 가장 큰 글자는 xl부터 쓴다.
+ */
 export function InstructorProfile() {
   const profile = INSTRUCTOR_PROFILE;
 
   return (
-    <div id="instructor" className="scroll-mt-6 border-t border-surface-200">
-      <header className="grid gap-8 border-b border-surface-200 p-6 sm:p-10 lg:grid-cols-[1fr_18rem] lg:p-12">
+    <div id="instructor" className="scroll-mt-24">
+      <header className="grid gap-8 border-b border-surface-200 p-6 sm:p-10 md:grid-cols-[1fr_13rem] xl:grid-cols-[1fr_18rem] xl:p-12">
         <div>
-          <p className="mb-4 font-mono text-xs font-bold uppercase tracking-[0.28em] text-primary-600">
+          <p className="mb-4 text-[11px] font-black uppercase tracking-[0.28em] text-primary-600">
             Instructor · AX &amp; Codex
           </p>
-          <h2 className="max-w-3xl break-keep text-[1.75rem] font-black leading-[1.18] tracking-tight sm:text-4xl lg:text-5xl">
+          <h2 className="max-w-3xl break-keep text-[1.75rem] font-black leading-[1.18] tracking-tight sm:text-4xl xl:text-5xl">
             {profile.headline.map((line, index) => (
               <span key={line} className={`block ${index > 0 ? 'mt-1 sm:mt-2' : ''}`}>
                 {line}
@@ -26,7 +29,7 @@ export function InstructorProfile() {
             <span>{profile.company}</span>
           </div>
         </div>
-        <div className="flex items-end lg:justify-end">
+        <div className="flex items-end md:justify-end">
           <div className="relative aspect-[4/5] w-full max-w-[18rem] overflow-hidden rounded-[1.75rem] bg-surface-100">
             <Image
               src="https://avatars.githubusercontent.com/u/66587554?v=4"
@@ -39,7 +42,7 @@ export function InstructorProfile() {
         </div>
       </header>
 
-      <section className="grid gap-10 p-6 sm:p-10 lg:grid-cols-[1.15fr_0.85fr] lg:p-12">
+      <section className="grid gap-10 p-6 sm:p-10 xl:grid-cols-[1.15fr_0.85fr] xl:p-12">
         <div>
           <SectionLabel>Profile</SectionLabel>
           <div className="space-y-4 text-base leading-8 text-surface-600">
@@ -50,7 +53,7 @@ export function InstructorProfile() {
         </div>
         <div>
           <SectionLabel>AI-Driven Highlights</SectionLabel>
-          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+          <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
             {profile.highlights.map(item => (
               <div
                 key={item.label}
@@ -66,7 +69,7 @@ export function InstructorProfile() {
         </div>
       </section>
 
-      <section className="border-y border-surface-200 bg-surface-900 p-6 text-white sm:p-10 lg:p-12 print:bg-white print:text-surface-900">
+      <section className="border-y border-surface-200 bg-surface-900 p-6 text-white sm:p-10 xl:p-12 print:bg-white print:text-surface-900">
         <SectionLabel dark>AX in Practice</SectionLabel>
         <h2 className="max-w-2xl break-keep text-3xl font-black tracking-tight sm:text-4xl">
           AI를 실제 업무에 붙여 써 왔습니다.
@@ -89,7 +92,7 @@ export function InstructorProfile() {
         </div>
       </section>
 
-      <section className="grid gap-10 p-6 sm:p-10 lg:grid-cols-2 lg:p-12">
+      <section className="grid gap-10 p-6 sm:p-10 xl:grid-cols-2 xl:p-12">
         <div>
           <SectionLabel>For Every Team</SectionLabel>
           <h2 className="break-keep text-2xl font-black tracking-tight">
@@ -133,7 +136,7 @@ function ProfileHistory() {
   const profile = INSTRUCTOR_PROFILE;
 
   return (
-    <section className="grid gap-10 border-t border-surface-200 p-6 sm:p-10 lg:grid-cols-[1.2fr_0.8fr] lg:p-12">
+    <section className="grid gap-10 border-t border-surface-200 p-6 sm:p-10 xl:grid-cols-[1.2fr_0.8fr] xl:p-12">
       <div>
         <SectionLabel>Experience</SectionLabel>
         <div className="space-y-6">
@@ -168,7 +171,7 @@ function ProfileFooter() {
   const { contacts } = INSTRUCTOR_PROFILE;
 
   return (
-    <footer className="flex flex-col gap-5 bg-surface-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-10 lg:p-12 print:bg-white">
+    <footer className="flex flex-col gap-5 bg-surface-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-10 xl:p-12 print:bg-white">
       <div>
         <p className="text-lg font-black">강의 및 협업 문의</p>
         <a
@@ -211,7 +214,7 @@ function CompactList({ title, items }: { title: string; items: string[] }) {
 function SectionLabel({ children, dark = false }: { children: ReactNode; dark?: boolean }) {
   return (
     <p
-      className={`mb-4 font-mono text-xs font-bold uppercase tracking-[0.24em] ${dark ? 'text-surface-400 print:text-surface-500' : 'text-surface-400'}`}
+      className={`mb-4 text-[11px] font-bold uppercase tracking-[0.28em] ${dark ? 'text-surface-400 print:text-surface-500' : 'text-surface-400'}`}
     >
       {children}
     </p>

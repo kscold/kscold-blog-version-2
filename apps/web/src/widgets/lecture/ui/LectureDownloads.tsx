@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { HANSALIM_DOWNLOADS, type HansalimDownload } from '../model/hansalimDownloads';
+import { LectureSectionHeading } from './LectureSectionHeading';
 
 const FILE_BASE = '/hansalim/files/';
 const SLIDES_HREF = '/hansalim/slides';
@@ -18,23 +19,20 @@ export function LectureDownloads() {
   const others = HANSALIM_DOWNLOADS.filter(item => !item.primary);
 
   return (
-    <section id="downloads" className="p-6 sm:p-10 lg:p-12" aria-labelledby="downloads-title">
-      <p className="mb-4 font-mono text-xs font-bold uppercase tracking-[0.24em] text-surface-400">
-        Downloads
-      </p>
-      <h2
-        id="downloads-title"
-        className="break-keep text-2xl font-black tracking-tight sm:text-3xl"
-      >
-        교육 자료 내려받기
-      </h2>
+    <section id="downloads" className="scroll-mt-24" aria-labelledby="downloads-title">
+      <LectureSectionHeading id="downloads-title" label="Downloads" title="교육 자료 내려받기" />
       {primary && <PrimaryDownload item={primary} />}
-      <div className="mt-4 grid gap-4 md:grid-cols-3">
-        {others.map(item => (
-          <DownloadCard key={item.key} item={item} />
+      {/* 사이드바가 붙는 노트북 폭에서는 세 칸이 좁아 두 칸으로 두고, 남는 마지막 카드가 한 줄을 다 쓴다. */}
+      <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {others.map((item, index) => (
+          <DownloadCard
+            key={item.key}
+            item={item}
+            wide={index === others.length - 1 && others.length % 2 === 1}
+          />
         ))}
       </div>
-      <p className="mt-6 text-sm leading-6 text-surface-500">
+      <p className="mt-6 break-keep text-sm leading-6 text-surface-500">
         슬라이드는 「슬라이드로 보기」에서 내려받지 않고 바로 넘겨 볼 수 있습니다. PPT는
         PowerPoint에서 고쳐 쓰실 분만 받으시면 됩니다.
       </p>
@@ -46,7 +44,7 @@ function PrimaryDownload({ item }: { item: HansalimDownload }) {
   return (
     <article
       data-testid={`lecture-download-${item.key}`}
-      className="mt-8 rounded-[1.75rem] bg-surface-900 p-5 text-white sm:p-8 print:bg-white print:text-surface-900 print:ring-1 print:ring-surface-200"
+      className="rounded-[28px] bg-surface-950 p-6 text-white shadow-sm sm:p-8 print:bg-white print:text-surface-900 print:ring-1 print:ring-surface-200"
     >
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-300 print:text-primary-600">
         먼저 받으세요 · 오후 실습
@@ -67,12 +65,12 @@ function PrimaryDownload({ item }: { item: HansalimDownload }) {
   );
 }
 
-function DownloadCard({ item }: { item: HansalimDownload }) {
+function DownloadCard({ item, wide }: { item: HansalimDownload; wide: boolean }) {
   return (
     <article
       id={`download-${item.key}`}
       data-testid={`lecture-download-${item.key}`}
-      className="flex scroll-mt-6 flex-col rounded-2xl border border-surface-200 bg-white p-5 target:border-primary-500 target:ring-2 target:ring-primary-200"
+      className={`flex scroll-mt-24 flex-col rounded-2xl border border-surface-200 bg-white p-5 target:border-primary-500 target:ring-2 target:ring-primary-200 ${wide ? 'md:col-span-2 xl:col-span-1' : ''}`}
     >
       <h3 className="break-keep text-lg font-black tracking-tight">{item.title}</h3>
       <p className="mt-2 flex-1 break-keep text-sm leading-6 text-surface-600">
@@ -94,7 +92,7 @@ function DownloadCard({ item }: { item: HansalimDownload }) {
         <Link
           href={SLIDES_HREF}
           data-testid="lecture-slides-link"
-          className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-primary-600 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-primary-700 print:hidden"
+          className="mt-4 inline-flex w-full items-center justify-center break-keep rounded-full bg-primary-600 px-5 py-3 text-center text-sm font-black text-white transition-colors hover:bg-primary-700 print:hidden"
         >
           슬라이드로 보기 (전체 화면)
         </Link>

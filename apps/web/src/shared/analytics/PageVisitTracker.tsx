@@ -1,15 +1,18 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
+import { isUntrackedPage } from '@/shared/config/standalonePages';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export function PageVisitTracker() {
   const pathname = usePathname();
+  const params = useParams();
+  const isUntracked = isUntrackedPage(params, pathname);
 
   useEffect(() => {
-    if (!pathname) return;
+    if (!pathname || isUntracked) return;
     if (pathname.startsWith('/admin') || pathname.startsWith('/api')) return;
 
     const controller = new AbortController();
@@ -25,7 +28,7 @@ export function PageVisitTracker() {
     });
 
     return () => controller.abort();
-  }, [pathname]);
+  }, [pathname, isUntracked]);
 
   return null;
 }
