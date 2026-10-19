@@ -80,6 +80,9 @@ apps/web/docs/hansalim-review-guide.md 를 읽고 한살림 교육 후기를 준
 ```bash
 gh repo clone kscold/lecture /tmp/lecture -- --depth 1
 node apps/web/scripts/sync-hansalim-downloads.mjs /tmp/lecture/downloads
+pnpm --dir apps/web exec prettier --write src/widgets/lecture/model/hansalimDownloads.ts
 ```
 
-sha256이 manifest와 하나라도 다르거나 강사용으로 보이는 파일 이름이 섞이면 아무것도 바꾸지 않고 멈춘다.
+- manifest의 sha256·크기·`release_id`가 파일과 하나라도 다르거나, 실습 ZIP에 글꼴(`included_fonts` 폴더의 .ttf 두 개와 OFL.txt)이 빠졌거나, 강사용으로 보이는 파일 이름이 섞이면 아무것도 바꾸지 않고 멈춘다.
+- manifest의 `files`에 적힌 파일만 `public/hansalim/files`로 옮긴다. `hidden: true`인 파일(예전 글꼴 ZIP)은 옛 주소 호환용으로 파일만 두고 화면에는 그리지 않는다.
+- 배포한 뒤 강의 저장소에서 `python3 downloads/검사도구/verify_downloads.py --base-url https://kscold.com/hansalim/files`로 운영 파일을 내려받아 크기·해시·장수를 확인한다(PyMuPDF 필요).

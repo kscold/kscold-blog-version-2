@@ -11,6 +11,7 @@ interface SlideShowControlsProps {
   canFullscreen: boolean;
   onToggleFullscreen: () => void;
   downloadHref: string;
+  downloadName: string;
 }
 
 const BUTTON =
@@ -75,7 +76,7 @@ export function SlideShowControls(props: SlideShowControlsProps) {
       )}
       <a
         href={props.downloadHref}
-        download
+        download={props.downloadName}
         className={`${BUTTON} text-surface-300 hover:text-white`}
       >
         PDF 받기

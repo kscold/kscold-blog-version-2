@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const linkPreviewImagePolicy = require('./src/shared/config/link-preview-images.json');
 require('./scripts/prepare-pdf-assets.cjs')();
 // 개발용 HMR만 eval·웹소켓을 허용하고 운영 문서 화면은 외부 자원을 차단한다.
@@ -21,6 +23,35 @@ const SITEMAP_CACHE_CONTROL =
   'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
 const ROBOTS_CACHE_CONTROL =
   'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800';
+
+// 한살림 강의 자료는 주소를 직접 열거나 download 속성을 무시하는 메신저 안 브라우저에서도 한글 파일 이름으로 저장되게 한다.
+// 목록은 scripts/sync-hansalim-downloads.mjs가 manifest대로 맞춘 폴더에서 빌드할 때 읽는다.
+// 캐시는 공개 파일 기본값(max-age=0 + ETag)을 그대로 써서 배포 직후에도 매번 새 파일인지 확인한다.
+const HANSALIM_FILES_DIR = path.join(__dirname, 'public/hansalim/files');
+
+/** RFC 5987 방식으로 이름을 바꾼다. encodeURIComponent가 남기는 !'()*까지 바꿔 경로 패턴과 헤더에 그대로 쓴다. */
+function encodeFileName(name) {
+  return encodeURIComponent(name).replace(
+    /[!'()*]/g,
+    char => `%${char.charCodeAt(0).toString(16).toUpperCase()}`
+  );
+}
+
+function hansalimFileHeaders() {
+  if (!fs.existsSync(HANSALIM_FILES_DIR)) return [];
+  return fs
+    .readdirSync(HANSALIM_FILES_DIR)
+    .filter(name => !name.startsWith('.'))
+    .map(name => ({
+      source: `/hansalim/files/${encodeFileName(name)}`,
+      headers: [
+        {
+          key: 'Content-Disposition',
+          value: `attachment; filename*=UTF-8''${encodeFileName(name)}`,
+        },
+      ],
+    }));
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -81,6 +112,7 @@ const nextConfig = {
         source: '/robots.txt',
         headers: [{ key: 'Cache-Control', value: ROBOTS_CACHE_CONTROL }],
       },
+      ...hansalimFileHeaders(),
     ];
   },
 

@@ -22,11 +22,15 @@ configurePdfWorker();
 
 interface SlideShowProps {
   file: string;
+  /** 「PDF 받기」로 저장할 파일 이름. 주소에 붙은 버전 질의가 이름에 섞이지 않게 따로 받는다. */
+  fileName: string;
+  /** 자료 페이지와 같은 자료 묶음인지 확인하는 값 */
+  releaseId: string;
   title: string;
   backHref: string;
 }
 
-export default function SlideShow({ file, title, backHref }: SlideShowProps) {
+export default function SlideShow({ file, fileName, releaseId, title, backHref }: SlideShowProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [aspectRatio, setAspectRatio] = useState(16 / 9);
@@ -62,6 +66,7 @@ export default function SlideShow({ file, title, backHref }: SlideShowProps) {
     <div
       ref={rootRef}
       data-testid="slideshow"
+      data-release-id={releaseId}
       className="flex h-[100dvh] flex-col bg-surface-950 text-white"
     >
       <header className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
@@ -126,6 +131,7 @@ export default function SlideShow({ file, title, backHref }: SlideShowProps) {
         canFullscreen={fullscreen.isSupported}
         onToggleFullscreen={fullscreen.toggle}
         downloadHref={file}
+        downloadName={fileName}
       />
     </div>
   );

@@ -34,16 +34,16 @@ export function CopyPageLinkButton() {
   };
 
   return (
-    <div className="flex flex-col items-end gap-2 print:hidden">
+    <div className="flex flex-col items-start gap-2 print:hidden">
       <button
         type="button"
         onClick={copyPageUrl}
-        className="rounded-full border border-surface-200 bg-white px-4 py-2 text-sm font-bold text-surface-700 transition-colors hover:border-surface-400"
+        className="min-h-11 rounded-full border border-surface-200 bg-white px-4 text-sm font-bold text-surface-700 transition-colors hover:border-surface-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900"
       >
         {state === 'copied' ? '링크를 복사했습니다' : '페이지 링크 복사'}
       </button>
       {state === 'manual' && (
-        <div data-testid="copy-link-fallback" className="w-64 max-w-[70vw] text-right">
+        <div data-testid="copy-link-fallback" className="w-64 max-w-[70vw]">
           <label htmlFor="page-link" className="mb-1 block text-xs text-surface-500">
             이 브라우저에서는 자동 복사가 막혀 있습니다. 주소를 길게 누르거나 선택해 복사하세요.
           </label>

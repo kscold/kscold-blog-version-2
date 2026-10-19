@@ -10,7 +10,7 @@ export function LectureReviewSection() {
 
   return (
     <section data-testid="lecture-review" aria-labelledby="review-title">
-      <LectureSectionHeading id="review-title" label="Review" title="교육 후기" />
+      <LectureSectionHeading id="review-title" title="교육 후기" />
       <Link
         href={review.postPath}
         className="group grid gap-6 overflow-hidden rounded-[28px] border border-surface-200 bg-white p-6 transition-colors hover:border-surface-400 sm:p-8 md:grid-cols-[1fr_16rem]"

@@ -1,222 +1,62 @@
 import Image from 'next/image';
-import type { ReactNode } from 'react';
 import { INSTRUCTOR_PROFILE } from '@/entities/profile';
 
+const PHOTO = 'https://avatars.githubusercontent.com/u/66587554?v=4';
+
 /**
- * 강의 페이지에 붙이는 강사 소개. 바깥 틀(카드·여백)은 붙이는 페이지가 정한다.
- * 블로그 사이드바만큼 본문이 좁아지므로 여러 칸 배치와 가장 큰 글자는 xl부터 쓴다.
+ * 강의 자료 페이지 아래쪽에 붙이는 짧은 강사 소개.
+ * 경력·연락처는 entities/profile에 있는 값만 쓰고 새로 지어 넣지 않는다.
  */
 export function InstructorProfile() {
   const profile = INSTRUCTOR_PROFILE;
+  const { contacts } = profile;
+  // 참가자에게 필요한 두 문단(하는 일, 강의 방식)만 보여 준다. 가운데 문단은 지난 프로젝트 소개다.
+  const [work, , teaching] = profile.introduction;
 
   return (
-    <div id="instructor" className="scroll-mt-24">
-      <header className="grid gap-8 border-b border-surface-200 p-6 sm:p-10 md:grid-cols-[1fr_13rem] xl:grid-cols-[1fr_18rem] xl:p-12">
-        <div>
-          <p className="mb-4 text-[11px] font-black uppercase tracking-[0.28em] text-primary-600">
-            Instructor · AX &amp; Codex
-          </p>
-          <h2 className="max-w-3xl break-keep text-[1.75rem] font-black leading-[1.18] tracking-tight sm:text-4xl xl:text-5xl">
-            {profile.headline.map((line, index) => (
-              <span key={line} className={`block ${index > 0 ? 'mt-1 sm:mt-2' : ''}`}>
-                {line}
-              </span>
-            ))}
-          </h2>
-          <div className="mt-7 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-surface-500">
-            <strong className="text-base text-surface-900">{profile.name}</strong>
-            <span>{profile.role}</span>
-            <span>{profile.company}</span>
-          </div>
-        </div>
-        <div className="flex items-end md:justify-end">
-          <div className="relative aspect-[4/5] w-full max-w-[18rem] overflow-hidden rounded-[1.75rem] bg-surface-100">
-            <Image
-              src="https://avatars.githubusercontent.com/u/66587554?v=4"
-              alt="강사 김승찬"
-              fill
-              sizes="(max-width: 1024px) 288px, 288px"
-              className="object-cover"
-            />
-          </div>
-        </div>
-      </header>
-
-      <section className="grid gap-10 p-6 sm:p-10 xl:grid-cols-[1.15fr_0.85fr] xl:p-12">
-        <div>
-          <SectionLabel>Profile</SectionLabel>
-          <div className="space-y-4 text-base leading-8 text-surface-600">
-            {profile.introduction.map(paragraph => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
-        </div>
-        <div>
-          <SectionLabel>AI-Driven Highlights</SectionLabel>
-          <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-            {profile.highlights.map(item => (
-              <div
-                key={item.label}
-                className="rounded-2xl border-l-2 border-primary-500 bg-surface-50 p-5 ring-1 ring-inset ring-surface-200"
-              >
-                <strong className="block break-keep text-xl font-black tracking-tight text-surface-900">
-                  {item.value}
-                </strong>
-                <span className="mt-1 block text-xs leading-5 text-surface-500">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-y border-surface-200 bg-surface-900 p-6 text-white sm:p-10 xl:p-12 print:bg-white print:text-surface-900">
-        <SectionLabel dark>AX in Practice</SectionLabel>
-        <h2 className="max-w-2xl break-keep text-3xl font-black tracking-tight sm:text-4xl">
-          AI를 실제 업무에 붙여 써 왔습니다.
-        </h2>
-        <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          {profile.axCases.map(item => (
-            <div
-              key={item.title}
-              className="rounded-2xl border border-white/10 bg-white/[0.06] p-5 print:border-surface-200 print:bg-white"
-            >
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-300 print:text-primary-600">
-                {item.category}
-              </p>
-              <h3 className="mt-3 text-lg font-black">{item.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-surface-300 print:text-surface-600">
-                {item.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="grid gap-10 p-6 sm:p-10 xl:grid-cols-2 xl:p-12">
-        <div>
-          <SectionLabel>For Every Team</SectionLabel>
-          <h2 className="break-keep text-2xl font-black tracking-tight">
-            개발이 본업이 아닌 부서의 말로 풀어 설명합니다.
-          </h2>
-          <div className="mt-6 divide-y divide-surface-200 border-y border-surface-200">
-            {profile.audienceExamples.map(([team, example]) => (
-              <div key={team} className="grid grid-cols-[5rem_1fr] gap-4 py-4 text-sm">
-                <strong>{team}</strong>
-                <span className="leading-6 text-surface-600">{example}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div>
-          <SectionLabel>Teaching Style</SectionLabel>
-          <h2 className="break-keep text-2xl font-black tracking-tight">
-            같은 화면을 보며 따라 하는 실습 강의
-          </h2>
-          <ul className="mt-6 space-y-4">
-            {profile.teaching.map((item, index) => (
-              <li
-                key={item}
-                className="grid grid-cols-[2rem_1fr] gap-3 text-sm leading-6 text-surface-600"
-              >
-                <span className="font-mono font-bold text-primary-600">0{index + 1}</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <ProfileHistory />
-      <ProfileFooter />
-    </div>
-  );
-}
-
-function ProfileHistory() {
-  const profile = INSTRUCTOR_PROFILE;
-
-  return (
-    <section className="grid gap-10 border-t border-surface-200 p-6 sm:p-10 xl:grid-cols-[1.2fr_0.8fr] xl:p-12">
-      <div>
-        <SectionLabel>Experience</SectionLabel>
-        <div className="space-y-6">
-          {profile.experience.map(item => (
-            <div
-              key={`${item.period}-${item.organization}`}
-              className="grid gap-2 sm:grid-cols-[9rem_1fr]"
-            >
-              <p className="font-mono text-xs text-surface-400">{item.period}</p>
-              <div>
-                <h3 className="font-black">{item.organization}</h3>
-                <p className="mt-1 text-sm font-bold text-surface-600">{item.role}</p>
-                <p className="mt-1 text-sm leading-6 text-surface-500">{item.description}</p>
-              </div>
-            </div>
-          ))}
+    <section
+      id="instructor"
+      aria-labelledby="instructor-title"
+      className="scroll-mt-24 border-t border-surface-200 pt-10"
+    >
+      <h2 id="instructor-title" className="text-xl font-black tracking-tight text-surface-900">
+        강사 소개
+      </h2>
+      <div className="mt-5 flex items-center gap-4">
+        <Image
+          src={PHOTO}
+          alt={`강사 ${profile.name}`}
+          width={64}
+          height={64}
+          className="h-16 w-16 shrink-0 rounded-full bg-surface-100 object-cover"
+        />
+        <div className="min-w-0">
+          <p className="text-lg font-black text-surface-900">{profile.name}</p>
+          <p className="break-keep text-sm leading-6 text-surface-500">{profile.role}</p>
+          <p className="break-keep text-sm leading-6 text-surface-500">{profile.company}</p>
         </div>
       </div>
-      <div className="space-y-8">
-        <CompactList title="강의·커뮤니티" items={profile.teachingExperience} />
-        <CompactList title="수상·선발" items={profile.awards} />
-        <div>
-          <SectionLabel>Education</SectionLabel>
-          <p className="text-sm leading-6 text-surface-600">{profile.education}</p>
-        </div>
+      <div className="mt-5 space-y-3 break-keep text-base leading-7 text-surface-600">
+        <p>{work}</p>
+        <p>{teaching}</p>
       </div>
-    </section>
-  );
-}
-
-function ProfileFooter() {
-  const { contacts } = INSTRUCTOR_PROFILE;
-
-  return (
-    <footer className="flex flex-col gap-5 bg-surface-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-10 xl:p-12 print:bg-white">
-      <div>
-        <p className="text-lg font-black">강의 및 협업 문의</p>
+      <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-surface-500">
+        <span>강의 및 협업 문의</span>
         <a
           href={`mailto:${contacts.email}`}
-          className="mt-1 block text-sm text-surface-500 hover:text-surface-900"
+          className="font-bold text-surface-800 hover:text-primary-700"
         >
           {contacts.email}
-        </a>
-      </div>
-      <div className="flex gap-4 text-sm font-bold">
-        <a href={contacts.website} className="hover:text-primary-600">
-          kscold.com
         </a>
         <a
           href={contacts.github}
           target="_blank"
           rel="noreferrer"
-          className="hover:text-primary-600"
+          className="font-bold text-surface-800 hover:text-primary-700"
         >
           GitHub
         </a>
-      </div>
-    </footer>
-  );
-}
-
-function CompactList({ title, items }: { title: string; items: string[] }) {
-  return (
-    <div>
-      <SectionLabel>{title}</SectionLabel>
-      <ul className="space-y-2 text-sm leading-6 text-surface-600">
-        {items.map(item => (
-          <li key={item}>— {item}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function SectionLabel({ children, dark = false }: { children: ReactNode; dark?: boolean }) {
-  return (
-    <p
-      className={`mb-4 text-[11px] font-bold uppercase tracking-[0.28em] ${dark ? 'text-surface-400 print:text-surface-500' : 'text-surface-400'}`}
-    >
-      {children}
-    </p>
+      </p>
+    </section>
   );
 }

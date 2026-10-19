@@ -1,15 +1,20 @@
-import { Fragment } from 'react';
-import { HANSALIM_LECTURE, type LectureSetupStep } from '../model/hansalimLecture';
+'use client';
+
+import { useRef, useState, type KeyboardEvent } from 'react';
+import { HANSALIM_LECTURE, type LecturePlatform } from '../model/hansalimLecture';
+import { GuideText } from './GuideText';
+import { LectureFolderTree } from './LectureFolderTree';
 import { LectureSectionHeading } from './LectureSectionHeading';
 
-const PLATFORMS = [
+const PLATFORMS: { key: LecturePlatform; label: string }[] = [
   { key: 'windows', label: 'Windows' },
   { key: 'mac', label: 'Mac' },
-] as const;
+];
 
-/** 실습 자료를 받은 뒤 VS Code에서 폴더를 열기까지의 순서를 Windows·Mac으로 나눠 보여 준다. */
+/** 실습 자료를 받은 뒤 VS Code에서 폴더를 열기까지의 순서. Windows를 먼저 보여 주고 Mac은 골라서 본다. */
 export function LectureSetupGuide() {
-  const { steps, notes } = HANSALIM_LECTURE.setup;
+  const { steps, done, notes, tree } = HANSALIM_LECTURE.setup;
+  const [platform, setPlatform] = useState<LecturePlatform>('windows');
 
   return (
     <section
@@ -18,20 +23,39 @@ export function LectureSetupGuide() {
       className="scroll-mt-24"
       aria-labelledby="setup-title"
     >
-      <LectureSectionHeading id="setup-title" label="Setup" title="실습 준비">
-        압축을 풀고 VS Code에서 폴더를 여는 순서입니다. 쓰시는 컴퓨터에 맞는 쪽만 따라 하세요.
+      <LectureSectionHeading id="setup-title" title="실습 준비">
+        압축을 풀고 VS Code에서 실습 폴더를 여는 순서입니다.
       </LectureSectionHeading>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {PLATFORMS.map(platform => (
-          <SetupPlatformCard key={platform.key} platform={platform} steps={steps} />
-        ))}
-      </div>
+      <PlatformTabs value={platform} onChange={setPlatform} />
+      {PLATFORMS.map(item => (
+        // 인쇄할 때는 두 운영체제 순서를 모두 보여 준다.
+        <div
+          key={item.key}
+          role="tabpanel"
+          id={`setup-panel-${item.key}`}
+          aria-labelledby={`setup-tab-${item.key}`}
+          data-testid={`lecture-setup-${item.key}`}
+          hidden={platform !== item.key}
+          // 안에 누를 것이 없으므로 탭 다음 Tab 키에서 본문으로 바로 들어오게 한다.
+          tabIndex={0}
+          className="mt-6 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-surface-900 print:!block"
+        >
+          <h3 className="mb-3 hidden font-bold print:block">{item.label}</h3>
+          <ol className="space-y-4">
+            {steps[item.key].map((text, index) => (
+              <SetupStep key={text} order={index + 1} text={text} />
+            ))}
+          </ol>
+        </div>
+      ))}
 
-      <ul className="mt-4 space-y-2 rounded-2xl border border-surface-200 bg-white p-5 text-sm leading-6 text-surface-600">
+      <p className="mt-6 break-keep text-base font-semibold leading-7 text-surface-900">{done}</p>
+      <LectureFolderTree root={tree} />
+      <ul className="mt-5 space-y-2 text-sm leading-6 text-surface-600">
         {notes.map(note => (
           <li key={note} className="break-keep">
-            — {note}
+            — <GuideText text={note} />
           </li>
         ))}
       </ul>
@@ -39,114 +63,77 @@ export function LectureSetupGuide() {
   );
 }
 
-function SetupPlatformCard({
-  platform,
-  steps,
+/** 방향키·Home·End로 옮겨 다니는 탭 목록. 고른 탭만 Tab 순서에 들어간다. */
+function PlatformTabs({
+  value,
+  onChange,
 }: {
-  platform: (typeof PLATFORMS)[number];
-  steps: LectureSetupStep[];
+  value: LecturePlatform;
+  onChange: (next: LecturePlatform) => void;
 }) {
+  const tabs = useRef<Partial<Record<LecturePlatform, HTMLButtonElement | null>>>({});
+
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const current = PLATFORMS.findIndex(item => item.key === value);
+    const targets: Record<string, number> = {
+      ArrowRight: current + 1,
+      ArrowLeft: current - 1,
+      Home: 0,
+      End: PLATFORMS.length - 1,
+    };
+    if (!(event.key in targets)) return;
+    event.preventDefault();
+    const next = PLATFORMS[(targets[event.key] + PLATFORMS.length) % PLATFORMS.length];
+    onChange(next.key);
+    tabs.current[next.key]?.focus();
+  };
+
   return (
-    <article
-      data-testid={`lecture-setup-${platform.key}`}
-      className="min-w-0 rounded-2xl border border-surface-200 bg-white p-5 sm:p-6"
-      aria-label={`${platform.label} 실습 준비`}
+    <div
+      role="tablist"
+      aria-label="쓰시는 컴퓨터"
+      onKeyDown={onKeyDown}
+      className="inline-flex rounded-full border border-surface-200 bg-white p-1 print:hidden"
     >
-      <h3 className="text-lg font-black tracking-tight">{platform.label}</h3>
-      <ol className="mt-5 space-y-5">
-        {steps.map((step, index) => (
-          <SetupStep
-            key={step.title}
-            step={step}
-            order={index + 1}
-            instruction={step[platform.key]}
-          />
-        ))}
-      </ol>
-    </article>
+      {PLATFORMS.map(item => {
+        const selected = item.key === value;
+        return (
+          <button
+            key={item.key}
+            ref={node => {
+              tabs.current[item.key] = node;
+            }}
+            type="button"
+            role="tab"
+            id={`setup-tab-${item.key}`}
+            aria-selected={selected}
+            aria-controls={`setup-panel-${item.key}`}
+            tabIndex={selected ? 0 : -1}
+            onClick={() => onChange(item.key)}
+            className={`min-h-11 min-w-[6.5rem] rounded-full px-5 text-sm font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 ${
+              selected ? 'bg-surface-900 text-white' : 'text-surface-600 hover:text-surface-900'
+            }`}
+          >
+            {item.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
-function SetupStep({
-  step,
-  order,
-  instruction,
-}: {
-  step: LectureSetupStep;
-  order: number;
-  instruction: string;
-}) {
+function SetupStep({ order, text }: { order: number; text: string }) {
   return (
     <li className="grid grid-cols-[2rem_1fr] gap-3">
       <span
-        className={`flex h-8 w-8 items-center justify-center rounded-full font-mono text-xs font-bold ${
-          step.optional ? 'bg-surface-100 text-surface-500' : 'bg-surface-900 text-white'
-        }`}
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-900 text-sm font-bold text-white"
         aria-hidden
       >
         {order}
       </span>
-      <div>
-        <p className="flex flex-wrap items-center gap-2 font-bold text-surface-900">
-          {step.title}
-          {step.optional && (
-            <span className="rounded-full bg-surface-100 px-2 py-0.5 text-xs font-bold text-surface-500">
-              선택
-            </span>
-          )}
-        </p>
-        <p className="mt-1 break-keep text-sm leading-6 text-surface-600">
-          <MenuPath text={instruction} />
-        </p>
-        {step.link && (
-          <a
-            href={step.link.href}
-            className="mt-1 inline-block text-sm font-bold text-primary-700 underline underline-offset-4"
-          >
-            {step.link.label}
-          </a>
-        )}
-      </div>
+      <p className="break-keep pt-0.5 text-base leading-7 text-surface-700">
+        <GuideText text={text} />
+      </p>
     </li>
-  );
-}
-
-// 이 길이를 넘는 조각은 메뉴 이름이 아니라 설명 문장으로 보고 줄바꿈을 허용한다.
-const MENU_NAME_MAX = 16;
-
-/**
- * 「파일 › 폴더 열기」처럼 메뉴를 따라가는 순서는 구분 기호를 흐리게 보여 눌러야 할 이름이 먼저 읽히게 한다.
- * 짧은 메뉴 이름은 한 덩어리로 두고 구분 기호에서만 줄을 바꿔, 휴대폰에서도 「모두 압축 풀기」가 둘로 갈라지지 않게 한다.
- * 문장처럼 긴 조각은 묶으면 좁은 화면을 넘치므로 평소처럼 줄을 바꾼다.
- */
-function MenuPath({ text }: { text: string }) {
-  const parts = text.split(' › ');
-  return (
-    <>
-      {parts.map((part, index) => (
-        <Fragment key={`${index}-${part}`}>
-          {/* 구분 기호 앞뒤의 공백이 줄을 바꿀 자리다. 없으면 묶인 메뉴 이름 전체가 한 줄로 이어져 좁은 화면을 넘친다. */}
-          {index > 0 && (
-            <>
-              {' '}
-              <span className="text-surface-300" aria-hidden>
-                ›
-              </span>
-              <span className="sr-only">, 다음</span>{' '}
-            </>
-          )}
-          <span
-            data-menu-part
-            className={
-              parts.length > 1
-                ? `font-semibold text-surface-800 ${part.length <= MENU_NAME_MAX ? 'whitespace-nowrap' : ''}`
-                : ''
-            }
-          >
-            {part}
-          </span>
-        </Fragment>
-      ))}
-    </>
   );
 }
