@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useRef, useState } from 'react';
 import { Document, Page } from 'react-pdf';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
 import {
   PDF_DOCUMENT_OPTIONS,
   configurePdfWorker,
@@ -55,7 +56,9 @@ export default function SlideShow({ file, fileName, releaseId, title, backHref }
   };
 
   // 화면 왼쪽 1/3을 누르면 앞으로, 나머지를 누르면 다음 장으로 간다.
+  // 슬라이드 속 링크(영상·공식 문서)를 누른 것이면 장을 넘기지 않고 링크만 연다.
   const onStageClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.target instanceof Element && event.target.closest('a')) return;
     const { left, width } = event.currentTarget.getBoundingClientRect();
     move(event.clientX - left < width / 3 ? -1 : 1);
   };
@@ -94,6 +97,9 @@ export default function SlideShow({ file, fileName, releaseId, title, backHref }
           <Document
             file={file}
             options={PDF_DOCUMENT_OPTIONS}
+            // PDF 속 바깥 링크는 새 탭으로 열어 발표 화면이 그대로 남게 한다.
+            externalLinkTarget="_blank"
+            externalLinkRel="noopener noreferrer"
             onLoadSuccess={onLoad}
             onLoadError={() => setError(true)}
             onSourceError={() => setError(true)}
@@ -113,7 +119,12 @@ export default function SlideShow({ file, fileName, releaseId, title, backHref }
                       aria-hidden={page !== slide}
                       className={`absolute inset-0 ${page === slide ? '' : 'pointer-events-none opacity-0'}`}
                     >
-                      <SlidePage pageNumber={page} width={fit.width} pixelRatio={pixelRatio} />
+                      <SlidePage
+                        pageNumber={page}
+                        width={fit.width}
+                        pixelRatio={pixelRatio}
+                        links={page === slide}
+                      />
                     </div>
                   ))}
               </div>
@@ -141,10 +152,13 @@ function SlidePage({
   pageNumber,
   width,
   pixelRatio,
+  links,
 }: {
   pageNumber: number;
   width: number;
   pixelRatio: number;
+  /** 지금 보이는 장에만 링크 층을 깐다. 미리 그려 둔 앞뒤 장의 링크가 Tab 순서에 끼지 않게 한다. */
+  links: boolean;
 }) {
   return (
     <Page
@@ -152,9 +166,11 @@ function SlidePage({
       width={width}
       devicePixelRatio={pixelRatio}
       renderTextLayer={false}
-      renderAnnotationLayer={false}
+      renderAnnotationLayer={links}
       renderForms={false}
-      className="overflow-hidden rounded-sm bg-white shadow-2xl"
+      // 휴대폰에서는 링크 높이가 손가락보다 훨씬 작다. 손가락 화면에서만 누르는 영역을 위아래로 넓힌다.
+      // 세로로 붙어 있는 링크는 같은 주소(두 줄 제목)뿐이라 넓혀도 다른 링크를 가리지 않는다.
+      className="overflow-hidden rounded-sm bg-white shadow-2xl [@media(pointer:coarse)]:[&_.linkAnnotation>a]:!-top-2 [@media(pointer:coarse)]:[&_.linkAnnotation>a]:!h-[calc(100%+1rem)]"
       loading={<div className="bg-surface-900" style={{ width, height: '100%' }} />}
     />
   );

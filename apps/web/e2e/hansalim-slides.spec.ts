@@ -54,6 +54,33 @@ test.describe('한살림 강의 슬라이드 보기', () => {
     await expect(current.locator('canvas')).toBeVisible();
   });
 
+  test('슬라이드 속 영상 링크를 누르면 새 탭으로 열리고 장은 넘어가지 않는다', async ({
+    page,
+    context,
+  }) => {
+    // 바깥 사이트로 실제로 나가지 않게 막고, 새 탭에 열린 주소만 확인한다.
+    await context.route(/youtube\.com/, route =>
+      route.fulfill({ contentType: 'text/html', body: '<p>video</p>' })
+    );
+    // 9장은 지금 자료에서 공식 소개 영상 세 편을 모아 둔 장이다.
+    await page.goto('/hansalim/slides#9');
+    const current = page.getByTestId('slideshow-current');
+    await expect(current).toHaveAttribute('data-slide', '9', { timeout: 20_000 });
+
+    const video = current.locator('.annotationLayer a[href*="youtube.com"]').first();
+    await expect(video).toHaveAttribute('target', '_blank');
+    await expect(video).toHaveAttribute('rel', /noopener/);
+    const [popup] = await Promise.all([context.waitForEvent('page'), video.click()]);
+    expect(popup.url()).toContain('youtube.com');
+    await expect(current).toHaveAttribute('data-slide', '9');
+    await expect(page).toHaveURL(/#9$/);
+
+    // 미리 그려 둔 앞뒤 장에는 링크 층을 두지 않아 Tab 순서에 끼지 않는다.
+    await expect(page.locator('[data-slide][aria-hidden="true"] .annotationLayer a')).toHaveCount(
+      0
+    );
+  });
+
   test('키를 빠르게 여러 번 눌러도 누른 만큼 넘어간다', async ({ page }) => {
     await page.goto('/hansalim/slides');
     const current = page.getByTestId('slideshow-current');
@@ -97,5 +124,20 @@ test.describe('한살림 강의 슬라이드 보기', () => {
     const download = page.getByRole('link', { name: 'PDF 받기' });
     await expect(download).toHaveAttribute('href', pdfHref);
     await expect(download).toHaveAttribute('download', pdf?.file ?? '');
+  });
+});
+
+test.describe('한살림 강의 슬라이드 보기 · 손가락 화면', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('슬라이드 속 링크는 누르는 영역이 위아래로 넓다', async ({ page }) => {
+    await page.goto('/hansalim/slides#9');
+    const current = page.getByTestId('slideshow-current');
+    await expect(current).toHaveAttribute('data-slide', '9', { timeout: 20_000 });
+
+    const link = current.locator('.annotationLayer .linkAnnotation').first();
+    const [area, anchor] = [await link.boundingBox(), await link.locator('a').boundingBox()];
+    // 글자 높이(몇 px)만큼이던 링크가 위아래 8px씩 넓어져야 손가락으로 누를 수 있다.
+    expect((anchor?.height ?? 0) - (area?.height ?? 0)).toBeGreaterThanOrEqual(15);
   });
 });
