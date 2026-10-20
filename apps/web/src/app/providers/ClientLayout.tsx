@@ -12,7 +12,7 @@ import { ViewerProvider } from '@/shared/model/ViewerProvider';
 import type { InitialViewer } from '@/shared/lib/initialViewer';
 import { PageVisitTracker } from '@/shared/analytics/PageVisitTracker';
 import { isAdminPath } from '@/shared/config/adminNavigation';
-import { isStandalonePage } from '@/shared/config/standalonePages';
+import { isStandalonePage, usesNativeCursor } from '@/shared/config/standalonePages';
 
 const FloatingChatWidget = dynamic(
   () => import('@/widgets/chat').then(module => module.FloatingChatWidget),
@@ -79,7 +79,8 @@ export function ClientLayout({ children, footer, initialViewer }: ClientLayoutPr
           </Suspense>
         )}
         <AlertToast />
-        <CustomCursor />
+        {/* 강의 자료 화면은 참가자가 커서를 놓치지 않도록 기본 화살표를 쓴다. */}
+        {!usesNativeCursor(pathname) && <CustomCursor />}
       </div>
     </ViewerProvider>
   );

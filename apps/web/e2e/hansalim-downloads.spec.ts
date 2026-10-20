@@ -218,6 +218,31 @@ test.describe('한살림 교육 다운로드 페이지', () => {
     });
   }
 
+  test('넓은 화면에서도 장식 커서 없이 기본 마우스 커서를 보여 준다', async ({ page }) => {
+    // 블로그 다른 화면이라면 장식 커서가 켜질 조건(움직임 허용·일반 GPU)을 만들어 둔다.
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.addInitScript(() => {
+      const originalGetContext = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (contextId, ...args) {
+        if (String(contextId).startsWith('webgl')) {
+          return {
+            getExtension: (name: string) =>
+              name === 'WEBGL_debug_renderer_info' ? { UNMASKED_RENDERER_WEBGL: 0x9246 } : null,
+            getParameter: () => 'NVIDIA GeForce',
+          } as unknown as RenderingContext;
+        }
+        return originalGetContext.call(this, contextId, ...args);
+      } as typeof HTMLCanvasElement.prototype.getContext;
+    });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/hansalim');
+    const button = page.getByTestId('lecture-primary-download');
+    await button.hover();
+    await expect(page.locator('html')).not.toHaveClass(/custom-cursor-active/);
+    await expect(page.getByTestId('custom-cursor')).toHaveCount(0);
+    await expect(button).toHaveCSS('cursor', 'pointer');
+  });
+
   test('주소를 잘못 치거나 한글로 쳐도 자료 페이지로 간다', async ({ request }) => {
     // 자료 페이지 자체는 이동 없이 바로 열려야 한다(대소문자 변형을 넣으면 자기 자신으로 무한 이동했다).
     const self = await request.get('/hansalim', { maxRedirects: 0 });
