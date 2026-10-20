@@ -1,6 +1,6 @@
 // 이 파일은 scripts/sync-hansalim-downloads.mjs가 강의 저장소의 manifest.json으로 만든다. 직접 고치지 않는다.
 export const HANSALIM_RELEASE = {
-  releaseId: 'de438ce51fb51353',
+  releaseId: '6f43a7d29e506626',
   slides: 164,
 } as const;
 
@@ -17,7 +17,7 @@ export const HANSALIM_DOWNLOADS = [
     bytes: 6700255,
     size: '6.7MB',
     format: 'ZIP',
-    sha256: 'd81357922e7b20c1c63d44256c07bd17c89b88e48f0a6a4e492ffadf0200e65c',
+    sha256: '34df9cf68b4e6987004745e97cc47a9a58fcfd5d905bfd1fa28935ec003e9101',
   },
   {
     order: 2,
@@ -27,10 +27,10 @@ export const HANSALIM_DOWNLOADS = [
     title: '강의 자료 PDF',
     description: '수강생용 강의 자료입니다. 보기만 하실 때는 PDF를 받으세요.',
     file: '한살림_AI교육_강의자료.pdf',
-    bytes: 9010309,
+    bytes: 9010060,
     size: '9.0MB',
     format: 'PDF',
-    sha256: '973b37ef737ec320021cc06583d0f1f6bf338109ae5319eb4d4b5be7a32e7f62',
+    sha256: '652bf9c056f13df5f162fd7c39dfd6c2707802199b200cc8dfd88753a1d66cb2',
   },
   {
     order: 3,
@@ -41,10 +41,10 @@ export const HANSALIM_DOWNLOADS = [
     description:
       'PowerPoint에서 편집할 수 있는 수강생용 자료입니다. 발표자 노트에 강의 설명이 들어 있습니다.',
     file: '한살림_AI교육_강의자료.pptx',
-    bytes: 8382792,
+    bytes: 8382662,
     size: '8.4MB',
     format: 'PPTX',
-    sha256: 'edc8143dc5199920b8b045bc7adff3de7c9f666f29e5178f2908e0b634437665',
+    sha256: '39d06121186ba20c3b50864d224d397b8e7723744f6511a751de202d096fce19',
   },
   {
     order: 4,
