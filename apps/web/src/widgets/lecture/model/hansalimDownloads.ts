@@ -1,6 +1,6 @@
 // 이 파일은 scripts/sync-hansalim-downloads.mjs가 강의 저장소의 manifest.json으로 만든다. 직접 고치지 않는다.
 export const HANSALIM_RELEASE = {
-  releaseId: 'e434be337f57ec3f',
+  releaseId: '474c3b59334c8f9f',
   slides: 164,
 } as const;
 
@@ -14,10 +14,10 @@ export const HANSALIM_DOWNLOADS = [
     description:
       '가상 엑셀, 요청문, 실습 규칙과 PPT용 글꼴을 함께 담았습니다. 압축을 풀어 한살림_AI실습 폴더를 여세요.',
     file: '참가자용_실습자료.zip',
-    bytes: 6700251,
+    bytes: 6700255,
     size: '6.7MB',
     format: 'ZIP',
-    sha256: 'fb0e91894f761e45d660895d8f7e9f7e3bab0fbf6050af9c495575a919492062',
+    sha256: '4171e65ace120af26c8b1cfa86293a2e4fd407fb5593360f8dd40af5b9f0b4e2',
   },
   {
     order: 2,
@@ -27,10 +27,10 @@ export const HANSALIM_DOWNLOADS = [
     title: '강의 자료 PDF',
     description: '수강생용 강의 자료입니다. 보기만 하실 때는 PDF를 받으세요.',
     file: '한살림_AI교육_강의자료.pdf',
-    bytes: 9010723,
+    bytes: 9010899,
     size: '9.0MB',
     format: 'PDF',
-    sha256: 'd1bd6c216cc56b72fcfc92efc48a3b5b113b52da3925a746339bead0f870e716',
+    sha256: '00c5b8250793abe1deefcc1e727baa9f338e518a8da8fe4a92f1cbfe421505a1',
   },
   {
     order: 3,
@@ -41,10 +41,10 @@ export const HANSALIM_DOWNLOADS = [
     description:
       'PowerPoint에서 편집할 수 있는 수강생용 자료입니다. 발표자 노트에 강의 설명이 들어 있습니다.',
     file: '한살림_AI교육_강의자료.pptx',
-    bytes: 8382270,
+    bytes: 8381457,
     size: '8.4MB',
     format: 'PPTX',
-    sha256: '2dadd6d950a61f05b0761f62e679eee39c5dff97f82ada1db7d45809b42974b3',
+    sha256: 'e4e7460b6d21a8f6d5e4ea7422673ab8b7cc81e415b955f5b2d761c4a7c8474e',
   },
   {
     order: 4,
