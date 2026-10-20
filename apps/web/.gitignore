@@ -11,3 +11,7 @@
 /scripts/*
 !/scripts/prepare-pdf-assets.cjs
 !/scripts/sync-hansalim-downloads.mjs
+!/scripts/sync-hansalim-presenter.mjs
+
+# 강사 발표 화면(/hansalim/presenter)의 대본·강사용 PDF. 공개 저장소에 올리지 않고 배포 파일에만 넣는다.
+/private/

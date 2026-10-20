@@ -19,10 +19,8 @@ const DOCUMENTS_CSP = [
   "frame-ancestors 'none'",
 ].join('; ');
 
-const SITEMAP_CACHE_CONTROL =
-  'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
-const ROBOTS_CACHE_CONTROL =
-  'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800';
+const SITEMAP_CACHE_CONTROL = 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
+const ROBOTS_CACHE_CONTROL = 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800';
 
 // 한살림 강의 자료는 주소를 직접 열거나 download 속성을 무시하는 메신저 안 브라우저에서도 한글 파일 이름으로 저장되게 한다.
 // 목록은 scripts/sync-hansalim-downloads.mjs가 manifest대로 맞춘 폴더에서 빌드할 때 읽는다.
@@ -59,6 +57,11 @@ const nextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
   reactStrictMode: true,
   poweredByHeader: false,
+  // 강사 발표 화면은 Git 밖(private/)의 대본·강사용 PDF를 실행 중에 읽는다. standalone 빌드에도 함께 넣는다.
+  outputFileTracingIncludes: {
+    '/hansalim/presenter': ['./private/hansalim-presenter/**'],
+    '/hansalim/presenter/deck': ['./private/hansalim-presenter/**'],
+  },
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
   // canonical·description이 본문 뒤로 스트리밍되면 일부 크롤러와 SEO 감사 도구가 놓친다.
   // 동적 페이지도 메타데이터를 완성한 뒤 최초 head에 포함해 모든 UA에 같은 문서 계약을 제공한다.
@@ -131,23 +134,89 @@ const nextConfig = {
       { source: '/hansalm', destination: '/hansalim', permanent: false },
       { source: '/hansaim', destination: '/hansalim', permanent: false },
       { source: '/%ED%95%9C%EC%82%B4%EB%A6%BC', destination: '/hansalim', permanent: false },
-      { source: '/blog/conference/aws-summit-seoul-2026-ai-agent-고도화-방향', destination: '/blog/conference/aws-summit-seoul-2026-ai-agent-key-principles', permanent: true },
-      { source: '/blog/dev-story/이상1', destination: '/blog/dev-story/reflection-1', permanent: true },
-      { source: '/blog/conference/EBAABDEAB3A0-db-ECBBA8ED8DBCEB9FB0EC8AA4', destination: '/blog/conference/mongodb-conference', permanent: true },
-      { source: '/blog/dev-story/EC82ACEB9190EC9AA9EBAFB8', destination: '/blog/dev-story/sadu-yongmi', permanent: true },
-      { source: '/blog/dev-story/EAB5BFEAB5BFEBB094EC9DB4', destination: '/blog/dev-story/good-goodbye', permanent: true },
+      {
+        source: '/blog/conference/aws-summit-seoul-2026-ai-agent-고도화-방향',
+        destination: '/blog/conference/aws-summit-seoul-2026-ai-agent-key-principles',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/이상1',
+        destination: '/blog/dev-story/reflection-1',
+        permanent: true,
+      },
+      {
+        source: '/blog/conference/EBAABDEAB3A0-db-ECBBA8ED8DBCEB9FB0EC8AA4',
+        destination: '/blog/conference/mongodb-conference',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/EC82ACEB9190EC9AA9EBAFB8',
+        destination: '/blog/dev-story/sadu-yongmi',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/EAB5BFEAB5BFEBB094EC9DB4',
+        destination: '/blog/dev-story/good-goodbye',
+        permanent: true,
+      },
       { source: '/blog/dev-story/ED8B80', destination: '/blog/dev-story/frame', permanent: true },
-      { source: '/blog/dev-story/EC889CED9A8C', destination: '/blog/dev-story/rounds', permanent: true },
-      { source: '/blog/dev-story/EAB3B5EBB0A9', destination: '/blog/dev-story/workshop', permanent: true },
-      { source: '/blog/dev-story/EB8BA8EB8BA8ED95B4ECA780EAB8B0', destination: '/blog/dev-story/getting-stronger', permanent: true },
-      { source: '/blog/dev-story/EB8298EC82AC-ECA1B0EC9DB4EAB8B0', destination: '/blog/dev-story/tightening-screws', permanent: true },
-      { source: '/blog/dev-story/EAB8B0EBA684ECB9A0', destination: '/blog/dev-story/oiling', permanent: true },
-      { source: '/blog/dev-story/EC9AA9EB9190EC9AA9EBAFB8', destination: '/blog/dev-story/yongdu-yongmi', permanent: true },
-      { source: '/blog/dev-story/EB8DB0EBB88CEC98B5EC8AA4-EBA79BEBB3B4EAB8B0-EC97ACECA095EAB8B0', destination: '/blog/dev-story/devops-getting-started', permanent: true },
-      { source: '/blog/dev-story/EBB091EBB9A0ECA784-strapi-ED858CEC9DB4EBB894EC9790-nestjstypeorm-EABBB4EBA789EAB8B0', destination: '/blog/dev-story/strapi-nestjs-typeorm-migration', permanent: true },
-      { source: '/blog/dev-story/nestjs-EC849CEBB284-EAB09CEBB09CEC9D98-EC849CEBA789-ED959C-EB8BACEC9D98-EC97ACECA095', destination: '/blog/dev-story/nestjs-server-development-journey', permanent: true },
-      { source: '/blog/dev-story/EB8298EC9D98-ECB2AB-nestjs-dx', destination: '/blog/dev-story/my-first-nestjs-dx', permanent: true },
-      { source: '/blog/dev-story/nestjsEC9D98-EC84B8EAB384EBA19C-EB93A4EC96B4EAB080EB8BA4', destination: '/blog/dev-story/entering-the-nestjs-world', permanent: true },
+      {
+        source: '/blog/dev-story/EC889CED9A8C',
+        destination: '/blog/dev-story/rounds',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/EAB3B5EBB0A9',
+        destination: '/blog/dev-story/workshop',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/EB8BA8EB8BA8ED95B4ECA780EAB8B0',
+        destination: '/blog/dev-story/getting-stronger',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/EB8298EC82AC-ECA1B0EC9DB4EAB8B0',
+        destination: '/blog/dev-story/tightening-screws',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/EAB8B0EBA684ECB9A0',
+        destination: '/blog/dev-story/oiling',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/EC9AA9EB9190EC9AA9EBAFB8',
+        destination: '/blog/dev-story/yongdu-yongmi',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/EB8DB0EBB88CEC98B5EC8AA4-EBA79BEBB3B4EAB8B0-EC97ACECA095EAB8B0',
+        destination: '/blog/dev-story/devops-getting-started',
+        permanent: true,
+      },
+      {
+        source:
+          '/blog/dev-story/EBB091EBB9A0ECA784-strapi-ED858CEC9DB4EBB894EC9790-nestjstypeorm-EABBB4EBA789EAB8B0',
+        destination: '/blog/dev-story/strapi-nestjs-typeorm-migration',
+        permanent: true,
+      },
+      {
+        source:
+          '/blog/dev-story/nestjs-EC849CEBB284-EAB09CEBB09CEC9D98-EC849CEBA789-ED959C-EB8BACEC9D98-EC97ACECA095',
+        destination: '/blog/dev-story/nestjs-server-development-journey',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/EB8298EC9D98-ECB2AB-nestjs-dx',
+        destination: '/blog/dev-story/my-first-nestjs-dx',
+        permanent: true,
+      },
+      {
+        source: '/blog/dev-story/nestjsEC9D98-EC84B8EAB384EBA19C-EB93A4EC96B4EAB080EB8BA4',
+        destination: '/blog/dev-story/entering-the-nestjs-world',
+        permanent: true,
+      },
     ];
   },
 };

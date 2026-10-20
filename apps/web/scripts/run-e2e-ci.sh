@@ -17,6 +17,8 @@ export NEXT_TELEMETRY_DISABLED=1
 export API_INTERNAL_URL=http://127.0.0.1:4100/api
 export NEXT_PUBLIC_API_URL='' NEXT_PUBLIC_WS_URL='' NEXT_PUBLIC_GA_ID='' NEXT_PUBLIC_ADSENSE_ID=''
 export PLAYWRIGHT_BASE_URL=http://127.0.0.1:3101
+# 강사 발표 화면은 실제 대본(private/) 대신 시험용 가짜 대본을 읽는다.
+export HANSALIM_PRESENTER_DIR="$APP_DIR/e2e/fixtures/hansalim-presenter"
 
 skip_build=0
 if [ "${1:-}" = "--skip-build" ]; then

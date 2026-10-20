@@ -187,6 +187,9 @@ function getResponseData(requestUrl) {
   return null;
 }
 
+// e2e/support/auth.ts의 createVerifiedAdminAccessToken과 같은 값
+const CI_VERIFIED_ADMIN_SIGNATURE = 'ci-verified-admin';
+
 const server = createServer((request, response) => {
   const requestUrl = new URL(request.url || '/', `http://127.0.0.1:${port}`);
   setCorsHeaders(request, response);
@@ -224,6 +227,20 @@ const server = createServer((request, response) => {
       response.writeHead(200);
       response.end(JSON.stringify({ success: true, data: emptyProfileFeedPage }));
     }, PROFILE_FEED_SLOW_DELAY_MS);
+    return;
+  }
+
+  // 서버 화면이 쿠키 토큰으로 관리자인지 묻는 요청. 서명 자리가 이 값인 시험용 토큰만 관리자로 답한다.
+  if (requestUrl.pathname === '/api/auth/me') {
+    const token = /(?:^|;\s*)auth-token=([^;]+)/.exec(request.headers.cookie ?? '')?.[1] ?? '';
+    response.setHeader('Content-Type', 'application/json; charset=utf-8');
+    if (!token.endsWith(`.${CI_VERIFIED_ADMIN_SIGNATURE}`)) {
+      response.writeHead(401);
+      response.end(JSON.stringify({ success: false }));
+      return;
+    }
+    response.writeHead(200);
+    response.end(JSON.stringify({ success: true, data: { id: 'admin-1', role: 'ADMIN' } }));
     return;
   }
 

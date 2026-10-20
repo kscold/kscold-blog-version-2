@@ -1,0 +1,52 @@
+{
+  "deckSha256": "37a497b3ce62b7d1d45c01509cdffef8027dfea1068ed2ba0d1c006921c6eb8e",
+  "deckBytes": 1855,
+  "syncedAt": "2026-10-20T00:00:00.000Z",
+  "slides": [
+    {
+      "number": 1,
+      "title": "시험용 첫 장",
+      "sub": "",
+      "time": "10:00–10:01",
+      "minutes": 1,
+      "part": "PART 1 · 시험",
+      "session": "am",
+      "script": "첫 장 대본입니다. 두 번째 문장입니다.",
+      "activity": "손을 들어 봅니다.",
+      "answer": "예상 답 하나",
+      "success": "",
+      "prompt": "",
+      "instructorOnly": false
+    },
+    {
+      "number": 2,
+      "title": "시험용 둘째 장",
+      "sub": "",
+      "time": "10:01–10:03",
+      "minutes": 2,
+      "part": "PART 1 · 시험",
+      "session": "am",
+      "script": "둘째 장 대본입니다. 이어서 설명합니다.",
+      "activity": "",
+      "answer": "",
+      "success": "확인 기준 하나",
+      "prompt": "요청문 예시를 보냅니다.",
+      "instructorOnly": true
+    },
+    {
+      "number": 3,
+      "title": "시험용 마지막 장",
+      "sub": "",
+      "time": "참고",
+      "minutes": 0,
+      "part": "PART 2 · 시험",
+      "session": "appendix",
+      "script": "마지막 장 대본입니다.",
+      "activity": "",
+      "answer": "",
+      "success": "",
+      "prompt": "",
+      "instructorOnly": false
+    }
+  ]
+}

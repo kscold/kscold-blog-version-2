@@ -35,6 +35,8 @@ jobs:
       NEXT_TELEMETRY_DISABLED: '1'
       API_INTERNAL_URL: http://127.0.0.1:4100/api
       NEXT_PUBLIC_API_URL: ''
+      # 강사 발표 화면은 실제 대본 대신 시험용 가짜 대본을 읽는다(apps/web 기준 경로).
+      HANSALIM_PRESENTER_DIR: e2e/fixtures/hansalim-presenter
     steps:
       - name: 소스 체크아웃
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6

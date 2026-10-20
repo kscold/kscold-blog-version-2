@@ -24,6 +24,11 @@ export function createAdminAccessToken(): string {
   return `${header}.${payload}.signature`;
 }
 
+/** E2E API 스텁(build-api-stub.mjs)이 서버 쪽 /auth/me에서 관리자로 인정하는 토큰. 서명 자리만 정해진 값이다. */
+export function createVerifiedAdminAccessToken(): string {
+  return createAdminAccessToken().replace(/\.signature$/, '.ci-verified-admin');
+}
+
 async function mockCurrentUser(page: Page, user: SessionUser) {
   await page.route('**/api/auth/me', async route => {
     if (route.request().method() !== 'GET') {
