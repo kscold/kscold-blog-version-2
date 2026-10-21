@@ -14,12 +14,13 @@ overrides:
   caniuse-lite: 1.0.30001810
   dompurify: 3.4.14
   flatted: 3.4.4
+  follow-redirects: 1.16.1
   joi: 18.2.8
   js-yaml@3: 3.15.2
   js-yaml@4: 4.3.2
   linkify-it: 5.0.2
   lodash-es: 4.18.1
-  markdown-it: 14.2.0
+  markdown-it: 14.3.3
   minimatch@3: 3.1.5
   nanoid@3: 3.3.18
   picomatch@2: 2.3.2
@@ -2858,7 +2859,7 @@ packages:
   /axios@1.20.0(debug@4.4.3):
     resolution: {integrity: sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==}
     dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3)
+      follow-redirects: 1.16.1(debug@4.4.3)
       form-data: 4.0.6
       https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
@@ -4292,8 +4293,8 @@ packages:
       preact: 10.28.4
     dev: false
 
-  /follow-redirects@1.16.0(debug@4.4.3):
-    resolution: {integrity: sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==}
+  /follow-redirects@1.16.1(debug@4.4.3):
+    resolution: {integrity: sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -5269,8 +5270,8 @@ packages:
     resolution: {integrity: sha512-TxFAc76Jnhb2OUu+n3yz9RMu4CwGfaT788br6HhEDlvWfdeJcLUsxk1Hgw2yJio0OXsxv7pyIPmvECY7bMbluA==}
     dev: false
 
-  /markdown-it@14.2.0:
-    resolution: {integrity: sha512-1TGiQiJVRQ3NPmZH6sx5Cfnmg6GQm9jvC1ch4TK511NjSJvjzKLzn5pPfZRNZkRPZP0HqCioSndqH8v2nRaWVQ==}
+  /markdown-it@14.3.3:
+    resolution: {integrity: sha512-L//tDAkjTjJCU6pBUSBTgs3Kg4InVaZuUZog/b6V12UKhcDQ7S78877ibbCanRExwPuYP1CZD7Gd2dxSy1GXRg==}
     hasBin: true
     dependencies:
       argparse: 2.0.1
@@ -6474,7 +6475,7 @@ packages:
     resolution: {integrity: sha512-D98dm4cQ3Hs6EmjK500TdAOew4Z03EV71ajEFiWra3Upr7diytJsjF4mPV2dW+eK5uNectiRj0xFxYI9NLXDbw==}
     dependencies:
       '@types/markdown-it': 14.1.2
-      markdown-it: 14.2.0
+      markdown-it: 14.3.3
       prosemirror-model: 1.25.4
     dev: false
 
@@ -7455,7 +7456,7 @@ packages:
     dependencies:
       '@tiptap/core': 3.31.2(@tiptap/pm@3.31.2)
       '@types/markdown-it': 13.0.9
-      markdown-it: 14.2.0
+      markdown-it: 14.3.3
       markdown-it-task-lists: 2.1.1
       prosemirror-markdown: 1.13.4
     dev: false
