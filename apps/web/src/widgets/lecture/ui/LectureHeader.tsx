@@ -63,6 +63,10 @@ export function LectureHeader() {
       >
         웹에서 강의 보기 <span aria-hidden>→</span>
       </Link>
+      <Link href="/hansalim/survey" className="mt-4 flex min-h-14 items-center justify-between gap-4 rounded-2xl border border-primary-200 bg-primary-50 px-5 py-4 text-primary-800 transition-colors hover:bg-primary-100 print:hidden">
+        <span><span className="block text-base font-bold">강의 만족도 조사</span><span className="mt-1 block text-sm font-normal">약 2분 · 로그인 없이 의견을 남겨주세요</span></span>
+        <span aria-hidden>→</span>
+      </Link>
     </header>
   );
 }

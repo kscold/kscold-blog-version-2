@@ -91,6 +91,12 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         href: '/admin/admin-night',
         description: '참가 신청을 확인하고 일정을 확정합니다',
       },
+      {
+        key: 'lecture-feedback',
+        label: '강의 설문',
+        href: '/admin/lecture-feedback',
+        description: '한살림 교육 만족도와 참가자 의견을 확인합니다',
+      },
     ],
   },
   {
