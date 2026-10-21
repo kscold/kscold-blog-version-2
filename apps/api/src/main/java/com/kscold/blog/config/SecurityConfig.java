@@ -96,6 +96,9 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.HEAD, PUBLIC_READ_PATHS)
                                         .permitAll()
                                         // 피드 쓰기 공개 엔드포인트
+                                        .requestMatchers(
+                                                HttpMethod.POST, "/lectures/hansalim/feedback")
+                                        .permitAll()
                                         .requestMatchers(HttpMethod.POST, "/feeds/*/like")
                                         .permitAll()
                                         .requestMatchers(HttpMethod.PUT, "/feeds/*/like")
