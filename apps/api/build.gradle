@@ -17,7 +17,7 @@ ext {
     set('jackson-bom.version', '3.1.7')
     // Jackson 2(JWT·디스코드 라이브러리가 사용): 같은 취약점의 2.x 수정 버전
     set('jackson-2-bom.version', '2.21.7')
-    grpcVersion = '1.84.0'
+    grpcVersion = '1.85.0'
     protobufVersion = '3.25.9'
 }
 
@@ -61,7 +61,7 @@ dependencies {
     implementation 'org.jspecify:jspecify'
 
     // AWS S3 SDK (MinIO S3 호환)
-    implementation 'software.amazon.awssdk:s3:2.54.10'
+    implementation 'software.amazon.awssdk:s3:2.56.0'
 
     // Jsoup (HTML 파싱 / OG 메타데이터 스크래핑)
     implementation 'org.jsoup:jsoup:1.23.2'
@@ -94,7 +94,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-jackson-test'
-    testImplementation 'com.tngtech.archunit:archunit-junit5:1.5.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.5.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
