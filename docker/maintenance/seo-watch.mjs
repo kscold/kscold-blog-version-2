@@ -3,6 +3,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { findAlerts, sendDiscordAlert } from './seo-watch/alerts.mjs';
 import { summarizeCrawlers } from './seo-watch/crawlers.mjs';
 import { findFileProblems, findPageProblems } from './seo-watch/health.mjs';
 import { findIndexNowKey, submitIndexNow } from './seo-watch/indexnow.mjs';
@@ -198,6 +199,36 @@ function readJson(path, fallback) {
   }
 }
 
+/** 마지막 기록 가운데 색인 수가 있는 것. 색인이 줄었는지 비교할 때 쓴다. */
+function readLastIndexedRecord(path) {
+  if (!existsSync(path)) return null;
+  const records = readFileSync(path, 'utf8')
+    .split('\n')
+    .filter(Boolean)
+    .map(line => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter(record => typeof record?.indexed === 'number');
+  return records.at(-1) ?? null;
+}
+
+/** 디스코드 봇 토큰과 채널이 env 파일에 있을 때만 보낸다. 사람이 볼 일이 있을 때만 부른다. */
+async function notify(env, date, alerts) {
+  if (alerts.length === 0 || !env.DISCORD_BOT_TOKEN || !env.DISCORD_ALERT_CHANNEL_ID) return;
+  const outcome = await sendDiscordAlert({
+    token: env.DISCORD_BOT_TOKEN,
+    channelId: env.DISCORD_ALERT_CHANNEL_ID,
+    date,
+    alerts,
+    fetcher: fetch,
+  });
+  if (!outcome.sent) console.error(`디스코드 알림을 보내지 못했습니다 (HTTP ${outcome.status})`);
+}
+
 async function main() {
   const args = process.argv.slice(2);
   if (args.some(arg => arg !== '--apply')) {
@@ -223,7 +254,9 @@ async function main() {
   });
 
   const report = renderReport(result);
+  const historyPath = join(STATE_DIRECTORY, 'history.jsonl');
   if (apply) {
+    await notify(env, result.date, findAlerts(result, readLastIndexedRecord(historyPath)));
     const reportDirectory = env.SEO_WATCH_REPORT_DIR || join(STATE_DIRECTORY, 'reports');
     mkdirSync(reportDirectory, { recursive: true });
     mkdirSync(STATE_DIRECTORY, { recursive: true, mode: 0o700 });
@@ -236,10 +269,7 @@ async function main() {
         1
       )
     );
-    appendFileSync(
-      join(STATE_DIRECTORY, 'history.jsonl'),
-      `${JSON.stringify(toHistoryRecord(result))}\n`
-    );
+    appendFileSync(historyPath, `${JSON.stringify(toHistoryRecord(result))}\n`);
     publishCoverage(result.searchConsole, env.DOCKER_BIN);
   }
   console.log(report);
@@ -247,8 +277,16 @@ async function main() {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  main().catch(error => {
-    console.error(`검색 노출 점검 실패 (${error.name}: ${error.message})`);
+  main().catch(async error => {
+    const message = `검색 노출 점검 실패 (${error.name}: ${error.message})`;
+    console.error(message);
     process.exitCode = 1;
+    if (process.argv.includes('--apply')) {
+      const env = {
+        ...readEnvFile(join(homedir(), '.config/kscold-seo-watch/env')),
+        ...process.env,
+      };
+      await notify(env, new Date().toISOString().slice(0, 10), [message]);
+    }
   });
 }

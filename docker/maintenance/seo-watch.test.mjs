@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createVerify, generateKeyPairSync } from 'node:crypto';
 import { test } from 'node:test';
 import { runWatch } from './seo-watch.mjs';
+import { findAlerts, sendDiscordAlert } from './seo-watch/alerts.mjs';
 import { summarizeCrawlers } from './seo-watch/crawlers.mjs';
 import { findFileProblems, findPageProblems } from './seo-watch/health.mjs';
 import { submitIndexNow } from './seo-watch/indexnow.mjs';
@@ -377,4 +378,72 @@ test('미리보기는 서치 콘솔을 읽기만 하고, 서비스 계정이 없
   assert.equal(preview.searchConsole.sitemap.action, '다시 제출 필요');
   assert.equal(skipped.searchConsole, null);
   assert.match(renderReport(skipped), /서비스 계정이 없어 건너뜀/);
+});
+
+const quietResult = overrides => ({
+  health: [{ target: '/', problems: [] }],
+  indexNow: { dryRun: false, urls: [], accepted: false, responses: [] },
+  searchConsole: {
+    coverage: { indexed: 10 },
+    sitemap: { lastDownloaded: '2026-10-05T00:00:00Z' },
+  },
+  ...overrides,
+});
+
+test('아무 이상이 없으면 알릴 것이 없다', () => {
+  assert.deepEqual(findAlerts(quietResult(), { indexed: 10 }, NOW), []);
+  assert.deepEqual(findAlerts(quietResult({ searchConsole: null }), null, NOW), []);
+});
+
+test('상태 문제, 거절된 색인 요청, 줄어든 색인, 오래 안 읽힌 사이트맵을 알린다', () => {
+  const alerts = findAlerts(
+    quietResult({
+      health: [{ target: '/blog', problems: ['canonical 없음'] }],
+      indexNow: {
+        dryRun: false,
+        urls: ['a'],
+        accepted: false,
+        responses: [{ endpoint: 'api.indexnow.org', outcome: 'HTTP 403' }],
+      },
+      searchConsole: {
+        coverage: { indexed: 7 },
+        sitemap: { lastDownloaded: '2026-09-01T00:00:00Z' },
+      },
+    }),
+    { indexed: 10 },
+    NOW
+  );
+
+  assert.equal(alerts.length, 4);
+  assert.match(alerts[0], /\/blog: canonical 없음/);
+  assert.match(alerts[1], /api\.indexnow\.org HTTP 403/);
+  assert.match(alerts[2], /10 → 7개/);
+  assert.match(alerts[3], /14일 넘게/);
+});
+
+test('서치 콘솔 조회가 실패하면 그 사유를 알린다', () => {
+  const alerts = findAlerts(quietResult({ searchConsole: { error: '토큰 발급 실패' } }), null, NOW);
+  assert.deepEqual(alerts, ['서치 콘솔 조회 실패: 토큰 발급 실패']);
+});
+
+test('디스코드에는 봇 토큰으로 멘션 없이 보낸다', async () => {
+  let sent;
+  const fetcher = async (url, options) => {
+    sent = { url, options, body: JSON.parse(options.body) };
+    return { ok: true, status: 200 };
+  };
+
+  const outcome = await sendDiscordAlert({
+    token: 'bot-token',
+    channelId: '123',
+    date: '2026-10-26',
+    alerts: ['@everyone 색인된 페이지가 줄었음'],
+    fetcher,
+  });
+
+  assert.deepEqual(outcome, { sent: true, status: 200 });
+  assert.equal(sent.url, 'https://discord.com/api/v10/channels/123/messages');
+  assert.equal(sent.options.headers.Authorization, 'Bot bot-token');
+  assert.deepEqual(sent.body.allowed_mentions, { parse: [] });
+  assert.match(sent.body.content, /확인할 것 1개/);
 });
