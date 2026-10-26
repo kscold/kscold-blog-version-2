@@ -118,11 +118,11 @@ export function CustomCursor() {
         WebkitTransform: 'translateZ(0)',
         outline: '1px solid transparent',
       }}
+      // 반투명 흰색은 밝은 배경에서 옅은 회색으로 섞여 잘 안 보였다.
+      // 평소에도 불투명 흰색으로 두어 difference 혼합으로 밝은 화면에선 검은 점, 어두운 화면에선 흰 점이 되게 한다.
       animate={{
-        scale: isHovering ? 1 : 0.4,
-        backgroundColor: isHovering
-            ? 'rgba(255, 255, 255, 1)'
-            : 'rgba(255, 255, 255, 0.4)',
+        scale: isHovering ? 1 : 0.3,
+        backgroundColor: 'rgba(255, 255, 255, 1)',
       }}
       transition={{
         scale: { type: 'spring', stiffness: 300, damping: 20 },
