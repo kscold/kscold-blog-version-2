@@ -23,6 +23,29 @@ test.describe('Vault 예전 주소 이동', () => {
     expect(findCurrentVaultSlug('---', titleIndex)).toBeUndefined();
   });
 
+  test('한글 단어 앞 4바이트를 16진수로 적은 더 예전 주소도 찾는다', () => {
+    const hexIndex = [
+      { name: '직렬화(serialization)', slug: '직렬화serialization' },
+      { name: '역직렬화 (deserialization)', slug: '역직렬화-deserialization' },
+      { name: '정적 메서드(static method)', slug: '정적-메서드static-method' },
+      { name: '소스코드의 평가 과정', slug: '소스코드의-평가-과정' },
+      { name: '데이터 바인딩', slug: '데이터-바인딩' },
+    ];
+
+    expect(findCurrentVaultSlug('eca781eb-serialization', hexIndex)).toBe('직렬화serialization');
+    // 겹친 주소에 붙었던 -2는 떼고 찾는다.
+    expect(findCurrentVaultSlug('eca095ec-eba994ec-static-method-2', hexIndex)).toBe(
+      '정적-메서드static-method'
+    );
+    expect(findCurrentVaultSlug('ec868cec-ed8f89ea-eab3bcec', hexIndex)).toBe(
+      '소스코드의-평가-과정'
+    );
+    // 한글 단어 수가 다르거나 첫 글자가 다르면 찾지 않는다.
+    expect(findCurrentVaultSlug('eb8db0ec', hexIndex)).toBeUndefined();
+    expect(findCurrentVaultSlug('ebaaa8eb-serialization', hexIndex)).toBeUndefined();
+    expect(findCurrentVaultSlug('deadbeef-serialization', hexIndex)).toBeUndefined();
+  });
+
   test('이미 현재 주소면 다시 보내지 않는다', () => {
     expect(findCurrentVaultSlug('typeormdelete', titleIndex)).toBeUndefined();
   });

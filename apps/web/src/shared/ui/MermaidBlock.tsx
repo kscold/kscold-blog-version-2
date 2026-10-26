@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState, type RefObject } from 'react';
 import { useMermaidInteraction, type MermaidRenderState } from '@/shared/ui/useMermaidInteraction';
 import { ensureMermaidFonts, loadMermaid, processMermaidSvg } from '@/shared/lib/mermaid';
 import { MermaidToolbar } from '@/shared/ui/mermaid/MermaidToolbar';
@@ -16,6 +16,8 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
   const diagramId = `mermaid-${blockId}`;
   const [svg, setSvg] = useState('');
   const [renderState, setRenderState] = useState<MermaidRenderState>('loading');
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const nearViewport = useNearViewport(wrapperRef);
 
   const {
     containerRef,
@@ -31,6 +33,8 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
   } = useMermaidInteraction(renderState);
 
   useEffect(() => {
+    // 다이어그램 배치 계산은 수백 ms 동안 화면을 붙잡는다. 첫 화면이 그려진 뒤, 다이어그램이 화면 가까이 왔을 때만 그린다.
+    if (!nearViewport) return;
     let active = true;
 
     const renderDiagram = async () => {
@@ -64,10 +68,13 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
     return () => {
       active = false;
     };
-  }, [chart, diagramId, theme]);
+  }, [chart, diagramId, theme, nearViewport]);
 
   return (
-    <div className="not-prose relative my-6 overflow-hidden rounded-2xl border shadow-sm">
+    <div
+      ref={wrapperRef}
+      className="not-prose relative my-6 overflow-hidden rounded-2xl border shadow-sm"
+    >
       {/* Header */}
       <MermaidToolbar
         theme={theme}
@@ -94,4 +101,31 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
       />
     </div>
   );
+}
+
+/** 요소가 화면 아래 한 화면 거리 안으로 들어오면 true. 한 번 true가 되면 그대로 둔다. */
+function useNearViewport(ref: RefObject<HTMLElement | null>) {
+  const [near, setNear] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || near) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setNear(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          setNear(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '100% 0px' }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref, near]);
+
+  return near;
 }
