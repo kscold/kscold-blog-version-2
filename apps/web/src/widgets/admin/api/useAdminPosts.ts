@@ -15,7 +15,7 @@ export function useAdminPosts() {
   const totalPages = postsData?.totalPages || 0;
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`"${title}" 포스트를 삭제하시겠습니까?`)) return;
+    if (!confirm(`"${title}" 글을 삭제하시겠습니까? 보관 처리되어 일반 방문자에게 보이지 않게 됩니다.`)) return;
     try {
       await deletePost.mutateAsync(id);
       alert.success('포스트가 삭제되었습니다.');

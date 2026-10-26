@@ -49,7 +49,7 @@ function RestrictedPostBadge({ compact = false }: { compact?: boolean }) {
       aria-label="제한 글"
     >
       <LockIcon className="h-3 w-3" />
-      비공개
+      승인 필요
     </span>
   );
 }

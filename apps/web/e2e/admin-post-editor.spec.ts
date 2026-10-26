@@ -42,14 +42,14 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
 
       await page.locator('[data-testid="post-editor-title"]').fill('노션형 작성기 테스트');
       await expect(page.locator('[data-testid="post-editor-category"]')).toBeVisible();
-      await expect(page.locator('[data-testid="post-editor-public-override"]')).toBeVisible();
+      await expect(page.getByTestId('post-publication-public')).toBeVisible();
       await expect(page.locator('[data-testid="post-editor-submit"]')).toBeAttached();
 
       await expectNoHorizontalOverflow(page, viewport.width);
     });
   }
 
-  test('제한 카테고리에서도 완전 공개 토글로 요청 없이 바로 공개할 수 있다', async ({ page }) => {
+  test('제한 카테고리에서도 저장 후 상태를 누구나로 선택할 수 있다', async ({ page }) => {
     await mockEditorApis(page);
     await seedAdminSession(page);
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -57,11 +57,10 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
 
     await expect(page.locator('[data-testid="post-editor-surface"]')).toHaveCount(1);
     await page.locator('[data-testid="post-editor-category"]').selectOption('cat-1');
-    await expect(page.getByText('현재 제한 카테고리라서 기본적으로 열람 요청이 필요합니다.')).toBeVisible();
-    await page.locator('[data-testid="post-editor-public-override"]').check({ force: true });
-    await expect(
-      page.getByText('현재 제한 카테고리지만, 이 글은 완전 공개로 우선 적용됩니다.')
-    ).toBeVisible();
+    await expect(page.getByTestId('post-planned-state')).toHaveText('초안');
+    await page.getByTestId('post-publication-public').check();
+    await expect(page.getByTestId('post-planned-state')).toHaveText('발행 · 누구나');
+    await expect(page.getByTestId('post-current-state')).toHaveText('아직 서버에 저장하지 않음');
   });
 
   test('작성기는 코드 블록 언어를 지정하면 미리보기에서 올바르게 인식한다', async ({ page }) => {

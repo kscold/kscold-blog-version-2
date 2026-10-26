@@ -26,8 +26,9 @@ export function PostsMobileList({ posts, onDelete }: PostsMobileListProps) {
                 {post.category.name}
               </p>
             </div>
-            <PostStatusBadge status={post.status} />
+            <PostStatusBadge post={post} />
           </div>
+          <p className="mt-2 text-xs text-surface-500 [overflow-wrap:anywhere]">{getPostViewHref(post)}</p>
           <div className="mt-3 flex items-center justify-between gap-2">
             <span className="text-xs text-surface-400">
               조회 {post.views} · {new Date(post.createdAt).toLocaleDateString('ko-KR')}
@@ -36,9 +37,10 @@ export function PostsMobileList({ posts, onDelete }: PostsMobileListProps) {
               <Link
                 href={getPostViewHref(post)}
                 target="_blank"
+                rel="noopener noreferrer"
                 className={`${ACTION} bg-surface-100 text-surface-600 hover:bg-surface-200`}
               >
-                보기
+                {post.status === 'PUBLISHED' ? '글 보기' : '관리자 미리보기'}
               </Link>
               <Link
                 href={`/admin/posts/${post.id}/edit`}

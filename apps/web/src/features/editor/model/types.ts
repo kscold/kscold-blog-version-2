@@ -1,3 +1,5 @@
+import type { Post } from '@/shared/model/types/blog';
+
 export interface PostFormData {
   title: string;
   slug: string;
@@ -12,4 +14,14 @@ export interface PostFormData {
   metaTitle: string;
   metaDescription: string;
   keywords: string;
+}
+
+export interface PostSubmission {
+  form: PostFormData;
+  changeSlug: boolean;
+}
+
+export interface PostSaveResult {
+  post: Post;
+  cacheRefreshed: boolean;
 }

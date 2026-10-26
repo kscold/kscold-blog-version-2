@@ -1,129 +1,60 @@
 'use client';
 
-import { TagSelector } from '@/features/editor/ui/TagSelector';
+import { PUBLICATION, type PublicationChoice } from '@/entities/post';
+import { TagSelector } from '../TagSelector';
 import type { PostEditorSidebarProps } from './postEditorSidebar.types';
 
-interface PostEditorPublishPanelProps
-  extends Pick<PostEditorSidebarProps, 'categories' | 'form' | 'mode' | 'onUpdateForm'> {
-  isHydrated: boolean;
-}
+type Props = Pick<PostEditorSidebarProps, 'categories' | 'category' | 'form' | 'mode' | 'state' |
+  'needsReview' | 'publicationError' | 'onSelect' | 'onCategoryChange' | 'onUpdateForm'>;
 
-export function PostEditorPublishPanel({
-  categories,
-  form,
-  isHydrated,
-  mode,
-  onUpdateForm,
-}: PostEditorPublishPanelProps) {
-  const selectedCategory = categories?.find(category => category.id === form.categoryId);
-  const isRestrictedCategory = Boolean(selectedCategory?.restricted);
-
+export function PostEditorPublishPanel(props: Props) {
+  const { categories, category, form, mode, state, needsReview, publicationError, onSelect, onCategoryChange, onUpdateForm } = props;
+  const choices: PublicationChoice[] = mode === 'edit' ? ['draft', 'public', 'restricted', 'archived'] : ['draft', 'public', 'restricted'];
   return (
-    <div className="rounded-[28px] border border-surface-200 bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-surface-400">
-        Publish
-      </p>
-      <h3 className="mt-3 text-xl font-black tracking-tight text-surface-900">
-        문서 설정
-      </h3>
-      <p className="mt-2 text-sm leading-relaxed text-surface-500">
-        발행 상태와 카테고리, 태그를 먼저 잡아두면 문서 정리가 훨씬 편합니다.
-      </p>
-
+    <section id="post-publish-settings" aria-labelledby="post-publish-title" className="scroll-mt-24 rounded-3xl border border-surface-200 bg-white p-5 shadow-sm">
+      <h2 id="post-publish-title" className="text-xl font-bold text-surface-900">발행 설정</h2>
+      <p className="mt-2 text-sm leading-6 text-surface-500">누가 읽을 수 있는지 확인하고 저장해 주세요.</p>
       <div className="mt-5 space-y-5">
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
-            상태
-          </label>
-          <select
-            value={form.status}
-            onChange={event => onUpdateForm('status', event.target.value as PostEditorSidebarProps['form']['status'])}
-            data-testid="post-editor-status"
-            className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
-          >
-            <option value="DRAFT">초안</option>
-            <option value="PUBLISHED">발행</option>
-            {mode === 'edit' && <option value="ARCHIVED">보관</option>}
-          </select>
-        </div>
-
-        <label className="flex items-center justify-between gap-4 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-4">
-          <div>
-            <p className="text-sm font-semibold text-surface-900">추천 포스트</p>
-            <p className="mt-1 text-sm text-surface-500">
-              메인 추천 영역에 노출할 수 있습니다.
-            </p>
-          </div>
-          <input
-            type="checkbox"
-            checked={form.featured}
-            onChange={event => onUpdateForm('featured', event.target.checked)}
-            className="h-4 w-4 rounded border-surface-300 text-surface-900 focus:ring-surface-900"
-          />
-        </label>
-
-        <label className="flex items-center justify-between gap-4 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-4">
-          <div>
-            <p className="text-sm font-semibold text-surface-900">완전 공개</p>
-            <p className="mt-1 text-sm text-surface-500">
-              제한 카테고리 안에 있어도 이 글만은 열람 요청 없이 바로 공개합니다.
-            </p>
-          </div>
-          <input
-            type="checkbox"
-            checked={form.publicOverride}
-            onChange={event => onUpdateForm('publicOverride', event.target.checked)}
-            data-testid="post-editor-public-override"
-            className="h-4 w-4 rounded border-surface-300 text-surface-900 focus:ring-surface-900"
-          />
-        </label>
-
-        <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
-            카테고리
-          </label>
-          <select
-            value={form.categoryId}
-            onChange={event => onUpdateForm('categoryId', event.target.value)}
-            data-testid="post-editor-category"
-            className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
-            required
-          >
+          <label htmlFor="post-category" className="mb-2 block text-sm font-semibold text-surface-700">카테고리</label>
+          <select id="post-category" value={form.categoryId} onChange={event => onCategoryChange(event.target.value)}
+            data-testid="post-editor-category" aria-describedby="publication-error"
+            className="w-full rounded-xl border border-surface-200 bg-surface-50 px-3 py-3 text-sm text-surface-900">
             <option value="">카테고리 선택</option>
-            {isHydrated &&
-              categories?.map(category => (
-                <option key={category.id} value={category.id}>
-                  {'  '.repeat(category.depth)}
-                  {category.icon && `${category.icon} `}
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          {selectedCategory && (
-            <p className="mt-2 text-xs leading-5 text-surface-500">
-              {isRestrictedCategory
-                ? form.publicOverride
-                  ? '현재 제한 카테고리지만, 이 글은 완전 공개로 우선 적용됩니다.'
-                  : '현재 제한 카테고리라서 기본적으로 열람 요청이 필요합니다.'
-                : '현재 공개 카테고리라서 누구나 바로 볼 수 있습니다.'}
-            </p>
-          )}
+            {categories?.map(item => <option key={item.id} value={item.id}>{'　'.repeat(item.depth)}{item.name}{item.restricted ? ' · 승인 필요' : ''}</option>)}
+          </select>
+          <p id="publication-error" role={publicationError && form.categoryId ? 'alert' : undefined} className="mt-2 text-xs leading-5 text-amber-800">{publicationError}</p>
         </div>
-
+        <fieldset className="space-y-2">
+          <legend className="mb-2 text-sm font-semibold text-surface-700">저장 후 상태</legend>
+          {choices.map(choice => {
+            const disabled = (choice === 'restricted' && !category?.restricted) || ((choice === 'public' || choice === 'restricted') && !category);
+            const selected = state === choice && !needsReview;
+            return (
+              <label key={choice} className={'flex items-start gap-3 rounded-2xl border p-3 ' +
+                (disabled ? 'border-surface-100 bg-surface-50 text-surface-400' : selected ? 'border-primary-400 bg-primary-50 text-surface-900' : 'border-surface-200 text-surface-700')}>
+                <input type="radio" name="publication" value={choice} checked={selected} disabled={disabled}
+                  onChange={() => onSelect(choice)} data-testid={'post-publication-' + choice}
+                  className="mt-1 h-4 w-4 shrink-0 accent-surface-900" />
+                <span><span className="block text-sm font-semibold">{PUBLICATION[choice].label}</span>
+                  <span className="mt-1 block text-xs leading-5">{choice === 'restricted' && !category?.restricted
+                    ? '제한 카테고리를 선택해야 사용할 수 있습니다.' : PUBLICATION[choice].description}</span></span>
+              </label>
+            );
+          })}
+        </fieldset>
+        {state === 'public' && category && <p className="text-xs leading-5 text-surface-500">{form.publicOverride
+          ? '이 글은 카테고리 제한과 관계없이 공개하는 개별 설정을 사용합니다.'
+          : '이 글은 현재 카테고리의 공개 설정을 따릅니다.'}</p>}
+        <label className="flex items-center justify-between gap-3 border-t border-surface-200 pt-4">
+          <span><span className="block text-sm font-semibold text-surface-900">추천 포스트</span><span className="mt-1 block text-xs text-surface-500">공개 범위와 별도로 추천 영역에 표시합니다.</span></span>
+          <input type="checkbox" checked={form.featured} onChange={event => onUpdateForm('featured', event.target.checked)} className="h-4 w-4 accent-surface-900" />
+        </label>
         <div>
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
-            태그
-          </label>
-          {isHydrated ? (
-            <TagSelector
-              selectedTagIds={form.tagIds}
-              onChange={tagIds => onUpdateForm('tagIds', tagIds)}
-            />
-          ) : (
-            <div className="h-[42px] rounded-2xl border border-surface-200 bg-surface-50" />
-          )}
+          <p className="mb-2 text-sm font-semibold text-surface-700">주제 태그</p>
+          <TagSelector selectedTagIds={form.tagIds} onChange={tagIds => onUpdateForm('tagIds', tagIds)} />
         </div>
       </div>
-    </div>
+    </section>
   );
 }

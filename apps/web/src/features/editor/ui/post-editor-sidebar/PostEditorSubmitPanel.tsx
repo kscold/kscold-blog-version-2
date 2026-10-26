@@ -1,54 +1,24 @@
 'use client';
 
-interface PostEditorSubmitPanelProps {
+interface Props {
   isSubmitting: boolean;
   lastSavedText: string | null;
-  mode: 'create' | 'edit';
+  submitLabel: string;
   onBack: () => void;
 }
 
-export function PostEditorSubmitPanel({
-  isSubmitting,
-  lastSavedText,
-  mode,
-  onBack,
-}: PostEditorSubmitPanelProps) {
+export function PostEditorSubmitPanel({ isSubmitting, lastSavedText, submitLabel, onBack }: Props) {
   return (
-    <div className="rounded-[28px] border border-surface-200 bg-surface-900 p-5 text-white shadow-[0_20px_50px_rgba(15,23,42,0.14)]">
-      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">
-        Ready
-      </p>
-      <h3 className="mt-3 text-xl font-black tracking-tight">
-        문서 상태를 저장합니다
-      </h3>
-      <p className="mt-2 text-sm leading-relaxed text-white/70">
-        작성 중인 초안은 자동 저장되고, 여기서 발행 상태와 함께 최종 저장할 수 있습니다.
-      </p>
-
-      {lastSavedText && (
-        <p className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/70">
-          {lastSavedText}
-        </p>
-      )}
-
-      <div className="mt-5 space-y-3">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          data-testid="post-editor-submit"
-          className="w-full rounded-full bg-white px-6 py-3 font-semibold text-surface-900 transition-colors hover:bg-surface-100 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isSubmitting ? '저장 중...' : mode === 'create' ? '포스트 저장' : '변경사항 저장'}
-        </button>
-
-        <button
-          type="button"
-          onClick={onBack}
-          className="w-full rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white transition-colors hover:bg-white/10"
-        >
-          목록으로 돌아가기
-        </button>
-      </div>
+    <div className="space-y-4 rounded-3xl border border-surface-200 bg-white p-5 shadow-sm">
+      <h3 className="text-base font-bold text-surface-900">저장</h3>
+      <p className="text-xs leading-5 text-surface-600">작성 내용의 임시 보관은 이 브라우저에만 남습니다. 아래 버튼으로 서버에 저장해 주세요.</p>
+      <p role="status" data-testid="post-autosave-status" className="text-xs leading-5 text-surface-500">{lastSavedText || '아직 브라우저에 임시 보관되지 않았습니다.'}</p>
+      <button id="post-submit-button" type="submit" disabled={isSubmitting} data-testid="post-editor-submit"
+        className="w-full rounded-full bg-surface-900 px-5 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
+        {isSubmitting ? '확인·저장 중…' : submitLabel}
+      </button>
+      <button type="button" onClick={onBack} disabled={isSubmitting}
+        className="w-full rounded-full border border-surface-200 px-5 py-3 text-sm font-semibold text-surface-600">목록으로 돌아가기</button>
     </div>
   );
 }

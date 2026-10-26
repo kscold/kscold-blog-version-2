@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import type { ReactNode } from 'react';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import { ImageUpload } from '@/shared/ui/ImageUpload';
 import type { PostFormData } from '@/features/editor/model/types';
@@ -16,12 +17,11 @@ interface PostEditorHeaderProps {
   restoredFromAutosave: boolean;
   onViewModeChange: (mode: ViewMode) => void;
   onTitleChange: (value: string) => void;
-  onSlugChange: (value: string) => void;
-  onSlugEdited: () => void;
+  address: ReactNode;
   onContentChange: (value: string) => void;
   onExcerptChange: (value: string) => void;
   onCoverImageChange: (value: string) => void;
-  editorKey: string;
+  editorKey: string | number;
 }
 
 export function PostEditorHeader({
@@ -31,8 +31,7 @@ export function PostEditorHeader({
   restoredFromAutosave,
   onViewModeChange,
   onTitleChange,
-  onSlugChange,
-  onSlugEdited,
+  address,
   onContentChange,
   onExcerptChange,
   onCoverImageChange,
@@ -83,7 +82,7 @@ export function PostEditorHeader({
       <div className="space-y-6 px-5 py-6 sm:px-8 sm:py-8">
         {restoredFromAutosave && (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            자동 저장된 문서를 복구했습니다.
+            이 브라우저에 임시 보관한 작성 내용을 복구했습니다. 주소와 발행 설정을 확인해 주세요.
           </div>
         )}
 
@@ -112,6 +111,8 @@ export function PostEditorHeader({
         <div className="rounded-[28px] border border-surface-200 bg-white p-5 sm:p-6">
           <div className="space-y-5">
             <input
+              id="post-title"
+              aria-label="제목"
               type="text"
               value={form.title}
               onChange={e => onTitleChange(e.target.value)}
@@ -121,32 +122,11 @@ export function PostEditorHeader({
               required
             />
 
-            <div className="rounded-2xl border border-surface-200 bg-surface-50 px-4 py-4">
-              <div className="grid gap-3 sm:grid-cols-[84px_minmax(0,1fr)] sm:items-center">
-                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-surface-400">
-                  Slug
-                </span>
-                <input
-                  type="text"
-                  value={form.slug}
-                  onChange={e => {
-                    onSlugChange(e.target.value);
-                    onSlugEdited();
-                  }}
-                  placeholder="url-friendly-slug"
-                  data-testid="post-editor-slug"
-                  className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
-                />
-              </div>
-              <p className="mt-3 text-sm text-surface-500">
-                발행 URL에 사용됩니다. 제목을 바꾸면 자동으로 제안되지만 직접 다듬을 수
-                있습니다.
-              </p>
-            </div>
+            {address}
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div id="post-document" tabIndex={-1} className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-surface-900">본문</p>
@@ -174,7 +154,7 @@ export function PostEditorHeader({
         <div className="rounded-[28px] border border-surface-200 bg-surface-50/70 p-5 sm:p-6">
           <div className="mb-3">
             <p className="text-sm font-semibold text-surface-900">
-              요약 <span className="font-normal text-surface-400">(비워두면 자동 생성)</span>
+              요약 <span className="font-normal text-surface-400">{mode === 'create' ? '(비워두면 본문에서 자동 생성)' : '(비우면 요약 없음)'}</span>
             </p>
             <p className="mt-1 text-sm text-surface-500">
               목록, 피드, 검색 결과에서 먼저 보일 짧은 소개 문구입니다.

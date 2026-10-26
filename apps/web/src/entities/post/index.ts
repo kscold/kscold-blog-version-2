@@ -6,3 +6,6 @@ export * from './ui/PostCard';
 export { useCreatePost, useDeletePost, useUpdatePost } from './api/usePostMutations';
 export { useAdminPost, useAdminPosts, useFeaturedPosts, usePosts, usePostsByCategory, usePostsByTag, useSearchPosts } from './api/usePosts';
 export { PostCard } from './ui/PostCard';
+export { PUBLICATION, getPostPublication, getPostPath, getPostViewPath } from './lib/publication';
+export type { PublicationState, PublicationChoice } from './lib/publication';
+export { checkPostSlugExists } from './api/checkPostSlug';

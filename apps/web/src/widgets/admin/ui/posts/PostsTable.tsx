@@ -66,7 +66,7 @@ export function PostsTable({ posts, totalPages, page, onPageChange, onDelete }: 
                       )}
                     </div>
                     <p className="mt-1 text-xs text-surface-400 [overflow-wrap:anywhere]">
-                      /{post.category.slug}/{post.slug}
+                      {getPostViewHref(post)}
                     </p>
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm text-surface-600">
@@ -74,7 +74,7 @@ export function PostsTable({ posts, totalPages, page, onPageChange, onDelete }: 
                     {post.category.name}
                   </td>
                   <td className="whitespace-nowrap px-5 py-4">
-                    <PostStatusBadge status={post.status} />
+                    <PostStatusBadge post={post} />
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm tabular-nums text-surface-600">
                     {post.views.toLocaleString('ko-KR')}
@@ -87,9 +87,10 @@ export function PostsTable({ posts, totalPages, page, onPageChange, onDelete }: 
                       <Link
                         href={getPostViewHref(post)}
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="rounded-lg px-2.5 py-1.5 text-surface-600 transition-colors hover:bg-surface-100 hover:text-surface-900"
                       >
-                        보기
+                        {post.status === 'PUBLISHED' ? '글 보기' : '관리자 미리보기'}
                       </Link>
                       <Link
                         href={`/admin/posts/${post.id}/edit`}

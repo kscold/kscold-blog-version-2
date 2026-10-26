@@ -1,4 +1,5 @@
 import { createServer } from 'node:http';
+import { handlePublicationRequest } from './post-publication-fixture.mjs';
 import { likeFeed } from './feed-like-fixture.mjs';
 import {
   blogArchiveCategory,
@@ -194,7 +195,7 @@ function getResponseData(requestUrl) {
 // e2e/support/auth.ts의 createVerifiedAdminAccessToken과 같은 값
 const CI_VERIFIED_ADMIN_SIGNATURE = 'ci-verified-admin';
 
-const server = createServer((request, response) => {
+const server = createServer(async (request, response) => {
   const requestUrl = new URL(request.url || '/', `http://127.0.0.1:${port}`);
   setCorsHeaders(request, response);
   if (request.method === 'OPTIONS') {
@@ -248,6 +249,7 @@ const server = createServer((request, response) => {
     return;
   }
 
+  if (await handlePublicationRequest(request, response, requestUrl)) return;
   const data = getResponseData(requestUrl);
 
   response.setHeader('Content-Type', 'application/json; charset=utf-8');

@@ -1,99 +1,73 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { PostFormData } from '@/features/editor/model/types';
+import type { PostFormData } from '../model/types';
+import { readPostAutosave, type PostAutosave } from './postAutosave';
 
-interface UsePostAutosaveOptions {
+interface Options {
   autosaveKey: string;
-  mode: 'create' | 'edit';
   form: PostFormData;
+  postId?: string;
+  updatedAt?: string;
+  dirty: boolean;
+  enabled: boolean;
 }
 
-interface AutosaveResult {
-  lastSaved: Date | null;
-  lastSavedText: string | null;
-  restoredFromAutosave: boolean;
-  tryRestoreAutosave: (
-    onRestore: (form: PostFormData) => void,
-  ) => void;
-  clearAutosave: () => void;
-}
+export function usePostAutosave({ autosaveKey, form, postId, updatedAt, dirty, enabled }: Options) {
+  const [recovery, setRecovery] = useState<PostAutosave | null>(null);
+  const [checkedKey, setCheckedKey] = useState('');
+  const [lastSavedText, setLastSavedText] = useState<string | null>(null);
+  const [restoredFromAutosave, setRestored] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inspectedKey = useRef('');
 
-export function usePostAutosave({
-  autosaveKey,
-  mode,
-  form,
-}: UsePostAutosaveOptions): AutosaveResult {
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [restoredFromAutosave, setRestoredFromAutosave] = useState(false);
-  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // 자동 임시저장
   useEffect(() => {
-    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    if (inspectedKey.current === autosaveKey) return;
+    inspectedKey.current = autosaveKey;
+    try {
+      const raw = localStorage.getItem(autosaveKey);
+      const saved = raw ? readPostAutosave(raw) : null;
+      if (saved && (!saved.postId || saved.postId === postId)) setRecovery(saved);
+      else if (raw) setLastSavedText('이 브라우저의 이전 임시 보관을 읽을 수 없습니다. 서버 원문은 유지됩니다.');
+    } catch {
+      setLastSavedText('이 브라우저에서 임시 보관을 사용할 수 없습니다. 서버에 직접 저장해 주세요.');
+    }
+    setCheckedKey(autosaveKey);
+  }, [autosaveKey, postId]);
 
-    autosaveTimer.current = setTimeout(() => {
+  useEffect(() => {
+    if (timer.current) clearTimeout(timer.current);
+    if (!enabled || !dirty || recovery || checkedKey !== autosaveKey) return;
+    timer.current = setTimeout(() => {
       try {
-        localStorage.setItem(
-          autosaveKey,
-          JSON.stringify({ form, savedAt: new Date().toISOString() }),
-        );
-        setLastSaved(new Date());
+        const savedAt = new Date();
+        localStorage.setItem(autosaveKey, JSON.stringify({
+          version: 2, form, postId, updatedAt, savedAt: savedAt.toISOString(),
+        }));
+        setLastSavedText('이 브라우저에 임시 보관됨 · ' + savedAt.toLocaleTimeString('ko-KR'));
       } catch {
-        // localStorage 접근 실패 시 무시
+        setLastSavedText('브라우저 임시 보관에 실패했습니다. 서버에 직접 저장해 주세요.');
       }
     }, 3000);
-
-    return () => {
-      if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-    };
-  }, [form, autosaveKey]);
-
-  // 임시저장 복구 (create 모드에서만, 마운트 시 1회 호출)
-  const tryRestoreAutosave = useCallback(
-    (onRestore: (savedForm: PostFormData) => void) => {
-      if (mode !== 'create') return;
-      try {
-        const saved = localStorage.getItem(autosaveKey);
-        if (saved) {
-          const { form: savedForm, savedAt } = JSON.parse(saved);
-          if (savedForm.title || savedForm.content) {
-            const date = new Date(savedAt);
-            const confirmed = window.confirm(
-              `${date.toLocaleString()}에 자동 저장된 내용이 있습니다. 복구하시겠습니까?`,
-            );
-            if (confirmed) {
-              onRestore(savedForm);
-              setRestoredFromAutosave(true);
-            } else {
-              localStorage.removeItem(autosaveKey);
-            }
-          }
-        }
-      } catch {
-        // 무시
-      }
-    },
-    [autosaveKey, mode],
-  );
+    return () => { if (timer.current) clearTimeout(timer.current); };
+  }, [autosaveKey, form, postId, updatedAt, enabled, dirty, recovery, checkedKey]);
 
   const clearAutosave = useCallback(() => {
-    localStorage.removeItem(autosaveKey);
+    if (timer.current) clearTimeout(timer.current);
+    try { localStorage.removeItem(autosaveKey); } catch { /* 서버 저장 성공에는 영향을 주지 않는다. */ }
+    setRecovery(null);
+    setLastSavedText(null);
   }, [autosaveKey]);
 
-  const lastSavedText = (() => {
-    if (!lastSaved) return null;
-    const diff = Math.floor((Date.now() - lastSaved.getTime()) / 1000);
-    if (diff < 60) return `${diff}초 전 자동 저장됨`;
-    if (diff < 3600) return `${Math.floor(diff / 60)}분 전 자동 저장됨`;
-    return lastSaved.toLocaleTimeString() + ' 자동 저장됨';
-  })();
+  function restore(onRestore: (saved: PostFormData) => void) {
+    if (!recovery) return;
+    onRestore(recovery.form);
+    setRecovery(null);
+    setRestored(true);
+  }
 
   return {
-    lastSaved,
-    lastSavedText,
-    restoredFromAutosave,
-    tryRestoreAutosave,
-    clearAutosave,
+    recovery, restore, clearAutosave, lastSavedText, restoredFromAutosave,
+    isOlder: Boolean(recovery && postId && (recovery.version !== 2 || recovery.updatedAt !== updatedAt)),
   };
 }

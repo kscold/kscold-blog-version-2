@@ -42,7 +42,7 @@ function RestrictedPostBadge() {
       aria-label="제한 글"
     >
       <LockIcon />
-      비공개
+      승인 필요
     </span>
   );
 }

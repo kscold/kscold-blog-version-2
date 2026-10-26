@@ -9,18 +9,19 @@ interface PostEditEditorProps {
 }
 
 export function PostEditEditor({ postId }: PostEditEditorProps) {
-  const { initialData, isLoading, handleSubmit, isSubmitting } = usePostEdit(postId);
+  const { post, isLoading, error, handleSubmit, isSubmitting } = usePostEdit(postId);
 
   if (isLoading) {
     return <AdminEditorSkeleton />;
   }
 
-  if (!initialData) return null;
+  if (error || !post) return <p role="alert" className="p-6 text-red-700">글을 불러오지 못했습니다. 새로고침 후 다시 확인해 주세요.</p>;
 
   return (
     <PostEditor
       mode="edit"
-      initialData={initialData}
+      key={postId}
+      post={post}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
       autosaveKey={`autosave-post-${postId}`}

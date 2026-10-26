@@ -39,7 +39,7 @@ export function DashboardRecentPosts({ posts }: { posts: Post[] }) {
                     <span>{new Date(post.createdAt).toLocaleDateString('ko-KR')}</span>
                   </span>
                 </span>
-                <PostStatusBadge status={post.status} />
+                <PostStatusBadge post={post} />
               </Link>
             </li>
           ))}
