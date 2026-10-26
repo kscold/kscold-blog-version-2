@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useLayoutEffect, useRef } from 'react';
-import { MarkdownContent } from '@/shared/ui/MarkdownContent';
+import { AgentMarkdown } from '@/shared/ui/AgentMarkdown';
+import { CopyAgentAnswer } from './CopyAgentAnswer';
 import {
   linkAgentSourceCitations,
   sourceHref,
@@ -101,7 +102,7 @@ export function AgentMessageList({
                   </div>
                 )}
                 {message.content ? (
-                  <MarkdownContent content={linkedContent} theme="light" size="sm" />
+                  <AgentMarkdown content={linkedContent} sectionIds={[]} allowedLinks={message.sources?.map(sourceHref)} />
                 ) : (
                   <div className="flex h-8 items-center gap-1.5 px-1" aria-label="답변을 준비하고 있습니다">
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-surface-300 [animation-delay:-0.2s]" />
@@ -123,7 +124,9 @@ export function AgentMessageList({
               </p>
             )}
             {visibleStages.length > 0 && message.role === 'assistant' && (
-              <div className="mt-3 grid gap-1.5">
+              <details className="mt-3 text-xs text-surface-500">
+                <summary className="min-h-9 cursor-pointer py-2 font-medium">답변 과정 {visibleStages.length}단계</summary>
+                <div className="grid gap-1.5">
                 {visibleStages.map(stage => (
                   <div
                     key={`${message.id}-${stage.name}-${stage.detail}`}
@@ -134,7 +137,8 @@ export function AgentMessageList({
                     {stage.detail}
                   </div>
                 ))}
-              </div>
+                </div>
+              </details>
             )}
             {message.sources && message.sources.length > 0 && (
               <div className="mt-3 border-t border-surface-200 pt-3">
@@ -142,7 +146,7 @@ export function AgentMessageList({
                   참고한 기록
                 </p>
                 <div className="grid gap-2">
-                  {message.sources.slice(0, 5).map(source => (
+                  {message.sources.slice(0, 5).map((source, index) => (
                     <Link
                       key={`${source.type}-${source.id}`}
                       href={sourceHref(source)}
@@ -153,7 +157,7 @@ export function AgentMessageList({
                       <span className="flex min-w-0 items-center justify-between gap-2">
                         <span className="min-w-0 truncate [overflow-wrap:anywhere]">
                           <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.14em] text-surface-400">
-                            {source.type || 'vault'}
+                            {index + 1} · {source.type || 'vault'}
                           </span>
                           {source.title || source.slug}
                         </span>
@@ -171,6 +175,8 @@ export function AgentMessageList({
                 </div>
               </div>
             )}
+            {message.role === 'assistant' && message.content && !message.isStreaming &&
+              message.id !== 'initial-agent-greeting' && <CopyAgentAnswer content={message.content} />}
           </div>
         );
       })}

@@ -10,14 +10,19 @@ interface ChatMessageListProps {
 }
 
 export default function ChatMessageList({ messages, currentUsername }: ChatMessageListProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const follow = useRef(true);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = containerRef.current;
+    if (container && follow.current) container.scrollTop = container.scrollHeight;
   }, [messages]);
 
   return (
-    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain bg-surface-50 p-4 custom-scrollbar sm:p-5">
+    <div ref={containerRef} data-testid="owner-message-list" onScroll={() => {
+      const container = containerRef.current;
+      if (container) follow.current = container.scrollHeight - container.scrollTop - container.clientHeight < 96;
+    }} className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain bg-surface-50 p-4 custom-scrollbar sm:p-5">
       <AnimatePresence initial={false}>
         {messages.map((message, index) => (
           <motion.div
@@ -50,7 +55,7 @@ export default function ChatMessageList({ messages, currentUsername }: ChatMessa
                       : 'bg-white text-surface-700 rounded-tl-sm border border-surface-200'
                   }`}
                 >
-                  <p className="text-sm break-words leading-relaxed font-medium">
+                  <p className="whitespace-pre-wrap text-sm break-words leading-relaxed font-medium [overflow-wrap:anywhere]">
                     {message.content}
                   </p>
                 </div>
@@ -65,7 +70,6 @@ export default function ChatMessageList({ messages, currentUsername }: ChatMessa
           </motion.div>
         ))}
       </AnimatePresence>
-      <div ref={messagesEndRef} />
     </div>
   );
 }

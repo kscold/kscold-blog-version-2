@@ -1,116 +1,92 @@
 'use client';
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from 'react';
-import type { RawChatPayload } from '@/entities/chat';
-import { toVisitorMessage } from '@/entities/chat';
+import { useEffect, useRef, useState } from 'react';
 import { fetchMyChatMessages, sendVisitorMessage, type VisitorChatMessage } from '@/entities/chat';
-import { resolveChatWsUrl } from '@/shared/lib/runtime-url';
+import { subscribeVisitorChat, mergeChatMessages } from './visitorChatConnection';
 
-interface UseChatSocketOptions {
-  isOpen: boolean;
-  username: string;
-}
+interface Options { isOpen: boolean; viewerId: string }
 
-export function useChatSocket({ isOpen, username: _username }: UseChatSocketOptions) {
+export function useChatSocket({ isOpen, viewerId }: Options) {
   const [messages, setMessages] = useState<VisitorChatMessage[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const shouldReconnectRef = useRef(false);
+  const [isSending, setIsSending] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [historyError, setHistoryError] = useState('');
+  const [sendError, setSendError] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const generation = useRef(0);
+  const pending = useRef(false);
+  const owner = useRef(viewerId);
 
-  const connect = useCallback(async () => {
-    if (!shouldReconnectRef.current || wsRef.current) return;
-
-    if (!shouldReconnectRef.current || wsRef.current) return;
-
-    const ws = new WebSocket(resolveChatWsUrl());
-    wsRef.current = ws;
-    ws.onopen = () => setIsConnected(true);
-    ws.onmessage = event => handleSocketMessage(event, setMessages);
-    ws.onclose = () => {
+  useEffect(() => {
+    owner.current = viewerId;
+    setMessages([]);
+    setSendError('');
+    setIsSending(false);
+    pending.current = false;
+    const current = ++generation.current;
+    if (!isOpen) return;
+    const active = () => current === generation.current;
+    const disconnect = subscribeVisitorChat({
+      viewerId,
+      onMessages: incoming => {
+        if (active()) setMessages(previous => mergeChatMessages(previous, incoming));
+      },
+      onConnection: connected => { if (active()) setIsConnected(connected); },
+    });
+    return () => {
+      generation.current += 1;
+      disconnect();
       setIsConnected(false);
-      wsRef.current = null;
-      if (shouldReconnectRef.current) {
-        reconnectRef.current = setTimeout(() => void connect(), 3000);
-      }
     };
-    ws.onerror = () => ws.close();
-  }, []);
+  }, [isOpen, viewerId]);
 
   useEffect(() => {
     if (!isOpen) return;
-    let isActive = true;
-    shouldReconnectRef.current = true;
-
-    const initializeChat = async () => {
-      try {
-        const chatMessages = await fetchMyChatMessages();
-        if (isActive) {
-          setMessages(chatMessages);
-        }
-      } catch {
-        if (isActive) {
-          setMessages([]);
-        }
+    let active = true;
+    const current = generation.current;
+    setIsLoading(true);
+    setHistoryError('');
+    void fetchMyChatMessages().then(history => {
+      if (active && current === generation.current) {
+        setMessages(previous => mergeChatMessages(history, previous));
       }
+    }).catch(() => {
+      if (active && current === generation.current) setHistoryError('이전 메시지를 불러오지 못했어요.');
+    }).finally(() => {
+      if (active && current === generation.current) setIsLoading(false);
+    });
+    return () => { active = false; };
+  }, [attempt, isOpen, viewerId]);
 
-      if (isActive) {
-        void connect();
+  const sendMessage = async (content: string): Promise<boolean> => {
+    if (!isOpen || !content.trim() || pending.current || owner.current !== viewerId) return false;
+    const current = generation.current;
+    pending.current = true;
+    setIsSending(true);
+    setSendError('');
+    try {
+      // 서버의 저장 응답을 받은 뒤 입력을 지운다. 실시간 에코와 응답은 ID로 합친다.
+      const saved = await sendVisitorMessage(content.trim());
+      if (current !== generation.current) return false;
+      setMessages(previous => mergeChatMessages(previous, [saved]));
+      return true;
+    } catch {
+      if (current === generation.current) {
+        setSendError('전송 확인을 받지 못했어요. 입력은 보관했어요. 대화에 도착했는지 확인한 뒤 다시 보내 주세요.');
       }
-    };
-
-    void initializeChat();
-
-    return () => {
-      isActive = false;
-      shouldReconnectRef.current = false;
-      if (reconnectRef.current) clearTimeout(reconnectRef.current);
-      if (wsRef.current) {
-        wsRef.current.onclose = null;
-        wsRef.current.close();
-        wsRef.current = null;
+      return false;
+    } finally {
+      if (current === generation.current) {
+        pending.current = false;
+        setIsSending(false);
       }
-      setMessages([]);
-      setIsConnected(false);
-    };
-  }, [connect, isOpen]);
-
-  const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim()) return;
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'message', content: content.trim() }));
-      return;
     }
-    const saved = await sendVisitorMessage(content.trim());
-    setMessages(prev => [...prev, saved]);
-  }, []);
+  };
 
-  return { messages, isConnected, sendMessage };
-}
-
-function handleSocketMessage(
-  event: MessageEvent,
-  setMessages: Dispatch<SetStateAction<VisitorChatMessage[]>>
-) {
-  try {
-    const data = JSON.parse(event.data as string) as RawChatPayload & {
-      messages?: RawChatPayload[];
-    };
-    if (data.type === 'history') {
-      setMessages((data.messages || []).map(toVisitorMessage));
-      return;
-    }
-    if (data.type === 'message' || data.type === 'system') {
-      setMessages(prev => [...prev, toVisitorMessage(data)]);
-    }
-  } catch {
-    // 의도적으로 무시
-  }
+  return {
+    messages: owner.current === viewerId ? messages : [], isConnected, isSending,
+    isLoading, historyError, sendError, sendMessage,
+    retryHistory: () => setAttempt(value => value + 1),
+  };
 }

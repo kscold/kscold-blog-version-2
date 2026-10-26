@@ -1,5 +1,6 @@
 'use client';
 
+import { readAgentStream } from './agentStreamTransport';
 import apiClient from '@/shared/api/api-client';
 import { resolveApiBaseUrl } from '@/shared/lib/runtime-url';
 import type { PageResponse } from '@/shared/model/types/api';
@@ -86,96 +87,13 @@ export function sendVaultAgentMessage(
   );
 }
 
-export async function streamVaultAgentMessage({
-  question,
-  activeFolderName,
-  sessionId,
-  onEvent,
-  signal,
-}: VaultAgentStreamRequest) {
-  const response = await fetch(`${resolveApiBaseUrl()}/vault/agent/chat/stream`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'text/event-stream',
-    },
-    credentials: 'include',
-    body: JSON.stringify({
-      message: question,
-      activeFolderName,
-      sessionId,
-    }),
-    signal,
+export async function streamVaultAgentMessage(request: VaultAgentStreamRequest) {
+  await readAgentStream({
+    url: `${resolveApiBaseUrl()}/vault/agent/chat/stream`,
+    body: { message: request.question, activeFolderName: request.activeFolderName, sessionId: request.sessionId },
+    onEvent: request.onEvent,
+    signal: request.signal,
   });
-
-  if (!response.ok || !response.body) {
-    throw new Error(await readStreamError(response));
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  const consumePacket = (packet: string) => {
-    const lines = packet.split(/\r?\n/);
-    const eventName = lines
-      .find(line => line.startsWith('event:'))
-      ?.slice('event:'.length)
-      .trim();
-    const rawData = lines
-      .filter(line => line.startsWith('data:'))
-      .map(line => line.slice('data:'.length).trimStart())
-      .join('\n');
-
-    if (!eventName || !rawData) {
-      return;
-    }
-
-    const payload = parseStreamPayload(rawData);
-    if (eventName === 'stage' && isStage(payload)) {
-      onEvent({ type: 'stage', stage: payload });
-      return;
-    }
-    if (eventName === 'delta' && isRecord(payload) && typeof payload.delta === 'string') {
-      onEvent({ type: 'delta', delta: payload.delta });
-      return;
-    }
-    if (eventName === 'complete' && isChatResponse(payload)) {
-      onEvent({ type: 'complete', response: payload });
-      return;
-    }
-    if (eventName === 'error' && isRecord(payload)) {
-      onEvent({
-        type: 'error',
-        message: typeof payload.message === 'string' ? payload.message : '응답을 만들지 못했습니다.',
-      });
-    }
-  };
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      buffer += decoder.decode(value, { stream: !done });
-
-      let separatorIndex = buffer.search(/\r?\n\r?\n/);
-      while (separatorIndex >= 0) {
-        const packet = buffer.slice(0, separatorIndex);
-        const separatorLength = buffer[separatorIndex] === '\r' ? 4 : 2;
-        buffer = buffer.slice(separatorIndex + separatorLength);
-        consumePacket(packet);
-        separatorIndex = buffer.search(/\r?\n\r?\n/);
-      }
-
-      if (done) {
-        if (buffer.trim()) {
-          consumePacket(buffer);
-        }
-        return;
-      }
-    }
-  } finally {
-    reader.releaseLock();
-  }
 }
 
 export function fetchVaultAgentContentScope() {
@@ -191,67 +109,5 @@ export function fetchVaultAgentHistory(sessionId: string) {
 export function fetchVaultAgentRuns(page: number = 0, size: number = 10) {
   return apiClient.get<PageResponse<VaultAgentRun>>(
     `/admin/vault/agent/runs?page=${page}&size=${size}`
-  );
-}
-
-function parseStreamPayload(rawData: string): unknown {
-  try {
-    const parsed = JSON.parse(rawData);
-    if (typeof parsed === 'string') {
-      try {
-        return JSON.parse(parsed);
-      } catch {
-        return parsed;
-      }
-    }
-    return parsed;
-  } catch {
-    return rawData;
-  }
-}
-
-async function readStreamError(response: Response) {
-  const fallback = 'Agent 응답 연결을 시작하지 못했습니다.';
-  const rawBody = await response.text().catch(() => '');
-  if (!rawBody.trim()) {
-    return fallback;
-  }
-
-  const payload = parseStreamPayload(rawBody);
-  if (typeof payload === 'string') {
-    const message = payload.trim();
-    return message && !message.startsWith('<') ? message.slice(0, 240) : fallback;
-  }
-  if (!isRecord(payload)) {
-    return fallback;
-  }
-  if (typeof payload.message === 'string' && payload.message.trim()) {
-    return payload.message.trim();
-  }
-  if (isRecord(payload.error) && typeof payload.error.message === 'string') {
-    return payload.error.message.trim() || fallback;
-  }
-  return fallback;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function isStage(value: unknown): value is VaultAgentStage {
-  return (
-    isRecord(value) &&
-    typeof value.name === 'string' &&
-    typeof value.detail === 'string'
-  );
-}
-
-function isChatResponse(value: unknown): value is VaultAgentChatResponse {
-  return (
-    isRecord(value) &&
-    typeof value.answer === 'string' &&
-    Array.isArray(value.stages) &&
-    Array.isArray(value.sources) &&
-    Array.isArray(value.followUps)
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { AGENT_QUESTION_MAX_LENGTH } from '@/features/chat';
+import { ChatTextInput } from './ChatTextInput';
 
 interface AgentComposerProps {
   value: string;
@@ -37,19 +38,17 @@ export function AgentComposer({
         </button>
       )}
       <form onSubmit={onSubmit} className="flex min-w-0 gap-2.5">
-      <input
-        type="text"
-        aria-label="Agent에게 보낼 질문"
+      <ChatTextInput
+        label="Agent에게 보낼 질문"
         value={value}
         maxLength={AGENT_QUESTION_MAX_LENGTH}
-        onChange={e => onChange(e.target.value)}
+        onChange={onChange}
+        canSubmit={!disabled}
         placeholder={
           isLoadingHistory
             ? '이전 대화를 불러오는 중입니다...'
             : '블로그·피드·Vault·Info에 대해 물어보기...'
         }
-        autoComplete="off"
-        className="min-w-0 flex-1 rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm font-medium text-surface-900 placeholder:text-surface-400 transition-all focus:border-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900"
       />
       {isThinking && onStop ? (
         <button

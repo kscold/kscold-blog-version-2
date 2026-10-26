@@ -24,6 +24,17 @@ export function ChatModeTabs({ mode, onChange }: ChatModeTabsProps) {
           type="button"
           role="tab"
           aria-selected={mode === chatMode.id}
+          tabIndex={mode === chatMode.id ? 0 : -1}
+          onKeyDown={event => {
+            const index = chatModes.findIndex(item => item.id === mode);
+            const next = event.key === 'ArrowRight' ? (index + 1) % chatModes.length
+              : event.key === 'ArrowLeft' ? (index + chatModes.length - 1) % chatModes.length
+              : event.key === 'Home' ? 0 : event.key === 'End' ? chatModes.length - 1 : -1;
+            if (next < 0) return;
+            event.preventDefault();
+            onChange(chatModes[next].id);
+            event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('button')[next]?.focus();
+          }}
           onClick={() => onChange(chatMode.id)}
           className={`min-w-0 rounded-xl px-2 py-2 text-[11px] font-black transition sm:px-3 sm:text-xs ${
             mode === chatMode.id

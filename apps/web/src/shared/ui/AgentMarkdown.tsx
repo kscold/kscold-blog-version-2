@@ -6,6 +6,7 @@ import { remarkLooseStrong } from '@/shared/lib/remarkLooseStrong';
 interface AgentMarkdownProps {
   content: string;
   sectionIds: readonly string[];
+  allowedLinks?: readonly string[];
   onSourceClick?: () => void;
 }
 
@@ -19,22 +20,25 @@ function isPageAnchor(href: string | undefined, sectionIds: readonly string[]): 
   return !!href && href.startsWith('#') && sectionIds.includes(href.slice(1));
 }
 
-/** 생성한 답변은 서식만 표시하고 미디어·HTML·페이지 밖 링크는 실행하지 않는다. */
-export function AgentMarkdown({ content, sectionIds, onSourceClick }: AgentMarkdownProps) {
+/** 생성한 답변은 서식과 확인된 출처 링크만 표시하며 미디어·HTML은 실행하지 않는다. */
+export function AgentMarkdown({ content, sectionIds, allowedLinks = [], onSourceClick }: AgentMarkdownProps) {
+  const isAllowed = (href: string | undefined) => isPageAnchor(href, sectionIds) ||
+    (!!href && allowedLinks.includes(href) && /^(https:\/\/|\/(?![\/\\]))/.test(href) &&
+      !/[\u0000-\u001f\u007f\\]/.test(href));
   return (
     <div className="prose prose-sm min-w-0 max-w-none break-words text-surface-700 prose-headings:font-sans prose-headings:font-semibold prose-headings:text-surface-900 prose-h3:mb-2 prose-h3:mt-5 prose-h3:text-base prose-h4:text-sm prose-p:my-2 prose-p:whitespace-normal prose-p:leading-7 prose-strong:text-surface-900 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-blockquote:border-primary-300 prose-blockquote:bg-primary-50 prose-blockquote:py-1 prose-blockquote:pl-4 prose-blockquote:not-italic prose-code:rounded prose-code:bg-surface-100 prose-code:px-1 prose-code:py-0.5 prose-code:font-mono prose-code:text-surface-800 prose-code:before:content-none prose-code:after:content-none prose-pre:rounded-lg prose-pre:border prose-pre:border-surface-200 prose-pre:bg-surface-50 prose-pre:text-surface-800 prose-hr:border-surface-200 [&>:first-child]:mt-0 [&>:last-child]:mb-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0">
       <ReactMarkdown
         remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkLooseStrong]}
         allowedElements={ALLOWED_ELEMENTS}
         skipHtml
-        urlTransform={(url, key) => key === 'href' && isPageAnchor(url, sectionIds) ? url : ''}
+        urlTransform={(url, key) => key === 'href' && isAllowed(url) ? url : ''}
         components={{
           h1: ({ children }) => <h3>{children}</h3>,
           h2: ({ children }) => <h3>{children}</h3>,
           h5: ({ children }) => <h4>{children}</h4>,
           h6: ({ children }) => <h4>{children}</h4>,
-          a: ({ href, children }) => isPageAnchor(href, sectionIds) ? (
-            <a href={href} onClick={onSourceClick} className="text-primary-700 underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600">{children}</a>
+          a: ({ href, children }) => isAllowed(href) ? (
+            <a href={href} onClick={onSourceClick} target={href?.startsWith('https://') ? '_blank' : undefined} rel={href?.startsWith('https://') ? 'noopener noreferrer' : undefined} className="text-primary-700 underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600">{children}</a>
           ) : <span>{children}</span>,
           table: ({ children }) => (
             <div role="region" aria-label="답변 표" tabIndex={0} className="my-3 w-full max-w-full overflow-x-auto rounded-lg border border-surface-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600">

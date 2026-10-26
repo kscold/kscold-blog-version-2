@@ -4,12 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '@/entities/user';
 import {
   AGENT_QUESTION_MAX_LENGTH,
-  AGENT_SESSION_STORAGE_KEY,
   createInitialAgentMessages,
   fetchVaultAgentContentScope,
-  fetchVaultAgentHistory,
   getOrCreateAgentSessionId,
   isValidAgentSessionId,
+  rememberAgentSessionId,
   resetAgentSessionId,
   starterPrompts,
   streamVaultAgentMessage,
@@ -25,22 +24,24 @@ import {
   interruptAgentMessage,
 } from './agentMessageState';
 import { useAgentStreamBuffer } from './useAgentStreamBuffer';
+import { useAgentHistory } from './useAgentHistory';
 
 export function useAgentChat(isOpen: boolean) {
-  const viewerId = useAuthStore(state => state.user?.id ?? null);
+  const viewerId = useAuthStore(state => state.user ? `${state.user.id}:${state.user.role}` : null);
   const historyViewerRef = useRef(viewerId);
   const isViewerCurrent = historyViewerRef.current === viewerId;
   const [agentInput, setAgentInput] = useState('');
   const [agentSessionId, setAgentSessionId] = useState('');
   const [isAgentThinking, setIsAgentThinking] = useState(false);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(true);
-  const [hasLoadedAgentHistory, setHasLoadedAgentHistory] = useState(false);
   const [agentContentScope, setAgentContentScope] = useState<VaultAgentContentScope>();
   const [agentMessages, setAgentMessages] = useState<AgentMessage[]>(() =>
     createInitialAgentMessages()
   );
   const streamAbortControllerRef = useRef<AbortController | undefined>(undefined);
-  const historyVersionRef = useRef(0);
+  const { hasLoaded: hasLoadedAgentHistory, error: agentHistoryError, resetHistory, retryHistory } = useAgentHistory({
+    isOpen, viewerId, setMessages: setAgentMessages, setSessionId: setAgentSessionId,
+  });
   const lastQuestionRef = useRef('');
   const { flushPendingDelta, queueDelta, resetBuffer } = useAgentStreamBuffer(setAgentMessages);
 
@@ -49,27 +50,26 @@ export function useAgentChat(isOpen: boolean) {
     lastAgentMessage?.role === 'assistant' && lastAgentMessage.followUps?.length
       ? lastAgentMessage.followUps
       : [];
-  const hasUserAsked = agentMessages.some(message => message.role === 'user');
+  const hasConversation = agentMessages.some(message => message.id !== 'initial-agent-greeting');
   const isFollowUp = dynamicFollowUps.length > 0;
-  const suggestions = isFollowUp ? dynamicFollowUps : hasUserAsked ? [] : starterPrompts;
-  const isAgentHistoryLoading = isOpen && (!hasLoadedAgentHistory || !isViewerCurrent);
+  const suggestions = isFollowUp ? dynamicFollowUps : hasConversation ? [] : starterPrompts;
+  const isAgentHistoryLoading = isOpen && ((!hasLoadedAgentHistory && !agentHistoryError) || !isViewerCurrent);
 
   useEffect(() => {
     if (historyViewerRef.current === viewerId) return;
     historyViewerRef.current = viewerId;
-    historyVersionRef.current += 1;
     streamAbortControllerRef.current?.abort('identity');
     streamAbortControllerRef.current = undefined;
     resetBuffer();
     lastQuestionRef.current = '';
     setAgentSessionId(resetAgentSessionId());
-    setHasLoadedAgentHistory(false);
+    resetHistory(false);
     setAgentContentScope(undefined);
     setAgentMessages(createInitialAgentMessages());
     setAgentInput('');
     setIsAgentThinking(false);
     setIsSuggestionsOpen(true);
-  }, [viewerId, resetBuffer]);
+  }, [viewerId, resetBuffer, resetHistory]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -95,44 +95,6 @@ export function useAgentChat(isOpen: boolean) {
       isCurrent = false;
     };
   }, [isOpen, viewerId]);
-
-  useEffect(() => {
-    if (!isOpen || hasLoadedAgentHistory) {
-      return;
-    }
-
-    const sessionId = getOrCreateAgentSessionId();
-    const historyVersion = ++historyVersionRef.current;
-    setAgentSessionId(sessionId);
-
-    void fetchVaultAgentHistory(sessionId)
-      .then(history => {
-        if (historyVersion !== historyVersionRef.current) return;
-        if (isValidAgentSessionId(history.sessionId) && history.sessionId !== sessionId) {
-          window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, history.sessionId);
-          setAgentSessionId(history.sessionId);
-        }
-
-        if (history.messages.length > 0) {
-          setAgentMessages(
-            history.messages.map(message => ({
-              id: message.id,
-              role: message.role,
-              content: message.content,
-              stages: message.stages,
-              sources: message.sources,
-            }))
-          );
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (historyVersion === historyVersionRef.current) setHasLoadedAgentHistory(true);
-      });
-    return () => {
-      historyVersionRef.current += 1;
-    };
-  }, [hasLoadedAgentHistory, isOpen, viewerId]);
 
   useEffect(() => {
     if (isOpen) {
@@ -209,7 +171,7 @@ export function useAgentChat(isOpen: boolean) {
               isValidAgentSessionId(event.response.sessionId) &&
               event.response.sessionId !== sessionId
             ) {
-              window.localStorage.setItem(AGENT_SESSION_STORAGE_KEY, event.response.sessionId);
+              rememberAgentSessionId(event.response.sessionId);
               setAgentSessionId(event.response.sessionId);
             }
             setAgentMessages(previous =>
@@ -256,17 +218,16 @@ export function useAgentChat(isOpen: boolean) {
     if (streamAbortControllerRef.current) {
       return;
     }
-    historyVersionRef.current += 1;
+    resetHistory(true);
     lastQuestionRef.current = '';
     const newSessionId = resetAgentSessionId();
     setAgentSessionId(newSessionId);
     setAgentMessages(createInitialAgentMessages(agentContentScope));
     setAgentInput('');
     setIsSuggestionsOpen(true);
-    setHasLoadedAgentHistory(true);
   };
 
-  const canStartNewChat = agentMessages.some(message => message.role === 'user');
+  const canStartNewChat = Boolean(agentHistoryError) || hasConversation;
   const canRetryLastQuestion = !isAgentThinking && !isAgentHistoryLoading &&
     Boolean(lastQuestionRef.current) &&
     (lastAgentMessage?.responseStatus === 'error' || lastAgentMessage?.responseStatus === 'interrupted');
@@ -280,6 +241,8 @@ export function useAgentChat(isOpen: boolean) {
     agentContentScope: isViewerCurrent ? agentContentScope : undefined,
     isAgentThinking: isViewerCurrent && isAgentThinking,
     isAgentHistoryLoading,
+    agentHistoryError,
+    retryHistory,
     agentInput: isViewerCurrent ? agentInput : '',
     setAgentInput,
     submitAgentQuestion,

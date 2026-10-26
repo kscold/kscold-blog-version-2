@@ -31,7 +31,7 @@ export function ChatModalHeader({
             <div className="mt-0.5 flex items-center gap-1.5">
               <div className={`h-1.5 w-1.5 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-surface-300'}`} />
               <span className="truncate text-xs font-medium text-surface-500">
-                {subtitle || (isConnected ? '실시간 연결됨' : '오프라인 전송 모드')}
+                {subtitle || (isConnected ? '실시간 연결됨' : '실시간 연결 대기 중')}
               </span>
             </div>
           </div>

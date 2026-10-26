@@ -1,7 +1,7 @@
 'use client';
 
 import type { CSSProperties } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/entities/user';
@@ -12,6 +12,9 @@ import {
 } from '@/features/feed-copilot';
 import { useChatSocket } from '@/features/chat';
 import { useAgentChat } from '../model/useAgentChat';
+import { useChatDialog } from '../model/useChatDialog';
+import { useChatViewport } from '../model/useChatViewport';
+import { ChatNotice } from './ChatNotice';
 import ChatMessageList from './ChatMessageList';
 import { ChatComposer } from './ChatComposer';
 import { ChatModalHeader } from './ChatModalHeader';
@@ -31,15 +34,21 @@ interface ChatModalProps {
 export default function ChatModal({ isOpen, isElevated = false, onClose, initialQuestion }: ChatModalProps) {
   const { user } = useAuthStore();
   const router = useRouter();
+  const panelRef = useChatDialog(isOpen, onClose);
+  useChatViewport(isOpen, panelRef);
   const [inputMessage, setInputMessage] = useState('');
   const [mode, setMode] = useState<ChatMode>('agent');
   const [feedMemo, setFeedMemo] = useState('');
   const [feedSourceUrl, setFeedSourceUrl] = useState('');
+  const draftViewer = useRef(user?.id);
+  const hasCurrentDraft = draftViewer.current === user?.id;
   const {
     agentMessages,
     agentContentScope,
     isAgentThinking,
     isAgentHistoryLoading,
+    agentHistoryError,
+    retryHistory,
     agentInput,
     setAgentInput,
     submitAgentQuestion,
@@ -62,10 +71,11 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
   }, [initialQuestion, isOpen, setAgentInput, setIsSuggestionsOpen]);
 
   const username = user?.displayName || user?.username || '';
-  const { messages, isConnected, sendMessage } = useChatSocket({
+  const ownerChat = useChatSocket({
     isOpen: isOpen && !!user && mode === 'owner',
-    username,
+    viewerId: user?.id || '',
   });
+  const { messages, isConnected, sendMessage } = ownerChat;
   const modalPositionStyle = {
     '--chat-modal-bottom': isElevated
       ? 'calc(env(safe-area-inset-bottom, 0px) + 7.75rem)'
@@ -76,23 +86,19 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
   } as CSSProperties;
 
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+    draftViewer.current = user?.id;
+    setInputMessage('');
+    setFeedMemo('');
+    setFeedSourceUrl('');
+  }, [user?.id]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
-    await sendMessage(inputMessage);
-    setInputMessage('');
+    const submitted = inputMessage;
+    if (await sendMessage(submitted)) {
+      setInputMessage(current => current === submitted ? '' : current);
+    }
   };
 
   const handleSendAgentMessage = (e?: React.FormEvent) => {
@@ -135,12 +141,14 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
 
           {/* 모달: 모바일 전체화면 / 데스크탑 우하단 고정 */}
           <motion.div
+            ref={panelRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-label={title}
             className="fixed z-[1400] flex min-h-0 flex-col overflow-hidden border border-surface-200 bg-white shadow-2xl
-                       inset-x-2 bottom-2 h-[calc(100dvh-0.5rem)] max-h-[calc(100dvh-0.5rem)] rounded-[24px]
-                       sm:inset-x-auto sm:bottom-[var(--chat-modal-bottom)] sm:right-4 sm:h-[720px] sm:max-h-[var(--chat-modal-max-height)] sm:w-[min(440px,calc(100vw-2rem))] sm:min-h-[480px] sm:min-w-[360px] sm:max-w-[calc(100vw-2rem)] sm:resize sm:rounded-[24px]"
+                       inset-x-2 bottom-[calc(var(--chat-keyboard-inset,0px)+0.5rem)] h-[calc(var(--chat-visible-height,100dvh)-0.5rem)] max-h-[calc(var(--chat-visible-height,100dvh)-0.5rem)] rounded-[24px]
+                       sm:inset-x-auto sm:bottom-[var(--chat-modal-bottom)] sm:right-4 sm:h-[720px] sm:max-h-[var(--chat-modal-max-height)] sm:w-[min(440px,calc(100vw-2rem))] sm:min-w-[360px] sm:max-w-[calc(100vw-2rem)] sm:resize sm:rounded-[24px] focus:outline-none"
             style={modalPositionStyle}
             initial={{ opacity: 0, y: 80 }}
             animate={{ opacity: 1, y: 0 }}
@@ -163,6 +171,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
             {mode === 'agent' ? (
               <>
                 <AgentMessageList messages={agentMessages} />
+                {agentHistoryError && <ChatNotice message={agentHistoryError} onRetry={retryHistory} />}
                 <div className="shrink-0 border-t border-surface-200 bg-white p-3 sm:p-4">
                   <AgentSuggestions
                     suggestions={suggestions}
@@ -170,7 +179,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
                     isOpen={isSuggestionsOpen}
                     onToggle={() => setIsSuggestionsOpen(open => !open)}
                     onPick={prompt => void submitAgentQuestion(prompt)}
-                    disabled={isAgentThinking || isAgentHistoryLoading}
+                    disabled={isAgentThinking || isAgentHistoryLoading || !!agentHistoryError}
                   />
                   <AgentComposer
                     value={agentInput}
@@ -179,7 +188,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
                     onRetry={() => void retryLastQuestion()}
                     canRetry={canRetryLastQuestion}
                     disabled={
-                      !agentInput.trim() || isAgentThinking || isAgentHistoryLoading
+                      !agentInput.trim() || isAgentThinking || isAgentHistoryLoading || !!agentHistoryError
                     }
                     isLoadingHistory={isAgentHistoryLoading}
                     onChange={setAgentInput}
@@ -198,9 +207,9 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
                 <FeedCopilotPanel
                   variant="chat"
                   defaultOpen
-                  memo={feedMemo}
+                  memo={hasCurrentDraft ? feedMemo : ''}
                   onMemoChange={setFeedMemo}
-                  sourceUrl={feedSourceUrl}
+                  sourceUrl={hasCurrentDraft ? feedSourceUrl : ''}
                   onSourceUrlChange={setFeedSourceUrl}
                   onApplyDraft={handleApplyFeedDraft}
                 />
@@ -214,12 +223,15 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
             ) : (
               <>
                 <ChatMessageList messages={messages} currentUsername={username} />
+                {ownerChat.isLoading && <ChatNotice message="이전 메시지를 불러오고 있어요." />}
+                {ownerChat.historyError && <ChatNotice message={ownerChat.historyError} onRetry={ownerChat.retryHistory} />}
+                {ownerChat.sendError && <ChatNotice message={ownerChat.sendError} />}
                 <ChatComposer
-                  value={inputMessage}
+                  value={hasCurrentDraft ? inputMessage : ''}
                   placeholder={
-                    isConnected ? '메시지를 입력하세요...' : '네트워크가 불안정해도 전송됩니다'
+                    ownerChat.isSending ? '전송을 확인하고 있어요...' : '블로그 주인에게 메시지 남기기...'
                   }
-                  disabled={!inputMessage.trim()}
+                  disabled={!inputMessage.trim() || ownerChat.isSending || ownerChat.isLoading}
                   onChange={setInputMessage}
                   onSubmit={handleSendMessage}
                 />
