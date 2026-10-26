@@ -40,6 +40,22 @@ const isoDay = (offsetDays: number) =>
 
 const round = (value: number, digits = 1) => Math.round(value * 10 ** digits) / 10 ** digits;
 
+/** 구글은 값이 0인 날을 빼고 준다. 기간의 모든 날을 채워 막대가 날짜에 맞게 놓이도록 한다. */
+function fillDays<T extends { date: string }>(
+  startDate: string,
+  endDate: string,
+  rows: T[],
+  empty: (date: string) => T
+) {
+  const byDate = new Map(rows.map(row => [row.date, row]));
+  const days: T[] = [];
+  for (let time = Date.parse(startDate); time <= Date.parse(endDate); time += DAY_MS) {
+    const date = new Date(time).toISOString().slice(0, 10);
+    days.push(byDate.get(date) ?? empty(date));
+  }
+  return days;
+}
+
 async function section<T>(load: () => Promise<T>): Promise<Section<T>> {
   try {
     return { ok: true, data: await load() };
@@ -82,11 +98,16 @@ async function loadSearchConsole(client: GoogleClient): Promise<SearchConsoleIns
     impressions: totals?.impressions ?? 0,
     ctr: round((totals?.ctr ?? 0) * 100),
     position: round(totals?.position ?? 0),
-    daily: (daily.rows ?? []).map(row => ({
-      date: row.keys[0],
-      clicks: row.clicks,
-      impressions: row.impressions,
-    })),
+    daily: fillDays(
+      range.startDate,
+      range.endDate,
+      (daily.rows ?? []).map(row => ({
+        date: row.keys[0],
+        clicks: row.clicks,
+        impressions: row.impressions,
+      })),
+      date => ({ date, clicks: 0, impressions: 0 })
+    ),
     pages: (pages.rows ?? []).map(toRanked),
     queries: (queries.rows ?? []).map(toRanked),
     sitemap: sitemap
@@ -151,13 +172,18 @@ async function loadAnalytics(client: GoogleClient, propertyId: string): Promise<
     organicSessions: organicRow ? metric(organicRow) : 0,
     organicUsers: organicRow ? metric(organicRow, 1) : 0,
     totalSessions: channelRows.reduce((sum, row) => sum + row.sessions, 0),
-    dailyOrganic: (daily.rows ?? []).map(row => {
-      const value = dimension(row);
-      return {
-        date: `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`,
-        value: metric(row),
-      };
-    }),
+    dailyOrganic: fillDays(
+      range.startDate,
+      range.endDate,
+      (daily.rows ?? []).map(row => {
+        const value = dimension(row);
+        return {
+          date: `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`,
+          value: metric(row),
+        };
+      }),
+      date => ({ date, value: 0 })
+    ),
     channels: channelRows,
     landingPages: (landing.rows ?? []).map(row => ({
       path: dimension(row),
