@@ -6,6 +6,7 @@ import { useResolveTag, useCheckSlugExists, useImportPost } from '@/features/imp
 import type { ParsedMarkdownFile, ImportResult, ImportStatus } from '@/shared/model/types/import';
 import type { PostCreateRequest } from '@/shared/model/types/blog';
 import { useAlert } from '@/shared/model/alertStore';
+import { validatePostSlug } from '@/shared/lib/postSlug';
 
 interface ImportProgress {
   current: number;
@@ -104,6 +105,12 @@ export function useImportProcessor(): UseImportProcessorReturn {
       return;
     }
 
+    const invalid = files.find(file => validatePostSlug(file.slug));
+    if (invalid) {
+      alert.warning(`${invalid.filename}: ${validatePostSlug(invalid.slug)}`);
+      return;
+    }
+
     setImportStatus('importing');
     setProgress({ current: 0, total: files.length });
     const results: ImportResult[] = [];
@@ -113,21 +120,14 @@ export function useImportProcessor(): UseImportProcessorReturn {
       setProgress({ current: i + 1, total: files.length });
 
       try {
+        const slug = file.slug;
+        if (await checkSlug.mutateAsync(slug)) {
+          throw new Error('이미 사용 중인 글 주소입니다. 주소를 직접 수정한 뒤 다시 가져와 주세요.');
+        }
         const tagIds: string[] = [];
         for (const tagName of file.tags) {
           const tag = await resolveTag.mutateAsync(tagName);
           tagIds.push(tag.id);
-        }
-
-        let slug = file.slug;
-        let exists = await checkSlug.mutateAsync(slug);
-        if (exists) {
-          let counter = 1;
-          while (exists) {
-            slug = `${file.slug}-${counter}`;
-            exists = await checkSlug.mutateAsync(slug);
-            counter++;
-          }
         }
 
         const postData: PostCreateRequest = {

@@ -2,6 +2,7 @@
 
 import { useCategories } from '@/entities/category';
 import type { ParsedMarkdownFile } from '@/shared/model/types/import';
+import { validatePostSlug } from '@/shared/lib/postSlug';
 
 interface ImportFileListProps {
   files: ParsedMarkdownFile[];
@@ -27,6 +28,7 @@ export function ImportFileList({
   onReset,
 }: ImportFileListProps) {
   const { data: categories } = useCategories();
+  const category = categories?.find(item => item.id === globalCategoryId);
 
   return (
     <div className="space-y-8">
@@ -61,8 +63,8 @@ export function ImportFileList({
               onChange={e => onGlobalPostStatusChange(e.target.value as 'DRAFT' | 'PUBLISHED')}
               className="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm bg-white text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900"
             >
-              <option value="DRAFT">DRAFT (임시저장)</option>
-              <option value="PUBLISHED">PUBLISHED (즉시 게시)</option>
+              <option value="DRAFT">초안 · 관리자만</option>
+              <option value="PUBLISHED">{category ? category.restricted ? '발행 · 승인 필요' : '발행 · 누구나' : '발행 · 카테고리 선택 필요'}</option>
             </select>
           </div>
         </div>
@@ -81,7 +83,7 @@ export function ImportFileList({
             </button>
             <button
               onClick={onImportAll}
-              disabled={!globalCategoryId}
+              disabled={!globalCategoryId || files.some(file => Boolean(validatePostSlug(file.slug)))}
               className="px-6 py-2 text-sm font-bold text-white bg-surface-900 rounded-lg hover:bg-surface-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               전체 가져오기
@@ -126,13 +128,17 @@ export function ImportFileList({
 
               {/* 슬러그 */}
               <div className="mt-3">
-                <label className="text-xs text-surface-400">slug:</label>
+                <label htmlFor={`import-slug-${index}`} className="text-xs text-surface-500">글 주소</label>
                 <input
+                  id={`import-slug-${index}`}
                   type="text"
                   value={file.slug}
+                  aria-invalid={Boolean(validatePostSlug(file.slug))}
+                  aria-describedby={`import-slug-error-${index}`}
                   onChange={e => onUpdateFile(index, { slug: e.target.value })}
-                  className="ml-2 text-sm text-surface-600 font-mono bg-transparent border-none outline-none focus:ring-0 p-0"
+                  className="mt-1 w-full rounded-lg border border-surface-200 px-3 py-2 text-sm text-surface-700 font-mono"
                 />
+                <p id={`import-slug-error-${index}`} className="mt-1 text-xs text-red-700">{validatePostSlug(file.slug)}</p>
               </div>
 
               {/* 태그 목록 */}

@@ -1,6 +1,7 @@
 import matter from 'gray-matter';
 import { ParsedMarkdownFile } from '@/shared/model/types/import';
 import { toPreviewText } from '@/shared/lib/seo/text';
+import { suggestPostSlug } from '@/shared/lib/postSlug';
 
 /**
  * .md 파일을 파싱하여 블로그 포스트 데이터로 변환
@@ -22,7 +23,8 @@ export function parseMarkdownFile(filename: string, rawContent: string): ParsedM
   }
 
   const title = extractTitle(frontmatter, content, filename);
-  const slug = extractSlug(frontmatter, filename, title);
+  const slug = extractSlug(frontmatter, title);
+  if (!slug) warnings.push('자동으로 영문 주소를 제안할 수 없습니다. 가져오기 전에 글 주소를 입력해 주세요.');
   const tags = extractTags(frontmatter);
   const category = extractCategory(frontmatter);
   const date = extractDate(frontmatter, filename);
@@ -62,20 +64,13 @@ function extractTitle(fm: Record<string, unknown>, content: string, filename: st
     .trim();
 }
 
-function extractSlug(fm: Record<string, unknown>, filename: string, title: string): string {
+function extractSlug(fm: Record<string, unknown>, title: string): string {
   if (typeof fm.slug === 'string' && fm.slug.trim()) return fm.slug.trim();
   if (typeof fm.permalink === 'string' && fm.permalink.trim()) {
     return fm.permalink.trim().replace(/^\/|\/$/g, '');
   }
 
-  // 제목에서 슬러그 생성
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9가-힣\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .trim();
+  return suggestPostSlug(title);
 }
 
 function extractTags(fm: Record<string, unknown>): string[] {

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
 import { Post, Tag, PostCreateRequest } from '@/shared/model/types/blog';
+import { checkPostSlugExists } from '@/entities/post';
 
 export function useResolveTag() {
   return useMutation({
@@ -10,7 +11,7 @@ export function useResolveTag() {
 
 export function useCheckSlugExists() {
   return useMutation({
-    mutationFn: (slug: string) => apiClient.get<boolean>(`/posts/exists/slug/${slug}`),
+    mutationFn: checkPostSlugExists,
   });
 }
 
