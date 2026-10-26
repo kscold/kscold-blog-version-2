@@ -9,6 +9,7 @@ import com.kscold.blog.vault.agent.domain.model.AgentReindexResult;
 import com.kscold.blog.vault.agent.domain.model.AgentSearchQuery;
 import com.kscold.blog.vault.agent.domain.model.AgentSource;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
+import com.kscold.blog.vault.agent.domain.model.AgentStreamSession;
 import com.kscold.blog.vault.agent.domain.port.out.VaultAgentClientPort;
 import com.kscold.blog.vault.agent.grpc.ChatCompleted;
 import com.kscold.blog.vault.agent.grpc.ChatRequest;
@@ -17,6 +18,7 @@ import com.kscold.blog.vault.agent.grpc.ContentAccessScope;
 import com.kscold.blog.vault.agent.grpc.ReindexRequest;
 import com.kscold.blog.vault.agent.grpc.SearchRequest;
 import com.kscold.blog.vault.agent.grpc.VaultAgentServiceGrpc;
+import io.grpc.Context;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -60,26 +62,39 @@ public class GrpcVaultAgentClient implements VaultAgentClientPort {
             String message,
             String activeFolderName,
             AgentContentAccessScope contentAccessScope,
+            AgentStreamSession session,
             Consumer<AgentStreamEvent> eventConsumer) {
-        try {
-            Iterator<ChatStreamEvent> events =
-                    stub().chatStream(toRequest(message, activeFolderName, contentAccessScope));
-            while (events.hasNext()) {
-                ChatStreamEvent event = events.next();
-                switch (event.getEventCase()) {
-                    case STAGE ->
-                            eventConsumer.accept(AgentStreamEvent.stage(toStage(event.getStage())));
-                    case DELTA -> eventConsumer.accept(AgentStreamEvent.delta(event.getDelta()));
-                    case COMPLETED ->
-                            eventConsumer.accept(
-                                    AgentStreamEvent.completed(toCompleted(event.getCompleted())));
-                    case EVENT_NOT_SET -> {
-                        // 아직 전달할 이벤트가 없는 경우는 건너뜀.
-                    }
+        try (Context.CancellableContext cancellation = Context.current().withCancellation()) {
+            session.onCancel(() -> cancellation.cancel(null));
+            cancellation.run(
+                    () ->
+                            consumeStream(
+                                    toRequest(message, activeFolderName, contentAccessScope),
+                                    session,
+                                    eventConsumer));
+        } catch (StatusRuntimeException exception) {
+            if (session.isActive()) throw unavailable(exception);
+        }
+    }
+
+    private void consumeStream(
+            ChatRequest request,
+            AgentStreamSession session,
+            Consumer<AgentStreamEvent> eventConsumer) {
+        Iterator<ChatStreamEvent> events = stub().chatStream(request);
+        while (session.isActive() && events.hasNext()) {
+            ChatStreamEvent event = events.next();
+            switch (event.getEventCase()) {
+                case STAGE ->
+                        eventConsumer.accept(AgentStreamEvent.stage(toStage(event.getStage())));
+                case DELTA -> eventConsumer.accept(AgentStreamEvent.delta(event.getDelta()));
+                case COMPLETED ->
+                        eventConsumer.accept(
+                                AgentStreamEvent.completed(toCompleted(event.getCompleted())));
+                case EVENT_NOT_SET -> {
+                    // 아직 전달할 이벤트가 없는 경우는 건너뜀.
                 }
             }
-        } catch (StatusRuntimeException exception) {
-            throw unavailable(exception);
         }
     }
 

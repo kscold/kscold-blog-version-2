@@ -14,6 +14,7 @@ import com.kscold.blog.vault.agent.application.dto.response.ReindexResponse;
 import com.kscold.blog.vault.agent.application.dto.response.SourceNote;
 import com.kscold.blog.vault.agent.application.port.in.VaultAgentUseCase;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
+import com.kscold.blog.vault.agent.domain.model.AgentStreamSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
@@ -80,7 +81,14 @@ public class VaultAgentController {
             @Valid @RequestBody ChatCommand request) {
         String clientIdentifier = clientIdentifierResolver.resolve(httpRequest);
         SseEmitter emitter = new SseEmitter(STREAM_TIMEOUT_MILLIS);
-        emitter.onTimeout(emitter::complete);
+        AgentStreamSession session = new AgentStreamSession();
+        emitter.onCompletion(session::close);
+        emitter.onTimeout(
+                () -> {
+                    session.close();
+                    emitter.complete();
+                });
+        emitter.onError(ignored -> session.close());
 
         vaultAgentSseExecutor.execute(
                 () -> {
@@ -89,14 +97,18 @@ public class VaultAgentController {
                                 request,
                                 userId,
                                 clientIdentifier,
+                                session,
                                 event -> sendAgentEvent(emitter, event));
-                        emitter.complete();
                     } catch (Exception exception) {
+                        if (!session.isActive()) return;
                         log.warn(
                                 "Vault Agent SSE 응답 중 오류가 발생했습니다: type={}",
                                 exception.getClass().getSimpleName());
                         sendError(emitter, ErrorCode.EXTERNAL_API_ERROR.getMessage());
                         emitter.completeWithError(exception);
+                    } finally {
+                        session.close();
+                        emitter.complete();
                     }
                 });
         return ResponseEntity.ok()

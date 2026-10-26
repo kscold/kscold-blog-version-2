@@ -8,6 +8,7 @@ import com.kscold.blog.vault.agent.application.dto.response.ChatResponse;
 import com.kscold.blog.vault.agent.application.dto.response.ReindexResponse;
 import com.kscold.blog.vault.agent.application.dto.response.SourceNote;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
+import com.kscold.blog.vault.agent.domain.model.AgentStreamSession;
 import java.util.List;
 import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
@@ -20,6 +21,7 @@ public interface VaultAgentUseCase {
             ChatCommand request,
             @Nullable String userId,
             String clientIdentifier,
+            AgentStreamSession session,
             Consumer<AgentStreamEvent> eventConsumer);
 
     ChatHistoryResponse history(

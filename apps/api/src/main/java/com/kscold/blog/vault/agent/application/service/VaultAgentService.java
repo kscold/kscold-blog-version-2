@@ -22,6 +22,7 @@ import com.kscold.blog.vault.agent.domain.model.AgentContentAccessScope;
 import com.kscold.blog.vault.agent.domain.model.AgentSearchQuery;
 import com.kscold.blog.vault.agent.domain.model.AgentSource;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
+import com.kscold.blog.vault.agent.domain.model.AgentStreamSession;
 import com.kscold.blog.vault.agent.domain.port.out.VaultAgentChatHistoryRepository;
 import com.kscold.blog.vault.agent.domain.port.out.VaultAgentClientPort;
 import java.time.Instant;
@@ -88,7 +89,9 @@ public class VaultAgentService implements VaultAgentUseCase {
             ChatCommand request,
             @Nullable String userId,
             String clientIdentifier,
+            AgentStreamSession session,
             Consumer<AgentStreamEvent> eventConsumer) {
+        if (!session.isActive()) return;
         String authenticatedUserId = normalize(userId);
         String sessionId = normalizeSessionId(request.getSessionId());
         String scopeKey = scopeKey(authenticatedUserId, clientIdentifier, sessionId);
@@ -105,7 +108,9 @@ public class VaultAgentService implements VaultAgentUseCase {
                     request.getMessage(),
                     request.getActiveFolderName(),
                     contentAccessScope,
+                    session,
                     event -> {
+                        if (!session.isActive()) return;
                         if (event.type() == AgentStreamEvent.Type.STAGE && event.stage() != null) {
                             stages.add(event.stage());
                             eventConsumer.accept(event);
@@ -122,6 +127,7 @@ public class VaultAgentService implements VaultAgentUseCase {
                         }
                     });
 
+            if (!session.isActive()) return;
             AgentChatResult rawResult = completedResult.get();
             if (rawResult == null) {
                 throw new AgentClientUnavailableException("Vault Agent 응답이 완료되지 않았습니다.", null);

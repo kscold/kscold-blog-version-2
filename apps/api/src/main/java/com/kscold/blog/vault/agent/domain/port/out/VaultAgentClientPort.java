@@ -6,6 +6,7 @@ import com.kscold.blog.vault.agent.domain.model.AgentReindexResult;
 import com.kscold.blog.vault.agent.domain.model.AgentSearchQuery;
 import com.kscold.blog.vault.agent.domain.model.AgentSource;
 import com.kscold.blog.vault.agent.domain.model.AgentStreamEvent;
+import com.kscold.blog.vault.agent.domain.model.AgentStreamSession;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -18,6 +19,7 @@ public interface VaultAgentClientPort {
             String message,
             String activeFolderName,
             AgentContentAccessScope contentAccessScope,
+            AgentStreamSession session,
             Consumer<AgentStreamEvent> eventConsumer);
 
     List<AgentSource> search(AgentSearchQuery query, AgentContentAccessScope contentAccessScope);

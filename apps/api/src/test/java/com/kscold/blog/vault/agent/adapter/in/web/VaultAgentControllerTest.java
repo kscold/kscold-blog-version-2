@@ -15,6 +15,7 @@ import com.kscold.blog.shared.web.ClientIdentifierResolver;
 import com.kscold.blog.support.TestJson;
 import com.kscold.blog.vault.agent.application.dto.command.ChatCommand;
 import com.kscold.blog.vault.agent.application.port.in.VaultAgentUseCase;
+import com.kscold.blog.vault.agent.domain.model.AgentStreamSession;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -33,7 +34,11 @@ class VaultAgentControllerTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(identifierResolver.resolve(request)).thenReturn("anonymous-client");
         doThrow(new IllegalStateException(sensitiveMessage)).when(useCase).stream(
-                any(ChatCommand.class), isNull(), anyString(), any(Consumer.class));
+                any(ChatCommand.class),
+                isNull(),
+                anyString(),
+                any(AgentStreamSession.class),
+                any(Consumer.class));
         Executor directExecutor = Runnable::run;
         VaultAgentController controller =
                 new VaultAgentController(
