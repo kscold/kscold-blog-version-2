@@ -7,10 +7,13 @@ import { summarizeCrawlers } from './seo-watch/crawlers.mjs';
 import { findFileProblems, findPageProblems } from './seo-watch/health.mjs';
 import { findIndexNowKey, submitIndexNow } from './seo-watch/indexnow.mjs';
 import { checkRanks } from './seo-watch/rank.mjs';
+import { checkSearchConsole } from './seo-watch/search-console.mjs';
 import { renderReport, toHistoryRecord } from './seo-watch/report.mjs';
 import { parseSitemap, planIndexNow, toSubmittedState } from './seo-watch/sitemap.mjs';
 
 const SITE = 'https://kscold.com';
+const SEARCH_CONSOLE_PROPERTY = `${SITE}/`;
+const DEFAULT_GOOGLE_ACCOUNT = '.config/claude-seo/kscold-blog-seo-sa.json';
 const HOSTS = ['kscold.com', 'www.kscold.com'];
 const PAGES = ['/', '/blog', '/feed', '/info', '/notes'];
 const FILES = ['robots.txt', 'sitemap.xml', 'rss.xml', 'ads.txt', 'llms.txt'];
@@ -71,6 +74,26 @@ async function requestIndexing({ plan, key, apply, fetcher, retryDelayMs }) {
   return { ...summary, ...outcome };
 }
 
+/** 서비스 계정이 없거나 서치 콘솔 조회가 실패해도 나머지 점검은 계속한다. */
+async function readSearchConsole({ googleAccount, entries, indexStatuses, apply, fetcher, now }) {
+  if (!googleAccount) return { result: null, nextStatuses: indexStatuses };
+  try {
+    const { nextStatuses, ...result } = await checkSearchConsole({
+      account: googleAccount,
+      property: SEARCH_CONSOLE_PROPERTY,
+      sitemapUrl: `${SITE}/sitemap.xml`,
+      urls: entries.map(entry => entry.loc),
+      statuses: indexStatuses,
+      apply,
+      fetcher,
+      now,
+    });
+    return { result, nextStatuses };
+  } catch (error) {
+    return { result: { error: error.message }, nextStatuses: indexStatuses };
+  }
+}
+
 /** 하루 한 번 도는 점검의 본체. 외부와 닿는 부분은 모두 주입받아 테스트에서 바꿔 끼운다. */
 export async function runWatch({
   apply,
@@ -79,6 +102,8 @@ export async function runWatch({
   env,
   submitted,
   key,
+  googleAccount = null,
+  indexStatuses = {},
   now = Date.now(),
   retryDelayMs,
 }) {
@@ -92,6 +117,14 @@ export async function runWatch({
     retryDelayMs,
   });
   const logText = readLog();
+  const searchConsole = await readSearchConsole({
+    googleAccount,
+    entries,
+    indexStatuses,
+    apply,
+    fetcher,
+    now,
+  });
   return {
     at: new Date(now).toISOString(),
     date: new Date(now + 9 * 3_600_000).toISOString().slice(0, 10),
@@ -102,8 +135,31 @@ export async function runWatch({
     crawlers:
       logText === null ? null : summarizeCrawlers(logText, { hosts: HOSTS, since: now - DAY_MS }),
     ranks: await checkRanks({ queries: RANK_QUERIES, host: HOSTS[0], env, fetcher }),
+    searchConsole: searchConsole.result,
     nextSubmitted: indexNow.accepted ? toSubmittedState(entries) : submitted,
+    nextIndexStatuses: searchConsole.nextStatuses,
   };
+}
+
+const BLOG_CONTAINER = 'ubuntu-blog';
+const COVERAGE_TARGET = '/app/frontend/data/search-insights';
+
+/** 관리자 검색 유입 화면이 읽도록 색인 현황 요약을 블로그 컨테이너에 넣는다. 실패해도 점검은 그대로 끝낸다. */
+function publishCoverage(searchConsole, binary = '/usr/local/bin/docker') {
+  if (!searchConsole || searchConsole.error) return;
+  const file = join(STATE_DIRECTORY, 'index-coverage.json');
+  writeFileSync(
+    file,
+    JSON.stringify({ checkedAt: new Date().toISOString(), ...searchConsole.coverage }, null, 1)
+  );
+  const docker = args =>
+    execFileSync(binary, ['--context', 'colima', ...args], { timeout: 30_000, stdio: 'ignore' });
+  try {
+    docker(['exec', BLOG_CONTAINER, 'mkdir', '-p', COVERAGE_TARGET]);
+    docker(['cp', file, `${BLOG_CONTAINER}:${COVERAGE_TARGET}/index-coverage.json`]);
+  } catch {
+    console.error('색인 현황을 블로그 컨테이너에 넣지 못했습니다');
+  }
 }
 
 function readNginxLog(binary = '/usr/local/bin/docker') {
@@ -150,13 +206,20 @@ async function main() {
   const apply = args.includes('--apply');
   const env = { ...readEnvFile(join(homedir(), '.config/kscold-seo-watch/env')), ...process.env };
   const statePath = join(STATE_DIRECTORY, 'state.json');
+  const state = readJson(statePath, {});
+  const googleAccount = readJson(
+    env.GOOGLE_SERVICE_ACCOUNT_FILE || join(homedir(), DEFAULT_GOOGLE_ACCOUNT),
+    null
+  );
   const result = await runWatch({
     apply,
     fetcher: fetch,
     readLog: () => readNginxLog(env.DOCKER_BIN),
     env,
-    submitted: readJson(statePath, {}).submitted ?? {},
+    submitted: state.submitted ?? {},
     key: findIndexNowKey(join(REPOSITORY_ROOT, 'apps/web/public')),
+    googleAccount,
+    indexStatuses: state.indexStatuses ?? {},
   });
 
   const report = renderReport(result);
@@ -165,11 +228,19 @@ async function main() {
     mkdirSync(reportDirectory, { recursive: true });
     mkdirSync(STATE_DIRECTORY, { recursive: true, mode: 0o700 });
     writeFileSync(join(reportDirectory, `${result.date}.md`), report);
-    writeFileSync(statePath, JSON.stringify({ submitted: result.nextSubmitted }, null, 1));
+    writeFileSync(
+      statePath,
+      JSON.stringify(
+        { submitted: result.nextSubmitted, indexStatuses: result.nextIndexStatuses },
+        null,
+        1
+      )
+    );
     appendFileSync(
       join(STATE_DIRECTORY, 'history.jsonl'),
       `${JSON.stringify(toHistoryRecord(result))}\n`
     );
+    publishCoverage(result.searchConsole, env.DOCKER_BIN);
   }
   console.log(report);
   if (result.health.some(item => item.problems.length > 0)) process.exitCode = 1;

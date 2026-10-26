@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createVerify, generateKeyPairSync } from 'node:crypto';
 import { test } from 'node:test';
 import { runWatch } from './seo-watch.mjs';
 import { summarizeCrawlers } from './seo-watch/crawlers.mjs';
@@ -6,6 +7,12 @@ import { findFileProblems, findPageProblems } from './seo-watch/health.mjs';
 import { submitIndexNow } from './seo-watch/indexnow.mjs';
 import { checkRanks, findPosition } from './seo-watch/rank.mjs';
 import { renderReport } from './seo-watch/report.mjs';
+import {
+  createAccessToken,
+  pickInspectionBatch,
+  shouldResubmitSitemap,
+  summarizeCoverage,
+} from './seo-watch/search-console.mjs';
 import { parseSitemap, planIndexNow, toSubmittedState } from './seo-watch/sitemap.mjs';
 
 const SITE = 'https://kscold.com';
@@ -249,4 +256,125 @@ test('색인 요청은 받아들인 곳이 하나라도 있으면 성공으로 �
     outcome.responses.map(response => response.outcome),
     ['HTTP 500', 'HTTP 202']
   );
+});
+
+const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
+const GOOGLE_ACCOUNT = {
+  client_email: 'watch@example.iam.gserviceaccount.com',
+  private_key: privateKey.export({ type: 'pkcs8', format: 'pem' }),
+  token_uri: 'https://oauth2.googleapis.com/token',
+};
+
+/** 토큰 발급과 서치 콘솔 API를 흉내 내고, 나머지 요청은 원래 가짜 웹으로 넘긴다. */
+function withSearchConsole(web, { googleSitemap = null, verdicts = {} } = {}) {
+  const calls = [];
+  const json = (status, body) => ({ ok: status < 400, status, json: async () => body });
+  const fetcher = async (url, options = {}) => {
+    if (url === GOOGLE_ACCOUNT.token_uri) return json(200, { access_token: 'token' });
+    if (!url.startsWith('https://searchconsole.googleapis.com')) return web.fetcher(url, options);
+    calls.push({ method: options.method, url, body: options.body && JSON.parse(options.body) });
+    assert.equal(options.headers.Authorization, 'Bearer token');
+    if (url.includes('/sitemaps/')) {
+      if (options.method === 'PUT') return { ok: true, status: 204 };
+      return googleSitemap ? json(200, googleSitemap) : json(404, {});
+    }
+    if (url.includes('urlInspection')) {
+      const target = JSON.parse(options.body).inspectionUrl;
+      const verdict = verdicts[target] ?? 'NEUTRAL';
+      return json(200, {
+        inspectionResult: {
+          indexStatusResult: {
+            verdict,
+            coverageState:
+              verdict === 'PASS'
+                ? '제출되고 색인이 생성되었습니다.'
+                : 'Google에는 아직 알려지지 않은 URL입니다.',
+          },
+        },
+      });
+    }
+    const body = JSON.parse(options.body);
+    if (!body.dimensions) return json(200, { rows: [{ clicks: 3, impressions: 40 }] });
+    return json(200, {
+      rows: [{ keys: [`${SITE}/blog/dev/a`], clicks: 3, impressions: 40, position: 7.25 }],
+    });
+  };
+  return { ...web, fetcher, calls };
+}
+
+test('서비스 계정 키로 서명한 JWT를 보내 토큰을 받는다', async () => {
+  let assertion;
+  const fetcher = async (url, options) => {
+    assertion = new URLSearchParams(options.body).get('assertion');
+    return { ok: true, json: async () => ({ access_token: 'token' }) };
+  };
+
+  const token = await createAccessToken({ account: GOOGLE_ACCOUNT, fetcher, now: NOW });
+
+  const [header, claims, signature] = assertion.split('.');
+  const verifier = createVerify('RSA-SHA256').update(`${header}.${claims}`);
+  assert.equal(token, 'token');
+  assert.equal(verifier.verify(publicKey, Buffer.from(signature, 'base64url')), true);
+  assert.equal(JSON.parse(Buffer.from(claims, 'base64url')).iss, GOOGLE_ACCOUNT.client_email);
+});
+
+test('안 본 URL, 색인 안 된 URL, 색인된 URL 순으로 오래된 것부터 검사한다', () => {
+  const statuses = {
+    a: { verdict: 'PASS', checkedAt: '2026-10-01' },
+    b: { verdict: 'NEUTRAL', checkedAt: '2026-10-05' },
+    c: { verdict: 'NEUTRAL', checkedAt: '2026-10-02' },
+  };
+
+  assert.deepEqual(pickInspectionBatch(['a', 'b', 'c', 'd'], statuses, 3), ['d', 'c', 'b']);
+  assert.deepEqual(summarizeCoverage(['a', 'b', 'd'], statuses), {
+    total: 3,
+    indexed: 1,
+    unchecked: 1,
+    byCoverage: { '알 수 없음': 2 },
+  });
+});
+
+test('구글이 아는 URL 수가 다르거나 일주일 넘게 안 읽어 가면 사이트맵을 다시 제출한다', () => {
+  const sitemap = (submitted, lastDownloaded) => ({
+    lastDownloaded,
+    contents: [{ type: 'web', submitted: String(submitted) }],
+  });
+
+  assert.equal(shouldResubmitSitemap(sitemap(3, '2026-10-05T00:00:00Z'), 3, NOW), false);
+  assert.equal(shouldResubmitSitemap(sitemap(2, '2026-10-05T00:00:00Z'), 3, NOW), true);
+  assert.equal(shouldResubmitSitemap(sitemap(3, '2026-09-01T00:00:00Z'), 3, NOW), true);
+  assert.equal(shouldResubmitSitemap(null, 3, NOW), true);
+});
+
+test('실제 실행은 사이트맵을 다시 제출하고 URL을 검사해 색인 현황을 남긴다', async () => {
+  const web = withSearchConsole(
+    fakeWeb([
+      ['/blog/dev/a', '2026-10-05'],
+      ['/blog', ''],
+    ]),
+    {
+      verdicts: { [`${SITE}/blog/dev/a`]: 'PASS' },
+    }
+  );
+
+  const result = await watch(web, { googleAccount: GOOGLE_ACCOUNT });
+  const report = renderReport(result);
+
+  assert.ok(web.calls.some(call => call.method === 'PUT'));
+  assert.equal(result.searchConsole.coverage.indexed, 1);
+  assert.equal(result.nextIndexStatuses[`${SITE}/blog/dev/a`].verdict, 'PASS');
+  assert.match(report, /색인: 1\/2개/);
+  assert.match(report, /\/blog\/dev\/a — 클릭 3, 노출 40, 평균 7.3위/);
+});
+
+test('미리보기는 서치 콘솔을 읽기만 하고, 서비스 계정이 없으면 건너뛴다', async () => {
+  const web = withSearchConsole(fakeWeb([['/blog/dev/a', '2026-10-05']]));
+
+  const preview = await watch(web, { apply: false, googleAccount: GOOGLE_ACCOUNT });
+  const skipped = await watch(fakeWeb([['/blog/dev/a', '2026-10-05']]));
+
+  assert.ok(web.calls.every(call => call.method !== 'PUT' && !call.url.includes('urlInspection')));
+  assert.equal(preview.searchConsole.sitemap.action, '다시 제출 필요');
+  assert.equal(skipped.searchConsole, null);
+  assert.match(renderReport(skipped), /서비스 계정이 없어 건너뜀/);
 });

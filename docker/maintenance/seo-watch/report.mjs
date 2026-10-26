@@ -38,6 +38,30 @@ function rankSection(ranks) {
   });
 }
 
+const formatRow = row =>
+  `${decodeURI(row.key.replace('https://kscold.com', '') || '/')} — 클릭 ${row.clicks}, 노출 ${row.impressions}, 평균 ${row.position}위`;
+
+function searchConsoleSection(searchConsole) {
+  if (!searchConsole) return ['- 서비스 계정이 없어 건너뜀'];
+  if (searchConsole.error) return [`- 조회 실패 (${searchConsole.error})`];
+  const { sitemap, coverage, performance, inspectedToday } = searchConsole;
+  const states = Object.entries(coverage.byCoverage)
+    .sort(([, left], [, right]) => right - left)
+    .map(([label, count]) => `  - ${label}: ${count}`);
+  return [
+    `- 사이트맵: 구글이 아는 URL ${sitemap.submitted}개, 마지막으로 읽은 시각 ${sitemap.lastDownloaded ?? '없음'} (${sitemap.action})`,
+    `- 색인: ${coverage.indexed}/${coverage.total}개 (오늘 검사 ${inspectedToday}개, 아직 못 본 URL ${coverage.unchecked}개)`,
+    ...states,
+    `- 검색 실적 ${performance.startDate}~${performance.endDate}: 클릭 ${performance.clicks}, 노출 ${performance.impressions}`,
+    ...(performance.pages.length
+      ? ['- 많이 노출된 페이지', ...performance.pages.map(row => `  - ${formatRow(row)}`)]
+      : []),
+    ...(performance.queries.length
+      ? ['- 많이 노출된 검색어', ...performance.queries.map(row => `  - ${formatRow(row)}`)]
+      : []),
+  ];
+}
+
 /** 하루치 점검 결과를 사람이 훑어볼 수 있는 마크다운으로 정리한다. */
 export function renderReport(result) {
   return [
@@ -53,6 +77,9 @@ export function renderReport(result) {
     '',
     '## 크롤러 방문 (지난 24시간)',
     ...crawlerSection(result.crawlers),
+    '',
+    '## 구글 서치 콘솔',
+    ...searchConsoleSection(result.searchConsole),
     '',
     '## 검색 순위',
     ...rankSection(result.ranks),
@@ -75,5 +102,12 @@ export function toHistoryRecord(result) {
         query,
         position,
       })),
+    ...(result.searchConsole && !result.searchConsole.error
+      ? {
+          indexed: result.searchConsole.coverage.indexed,
+          clicks: result.searchConsole.performance.clicks,
+          impressions: result.searchConsole.performance.impressions,
+        }
+      : {}),
   };
 }
