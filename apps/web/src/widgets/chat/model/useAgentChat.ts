@@ -83,11 +83,11 @@ export function useAgentChat(isOpen: boolean) {
           return;
         }
         setAgentContentScope(scope);
-        setAgentMessages(previous =>
-          previous.some(message => message.role === 'user')
-            ? previous
-            : createInitialAgentMessages(scope)
-        );
+        // 검색 범위는 안내 문구만 갱신한다. 늦은 응답이 복원된 답변을 지우지 않는다.
+        const greeting = createInitialAgentMessages(scope)[0];
+        setAgentMessages(previous => previous.map(message =>
+          message.id === greeting.id ? greeting : message
+        ));
       })
       .catch(() => undefined);
 
