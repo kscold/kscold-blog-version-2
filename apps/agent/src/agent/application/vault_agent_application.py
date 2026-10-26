@@ -9,6 +9,7 @@ from agent.skills.feed_writing.models import ExternalSource, FeedCopilotDraft, F
 from agent.skills.feed_writing.workflow import FeedCopilotGraph
 from agent.skills.page_chat.workflow import PageChatSkill
 from agent.tools.models import ContentAccessScope, SearchHit, SearchOptions
+from agent.tools.stream_control import StreamControl
 
 
 class VaultAgentApplication:
@@ -32,8 +33,9 @@ class VaultAgentApplication:
         question: str,
         active_folder_name: str,
         scope: ContentAccessScope,
+        control: StreamControl | None = None,
     ) -> Iterator[tuple[str, AgentStage | str | AgentState]]:
-        return self.rag_graph.stream_chat(question, active_folder_name, scope)
+        return self.rag_graph.stream_chat(question, active_folder_name, scope, control)
 
     def search_vault(self, query: str, options: SearchOptions) -> list[SearchHit]:
         return self.rag_graph.store.search_vault(query, options)

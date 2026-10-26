@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import grpc
+from contextlib import closing
 
 from agent.application import VaultAgentApplication
 from agent.config import AgentConfig
@@ -8,6 +9,7 @@ from agent.grpc import vault_agent_pb2, vault_agent_pb2_grpc
 from agent.skills.feed_writing.models import ExternalSource
 from agent.skills.page_chat import PageChatInput, PageSection
 from agent.tools.models import ContentAccessScope, SearchHit, SearchOptions
+from agent.tools.stream_control import StreamControl
 
 
 class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
@@ -33,11 +35,27 @@ class VaultAgentServicer(vault_agent_pb2_grpc.VaultAgentServiceServicer):
         )
 
     def ChatStream(self, request, context):
-        for event_type, payload in self.application.stream_chat(
+        try:
+            with closing(self._chat_events(request, context)) as events:
+                yield from events
+        except Exception:
+            if context.is_active():
+                context.abort(grpc.StatusCode.UNAVAILABLE, "Agent 응답을 완료하지 못했습니다.")
+
+    def _chat_events(self, request, context):
+        events = self.application.stream_chat(
             request.message,
             request.active_folder_name,
             self._content_access_scope(request),
-        ):
+            StreamControl(context.is_active, context.add_callback),
+        )
+        with closing(events):
+            yield from self._map_chat_events(events, context)
+
+    def _map_chat_events(self, events, context):
+        for event_type, payload in events:
+            if not context.is_active():
+                return
             if event_type == "stage":
                 yield vault_agent_pb2.ChatStreamEvent(
                     stage=vault_agent_pb2.AgentStage(

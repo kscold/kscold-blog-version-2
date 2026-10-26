@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from typing import Iterator
+import httpx
 
 from agent.prompts.vault_chat import answer_messages, follow_up_messages
 from agent.tools.models import ContentAccessScope, SearchHit
+from agent.tools.stream_control import StreamControl
 
 
 class VaultAnsweringMixin:
@@ -17,9 +19,10 @@ class VaultAnsweringMixin:
         web_results: list[str] | None = None,
         scope: ContentAccessScope | None = None,
     ) -> str:
-        response = self.openai.chat.completions.create(
+        response = self.openai.with_options(max_retries=0).chat.completions.create(
             model=self.config.openai_chat_model,
             temperature=0.2,
+            timeout=httpx.Timeout(30.0, connect=5.0, pool=5.0, write=5.0),
             messages=answer_messages(
                 question,
                 active_folder_name,
@@ -37,11 +40,16 @@ class VaultAnsweringMixin:
         context: list[SearchHit],
         web_results: list[str] | None = None,
         scope: ContentAccessScope | None = None,
+        control: StreamControl | None = None,
     ) -> Iterator[str]:
-        response = self.openai.chat.completions.create(
+        control = control or StreamControl()
+        if not control.is_active():
+            return
+        response = self.openai.with_options(max_retries=0).chat.completions.create(
             model=self.config.openai_chat_model,
             temperature=0.2,
             stream=True,
+            timeout=httpx.Timeout(20.0, connect=5.0, pool=5.0, write=5.0),
             messages=answer_messages(
                 question,
                 active_folder_name,
@@ -50,17 +58,25 @@ class VaultAnsweringMixin:
                 scope or ContentAccessScope(),
             ),
         )
-        for chunk in response:
-            if chunk.choices and (delta := chunk.choices[0].delta.content):
-                yield delta
+        try:
+            if control.register_cancel is not None and not control.register_cancel(response.close):
+                return
+            for chunk in response:
+                if not control.is_active():
+                    return
+                if chunk.choices and (delta := chunk.choices[0].delta.content):
+                    yield delta
+        finally:
+            response.close()
 
     def follow_ups(
         self, question: str, answer: str, context: list[SearchHit]
     ) -> list[str]:
         try:
-            response = self.openai.chat.completions.create(
+            response = self.openai.with_options(max_retries=0).chat.completions.create(
                 model=self.config.openai_chat_model,
                 temperature=0.5,
+                timeout=httpx.Timeout(10.0, connect=5.0, pool=5.0, write=5.0),
                 messages=follow_up_messages(question, answer, context),
             )
             raw = response.choices[0].message.content or ""

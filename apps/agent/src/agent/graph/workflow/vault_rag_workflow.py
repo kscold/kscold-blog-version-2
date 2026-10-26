@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from contextlib import closing
 import logging
 import threading
 from typing import Iterator
@@ -13,6 +14,7 @@ from agent.graph.state.vault_chat_state import AgentStage, AgentState, initial_s
 from agent.tools.capabilities import WebSearchTool
 from agent.tools.models import ContentAccessScope
 from agent.tools.store import VaultStore
+from agent.tools.stream_control import StreamControl
 
 
 logger = logging.getLogger(__name__)
@@ -50,31 +52,48 @@ class VaultRagGraph:
         question: str,
         active_folder_name: str,
         content_access_scope: ContentAccessScope | None = None,
+        control: StreamControl | None = None,
     ) -> Iterator[tuple[str, AgentStage | str | AgentState]]:
+        control = control or StreamControl()
+        if not control.is_active():
+            return
         state = initial_state(question, active_folder_name, content_access_scope)
         yield "stage", state["stages"][-1]
 
         for node in (self.nodes.retrieve, self.nodes.expand, self.nodes.search_web):
+            if not control.is_active():
+                return
             node(state)
+            if not control.is_active():
+                return
             yield "stage", state["stages"][-1]
 
         self.nodes.add_answer_stage(state)
         yield "stage", state["stages"][-1]
 
         chunks: list[str] = []
-        for delta in self.store.answer_stream(
+        with closing(self.store.answer_stream(
             state["question"],
             state["active_folder_name"],
             state["context"],
             state.get("web_results", []),
             state["content_access_scope"],
-        ):
-            chunks.append(delta)
-            yield "delta", delta
+            control=control,
+        )) as answer:
+            for delta in answer:
+                if not control.is_active():
+                    return
+                chunks.append(delta)
+                yield "delta", delta
 
+        if not control.is_active():
+            return
         state["answer"] = "".join(chunks).strip()
+        if not state["answer"]:
+            raise RuntimeError("Agent의 답변이 비어 있습니다.")
         self.nodes.complete(state)
-        yield "completed", state
+        if control.is_active():
+            yield "completed", state
 
     def reindex(self, force: bool = False) -> tuple[int, int, int]:
         return self.store.reindex(force=force)
