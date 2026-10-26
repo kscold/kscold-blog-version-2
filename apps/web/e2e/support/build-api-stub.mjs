@@ -65,6 +65,7 @@ const featuredPost = {
   updatedAt: '2026-01-01T00:00:00Z',
 };
 const featuredPostSummary = { ...featuredPost, content: null };
+const koreanSlugPost = { ...featuredPost, id: 'ci-korean-post', title: 'CI 한글 주소 글', slug: '한글-주소-글' };
 const vaultWikiLinkNote = {
   id: 'ci-vault-note',
   title: 'CI Vault 위키링크 검증',
@@ -145,6 +146,9 @@ function getResponseData(requestUrl) {
   }
   if (pathname === '/api/posts/slug/ci-older') {
     return { ...featuredPost, id: 'ci-older', title: 'CI 이전 글', slug: 'ci-older' };
+  }
+  if (pathname === `/api/posts/slug/${encodeURIComponent(koreanSlugPost.slug)}`) {
+    return koreanSlugPost;
   }
   if (pathname === '/api/posts/slug/ci-frontend-verification') {
     return featuredPost;

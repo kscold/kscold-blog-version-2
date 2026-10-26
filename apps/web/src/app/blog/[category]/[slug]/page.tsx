@@ -14,11 +14,13 @@ import {
   toSeoDateTime,
   uniqueKeywords,
 } from '@/shared/lib/seo';
+import { safeDecodeURIComponent } from '@/shared/lib/safeDecodeURIComponent';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 const getPost = cache(async (slug: string): Promise<Post | null> => {
-  const encodedSlug = encodeURIComponent(slug);
+  // Next가 넘겨주는 한글 slug는 이미 인코딩돼 있다. 한 번 풀고 다시 인코딩해야 이중 인코딩(%25EA…)으로 API가 400을 내지 않는다.
+  const encodedSlug = encodeURIComponent(safeDecodeURIComponent(slug));
   const publicPost = await fetchPublicApi<Post>(`/posts/slug/${encodedSlug}`, 300);
 
   if (publicPost?.status === 'PUBLISHED' && !publicPost.restricted) {
@@ -50,7 +52,11 @@ export async function generateMetadata({
 
   const title = post.seo?.metaTitle || post.title;
   const description = toMetaDescription(post.seo?.metaDescription || post.excerpt || post.content);
-  const keywords = uniqueKeywords([...(post.seo?.keywords || []), ...post.tags.map(tag => tag.name), post.category.name]);
+  const keywords = uniqueKeywords([
+    ...(post.seo?.keywords || []),
+    ...post.tags.map(tag => tag.name),
+    post.category.name,
+  ]);
 
   return buildPageMetadata({
     title,
@@ -97,7 +103,10 @@ export default async function PostPage({
         datePublished: toSeoDateTime(post.publishedAt || post.createdAt),
         dateModified: toSeoDateTime(post.updatedAt),
         articleSection: post.category.name,
-        keywords: uniqueKeywords([...(post.seo?.keywords || []), ...post.tags.map(tag => tag.name)]).join(', '),
+        keywords: uniqueKeywords([
+          ...(post.seo?.keywords || []),
+          ...post.tags.map(tag => tag.name),
+        ]).join(', '),
         isAccessibleForFree: !post.restricted,
         author: { '@id': `${absoluteUrl('/')}#person` },
         publisher: {
