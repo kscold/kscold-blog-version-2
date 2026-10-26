@@ -64,6 +64,18 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     ],
   },
   {
+    key: 'insights',
+    label: '분석',
+    items: [
+      {
+        key: 'search',
+        label: '검색 유입',
+        href: '/admin/search',
+        description: '구글 검색 노출·유입과 색인 상태를 확인합니다',
+      },
+    ],
+  },
+  {
     key: 'community',
     label: '소통',
     items: [

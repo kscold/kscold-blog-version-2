@@ -19,6 +19,9 @@ export NEXT_PUBLIC_API_URL='' NEXT_PUBLIC_WS_URL='' NEXT_PUBLIC_GA_ID='' NEXT_PU
 export PLAYWRIGHT_BASE_URL=http://127.0.0.1:3101
 # 강사 발표 화면은 실제 대본(private/) 대신 시험용 가짜 대본을 읽는다.
 export HANSALIM_PRESENTER_DIR="$APP_DIR/e2e/fixtures/hansalim-presenter"
+# 검색 유입 화면은 시험용 설정과 색인 기록만 읽는다. 서비스 계정 키가 없으니 구글에는 요청하지 않는다.
+export SEARCH_INSIGHTS_DIR="$APP_DIR/e2e/fixtures/search-insights/config"
+export SEARCH_INSIGHTS_STATE_DIR="$APP_DIR/e2e/fixtures/search-insights/state"
 
 skip_build=0
 if [ "${1:-}" = "--skip-build" ]; then

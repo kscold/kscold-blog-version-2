@@ -61,6 +61,7 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/hansalim/presenter': ['./private/hansalim-presenter/**'],
     '/hansalim/presenter/deck': ['./private/hansalim-presenter/**'],
+    '/admin/search': ['./private/search-insights/**'],
   },
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
   // canonical·description이 본문 뒤로 스트리밍되면 일부 크롤러와 SEO 감사 도구가 놓친다.
