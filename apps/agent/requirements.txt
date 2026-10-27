@@ -1,7 +1,7 @@
 grpcio==1.85.0
 grpcio-tools==1.85.0
 langgraph==1.2.18
-openai==1.109.1
+openai==2.54.0
 pymongo==4.19.0
 qdrant-client==1.19.0
 python-dotenv==1.2.4

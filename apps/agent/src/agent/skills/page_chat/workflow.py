@@ -3,7 +3,7 @@ from __future__ import annotations
 from threading import BoundedSemaphore
 from typing import Callable, Iterator
 
-import httpx
+from openai import Timeout
 
 from agent.prompts.page_chat import page_chat_messages
 from agent.skills.page_chat.models import PageChatInput
@@ -48,7 +48,7 @@ class PageChatSkill:
             # 초기 HTTP 응답을 기다리는 요청도 실제 종료할 때까지 슬롯을 유지합니다.
             stream = self.openai.chat.completions.create(
                 model=self.model, temperature=0.2, stream=True, store=False, max_tokens=900,
-                timeout=httpx.Timeout(20.0, connect=5.0, pool=5.0, write=5.0),
+                timeout=Timeout(20.0, connect=5.0, pool=5.0, write=5.0),
                 messages=page_chat_messages(data),
             )
             if register_cancel is not None and not register_cancel(stream.close):

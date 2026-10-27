@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Iterator
-import httpx
+from openai import Timeout
 
 from agent.prompts.vault_chat import answer_messages, follow_up_messages
 from agent.tools.models import ContentAccessScope, SearchHit
@@ -22,7 +22,7 @@ class VaultAnsweringMixin:
         response = self.openai.with_options(max_retries=0).chat.completions.create(
             model=self.config.openai_chat_model,
             temperature=0.2,
-            timeout=httpx.Timeout(30.0, connect=5.0, pool=5.0, write=5.0),
+            timeout=Timeout(30.0, connect=5.0, pool=5.0, write=5.0),
             messages=answer_messages(
                 question,
                 active_folder_name,
@@ -49,7 +49,7 @@ class VaultAnsweringMixin:
             model=self.config.openai_chat_model,
             temperature=0.2,
             stream=True,
-            timeout=httpx.Timeout(20.0, connect=5.0, pool=5.0, write=5.0),
+            timeout=Timeout(20.0, connect=5.0, pool=5.0, write=5.0),
             messages=answer_messages(
                 question,
                 active_folder_name,
@@ -76,7 +76,7 @@ class VaultAnsweringMixin:
             response = self.openai.with_options(max_retries=0).chat.completions.create(
                 model=self.config.openai_chat_model,
                 temperature=0.5,
-                timeout=httpx.Timeout(10.0, connect=5.0, pool=5.0, write=5.0),
+                timeout=Timeout(10.0, connect=5.0, pool=5.0, write=5.0),
                 messages=follow_up_messages(question, answer, context),
             )
             raw = response.choices[0].message.content or ""
