@@ -9,6 +9,8 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - 'turbo.json'
+      - '.nvmrc'
+      - 'docker/Dockerfile.web'
       - '.github/workflows/frontend-ci.yml'
   pull_request:
     paths:
@@ -17,6 +19,8 @@ on:
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
       - 'turbo.json'
+      - '.nvmrc'
+      - 'docker/Dockerfile.web'
       - '.github/workflows/frontend-ci.yml'
   workflow_dispatch:
 
@@ -52,7 +56,7 @@ jobs:
       - name: Node.js 설정
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
