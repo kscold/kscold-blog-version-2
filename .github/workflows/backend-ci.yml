@@ -54,7 +54,7 @@ jobs:
 
       - name: 테스트, 포맷 및 패키징 검사
         working-directory: apps/api
-        run: ./gradlew test spotlessCheck bootJar --no-daemon
+        run: ./gradlew test spotlessCheck build --no-daemon
 
       - name: API 이미지 빌드
         run: docker build --file docker/Dockerfile.api --tag kscold-blog-api:ci .
@@ -68,6 +68,7 @@ jobs:
       - name: API 이미지 보안 검사
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
+          version: v0.76.1
           image-ref: kscold-blog-api:ci
           format: table
           exit-code: '1'
