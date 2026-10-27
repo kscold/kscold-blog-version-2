@@ -146,7 +146,7 @@ export function AgentMessageList({
                   참고한 기록
                 </p>
                 <div className="grid gap-2">
-                  {message.sources.slice(0, 5).map((source, index) => (
+                  {message.sources.map((source, index) => (
                     <Link
                       key={`${source.type}-${source.id}`}
                       href={sourceHref(source)}

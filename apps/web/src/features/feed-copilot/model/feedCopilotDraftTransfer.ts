@@ -22,7 +22,11 @@ export function stageFeedCopilotDraft(draft: FeedCopilotDraft, sourceUrl: string
     tags: draft.tags,
     sourceUrl,
   };
-  window.sessionStorage.setItem(storageKey, JSON.stringify(payload));
+  try {
+    window.sessionStorage.setItem(storageKey, JSON.stringify(payload));
+  } catch {
+    // 이전 화면의 초안 전달이 불가능해도 작성 화면을 계속 사용할 수 있게 한다.
+  }
   window.dispatchEvent(new Event(FEED_COPILOT_DRAFT_EVENT));
 }
 
@@ -31,14 +35,10 @@ export function takeFeedCopilotDraft(): FeedCopilotTransferDraft | null {
     return null;
   }
 
-  const storedDraft = window.sessionStorage.getItem(storageKey);
-  if (!storedDraft) {
-    return null;
-  }
-
-  window.sessionStorage.removeItem(storageKey);
-
   try {
+    const storedDraft = window.sessionStorage.getItem(storageKey);
+    if (!storedDraft) return null;
+    window.sessionStorage.removeItem(storageKey);
     const draft = JSON.parse(storedDraft) as Partial<FeedCopilotTransferDraft>;
     if (typeof draft.title !== 'string' || typeof draft.content !== 'string') {
       return null;

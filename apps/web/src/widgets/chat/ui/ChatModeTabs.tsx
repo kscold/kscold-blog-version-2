@@ -1,4 +1,4 @@
-export type ChatMode = 'agent' | 'feed' | 'owner';
+export type ChatMode = 'agent' | 'owner';
 
 interface ChatModeTabsProps {
   mode: ChatMode;
@@ -7,7 +7,6 @@ interface ChatModeTabsProps {
 
 const chatModes: Array<{ id: ChatMode; label: string }> = [
   { id: 'agent', label: 'Agent에게 묻기' },
-  { id: 'feed', label: '피드 초안' },
   { id: 'owner', label: '주인에게 남기기' },
 ];
 
@@ -16,7 +15,7 @@ export function ChatModeTabs({ mode, onChange }: ChatModeTabsProps) {
     <div
       role="tablist"
       aria-label="대화 기능 선택"
-      className="grid shrink-0 grid-cols-3 gap-2 border-b border-surface-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3"
+      className="grid shrink-0 grid-cols-2 gap-2 border-b border-surface-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3"
     >
       {chatModes.map(chatMode => (
         <button

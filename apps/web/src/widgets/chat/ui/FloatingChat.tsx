@@ -18,12 +18,17 @@ export default function FloatingChat() {
   const initialQuestion = getAgentEntryQuestion(searchParams.get('agentTopic'));
 
   useEffect(() => {
+    if (searchParams.get('chat') === 'feed' || searchParams.get('chatMode') === 'feed') {
+      setIsOpen(false);
+      router.replace('/feed?draft=open#feed-composer', { scroll: true });
+      return;
+    }
     const shouldOpen = searchParams.get('chat') === 'open';
     setIsOpen(shouldOpen);
     if (shouldOpen) {
       setShouldLoadModal(true);
     }
-  }, [searchParams]);
+  }, [router, searchParams]);
 
   const clearChatParam = () => {
     if (searchParams.get('chat') !== 'open') {

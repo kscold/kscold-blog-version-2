@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import {
   FEED_COPILOT_DRAFT_EVENT,
@@ -23,6 +24,7 @@ interface FeedComposerProps {
 }
 
 export function FeedComposer({ currentUser }: FeedComposerProps) {
+  const searchParams = useSearchParams();
   const {
     content,
     setContent,
@@ -137,6 +139,7 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
 
   return (
     <motion.section
+      id="feed-composer"
       data-testid="feed-composer"
       className="mb-8 overflow-hidden rounded-[32px] border border-surface-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.06)] [word-break:keep-all]"
       initial={{ opacity: 0, y: 10 }}
@@ -157,6 +160,8 @@ export function FeedComposer({ currentUser }: FeedComposerProps) {
           onDrop={handleDrop}
         />
         <FeedCopilotPanel
+          key={`${currentUser.id}:${searchParams.get('draft') || ''}`}
+          defaultOpen={searchParams.get('draft') === 'open'}
           memo={content}
           sourceUrl={linkUrl}
           onSourceUrlChange={setLinkUrl}

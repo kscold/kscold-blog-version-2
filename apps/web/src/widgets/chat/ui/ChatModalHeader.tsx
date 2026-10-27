@@ -7,6 +7,7 @@ interface Props {
   onClose: () => void;
   onNewChat?: () => void;
   canNewChat?: boolean;
+  onResetSize?: () => void;
 }
 
 export function ChatModalHeader({
@@ -16,6 +17,7 @@ export function ChatModalHeader({
   onClose,
   onNewChat,
   canNewChat = false,
+  onResetSize,
 }: Props) {
   return (
     <div className="flex-shrink-0 border-b border-surface-200 bg-surface-50 p-3 sm:p-4">
@@ -37,6 +39,19 @@ export function ChatModalHeader({
           </div>
         </div>
         <div className="ml-2 flex flex-shrink-0 items-center gap-1">
+          {onResetSize && (
+            <button
+              type="button"
+              onClick={onResetSize}
+              aria-label="채팅 기본 크기로 복원"
+              title="기본 크기로 복원"
+              className="hidden h-9 w-9 items-center justify-center rounded-lg text-surface-500 hover:bg-surface-200 sm:flex"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path d="M4 9V4h5m11 11v5h-5M4 4l6 6m10 10-6-6" />
+              </svg>
+            </button>
+          )}
           {onNewChat && (
             <button
               onClick={onNewChat}

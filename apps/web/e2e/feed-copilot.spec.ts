@@ -100,38 +100,62 @@ test('말투 참고 초안을 끝까지 확인하고 최신 입력만 본문에 
   await expect(contentInput).toHaveValue(new RegExp('#Agent #개발회고'));
 });
 
-test('채팅 모달에서 만든 피드 초안을 작성기로 잃지 않고 전달한다', async ({ page }) => {
+for (const width of [1440, 390]) {
+  test(`초안 도우미는 피드 작성 영역에서 본문을 채운다 (${width})`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 960 });
+    await mockFeedPage(page);
+    await mockApi(page, 'POST', '**/api/feeds/copilot/draft', success({
+      ...DRAFT, content: '기록의 출처와 공개 범위를 확인했습니다.\n\n작성일을 기준으로 최근 피드를 살폈습니다.',
+    }));
+    await seedSession(page, USER);
+    let published = false;
+    await page.route('**/api/feeds', async route => {
+      if (route.request().method() === 'POST') published = true;
+      await route.fallback();
+    });
+    await page.goto('/feed?chat=open&chatMode=feed');
+    await expect(page).toHaveURL(/\/feed\?draft=open/);
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    const composer = page.getByTestId('feed-composer');
+    const copilot = composer.getByTestId('feed-copilot');
+    const content = composer.getByTestId('feed-composer-content');
+    await content.fill('작성 폼에서 검색 범위를 확인한 메모');
+    await copilot.getByRole('button', { name: '작성 계획 세우기' }).click();
+    await copilot.getByRole('button', { name: '이 방향으로 초안 만들기' }).click();
+    await copilot.getByRole('button', { name: '본문에 적용하기' }).click();
+    await expect(content).toHaveValue(/기록의 출처와 공개 범위/);
+    await expect(content).toHaveValue(/#Agent #개발회고/);
+    expect(published).toBe(false);
+    await copilot.getByRole('button').first().click();
+    await expect(copilot.getByTestId('feed-copilot-source-url')).toBeHidden();
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await page.screenshot({ path: testInfo.outputPath(`feed-draft-${width}.png`), fullPage: true });
+  });
+}
+
+test('이전 화면이 전달한 초안을 복원하고 저장소 차단 시에도 작성기를 연다', async ({ page }) => {
   await mockFeedPage(page);
-  await mockApi(page, 'POST', '**/api/feeds/copilot/draft', success(DRAFT));
-  await mockApi(
-    page,
-    'GET',
-    '**/api/vault/agent/content-scope',
-    success({ label: '전체 기록', description: '허용된 기록을 검색합니다.' })
-  );
-  await mockApi(
-    page,
-    'GET',
-    '**/api/vault/agent/history*',
-    success({ sessionId: 'feed-transfer', messages: [] })
-  );
   await seedSession(page, USER);
+  await page.addInitScript(() => {
+    sessionStorage.setItem('kscold-feed-copilot-draft', JSON.stringify({
+      title: '이전에 만든 제목', content: '이전에 만든 본문', tags: ['기록'], sourceUrl: '',
+    }));
+  });
   await page.goto('/feed');
+  await expect(page.getByTestId('feed-composer-content')).toHaveValue(/이전에 만든 본문/);
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'sessionStorage', { get() { throw new Error('blocked'); } });
+  });
+  await page.reload();
+  await expect(page.getByTestId('feed-composer-content')).toBeVisible();
+});
 
-  await page.getByRole('button', { name: 'KSCOLD 대화 열기' }).click();
-  const dialog = page.getByRole('dialog');
-  await dialog.getByRole('tab', { name: '피드 초안' }).click();
-  const memoInput = dialog.locator('[data-testid="feed-copilot-memo"]');
-  await expect(memoInput).toHaveAttribute('maxlength', '4000');
-  await memoInput.fill('모달에서 만든 피드 메모');
-  await dialog.getByRole('button', { name: '작성 계획 세우기' }).click();
-  await dialog.getByRole('button', { name: '이 방향으로 초안 만들기' }).click();
-  await dialog.getByRole('button', { name: '본문에 적용하기' }).click();
-
-  await expect(dialog).toBeHidden();
-  await expect(page.locator('[data-testid="feed-composer-content"]')).toHaveValue(
-    new RegExp('28번째 문단')
-  );
+test('로그인하지 않은 방문자에게 초안 도우미를 노출하지 않는다', async ({ page }) => {
+  await mockShellApis(page);
+  await mockApi(page, 'GET', '**/api/auth/me', success(null));
+  await page.goto('/feed?draft=open');
+  await expect(page.getByRole('link', { name: '로그인하고 글 쓰기' })).toBeVisible();
+  await expect(page.getByTestId('feed-copilot')).toHaveCount(0);
 });
 
 test('긴 피드 본문은 게시할 수 있지만 Copilot 메모 한도는 이유와 함께 안내한다', async ({
