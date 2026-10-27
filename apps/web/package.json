@@ -65,7 +65,7 @@
     "axe-core": "4.13.0",
     "eslint": "^10.13.0",
     "eslint-config-next": "^16.4.3",
-    "postcss": "^8.5.28",
+    "postcss": "^8.5.32",
     "start-server-and-test": "^3.0.13",
     "tailwindcss": "^4.3.3",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
