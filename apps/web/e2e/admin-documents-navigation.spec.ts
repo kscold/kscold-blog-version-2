@@ -141,5 +141,5 @@ test('세션 확인 실패는 개인 문서를 열지 않으며 명시적으로 
   isAllowed = true;
   await page.locator('[data-testid="admin-documents-verify-session"]').click();
   await expect(page.locator('[data-testid="admin-documents-page"]')).toBeVisible();
-  expect(listRequests).toBeGreaterThan(0);
+  await expect.poll(() => listRequests).toBeGreaterThan(0);
 });

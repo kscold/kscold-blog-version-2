@@ -22,6 +22,30 @@ async function setup(page: Page) {
   return state;
 }
 
+test('스크립트가 늦게 도착해도 좋아요는 hydration 뒤에 활성화된다', async ({ page }) => {
+  const state = await setup(page);
+  let releaseScripts!: () => void;
+  const scriptsReady = new Promise<void>(resolve => { releaseScripts = resolve; });
+  await page.route('**/_next/static/**/*.js', async route => {
+    await scriptsReady;
+    await route.continue();
+  });
+  try {
+    await page.goto('/feed/ci-like-feed', { waitUntil: 'commit' });
+    const like = page.getByRole('button', { name: '좋아요 3개', exact: true });
+    await expect(like).toBeVisible();
+    await expect(like).toBeDisabled();
+    expect(state.requests).toEqual([]);
+    releaseScripts();
+    await expect(like).toBeEnabled();
+    await like.click();
+    await expect(page.getByRole('button', { name: '좋아요 취소 8개', exact: true })).toBeEnabled();
+    expect(state.requests).toEqual([true]);
+  } finally {
+    releaseScripts();
+  }
+});
+
 for (const path of ['/feed', '/feed/ci-like-feed', '/profile/kscold']) {
   test(`${path}: 서버가 확정한 개수로 표시하고 명시적 해제 요청을 보낸다`, async ({ page }) => {
     const state = await setup(page);

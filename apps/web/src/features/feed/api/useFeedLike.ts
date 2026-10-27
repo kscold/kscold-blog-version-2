@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { useIsFetching, useIsMutating, useMutation, useQueryClient, type Query } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/api-client';
+import { useHydrated } from '@/shared/lib/useBrowserSnapshot';
 import { useSessionIdentity } from '@/shared/model/SessionIdentity';
 import type { Feed } from '@/shared/model/types/social';
 
@@ -25,6 +26,7 @@ export function updateFeedReaction(data: unknown, feed: Pick<Feed, 'id' | 'isLik
 }
 
 export function useFeedLike(feedId: string) {
+  const hydrated = useHydrated();
   const viewer = useSessionIdentity();
   const queryClient = useQueryClient();
   const guard = useRef<string | null>(null);
@@ -47,7 +49,7 @@ export function useFeedLike(feedId: string) {
   });
 
   const submit = async (liked: boolean) => {
-    if (guard.current === viewer || fetching > 0 || queryClient.isMutating({ mutationKey }) > 0) return;
+    if (!hydrated || guard.current === viewer || fetching > 0 || queryClient.isMutating({ mutationKey }) > 0) return;
     guard.current = viewer;
     try { await mutation.mutateAsync({ liked, viewer }); }
     catch { /* 서버 오류 원문 대신 고정 안내와 재조회한 상태를 표시한다. */ }
@@ -55,7 +57,7 @@ export function useFeedLike(feedId: string) {
   };
   return {
     submit,
-    isPending: pendingCount > 0 || fetching > 0,
+    isPending: !hydrated || pendingCount > 0 || fetching > 0,
     hasError: mutation.isError && mutation.variables?.viewer === viewer,
   };
 }
