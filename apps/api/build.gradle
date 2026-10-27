@@ -12,7 +12,7 @@ version = '2.0.0'
 ext {
     // Spring Boot가 관리하는 버전에 남아 있는 취약점을 수정 버전으로 올린다.
     // Tomcat: CVE-2026-65182·65905·68525 (11.0.25에서 수정)
-    set('tomcat.version', '11.0.26')
+    set('tomcat.version', '11.0.27')
     // Jackson 3(애플리케이션과 스프링이 사용): CVE-2026-68497·89407·89425·91776·91777 (3.1.7에서 수정)
     set('jackson-bom.version', '3.1.7')
     // Jackson 2(JWT·디스코드 라이브러리가 사용): 같은 취약점의 2.x 수정 버전
