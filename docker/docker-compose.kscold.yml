@@ -33,7 +33,8 @@ services:
 
   blog-qdrant:
     container_name: kscold-vault-qdrant
-    image: qdrant/qdrant:v1.19.0-unprivileged
+    # 기존 볼륨은 apps/agent/UPGRADING.md의 순차 이전 절차를 먼저 따릅니다.
+    image: qdrant/qdrant:v1.20.0-unprivileged@sha256:8c215051dc7bc15221b5f89c100a84a4b04d0dd8497fb73e6fa86fc948d1a41d
     read_only: true
     cap_drop:
       - ALL

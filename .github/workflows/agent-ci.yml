@@ -6,11 +6,17 @@ on:
     paths:
       - 'apps/agent/**'
       - 'apps/api/src/main/proto/vault_agent.proto'
+      - 'docker/docker-compose.yml'
+      - 'docker/docker-compose.prod.yml'
+      - 'docker/docker-compose.kscold.yml'
       - '.github/workflows/agent-ci.yml'
   pull_request:
     paths:
       - 'apps/agent/**'
       - 'apps/api/src/main/proto/vault_agent.proto'
+      - 'docker/docker-compose.yml'
+      - 'docker/docker-compose.prod.yml'
+      - 'docker/docker-compose.kscold.yml'
       - '.github/workflows/agent-ci.yml'
   workflow_dispatch:
 
@@ -25,6 +31,11 @@ jobs:
   verify:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    services:
+      qdrant-test:
+        image: qdrant/qdrant:v1.20.0-unprivileged@sha256:8c215051dc7bc15221b5f89c100a84a4b04d0dd8497fb73e6fa86fc948d1a41d
+        ports:
+          - 16333:6333
     steps:
       - name: 소스 체크아웃
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -58,6 +69,12 @@ jobs:
           'import unittest, sys; suite = unittest.defaultTestLoader.discover("/tests");
           result = unittest.TextTestRunner(verbosity=2).run(suite);
           sys.exit(not result.wasSuccessful() or bool(result.skipped) or result.testsRun == 0)'
+
+      - name: Qdrant 서버 검색 계약 검사
+        run: >-
+          docker run --rm --network host --env QDRANT_TEST_URL=http://127.0.0.1:16333
+          --volume "$PWD/apps/agent/tests:/tests:ro" --entrypoint python
+          kscold-vault-agent:ci /tests/qdrant_server_smoke.py
 
       - name: Python 취약점 검사
         run: |
