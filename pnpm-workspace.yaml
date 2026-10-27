@@ -16,6 +16,7 @@ supportedArchitectures:
 
 # pnpm 11+에서는 루트 package.json의 pnpm 설정을 읽지 않는다.
 overrides:
+  "@ungap/structured-clone": "1.4.0"
   "@humanfs/node": "0.16.8"
   "@tiptap/core": "3.32.0"
   "@tiptap/pm": "3.32.0"
