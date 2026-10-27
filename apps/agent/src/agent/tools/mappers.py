@@ -1,6 +1,22 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from agent.tools.models import VaultNote
+
+
+def created_at(document: dict) -> str:
+    value = document.get("createdAt")
+    if isinstance(value, str):
+        try:
+            value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return ""
+    if not isinstance(value, datetime):
+        return ""
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc).isoformat()
 
 
 class VaultDocumentMapperMixin:
@@ -19,6 +35,7 @@ class VaultDocumentMapperMixin:
             tags=list(document.get("tags") or []),
             content_type="vault",
             path=f"/vault/{slug}",
+            created_at=created_at(document),
         )
 
     @staticmethod
@@ -45,6 +62,7 @@ class VaultDocumentMapperMixin:
             tags=tags,
             content_type="blog",
             path=f"/blog/{category_slug}/{slug}",
+            created_at=created_at(document),
         )
 
     @staticmethod
@@ -68,4 +86,5 @@ class VaultDocumentMapperMixin:
             tags=list(document.get("tags") or []),
             content_type="feed",
             path=f"/feed/{feed_id}",
+            created_at=created_at(document),
         )

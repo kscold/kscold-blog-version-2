@@ -6,6 +6,8 @@ from agent.config import AgentConfig
 from agent.graph.state.vault_chat_state import AgentState
 from agent.tools.capabilities import WebSearchTool
 from agent.tools.models import SearchOptions
+from agent.tools.intent import query_intent
+from agent.tools.citations import cited_records
 from agent.tools.store import VaultStore
 
 
@@ -18,13 +20,8 @@ class VaultRagNodes:
     web_search: WebSearchTool
 
     def retrieve(self, state: AgentState) -> AgentState:
-        scoped_question = " ".join(
-            part
-            for part in [state.get("active_folder_name", ""), state["question"]]
-            if part
-        )
         hits = self.store.search(
-            scoped_question,
+            state["question"],
             SearchOptions(
                 limit=self.config.max_context_notes,
                 active_folder_name=state.get("active_folder_name", ""),
@@ -35,27 +32,34 @@ class VaultRagNodes:
         state["stages"].append(
             {
                 "name": "기록 찾기",
-                "detail": f"질문과 가까운 기록 {len(hits)}개를 찾았습니다.",
+                "detail": f"현재 열람 범위에서 {'최근 작성된' if query_intent(state['question']).recent else '질문에 맞는'} 기록 {len(hits)}개를 찾았습니다.",
             }
         )
         return state
 
     def expand(self, state: AgentState) -> AgentState:
-        state["context"] = self.store.expand_graph(
-            state["hits"],
-            self.config.max_context_notes + 3,
-            state["content_access_scope"],
-        )
+        intent = query_intent(state["question"])
+        if intent.content_types or intent.recent:
+            state["context"] = state["hits"]
+        else:
+            state["context"] = self.store.expand_graph(
+                state["hits"],
+                self.config.max_context_notes + 3,
+                state["content_access_scope"],
+            )
         state["stages"].append(
             {
                 "name": "맥락 연결",
-                "detail": "링크와 백링크를 따라 필요한 주변 기록을 함께 확인했습니다.",
+                "detail": "요청한 출처와 작성일 범위를 유지했습니다." if intent.content_types or intent.recent
+                else "링크와 백링크를 따라 필요한 주변 기록을 함께 확인했습니다.",
             }
         )
         return state
 
     def search_web(self, state: AgentState) -> AgentState:
-        if not self.config.web_search_enabled or not self.needs_web_search(state["question"]):
+        if (query_intent(state["question"]).content_types
+                or not self.config.web_search_enabled
+                or not self.needs_web_search(state["question"])):
             state["web_results"] = []
             state["stages"].append(
                 {
@@ -97,6 +101,7 @@ class VaultRagNodes:
         return state
 
     def complete(self, state: AgentState) -> AgentState:
+        state["answer"], state["context"] = cited_records(state["answer"], state["context"])
         state["follow_ups"] = self.store.follow_ups(
             state["question"],
             state["answer"],

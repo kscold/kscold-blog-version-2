@@ -16,6 +16,7 @@ class VaultNote:
     tags: list[str]
     content_type: str = "vault"
     path: str = ""
+    created_at: str = ""
 
 
 @dataclass(frozen=True)

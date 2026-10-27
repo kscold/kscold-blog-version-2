@@ -1,11 +1,40 @@
 from __future__ import annotations
 
-from agent.tools.models import ContentAccessScope, VaultNote
+import re
+
+from agent.tools.models import ContentAccessScope, SearchHit, SearchOptions, VaultNote
 from agent.tools.profile import public_profile_note
 
 
 class VaultCatalogMixin:
     """MongoDB 원본을 검색 문서로 읽고, 실제 권한으로 다시 검증합니다."""
+
+    def recent_records(self, topic: str, options: SearchOptions, folder_ids: set) -> list[SearchHit]:
+        """권한·출처·주제를 먼저 제한하고 각 컬렉션의 최신 작성 기록을 읽는다."""
+        terms = self._query_terms(topic)
+        hits: list[SearchHit] = []
+        for kind, collection, access, mapper, fields in (
+            ("vault", self.notes, self._vault_access_filter, self._to_note, ("title", "content", "tags")),
+            ("blog", self.posts, self._post_access_filter, self._to_post, ("title", "content", "excerpt", "tags.name")),
+            ("feed", self.feeds, self._feed_access_filter, self._to_feed, ("content", "tags", "linkPreview.title", "linkPreview.description")),
+        ):
+            if options.content_types and kind not in options.content_types:
+                continue
+            if folder_ids and kind != "vault" and not options.content_types:
+                continue
+            filters = [access(options.scope)]
+            if folder_ids and kind == "vault":
+                filters.append({"folderId": {"$in": list(folder_ids)}})
+            if terms:
+                filters.append({"$or": [
+                    {field: {"$regex": re.escape(term), "$options": "i"}}
+                    for term in terms for field in fields
+                ]})
+            documents = collection.find({"$and": filters}).sort([("createdAt", -1), ("_id", -1)]).limit(options.limit)
+            hits.extend(SearchHit(note=mapper(document), score=1.0) for document in documents)
+        # 컬렉션별 limit은 정렬 후에 적용해야 오래된 기록이 최신 기록을 밀어내지 않는다.
+        hits.sort(key=lambda hit: (hit.note.created_at, hit.note.content_type, hit.note.id), reverse=True)
+        return hits[:options.limit]
 
     def iter_notes(self, scope: ContentAccessScope | None = None) -> list[VaultNote]:
         access_scope = scope or ContentAccessScope()

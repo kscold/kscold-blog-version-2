@@ -1,20 +1,36 @@
 from __future__ import annotations
 
 import re
+from dataclasses import replace
 
 from bson import ObjectId
+from qdrant_client import models
 
 from agent.tools.models import ContentAccessScope, SearchHit, SearchOptions
 from agent.tools.profile import profile_query_matches, public_profile_note
+from agent.tools.intent import query_intent
 
 
 class VaultSearchMixin:
     """Qdrant 의미 검색, MongoDB 키워드 검색, 링크 확장을 같은 권한 범위로 실행합니다."""
 
     def search(self, query: str, options: SearchOptions) -> list[SearchHit]:
+        intent = query_intent(query)
+        if options.content_types and intent.content_types:
+            selected_types = options.content_types & intent.content_types
+            if not selected_types:
+                return []
+        else:
+            selected_types = options.content_types or intent.content_types
+        options = replace(options, content_types=selected_types)
         folder_ids = self.resolve_folder_scope(options.active_folder_name)
+        if intent.recent or (intent.content_types and not intent.topic):
+            if selected_types == frozenset({"profile"}) and not intent.recent:
+                return [SearchHit(note=public_profile_note(), score=1.0)]
+            return self.recent_records(intent.topic, options, folder_ids)
+        search_query = intent.topic if intent.content_types else query
         keyword_hits = self.keyword_search(
-            query,
+            search_query,
             options.limit * 2,
             folder_ids,
             options.scope,
@@ -30,7 +46,7 @@ class VaultSearchMixin:
             ):
                 return keyword_hits[: options.limit]
             vector_hits = self._vector_search(
-                query,
+                search_query,
                 options.limit,
                 folder_ids,
                 options.scope,
@@ -62,9 +78,18 @@ class VaultSearchMixin:
         scope: ContentAccessScope,
         content_types: frozenset[str],
     ) -> list[SearchHit]:
+        type_filter = None
+        if content_types:
+            conditions = [models.FieldCondition(
+                key="content_type", match=models.MatchAny(any=sorted(content_types))
+            )]
+            if "vault" in content_types:
+                conditions.append(models.IsEmptyCondition(is_empty=models.PayloadField(key="content_type")))
+            type_filter = models.Filter(should=conditions)
         response = self.qdrant.query_points(
             collection_name=self.config.qdrant_collection,
             query=self.embed_text(query),
+            query_filter=type_filter,
             # 후보는 넉넉히 받고 원본 MongoDB 권한을 반드시 다시 적용합니다.
             limit=max(limit * 5, 25),
             with_payload=True,
@@ -139,11 +164,11 @@ class VaultSearchMixin:
             if not content_types or "vault" in content_types
             else []
         )
-        if not folder_ids and (not content_types or "blog" in content_types):
+        if (not folder_ids or "blog" in content_types) and (not content_types or "blog" in content_types):
             candidates.extend(self._post_candidates(conditions, access_scope))
-        if not folder_ids and (not content_types or "feed" in content_types):
+        if (not folder_ids or "feed" in content_types) and (not content_types or "feed" in content_types):
             candidates.extend(self._feed_candidates(conditions, access_scope))
-        if not folder_ids and (not content_types or "profile" in content_types):
+        if (not folder_ids or "profile" in content_types) and (not content_types or "profile" in content_types):
             profile = public_profile_note()
             if profile_query_matches(query, terms) or self._note_matches_query_focus(profile, terms):
                 candidates.append(profile)

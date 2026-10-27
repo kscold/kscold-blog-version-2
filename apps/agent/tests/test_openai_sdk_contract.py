@@ -9,6 +9,7 @@ from openai import OpenAI, RateLimitError
 from agent.skills.page_chat.models import PageChatInput, PageSection
 from agent.skills.page_chat.workflow import PageChatSkill
 from agent.tools.store import VaultStore
+from agent.tools.models import SearchHit, VaultNote
 
 
 class OpenAISdkContractTest(unittest.TestCase):
@@ -105,8 +106,15 @@ class OpenAISdkContractTest(unittest.TestCase):
     def test_vault_answer_and_followups_use_sdk_timeout(self):
         store = self.vault()
         self.assertEqual(store.answer("질문", "", []), "근거 답변")
-        self.state.content = "- 질문 하나\n- 질문 둘"
-        self.assertEqual(store.follow_ups("질문", "답변", []), ["질문 하나", "질문 둘"])
+        context = [SearchHit(note=VaultNote(
+            id="feed-1", title="검색 범위", slug="feed-1", content="공개 기록의 검색 범위를 확인했다.",
+            folder_id=None, outgoing_links=[], tags=[], content_type="feed",
+        ), score=1.0)]
+        self.state.content = json.dumps([
+            {"source": 1, "topic": "검색 범위", "question": "검색 범위는 어떻게 확인했어?"},
+        ])
+        self.assertEqual(store.follow_ups("질문", "답변", context), ["검색 범위는 어떻게 확인했어?"])
+        self.assertEqual(len(self.state.requests), 2)
 
     def test_vault_stream_parses_real_sdk_chunks(self):
         self.assertEqual(list(self.vault().answer_stream("질문", "", [])), ["근거 ", "답변"])
