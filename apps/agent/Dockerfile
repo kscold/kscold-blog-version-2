@@ -5,7 +5,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 ARG PIP_VERSION=26.2.2
-ARG SETUPTOOLS_VERSION=84.1.0
+ARG SETUPTOOLS_VERSION=84.2.1
 
 WORKDIR /service
 
