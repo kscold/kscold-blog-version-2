@@ -114,6 +114,11 @@ jobs:
           pnpm --dir apps/web exec playwright test
           test "$(curl --fail --silent http://127.0.0.1:4100/__request-count)" -gt 0
 
+      - name: 빈 블로그 아카이브 검사
+        env:
+          BUILD_BLOG_EMPTY: 'true'
+        run: pnpm --dir apps/web test:e2e:ci --grep '빈 첫 아카이브'
+
       - name: 실패한 브라우저 검사 자료 보관
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

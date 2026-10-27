@@ -4,7 +4,7 @@ import { parseArchivePage } from '../src/widgets/blog/lib/archivePage';
 const isEmptyArchive = process.env.BUILD_BLOG_EMPTY === 'true';
 
 test.describe('블로그 아카이브 페이지 계약', () => {
-  test.skip(isEmptyArchive, '빈 아카이브는 별도 운영 서버에서 검증한다.');
+  test.skip(isEmptyArchive, '빈 아카이브는 별도 스텁 빌드에서 검증한다.');
 
   test('초기 HTML은 각 페이지의 글과 자기 URL 메타데이터를 제공한다', async ({ request }) => {
     const first = await request.get('/blog');
@@ -99,7 +99,7 @@ test.describe('블로그 아카이브 페이지 계약', () => {
 test('빈 첫 아카이브는 200이고 2페이지는 404이다', async ({ request }) => {
   test.skip(
     !isEmptyArchive,
-    '빈 응답 정책은 기본 CI에서 검사하며, 이 HTTP 검증은 BUILD_BLOG_EMPTY 전용 스텁과 격리된 캐시에서 실행한다.'
+    '이 HTTP 검증은 CI의 BUILD_BLOG_EMPTY 전용 스텁 빌드와 격리된 캐시에서 실행한다.'
   );
   const first = await request.get('/blog');
   expect(first.status()).toBe(200);

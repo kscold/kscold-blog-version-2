@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import path from 'node:path';
 import { success, mockApi } from './support/api';
 import { seedAdminSession } from './support/auth';
 import { expectNoHorizontalOverflow, VIEWPORTS } from './support/dom';
@@ -162,7 +163,31 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
     });
   }
 
-  // 비디오 버튼이 'URL prompt 임베드' → 'mp4 파일 업로드'로 변경되어 원본 시나리오(YouTube URL 임베드)는
-  // 더 이상 적용되지 않는다. 파일 업로드 기반 임베드는 별도 fixture 가 필요해 추후 보강한다.
-  test.skip('작성기는 비디오 링크를 노션처럼 임베드 미리보기한다', async () => {});
+  test('작성기는 동영상 파일을 업로드하고 편집·미리보기에서 재생 가능한 영상을 유지한다', async ({ page, baseURL }) => {
+    await mockEditorApis(page);
+    await seedAdminSession(page);
+    const fixture = path.resolve('e2e/fixtures/editor-video.webm');
+    const videoUrl = new URL('/e2e/editor-video.webm', baseURL).href;
+    await mockApi(page, 'POST', '**/api/media/upload', success({ url: videoUrl }));
+    await page.route(videoUrl, route => route.fulfill({ path: fixture, contentType: 'video/webm' }));
+    await page.goto('/admin/posts/new');
+    await expect(page.locator('.ProseMirror')).toBeVisible();
+    const chooser = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: '동영상', exact: true }).click();
+    const uploaded = page.waitForRequest(request => request.method() === 'POST' && new URL(request.url()).pathname === '/api/media/upload');
+    await (await chooser).setFiles(fixture);
+    const request = await uploaded;
+    expect(request.headers()['content-type']).toContain('multipart/form-data');
+    expect(request.postDataBuffer()?.includes(Buffer.from('editor-video.webm'))).toBe(true);
+
+    const editorVideo = page.locator('.ProseMirror video');
+    await expect(editorVideo).toHaveAttribute('src', videoUrl);
+    await expect.poll(() => editorVideo.evaluate((video: HTMLVideoElement) => video.videoWidth)).toBeGreaterThan(0);
+    await page.getByTestId('post-editor-view-preview').click();
+    const previewVideo = page.locator('video');
+    await expect(previewVideo).toHaveCount(1);
+    await expect(previewVideo).toHaveAttribute('src', videoUrl);
+    await expect.poll(() => previewVideo.evaluate((video: HTMLVideoElement) => video.videoWidth)).toBeGreaterThan(0);
+    expect(await previewVideo.evaluate((video: HTMLVideoElement) => video.error)).toBeNull();
+  });
 });
