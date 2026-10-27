@@ -1,4 +1,4 @@
-FROM gradle:9.8.2-jdk21@sha256:e8af4a499559e4eadfd52b90eb6770a8f856b3552c3b0432eae1f17080383c7a AS builder
+FROM gradle:9.8.2-jdk25@sha256:b4142d83c87243b2dfd9a2d60a9412b83960663adbecb6995371889cf22b25c3 AS builder
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN ./gradlew dependencies --configuration runtimeClasspath --no-daemon --quiet 
 COPY apps/api/src ./src
 RUN ./gradlew bootJar --no-daemon
 
-FROM eclipse-temurin:21-jre-alpine@sha256:974b08960c5d96694c780e65b2d5705268ab1e1ca1a0dd0caf4ba6c3fe34d699 AS runner
+FROM eclipse-temurin:25-jre-alpine@sha256:b7528962e65d43064d8a8b67ba175367896bc948363ea2d3fcd7f10d34e1f048 AS runner
 
 WORKDIR /app
 

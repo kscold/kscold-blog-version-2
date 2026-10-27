@@ -22,7 +22,7 @@ ext {
 }
 
 java {
-    sourceCompatibility = '21'
+    sourceCompatibility = '25'
 }
 
 spotless {
