@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 export interface ModalProps {
   isOpen: boolean;

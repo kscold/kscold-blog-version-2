@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { AuthGridPattern } from '@/features/auth/ui/AuthGridPattern';

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'motion/react';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 export function ScrollProgress() {

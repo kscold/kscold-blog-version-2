@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { AlertItem, AlertType, useAlertStore } from '@/shared/model/alertStore';
 
 const ICONS: Record<AlertType, React.ReactNode> = {

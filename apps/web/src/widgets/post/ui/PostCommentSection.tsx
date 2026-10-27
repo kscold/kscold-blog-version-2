@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 import { filterVisibleTagInfos } from '@/shared/lib/tags';
 import type { Tag } from '@/shared/model/types/blog';

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { VaultFolder, VaultNote } from '@/shared/model/types/vault';
 import { useVaultNotes } from '@/entities/vault';
 

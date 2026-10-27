@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, useMotionValue } from 'framer-motion';
+import { motion, useMotionValue } from 'motion/react';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 const ACTIVE_CURSOR_CLASS = 'custom-cursor-active';

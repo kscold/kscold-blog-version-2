@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { VisitEntry } from '@/entities/analytics';
 import { formatRelativeTime } from '@/shared/lib/format-utils';
 

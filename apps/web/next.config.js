@@ -95,7 +95,7 @@ const nextConfig = {
 
   // 실험적 기능
   experimental: {
-    optimizePackageImports: ['framer-motion', '@tanstack/react-query'],
+    optimizePackageImports: ['motion/react', '@tanstack/react-query'],
   },
 
   async headers() {

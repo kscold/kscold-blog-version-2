@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useAuth } from '@/features/auth';
 import { useUpdateProfile, useTechStacks } from '@/features/profile';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';

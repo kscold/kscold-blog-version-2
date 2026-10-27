@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { RecentUser } from '@/entities/user';
 import { useSoftDeleteUser, useHardDeleteUser } from '@/features/user';
 import { useAlert } from '@/shared/model/alertStore';

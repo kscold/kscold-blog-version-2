@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/shared/api/api-client';
 import type { GitHubContributionDay } from '@/entities/github';

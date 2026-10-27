@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { PUBLIC_SEARCH_QUERY_MAX_LENGTH } from '@/shared/lib/search';
 
 interface BlogSearchFormProps {

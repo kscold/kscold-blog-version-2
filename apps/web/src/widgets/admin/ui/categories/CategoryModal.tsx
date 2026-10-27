@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { Category } from '@/shared/model/types/blog';
 
 interface CategoryFormData {

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useVaultFolders } from '@/entities/vault';
 import { useCreateVaultNote, useUpdateVaultNote } from '@/features/vault';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';

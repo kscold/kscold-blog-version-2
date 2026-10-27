@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { PublicProfile } from '@/features/profile';
 import { ProfileTechStack } from './ProfileTechStack';
 import { ProfileSocialLinks } from './ProfileSocialLinks';

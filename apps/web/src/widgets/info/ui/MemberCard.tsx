@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import type { TeamMember } from '@/entities/profile';
 
 const DEPT_STYLES: Record<TeamMember['department'], { accent: string; avatarBg: string }> = {

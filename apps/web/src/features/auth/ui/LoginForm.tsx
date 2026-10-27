@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import Input from '@/shared/ui/Input';
 import Button from '@/shared/ui/Button';
 import { AuthToggle } from '@/features/auth/ui/AuthToggle';

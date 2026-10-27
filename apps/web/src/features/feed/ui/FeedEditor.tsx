@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import FeedActionBar from '@/features/feed/ui/FeedActionBar';
 import { useFeedEditor } from '@/features/feed/lib/useFeedEditor';
 import { FeedEditorContentPanel } from '@/features/feed/ui/feed-editor/FeedEditorContentPanel';

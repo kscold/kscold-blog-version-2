@@ -3,7 +3,7 @@
 import { useHydrated } from '@/shared/lib/useBrowserSnapshot';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useVaultStats } from '@/entities/vault/api';
 import { usePosts } from '@/entities/post';

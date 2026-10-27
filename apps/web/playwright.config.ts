@@ -30,7 +30,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'off',
     trace: 'on-first-retry',
-    // framer-motion 진입 애니메이션 중 요소가 detach/remount 되어 클릭이 불안정해지는 것을
+    // Motion 진입 애니메이션 중 요소가 detach/remount 되어 클릭이 불안정해지는 것을
     // 막는다. 사이트의 reduced-motion 게이트가 작동해 모션을 끄므로 DOM 이 안정된다.
     reducedMotion: 'reduce',
   },

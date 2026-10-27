@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, type MotionProps } from 'motion/react';
 import { useUiStore } from '@/shared/model/uiStore';
 import { useLogout } from '@/entities/user';
 import { useState, useEffect } from 'react';
@@ -36,7 +36,7 @@ export function Header() {
     { label: 'Info', href: '/info' },
   ];
 
-  const headerMotionProps = allowRichEffects
+  const headerMotionProps: MotionProps = allowRichEffects
     ? {
         initial: { y: -100 },
         animate: { y: 0 },

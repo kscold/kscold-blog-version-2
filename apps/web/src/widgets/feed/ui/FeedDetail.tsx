@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useFeed } from '@/entities/feed';
 import { isIndexableFeed } from '@/shared/lib/seo/indexability';

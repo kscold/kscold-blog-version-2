@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { useWithdrawAccount } from '@/features/profile';
 import { useAuthStore } from '@/entities/user';
 import { useAlert } from '@/shared/model/alertStore';

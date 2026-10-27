@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { FEED_INPUT_LIMITS } from '@/entities/feed';
 import type { LinkPreview } from '@/shared/model/types/social';
 import { LinkPreviewCard } from '@/shared/ui/LinkPreviewCard';

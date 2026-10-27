@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { useAuthStore } from '@/entities/user';
 import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { useChatSocket } from '@/features/chat';

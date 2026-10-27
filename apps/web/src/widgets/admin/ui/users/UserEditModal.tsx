@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useAdminUpdateProfile, AdminUser, useTechStacks } from '@/features/profile';
 import { TechStackSelector } from '@/shared/ui/TechStackSelector';
 import { useAlert } from '@/shared/model/alertStore';
