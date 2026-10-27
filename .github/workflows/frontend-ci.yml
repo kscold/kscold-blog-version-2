@@ -68,8 +68,8 @@ jobs:
       - name: 타입 검사
         run: pnpm --dir apps/web type-check
 
-      - name: 운영 의존성 보안 검사
-        run: pnpm audit --prod --audit-level high
+      - name: 전체 의존성 보안 검사
+        run: pnpm audit --audit-level low
 
       - name: 운영 빌드 검사
         run: |

@@ -111,6 +111,41 @@ test.describe('포스트 에디터 반응형 시나리오', () => {
     await expect(page.locator('.mermaid-diagram svg')).toBeVisible({ timeout: 20000 });
   });
 
+  for (const diagram of [
+    {
+      name: '흐름도',
+      chart: String.raw`flowchart LR; A["$$x^2 + y^2 = z^2$$"] --> B["$$\frac{1}{2}$$"]`,
+      formulas: 2,
+    },
+    {
+      name: '시퀀스',
+      chart: String.raw`sequenceDiagram
+        Alice->>Bob: $$\sqrt{x^2}$$`,
+      formulas: 1,
+    },
+  ]) {
+    test(`작성기는 Mermaid ${diagram.name} 안의 수식을 MathML로 렌더링한다`, async ({ page }) => {
+      await mockEditorApis(page);
+      await seedAdminSession(page);
+      await page.goto('/admin/posts/new');
+      page.on('dialog', dialog => dialog.accept('mermaid'));
+      const editor = page.locator('.ProseMirror');
+      await expect(editor).toBeVisible();
+      await editor.click();
+      await page.getByRole('button', { name: '코드', exact: true }).click();
+      await page.getByRole('button', { name: '언어', exact: true }).click();
+      await editor.locator('pre').click();
+      await page.keyboard.insertText(diagram.chart);
+      await page.getByTestId('post-editor-view-preview').click();
+
+      const rendered = page.locator('[data-mermaid-status="rendered"]');
+      await expect(rendered).toBeVisible({ timeout: 20000 });
+      await expect(rendered.locator('svg math')).toHaveCount(diagram.formulas);
+      await expect(rendered.locator('svg math').first()).toBeVisible();
+      await expect(rendered.locator('.katex-error')).toHaveCount(0);
+    });
+  }
+
   // 비디오 버튼이 'URL prompt 임베드' → 'mp4 파일 업로드'로 변경되어 원본 시나리오(YouTube URL 임베드)는
   // 더 이상 적용되지 않는다. 파일 업로드 기반 임베드는 별도 fixture 가 필요해 추후 보강한다.
   test.skip('작성기는 비디오 링크를 노션처럼 임베드 미리보기한다', async () => {});
