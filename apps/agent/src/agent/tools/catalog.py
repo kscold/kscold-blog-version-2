@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from dataclasses import replace
 
 from agent.tools.models import ContentAccessScope, SearchHit, SearchOptions, VaultNote
 from agent.tools.profile import public_profile_note
@@ -10,8 +11,17 @@ class VaultCatalogMixin:
     """MongoDB 원본을 검색 문서로 읽고, 실제 권한으로 다시 검증합니다."""
 
     def recent_records(self, topic: str, options: SearchOptions, folder_ids: set) -> list[SearchHit]:
-        """권한·출처·주제를 먼저 제한하고 각 컬렉션의 최신 작성 기록을 읽는다."""
+        """주제 결과가 비면 권한·출처·폴더를 유지한 최신 조회를 한 번만 수행한다."""
         terms = self._query_terms(topic)
+        hits = self._recent_candidates(terms, options, folder_ids)
+        if hits or not terms:
+            return hits
+        return [
+            replace(hit, topic_fallback=True)
+            for hit in self._recent_candidates([], options, folder_ids)
+        ]
+
+    def _recent_candidates(self, terms: list[str], options: SearchOptions, folder_ids: set) -> list[SearchHit]:
         hits: list[SearchHit] = []
         for kind, collection, access, mapper, fields in (
             ("vault", self.notes, self._vault_access_filter, self._to_note, ("title", "content", "tags")),

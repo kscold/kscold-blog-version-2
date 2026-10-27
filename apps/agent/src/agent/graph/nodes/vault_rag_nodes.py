@@ -6,7 +6,7 @@ from agent.config import AgentConfig
 from agent.graph.state.vault_chat_state import AgentState
 from agent.tools.capabilities import WebSearchTool
 from agent.tools.models import SearchOptions
-from agent.tools.intent import query_intent
+from agent.tools.intent import query_intent, recent_fallback_notice
 from agent.tools.citations import cited_records
 from agent.tools.store import VaultStore
 
@@ -29,10 +29,12 @@ class VaultRagNodes:
             ),
         )
         state["hits"] = hits
+        notice = recent_fallback_notice(hits)
         state["stages"].append(
             {
                 "name": "기록 찾기",
-                "detail": f"현재 열람 범위에서 {'최근 작성된' if query_intent(state['question']).recent else '질문에 맞는'} 기록 {len(hits)}개를 찾았습니다.",
+                "detail": f"{notice} ({len(hits)}개)" if notice else
+                f"현재 열람 범위에서 {'최근 작성된' if query_intent(state['question']).recent else '질문에 맞는'} 기록 {len(hits)}개를 찾았습니다.",
             }
         )
         return state

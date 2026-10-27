@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -73,7 +74,7 @@ class SourceIntentSearchTest(unittest.TestCase):
     def test_Vault_폴더_범위는_최근_조회에도_유지한다(self):
         self.store.folders = Collection({'_id': 'folder-1', 'name': '개발'})
         self.store.notes.documents[0]['folderId'] = 'folder-1'
-        self.store.notes.documents.append({'_id': 'other-folder', 'title': '다른 폴더', 'createdAt': '2026-10-27T10:00:00Z'})
+        self.store.notes.documents.append({'_id': 'other-folder', 'title': '다른 폴더', 'createdAt': datetime(2026, 10, 27, 10)})
         options = SearchOptions(limit=5, active_folder_name='개발')
         self.assertEqual([hit.note.id for hit in self.store.search('최근 Vault 노트 알려줘', options)], ['vault-1'])
 

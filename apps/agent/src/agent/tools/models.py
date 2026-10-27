@@ -25,6 +25,7 @@ class SearchHit:
 
     note: VaultNote
     score: float
+    topic_fallback: bool = False
 
 
 @dataclass(frozen=True)

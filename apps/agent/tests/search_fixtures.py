@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -46,7 +47,9 @@ class Cursor:
 
     def sort(self, fields):
         for field, direction in reversed(fields):
-            self.documents.sort(key=lambda doc: str(doc.get(field) or ''), reverse=direction < 0)
+            self.documents.sort(
+                key=lambda doc: (doc.get(field) is not None, doc.get(field)), reverse=direction < 0
+            )
         return self
 
     def limit(self, limit):
@@ -80,18 +83,18 @@ def make_store():
     store.folders = Collection()
     store.categories = Collection({'_id': 'restricted', 'restricted': True})
     store.notes = Collection(
-        {'_id': 'vault-1', 'title': '검색 노트', 'slug': 'search', 'content': '검색 노트와 벡터 색인', 'visibility': 'PUBLIC', 'createdAt': '2026-10-25T10:00:00Z'},
-        {'_id': 'vault-private', 'title': '숨긴 노트', 'content': '검색 비공개', 'visibility': 'PRIVATE', 'createdAt': '2026-10-27T10:00:00Z'},
+        {'_id': 'vault-1', 'title': '검색 노트', 'slug': 'search', 'content': '검색 노트와 벡터 색인', 'visibility': 'PUBLIC', 'createdAt': datetime(2026, 10, 25, 10)},
+        {'_id': 'vault-private', 'title': '숨긴 노트', 'content': '검색 비공개', 'visibility': 'PRIVATE', 'createdAt': datetime(2026, 10, 27, 10)},
     )
     store.posts = Collection(
-        {'_id': 'post-1', 'title': '검색 블로그', 'slug': 'search', 'content': '검색 범위 확인', 'status': 'PUBLISHED', 'createdAt': '2026-10-24T10:00:00Z'},
-        {'_id': 'post-private', 'title': '제한된 블로그', 'content': '검색 권한', 'status': 'PUBLISHED', 'category': {'id': 'restricted'}, 'createdAt': '2026-10-27T10:00:00Z'},
-        {'_id': 'post-draft', 'title': '미발행 글', 'content': '검색 초안', 'status': 'DRAFT', 'createdAt': '2026-10-28T10:00:00Z'},
+        {'_id': 'post-1', 'title': '검색 블로그', 'slug': 'search', 'content': '검색 범위 확인', 'status': 'PUBLISHED', 'createdAt': datetime(2026, 10, 24, 10)},
+        {'_id': 'post-private', 'title': '제한된 블로그', 'content': '검색 권한', 'status': 'PUBLISHED', 'category': {'id': 'restricted'}, 'createdAt': datetime(2026, 10, 27, 10)},
+        {'_id': 'post-draft', 'title': '미발행 글', 'content': '검색 초안', 'status': 'DRAFT', 'createdAt': datetime(2026, 10, 28, 10)},
     )
     store.feeds = Collection(
-        {'_id': 'feed-old', 'content': '검색 범위 예전 기록', 'visibility': 'PUBLIC', 'createdAt': '2025-01-01T10:00:00Z'},
-        {'_id': 'feed-new', 'content': '검색 범위 최신 확인. 공개 기록만 찾았다.', 'visibility': 'PUBLIC', 'createdAt': '2026-10-26T10:00:00Z'},
-        {'_id': 'feed-private', 'content': '검색 비공개 피드', 'visibility': 'PRIVATE', 'createdAt': '2026-10-27T10:00:00Z'},
-        {'_id': 'feed-other', 'content': '전시 관람 메모', 'visibility': 'PUBLIC', 'createdAt': '2026-10-26T11:00:00Z'},
+        {'_id': 'feed-old', 'content': '검색 범위 예전 기록', 'visibility': 'PUBLIC', 'createdAt': datetime(2025, 1, 1, 10)},
+        {'_id': 'feed-new', 'content': '검색 범위 최신 확인. 공개 기록만 찾았다.', 'visibility': 'PUBLIC', 'createdAt': datetime(2026, 10, 26, 10)},
+        {'_id': 'feed-private', 'content': '검색 비공개 피드', 'visibility': 'PRIVATE', 'createdAt': datetime(2026, 10, 27, 10)},
+        {'_id': 'feed-other', 'content': '전시 관람 메모', 'visibility': 'PUBLIC', 'createdAt': datetime(2026, 10, 26, 11)},
     )
     return store

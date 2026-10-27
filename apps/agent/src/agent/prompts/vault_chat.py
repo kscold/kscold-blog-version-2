@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from agent.tools.models import ContentAccessScope, SearchHit
+from agent.tools.intent import recent_fallback_notice
 
 
 def answer_messages(
@@ -48,6 +49,8 @@ def answer_messages(
                 "피드·블로그·Vault·소개를 지정한 질문은 그 종류 기록의 본문에만 근거해 답한다. "
                 "자료가 없거나 일부 종류가 빠져 있으면 현재 열람 범위에서 찾지 못했다고 말하고 다른 종류로 대신하지 않는다. "
                 "최근 기록 질문은 제공된 작성일 순서를 유지하고 날짜가 없는 자료를 최신이라고 단정하지 않는다. "
+                "주제 검색 대체 안내가 있으면 해당 기록을 원래 주제와 일치하는 결과처럼 설명하지 않는다. "
+                "대체 안내 문장은 이미 답변 앞에 제공되므로 반복하지 않고 실제 기록만 소개한다. "
                 "먼저 핵심을 한두 문장으로 답하고 필요한 기록만 최대 세 개로 짧게 정리한다. 인사나 장황한 맺음말은 생략한다. "
                 "일반 개념을 직접 묻는 질문에만 일반 지식을 별도 문단에서 '일반 지식 보강:'으로 구분할 수 있다. "
                 "웹 검색 결과는 최신성 확인이 필요할 때만 보조 근거로 사용한다. 한국어로 자연스럽고 간결하게 답한다."
@@ -59,6 +62,7 @@ def answer_messages(
                 f"현재 열람 범위: {access_description}\n"
                 f"선택된 폴더: {active_folder_name or '전체 기록'}\n"
                 f"질문: {question}\n\n"
+                f"주제 검색 대체 안내: {recent_fallback_notice(context) or '없음'}\n\n"
                 f"검색된 기록:\n{context_text or '관련 기록을 찾지 못했습니다.'}\n\n"
                 f"웹 검색 보강:\n{web_context}"
             ),

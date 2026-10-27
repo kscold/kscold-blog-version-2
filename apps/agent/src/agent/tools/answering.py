@@ -8,7 +8,7 @@ from openai import Timeout
 from agent.prompts.vault_chat import answer_messages, follow_up_messages
 from agent.tools.models import ContentAccessScope, SearchHit
 from agent.tools.stream_control import StreamControl
-from agent.tools.intent import missing_records_answer, query_intent
+from agent.tools.intent import missing_records_answer, query_intent, recent_fallback_notice
 
 
 class VaultAnsweringMixin:
@@ -37,7 +37,9 @@ class VaultAnsweringMixin:
                 scope or ContentAccessScope(),
             ),
         )
-        return response.choices[0].message.content or ""
+        answer = response.choices[0].message.content or ""
+        notice = recent_fallback_notice(context)
+        return f"{notice}\n\n{answer}" if notice and answer.strip() else answer
 
     def answer_stream(
         self,
@@ -71,10 +73,16 @@ class VaultAnsweringMixin:
         try:
             if control.register_cancel is not None and not control.register_cancel(response.close):
                 return
+            notice = recent_fallback_notice(context)
             for chunk in response:
                 if not control.is_active():
                     return
                 if chunk.choices and (delta := chunk.choices[0].delta.content):
+                    if notice:
+                        yield f"{notice}\n\n"
+                        notice = ""
+                    if not control.is_active():
+                        return
                     yield delta
         finally:
             response.close()
