@@ -218,8 +218,8 @@ importers:
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.56.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@portone/browser-sdk':
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.13
+        version: 0.1.13
       '@tanstack/react-query':
         specifier: ^5.105.0
         version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
@@ -1125,8 +1125,8 @@ packages:
     resolution: {integrity: sha512-pOr5+q1fLYKwFN3LAJuGZEnfXDcQ73zqgDHMtGy+K+uIoUqyY+6MeDCWFwfu+4EFuq76I5EPFofoNAI+Bmmq4A==}
     engines: {node: '>=22.13'}
 
-  '@portone/browser-sdk@0.1.9':
-    resolution: {integrity: sha512-GiLziqmKKSrorjWDvWjPhtD1nBd4zlY1crIPX5Kisx797MQYveqhtSMYwuyjRgwgInfEWonXjXWkHd5bTFUiWQ==}
+  '@portone/browser-sdk@0.1.13':
+    resolution: {integrity: sha512-zC94/gmMeh5O44iRx/SiIyt8p+1YXxEVRQu+Fhi7WKMlzbERBViwCxY6B6MVO2QprGJS5iQG2bf6e7KoXln5Kg==}
 
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
@@ -5407,7 +5407,7 @@ snapshots:
 
   '@pnpm/deps.graph-sequencer@1100.0.1': {}
 
-  '@portone/browser-sdk@0.1.9': {}
+  '@portone/browser-sdk@0.1.13': {}
 
   '@rtsao/scc@1.1.0': {}
 
