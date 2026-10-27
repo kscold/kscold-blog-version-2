@@ -1,4 +1,4 @@
-FROM ubuntu:24.04@sha256:24737cef17f4e22b1977df7d9a05e77c4e28b7da5b8911f8d8ccda136bf3573c AS builder
+FROM ubuntu:24.10@sha256:cdf755952ed117f6126ff4e65810bf93767d4c38f5c7185b50ec1f1078b464cc AS builder
 
 ARG TARGETARCH
 
@@ -35,7 +35,7 @@ RUN ./gradlew dependencies --configuration runtimeClasspath --no-daemon --quiet 
 COPY apps/api/src ./src
 RUN ./gradlew bootJar --no-daemon
 
-FROM ubuntu:24.04@sha256:24737cef17f4e22b1977df7d9a05e77c4e28b7da5b8911f8d8ccda136bf3573c AS runner
+FROM ubuntu:24.10@sha256:cdf755952ed117f6126ff4e65810bf93767d4c38f5c7185b50ec1f1078b464cc AS runner
 
 ARG TARGETARCH
 
