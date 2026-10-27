@@ -79,17 +79,44 @@ jobs:
 
       - name: API 이미지 실행 권한 검사
         run: |
+          docker run --rm --entrypoint java kscold-blog-api:ci -version
           test "$(docker image inspect kscold-blog-api:ci --format '{{.Config.User}}')" = blog-api
           test "$(docker run --rm --entrypoint id kscold-blog-api:ci -u)" = 10001
           test "$(docker image inspect kscold-blog-api:ci --format '{{if .Config.Healthcheck}}yes{{end}}')" = yes
 
-      - name: API 이미지 보안 검사
+      - name: API 이미지 전체 취약점 수집
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           version: v0.76.1
           image-ref: kscold-blog-api:ci
-          format: table
-          exit-code: '1'
-          ignore-unfixed: true
+          scanners: vuln
+          format: json
+          output: backend-security.json
+          exit-code: '0'
+          ignore-unfixed: false
           vuln-type: os,library
-          severity: HIGH,CRITICAL
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          cache: false
+
+      - name: 수정 가능한 이미지 취약점 검사
+        run: |
+          python3 - <<'PYAUDIT'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          report = json.loads(Path("backend-security.json").read_text())
+          vulnerabilities = [item for result in report.get("Results", []) for item in result.get("Vulnerabilities", [])]
+          print("전체 취약점:", dict(Counter(item["Severity"] for item in vulnerabilities)))
+          fixable = [item for item in vulnerabilities if item.get("FixedVersion")]
+          for item in fixable:
+              print(item["VulnerabilityID"], item["PkgName"], item["InstalledVersion"], "->", item["FixedVersion"])
+          assert not fixable, f"수정 가능한 취약점 {len(fixable)}건"
+          PYAUDIT
+
+      - name: 이미지 보안 검사 결과 보관
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: backend-security
+          path: backend-security.json
+          retention-days: 7
