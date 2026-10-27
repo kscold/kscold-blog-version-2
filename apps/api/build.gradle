@@ -17,7 +17,7 @@ ext {
     set('jackson-bom.version', '3.2.4')
     // Jackson 2(JWT·디스코드 라이브러리)도 함께 올려 Jackson 3.2의 공용 annotations 2.22 요구를 맞춘다.
     set('jackson-2-bom.version', '2.22.4')
-    grpcVersion = '1.84.0'
+    grpcVersion = '1.85.1'
     protobufVersion = '4.36.2'
 }
 
