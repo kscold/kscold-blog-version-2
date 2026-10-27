@@ -52,6 +52,7 @@ jobs:
 
       - name: Agent 런타임 및 실행 권한 검사
         run: |
+          docker run --rm --entrypoint sh kscold-vault-agent:ci -c '. /etc/os-release; test "$ID" = ubuntu && test "$VERSION_ID" = 24.04'
           docker run --rm --entrypoint python kscold-vault-agent:ci -c 'import sys; print(sys.version); assert sys.version_info[:3] == (3, 13, 18)'
           docker run --rm --entrypoint python kscold-vault-agent:ci -c 'import importlib.util; assert importlib.util.find_spec("pip") is None; assert importlib.util.find_spec("ensurepip") is None'
           test "$(docker run --rm --entrypoint id kscold-vault-agent:ci -u)" = 10001
