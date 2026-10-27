@@ -29,7 +29,12 @@
       "@/styles/*": [
         "./src/styles/*"
       ]
-    }
+    },
+    "types": [
+      "node",
+      "react-syntax-highlighter"
+    ],
+    "rootDir": "."
   },
   "include": [
     "**/*.ts",

@@ -34,7 +34,7 @@ KSCOLD Blog v2는 단순히 글을 쌓아두는 블로그가 아니라,
 
 ### 프론트엔드
 
-- Next.js 16 (App Router) · React 19 · TypeScript 5
+- Next.js 16 (App Router) · React 19 · TypeScript 7 (CLI) / 6 (Next·ESLint 호환 API)
 - Tailwind CSS · Framer Motion
 - Zustand · TanStack Query
 - TipTap · Monaco Editor · React Markdown · Mermaid
