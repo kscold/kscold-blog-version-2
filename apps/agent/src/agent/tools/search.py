@@ -62,9 +62,9 @@ class VaultSearchMixin:
         scope: ContentAccessScope,
         content_types: frozenset[str],
     ) -> list[SearchHit]:
-        response = self.qdrant.search(
+        response = self.qdrant.query_points(
             collection_name=self.config.qdrant_collection,
-            query_vector=self.embed_text(query),
+            query=self.embed_text(query),
             # 후보는 넉넉히 받고 원본 MongoDB 권한을 반드시 다시 적용합니다.
             limit=max(limit * 5, 25),
             with_payload=True,
@@ -75,7 +75,7 @@ class VaultSearchMixin:
                 str(hit.payload.get("content_type") or "vault"),
                 str(hit.payload.get("document_id") or hit.payload.get("note_id")),
             )
-            for hit in response
+            for hit in response.points
             if hit.payload and (hit.payload.get("document_id") or hit.payload.get("note_id"))
             and (
                 not content_types
