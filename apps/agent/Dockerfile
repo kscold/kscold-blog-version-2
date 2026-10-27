@@ -1,4 +1,8 @@
-FROM python:3.11-slim@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534
+FROM python:3.13.18-slim@sha256:8a7c3cd378e4e6dfa5d0ea4f6ca1a11068c951e3de3146ebc484eadf4b05a2be
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
 
 ARG PIP_VERSION=26.2.1
 ARG SETUPTOOLS_VERSION=84.1.0
