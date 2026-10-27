@@ -91,6 +91,9 @@ export async function loadMermaid(theme: 'light' | 'dark') {
     startOnLoad: false,
     securityLevel: 'strict',
     theme: theme === 'dark' ? 'dark' : 'default',
+    // Mermaid 12의 기본 ELK/neo 전환 뒤에도 기존 글의 배치와 모양을 유지한다.
+    layout: 'dagre',
+    look: 'classic',
     fontFamily:
       'Pretendard Variable, -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
     flowchart: {
