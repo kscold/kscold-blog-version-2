@@ -15,7 +15,7 @@ import { SessionManager } from './qa-runner/sessions.mjs';
 
 // 저장소에서 바로 띄우면 apps/web의 스펙을 쓴다. 설치본은 BLOG_QA_RUNNER_WEB_DIR로 복사해 둔 폴더를 가리킨다.
 const REPOSITORY_WEB_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'apps', 'web');
-const ENV_FILE = join(homedir(), '.config/kscold-blog-qa/env');
+const ENV_FILE = process.env.BLOG_QA_RUNNER_ENV_FILE || join(homedir(), '.config/kscold-blog-qa/env');
 const SHUTDOWN_GRACE_MS = 3_000;
 
 /** 보관소 접속 정보처럼 저장소에 두면 안 되는 값은 홈 디렉터리의 env 파일에서 읽는다. */
