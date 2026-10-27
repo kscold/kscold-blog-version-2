@@ -1,3 +1,10 @@
+buildscript {
+    configurations.classpath {
+        // Spring Boot 빌드 플러그인의 commons-compress 전이 의존성에 남은 GHSA-j288-q9x7-2f5v를 수정한다.
+        resolutionStrategy.force 'org.apache.commons:commons-lang3:3.21.0'
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '4.1.2'
@@ -77,7 +84,6 @@ dependencies {
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
-    compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
