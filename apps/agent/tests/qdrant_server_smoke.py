@@ -16,30 +16,31 @@ class QdrantServerContractTest(unittest.TestCase):
         # 운영 주소나 기본값으로 연결하지 않습니다.
         url = os.environ["QDRANT_TEST_URL"]
         self.assertEqual(url, "http://127.0.0.1:16333")
-        with QdrantClient(url=url, timeout=5) as client:
-            for attempt in range(30):
-                try:
-                    client.get_collections()
-                    break
-                except Exception:
-                    if attempt == 29:
-                        raise
-                    time.sleep(1)
-            collection = "upgrade_contract_" + uuid4().hex
-            client.create_collection(collection, vectors_config=models.VectorParams(size=2, distance=models.Distance.COSINE))
+        client = QdrantClient(url=url, timeout=5)
+        self.addCleanup(client.close)
+        for attempt in range(30):
             try:
-                client.upsert(collection, wait=True, points=[
-                    models.PointStruct(id=index, vector=[1.0, 0.0], payload={
-                        "content_type": "vault", "document_id": identifier,
-                    })
-                    for index, identifier in enumerate(["public", "private-or-deleted"], start=1)
-                ])
-                store = VectorSearchHarness(client)
-                store.config.qdrant_collection = collection
-                hits = store._vector_search("질문", 5, {"folder-a"}, ContentAccessScope(), frozenset({"vault"}))
-                self.assertEqual([hit.note.id for hit in hits], ["public"])
-            finally:
-                client.delete_collection(collection)
+                client.get_collections()
+                break
+            except Exception:
+                if attempt == 29:
+                    raise
+                time.sleep(1)
+        collection = "upgrade_contract_" + uuid4().hex
+        client.create_collection(collection, vectors_config=models.VectorParams(size=2, distance=models.Distance.COSINE))
+        try:
+            client.upsert(collection, wait=True, points=[
+                models.PointStruct(id=index, vector=[1.0, 0.0], payload={
+                    "content_type": "vault", "document_id": identifier,
+                })
+                for index, identifier in enumerate(["public", "private-or-deleted"], start=1)
+            ])
+            store = VectorSearchHarness(client)
+            store.config.qdrant_collection = collection
+            hits = store._vector_search("질문", 5, {"folder-a"}, ContentAccessScope(), frozenset({"vault"}))
+            self.assertEqual([hit.note.id for hit in hits], ["public"])
+        finally:
+            client.delete_collection(collection)
 
 
 if __name__ == "__main__":
