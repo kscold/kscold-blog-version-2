@@ -1,5 +1,5 @@
-grpcio==1.83.1
-grpcio-tools==1.83.1
+grpcio==1.85.0
+grpcio-tools==1.85.0
 langgraph==1.2.11
 openai==1.109.1
 pymongo==4.19.0
