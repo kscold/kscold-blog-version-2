@@ -18,7 +18,7 @@ ext {
     // Jackson 2(JWT·디스코드 라이브러리가 사용): 같은 취약점의 2.x 수정 버전
     set('jackson-2-bom.version', '2.21.7')
     grpcVersion = '1.84.0'
-    protobufVersion = '3.25.9'
+    protobufVersion = '4.36.2'
 }
 
 java {
@@ -75,6 +75,7 @@ dependencies {
     // gRPC (Vault Agent bridge)
     implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 
