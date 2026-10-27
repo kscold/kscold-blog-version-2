@@ -173,7 +173,7 @@ overrides:
   dompurify: 3.4.17
   flatted: 3.4.4
   follow-redirects: 1.16.1
-  joi: 18.2.8
+  joi: 18.3.0
   js-yaml@3: 3.15.2
   js-yaml@4: 4.3.2
   linkify-it: 5.0.2
@@ -2952,8 +2952,8 @@ packages:
     resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
     hasBin: true
 
-  joi@18.2.8:
-    resolution: {integrity: sha512-G2TX62h58ZHuwqetJgP2F4ualakqAmZtBYe3jWen7gxQRw5xApX6crnFtuB91WC0c3ESBnva+kGSnb3+6pIQDQ==}
+  joi@18.3.0:
+    resolution: {integrity: sha512-/RwAK4BAfzcdbdFg073tzq4/xhY6Q7lMd5AmjqTL6pu0QFJdEmtswgm8BvgwXvOKuPNYQ8XrdQrrW/gF65LiNw==}
     engines: {node: '>= 20'}
 
   js-cookie@3.0.8:
@@ -7232,7 +7232,7 @@ snapshots:
 
   jiti@1.21.7: {}
 
-  joi@18.2.8:
+  joi@18.3.0:
     dependencies:
       '@hapi/address': 5.1.1
       '@hapi/formula': 3.0.2
@@ -8972,7 +8972,7 @@ snapshots:
   wait-on@9.0.4(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0):
     dependencies:
       axios: 1.20.0(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
-      joi: 18.2.8
+      joi: 18.3.0
       lodash: 4.18.1
       minimist: 1.2.8
       rxjs: 7.8.2
