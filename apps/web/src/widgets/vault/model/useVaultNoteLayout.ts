@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 560;
@@ -14,22 +15,12 @@ export function useVaultNoteLayout(initialSlug?: string) {
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const { isDesktopViewport: isDesktop } = usePerformanceMode();
   const isResizingRef = useRef(false);
   const startXRef = useRef(0);
   const startWidthRef = useRef(DEFAULT_SIDEBAR_WIDTH);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 1024px)');
-    setIsDesktop(mediaQuery.matches);
 
-    const handleDesktopChange = (event: MediaQueryListEvent) => {
-      setIsDesktop(event.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleDesktopChange);
-    return () => mediaQuery.removeEventListener('change', handleDesktopChange);
-  }, []);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {

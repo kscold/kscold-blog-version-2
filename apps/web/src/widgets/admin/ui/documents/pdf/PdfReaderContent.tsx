@@ -9,10 +9,10 @@ interface PdfReaderContentProps {
 }
 
 export function PdfReaderContent({ state, onRetry }: PdfReaderContentProps) {
-  const { document, fitWidth, pageWidth } = state;
+  const { document, fitWidth, pageWidth, scrollRef } = state;
   return (
     <div
-      ref={state.scrollRef}
+      ref={scrollRef}
       onScroll={state.navigation.onScroll}
       tabIndex={0}
       aria-label="PDF 본문"

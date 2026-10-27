@@ -1,5 +1,7 @@
 'use client';
 
+import { useHydrated } from '@/shared/lib/useBrowserSnapshot';
+
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { GraphData } from '@/shared/model/types/vault';
@@ -29,7 +31,9 @@ const LoadedVaultGraph = dynamic(
 
 function DeferredVaultGraph(props: LoadedVaultGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isNearViewport, setIsNearViewport] = useState(false);
+  const [observed, setIsNearViewport] = useState(false);
+  const hydrated = useHydrated();
+  const isNearViewport = observed || (hydrated && typeof IntersectionObserver === 'undefined');
 
   useEffect(() => {
     const container = containerRef.current;
@@ -38,7 +42,6 @@ function DeferredVaultGraph(props: LoadedVaultGraphProps) {
     }
 
     if (!('IntersectionObserver' in window)) {
-      setIsNearViewport(true);
       return;
     }
 

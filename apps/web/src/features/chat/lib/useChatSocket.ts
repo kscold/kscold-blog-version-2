@@ -10,19 +10,26 @@ export function useChatSocket({ isOpen, viewerId }: Options) {
   const [messages, setMessages] = useState<VisitorChatMessage[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(isOpen);
   const [historyError, setHistoryError] = useState('');
   const [sendError, setSendError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const generation = useRef(0);
   const pending = useRef(false);
-  const owner = useRef(viewerId);
+  const [owner, setOwner] = useState({ viewerId, isOpen, attempt });
+  if (owner.viewerId !== viewerId || owner.isOpen !== isOpen || owner.attempt !== attempt) {
+    if (owner.viewerId !== viewerId || owner.isOpen !== isOpen) {
+      setMessages([]);
+      setSendError('');
+      setIsSending(false);
+      setIsConnected(false);
+    }
+    setOwner({ viewerId, isOpen, attempt });
+    setIsLoading(isOpen);
+    setHistoryError('');
+  }
 
   useEffect(() => {
-    owner.current = viewerId;
-    setMessages([]);
-    setSendError('');
-    setIsSending(false);
     pending.current = false;
     const current = ++generation.current;
     if (!isOpen) return;
@@ -45,8 +52,6 @@ export function useChatSocket({ isOpen, viewerId }: Options) {
     if (!isOpen) return;
     let active = true;
     const current = generation.current;
-    setIsLoading(true);
-    setHistoryError('');
     void fetchMyChatMessages().then(history => {
       if (active && current === generation.current) {
         setMessages(previous => mergeChatMessages(history, previous));
@@ -60,7 +65,7 @@ export function useChatSocket({ isOpen, viewerId }: Options) {
   }, [attempt, isOpen, viewerId]);
 
   const sendMessage = async (content: string): Promise<boolean> => {
-    if (!isOpen || !content.trim() || pending.current || owner.current !== viewerId) return false;
+    if (!isOpen || !content.trim() || pending.current || owner.viewerId !== viewerId) return false;
     const current = generation.current;
     pending.current = true;
     setIsSending(true);
@@ -85,7 +90,7 @@ export function useChatSocket({ isOpen, viewerId }: Options) {
   };
 
   return {
-    messages: owner.current === viewerId ? messages : [], isConnected, isSending,
+    messages: owner.viewerId === viewerId ? messages : [], isConnected, isSending,
     isLoading, historyError, sendError, sendMessage,
     retryHistory: () => setAttempt(value => value + 1),
   };

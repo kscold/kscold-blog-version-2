@@ -1,5 +1,7 @@
 'use client';
 
+import { useHydrated } from '@/shared/lib/useBrowserSnapshot';
+
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
@@ -12,7 +14,9 @@ import { StatsGrid } from './StatsGrid';
 
 export function StatsSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [shouldLoadStats, setShouldLoadStats] = useState(false);
+  const [observed, setShouldLoadStats] = useState(false);
+  const hydrated = useHydrated();
+  const shouldLoadStats = observed || (hydrated && typeof IntersectionObserver === 'undefined');
   const { allowRichEffects, isTouchDevice } = usePerformanceMode();
   const { data: github } = useGitHubOverview('kscold', shouldLoadStats);
   const { data: vaultStats } = useVaultStats(shouldLoadStats);
@@ -25,7 +29,6 @@ export function StatsSection() {
     }
 
     if (!('IntersectionObserver' in window)) {
-      setShouldLoadStats(true);
       return;
     }
 

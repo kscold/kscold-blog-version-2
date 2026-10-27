@@ -1,18 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useStoredString } from '@/shared/lib/useBrowserSnapshot';
 
 const FONT_SIZES = [18, 20, 22, 25, 28, 32] as const;
 const FONT_KEY = 'hansalim-presenter-font';
 const TIMER_KEY = 'hansalim-presenter-start';
-
-function readStorage(key: string) {
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
 
 function writeStorage(key: string, value: string | null) {
   try {
@@ -25,20 +18,16 @@ function writeStorage(key: string, value: string | null) {
 
 /** 대본 글자 크기. 기기마다 다르게 쓰므로 이 브라우저에만 기억한다. */
 export function useScriptFontSize() {
-  const [index, setIndex] = useState(2);
-
-  useEffect(() => {
-    const saved = Number.parseInt(readStorage(FONT_KEY) ?? '', 10);
-    if (saved >= 0 && saved < FONT_SIZES.length) setIndex(saved);
-  }, []);
+  const stored = useStoredString(FONT_KEY);
+  const saved = Number.parseInt(stored ?? '', 10);
+  const [selectedIndex, setIndex] = useState<number | null>(null);
+  const index = selectedIndex ?? (saved >= 0 && saved < FONT_SIZES.length ? saved : 2);
 
   const change = useCallback((delta: number) => {
-    setIndex(current => {
-      const next = Math.min(Math.max(current + delta, 0), FONT_SIZES.length - 1);
-      writeStorage(FONT_KEY, String(next));
-      return next;
-    });
-  }, []);
+    const next = Math.min(Math.max(index + delta, 0), FONT_SIZES.length - 1);
+    writeStorage(FONT_KEY, String(next));
+    setIndex(next);
+  }, [index]);
 
   return {
     size: FONT_SIZES[index],
@@ -61,23 +50,21 @@ export function useNow() {
 
 /** 강의 경과 시간. 새로고침해도 이어지도록 시작 시각을 이 브라우저에 기억한다. */
 export function useElapsedTimer() {
-  const [startedAt, setStartedAt] = useState<number | null>(null);
-
-  useEffect(() => {
-    const saved = Number.parseInt(readStorage(TIMER_KEY) ?? '', 10);
-    if (Number.isFinite(saved) && saved > 0) setStartedAt(saved);
-  }, []);
+  const stored = useStoredString(TIMER_KEY);
+  const saved = Number.parseInt(stored ?? '', 10);
+  const [selectedStart, setStartedAt] = useState<number | null | undefined>(undefined);
+  const startedAt = selectedStart === undefined ? (Number.isFinite(saved) && saved > 0 ? saved : null) : selectedStart;
 
   const start = useCallback(() => {
     const value = Date.now();
     writeStorage(TIMER_KEY, String(value));
     setStartedAt(value);
-  }, []);
+  }, [setStartedAt]);
 
   const reset = useCallback(() => {
     writeStorage(TIMER_KEY, null);
     setStartedAt(null);
-  }, []);
+  }, [setStartedAt]);
 
   return { startedAt, start, reset };
 }

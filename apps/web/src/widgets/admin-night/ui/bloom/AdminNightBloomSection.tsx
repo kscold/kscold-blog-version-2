@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   useAdminNightProgramVoteSummary,
   useMyAdminNightProgramVote,
@@ -33,7 +33,10 @@ export function AdminNightBloomSection() {
   const { data: myVote } = useMyAdminNightProgramVote(AI_AGENT_BLOOM_PROGRAM_KEY, isAuthenticated);
   const voteMutation = useUpsertAdminNightProgramVote(AI_AGENT_BLOOM_PROGRAM_KEY);
 
-  useEffect(() => {
+  const identity = `${user?.displayName ?? ''}:${user?.email ?? ''}`;
+  const [source, setSource] = useState<{ vote: typeof myVote; identity: string }>({ vote: undefined, identity: '' });
+  if (source.vote !== myVote || source.identity !== identity) {
+    setSource({ vote: myVote, identity });
     if (myVote) {
       setForm({
         requesterName: myVote.requesterName,
@@ -51,17 +54,14 @@ export function AdminNightBloomSection() {
         desiredTakeaways: myVote.desiredTakeaways ?? '',
         message: myVote.message ?? '',
       });
-      return;
-    }
-
-    if (user?.displayName || user?.email) {
+    } else if (user?.displayName || user?.email) {
       setForm(prev => ({
         ...prev,
         requesterName: prev.requesterName || user?.displayName || '',
         contactEmail: prev.contactEmail || user?.email || '',
       }));
     }
-  }, [myVote, user?.displayName, user?.email]);
+  }
 
   const readyCount = useMemo(
     () => summary?.interestLevelCounts.READY_IF_SCHEDULE_FITS ?? 0,

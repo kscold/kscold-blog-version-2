@@ -44,7 +44,7 @@ function clearAuthCookie(response: NextResponse) {
   return response;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const legacyFeedTag = request.nextUrl.searchParams.get('tag')?.trim();
   if (request.nextUrl.pathname === '/feed' && legacyFeedTag) {
     const tagUrl = request.nextUrl.clone();

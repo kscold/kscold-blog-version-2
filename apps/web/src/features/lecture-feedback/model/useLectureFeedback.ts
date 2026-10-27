@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useStoredString } from '@/shared/lib/useBrowserSnapshot';
 import type { FormEvent } from 'react';
 import type { FeedbackDraft } from './questions';
 
@@ -15,13 +16,14 @@ export function useLectureFeedback() {
   const submissionId = useRef('');
   const locked = useRef(false);
 
+  const stored = useStoredString(STORAGE_KEY);
+  let saved: { id?: string; submitted?: boolean } | null = null;
+  try { saved = JSON.parse(stored || 'null'); } catch { /* 저장 실패는 새 제출을 막지 않는다. */ }
+  const savedId = saved?.id;
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      if (saved?.id) submissionId.current = saved.id;
-      if (saved?.submitted === true) setSubmitted(true);
-    } catch { /* 저장 공간을 쓸 수 없어도 설문 제출은 가능하다. */ }
-  }, []);
+    if (savedId) submissionId.current = savedId;
+  }, [savedId]);
+
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,5 +57,5 @@ export function useLectureFeedback() {
     }
   }
 
-  return { draft, setDraft, submitted, pending, error, submit };
+  return { draft, setDraft, submitted: submitted || saved?.submitted === true, pending, error, submit };
 }

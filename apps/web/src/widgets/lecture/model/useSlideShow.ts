@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type RefObject } from 'react';
 
 /** 주소의 #12 같은 조각에서 시작할 슬라이드를 읽는다. 새로고침하거나 링크를 나눠도 같은 장에서 열린다. */
 function slideFromHash() {
@@ -8,24 +8,19 @@ function slideFromHash() {
   return Number.isFinite(value) && value > 0 ? value : 1;
 }
 
+function subscribeHash(notify: () => void) {
+  window.addEventListener('hashchange', notify);
+  return () => window.removeEventListener('hashchange', notify);
+}
+
 export function useSlideNavigation() {
-  const [slide, setSlide] = useState(1);
+  const slide = useSyncExternalStore(subscribeHash, slideFromHash, () => 1);
   const [slideCount, setSlideCount] = useState(0);
-  // 주소의 번호를 읽기 전에 1번으로 주소를 덮어쓰지 않도록, 읽은 뒤부터 주소에 반영한다.
-  const [hashRead, setHashRead] = useState(false);
-
-  useEffect(() => {
-    setSlide(slideFromHash());
-    setHashRead(true);
-    const onHashChange = () => setSlide(slideFromHash());
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
+  const setSlide = useCallback((next: number | ((current: number) => number)) => {
+    const value = typeof next === 'function' ? next(slideFromHash()) : next;
+    window.history.replaceState(null, '', `#${value}`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
   }, []);
-
-  useEffect(() => {
-    // 넘길 때마다 방문 기록을 쌓지 않도록 현재 기록만 바꾼다.
-    if (hashRead) window.history.replaceState(null, '', `#${slide}`);
-  }, [hashRead, slide]);
 
   const clamp = useCallback(
     (target: number) =>
@@ -33,15 +28,15 @@ export function useSlideNavigation() {
     [slideCount]
   );
 
-  const goTo = useCallback((target: number) => setSlide(clamp(target)), [clamp]);
+  const goTo = useCallback((target: number) => setSlide(clamp(target)), [clamp, setSlide]);
 
   // 키를 빠르게 여러 번 눌러도 매번 바로 앞 결과에서 한 장씩 움직이게 한다.
-  const move = useCallback((delta: number) => setSlide(current => clamp(current + delta)), [clamp]);
+  const move = useCallback((delta: number) => setSlide(current => clamp(current + delta)), [clamp, setSlide]);
 
   const onLoaded = useCallback((count: number) => {
     setSlideCount(count);
     setSlide(current => Math.min(current, count));
-  }, []);
+  }, [setSlide]);
 
   return { slide, slideCount, goTo, move, onLoaded };
 }

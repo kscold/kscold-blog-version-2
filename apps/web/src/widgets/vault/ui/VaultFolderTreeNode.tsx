@@ -33,11 +33,11 @@ export function VaultFolderTreeNode({
 
   const isFolderActive = activeFolderId === folder.id;
 
-  useEffect(() => {
-    if (shouldAutoOpen) {
-      setIsOpen(true);
-    }
-  }, [shouldAutoOpen]);
+  const [previousAutoOpen, setPreviousAutoOpen] = useState(shouldAutoOpen);
+  if (previousAutoOpen !== shouldAutoOpen) {
+    setPreviousAutoOpen(shouldAutoOpen);
+    if (shouldAutoOpen) setIsOpen(true);
+  }
 
   useEffect(() => {
     if (!activeNoteSlug || !isOpen) {

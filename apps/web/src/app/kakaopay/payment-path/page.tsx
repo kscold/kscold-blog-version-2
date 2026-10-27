@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { buildPageMetadata } from '@/shared/lib/seo';
 import { AiAgentBloomPaymentPage } from '@/widgets/payment';
 
@@ -9,5 +10,5 @@ export const metadata = buildPageMetadata({
 });
 
 export default function KakaoPayPaymentPathPage() {
-  return <AiAgentBloomPaymentPage />;
+  return <Suspense><AiAgentBloomPaymentPage /></Suspense>;
 }

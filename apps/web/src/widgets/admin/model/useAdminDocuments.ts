@@ -31,11 +31,16 @@ export function useAdminDocuments(fixedCategory?: AdminDocumentCategory) {
   const mutationLocked = useRef(false);
   const refresh = useCallback(() => setRevision(value => value + 1), []);
 
-  useEffect(() => {
-    const controller = new AbortController();
+  const [source, setSource] = useState({ filter, revision });
+  if (source.filter !== filter || source.revision !== revision) {
+    setSource({ filter, revision });
     setIsLoading(true);
     setListing(null);
     setError('');
+  }
+
+  useEffect(() => {
+    const controller = new AbortController();
     void fetchAdminDocuments(filter, controller.signal)
       .then(data => {
         if (controller.signal.aborted) return;

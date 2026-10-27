@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import Button from '@/shared/ui/Button';
 
 interface PaginationProps {
@@ -11,7 +11,11 @@ interface PaginationProps {
 
 function PdfPageInput({ pageCount, pageNumber, onPage }: PaginationProps) {
   const [input, setInput] = useState(String(pageNumber));
-  useEffect(() => setInput(String(pageNumber)), [pageNumber]);
+  const [previousPage, setPreviousPage] = useState(pageNumber);
+  if (previousPage !== pageNumber) {
+    setPreviousPage(pageNumber);
+    setInput(String(pageNumber));
+  }
   function submit(event: FormEvent) {
     event.preventDefault();
     onPage(Number(input));

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   BANK_OPTIONS,
   formatPhoneNumber,
@@ -26,13 +26,15 @@ export function StackShareAccountPanel() {
   const [contactPhone, setContactPhone] = useState('');
 
   // 서버 값이 도착하면 입력창을 채운다. 사용자가 편집 중인 값을 덮지 않도록 최초 로드에만 반응한다.
-  useEffect(() => {
-    if (!account.data) return;
+  const [previousSource, setPreviousSource] = useState<typeof account.data>(undefined);
+  if (previousSource !== account.data && account.data) {
+    setPreviousSource(account.data);
+
     setBankName(account.data.bankName ?? '');
     setAccountNumber(account.data.accountNumber ?? '');
     setAccountHolder(account.data.accountHolder ?? '');
     setContactPhone(formatPhoneNumber(account.data.contactPhone ?? ''));
-  }, [account.data]);
+  }
 
   // 서버가 휴대전화 형식을 요구하므로 저장 전에 자릿수를 확인한다.
   const phoneDigits = contactPhone.replace(/[^0-9]/g, '');

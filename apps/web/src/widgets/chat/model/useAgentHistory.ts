@@ -23,10 +23,10 @@ export function useAgentHistory({ isOpen, viewerId, setMessages, setSessionId }:
     if (!isOpen || hasLoaded) return;
     const sessionId = getOrCreateAgentSessionId();
     const current = ++version.current;
-    setSessionId(sessionId);
-    setError('');
     void fetchVaultAgentHistory(sessionId).then(history => {
       if (current !== version.current) return;
+      setSessionId(sessionId);
+      setError('');
       if (isValidAgentSessionId(history.sessionId)) {
         rememberAgentSessionId(history.sessionId);
         setSessionId(history.sessionId);

@@ -4,13 +4,17 @@ import path from 'node:path';
 
 // 서비스 계정 키와 GA4 속성 번호를 두는 곳. Git에서 제외되고 배포 파일에만 들어간다.
 // next.config의 outputFileTracingIncludes로 standalone 빌드에도 함께 복사된다.
+// 런타임 경로는 여기서 전체 프로젝트로 추적하지 않고 위 명시적 포함 목록으로만 묶는다.
 export const SEARCH_INSIGHTS_DIR = path.resolve(
+  /* turbopackIgnore: true */
   process.cwd(),
   process.env.SEARCH_INSIGHTS_DIR || 'private/search-insights'
 );
 
 // seo-watch가 매일 남기는 색인 현황. 배포 때 지워지지 않도록 앱 폴더 밖(/app/frontend/data)에 둔다.
+// 이 상태 디렉터리는 런타임에서 읽으며 빌드 산출물에 포함하지 않는다.
 export const SEARCH_INSIGHTS_STATE_DIR = path.resolve(
+  /* turbopackIgnore: true */
   process.cwd(),
   process.env.SEARCH_INSIGHTS_STATE_DIR || '../../data/search-insights'
 );

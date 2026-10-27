@@ -21,11 +21,11 @@ interface VaultGraphViewProps {
 }
 
 export function VaultGraphView(props: VaultGraphViewProps) {
-  const g = useVaultForceGraph(props);
+  const { containerRef, fgRef, ...g } = useVaultForceGraph(props);
 
   return (
     <div
-      ref={g.containerRef}
+      ref={containerRef}
       data-vault-graph
       onMouseEnter={g.handleGraphMouseEnter}
       onMouseLeave={g.handleGraphMouseLeave}
@@ -35,7 +35,7 @@ export function VaultGraphView(props: VaultGraphViewProps) {
       <VaultGraphBackdrop reducedGraphEffects={g.reducedGraphEffects} isGraphHovered={g.isGraphHovered} />
 
       <ForceGraph2D
-        ref={g.fgRef}
+        ref={fgRef}
         graphData={g.gData}
         width={g.width > 0 ? g.width : 100}
         height={g.height > 0 ? g.height : 100}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useAdminNightCalendar, useMyAdminNightRequests } from '@/entities/admin-night';
 import { useCreateAdminNightRequest, useResubmitAdminNightRequest } from '@/features/admin-night';
 import type { AdminNightRequest } from '@/entities/admin-night';
@@ -28,7 +28,7 @@ export function useAdminNightPage(initialDateKey: string) {
     [weekSlots]
   );
   const initialRange = useMemo(() => parseAdminNightTimeRange(upcomingSlots[0]?.timeLabel), [upcomingSlots]);
-  const hasPrefilledRequesterName = useRef(false);
+  const [hasPrefilledRequesterName, setHasPrefilledRequesterName] = useState(false);
   const [requesterName, setRequesterName] = useState('');
   const [taskTitle, setTaskTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -43,20 +43,15 @@ export function useAdminNightPage(initialDateKey: string) {
   const createRequestMutation = useCreateAdminNightRequest();
   const resubmitRequestMutation = useResubmitAdminNightRequest();
 
-  useEffect(() => {
-    if (!hasPrefilledRequesterName.current && !requesterName.trim() && user?.displayName) {
-      setRequesterName(user.displayName);
-      hasPrefilledRequesterName.current = true;
-    }
-  }, [requesterName, user?.displayName]);
-
-  useEffect(() => {
-    if (!selectedDate) return;
-    if (upcomingSlots.some(slot => slot.date === selectedDate)) return;
+  if (!hasPrefilledRequesterName && !requesterName.trim() && user?.displayName) {
+    setRequesterName(user.displayName);
+    setHasPrefilledRequesterName(true);
+  }
+  if (selectedDate && !upcomingSlots.some(slot => slot.date === selectedDate)) {
     const nextSlot = upcomingSlots[0];
     setSelectedDate(nextSlot?.date ?? '');
     setTimeRange(parseAdminNightTimeRange(nextSlot?.timeLabel));
-  }, [selectedDate, upcomingSlots]);
+  }
 
   const currentUpcomingSlots = () => {
     const currentDateKey = getAdminNightDateKey(new Date());

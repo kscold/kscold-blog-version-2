@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { checkPostSlugExists, type PublicationState } from '@/entities/post';
 import type { Category, Post } from '@/shared/model/types/blog';
 import { validatePostSlug } from '@/shared/lib/postSlug';
@@ -29,7 +29,7 @@ export function usePostSubmission(options: Options) {
   const [attempted, setAttempted] = useState(false);
   const lock = useRef(false);
   const latest = useRef(options.form);
-  latest.current = options.form;
+  useLayoutEffect(() => { latest.current = options.form; }, [options.form]);
 
   async function save(input: PostSubmission) {
     try {

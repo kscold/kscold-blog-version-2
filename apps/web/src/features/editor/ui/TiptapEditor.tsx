@@ -6,7 +6,7 @@ import type { Editor } from '@tiptap/react';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';
 import {
   buildEditorExtensions,
-  buildEditorProps,
+  useEditorProps,
   preprocessEditorMarkdown,
   promptCodeBlockLanguage,
   promptImageUpload,
@@ -63,6 +63,7 @@ export default function TiptapEditor({
     [uploadVideo]
   );
 
+  const editorProps = useEditorProps(minHeight, editorRef, uploadImage);
   const editor = useEditor({
     immediatelyRender: false,
     extensions: buildEditorExtensions(placeholder, {
@@ -81,7 +82,7 @@ export default function TiptapEditor({
     onDestroy() {
       editorRef.current = null;
     },
-    editorProps: buildEditorProps(minHeight, () => editorRef.current, uploadImage),
+    editorProps,
   });
 
   useEffect(() => {

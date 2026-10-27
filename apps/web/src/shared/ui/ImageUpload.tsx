@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, DragEvent } from 'react';
+import { useState, useRef, DragEvent } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useMediaUpload } from '@/shared/lib/useMediaUpload';
@@ -18,9 +18,11 @@ export function ImageUpload({ onUploadSuccess, currentImage, testId }: ImageUplo
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  const [previousImage, setPreviousImage] = useState(currentImage);
+  if (previousImage !== currentImage) {
+    setPreviousImage(currentImage);
     setPreview(currentImage || null);
-  }, [currentImage]);
+  }
 
   const uploadSelectedFile = async (file: File) => {
     if (!file) return;

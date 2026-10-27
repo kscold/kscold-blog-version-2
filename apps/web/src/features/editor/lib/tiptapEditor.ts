@@ -15,4 +15,4 @@ export {
   promptImageUpload,
   promptImageRowUpload,
 } from '@/features/editor/lib/tiptapCommands';
-export { buildEditorProps } from '@/features/editor/lib/tiptapEditorProps';
+export { useEditorProps } from '@/features/editor/lib/tiptapEditorProps';

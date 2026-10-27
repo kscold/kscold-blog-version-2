@@ -53,7 +53,7 @@ export function usePdfReaderState(bytes: Uint8Array) {
   const document = usePdfReaderDocument({ bytes, onPages: navigation.setPageCount });
   const pageWidth = Math.round(fitWidth * scale);
   const currentPage = useRef(navigation.pageNumber);
-  currentPage.current = navigation.pageNumber;
+  useLayoutEffect(() => { currentPage.current = navigation.pageNumber; }, [navigation.pageNumber]);
   usePdfPinchZoom({ scrollRef, scale, onScale: setScale });
   useLayoutEffect(() => {
     goToPage(currentPage.current);

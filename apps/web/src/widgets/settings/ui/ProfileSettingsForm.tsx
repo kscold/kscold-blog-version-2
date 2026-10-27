@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/features/auth';
@@ -34,14 +34,16 @@ export function ProfileSettingsForm() {
   const [techStack, setTechStack] = useState<string[]>([]);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
-  useEffect(() => {
-    if (!currentUser) return;
+  const [previousSource, setPreviousSource] = useState<typeof currentUser>(undefined);
+  if (previousSource !== currentUser && currentUser) {
+    setPreviousSource(currentUser);
+
     setDisplayName(currentUser.displayName || '');
     setBio(currentUser.bio || '');
     setAvatar(currentUser.avatar || '');
     setSocialLinks(currentUser.socialLinks || {});
     setTechStack(currentUser.techStack || []);
-  }, [currentUser]);
+  }
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

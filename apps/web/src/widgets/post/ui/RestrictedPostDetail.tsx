@@ -30,18 +30,14 @@ const MarkdownContent = dynamic(
 export function RestrictedPostDetail({ post }: RestrictedPostDetailProps) {
   const { isAuthenticated, role } = useViewer();
   const [resolvedPost, setResolvedPost] = useState(post);
-  const [isResolvingAccess, setIsResolvingAccess] = useState(false);
+  const [isResolvingAccess, setIsResolvingAccess] = useState(isAuthenticated && post.restricted && post.content === null);
 
-  useEffect(() => {
+  const [source, setSource] = useState({ post, isAuthenticated });
+  if (source.post !== post || source.isAuthenticated !== isAuthenticated) {
+    setSource({ post, isAuthenticated });
     setResolvedPost(post);
-  }, [post]);
-
-  useEffect(() => {
-    if (!isAuthenticated && post.restricted && post.content === null) {
-      setResolvedPost(post);
-      setIsResolvingAccess(false);
-    }
-  }, [isAuthenticated, post]);
+    setIsResolvingAccess(isAuthenticated && post.restricted && post.content === null);
+  }
 
   useEffect(() => {
     if (!isAuthenticated || !post.restricted || post.content !== null) {
@@ -51,8 +47,6 @@ export function RestrictedPostDetail({ post }: RestrictedPostDetailProps) {
     let active = true;
 
     const resolveRestrictedPost = async () => {
-      setIsResolvingAccess(true);
-
       try {
         const latestPost = await apiClient.get<Post>(`/posts/slug/${post.slug}`);
 

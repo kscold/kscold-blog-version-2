@@ -32,7 +32,7 @@ export function useChatAdmin() {
     }
   }, []);
 
-  const connect = useCallback(() => {
+  const connect = useCallback(function connect() {
     const ws = new WebSocket(resolveChatWsUrl());
     wsRef.current = ws;
     ws.onopen = () => setIsConnected(true);

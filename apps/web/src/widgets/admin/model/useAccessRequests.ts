@@ -25,18 +25,12 @@ export function useAccessRequests() {
   const [scopeById, setScopeById] = useState<Record<string, GrantScope>>({});
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
-    try {
-      const data = await apiClient.get<AccessRequest[]>('/admin/access-requests');
+  const load = useCallback(() => apiClient.get<AccessRequest[]>('/admin/access-requests')
+    .then(data => {
       setRequests(data);
-      setScopeById(
-        Object.fromEntries(data.map(request => [request.id, request.postId ? 'POST' : 'CATEGORY']))
-      );
-    } catch {
-      // 의도적으로 무시
-    }
-    setLoading(false);
-  }, []);
+      setScopeById(Object.fromEntries(data.map(request => [request.id, request.postId ? 'POST' : 'CATEGORY'])));
+    }).catch(() => { /* 조회 실패 시 기존 목록을 유지한다. */ })
+    .finally(() => setLoading(false)), []);
 
   useEffect(() => {
     void load();

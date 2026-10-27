@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import {
   ACESFilmicToneMapping,
   Color,
@@ -99,7 +99,7 @@ export default function HeroLogoScene({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // 콜백이 바뀌어도 장면을 다시 만들지 않도록 최신 값만 잡아둔다.
   const callbacks = useRef({ onReady, onError });
-  callbacks.current = { onReady, onError };
+  useLayoutEffect(() => { callbacks.current = { onReady, onError }; }, [onReady, onError]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

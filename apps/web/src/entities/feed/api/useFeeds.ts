@@ -75,7 +75,6 @@ function useDebouncedLinkUrl(url: string): string {
   useEffect(() => {
     const normalizedUrl = normalizeFeedLinkUrl(url);
     if (getFeedLinkUrlError(normalizedUrl)) {
-      setDebouncedUrl('');
       return;
     }
 
@@ -86,7 +85,7 @@ function useDebouncedLinkUrl(url: string): string {
     return () => window.clearTimeout(timeoutId);
   }, [url]);
 
-  return debouncedUrl;
+  return getFeedLinkUrlError(normalizeFeedLinkUrl(url)) ? '' : debouncedUrl;
 }
 
 export function useLinkPreview(url: string) {

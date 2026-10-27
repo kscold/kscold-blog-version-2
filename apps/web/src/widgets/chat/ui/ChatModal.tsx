@@ -1,9 +1,10 @@
 'use client';
 
 import type { CSSProperties } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/entities/user';
+import { usePerformanceMode } from '@/shared/model/usePerformanceMode';
 import { useChatSocket } from '@/features/chat';
 import { useAgentChat } from '../model/useAgentChat';
 import { useChatDialog } from '../model/useChatDialog';
@@ -29,13 +30,14 @@ interface ChatModalProps {
 
 export default function ChatModal({ isOpen, isElevated = false, onClose, initialQuestion }: ChatModalProps) {
   const { user } = useAuthStore();
+  const { allowRichEffects } = usePerformanceMode();
   const panelRef = useChatDialog(isOpen, onClose);
   useChatViewport(isOpen, panelRef);
   const resize = useChatResize(isOpen, panelRef);
   const [inputMessage, setInputMessage] = useState('');
   const [mode, setMode] = useState<ChatMode>('agent');
-  const draftViewer = useRef(user?.id);
-  const hasCurrentDraft = draftViewer.current === user?.id;
+  const [draftViewer, setDraftViewer] = useState(user?.id);
+  const hasCurrentDraft = draftViewer === user?.id;
   const {
     agentMessages,
     agentContentScope,
@@ -57,12 +59,17 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
     canRetryLastQuestion,
   } = useAgentChat(isOpen);
 
-  useEffect(() => {
-    if (!isOpen || !initialQuestion) return;
-    setMode('agent');
-    setAgentInput(initialQuestion);
-    setIsSuggestionsOpen(false);
-  }, [initialQuestion, isOpen, setAgentInput, setIsSuggestionsOpen]);
+  const question = isOpen ? initialQuestion : undefined;
+  const [preparedQuestion, setPreparedQuestion] = useState<string | undefined>(undefined);
+  if (preparedQuestion !== question) {
+    setPreparedQuestion(question);
+    if (question) {
+      setMode('agent');
+      setAgentInput(question);
+      setIsSuggestionsOpen(false);
+    }
+  }
+
 
   const username = user?.displayName || user?.username || '';
   const ownerChat = useChatSocket({
@@ -80,10 +87,10 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
       : 'calc(100dvh - env(safe-area-inset-bottom, 0px) - 2.5rem)',
   } as CSSProperties;
 
-  useEffect(() => {
-    draftViewer.current = user?.id;
+  if (!hasCurrentDraft) {
+    setDraftViewer(user?.id);
     setInputMessage('');
-  }, [user?.id]);
+  }
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,10 +116,10 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
           {/* 오버레이 */}
           <motion.div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1300]"
-            initial={{ opacity: 0 }}
+            initial={allowRichEffects ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: allowRichEffects ? 0.2 : 0 }}
             onClick={onClose}
           />
 
@@ -127,10 +134,10 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
                        inset-x-2 bottom-[calc(var(--chat-keyboard-inset,0px)+0.5rem)] h-[calc(var(--chat-visible-height,100dvh)-0.5rem)] max-h-[calc(var(--chat-visible-height,100dvh)-0.5rem)] rounded-[24px]
                        sm:inset-x-auto sm:bottom-[var(--chat-modal-bottom)] sm:right-4 sm:h-[var(--chat-height,720px)] sm:max-h-[var(--chat-modal-max-height)] sm:w-[var(--chat-width,440px)] sm:min-w-[360px] sm:max-w-[calc(100vw-2rem)] sm:rounded-[24px] focus:outline-none"
             style={modalPositionStyle}
-            initial={{ opacity: 0, y: 80 }}
+            initial={allowRichEffects ? { opacity: 0, y: 80 } : false}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 80 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            exit={allowRichEffects ? { opacity: 0, y: 80 } : { opacity: 0 }}
+            transition={allowRichEffects ? { type: 'spring', stiffness: 400, damping: 30 } : { duration: 0 }}
             onClick={e => e.stopPropagation()}
           >
             <ChatResizeHandles resize={resize} />

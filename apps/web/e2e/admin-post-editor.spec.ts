@@ -20,6 +20,22 @@ async function mockEditorApis(page: Page) {
 }
 
 test.describe('포스트 에디터 반응형 시나리오', () => {
+  for (const stored of ['{"form":', '{"version":999}']) {
+    test(`손상된 임시 보관을 안내하고 새 글 작성을 유지한다: ${stored}`, async ({ page }) => {
+      await mockEditorApis(page);
+      await seedAdminSession(page);
+      await page.addInitScript(value => localStorage.setItem('autosave-new-post', value), stored);
+      const errors: string[] = [];
+      page.on('pageerror', error => errors.push(error.message));
+      await page.goto('/admin/posts/new');
+      await expect(page.getByTestId('post-autosave-status')).toContainText('임시 보관을 읽을 수 없습니다');
+      await page.getByTestId('post-editor-title').fill('계속 작성할 새 글');
+      await expect(page.getByTestId('post-editor-title')).toHaveValue('계속 작성할 새 글');
+      await expect(page.locator('.ProseMirror')).toBeVisible();
+      expect(errors).toEqual([]);
+    });
+  }
+
   for (const viewport of VIEWPORTS) {
     test(`${viewport.label} 해상도에서도 노션형 포스트 에디터를 편하게 사용할 수 있다`, async ({
       page,

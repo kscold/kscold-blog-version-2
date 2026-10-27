@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/entities/user';
 import { verifyAdminDocumentSession } from '../api/adminDocumentsApi';
 
@@ -8,30 +8,27 @@ export function useAdminDocumentIdentity() {
   const user = useAuthStore(state => state.user);
   const hasHydrated = useAuthStore(state => state.hasHydrated);
   const setUser = useAuthStore(state => state.setUser);
-  const [isVerifying, setIsVerifying] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(hasHydrated && !user);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
-  const hasHadUser = useRef(false);
-  const consumedRetry = useRef(0);
+  const [hasHadUser, setHasHadUser] = useState(false);
+  const [request, setRequest] = useState({ user, hasHydrated, retry });
+  if (request.user !== user || request.hasHydrated !== hasHydrated || request.retry !== retry) {
+    const shouldVerify = hasHydrated && !user && (!hasHadUser || request.retry !== retry);
+    setRequest({ user, hasHydrated, retry });
+    setIsVerifying(shouldVerify);
+    if (shouldVerify) setError('');
+  }
+  if (user && !hasHadUser) setHasHadUser(true);
 
   useEffect(() => {
-    if (!hasHydrated) return;
-    if (user) {
-      hasHadUser.current = true;
-      setIsVerifying(false);
-      return;
-    }
-    const isManualRetry = retry !== consumedRetry.current;
-    if (hasHadUser.current && !isManualRetry) return;
-    consumedRetry.current = retry;
+    if (!hasHydrated || user || !isVerifying) return;
     const controller = new AbortController();
     let hasTimedOut = false;
     const timeout = window.setTimeout(() => {
       hasTimedOut = true;
       controller.abort();
     }, 10_000);
-    setIsVerifying(true);
-    setError('');
     void verifyAdminDocumentSession(controller.signal)
       .then(verifiedUser => {
         if (!controller.signal.aborted) setUser(verifiedUser);
@@ -55,7 +52,7 @@ export function useAdminDocumentIdentity() {
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [hasHydrated, user, retry, setUser]);
+  }, [hasHydrated, user, retry, setUser, isVerifying]);
 
   return { user, hasHydrated, isVerifying, error, verifyAgain: () => setRetry(value => value + 1) };
 }

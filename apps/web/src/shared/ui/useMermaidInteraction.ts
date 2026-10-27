@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export type MermaidRenderState = 'loading' | 'rendered' | 'error';
 
@@ -41,13 +41,21 @@ export function useMermaidInteraction(renderState: MermaidRenderState) {
     commit(ns, cx + r * (txRef.current - cx), cy + r * (tyRef.current - cy));
   }, [commit]);
 
-  // 새 렌더 시작 시 리셋
-  useEffect(() => {
+  const [previousRenderState, setPreviousRenderState] = useState(renderState);
+  if (previousRenderState !== renderState) {
+    setPreviousRenderState(renderState);
     if (renderState === 'loading') {
       setContainerHeight(undefined);
-      commit(1, 0, 0);
+      setTf({ s: 1, x: 0, y: 0 });
     }
-  }, [renderState, commit]);
+  }
+  useLayoutEffect(() => {
+    if (renderState === 'loading') {
+      scaleRef.current = 1;
+      txRef.current = 0;
+      tyRef.current = 0;
+    }
+  }, [renderState]);
 
   // 자동 피팅: SVG가 컨테이너보다 넓으면 폭에 맞춰 축소하고 높이를 확정
   useEffect(() => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useHydrated, useStoredString } from '@/shared/lib/useBrowserSnapshot';
 import type { PostFormData } from '../model/types';
 import { readPostAutosave, type PostAutosave } from './postAutosave';
 
@@ -19,22 +20,24 @@ export function usePostAutosave({ autosaveKey, form, postId, updatedAt, dirty, e
   const [lastSavedText, setLastSavedText] = useState<string | null>(null);
   const [restoredFromAutosave, setRestored] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const inspectedKey = useRef('');
+  const hydrated = useHydrated();
+  const stored = useStoredString(autosaveKey);
 
-  useEffect(() => {
-    if (inspectedKey.current === autosaveKey) return;
-    inspectedKey.current = autosaveKey;
-    try {
-      const raw = localStorage.getItem(autosaveKey);
-      const saved = raw ? readPostAutosave(raw) : null;
-      if (saved && (!saved.postId || saved.postId === postId)) setRecovery(saved);
-      else if (raw) setLastSavedText('이 브라우저의 이전 임시 보관을 읽을 수 없습니다. 서버 원문은 유지됩니다.');
-    } catch {
-      setLastSavedText('이 브라우저에서 임시 보관을 사용할 수 없습니다. 서버에 직접 저장해 주세요.');
-    }
+  if (hydrated && checkedKey !== autosaveKey) {
     setCheckedKey(autosaveKey);
-  }, [autosaveKey, postId]);
-
+    let saved: PostAutosave | null = null;
+    try {
+      saved = stored ? readPostAutosave(stored) : null;
+    } catch {
+      // 손상된 브라우저 보관 값이 서버 원문과 작성기 진입을 막지 않게 한다.
+    }
+    setRecovery(saved && (!saved.postId || saved.postId === postId) ? saved : null);
+    if (stored === undefined) {
+      setLastSavedText('이 브라우저에서 임시 보관을 사용할 수 없습니다. 서버에 직접 저장해 주세요.');
+    } else if (stored && !saved) {
+      setLastSavedText('이 브라우저의 이전 임시 보관을 읽을 수 없습니다. 서버 원문은 유지됩니다.');
+    }
+  }
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
     if (!enabled || !dirty || recovery || checkedKey !== autosaveKey) return;

@@ -17,18 +17,19 @@ export default function FloatingChat() {
   const isVaultPage = pathname.startsWith('/vault');
   const initialQuestion = getAgentEntryQuestion(searchParams.get('agentTopic'));
 
-  useEffect(() => {
-    if (searchParams.get('chat') === 'feed' || searchParams.get('chatMode') === 'feed') {
-      setIsOpen(false);
-      router.replace('/feed?draft=open#feed-composer', { scroll: true });
-      return;
-    }
-    const shouldOpen = searchParams.get('chat') === 'open';
+  const isFeedDraftEntry = searchParams.get('chat') === 'feed' || searchParams.get('chatMode') === 'feed';
+  const query = searchParams.toString();
+  const [previousQuery, setPreviousQuery] = useState<string | null>(null);
+  if (previousQuery !== query) {
+    setPreviousQuery(query);
+    const shouldOpen = !isFeedDraftEntry && searchParams.get('chat') === 'open';
     setIsOpen(shouldOpen);
-    if (shouldOpen) {
-      setShouldLoadModal(true);
-    }
-  }, [router, searchParams]);
+    if (shouldOpen) setShouldLoadModal(true);
+  }
+
+  useEffect(() => {
+    if (isFeedDraftEntry) router.replace('/feed?draft=open#feed-composer', { scroll: true });
+  }, [isFeedDraftEntry, query, router]);
 
   const clearChatParam = () => {
     if (searchParams.get('chat') !== 'open') {

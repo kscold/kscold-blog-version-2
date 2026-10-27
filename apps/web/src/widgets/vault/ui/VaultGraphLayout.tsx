@@ -18,7 +18,7 @@ const DEFAULT_SIDEBAR_WIDTH = 320;
 
 export function VaultGraphLayout() {
   const { theme } = useUiStore();
-  const { isTouchDevice, allowRichEffects } = usePerformanceMode();
+  const { isTouchDevice, allowRichEffects, isDesktopViewport: isDesktop } = usePerformanceMode();
   const useSolidSurface = isTouchDevice || !allowRichEffects;
   const searchParams = useSearchParams();
   const initialFolder = searchParams.get('folder');
@@ -26,7 +26,6 @@ export function VaultGraphLayout() {
   const [hoverFolderId, setHoverFolderId] = useState<string | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
-  const [isDesktop, setIsDesktop] = useState(false);
 
   const isResizingRef = useRef(false);
   const startXRef = useRef(0);
@@ -36,19 +35,10 @@ export function VaultGraphLayout() {
     useVaultGraphData(activeFolderId);
   const activeFolder = activeFolderId ? findFolderById(folders, activeFolderId) : null;
 
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    setIsDesktop(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
+  if (!isFoldersLoading && activeFolderId && !activeFolder) {
+    setActiveFolderId(null);
+  }
 
-  useEffect(() => {
-    if (!isFoldersLoading && activeFolderId && !activeFolder) {
-      setActiveFolderId(null);
-    }
-  }, [activeFolder, activeFolderId, isFoldersLoading]);
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {

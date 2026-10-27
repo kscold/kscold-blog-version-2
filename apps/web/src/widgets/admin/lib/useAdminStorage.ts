@@ -42,30 +42,22 @@ export function useAdminStorage() {
   }, []);
 
   const loadListing = useCallback(
-    async (prefix = currentPrefix, showLoader = false) => {
-      if (showLoader) {
-        setIsLoading(true);
-      }
-
-      try {
-        const data = await apiClient.get<AdminStorageListing>(
-          `/admin/storage?prefix=${encodeURIComponent(prefix)}`
-        );
-        applyListing(data);
-      } catch (error) {
-        setListing(null);
-        setErrorMessage(
-          error instanceof Error ? error.message : '저장소 목록을 불러오지 못했습니다.'
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    },
+    (prefix = currentPrefix) => apiClient.get<AdminStorageListing>(
+      `/admin/storage?prefix=${encodeURIComponent(prefix)}`
+    ).then(applyListing).catch(error => {
+      setListing(null);
+      setErrorMessage(error instanceof Error ? error.message : '저장소 목록을 불러오지 못했습니다.');
+    }).finally(() => setIsLoading(false)),
     [applyListing, currentPrefix]
   );
 
+  const [requestedPrefix, setRequestedPrefix] = useState(currentPrefix);
+  if (requestedPrefix !== currentPrefix) {
+    setRequestedPrefix(currentPrefix);
+    setIsLoading(true);
+  }
   useEffect(() => {
-    void loadListing(currentPrefix, true);
+    void loadListing(currentPrefix);
   }, [currentPrefix, loadListing]);
 
   function navigateTo(prefix: string) {
@@ -166,7 +158,7 @@ export function useAdminStorage() {
     selectedObject,
     currentPrefix,
     navigateTo,
-    refresh: () => loadListing(currentPrefix, false),
+    refresh: () => loadListing(currentPrefix),
     createFolder,
     uploadFiles,
     deleteEntry,

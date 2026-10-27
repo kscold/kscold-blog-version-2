@@ -5,7 +5,9 @@ import type { PresenterSlide } from '../model/presenterSlide';
 // scripts/sync-hansalim-presenter.mjs가 쓰는 곳. Git에서 제외되고 배포 파일에만 들어간다.
 // next.config의 outputFileTracingIncludes로 standalone 빌드에도 함께 복사된다.
 // E2E는 HANSALIM_PRESENTER_DIR로 시험용 가짜 대본(e2e/fixtures/hansalim-presenter)을 읽는다.
+// 동적 경로의 전체 프로젝트 추적 대신 위 명시적 포함 목록만 사용한다.
 const PRESENTER_DIR = path.resolve(
+  /* turbopackIgnore: true */
   process.cwd(),
   process.env.HANSALIM_PRESENTER_DIR || 'private/hansalim-presenter'
 );

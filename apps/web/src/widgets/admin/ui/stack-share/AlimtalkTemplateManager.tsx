@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   type AlimtalkTemplate,
   type AlimtalkTemplateStatus,
@@ -27,10 +27,13 @@ function TemplateCard({ template }: { template: AlimtalkTemplate }) {
   const [externalTemplateId, setExternalTemplateId] = useState(template.externalTemplateId ?? '');
   const [status, setStatus] = useState<AlimtalkTemplateStatus>(template.status);
 
-  useEffect(() => {
+  const source = `${template.externalTemplateId ?? ''}:${template.status}`;
+  const [previousSource, setPreviousSource] = useState(source);
+  if (previousSource !== source) {
+    setPreviousSource(source);
     setExternalTemplateId(template.externalTemplateId ?? '');
     setStatus(template.status);
-  }, [template.externalTemplateId, template.status]);
+  }
 
   const handleCopy = async () => {
     try {

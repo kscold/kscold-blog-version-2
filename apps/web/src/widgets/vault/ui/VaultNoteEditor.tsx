@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
@@ -53,7 +53,9 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
   const [tags, setTags] = useState(initialData?.tags || '');
   const [showPreview, setShowPreview] = useState(false);
 
-  useEffect(() => {
+  const [previousSource, setPreviousSource] = useState(initialData);
+  if (previousSource !== initialData) {
+    setPreviousSource(initialData);
     if (initialData) {
       setTitle(initialData.title);
       setSlug(initialData.slug);
@@ -61,18 +63,14 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
       setFolderId(initialData.folderId);
       setTags(initialData.tags);
     }
-  }, [initialData]);
+  }
 
-  useEffect(() => {
-    if (mode === 'create' && title && !slug) {
-      const autoSlug = title
-        .toLowerCase()
-        .replace(/[^a-z0-9가-힣\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .substring(0, 100);
-      setSlug(autoSlug);
+  const changeTitle = (value: string) => {
+    setTitle(value);
+    if (mode === 'create' && value && !slug) {
+      setSlug(value.toLowerCase().replace(/[^a-z0-9가-힣\s-]/g, '').replace(/\s+/g, '-').substring(0, 100));
     }
-  }, [mode, title, slug]);
+  };
 
   const flatFolders = folders ? flattenFolders(folders.filter(f => !f.parent)) : [];
   const mutation = mode === 'create' ? createNote : updateNote;
@@ -134,7 +132,7 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
                   <input
                     type="text"
                     value={title}
-                    onChange={e => setTitle(e.target.value)}
+                    onChange={e => changeTitle(e.target.value)}
                     placeholder="노트 제목을 입력하세요"
                     className="w-full px-4 py-3 bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
                     required

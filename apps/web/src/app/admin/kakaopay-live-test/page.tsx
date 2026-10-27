@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { KakaoPayLiveTestPage } from '@/widgets/payment';
 
@@ -11,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function KakaoPayLiveTestRoute() {
-  return <KakaoPayLiveTestPage />;
+  return <Suspense><KakaoPayLiveTestPage /></Suspense>;
 }

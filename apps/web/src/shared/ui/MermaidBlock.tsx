@@ -1,5 +1,7 @@
 'use client';
 
+import { useHydrated } from '@/shared/lib/useBrowserSnapshot';
+
 import { useEffect, useId, useRef, useState, type RefObject } from 'react';
 import { useMermaidInteraction, type MermaidRenderState } from '@/shared/ui/useMermaidInteraction';
 import { ensureMermaidFonts, loadMermaid, processMermaidSvg } from '@/shared/lib/mermaid';
@@ -105,13 +107,14 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
 
 /** 요소가 화면 아래 한 화면 거리 안으로 들어오면 true. 한 번 true가 되면 그대로 둔다. */
 function useNearViewport(ref: RefObject<HTMLElement | null>) {
-  const [near, setNear] = useState(false);
+  const [observed, setNear] = useState(false);
+  const hydrated = useHydrated();
+  const near = observed || (hydrated && typeof IntersectionObserver === 'undefined');
 
   useEffect(() => {
     const element = ref.current;
     if (!element || near) return;
     if (typeof IntersectionObserver === 'undefined') {
-      setNear(true);
       return;
     }
     const observer = new IntersectionObserver(

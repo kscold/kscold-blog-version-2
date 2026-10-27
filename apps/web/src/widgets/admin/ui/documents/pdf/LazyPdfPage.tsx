@@ -12,7 +12,7 @@ interface LazyPageProps {
 }
 
 interface PdfPageCanvasProps extends LazyPageProps {
-  state: LazyPdfPageState;
+  state: Omit<LazyPdfPageState, 'pageRef'>;
 }
 
 function PdfPageCanvas({ pageNumber, width, rotation, state }: PdfPageCanvasProps) {
@@ -39,10 +39,10 @@ function PdfPageCanvas({ pageNumber, width, rotation, state }: PdfPageCanvasProp
 
 export function LazyPdfPage(props: LazyPageProps) {
   const { pageNumber, width } = props;
-  const state = useLazyPdfPage(props);
+  const { pageRef, ...state } = useLazyPdfPage(props);
   return (
     <div
-      ref={state.pageRef}
+      ref={pageRef}
       data-testid={`pdf-page-${pageNumber}`}
       data-pdf-page={pageNumber}
       className="relative shrink-0 overflow-hidden bg-white shadow-sm"

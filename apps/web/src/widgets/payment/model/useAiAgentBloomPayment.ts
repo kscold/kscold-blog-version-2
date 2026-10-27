@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useViewer } from '@/entities/user';
 import { aiAgentBloomPaymentApi, type AiAgentBloomPaymentConfig } from '@/features/payment';
 import {
@@ -22,12 +23,14 @@ import { requestPortOnePayment } from '@/widgets/payment/lib/requestPortOnePayme
 
 export function useAiAgentBloomPayment() {
   const { user, isAuthenticated } = useViewer();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<FormErrors>({});
   const [config, setConfig] = useState<AiAgentBloomPaymentConfig | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
-  const [paymentAccessToken, setPaymentAccessToken] = useState<string | undefined>();
+  const paymentAccessToken = searchParams.get('token')?.trim() || undefined;
   const [isPreparing, setIsPreparing] = useState(false);
   const handledRedirectPaymentId = useRef<string | null>(null);
   const canPay = isAuthenticated || !!paymentAccessToken;
@@ -76,31 +79,20 @@ export function useAiAgentBloomPayment() {
     };
   }, []);
 
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const token = searchParams.get('token')?.trim();
-    if (token) {
-      setPaymentAccessToken(token);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
+  const [prefilledUser, setPrefilledUser] = useState<typeof user>(null);
+  if (user && prefilledUser !== user) {
+    setPrefilledUser(user);
 
     setForm(prev => ({
       customerName: prev.customerName || user.displayName || user.username || '',
       customerEmail: prev.customerEmail || user.email || '',
       customerPhone: prev.customerPhone,
     }));
-  }, [user]);
+  }
 
   const completePayment = useCallback(
     async (paymentId: string) => {
       try {
-        setIsPreparing(true);
-        setPaymentStatus('결제 결과를 확인하고 있습니다.');
         const completed = await aiAgentBloomPaymentApi.complete(paymentId, paymentAccessToken);
         setPaymentStatus(completed.message || '결제가 확인되었습니다.');
       } catch (error) {
@@ -112,29 +104,24 @@ export function useAiAgentBloomPayment() {
     [paymentAccessToken]
   );
 
+  const paymentId = searchParams.get('paymentId');
+  const code = searchParams.get('code');
+  const message = searchParams.get('message');
+  const redirectKey = JSON.stringify([canPay, paymentId, code, message]);
+  const [previousRedirect, setPreviousRedirect] = useState('');
+  if (previousRedirect !== redirectKey) {
+    setPreviousRedirect(redirectKey);
+    if (canPay && code) setPaymentStatus(message ? `결제가 완료되지 않았습니다. ${message}` : '결제가 완료되지 않았습니다.');
+    else if (canPay && paymentId) {
+      setIsPreparing(true);
+      setPaymentStatus('결제 결과를 확인하고 있습니다.');
+    }
+  }
   useEffect(() => {
-    if (!canPay) {
-      return;
-    }
-
-    const searchParams = new URLSearchParams(window.location.search);
-    const paymentId = searchParams.get('paymentId');
-    const code = searchParams.get('code');
-    const message = searchParams.get('message');
-
-    if (code) {
-      setPaymentStatus(
-        message ? `결제가 완료되지 않았습니다. ${message}` : '결제가 완료되지 않았습니다.'
-      );
-      return;
-    }
-    if (!paymentId || handledRedirectPaymentId.current === paymentId) {
-      return;
-    }
-
+    if (!canPay || code || !paymentId || handledRedirectPaymentId.current === paymentId) return;
     handledRedirectPaymentId.current = paymentId;
-    completePayment(paymentId);
-  }, [canPay, completePayment]);
+    void completePayment(paymentId);
+  }, [canPay, code, paymentId, completePayment]);
 
   const updateField = (field: keyof FormState, value: string) => {
     const nextValue = field === 'customerPhone' ? formatPhoneNumber(value) : value;
@@ -153,7 +140,7 @@ export function useAiAgentBloomPayment() {
 
   const openPaymentWindow = async () => {
     if (!canPay) {
-      window.location.href = loginPath;
+      router.push(loginPath);
       return;
     }
     if (configError) {

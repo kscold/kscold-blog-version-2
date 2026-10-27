@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useViewer } from '@/entities/user';
 import { kakaoPayLiveTestApi, type AiAgentBloomPaymentConfig } from '@/features/payment';
 import {
@@ -17,6 +18,7 @@ import { requestPortOnePayment } from '@/widgets/payment/lib/requestPortOnePayme
 
 export function useKakaoPayLiveTest() {
   const { user, role } = useViewer();
+  const searchParams = useSearchParams();
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<FormErrors>({});
   const [config, setConfig] = useState<AiAgentBloomPaymentConfig | null>(null);
@@ -39,20 +41,17 @@ export function useKakaoPayLiveTest() {
       .catch(error => setStatus(resolveErrorMessage(error, '실결제 설정을 불러오지 못했습니다.')));
   }, [isAdmin]);
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
+  const [prefilledUser, setPrefilledUser] = useState<typeof user>(null);
+  if (user && prefilledUser !== user) {
+    setPrefilledUser(user);
     setForm(previous => ({
       customerName: previous.customerName || user.displayName || user.username || '',
       customerEmail: previous.customerEmail || user.email || '',
       customerPhone: previous.customerPhone,
     }));
-  }, [user]);
+  }
 
   const completePayment = useCallback(async (paymentId: string) => {
-    setIsProcessing(true);
-    setStatus('포트원에서 실결제 승인 결과를 확인하고 있습니다.');
     try {
       const completed = await kakaoPayLiveTestApi.complete(paymentId);
       setStatus(`${completed.message} 포트원 관리자에서 결제 취소까지 확인해주세요.`);
@@ -63,23 +62,24 @@ export function useKakaoPayLiveTest() {
     }
   }, []);
 
+  const paymentId = searchParams.get('paymentId');
+  const code = searchParams.get('code');
+  const message = searchParams.get('message');
+  const redirectKey = JSON.stringify([isAdmin, paymentId, code, message]);
+  const [previousRedirect, setPreviousRedirect] = useState('');
+  if (previousRedirect !== redirectKey) {
+    setPreviousRedirect(redirectKey);
+    if (isAdmin && code) setStatus(message || '결제가 완료되지 않았습니다.');
+    else if (isAdmin && paymentId) {
+      setIsProcessing(true);
+      setStatus('포트원에서 실결제 승인 결과를 확인하고 있습니다.');
+    }
+  }
   useEffect(() => {
-    if (!isAdmin) {
-      return;
-    }
-    const searchParams = new URLSearchParams(window.location.search);
-    const paymentId = searchParams.get('paymentId');
-    const code = searchParams.get('code');
-    if (code) {
-      setStatus(searchParams.get('message') || '결제가 완료되지 않았습니다.');
-      return;
-    }
-    if (!paymentId || handledPaymentId.current === paymentId) {
-      return;
-    }
+    if (!isAdmin || code || !paymentId || handledPaymentId.current === paymentId) return;
     handledPaymentId.current = paymentId;
-    completePayment(paymentId);
-  }, [completePayment, isAdmin]);
+    void completePayment(paymentId);
+  }, [isAdmin, code, paymentId, completePayment]);
 
   const updateField = (field: keyof FormState, value: string) => {
     const nextValue = field === 'customerPhone' ? formatPhoneNumber(value) : value;
