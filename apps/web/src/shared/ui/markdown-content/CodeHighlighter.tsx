@@ -70,7 +70,7 @@ export default function CodeHighlighter({ codeText, language, isDark }: CodeHigh
       style={isDark ? vscDarkPlus : a11yOneLight}
       language={language}
       PreTag="div"
-      className="!my-0 !border-0 !bg-transparent"
+      className="my-0! border-0! bg-transparent!"
       customStyle={{
         margin: 0,
         padding: '1.25rem',

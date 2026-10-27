@@ -105,12 +105,12 @@ export function PostPageSkeleton() {
             <Skeleton className="h-4 w-28" />
             <Skeleton className="h-4 w-16" />
           </div>
-          <Skeleton className="aspect-[16/9] w-full rounded-[2rem]" />
+          <Skeleton className="aspect-video w-full rounded-4xl" />
         </div>
 
         <div className="mt-12 space-y-4">
           <SkeletonTextGroup widths={['w-full', 'w-full', 'w-11/12', 'w-10/12', 'w-9/12']} />
-          <Skeleton className="h-52 w-full rounded-[2rem]" />
+          <Skeleton className="h-52 w-full rounded-4xl" />
           <SkeletonTextGroup widths={['w-full', 'w-full', 'w-full', 'w-5/6']} />
         </div>
 

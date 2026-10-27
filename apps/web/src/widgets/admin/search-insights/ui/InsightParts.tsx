@@ -54,9 +54,9 @@ export function DailyBars({ points }: { points: { date: string; value: number }[
           <span className="text-[9px] font-bold leading-none text-surface-700 tabular-nums">
             {point.value > 0 ? point.value : ''}
           </span>
-          <div className="flex w-full flex-1 items-end overflow-hidden rounded-sm bg-surface-100">
+          <div className="flex w-full flex-1 items-end overflow-hidden rounded-xs bg-surface-100">
             <div
-              className="w-full rounded-sm bg-surface-800"
+              className="w-full rounded-xs bg-surface-800"
               title={`${point.date}: ${point.value}`}
               style={{
                 height: `${Math.round((point.value / max) * 100)}%`,

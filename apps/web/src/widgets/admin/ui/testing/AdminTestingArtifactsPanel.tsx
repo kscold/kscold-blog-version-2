@@ -24,7 +24,7 @@ export function AdminTestingArtifactsPanel({
           <div className="mt-4 rounded-2xl bg-surface-950 text-surface-100 p-4 min-h-[280px] max-h-[420px] overflow-auto">
             <pre
               data-testid="admin-qa-log-panel"
-              className="text-[11px] sm:text-xs leading-6 whitespace-pre-wrap break-words font-mono"
+              className="text-[11px] sm:text-xs leading-6 whitespace-pre-wrap wrap-break-word font-mono"
             >
               {session?.logs.length
                 ? formatLogOutput(session.logs)
@@ -42,7 +42,7 @@ export function AdminTestingArtifactsPanel({
           </div>
           <div className="mt-4 rounded-2xl border border-surface-100 bg-surface-50 overflow-hidden">
             {latestScreenshot ? (
-              <div className="relative aspect-[16/10]">
+              <div className="relative aspect-16/10">
                 <Image
                   src={latestScreenshot}
                   alt="QA 최신 스크린샷"
@@ -86,9 +86,9 @@ export function AdminTestingArtifactsPanel({
                 href={item.url}
                 target="_blank"
                 rel="noreferrer"
-                className="group overflow-hidden rounded-2xl border border-surface-200 bg-white hover:border-surface-300 hover:shadow-sm transition-all"
+                className="group overflow-hidden rounded-2xl border border-surface-200 bg-white hover:border-surface-300 hover:shadow-xs transition-all"
               >
-                <div className="relative aspect-[16/10] bg-surface-100">
+                <div className="relative aspect-16/10 bg-surface-100">
                   <Image
                     src={item.url}
                     alt={item.name}
@@ -99,7 +99,7 @@ export function AdminTestingArtifactsPanel({
                   />
                 </div>
                 <div className="px-4 py-3">
-                  <div className="text-sm font-semibold leading-6 text-surface-900 [overflow-wrap:anywhere]">
+                  <div className="text-sm font-semibold leading-6 text-surface-900 wrap-anywhere">
                     {formatScreenshotLabel(item.name)}
                   </div>
                   <div className="mt-1 text-xs text-surface-400">새 탭에서 원본 보기</div>

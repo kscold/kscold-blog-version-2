@@ -20,10 +20,10 @@ export function ChatModalHeader({
   onResetSize,
 }: Props) {
   return (
-    <div className="flex-shrink-0 border-b border-surface-200 bg-surface-50 p-3 sm:p-4">
+    <div className="shrink-0 border-b border-surface-200 bg-surface-50 p-3 sm:p-4">
       <div className="flex items-center justify-between">
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-surface-900 shadow-sm sm:h-10 sm:w-10">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-900 shadow-xs sm:h-10 sm:w-10">
             <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
@@ -38,7 +38,7 @@ export function ChatModalHeader({
             </div>
           </div>
         </div>
-        <div className="ml-2 flex flex-shrink-0 items-center gap-1">
+        <div className="ml-2 flex shrink-0 items-center gap-1">
           {onResetSize && (
             <button
               type="button"

@@ -20,7 +20,7 @@ export function AuthSupportShell({
 }: AuthSupportShellProps) {
   return (
     <div className="relative flex min-h-screen items-start justify-center overflow-hidden bg-surface-50 px-4 pb-10 pt-24 sm:items-center sm:p-4">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white via-surface-50 to-surface-100" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-white via-surface-50 to-surface-100" />
       <AuthGridPattern />
 
       <motion.div
@@ -32,7 +32,7 @@ export function AuthSupportShell({
         <div className="mb-8 text-center sm:mb-10">
           <Link href="/" className="inline-block group">
             <h1 className="mb-3 text-5xl font-black tracking-tighter transition-transform group-hover:scale-[1.02]">
-              <span className="bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 bg-[size:200%_auto] bg-clip-text text-transparent animate-shimmer">
+              <span className="bg-linear-to-r from-surface-900 via-surface-500 to-surface-900 bg-size-[200%_auto] bg-clip-text text-transparent animate-shimmer">
                 KSCOLD
               </span>
             </h1>

@@ -2,13 +2,13 @@ import Link from 'next/link';
 import { ADMIN_NAV_GROUPS, type AdminNavItem } from '@/shared/config/adminNavigation';
 
 const LINK_CLASS =
-  'block rounded-xl px-3 py-2.5 transition-colors hover:bg-surface-50 focus:outline-none focus:ring-2 focus:ring-surface-900/40';
+  'block rounded-xl px-3 py-2.5 transition-colors hover:bg-surface-50 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40';
 
 function ShortcutLink({ item }: { item: AdminNavItem }) {
   const content = (
     <>
       <span className="block text-sm font-bold text-surface-900">{item.label}</span>
-      <span className="mt-0.5 block text-xs leading-5 text-surface-500 [overflow-wrap:anywhere]">
+      <span className="mt-0.5 block text-xs leading-5 text-surface-500 wrap-anywhere">
         {item.description}
       </span>
     </>

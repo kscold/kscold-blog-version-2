@@ -59,9 +59,9 @@ export function AdminUserStatsSection() {
               <span className="text-[10px] font-bold text-surface-700 tabular-nums leading-none">
                 {day.count > 0 ? day.count : ''}
               </span>
-              <div className="flex w-full flex-1 items-end overflow-hidden rounded-sm bg-surface-100">
+              <div className="flex w-full flex-1 items-end overflow-hidden rounded-xs bg-surface-100">
                 <div
-                  className="w-full bg-surface-800 rounded-sm transition-all duration-700"
+                  className="w-full bg-surface-800 rounded-xs transition-all duration-700"
                   style={{
                     height: `${Math.round((day.count / maxDaily) * 100)}%`,
                     minHeight: day.count > 0 ? 4 : 0,

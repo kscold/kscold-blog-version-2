@@ -23,7 +23,7 @@ export function MermaidToolbar({ theme, chart, isTransformed, scale, onReset }: 
             className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
               theme === 'dark'
                 ? 'bg-surface-800/90 text-surface-300'
-                : 'bg-white/90 text-surface-500 shadow-sm'
+                : 'bg-white/90 text-surface-500 shadow-xs'
             }`}
           >
             Mermaid

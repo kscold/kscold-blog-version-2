@@ -35,8 +35,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             w-full px-5 py-3 rounded-[8px]
             bg-white border border-surface-200
             text-surface-900 placeholder:text-surface-400
-            shadow-sm
-            focus:outline-none focus:ring-1 focus:ring-surface-900 focus:border-surface-900 focus:shadow-[0_4px_12px_rgba(15,23,42,0.08)]
+            shadow-xs
+            focus:outline-hidden focus:ring-1 focus:ring-surface-900 focus:border-surface-900 focus:shadow-[0_4px_12px_rgba(15,23,42,0.08)]
             transition-all duration-200
             disabled:opacity-50 disabled:cursor-not-allowed
             ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}

@@ -81,7 +81,7 @@ export function VaultGraphLayout() {
     <div className="absolute inset-0 flex overflow-hidden bg-transparent lg:p-4 lg:gap-4">
       {isMobileOpen && (
         <div
-          className={`fixed inset-0 z-[45] lg:hidden ${useSolidSurface ? 'bg-surface-900/25' : 'bg-surface-900/20 backdrop-blur-sm'}`}
+          className={`fixed inset-0 z-45 lg:hidden ${useSolidSurface ? 'bg-surface-900/25' : 'bg-surface-900/20 backdrop-blur-sm'}`}
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -120,7 +120,7 @@ export function VaultGraphLayout() {
               onClick={() => {
                 setActiveFolderId(activeFolder?.parent ?? null);
               }}
-              className={`px-4 py-2 rounded-full border text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 shadow-sm transition-all ${useSolidSurface ? 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-800' : 'bg-surface-50/80 dark:bg-surface-900/80 border-surface-200 dark:border-surface-800 backdrop-blur-xl hover:scale-105'}`}
+              className={`px-4 py-2 rounded-full border text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white text-sm font-bold flex items-center gap-2 shadow-xs transition-all ${useSolidSurface ? 'bg-white dark:bg-surface-900 border-surface-200 dark:border-surface-800' : 'bg-surface-50/80 dark:bg-surface-900/80 border-surface-200 dark:border-surface-800 backdrop-blur-xl hover:scale-105'}`}
             >
               <svg
                 className="w-4 h-4"
@@ -145,7 +145,7 @@ export function VaultGraphLayout() {
             <GraphPanelSkeleton />
           ) : filteredGraph && filteredGraph.nodes.length > 0 ? (
             <div
-              className={`w-full h-full flex flex-col overflow-hidden lg:rounded-3xl border-0 lg:border ${useSolidSurface ? 'bg-white dark:bg-surface-950 lg:shadow-sm border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-sm border-surface-200/50 dark:border-surface-800/50'}`}
+              className={`w-full h-full flex flex-col overflow-hidden lg:rounded-3xl border-0 lg:border ${useSolidSurface ? 'bg-white dark:bg-surface-950 lg:shadow-xs border-surface-200 dark:border-surface-800' : 'bg-white/40 dark:bg-surface-950/40 backdrop-blur-md lg:shadow-xs border-surface-200/50 dark:border-surface-800/50'}`}
             >
               <ClientVaultGraph
                 graphData={filteredGraph}

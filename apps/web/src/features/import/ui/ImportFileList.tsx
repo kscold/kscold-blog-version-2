@@ -45,7 +45,7 @@ export function ImportFileList({
             <select
               value={globalCategoryId}
               onChange={e => onGlobalCategoryChange(e.target.value)}
-              className="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm bg-white text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900"
+              className="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm bg-white text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900"
             >
               <option value="">카테고리 선택</option>
               {categories?.map(cat => (
@@ -61,7 +61,7 @@ export function ImportFileList({
             <select
               value={globalPostStatus}
               onChange={e => onGlobalPostStatusChange(e.target.value as 'DRAFT' | 'PUBLISHED')}
-              className="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm bg-white text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900"
+              className="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm bg-white text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900"
             >
               <option value="DRAFT">초안 · 관리자만</option>
               <option value="PUBLISHED">{category ? category.restricted ? '발행 · 승인 필요' : '발행 · 누구나' : '발행 · 카테고리 선택 필요'}</option>
@@ -103,7 +103,7 @@ export function ImportFileList({
                     type="text"
                     value={file.title}
                     onChange={e => onUpdateFile(index, { title: e.target.value })}
-                    className="text-lg font-bold text-surface-900 bg-transparent border-none outline-none w-full focus:ring-0 p-0"
+                    className="text-lg font-bold text-surface-900 bg-transparent border-none outline-hidden w-full focus:ring-0 p-0"
                     placeholder="제목"
                   />
                   <div className="mt-1 flex items-center gap-3 text-xs text-surface-400">

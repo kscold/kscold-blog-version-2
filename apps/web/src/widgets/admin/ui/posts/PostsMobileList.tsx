@@ -28,7 +28,7 @@ export function PostsMobileList({ posts, onDelete }: PostsMobileListProps) {
             </div>
             <PostStatusBadge post={post} />
           </div>
-          <p className="mt-2 text-xs text-surface-500 [overflow-wrap:anywhere]">{getPostViewHref(post)}</p>
+          <p className="mt-2 text-xs text-surface-500 wrap-anywhere">{getPostViewHref(post)}</p>
           <div className="mt-3 flex items-center justify-between gap-2">
             <span className="text-xs text-surface-400">
               조회 {post.views} · {new Date(post.createdAt).toLocaleDateString('ko-KR')}

@@ -34,7 +34,7 @@ export default function FeedActionBar({
 
   return (
     <aside data-testid="feed-editor-sidebar" className="space-y-4 xl:sticky xl:top-24 xl:self-start">
-      <div className="rounded-[28px] border border-surface-200 bg-white p-5 shadow-sm">
+      <div className="rounded-[28px] border border-surface-200 bg-white p-5 shadow-xs">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-surface-400">
           Compose
         </p>

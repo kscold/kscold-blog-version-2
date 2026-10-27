@@ -48,13 +48,13 @@ export function VaultCommentForm({ currentUser, isAuthenticated, createComment }
               onChange={e => setContent(e.target.value)}
               placeholder="Initialize synapse link..."
               maxLength={500}
-              className="flex-1 px-4 py-2.5 text-sm bg-white border border-surface-200 rounded-xl text-surface-900 placeholder-surface-400 focus:outline-none focus:border-accent-light focus:ring-1 focus:ring-accent-light transition-all font-mono shadow-sm"
+              className="flex-1 px-4 py-2.5 text-sm bg-white border border-surface-200 rounded-xl text-surface-900 placeholder-surface-400 focus:outline-hidden focus:border-accent-light focus:ring-1 focus:ring-accent-light transition-all font-mono shadow-xs"
               required
             />
             <button
               type="submit"
               disabled={createComment.isPending}
-              className="px-6 py-2.5 bg-surface-900 text-white text-sm font-bold rounded-xl hover:bg-surface-800 disabled:opacity-50 transition-all font-mono shadow-sm"
+              className="px-6 py-2.5 bg-surface-900 text-white text-sm font-bold rounded-xl hover:bg-surface-800 disabled:opacity-50 transition-all font-mono shadow-xs"
             >
               {createComment.isPending ? '...' : 'POST'}
             </button>

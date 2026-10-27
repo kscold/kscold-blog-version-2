@@ -75,7 +75,7 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
   return (
     <div
       ref={wrapperRef}
-      className="not-prose relative my-6 overflow-hidden rounded-2xl border shadow-sm"
+      className="not-prose relative my-6 overflow-hidden rounded-2xl border shadow-xs"
     >
       {/* Header */}
       <MermaidToolbar

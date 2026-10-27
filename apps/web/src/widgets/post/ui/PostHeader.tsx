@@ -37,7 +37,7 @@ function LockIcon() {
 function RestrictedPostBadge() {
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full border border-surface-200 bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-surface-500 shadow-sm"
+      className="inline-flex items-center gap-1.5 rounded-full border border-surface-200 bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-surface-500 shadow-xs"
       title="제한 글"
       aria-label="제한 글"
     >
@@ -108,7 +108,7 @@ export function PostHeader({
 
         {/* 요약 */}
         {previewExcerpt ? (
-          <p className="mb-8 text-lg leading-relaxed text-surface-500 break-words [overflow-wrap:anywhere]">
+          <p className="mb-8 text-lg leading-relaxed text-surface-500 wrap-break-word wrap-anywhere">
             {previewExcerpt}
           </p>
         ) : null}

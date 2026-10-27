@@ -52,7 +52,7 @@ function BlogSearchInput({ query, onChange }: Pick<BlogSearchFormProps, 'query' 
       value={query}
       onChange={event => onChange(event.target.value)}
       placeholder="포스트 검색..."
-      className="w-full px-6 py-4 pr-12 bg-white border border-surface-200 rounded-2xl text-surface-900 placeholder-surface-400 shadow-sm focus:outline-none focus:ring-1 focus:ring-surface-900 focus:border-surface-900 transition-all"
+      className="w-full px-6 py-4 pr-12 bg-white border border-surface-200 rounded-2xl text-surface-900 placeholder-surface-400 shadow-xs focus:outline-hidden focus:ring-1 focus:ring-surface-900 focus:border-surface-900 transition-all"
     />
   );
 }

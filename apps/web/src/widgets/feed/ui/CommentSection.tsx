@@ -102,7 +102,7 @@ export function CommentSection({ feedId }: CommentSectionProps) {
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold text-surface-900">{comment.authorName}</span>
                   {comment.isAdmin && (
-                    <span className="text-[10px] px-1.5 py-0.5 bg-surface-900 text-white rounded font-bold">
+                    <span className="text-[10px] px-1.5 py-0.5 bg-surface-900 text-white rounded-sm font-bold">
                       ADMIN
                     </span>
                   )}
@@ -143,7 +143,7 @@ export function CommentSection({ feedId }: CommentSectionProps) {
                 <LinkifiedText
                   text={comment.content}
                   mentions={mentionMap}
-                  className="text-sm text-surface-700 mt-1 whitespace-pre-wrap break-words"
+                  className="text-sm text-surface-700 mt-1 whitespace-pre-wrap wrap-break-word"
                 />
               </div>
 

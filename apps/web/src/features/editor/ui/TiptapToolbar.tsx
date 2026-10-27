@@ -10,7 +10,7 @@ export function TiptapToolbar({
   return (
     <div
       data-testid={testId}
-      className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden"
     >
       {buttons.map(button => (
         <ToolbarButton key={button.title} {...button} />

@@ -118,7 +118,7 @@ export function PostEditorHeader({
               onChange={e => onTitleChange(e.target.value)}
               placeholder="제목 없음"
               data-testid="post-editor-title"
-              className="w-full border-0 bg-transparent p-0 text-3xl font-black tracking-tight text-surface-900 placeholder:text-surface-300 focus:outline-none sm:text-5xl"
+              className="w-full border-0 bg-transparent p-0 text-3xl font-black tracking-tight text-surface-900 placeholder:text-surface-300 focus:outline-hidden sm:text-5xl"
               required
             />
 
@@ -166,7 +166,7 @@ export function PostEditorHeader({
             placeholder="포스트 요약을 입력하세요"
             rows={4}
             data-testid="post-editor-excerpt"
-            className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-4 text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
+            className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-4 text-surface-900 placeholder:text-surface-400 focus:outline-hidden focus:ring-1 focus:ring-surface-900"
           />
         </div>
       </div>

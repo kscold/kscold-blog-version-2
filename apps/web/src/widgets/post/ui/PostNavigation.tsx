@@ -40,9 +40,9 @@ function NavigationLink({ entry, direction }: {
   return (
     <Link href={`/blog/${encodeURIComponent(entry.categorySlug)}/${encodeURIComponent(entry.slug)}`}
       prefetch={false} rel={isPrevious ? 'prev' : 'next'}
-      className={`min-w-0 rounded-2xl border border-surface-200 bg-white p-5 hover:border-surface-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-surface-900 ${isPrevious ? '' : 'text-right'}`}>
+      className={`min-w-0 rounded-2xl border border-surface-200 bg-white p-5 hover:border-surface-400 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-surface-900 ${isPrevious ? '' : 'text-right'}`}>
       <span className="block text-sm text-surface-500">{isPrevious ? '이전글 · 더 오래된 글' : '다음글 · 더 최근 글'}</span>
-      <span className="mt-2 block break-words font-bold text-surface-900">{entry.title}</span>
+      <span className="mt-2 block wrap-break-word font-bold text-surface-900">{entry.title}</span>
     </Link>
   );
 }

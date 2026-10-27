@@ -23,7 +23,7 @@ export function AdminEditorSkeleton() {
               <Skeleton className="h-12 w-full rounded-xl" />
               <Skeleton className="h-12 w-full rounded-xl" />
             </div>
-            <Skeleton className="mt-5 h-72 w-full rounded-[2rem]" />
+            <Skeleton className="mt-5 h-72 w-full rounded-4xl" />
           </SurfaceCard>
 
           <div className="space-y-6">

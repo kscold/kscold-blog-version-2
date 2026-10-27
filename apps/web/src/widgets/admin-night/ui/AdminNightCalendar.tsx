@@ -87,7 +87,7 @@ export function AdminNightCalendar({ slots, entries = [] }: AdminNightCalendarPr
                 <p className="text-xs font-medium leading-5 opacity-70">
                   {slot.timeLabel}
                 </p>
-                <p className="text-xs leading-5 opacity-80 [overflow-wrap:anywhere]">
+                <p className="text-xs leading-5 opacity-80 wrap-anywhere">
                   {slot.description}
                 </p>
               </div>

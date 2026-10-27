@@ -27,7 +27,7 @@ export default function AdminChatView() {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-8rem)] min-h-[32rem] flex-col overflow-hidden rounded-2xl border border-surface-200 bg-white lg:flex-row">
+    <div className="flex h-[calc(100dvh-8rem)] min-h-128 flex-col overflow-hidden rounded-2xl border border-surface-200 bg-white lg:flex-row">
       <AdminChatRoomList
         rooms={roomList}
         selectedRoomId={selectedRoomId}

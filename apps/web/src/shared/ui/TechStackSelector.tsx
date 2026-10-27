@@ -90,13 +90,13 @@ export function TechStackSelector({ value, sharedStacks = [], onChange }: TechSt
           onKeyDown={handleKeyDown}
           maxLength={PROFILE_LIMITS.techStackItem}
           placeholder="기술 검색 또는 직접 입력 후 Enter"
-          className="flex-1 text-sm outline-none placeholder:text-surface-400 bg-transparent"
+          className="flex-1 text-sm outline-hidden placeholder:text-surface-400 bg-transparent"
         />
       </div>
 
       {/* 드롭다운 */}
       {(filtered.length > 0 || showCreate) && (
-        <div className="rounded-xl border border-surface-200 bg-white shadow-sm overflow-hidden max-h-48 overflow-y-auto">
+        <div className="rounded-xl border border-surface-200 bg-white shadow-xs overflow-hidden max-h-48 overflow-y-auto">
           {showCreate && (
             <button
               type="button"

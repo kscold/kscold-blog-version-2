@@ -41,19 +41,19 @@ export function RestrictedOverlay({
       {/* 블러된 미리보기 */}
       {previewExcerpt && (
         <div className="select-none pointer-events-none" aria-hidden>
-          <div className="prose prose-lg max-w-none text-surface-700 blur-sm opacity-50 break-words [overflow-wrap:anywhere]">
-            <p className="break-words [overflow-wrap:anywhere]">{previewExcerpt}</p>
+          <div className="prose prose-lg max-w-none text-surface-700 blur-xs opacity-50 wrap-break-word wrap-anywhere">
+            <p className="wrap-break-word wrap-anywhere">{previewExcerpt}</p>
             <p className="text-surface-400">
               이 글의 나머지 내용은 열람 권한이 필요합니다. 아래에서 접근을 요청할 수 있습니다.
               이 글의 나머지 내용은 열람 권한이 필요합니다. 아래에서 접근을 요청할 수 있습니다.
             </p>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-surface-50/80 to-surface-50" />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-surface-50/80 to-surface-50" />
         </div>
       )}
 
       {/* 접근 요청 카드 */}
-      <div className="relative mt-8 rounded-2xl border border-surface-200 bg-white p-8 text-center shadow-sm">
+      <div className="relative mt-8 rounded-2xl border border-surface-200 bg-white p-8 text-center shadow-xs">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-surface-100">
           <svg className="h-7 w-7 text-surface-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}

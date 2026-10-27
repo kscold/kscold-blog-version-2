@@ -150,7 +150,7 @@ export function ImportContainer() {
                 {result.success ? (
                   <span className="text-sm font-medium text-green-700 sm:text-right">성공</span>
                 ) : (
-                  <span className="break-words text-sm text-red-600 sm:text-right">{result.error}</span>
+                  <span className="wrap-break-word text-sm text-red-600 sm:text-right">{result.error}</span>
                 )}
               </div>
             ))}

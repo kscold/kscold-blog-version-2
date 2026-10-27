@@ -51,7 +51,7 @@ export function TagManagementContainer() {
             value={newTagName}
             onChange={e => setNewTagName(e.target.value)}
             placeholder="태그 이름 입력"
-            className="flex-1 px-3 py-2 text-sm bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-400 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+            className="flex-1 px-3 py-2 text-sm bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-400 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
           />
           <button
             type="submit"

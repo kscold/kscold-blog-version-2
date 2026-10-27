@@ -22,7 +22,7 @@ export function LectureReviewSection() {
           </span>
         </div>
         {review.coverImage && (
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-surface-100">
+          <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-surface-100">
             <Image src={review.coverImage} alt="" fill sizes="256px" className="object-cover" />
           </div>
         )}

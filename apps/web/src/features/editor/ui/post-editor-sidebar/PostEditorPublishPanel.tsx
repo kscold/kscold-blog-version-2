@@ -11,7 +11,7 @@ export function PostEditorPublishPanel(props: Props) {
   const { categories, category, form, mode, state, needsReview, publicationError, onSelect, onCategoryChange, onUpdateForm } = props;
   const choices: PublicationChoice[] = mode === 'edit' ? ['draft', 'public', 'restricted', 'archived'] : ['draft', 'public', 'restricted'];
   return (
-    <section id="post-publish-settings" aria-labelledby="post-publish-title" className="scroll-mt-24 rounded-3xl border border-surface-200 bg-white p-5 shadow-sm">
+    <section id="post-publish-settings" aria-labelledby="post-publish-title" className="scroll-mt-24 rounded-3xl border border-surface-200 bg-white p-5 shadow-xs">
       <h2 id="post-publish-title" className="text-xl font-bold text-surface-900">발행 설정</h2>
       <p className="mt-2 text-sm leading-6 text-surface-500">누가 읽을 수 있는지 확인하고 저장해 주세요.</p>
       <div className="mt-5 space-y-5">

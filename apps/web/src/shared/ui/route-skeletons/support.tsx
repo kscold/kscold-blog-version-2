@@ -26,13 +26,13 @@ export function GuestbookPageSkeleton() {
           </SurfaceCard>
 
           <SurfaceCard className="p-5 sm:p-6">
-            <div className="rounded-[1.5rem] bg-surface-900 px-5 py-5 sm:px-6">
+            <div className="rounded-3xl bg-surface-900 px-5 py-5 sm:px-6">
               <Skeleton className="h-3 w-24 rounded-full bg-white/10" />
               <SkeletonTextGroup
                 className="mt-5"
                 widths={['w-4/5 bg-white/10', 'w-2/3 bg-white/10']}
               />
-              <Skeleton className="mt-5 h-40 w-full rounded-[1.5rem] bg-white/10" />
+              <Skeleton className="mt-5 h-40 w-full rounded-3xl bg-white/10" />
               <div className="mt-4 flex justify-between gap-3">
                 <Skeleton className="h-4 w-16 bg-white/10" />
                 <Skeleton className="h-10 w-28 rounded-full bg-white/10" />

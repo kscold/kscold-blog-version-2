@@ -15,7 +15,7 @@ export function AiAgentBloomProductDetailSection({
   return (
     <section
       id="product-detail"
-      className="scroll-mt-28 overflow-hidden rounded-[2rem] border border-surface-200 bg-white shadow-sm"
+      className="scroll-mt-28 overflow-hidden rounded-4xl border border-surface-200 bg-white shadow-xs"
     >
       <div className="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-8 p-6 sm:p-8 lg:p-10">
@@ -46,7 +46,7 @@ export function AiAgentBloomProductDetailSection({
         </div>
 
         <aside className="bg-surface-950 p-6 text-white sm:p-8 lg:p-10">
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.06] p-5">
+          <div className="rounded-[1.75rem] border border-white/10 bg-white/6 p-5">
             <div className="text-xs font-black uppercase tracking-[0.35em] text-cyan-100">
               Ticket
             </div>

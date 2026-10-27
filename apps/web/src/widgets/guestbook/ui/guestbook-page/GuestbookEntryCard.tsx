@@ -64,7 +64,7 @@ export function GuestbookEntryCard({
         )}
       </div>
 
-      <p className="mt-4 whitespace-pre-wrap break-words text-sm leading-7 text-surface-700">
+      <p className="mt-4 whitespace-pre-wrap wrap-break-word text-sm leading-7 text-surface-700">
         {entry.content}
       </p>
 
@@ -78,7 +78,7 @@ export function GuestbookEntryCard({
               {formatRelativeTime(entry.reply.repliedAt)}
             </span>
           </div>
-          <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-7 text-white">
+          <p className="mt-2 whitespace-pre-wrap wrap-break-word text-sm leading-7 text-white">
             {entry.reply.content}
           </p>
         </div>
@@ -95,7 +95,7 @@ export function GuestbookEntryCard({
                 placeholder="답글을 입력하세요..."
                 maxLength={500}
                 autoFocus
-                className="flex-1 rounded-xl border border-surface-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-surface-400"
+                className="flex-1 rounded-xl border border-surface-200 bg-white px-3 py-2 text-sm focus:outline-hidden focus:ring-1 focus:ring-surface-400"
               />
               <button
                 type="submit"

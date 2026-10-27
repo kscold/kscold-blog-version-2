@@ -29,7 +29,7 @@ export function CategoryTree({ categories, onEdit, onDelete }: CategoryTreeProps
                       <span className="font-medium text-surface-900">
                         {category.name}
                       </span>
-                      <span className="rounded bg-surface-100 px-2 py-1 text-xs text-surface-600">
+                      <span className="rounded-sm bg-surface-100 px-2 py-1 text-xs text-surface-600">
                         Depth {category.depth}
                       </span>
                       <span className="text-xs text-surface-500">

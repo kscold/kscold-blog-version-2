@@ -77,7 +77,7 @@ export function VaultNoteLayout({
     <div className="absolute inset-0 flex overflow-hidden bg-transparent lg:p-4 lg:gap-4">
       {isMobileOpen && (
         <div
-          className={`fixed inset-0 z-[45] lg:hidden ${useSolidSurface ? 'bg-surface-900/25' : 'bg-surface-900/20 backdrop-blur-sm'}`}
+          className={`fixed inset-0 z-45 lg:hidden ${useSolidSurface ? 'bg-surface-900/25' : 'bg-surface-900/20 backdrop-blur-sm'}`}
           onClick={() => setIsMobileOpen(false)}
         />
       )}

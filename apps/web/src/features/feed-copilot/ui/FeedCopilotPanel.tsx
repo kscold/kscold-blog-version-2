@@ -172,7 +172,7 @@ export function FeedCopilotPanel({
         }`}
         aria-expanded={isOpen}
       >
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-900 text-white shadow-sm">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-900 text-white shadow-xs">
           <svg
             className="h-5 w-5"
             fill="none"

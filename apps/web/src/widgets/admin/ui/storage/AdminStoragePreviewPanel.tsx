@@ -29,7 +29,7 @@ export function AdminStoragePreviewPanel({
         <div className="mt-4">
           <div className="rounded-2xl border border-surface-100 bg-surface-50 p-4">
             {selectedObject.isImage ? (
-              <div className="relative mb-4 aspect-[16/10] overflow-hidden rounded-xl border border-surface-200 bg-white">
+              <div className="relative mb-4 aspect-16/10 overflow-hidden rounded-xl border border-surface-200 bg-white">
                 <Image
                   src={`/api/admin/storage/object?key=${encodeURIComponent(selectedObject.key)}`}
                   alt={selectedObject.name}
@@ -45,10 +45,10 @@ export function AdminStoragePreviewPanel({
               </div>
             )}
 
-            <div className="text-sm font-semibold leading-6 text-surface-900 [overflow-wrap:anywhere]">
+            <div className="text-sm font-semibold leading-6 text-surface-900 wrap-anywhere">
               {selectedObject.name}
             </div>
-            <div className="mt-1 text-xs leading-5 text-surface-500 [overflow-wrap:anywhere]">
+            <div className="mt-1 text-xs leading-5 text-surface-500 wrap-anywhere">
               {selectedObject.key}
             </div>
             <div className="mt-3 grid grid-cols-2 gap-3 text-sm text-surface-500">

@@ -10,7 +10,7 @@ export function AdminNightPromoSection() {
   return (
     <section className="border-t border-surface-200 bg-surface-50/80 px-4 py-14 sm:py-20 sm:px-6 lg:px-8">
       <motion.div
-        className="mx-auto grid max-w-5xl gap-6 rounded-[32px] border border-surface-200 bg-white p-5 shadow-sm sm:p-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:p-8"
+        className="mx-auto grid max-w-5xl gap-6 rounded-[32px] border border-surface-200 bg-white p-5 shadow-xs sm:p-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:p-8"
         initial={allowRichEffects ? { opacity: 0, y: 16 } : false}
         whileInView={allowRichEffects ? { opacity: 1, y: 0 } : undefined}
         viewport={allowRichEffects ? { once: true } : undefined}

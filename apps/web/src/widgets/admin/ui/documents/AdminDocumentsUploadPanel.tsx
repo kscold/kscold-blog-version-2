@@ -72,7 +72,7 @@ export function AdminDocumentsUploadPanel({
             disabled={disabled || isUploading}
             placeholder={space.descriptionPlaceholder}
             rows={3}
-            className="block w-full resize-y rounded-lg border border-surface-200 bg-white px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900 disabled:opacity-50"
+            className="block w-full resize-y rounded-lg border border-surface-200 bg-white px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-hidden focus:ring-1 focus:ring-surface-900 disabled:opacity-50"
           />
           <p className="text-xs text-surface-400">분류와 설명은 선택한 파일에 함께 적용됩니다.</p>
         </div>

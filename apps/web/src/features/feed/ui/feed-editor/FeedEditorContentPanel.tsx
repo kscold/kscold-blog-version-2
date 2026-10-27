@@ -68,7 +68,7 @@ export function FeedEditorContentPanel({
             data-testid="feed-editor-content"
             aria-invalid={Boolean(contentError)}
             aria-describedby={contentError ? 'feed-editor-content-error' : undefined}
-            className="min-h-[260px] w-full resize-none border-0 bg-transparent p-0 text-lg leading-8 text-surface-900 placeholder:text-surface-300 focus:outline-none sm:text-[1.15rem]"
+            className="min-h-[260px] w-full resize-none border-0 bg-transparent p-0 text-lg leading-8 text-surface-900 placeholder:text-surface-300 focus:outline-hidden sm:text-[1.15rem]"
           />
           {contentError ? (
             <p

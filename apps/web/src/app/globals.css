@@ -1,8 +1,182 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss' source('../');
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c4a6e;
+  --color-primary-950: #082f49;
+
+  --color-background-dark: #020410;
+  --color-background-light: #ffffff;
+
+  --color-accent-light: #67e8f9;
+  --color-accent: #06b6d4;
+  --color-accent-dark: #0891b2;
+  --color-accent-glow: #22d3ee;
+  --color-accent-blue: #3b82f6;
+
+  --color-surface-50: #f8fafc;
+  --color-surface-100: #f1f5f9;
+  --color-surface-200: #e2e8f0;
+  --color-surface-300: #cbd5e1;
+  --color-surface-400: #94a3b8;
+  --color-surface-500: #64748b;
+  --color-surface-600: #475569;
+  --color-surface-700: #334155;
+  --color-surface-800: #1e293b;
+  --color-surface-900: #0f172a;
+  --color-surface-950: #020617;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --text-7xl: 4.5rem;
+  --text-7xl--line-height: 1;
+
+  --container-content: 780px;
+
+  --backdrop-blur-xs: 2px;
+  --backdrop-blur-sm: 4px;
+
+  --animate-fade-in: fadeIn 0.6s ease-out;
+  --animate-fade-in-up: fadeInUp 0.6s ease-out;
+  --animate-scale-in: scaleIn 0.4s ease-out;
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-slide-up: slideUp 0.5s ease-out;
+
+  --shadow-gallery: 0 4px 20px -10px rgba(0, 0, 0, 0.05);
+  --shadow-gallery-hover: 0 8px 30px -10px rgba(0, 0, 0, 0.1);
+  --shadow-glow-surface: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes scaleIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  @keyframes slideUp {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-pretendard), system-ui, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-mono: var(--font-jetbrains), Consolas, monospace;
+}
+
+@utility gallery-border {
+  @apply border border-surface-200 dark:border-surface-800;
+  @apply hover:border-surface-300 dark:hover:border-surface-700 transition-colors duration-300;
+}
+
+@utility btn-bank {
+  @apply px-6 py-3;
+  @apply rounded-[10px];
+  @apply font-semibold text-sm uppercase tracking-wide;
+  @apply transition-all duration-300 ease-out;
+  @apply shadow-[0_4px_12px_rgba(0,0,0,0.2)];
+
+  &:hover {
+    @apply shadow-[0_8px_20px_rgba(0,0,0,0.3)];
+    @apply -translate-y-1;
+  }
+}
 
 @layer base {
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200);
+  }
+
+  /* v3의 클릭 가능한 컨트롤과 입력 안내색을 유지한다. */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+
   :root {
     --font-pretendard:
       'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
@@ -152,11 +326,6 @@
   }
 
   /* 은은한 보더 강조 */
-  .gallery-border {
-    @apply border border-surface-200 dark:border-surface-800;
-    @apply hover:border-surface-300 dark:hover:border-surface-700 transition-colors duration-300;
-  }
-
   /* 입체 카드 효과 */
   .card-3d {
     transform-style: preserve-3d;
@@ -191,19 +360,6 @@
   }
 
   /* 묵직한 버튼 스타일 */
-  .btn-bank {
-    @apply px-6 py-3;
-    @apply rounded-[10px];
-    @apply font-semibold text-sm uppercase tracking-wide;
-    @apply transition-all duration-300 ease-out;
-    @apply shadow-[0_4px_12px_rgba(0,0,0,0.2)];
-  }
-
-  .btn-bank:hover {
-    @apply shadow-[0_8px_20px_rgba(0,0,0,0.3)];
-    @apply -translate-y-1;
-  }
-
   .btn-bank-primary {
     @apply btn-bank;
     @apply bg-accent text-white;
@@ -230,7 +386,7 @@
     @apply text-primary-100 placeholder-surface-400;
     @apply shadow-[0_4px_8px_rgba(0,0,0,0.2)];
     @apply transition-all duration-200 ease-out;
-    @apply outline-none;
+    @apply outline-hidden;
   }
 
   .input-bank:focus {
@@ -245,7 +401,7 @@
 
   /* 청록 계열 텍스트 그라데이션 */
   .text-gradient {
-    @apply bg-gradient-to-r from-accent-light to-accent-blue;
+    @apply bg-linear-to-r from-accent-light to-accent-blue;
     @apply bg-clip-text text-transparent;
   }
 
@@ -393,7 +549,7 @@
 
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: theme('colors.surface.300') transparent;
+    scrollbar-color: var(--color-surface-300) transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
@@ -409,11 +565,11 @@
     border: 1px solid transparent;
     border-radius: 9999px;
     background-clip: padding-box;
-    background-color: theme('colors.surface.300');
+    background-color: var(--color-surface-300);
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: theme('colors.surface.400');
+    background-color: var(--color-surface-400);
   }
 
   /* 볼트 그래프 노드 클릭 리플 */

@@ -106,7 +106,7 @@ export function CustomCursor() {
     <motion.div
       data-testid="custom-cursor"
       aria-hidden="true"
-      className="fixed top-0 left-0 z-[9999] h-[80px] w-[80px] rounded-full pointer-events-none mix-blend-difference"
+      className="fixed top-0 left-0 z-9999 h-[80px] w-[80px] rounded-full pointer-events-none mix-blend-difference"
       style={{
         x: cursorX,
         y: cursorY,

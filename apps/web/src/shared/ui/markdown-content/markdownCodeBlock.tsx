@@ -104,7 +104,7 @@ export function MarkdownCodeBlock({
       <div className="not-prose group relative my-6">
         <MarkdownCopyButton codeText={codeText} isDark={isDark} variant="overlay" />
         <pre
-          className={`my-0 overflow-x-auto rounded-xl border p-5 shadow-sm ${
+          className={`my-0 overflow-x-auto rounded-xl border p-5 shadow-xs ${
             isDark ? 'border-surface-800 bg-[#0f111a]' : 'border-surface-200 bg-surface-50'
           }`}
         >
@@ -122,7 +122,7 @@ export function MarkdownCodeBlock({
 
   return (
     <div
-      className={`not-prose my-6 overflow-hidden rounded-xl border shadow-sm ${
+      className={`not-prose my-6 overflow-hidden rounded-xl border shadow-xs ${
         isDark ? 'border-surface-800 bg-[#0f111a]' : 'border-surface-200 bg-surface-50'
       }`}
     >
@@ -134,7 +134,7 @@ export function MarkdownCodeBlock({
         <span
           data-code-language={rawLanguage.toLowerCase()}
           className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
-            isDark ? 'bg-surface-800/90 text-surface-300' : 'bg-surface-50 text-surface-500 shadow-sm'
+            isDark ? 'bg-surface-800/90 text-surface-300' : 'bg-surface-50 text-surface-500 shadow-xs'
           }`}
         >
           {formatLanguageLabel(rawLanguage)}

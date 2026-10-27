@@ -105,7 +105,7 @@ export function RestrictedPostDetail({ post }: RestrictedPostDetailProps) {
         />
 
         {isCheckingRestrictedAccess ? (
-          <div className="mb-12 overflow-hidden rounded-[28px] border border-surface-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="mb-12 overflow-hidden rounded-[28px] border border-surface-200 bg-white p-6 shadow-xs sm:p-8">
             <div className="mb-5 flex items-center gap-3">
               <div className="h-3 w-3 animate-pulse rounded-full bg-surface-900" />
               <p className="text-sm font-medium text-surface-600">{accessStatusMessage}</p>

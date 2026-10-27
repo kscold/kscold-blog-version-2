@@ -120,7 +120,7 @@ export function ProfileSettingsForm() {
             onChange={e => setDisplayName(e.target.value)}
             maxLength={PROFILE_LIMITS.displayName}
             placeholder={currentUser.username}
-            className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400 transition-colors"
+            className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-hidden focus:border-surface-400 transition-colors"
           />
           <p className="mt-1 text-xs text-surface-400">피드, 댓글 등에 표시되는 이름입니다.</p>
         </div>
@@ -132,7 +132,7 @@ export function ProfileSettingsForm() {
             rows={3}
             maxLength={PROFILE_LIMITS.bio}
             placeholder="간단한 자기소개를 입력하세요."
-            className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400 transition-colors resize-none"
+            className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-hidden focus:border-surface-400 transition-colors resize-none"
           />
           <p className="mt-1 text-xs text-surface-400">{bio.length}/200</p>
         </div>
@@ -156,7 +156,7 @@ export function ProfileSettingsForm() {
               placeholder={placeholder}
               type="url"
               maxLength={PROFILE_LIMITS.url}
-              className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-surface-400 transition-colors"
+              className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-hidden focus:border-surface-400 transition-colors"
             />
           </div>
         ))}

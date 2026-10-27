@@ -25,7 +25,7 @@ export default function FloatingChatButton({
       onClick={onClick}
       onHoverStart={supportsHover ? () => setIsHovered(true) : undefined}
       onHoverEnd={supportsHover ? () => setIsHovered(false) : undefined}
-      className="fixed right-4 z-[1200] group sm:right-6"
+      className="fixed right-4 z-1200 group sm:right-6"
       style={{ bottom: bottomOffset }}
       initial={allowRichEffects ? { scale: 0, opacity: 0 } : false}
       animate={allowRichEffects ? { scale: 1, opacity: 1 } : undefined}
@@ -125,7 +125,7 @@ export default function FloatingChatButton({
             transition={{ duration: 0.2 }}
           >
             Agent에게 묻기
-            <div className="absolute top-full right-6 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white drop-shadow-sm" />
+            <div className="absolute top-full right-6 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white drop-shadow-xs" />
           </motion.div>
         )}
       </AnimatePresence>

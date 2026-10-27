@@ -54,7 +54,7 @@ function renderSegment(seg: LinkifySegment) {
   return (
     <a href={seg.href} target="_blank" rel="noopener noreferrer" className={EXTERNAL_LINK_CLASS}>
       <LinkIcon />
-      <span className="truncate max-w-[28rem]">{stripProtocol(seg.label)}</span>
+      <span className="truncate max-w-md">{stripProtocol(seg.label)}</span>
     </a>
   );
 }
@@ -105,7 +105,7 @@ function stripProtocol(url: string): string {
 }
 
 function SkeletonLabel() {
-  return <span className="inline-block w-16 h-3 bg-surface-200 rounded animate-pulse" />;
+  return <span className="inline-block w-16 h-3 bg-surface-200 rounded-sm animate-pulse" />;
 }
 
 function LinkIcon() {
@@ -136,4 +136,4 @@ const HASHTAG_CLASS =
   'font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-2 transition-colors';
 
 const MENTION_CLASS =
-  'font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded px-1 py-0.5 transition-colors';
+  'font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-sm px-1 py-0.5 transition-colors';

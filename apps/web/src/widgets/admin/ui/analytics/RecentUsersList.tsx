@@ -118,7 +118,7 @@ export function RecentUsersList({ users }: RecentUsersListProps) {
                       <button
                         onClick={() => handleSoftDelete(user)}
                         disabled={softDelete.isPending}
-                        className="px-2 py-1 text-[11px] font-medium text-surface-600 hover:bg-surface-100 rounded transition-colors disabled:opacity-50"
+                        className="px-2 py-1 text-[11px] font-medium text-surface-600 hover:bg-surface-100 rounded-sm transition-colors disabled:opacity-50"
                         title="계정 비활성화 (복구 가능)"
                       >
                         비활성
@@ -127,7 +127,7 @@ export function RecentUsersList({ users }: RecentUsersListProps) {
                     <button
                       onClick={() => handleHardDelete(user)}
                       disabled={hardDelete.isPending}
-                      className="px-2 py-1 text-[11px] font-medium text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                      className="px-2 py-1 text-[11px] font-medium text-red-600 hover:bg-red-50 rounded-sm transition-colors disabled:opacity-50"
                       title="계정 영구 삭제 (복구 불가)"
                     >
                       영구삭제

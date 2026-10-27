@@ -49,13 +49,13 @@ export default function ChatMessageList({ messages, currentUsername }: ChatMessa
                   {message.user.name}
                 </div>
                 <div
-                  className={`px-4 py-2.5 rounded-[16px] shadow-sm ${
+                  className={`px-4 py-2.5 rounded-[16px] shadow-xs ${
                     !message.fromAdmin
                       ? 'bg-surface-900 text-white rounded-tr-sm'
                       : 'bg-white text-surface-700 rounded-tl-sm border border-surface-200'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap text-sm break-words leading-relaxed font-medium [overflow-wrap:anywhere]">
+                  <p className="whitespace-pre-wrap text-sm wrap-break-word leading-relaxed font-medium wrap-anywhere">
                     {message.content}
                   </p>
                 </div>

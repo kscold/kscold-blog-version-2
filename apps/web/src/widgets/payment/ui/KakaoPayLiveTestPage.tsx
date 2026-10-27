@@ -20,7 +20,7 @@ export function KakaoPayLiveTestPage() {
   return (
     <main className="min-h-screen bg-surface-50 px-4 py-8 text-surface-950 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
-        <header className="overflow-hidden rounded-[2rem] border border-surface-200 bg-white shadow-sm">
+        <header className="overflow-hidden rounded-4xl border border-surface-200 bg-white shadow-xs">
           <div className="grid lg:grid-cols-[1.15fr_0.85fr]">
             <div className="p-6 sm:p-9 lg:p-12">
               <div className="flex flex-wrap gap-2">
@@ -52,7 +52,7 @@ export function KakaoPayLiveTestPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-[2rem] border border-surface-200 bg-white p-6 shadow-sm sm:p-9 lg:p-12"
+          className="rounded-4xl border border-surface-200 bg-white p-6 shadow-xs sm:p-9 lg:p-12"
         >
           <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
             <section>

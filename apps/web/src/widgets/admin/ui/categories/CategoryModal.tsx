@@ -67,7 +67,7 @@ export function CategoryModal({
                 type="text"
                 value={formData.name}
                 onChange={e => onFormChange({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+                className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
                 required
               />
             </div>
@@ -80,7 +80,7 @@ export function CategoryModal({
                 type="text"
                 value={formData.slug}
                 onChange={e => onFormChange({ ...formData, slug: e.target.value })}
-                className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+                className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
                 required
               />
             </div>
@@ -93,7 +93,7 @@ export function CategoryModal({
                 type="text"
                 value={formData.icon}
                 onChange={e => onFormChange({ ...formData, icon: e.target.value })}
-                className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+                className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
               />
             </div>
 
@@ -104,7 +104,7 @@ export function CategoryModal({
               <select
                 value={formData.parent}
                 onChange={e => onFormChange({ ...formData, parent: e.target.value })}
-                className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+                className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
               >
                 <option value="">없음 (최상위)</option>
                 {categories
@@ -128,7 +128,7 @@ export function CategoryModal({
               value={formData.description}
               onChange={e => onFormChange({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+              className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
             />
           </div>
 

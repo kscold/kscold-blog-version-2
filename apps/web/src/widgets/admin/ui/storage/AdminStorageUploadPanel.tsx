@@ -31,7 +31,7 @@ export function AdminStorageUploadPanel({
       >
         <span className="text-sm font-semibold text-surface-900">파일 선택</span>
         <span
-          className="mt-2 block text-xs leading-5 text-surface-500 [overflow-wrap:anywhere]"
+          className="mt-2 block text-xs leading-5 text-surface-500 wrap-anywhere"
           data-testid="admin-storage-selected-files"
         >
           {selectedFilesLabel}

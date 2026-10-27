@@ -71,7 +71,7 @@ export function FeedComposerEditorCard({
         aria-label="피드 본문"
         aria-invalid={Boolean(contentError)}
         aria-describedby={contentError ? 'feed-composer-content-error' : undefined}
-        className="min-h-[140px] w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-base leading-8 text-surface-900 placeholder:text-surface-300 focus:outline-none sm:min-h-[180px] sm:text-[1.05rem]"
+        className="min-h-[140px] w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-base leading-8 text-surface-900 placeholder:text-surface-300 focus:outline-hidden sm:min-h-[180px] sm:text-[1.05rem]"
       />
 
       {contentError ? (

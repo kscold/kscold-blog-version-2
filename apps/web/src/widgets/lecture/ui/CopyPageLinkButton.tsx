@@ -38,7 +38,7 @@ export function CopyPageLinkButton() {
       <button
         type="button"
         onClick={copyPageUrl}
-        className="min-h-11 rounded-full border border-surface-200 bg-white px-4 text-sm font-bold text-surface-700 transition-colors hover:border-surface-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900"
+        className="min-h-11 rounded-full border border-surface-200 bg-white px-4 text-sm font-bold text-surface-700 transition-colors hover:border-surface-400 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900"
       >
         {state === 'copied' ? '링크를 복사했습니다' : '페이지 링크 복사'}
       </button>

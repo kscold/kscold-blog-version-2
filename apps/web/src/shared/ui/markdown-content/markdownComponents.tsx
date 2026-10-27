@@ -87,7 +87,7 @@ export function createMarkdownComponents(
 ): Components {
   const tableSurfaceClass = isDark
     ? 'border-surface-800 bg-surface-950/30'
-    : 'border-surface-200 bg-white shadow-sm';
+    : 'border-surface-200 bg-white shadow-xs';
   const tableHeaderClass = isDark
     ? 'border-surface-700 bg-surface-900/90 text-surface-100'
     : 'border-surface-200 bg-surface-50 text-surface-900';

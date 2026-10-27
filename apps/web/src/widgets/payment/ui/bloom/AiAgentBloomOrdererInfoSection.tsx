@@ -19,7 +19,7 @@ export function AiAgentBloomOrdererInfoSection({
   return (
     <section
       id="orderer-info"
-      className="scroll-mt-28 rounded-[2rem] border border-surface-200 bg-white p-6 shadow-sm sm:p-8 lg:p-10"
+      className="scroll-mt-28 rounded-4xl border border-surface-200 bg-white p-6 shadow-xs sm:p-8 lg:p-10"
     >
       <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="space-y-4">

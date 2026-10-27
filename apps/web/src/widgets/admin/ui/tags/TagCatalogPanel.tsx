@@ -117,7 +117,7 @@ export function TagCatalogPanel() {
                   <td className="py-2 pr-3">
                     <span className="font-medium text-surface-900">#{tag.name}</span>
                     {tag.unregistered && (
-                      <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
+                      <span className="ml-2 rounded-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
                         미등록
                       </span>
                     )}
@@ -132,7 +132,7 @@ export function TagCatalogPanel() {
                         onChange={event =>
                           handleCategoryChange(tag.id!, tag.name, event.target.value)
                         }
-                        className="rounded border border-surface-300 bg-white px-2 py-1 text-xs"
+                        className="rounded-sm border border-surface-300 bg-white px-2 py-1 text-xs"
                       >
                         <option value="">{UNCATEGORIZED}</option>
                         {categories.map(category => (
@@ -156,7 +156,7 @@ export function TagCatalogPanel() {
                               [tag.id!]: event.target.value,
                             }))
                           }
-                          className="rounded border border-surface-300 bg-white px-2 py-1 text-xs"
+                          className="rounded-sm border border-surface-300 bg-white px-2 py-1 text-xs"
                         >
                           <option value="">합칠 태그 선택</option>
                           {tags
@@ -171,7 +171,7 @@ export function TagCatalogPanel() {
                           type="button"
                           disabled={!mergeTargets[tag.id] || mergeTags.isPending}
                           onClick={() => handleMerge(tag.id!, tag.name)}
-                          className="rounded border border-surface-300 px-2 py-1 text-xs text-surface-600 transition-colors hover:border-surface-900 hover:text-surface-900 disabled:cursor-not-allowed disabled:opacity-40"
+                          className="rounded-sm border border-surface-300 px-2 py-1 text-xs text-surface-600 transition-colors hover:border-surface-900 hover:text-surface-900 disabled:cursor-not-allowed disabled:opacity-40"
                         >
                           합치기
                         </button>

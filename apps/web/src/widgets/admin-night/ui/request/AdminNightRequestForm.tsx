@@ -61,7 +61,7 @@ export function AdminNightRequestForm({
           onChange={event => onRequesterNameChange(event.target.value)}
           required
           placeholder="실제 만남과 일정 안내에 사용할 이름을 적어 주세요."
-          className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+          className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 outline-hidden transition-colors placeholder:text-surface-300 focus:border-surface-900"
         />
       </div>
 
@@ -76,7 +76,7 @@ export function AdminNightRequestForm({
           onChange={event => onTaskTitleChange(event.target.value)}
           required
           placeholder="메일 답장, 블로그 초안, 작은 버그 수정처럼 오늘 끝낼 일을 한 줄로 적어 주세요."
-          className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+          className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 outline-hidden transition-colors placeholder:text-surface-300 focus:border-surface-900"
         />
       </div>
 
@@ -143,7 +143,7 @@ export function AdminNightRequestForm({
           value={message}
           onChange={event => onMessageChange(event.target.value)}
           placeholder="왜 이걸 지금 끝내고 싶은지, 어디까지 마무리하고 싶은지 짧게 남겨 주세요."
-          className="min-h-32 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 text-surface-900 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+          className="min-h-32 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 text-surface-900 outline-hidden transition-colors placeholder:text-surface-300 focus:border-surface-900"
         />
       </div>
 

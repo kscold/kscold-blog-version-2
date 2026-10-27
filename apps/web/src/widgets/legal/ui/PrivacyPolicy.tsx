@@ -3,7 +3,7 @@ const EFFECTIVE_DATE = '2026년 4월 27일';
 export function PrivacyPolicy() {
   return (
     <main className="min-h-screen bg-white">
-      <article className="max-w-3xl mx-auto px-6 py-16 lg:py-24 [word-break:keep-all]">
+      <article className="max-w-3xl mx-auto px-6 py-16 lg:py-24 break-keep">
         <header className="mb-12">
           <p className="text-xs font-mono text-surface-400 uppercase tracking-[0.25em] mb-3">
             Privacy Policy

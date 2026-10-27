@@ -90,7 +90,7 @@ export function AdminDocumentEditForm({
             onChange={event =>
               setDetails(current => ({ ...current, description: event.target.value }))
             }
-            className="block w-full resize-y rounded-lg border border-surface-200 bg-white px-4 py-3 text-sm text-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900 disabled:opacity-50"
+            className="block w-full resize-y rounded-lg border border-surface-200 bg-white px-4 py-3 text-sm text-surface-900 focus:outline-hidden focus:ring-1 focus:ring-surface-900 disabled:opacity-50"
           />
         </div>
         <div className="flex flex-wrap gap-2">

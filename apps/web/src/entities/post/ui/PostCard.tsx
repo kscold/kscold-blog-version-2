@@ -95,11 +95,11 @@ export function PostCard({
             href={`/blog/${post.category.slug}/${post.slug}`}
             prefetch={false}
             aria-label={`${post.title} 글 읽기`}
-            className="absolute inset-0 z-10 rounded-[24px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-surface-900"
+            className="absolute inset-0 z-10 rounded-[24px] focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-surface-900"
           />
           {/* 빛이 스쳐 지나가는 듯한 강조 효과 */}
           {supportsHover && allowRichEffects && (
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none z-10 mix-blend-overlay" />
+            <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/40 to-transparent skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out pointer-events-none z-10 mix-blend-overlay" />
           )}
 
           {post.coverImage && (
@@ -116,7 +116,7 @@ export function PostCard({
                 className={`object-cover transition-transform duration-500 ${supportsHover ? 'group-hover:scale-110' : ''}`}
               />
               {post.featured && (
-                <div className={`absolute top-4 right-4 px-3 py-1.5 text-[10px] font-bold text-surface-900 rounded-full uppercase tracking-widest shadow-sm ${isTouchDevice ? 'bg-white' : 'bg-white/90 backdrop-blur-md'}`}>
+                <div className={`absolute top-4 right-4 px-3 py-1.5 text-[10px] font-bold text-surface-900 rounded-full uppercase tracking-widest shadow-xs ${isTouchDevice ? 'bg-white' : 'bg-white/90 backdrop-blur-md'}`}>
                   Featured
                 </div>
               )}
@@ -144,7 +144,7 @@ export function PostCard({
           </Heading>
 
           <p
-            className={`mb-6 text-sm font-medium leading-relaxed text-surface-500 break-words [overflow-wrap:anywhere] ${
+            className={`mb-6 text-sm font-medium leading-relaxed text-surface-500 wrap-break-word wrap-anywhere ${
               featured ? 'line-clamp-4' : 'line-clamp-3'
             }`}
           >

@@ -35,7 +35,7 @@ export default function VaultEditorSidebar({
         <select
           value={folderId}
           onChange={e => onFolderChange(e.target.value)}
-          className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+          className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
           required
         >
           <option value="">폴더 선택</option>
@@ -55,7 +55,7 @@ export default function VaultEditorSidebar({
           value={tags}
           onChange={e => onTagsChange(e.target.value)}
           placeholder="태그1, 태그2, 태그3"
-          className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+          className="w-full px-4 py-2 bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-500 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
         />
         <p className="mt-2 text-xs text-surface-500">
           쉼표로 구분하여 입력하세요
@@ -65,7 +65,7 @@ export default function VaultEditorSidebar({
             {tags.split(',').map(tag => tag.trim()).filter(Boolean).map(tag => (
               <span
                 key={tag}
-                className="text-xs px-2 py-1 bg-surface-100 text-surface-700 rounded"
+                className="text-xs px-2 py-1 bg-surface-100 text-surface-700 rounded-sm"
               >
                 #{tag}
               </span>

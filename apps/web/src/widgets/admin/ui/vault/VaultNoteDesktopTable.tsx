@@ -50,7 +50,7 @@ export function VaultNoteDesktopTable({
                   {note.tags.slice(0, 3).map(tag => (
                     <span
                       key={tag}
-                      className="rounded bg-surface-900 px-2 py-0.5 text-[10px] text-surface-900"
+                      className="rounded-sm bg-surface-900 px-2 py-0.5 text-[10px] text-surface-900"
                     >
                       {tag}
                     </span>

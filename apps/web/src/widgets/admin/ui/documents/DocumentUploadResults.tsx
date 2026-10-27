@@ -47,7 +47,7 @@ export function DocumentUploadResults({ items, isUploading }: DocumentUploadResu
               />
             )}
             {item.error && (
-              <p className="break-words text-xs leading-5 text-red-600">{item.error}</p>
+              <p className="wrap-break-word text-xs leading-5 text-red-600">{item.error}</p>
             )}
           </li>
         ))}

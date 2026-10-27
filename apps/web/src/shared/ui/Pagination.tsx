@@ -42,7 +42,7 @@ export function Pagination({ page, totalPages, onPageChange, maxVisible = 5 }: P
           onClick={() => onPageChange(p)}
           className={`px-3.5 py-2 rounded-xl text-sm font-bold transition-all ${
             page === p
-              ? 'bg-surface-900 text-white shadow-sm'
+              ? 'bg-surface-900 text-white shadow-xs'
               : 'bg-white border border-surface-200 text-surface-500 hover:border-surface-400 hover:text-surface-900'
           }`}
         >

@@ -43,11 +43,11 @@ export function FeedList({ initialFeeds }: FeedListProps = {}) {
             className="overflow-hidden rounded-2xl border border-surface-200 bg-white animate-pulse"
           >
             <div className="h-16 border-b border-surface-100 bg-surface-50" />
-            <div className="aspect-[16/10] bg-surface-100" />
+            <div className="aspect-16/10 bg-surface-100" />
             <div className="space-y-3 p-5">
-              <div className="h-4 w-2/3 rounded bg-surface-100" />
-              <div className="h-4 w-full rounded bg-surface-100" />
-              <div className="h-4 w-3/4 rounded bg-surface-100" />
+              <div className="h-4 w-2/3 rounded-sm bg-surface-100" />
+              <div className="h-4 w-full rounded-sm bg-surface-100" />
+              <div className="h-4 w-3/4 rounded-sm bg-surface-100" />
             </div>
           </div>
         ))}

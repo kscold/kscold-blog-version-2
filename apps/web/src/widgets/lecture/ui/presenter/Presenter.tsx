@@ -94,7 +94,7 @@ export default function Presenter({ slides, deckHref, title }: PresenterProps) {
     <div
       ref={rootRef}
       data-testid="presenter"
-      className="flex h-[100dvh] flex-col bg-surface-950 text-surface-100"
+      className="flex h-dvh flex-col bg-surface-950 text-surface-100"
     >
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-white/10 px-4 py-2.5 text-sm">
         <p className="font-mono text-base font-bold text-white" aria-live="polite">
@@ -108,7 +108,7 @@ export default function Presenter({ slides, deckHref, title }: PresenterProps) {
           {current.minutes > 0 && <span className="text-surface-400">· {current.minutes}분</span>}
           {gap !== null && gap !== 0 && (
             <span
-              className={`rounded px-1.5 py-0.5 text-xs font-bold ${gap > 0 ? 'bg-amber-400 text-surface-950' : 'bg-sky-400 text-surface-950'}`}
+              className={`rounded-sm px-1.5 py-0.5 text-xs font-bold ${gap > 0 ? 'bg-amber-400 text-surface-950' : 'bg-sky-400 text-surface-950'}`}
             >
               {gap > 0 ? `${gap}분 늦음` : `${-gap}분 빠름`}
             </span>
@@ -203,7 +203,7 @@ export default function Presenter({ slides, deckHref, title }: PresenterProps) {
           {next && (
             <div className="space-y-1">
               {next.part !== current.part && next.part && (
-                <p className="inline-block rounded bg-primary-600 px-2 py-0.5 text-xs font-bold text-white">
+                <p className="inline-block rounded-sm bg-primary-600 px-2 py-0.5 text-xs font-bold text-white">
                   여기서부터 {next.part}
                 </p>
               )}
@@ -228,14 +228,14 @@ export default function Presenter({ slides, deckHref, title }: PresenterProps) {
         {/* 대본 */}
         <section
           aria-label="대본"
-          className="flex min-h-[40dvh] min-w-0 flex-col rounded-lg bg-white/[0.04] sm:min-h-0"
+          className="flex min-h-[40dvh] min-w-0 flex-col rounded-lg bg-white/4 sm:min-h-0"
         >
           <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2">
             <h2 className="min-w-0 flex-1 truncate whitespace-nowrap font-bold text-white">
               {current.title.replace(/\n/g, ' ')}
             </h2>
             {current.instructorOnly && (
-              <span className="shrink-0 rounded bg-amber-400 px-1.5 py-0.5 text-xs font-bold text-surface-950">
+              <span className="shrink-0 rounded-sm bg-amber-400 px-1.5 py-0.5 text-xs font-bold text-surface-950">
                 강사용 장
               </span>
             )}
@@ -271,7 +271,7 @@ export default function Presenter({ slides, deckHref, title }: PresenterProps) {
         {/* 활동·예상 답 */}
         <section
           aria-label="진행 메모"
-          className="min-w-0 space-y-3 overflow-y-auto rounded-lg bg-white/[0.04] p-4 text-sm leading-6"
+          className="min-w-0 space-y-3 overflow-y-auto rounded-lg bg-white/4 p-4 text-sm leading-6"
         >
           <Note label="참가자 활동" text={current.activity} />
           <Note label="예상 답" text={current.answer} />
@@ -345,7 +345,7 @@ function DeckPage({
       renderTextLayer={false}
       renderAnnotationLayer={links}
       renderForms={false}
-      className="overflow-hidden rounded-sm bg-white shadow-2xl"
+      className="overflow-hidden rounded-xs bg-white shadow-2xl"
       loading={<div className="bg-surface-900" style={{ width, height }} />}
     />
   );
@@ -354,7 +354,7 @@ function DeckPage({
 /** PDF를 못 받았을 때 장 제목만 크게 보여 준다. */
 function SlideFallback({ slide, small }: { slide: PresenterSlide; small?: boolean }) {
   return (
-    <div className="flex size-full flex-col justify-center rounded-sm bg-surface-800 p-6">
+    <div className="flex size-full flex-col justify-center rounded-xs bg-surface-800 p-6">
       <p className="text-xs text-surface-400">슬라이드 그림을 불러오지 못했습니다</p>
       <p
         className={`mt-2 whitespace-pre-line break-keep font-bold text-white ${small ? 'text-base' : 'text-2xl'}`}
@@ -372,7 +372,7 @@ function Note({ label, text, mono }: { label: string; text: string; mono?: boole
     <div>
       <p className="text-xs font-bold text-surface-400">{label}</p>
       <p
-        className={`mt-1 whitespace-pre-line break-keep text-surface-100 ${mono ? 'rounded bg-black/30 p-2 font-mono text-[0.8125rem] leading-6' : ''}`}
+        className={`mt-1 whitespace-pre-line break-keep text-surface-100 ${mono ? 'rounded-sm bg-black/30 p-2 font-mono text-[0.8125rem] leading-6' : ''}`}
       >
         {text}
       </p>

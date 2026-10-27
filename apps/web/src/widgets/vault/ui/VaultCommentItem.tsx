@@ -18,12 +18,12 @@ export function VaultCommentItem({ comment, onDelete, formatTime }: VaultComment
   };
 
   return (
-    <div className="flex gap-3 group p-4 rounded-2xl border border-surface-200/50 bg-white hover:bg-surface-50 transition-colors shadow-sm">
+    <div className="flex gap-3 group p-4 rounded-2xl border border-surface-200/50 bg-white hover:bg-surface-50 transition-colors shadow-xs">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold text-surface-900 font-mono">{comment.authorName}</span>
           {comment.isAdmin && (
-            <span className="text-[10px] px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded-sm font-mono font-bold border border-violet-200">
+            <span className="text-[10px] px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded-xs font-mono font-bold border border-violet-200">
               ADMIN
             </span>
           )}
@@ -33,7 +33,7 @@ export function VaultCommentItem({ comment, onDelete, formatTime }: VaultComment
       </div>
 
       {comment.canDelete && isDeleting ? (
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           <button onClick={handleDelete} className="text-xs text-red-400 font-mono hover:text-red-300">
             OK
           </button>
@@ -47,7 +47,7 @@ export function VaultCommentItem({ comment, onDelete, formatTime }: VaultComment
       ) : comment.canDelete ? (
         <button
           onClick={() => setIsDeleting(true)}
-          className="text-xs text-surface-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all font-mono flex-shrink-0"
+          className="text-xs text-surface-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all font-mono shrink-0"
         >
           DEL
         </button>

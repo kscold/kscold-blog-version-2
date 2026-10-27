@@ -12,7 +12,7 @@ export function AuthToggle({ isLogin, onToggle }: AuthToggleProps) {
     <div className="flex items-center justify-center mb-8">
       <div className="relative inline-flex bg-surface-100/80 p-1 rounded-xl">
         <motion.div
-          className="absolute h-[calc(100%-8px)] bg-white rounded-lg shadow-sm transition-all duration-300"
+          className="absolute h-[calc(100%-8px)] bg-white rounded-lg shadow-xs transition-all duration-300"
           initial={false}
           animate={{
             width: 'calc(50% - 4px)',

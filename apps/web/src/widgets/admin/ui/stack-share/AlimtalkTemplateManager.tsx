@@ -104,7 +104,7 @@ function TemplateCard({ template }: { template: AlimtalkTemplate }) {
           <select
             value={status}
             onChange={event => setStatus(event.target.value as AlimtalkTemplateStatus)}
-            className="mt-2 h-12 w-full rounded-xl border border-surface-200 bg-white px-3 text-sm outline-none focus:border-surface-900"
+            className="mt-2 h-12 w-full rounded-xl border border-surface-200 bg-white px-3 text-sm outline-hidden focus:border-surface-900"
           >
             {STATUS_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>

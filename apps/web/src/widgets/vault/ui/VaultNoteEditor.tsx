@@ -134,7 +134,7 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
                     value={title}
                     onChange={e => changeTitle(e.target.value)}
                     placeholder="노트 제목을 입력하세요"
-                    className="w-full px-4 py-3 bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+                    className="w-full px-4 py-3 bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-500 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
                     required
                   />
                 </div>
@@ -145,7 +145,7 @@ export default function VaultNoteEditor({ mode, noteId, initialData }: VaultNote
                     value={slug}
                     onChange={e => setSlug(e.target.value)}
                     placeholder="url-friendly-slug"
-                    className="w-full px-4 py-3 bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+                    className="w-full px-4 py-3 bg-white border border-surface-300 rounded-lg text-surface-900 placeholder-surface-500 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
                   />
                 </div>
                 <div>

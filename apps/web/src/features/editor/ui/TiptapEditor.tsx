@@ -112,7 +112,7 @@ export default function TiptapEditor({
   return (
     <div
       data-testid="post-editor-document"
-      className="overflow-hidden rounded-[28px] border border-surface-200 bg-white shadow-sm"
+      className="overflow-hidden rounded-[28px] border border-surface-200 bg-white shadow-xs"
     >
       <EditorSurfaceHeader
         isUploading={isUploading}

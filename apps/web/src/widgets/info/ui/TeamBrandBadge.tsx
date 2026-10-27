@@ -11,7 +11,7 @@ export function TeamBrandBadge({ team, compact = false }: TeamBrandBadgeProps) {
 
   return (
     <div
-      className={`flex flex-shrink-0 items-center gap-2 rounded-full shadow-sm ${
+      className={`flex shrink-0 items-center gap-2 rounded-full shadow-xs ${
         compact ? 'px-4 py-2' : 'px-5 py-2.5'
       }`}
       style={{ background: team.badge.backgroundColor }}

@@ -70,7 +70,7 @@ export default function SlideShow({ file, fileName, releaseId, title, backHref }
       ref={rootRef}
       data-testid="slideshow"
       data-release-id={releaseId}
-      className="flex h-[100dvh] flex-col bg-surface-950 text-white"
+      className="flex h-dvh flex-col bg-surface-950 text-white"
     >
       <header className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
         <Link href={backHref} className="shrink-0 font-bold text-surface-300 hover:text-white">
@@ -170,7 +170,7 @@ function SlidePage({
       renderForms={false}
       // 휴대폰에서는 링크 높이가 손가락보다 훨씬 작다. 손가락 화면에서만 누르는 영역을 위아래로 넓힌다.
       // 세로로 붙어 있는 링크는 같은 주소(두 줄 제목)뿐이라 넓혀도 다른 링크를 가리지 않는다.
-      className="overflow-hidden rounded-sm bg-white shadow-2xl [@media(pointer:coarse)]:[&_.linkAnnotation>a]:!-top-2 [@media(pointer:coarse)]:[&_.linkAnnotation>a]:!h-[calc(100%+1rem)]"
+      className="overflow-hidden rounded-xs bg-white shadow-2xl pointer-coarse:[&_.linkAnnotation>a]:-top-2! pointer-coarse:[&_.linkAnnotation>a]:h-[calc(100%+1rem)]!"
       loading={<div className="bg-surface-900" style={{ width, height: '100%' }} />}
     />
   );

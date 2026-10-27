@@ -132,7 +132,7 @@ export function TagSelector({ selectedTagIds, onChange }: TagSelectorProps) {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={selectedTagIds.length === 0 ? '태그 검색 또는 생성...' : ''}
-          className="flex-1 min-w-[120px] bg-transparent text-sm text-surface-900 placeholder-surface-400 outline-none"
+          className="flex-1 min-w-[120px] bg-transparent text-sm text-surface-900 placeholder-surface-400 outline-hidden"
         />
       </div>
 

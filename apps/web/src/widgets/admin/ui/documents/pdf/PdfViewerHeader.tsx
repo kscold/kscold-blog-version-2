@@ -10,7 +10,7 @@ export function PdfViewerHeader({ document }: { document?: AdminDocument }) {
         href={space.href}
         aria-label={`${space.title}로 돌아가기`}
         data-testid="pdf-viewer-back"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-surface-200 text-xl text-surface-700 hover:bg-surface-50 focus:outline-none focus:ring-2 focus:ring-surface-900"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-surface-200 text-xl text-surface-700 hover:bg-surface-50 focus:outline-hidden focus:ring-2 focus:ring-surface-900"
       >
         ←
       </a>
@@ -30,7 +30,7 @@ export function PdfViewerHeader({ document }: { document?: AdminDocument }) {
           href={`/api/admin/documents/${encodeURIComponent(document.id)}/download`}
           download={document.fileName}
           data-testid="pdf-viewer-download"
-          className="flex min-h-11 shrink-0 items-center rounded-xl bg-surface-900 px-3 text-xs font-semibold text-white hover:bg-surface-700 focus:outline-none focus:ring-2 focus:ring-surface-900 focus:ring-offset-2"
+          className="flex min-h-11 shrink-0 items-center rounded-xl bg-surface-900 px-3 text-xs font-semibold text-white hover:bg-surface-700 focus:outline-hidden focus:ring-2 focus:ring-surface-900 focus:ring-offset-2"
         >
           다운로드
         </a>

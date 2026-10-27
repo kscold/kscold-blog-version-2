@@ -28,7 +28,7 @@ export function FeedComposerHeader({
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-surface-400">
                 SHARE A NOTE
               </p>
-              <h2 className="mt-2 text-balance text-2xl font-black tracking-tight text-surface-900 [word-break:keep-all] sm:text-3xl">
+              <h2 className="mt-2 text-balance text-2xl font-black tracking-tight text-surface-900 break-keep sm:text-3xl">
                 {currentUser.displayName}님, 지금 하고 있는 흐름을 남겨보세요
               </h2>
             </div>
@@ -41,7 +41,7 @@ export function FeedComposerHeader({
               </span>
             </div>
           </div>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-surface-500 [overflow-wrap:anywhere]">
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-surface-500 wrap-anywhere">
             짧은 메모, 작업 캡처, 참고 링크를 한 흐름으로 묶어두는 기록 공간입니다.
           </p>
         </div>

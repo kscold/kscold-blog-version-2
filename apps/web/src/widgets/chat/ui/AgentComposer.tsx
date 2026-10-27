@@ -32,7 +32,7 @@ export function AgentComposer({
         <button
           type="button"
           onClick={onRetry}
-          className="mb-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-1 py-1 text-xs font-bold text-cyan-700 transition hover:text-surface-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+          className="mb-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-1 py-1 text-xs font-bold text-cyan-700 transition hover:text-surface-900 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
         >
           마지막 질문 다시 보내기 <span aria-hidden="true">↻</span>
         </button>
@@ -55,15 +55,15 @@ export function AgentComposer({
           type="button"
           aria-label="Agent 답변 수신 중단"
           onClick={onStop}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-surface-300 bg-white text-surface-900 transition hover:bg-surface-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-surface-300 bg-white text-surface-900 transition hover:bg-surface-100 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
         >
-          <span className="h-3.5 w-3.5 rounded-sm bg-current" aria-hidden="true" />
+          <span className="h-3.5 w-3.5 rounded-xs bg-current" aria-hidden="true" />
         </button>
       ) : <button
         type="submit"
         aria-label="Agent에게 질문 보내기"
         disabled={disabled}
-        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-surface-900 text-white transition-all hover:bg-surface-800 disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface-900 text-white transition-all hover:bg-surface-800 disabled:cursor-not-allowed disabled:opacity-40"
       >
         <svg
           className="w-5 h-5"

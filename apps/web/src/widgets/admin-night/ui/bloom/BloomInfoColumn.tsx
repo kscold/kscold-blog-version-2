@@ -21,7 +21,7 @@ export function BloomInfoColumn({ summary, readyCount }: BloomInfoColumnProps) {
         <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.28em] text-white/70">
           AI Agent Bloom · Build & Share
         </div>
-        <div className="max-w-3xl space-y-4 [word-break:keep-all]">
+        <div className="max-w-3xl space-y-4 break-keep">
           <h2 className="text-[2.45rem] font-black leading-[1.08] tracking-tight sm:text-5xl sm:leading-[1.08]">
             <span className="inline-block">AI Agent,</span>{' '}
             <span className="inline-block">같이 만들고</span>
@@ -62,18 +62,18 @@ export function BloomInfoColumn({ summary, readyCount }: BloomInfoColumnProps) {
             className={`rounded-[24px] border p-4 ${
               phase.state === 'active'
                 ? 'border-cyan-300/60 bg-cyan-300/10'
-                : 'border-white/10 bg-white/[0.04]'
+                : 'border-white/10 bg-white/4'
             }`}
           >
             <p className="text-[11px] font-black uppercase tracking-[0.24em] text-white/45">{phase.label}</p>
-            <h3 className="mt-2 text-lg font-black tracking-tight [word-break:keep-all]">{phase.title}</h3>
-            <p className="mt-2 text-xs leading-6 text-white/58 [word-break:keep-all]">{phase.description}</p>
+            <h3 className="mt-2 text-lg font-black tracking-tight break-keep">{phase.title}</h3>
+            <p className="mt-2 text-xs leading-6 text-white/58 break-keep">{phase.description}</p>
           </article>
         ))}
       </div>
 
       <div className="grid gap-4">
-        <article className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+        <article className="rounded-[28px] border border-white/10 bg-white/4 p-5">
           <p className="text-[11px] font-black uppercase tracking-[0.24em] text-cyan-200">Current Signal</p>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div>
@@ -85,14 +85,14 @@ export function BloomInfoColumn({ summary, readyCount }: BloomInfoColumnProps) {
               <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-white/45">ready</p>
             </div>
           </div>
-          <p className="mt-4 text-xs leading-6 text-white/55 [word-break:keep-all]">
+          <p className="mt-4 text-xs leading-6 text-white/55 break-keep">
             ready는 “일정 맞으면 참여”를 고른 사람입니다. 숫자가 쌓이면 실제 날짜와 장소,
             참가비 범위를 따로 안내하겠습니다.
           </p>
         </article>
       </div>
 
-      <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+      <div className="rounded-[28px] border border-white/10 bg-white/4 p-5">
         <p className="text-[11px] font-black uppercase tracking-[0.24em] text-white/45">Hot Topics</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {topEntries(summary?.interestedTopicCounts, 5).length > 0 ? (

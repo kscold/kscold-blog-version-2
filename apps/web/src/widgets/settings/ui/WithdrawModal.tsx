@@ -72,7 +72,7 @@ export function WithdrawModal({ open, onClose }: WithdrawModalProps) {
               value={confirmInput}
               onChange={e => setConfirmInput(e.target.value)}
               placeholder={CONFIRM_PHRASE}
-              className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-none focus:border-red-400 transition-colors mb-4"
+              className="w-full px-3 py-2.5 text-sm border border-surface-200 rounded-xl focus:outline-hidden focus:border-red-400 transition-colors mb-4"
             />
             <div className="flex gap-2">
               <button

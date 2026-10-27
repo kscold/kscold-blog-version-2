@@ -27,15 +27,15 @@ export function VaultNoteContent({ note, theme = 'light', titleSlugMap = {} }: V
   return (
     <article className="max-w-none">
       <header className="mb-16 relative">
-        <div className="absolute -inset-x-6 -inset-y-6 z-0 bg-gradient-to-b from-surface-100 dark:from-surface-900/50 to-transparent blur-2xl opacity-50 pointer-events-none rounded-[3rem]" />
+        <div className="absolute -inset-x-6 -inset-y-6 z-0 bg-linear-to-b from-surface-100 dark:from-surface-900/50 to-transparent blur-2xl opacity-50 pointer-events-none rounded-[3rem]" />
 
         <div className="relative z-10 flex flex-col gap-6">
-          <h1 className="text-4xl sm:text-5xl font-sans font-black tracking-tighter text-surface-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-white dark:to-surface-400">
+          <h1 className="text-4xl sm:text-5xl font-sans font-black tracking-tighter text-surface-900 dark:text-transparent dark:bg-clip-text dark:bg-linear-to-r dark:from-white dark:via-white dark:to-surface-400">
             {note.title}
           </h1>
 
           <div className="flex flex-wrap items-center gap-4 text-sm font-mono text-surface-500 dark:text-surface-400">
-            <div className="flex items-center gap-2 bg-white/50 dark:bg-surface-900/50 px-3 py-1.5 rounded-lg border border-surface-200 dark:border-white/5 shadow-sm dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)] backdrop-blur-md">
+            <div className="flex items-center gap-2 bg-white/50 dark:bg-surface-900/50 px-3 py-1.5 rounded-lg border border-surface-200 dark:border-white/5 shadow-xs dark:shadow-[inset_0_1px_rgba(255,255,255,0.05)] backdrop-blur-md">
               <svg
                 className="w-4 h-4 text-accent-light"
                 fill="none"
@@ -64,7 +64,7 @@ export function VaultNoteContent({ note, theme = 'light', titleSlugMap = {} }: V
             </div>
           </div>
         </div>
-        <div className="absolute -bottom-8 left-0 right-0 h-px bg-gradient-to-r from-transparent via-surface-200 dark:via-white/10 to-transparent" />
+        <div className="absolute -bottom-8 left-0 right-0 h-px bg-linear-to-r from-transparent via-surface-200 dark:via-white/10 to-transparent" />
       </header>
 
       <div className="mt-8 font-sans">

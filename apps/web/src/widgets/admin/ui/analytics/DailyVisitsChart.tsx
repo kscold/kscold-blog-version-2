@@ -19,7 +19,7 @@ export function DailyVisitsChart({ daily, isLoading }: Props) {
     >
       <h3 className="text-sm font-bold text-surface-900 mb-4">일별 방문 추이</h3>
       {isLoading ? (
-        <div className="h-20 animate-pulse bg-surface-100 rounded" />
+        <div className="h-20 animate-pulse bg-surface-100 rounded-sm" />
       ) : daily.length === 0 ? (
         <p className="text-sm text-surface-400 py-6 text-center">데이터가 없습니다</p>
       ) : (
@@ -29,9 +29,9 @@ export function DailyVisitsChart({ daily, isLoading }: Props) {
               <span className="text-[9px] font-bold text-surface-700 tabular-nums leading-none">
                 {d.visits > 0 ? d.visits : ''}
               </span>
-              <div className="flex w-full flex-1 items-end overflow-hidden rounded-sm bg-surface-100">
+              <div className="flex w-full flex-1 items-end overflow-hidden rounded-xs bg-surface-100">
                 <div
-                  className="w-full bg-surface-800 rounded-sm transition-all duration-500"
+                  className="w-full bg-surface-800 rounded-xs transition-all duration-500"
                   style={{
                     height: `${Math.round((d.visits / maxVisits) * 100)}%`,
                     minHeight: d.visits > 0 ? 3 : 0,

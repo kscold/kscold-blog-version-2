@@ -85,7 +85,7 @@ export function AdminTestingRunPanel({
             <div className="text-xs font-semibold uppercase tracking-wide text-surface-400">
               최근 실행
             </div>
-            <div className="mt-2 text-sm font-semibold leading-6 text-surface-900 [overflow-wrap:anywhere]">
+            <div className="mt-2 text-sm font-semibold leading-6 text-surface-900 wrap-anywhere">
               {session?.suiteLabel || '어드민 UI 테스트 실행'}
             </div>
             <div className="mt-1 text-xs text-surface-500">{formatSessionId(session?.id || null)}</div>

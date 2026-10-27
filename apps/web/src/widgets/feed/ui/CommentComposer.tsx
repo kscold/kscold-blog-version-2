@@ -173,7 +173,7 @@ export function CommentComposer({
                     <span className="block truncate text-sm font-semibold text-surface-900">
                       {user.displayName}
                       {user.isAdmin && (
-                        <span className="ml-1 rounded bg-surface-900 px-1 py-0.5 text-[9px] font-bold text-white">
+                        <span className="ml-1 rounded-sm bg-surface-900 px-1 py-0.5 text-[9px] font-bold text-white">
                           주인
                         </span>
                       )}
@@ -205,7 +205,7 @@ export function CommentComposer({
           onBlur={() => setQuery(null)}
           placeholder="댓글을 입력하세요... (@로 언급)"
           maxLength={500}
-          className="min-w-0 flex-1 rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-surface-400"
+          className="min-w-0 flex-1 rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm focus:outline-hidden focus:ring-1 focus:ring-surface-400"
         />
         <button
           type="button"

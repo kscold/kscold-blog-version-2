@@ -122,7 +122,7 @@ export function BloomVotePreferenceFields({
           value={form.desiredTakeaways}
           onChange={event => updateForm('desiredTakeaways', event.target.value)}
           placeholder="예: LangGraph 흐름을 감으로 잡고 싶어요. 실제 업무에 붙일 때 기준이 궁금해요."
-          className="min-h-28 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+          className="min-h-28 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 outline-hidden transition-colors placeholder:text-surface-300 focus:border-surface-900"
         />
       </div>
 
@@ -135,7 +135,7 @@ export function BloomVotePreferenceFields({
           value={form.message}
           onChange={event => updateForm('message', event.target.value)}
           placeholder="목차에 들어가면 좋을 내용이나 지금 궁금한 점이 있다면 편하게 남겨주세요."
-          className="min-h-28 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+          className="min-h-28 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 outline-hidden transition-colors placeholder:text-surface-300 focus:border-surface-900"
         />
       </div>
     </>

@@ -33,7 +33,7 @@ function PdfPageInput({ pageCount, pageNumber, onPage }: PaginationProps) {
         onChange={event => setInput(event.target.value)}
         aria-label="PDF 페이지 번호"
         data-testid="pdf-viewer-page-input"
-        className="h-11 w-14 rounded-lg border border-surface-200 bg-white px-2 text-center text-sm text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900"
+        className="h-11 w-14 rounded-lg border border-surface-200 bg-white px-2 text-center text-sm text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900"
       />
       <span className="whitespace-nowrap" data-testid="pdf-viewer-page-count">
         / {pageCount || '—'}

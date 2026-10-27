@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { commands, scenarioLinks } from '@/widgets/admin/lib/adminTesting';
 
 function ScenarioLink({ link, children }: { link: typeof scenarioLinks[number]; children: ReactNode }) {
-  const className = 'group rounded-2xl border border-surface-200 bg-white p-5 hover:border-surface-300 hover:shadow-sm transition-all';
+  const className = 'group rounded-2xl border border-surface-200 bg-white p-5 hover:border-surface-300 hover:shadow-xs transition-all';
   if (link.href === '/admin/documents') return <a href={link.href} data-testid={link.testId} className={className}>{children}</a>;
   return <Link href={link.href} data-testid={link.testId} className={className}>{children}</Link>;
 }
@@ -48,7 +48,7 @@ export function AdminTestingReferencePanels() {
                 className="rounded-xl border border-surface-100 bg-surface-50 px-4 py-3"
               >
                 <div className="text-sm font-semibold text-surface-900">{item.title}</div>
-                <code className="mt-2 block text-xs leading-6 text-surface-600 [overflow-wrap:anywhere] sm:text-sm">
+                <code className="mt-2 block text-xs leading-6 text-surface-600 wrap-anywhere sm:text-sm">
                   {item.command}
                 </code>
               </div>

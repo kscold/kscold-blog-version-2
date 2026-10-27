@@ -51,7 +51,7 @@ export function FeedCopilotControls({
             aria-describedby={
               memoError ? 'feed-copilot-memo-error' : 'feed-copilot-memo-count'
             }
-            className="mt-3 w-full resize-y rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm leading-6 text-surface-700 placeholder:text-surface-400 outline-none transition focus:border-surface-400 focus:ring-4 focus:ring-surface-100"
+            className="mt-3 w-full resize-y rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm leading-6 text-surface-700 placeholder:text-surface-400 outline-hidden transition focus:border-surface-400 focus:ring-4 focus:ring-surface-100"
           />
           <span className="mt-2 flex items-start justify-between gap-3 text-xs">
             {memoError ? (
@@ -102,7 +102,7 @@ export function FeedCopilotControls({
             aria-describedby={
               sourceUrlError ? 'feed-copilot-link-error' : 'feed-copilot-link-count'
             }
-            className="mt-3 w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 outline-none transition focus:border-surface-400 focus:ring-4 focus:ring-surface-100"
+            className="mt-3 w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 outline-hidden transition focus:border-surface-400 focus:ring-4 focus:ring-surface-100"
           />
           <span className="mt-2 flex items-start justify-between gap-3 text-xs">
             {sourceUrlError ? (
@@ -147,7 +147,7 @@ export function FeedCopilotControls({
                 aria-pressed={selected}
                 className={`rounded-2xl border px-3 py-2 text-left transition ${
                   selected
-                    ? 'border-surface-900 bg-surface-900 text-white shadow-sm'
+                    ? 'border-surface-900 bg-surface-900 text-white shadow-xs'
                     : 'border-surface-200 bg-white text-surface-500 hover:border-surface-300 hover:text-surface-700'
                 }`}
               >

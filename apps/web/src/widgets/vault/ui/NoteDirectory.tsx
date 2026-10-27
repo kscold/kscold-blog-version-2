@@ -25,7 +25,7 @@ export async function NoteDirectory() {
               <Link
                 href={`/vault/${encodeURIComponent(note.slug)}`}
                 prefetch={false}
-                className="block rounded-lg border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 hover:border-surface-400 hover:text-surface-900 break-words"
+                className="block rounded-lg border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 hover:border-surface-400 hover:text-surface-900 wrap-break-word"
               >
                 {note.name}
               </Link>

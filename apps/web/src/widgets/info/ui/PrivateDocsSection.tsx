@@ -36,7 +36,7 @@ export function PrivateDocsSection({ teamId }: { teamId: string }) {
                 onChange={e => setPassword(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleUnlock()}
                 placeholder="비밀번호"
-                className={`flex-1 px-3 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-surface-300 ${pwError ? 'border-red-400 bg-red-50' : 'border-surface-200'}`}
+                className={`flex-1 px-3 py-2.5 text-sm border rounded-xl focus:outline-hidden focus:ring-2 focus:ring-surface-300 ${pwError ? 'border-red-400 bg-red-50' : 'border-surface-200'}`}
               />
               <button
                 onClick={handleUnlock}

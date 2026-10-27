@@ -48,14 +48,14 @@ function ToastItem({ alert }: { alert: AlertItem }) {
         ${STYLES[alert.type]}
       `}
     >
-      <span className="icon-wrap flex-shrink-0 mt-0.5 p-1 rounded-lg">
+      <span className="icon-wrap shrink-0 mt-0.5 p-1 rounded-lg">
         {ICONS[alert.type]}
       </span>
       <p className="flex-1 text-sm font-medium leading-snug pt-0.5">{alert.message}</p>
       <button
         type="button"
         onClick={() => dismissAlert(alert.id)}
-        className="flex-shrink-0 mt-0.5 text-current opacity-40 hover:opacity-70 transition-opacity"
+        className="shrink-0 mt-0.5 text-current opacity-40 hover:opacity-70 transition-opacity"
         aria-label="닫기"
       >
         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +70,7 @@ export function AlertToast() {
   const { alerts } = useAlertStore();
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2.5 pointer-events-none">
+    <div className="fixed bottom-6 right-6 z-9999 flex flex-col gap-2.5 pointer-events-none">
       <AnimatePresence mode="popLayout">
         {alerts.map(alert => (
           <div key={alert.id} className="pointer-events-auto">

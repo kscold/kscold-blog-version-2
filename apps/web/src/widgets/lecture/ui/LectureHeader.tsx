@@ -21,7 +21,7 @@ export function LectureHeader() {
         <span className="block text-base font-bold text-primary-700 sm:text-lg">
           {lecture.organization}
         </span>
-        <span className="mt-2 block text-[1.75rem] font-black leading-[1.25] tracking-tight text-surface-900 sm:text-4xl">
+        <span className="mt-2 block text-[1.75rem] font-black leading-tight tracking-tight text-surface-900 sm:text-4xl">
           {lecture.title}
         </span>
       </h1>
@@ -49,7 +49,7 @@ export function LectureHeader() {
           </p>
           <a
             href="#setup"
-            className="inline-flex min-h-11 items-center self-start text-base font-bold text-primary-700 underline underline-offset-4 hover:text-primary-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 sm:self-auto print:hidden"
+            className="inline-flex min-h-11 items-center self-start text-base font-bold text-primary-700 underline underline-offset-4 hover:text-primary-900 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 sm:self-auto print:hidden"
           >
             준비 방법 보기
           </a>
@@ -59,7 +59,7 @@ export function LectureHeader() {
       <Link
         href={SLIDES_HREF}
         data-testid="lecture-slides-link"
-        className="mt-1 inline-flex min-h-11 items-center gap-1 text-base font-bold text-surface-800 sm:mt-5 underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 print:hidden"
+        className="mt-1 inline-flex min-h-11 items-center gap-1 text-base font-bold text-surface-800 sm:mt-5 underline-offset-4 hover:underline focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 print:hidden"
       >
         웹에서 강의 보기 <span aria-hidden>→</span>
       </Link>

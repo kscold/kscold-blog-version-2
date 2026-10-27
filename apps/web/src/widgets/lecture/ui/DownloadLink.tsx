@@ -14,7 +14,7 @@ export function lectureFileHref(item: Pick<HansalimDownload, 'file' | 'sha256'>)
 const STYLES = {
   // 한 화면에서 채운 버튼은 이것 하나만 쓴다.
   primary:
-    'min-h-[3.25rem] w-full bg-surface-900 px-8 text-base text-white hover:bg-surface-700 sm:w-auto',
+    'min-h-13 w-full bg-surface-900 px-8 text-base text-white hover:bg-surface-700 sm:w-auto',
   secondary:
     'min-h-12 w-full border border-surface-300 bg-white px-6 text-sm text-surface-900 hover:border-surface-900 sm:w-auto',
 };
@@ -33,7 +33,7 @@ export function DownloadLink({ item, variant, testId, children }: DownloadLinkPr
       href={lectureFileHref(item)}
       download={item.file}
       data-testid={testId}
-      className={`inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 print:hidden ${STYLES[variant]}`}
+      className={`inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-bold transition-colors focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 print:hidden ${STYLES[variant]}`}
     >
       {children}
     </a>

@@ -30,7 +30,7 @@ export function DashboardRecentPosts({ posts }: { posts: Post[] }) {
                 className="flex items-start justify-between gap-3 p-4 transition-colors hover:bg-surface-50"
               >
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-bold leading-5 text-surface-900 [overflow-wrap:anywhere]">
+                  <span className="block text-sm font-bold leading-5 text-surface-900 wrap-anywhere">
                     {post.title}
                   </span>
                   <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-surface-500">

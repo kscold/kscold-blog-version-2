@@ -63,7 +63,7 @@ function LectureFontHelp() {
 
   return (
     <details data-testid="lecture-font-help" className="group border-b border-surface-200">
-      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-3 text-base font-bold text-surface-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 [&::-webkit-details-marker]:hidden">
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-3 text-base font-bold text-surface-900 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 [&::-webkit-details-marker]:hidden">
         {help.title}
         <svg
           aria-hidden

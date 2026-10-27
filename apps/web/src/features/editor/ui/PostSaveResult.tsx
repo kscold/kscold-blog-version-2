@@ -28,13 +28,13 @@ export function PostSaveResult({ result, onContinue }: { result: Result; onConti
     catch { setMessage('아래 주소를 선택해 복사해 주세요.'); }
   }
   return (
-    <section data-testid="post-save-result" className="mx-auto max-w-2xl space-y-5 rounded-3xl border border-surface-200 bg-white p-6 shadow-sm sm:p-8" aria-label="글 저장 결과">
+    <section data-testid="post-save-result" className="mx-auto max-w-2xl space-y-5 rounded-3xl border border-surface-200 bg-white p-6 shadow-xs sm:p-8" aria-label="글 저장 결과">
       <p className="text-sm font-semibold text-primary-700">서버에 저장됨</p>
       <h1 ref={heading} tabIndex={-1} className="text-2xl font-bold text-surface-900">{state === 'draft' ? '초안을 저장했습니다' : state === 'archived' ? '글을 보관했습니다' : '글을 발행했습니다'}</h1>
-      <p className="break-words text-lg font-semibold text-surface-900">{post.title}</p>
+      <p className="wrap-break-word text-lg font-semibold text-surface-900">{post.title}</p>
       <p className="text-sm font-bold text-surface-700">{PUBLICATION[state].label}</p>
       <p className="text-sm leading-6 text-surface-600">{PUBLICATION[state].description}</p>
-      <p className="select-all rounded-xl bg-surface-50 p-4 text-sm text-surface-700 [overflow-wrap:anywhere]">{SITE_URL + href}</p>
+      <p className="select-all rounded-xl bg-surface-50 p-4 text-sm text-surface-700 wrap-anywhere">{SITE_URL + href}</p>
       {!refreshed && <div className="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
         <p>저장됨 · 화면 갱신 확인 필요. 글을 다시 저장하지 않고 화면 갱신만 재시도합니다.</p>
         <button type="button" disabled={refreshing} onClick={refresh} className="mt-2 rounded-lg border border-amber-200 px-3 py-2 font-semibold">{refreshing ? '갱신 중…' : '화면 갱신 재시도'}</button>

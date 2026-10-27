@@ -16,7 +16,7 @@ export function PostEditorSeoPanel({
   onUpdateForm,
 }: PostEditorSeoPanelProps) {
   return (
-    <div className="rounded-[28px] border border-surface-200 bg-white p-5 shadow-sm">
+    <div className="rounded-[28px] border border-surface-200 bg-white p-5 shadow-xs">
       <button
         type="button"
         onClick={onToggle}
@@ -46,7 +46,7 @@ export function PostEditorSeoPanel({
               value={form.metaTitle}
               onChange={event => onUpdateForm('metaTitle', event.target.value)}
               placeholder="검색 결과에 표시될 제목"
-              className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
+              className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-hidden focus:ring-1 focus:ring-surface-900"
             />
           </div>
           <div>
@@ -58,7 +58,7 @@ export function PostEditorSeoPanel({
               onChange={event => onUpdateForm('metaDescription', event.target.value)}
               placeholder="검색 결과에 표시될 설명 (150자 권장)"
               rows={3}
-              className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
+              className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-hidden focus:ring-1 focus:ring-surface-900"
             />
             <p className="mt-2 text-xs text-surface-400">{form.metaDescription.length}/160</p>
           </div>
@@ -71,7 +71,7 @@ export function PostEditorSeoPanel({
               value={form.keywords}
               onChange={event => onUpdateForm('keywords', event.target.value)}
               placeholder="React, TypeScript, 프론트엔드"
-              className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
+              className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-hidden focus:ring-1 focus:ring-surface-900"
             />
           </div>
         </div>

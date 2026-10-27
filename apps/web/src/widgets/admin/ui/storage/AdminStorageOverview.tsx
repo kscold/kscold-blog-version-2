@@ -37,7 +37,7 @@ export function AdminStorageOverview({
               </button>
             ))}
           </div>
-          <p className="text-sm leading-6 text-surface-500 [overflow-wrap:anywhere]">
+          <p className="text-sm leading-6 text-surface-500 wrap-anywhere">
             prefix: <span className="font-mono text-surface-600">{currentPrefix || '/'}</span>
           </p>
         </div>

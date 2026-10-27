@@ -34,7 +34,7 @@ export function VaultSemanticSearch({ activeFolderName, onNavigate }: VaultSeman
           value={input}
           onChange={event => setInput(event.target.value)}
           placeholder="의미로 문서 찾기"
-          className="h-10 w-full rounded-xl border border-surface-200 bg-surface-50 px-3 pr-10 text-sm text-surface-900 outline-none transition focus:border-accent dark:border-surface-700 dark:bg-surface-950 dark:text-white"
+          className="h-10 w-full rounded-xl border border-surface-200 bg-surface-50 px-3 pr-10 text-sm text-surface-900 outline-hidden transition focus:border-accent dark:border-surface-700 dark:bg-surface-950 dark:text-white"
         />
         <button
           type="submit"

@@ -115,7 +115,7 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
         <>
           {/* 오버레이 */}
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1300]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-1300"
             initial={allowRichEffects ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -130,9 +130,9 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className="fixed z-[1400] flex min-h-0 flex-col overflow-hidden border border-surface-200 bg-white shadow-2xl
+            className="fixed z-1400 flex min-h-0 flex-col overflow-hidden border border-surface-200 bg-white shadow-2xl
                        inset-x-2 bottom-[calc(var(--chat-keyboard-inset,0px)+0.5rem)] h-[calc(var(--chat-visible-height,100dvh)-0.5rem)] max-h-[calc(var(--chat-visible-height,100dvh)-0.5rem)] rounded-[24px]
-                       sm:inset-x-auto sm:bottom-[var(--chat-modal-bottom)] sm:right-4 sm:h-[var(--chat-height,720px)] sm:max-h-[var(--chat-modal-max-height)] sm:w-[var(--chat-width,440px)] sm:min-w-[360px] sm:max-w-[calc(100vw-2rem)] sm:rounded-[24px] focus:outline-none"
+                       sm:inset-x-auto sm:bottom-(--chat-modal-bottom) sm:right-4 sm:h-[var(--chat-height,720px)] sm:max-h-(--chat-modal-max-height) sm:w-[var(--chat-width,440px)] sm:min-w-[360px] sm:max-w-[calc(100vw-2rem)] sm:rounded-[24px] focus:outline-hidden"
             style={modalPositionStyle}
             initial={allowRichEffects ? { opacity: 0, y: 80 } : false}
             animate={{ opacity: 1, y: 0 }}

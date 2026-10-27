@@ -60,7 +60,7 @@ export function VaultCommentSection({ noteId }: VaultCommentSectionProps) {
       {isLoading ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-12 bg-surface-100 rounded animate-pulse" />
+            <div key={i} className="h-12 bg-surface-100 rounded-sm animate-pulse" />
           ))}
         </div>
       ) : comments.length > 0 ? (

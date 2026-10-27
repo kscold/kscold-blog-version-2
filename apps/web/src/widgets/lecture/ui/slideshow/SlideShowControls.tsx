@@ -52,7 +52,7 @@ export function SlideShowControls(props: SlideShowControlsProps) {
           value={draft}
           onChange={event => setDraft(event.target.value.replace(/\D/g, ''))}
           placeholder={String(slide)}
-          className="h-11 w-14 rounded-full bg-white/10 text-center text-white placeholder:text-surface-300 focus:outline-none focus:ring-2 focus:ring-primary-400"
+          className="h-11 w-14 rounded-full bg-white/10 text-center text-white placeholder:text-surface-300 focus:outline-hidden focus:ring-2 focus:ring-primary-400"
         />
         <span>/ {slideCount || '–'}</span>
       </form>

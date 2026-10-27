@@ -51,7 +51,7 @@ export function HeroLogo() {
         className="absolute left-1/2 top-1/2 aspect-square h-[88%] max-w-[94%] -translate-x-1/2 -translate-y-1/2"
       >
         {/* 떠 있는 물체가 바닥에 닿지 않게 옅은 그림자를 깔아준다. */}
-        <div className="hero-logo-shadow absolute inset-x-[18%] -bottom-[6%] h-[9%] rounded-[50%] bg-surface-900/10 blur-2xl" />
+        <div className="hero-logo-shadow absolute inset-x-[18%] bottom-[-6%] h-[9%] rounded-[50%] bg-surface-900/10 blur-2xl" />
         <HeroLogoMark
           className={`hero-logo-float h-full w-full transition-opacity duration-700 ${
             ready && allowRichEffects ? 'opacity-0' : 'opacity-100'

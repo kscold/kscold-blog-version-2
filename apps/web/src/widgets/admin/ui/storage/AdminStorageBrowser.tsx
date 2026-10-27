@@ -65,10 +65,10 @@ export function AdminStorageBrowser({
                   className="w-full text-left"
                   data-testid={`admin-storage-folder-${folder.name}`}
                 >
-                  <div className="text-sm font-semibold leading-6 text-surface-900 [overflow-wrap:anywhere]">
+                  <div className="text-sm font-semibold leading-6 text-surface-900 wrap-anywhere">
                     {folder.name}
                   </div>
-                  <div className="mt-1 text-xs leading-5 text-surface-500 [overflow-wrap:anywhere]">
+                  <div className="mt-1 text-xs leading-5 text-surface-500 wrap-anywhere">
                     {folder.key}
                   </div>
                 </button>
@@ -129,10 +129,10 @@ export function AdminStorageBrowser({
                       className="text-left"
                       data-testid={`admin-storage-object-${object.name}`}
                     >
-                      <div className="text-sm font-semibold leading-6 text-surface-900 [overflow-wrap:anywhere]">
+                      <div className="text-sm font-semibold leading-6 text-surface-900 wrap-anywhere">
                         {object.name}
                       </div>
-                      <div className="mt-1 text-xs leading-5 text-surface-500 [overflow-wrap:anywhere]">
+                      <div className="mt-1 text-xs leading-5 text-surface-500 wrap-anywhere">
                         {object.key}
                       </div>
                     </button>

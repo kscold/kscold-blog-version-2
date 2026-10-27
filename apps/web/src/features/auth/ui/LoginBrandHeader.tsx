@@ -13,7 +13,7 @@ export function LoginBrandHeader() {
     >
       <Link href="/" className="inline-block group">
         <h1 className="text-5xl font-sans font-black tracking-tighter mb-3 group-hover:scale-105 transition-transform">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-surface-900 via-surface-500 to-surface-900 bg-[size:200%_auto] animate-shimmer">
+          <span className="bg-clip-text text-transparent bg-linear-to-r from-surface-900 via-surface-500 to-surface-900 bg-size-[200%_auto] animate-shimmer">
             KSCOLD
           </span>
         </h1>

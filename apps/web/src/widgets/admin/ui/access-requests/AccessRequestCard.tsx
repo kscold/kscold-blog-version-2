@@ -45,7 +45,7 @@ export function AccessRequestCard({
                   글 열어보기
                 </span>
               </span>
-              <span className="mt-2 block text-sm font-bold leading-6 text-surface-900 underline-offset-4 group-hover:underline [overflow-wrap:anywhere]">
+              <span className="mt-2 block text-sm font-bold leading-6 text-surface-900 underline-offset-4 group-hover:underline wrap-anywhere">
                 {request.postTitle || request.postSlug}
               </span>
             </Link>
@@ -54,7 +54,7 @@ export function AccessRequestCard({
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-surface-400">
                 글
               </p>
-              <p className="mt-2 text-sm font-medium leading-6 text-surface-800 [overflow-wrap:anywhere]">
+              <p className="mt-2 text-sm font-medium leading-6 text-surface-800 wrap-anywhere">
                 {request.postTitle || '기존 카테고리 요청'}
               </p>
             </div>
@@ -63,7 +63,7 @@ export function AccessRequestCard({
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-surface-400">
               카테고리
             </p>
-            <p className="mt-2 text-sm font-medium leading-6 text-surface-800 [overflow-wrap:anywhere]">
+            <p className="mt-2 text-sm font-medium leading-6 text-surface-800 wrap-anywhere">
               {request.categoryName}
             </p>
           </div>
@@ -74,7 +74,7 @@ export function AccessRequestCard({
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-surface-400">
               메시지
             </p>
-            <p className="mt-2 text-sm leading-6 text-surface-500 [overflow-wrap:anywhere]">
+            <p className="mt-2 text-sm leading-6 text-surface-500 wrap-anywhere">
               &quot;{request.message}&quot;
             </p>
           </div>

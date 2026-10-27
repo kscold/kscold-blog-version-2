@@ -25,8 +25,8 @@ export function TopPathsList({ topPaths, isLoading }: Props) {
       <div className="divide-y divide-surface-50">
         {isLoading ? (
           <div className="p-8 animate-pulse">
-            <div className="h-4 bg-surface-100 rounded mb-2" />
-            <div className="h-4 bg-surface-100 rounded w-3/4" />
+            <div className="h-4 bg-surface-100 rounded-sm mb-2" />
+            <div className="h-4 bg-surface-100 rounded-sm w-3/4" />
           </div>
         ) : topPaths.length === 0 ? (
           <p className="text-center py-8 text-sm text-surface-400">데이터가 없습니다</p>

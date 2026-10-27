@@ -30,7 +30,7 @@ export function FeedComposerHighlights() {
           <p className="mt-2 text-balance text-base font-semibold leading-6 text-surface-900">
             {item.title}
           </p>
-          <p className="mt-1 text-sm leading-6 text-surface-500 [overflow-wrap:anywhere]">
+          <p className="mt-1 text-sm leading-6 text-surface-500 wrap-anywhere">
             {item.description}
           </p>
         </div>

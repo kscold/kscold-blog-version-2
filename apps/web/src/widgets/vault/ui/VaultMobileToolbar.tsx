@@ -25,7 +25,7 @@ export function VaultMobileToolbar({
         <button
           type="button"
           onClick={onOpenFolders}
-          className="flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-surface-200 bg-white px-3 text-xs font-bold text-surface-700 shadow-sm transition active:scale-95 dark:border-surface-800 dark:bg-surface-900 dark:text-surface-200"
+          className="flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-surface-200 bg-white px-3 text-xs font-bold text-surface-700 shadow-xs transition active:scale-95 dark:border-surface-800 dark:bg-surface-900 dark:text-surface-200"
         >
           <svg
             className="h-4 w-4"
@@ -53,7 +53,7 @@ export function VaultMobileToolbar({
         type="button"
         onClick={onOpenChat}
         aria-label="AI로 Vault Agent에게 묻기"
-        className="flex h-10 shrink-0 items-center justify-center rounded-xl bg-surface-900 px-3 text-white shadow-sm transition active:scale-95 dark:bg-white dark:text-surface-900"
+        className="flex h-10 shrink-0 items-center justify-center rounded-xl bg-surface-900 px-3 text-white shadow-xs transition active:scale-95 dark:bg-white dark:text-surface-900"
       >
         <svg
           className="h-4 w-4"

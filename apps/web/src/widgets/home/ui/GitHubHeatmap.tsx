@@ -148,7 +148,7 @@ export function GitHubHeatmap({ username, enabled = true }: Props) {
         <div className="flex items-center gap-1.5 sm:ml-auto">
           <span className="text-[10px] text-surface-400">Less</span>
           {COLORS.map((c, i) => (
-            <div key={i} className="w-[10px] h-[10px] rounded-sm" style={{ backgroundColor: c }} />
+            <div key={i} className="w-[10px] h-[10px] rounded-xs" style={{ backgroundColor: c }} />
           ))}
           <span className="text-[10px] text-surface-400">More</span>
         </div>

@@ -51,7 +51,7 @@ export function AdminPageHeader({ title, eyebrow, description, actions }: AdminP
 }
 
 const ACTION_BASE =
-  'inline-flex items-center justify-center rounded-[10px] px-5 py-2.5 text-sm font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-surface-900/50 focus:ring-offset-2';
+  'inline-flex items-center justify-center rounded-[10px] px-5 py-2.5 text-sm font-bold transition-colors focus:outline-hidden focus:ring-2 focus:ring-surface-900/50 focus:ring-offset-2';
 
 const ACTION_VARIANT = {
   primary: 'bg-surface-900 text-white hover:bg-surface-800',

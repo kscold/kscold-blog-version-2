@@ -33,7 +33,7 @@ export function FeedbackResults() {
           </div>
           <p className="mt-3 text-sm text-surface-700">진행 속도: {PACE_OPTIONS.find(option => option.key === item.pace)?.title}</p>
           <p className="mt-2 text-sm text-surface-600">도움이 된 내용: {item.helpful.map(key => HELPFUL_TOPICS.find(topic => topic.key === key)?.title).join(' · ') || '선택 안 함'}</p>
-          <p className="mt-4 whitespace-pre-wrap break-words leading-7 text-surface-900">{item.comment || '자유 의견 없음'}</p>
+          <p className="mt-4 whitespace-pre-wrap wrap-break-word leading-7 text-surface-900">{item.comment || '자유 의견 없음'}</p>
         </article>
       ))}
     </section>

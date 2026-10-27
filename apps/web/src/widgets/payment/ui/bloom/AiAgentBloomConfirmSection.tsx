@@ -27,7 +27,7 @@ export function AiAgentBloomConfirmSection({
   return (
     <section
       id="before-payment-window"
-      className="scroll-mt-28 rounded-[2rem] border border-surface-200 bg-white p-6 shadow-sm sm:p-8 lg:p-10"
+      className="scroll-mt-28 rounded-4xl border border-surface-200 bg-white p-6 shadow-xs sm:p-8 lg:p-10"
     >
       <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="space-y-4">
@@ -52,7 +52,7 @@ export function AiAgentBloomConfirmSection({
         </div>
 
         <div className="rounded-[1.75rem] border border-surface-200 bg-surface-950 p-5 text-white">
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.06] p-5">
+          <div className="rounded-3xl border border-white/10 bg-white/6 p-5">
             <div className="flex items-center justify-between gap-3">
               <span className="rounded-full bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.3em] text-cyan-100">
                 Confirm

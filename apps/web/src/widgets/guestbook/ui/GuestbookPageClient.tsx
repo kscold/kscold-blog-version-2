@@ -78,7 +78,7 @@ export function GuestbookPageClient() {
             totalEntries={data?.totalElements ?? 0}
           />
 
-          <section className="rounded-[2rem] border border-surface-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-4xl border border-surface-200 bg-white p-5 shadow-xs sm:p-6">
             <GuestbookComposerCard
               content={content}
               currentUser={currentUser}

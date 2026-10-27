@@ -75,7 +75,7 @@ export function ImageCarousel({ images, label, sizes }: ImageCarouselProps) {
           type="button"
           aria-label="이전 이미지 보기"
           onClick={goPrev}
-          className="absolute left-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 shadow-sm backdrop-blur-sm transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 sm:left-3"
+          className="absolute left-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 shadow-xs backdrop-blur-sm transition-colors hover:bg-white focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 sm:left-3"
         >
           <svg
             className="w-4 h-4 text-surface-900"
@@ -99,7 +99,7 @@ export function ImageCarousel({ images, label, sizes }: ImageCarouselProps) {
           type="button"
           aria-label="다음 이미지 보기"
           onClick={goNext}
-          className="absolute right-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 shadow-sm backdrop-blur-sm transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 sm:right-3"
+          className="absolute right-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 shadow-xs backdrop-blur-sm transition-colors hover:bg-white focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 sm:right-3"
         >
           <svg
             className="w-4 h-4 text-surface-900"
@@ -122,7 +122,7 @@ export function ImageCarousel({ images, label, sizes }: ImageCarouselProps) {
               aria-label={`${i + 1}번 이미지 보기`}
               aria-current={i === currentIndex ? 'true' : undefined}
               onClick={() => goTo(i)}
-              className="flex h-6 w-6 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white"
+              className="flex h-6 w-6 items-center justify-center rounded-full focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white"
             >
               <span
                 aria-hidden

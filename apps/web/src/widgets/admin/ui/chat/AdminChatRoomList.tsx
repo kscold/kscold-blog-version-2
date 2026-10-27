@@ -36,7 +36,7 @@ export function AdminChatRoomList({ rooms, selectedRoomId, onSelect, hiddenOnMob
                 </p>
               </div>
               {room.unreadCount > 0 && (
-                <span className="flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-blue-500 px-1 text-xs text-white">
+                <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-blue-500 px-1 text-xs text-white">
                   {room.unreadCount}
                 </span>
               )}

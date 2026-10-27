@@ -21,7 +21,7 @@ export function GuestbookComposerCard({
   onSubmit,
 }: GuestbookComposerCardProps) {
   return (
-    <div className="rounded-[1.5rem] bg-surface-900 px-5 py-5 text-white sm:px-6">
+    <div className="rounded-3xl bg-surface-900 px-5 py-5 text-white sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/50">
         Leave A Note
       </p>
@@ -39,7 +39,7 @@ export function GuestbookComposerCard({
               placeholder="잘 보고 갑니다, 다음 글도 기대할게요, 이 부분은 조금 어색했어요 같은 짧은 메모면 충분해요."
               maxLength={500}
               rows={6}
-              className="min-h-[160px] w-full resize-y rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm leading-6 text-white placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-white/30"
+              className="min-h-[160px] w-full resize-y rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm leading-6 text-white placeholder:text-white/45 focus:outline-hidden focus:ring-2 focus:ring-white/30"
               required
             />
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

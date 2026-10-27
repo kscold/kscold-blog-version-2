@@ -26,7 +26,7 @@ export function MemberCard({ member, index, isLeader }: MemberCardProps) {
 
   return (
     <motion.div
-      className="p-6 bg-gradient-to-br from-surface-900 to-surface-800 text-white rounded-2xl shadow-lg"
+      className="p-6 bg-linear-to-br from-surface-900 to-surface-800 text-white rounded-2xl shadow-lg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: isLeader ? 0.1 : 0.15 + index * 0.08 }}

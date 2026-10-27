@@ -33,7 +33,7 @@ export function FeedCopilotDraftCard({
           메모, 링크, 문체 또는 참고 기록이 바뀌었습니다. 현재 입력으로 초안을 다시 만들어주세요.
         </p>
       ) : null}
-      <div className="mt-4 max-h-[32rem] overflow-y-auto rounded-2xl border border-surface-100 bg-surface-50 px-4 py-4 break-words whitespace-pre-wrap text-sm leading-7 text-surface-700 custom-scrollbar">
+      <div className="mt-4 max-h-128 overflow-y-auto rounded-2xl border border-surface-100 bg-surface-50 px-4 py-4 wrap-break-word whitespace-pre-wrap text-sm leading-7 text-surface-700 custom-scrollbar">
         {draft.content}
       </div>
       {draft.tags.length ? (

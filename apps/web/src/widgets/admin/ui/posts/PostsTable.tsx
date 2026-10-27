@@ -65,7 +65,7 @@ export function PostsTable({ posts, totalPages, page, onPageChange, onDelete }: 
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 text-xs text-surface-400 [overflow-wrap:anywhere]">
+                    <p className="mt-1 text-xs text-surface-400 wrap-anywhere">
                       {getPostViewHref(post)}
                     </p>
                   </td>

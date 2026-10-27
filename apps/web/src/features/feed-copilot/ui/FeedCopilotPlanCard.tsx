@@ -42,7 +42,7 @@ export function FeedCopilotPlanCard({
               key={`${point}-${index}`}
               className="flex gap-3 rounded-2xl bg-surface-50 px-3 py-3 text-sm leading-6 text-surface-600"
             >
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-surface-700 shadow-sm">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-surface-700 shadow-xs">
                 {index + 1}
               </span>
               {point}

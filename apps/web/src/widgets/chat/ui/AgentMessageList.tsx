@@ -74,7 +74,7 @@ export function AgentMessageList({
         return (
           <div
             key={message.id}
-            className={`min-w-0 rounded-2xl p-3 text-sm leading-7 shadow-sm sm:p-4 ${
+            className={`min-w-0 rounded-2xl p-3 text-sm leading-7 shadow-xs sm:p-4 ${
               message.role === 'user'
                 ? 'ml-8 bg-surface-900 text-white'
                 : 'mr-0 border border-surface-200 bg-white text-surface-700 sm:mr-4'
@@ -112,7 +112,7 @@ export function AgentMessageList({
                 )}
               </>
             ) : (
-              <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+              <p className="whitespace-pre-wrap wrap-break-word wrap-anywhere">
                 {message.content}
               </p>
             )}
@@ -155,7 +155,7 @@ export function AgentMessageList({
                       className="group block min-w-0 rounded-xl border border-surface-200 bg-surface-50 px-3 py-2.5 text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:bg-white hover:text-surface-900"
                     >
                       <span className="flex min-w-0 items-center justify-between gap-2">
-                        <span className="min-w-0 truncate [overflow-wrap:anywhere]">
+                        <span className="min-w-0 truncate wrap-anywhere">
                           <span className="mr-2 font-mono text-[9px] uppercase tracking-[0.14em] text-surface-400">
                             {index + 1} · {source.type || 'vault'}
                           </span>
@@ -166,7 +166,7 @@ export function AgentMessageList({
                         </span>
                       </span>
                       {source.excerpt && (
-                        <span className="mt-1.5 block line-clamp-2 break-words text-[11px] font-normal leading-5 text-surface-500 [overflow-wrap:anywhere]">
+                        <span className="mt-1.5 block line-clamp-2 wrap-break-word text-[11px] font-normal leading-5 text-surface-500 wrap-anywhere">
                           {source.excerpt}
                         </span>
                       )}

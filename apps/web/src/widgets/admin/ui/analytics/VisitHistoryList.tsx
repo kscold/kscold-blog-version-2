@@ -44,11 +44,11 @@ export function VisitHistoryList({ history, isLoading, loggedInOnly, onToggle }:
           </button>
         </div>
       </div>
-      <div className="divide-y divide-surface-50 max-h-[28rem] overflow-y-auto">
+      <div className="divide-y divide-surface-50 max-h-112 overflow-y-auto">
         {isLoading ? (
           <div className="p-8 animate-pulse">
-            <div className="h-4 bg-surface-100 rounded mb-2" />
-            <div className="h-4 bg-surface-100 rounded w-3/4" />
+            <div className="h-4 bg-surface-100 rounded-sm mb-2" />
+            <div className="h-4 bg-surface-100 rounded-sm w-3/4" />
           </div>
         ) : history.length === 0 ? (
           <p className="text-center py-8 text-sm text-surface-400">

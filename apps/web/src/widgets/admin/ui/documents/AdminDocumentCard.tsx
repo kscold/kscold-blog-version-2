@@ -37,14 +37,14 @@ export function AdminDocumentCard({
           {formatDocumentSize(document.size)}
         </span>
       </div>
-      <h3 className="break-words text-base font-bold leading-6 text-surface-900 [overflow-wrap:anywhere]">
+      <h3 className="wrap-break-word text-base font-bold leading-6 text-surface-900 wrap-anywhere">
         {document.title}
       </h3>
       {document.title !== document.fileName && (
         <p className="mt-1 break-all text-xs leading-5 text-surface-500">{document.fileName}</p>
       )}
       {document.description && (
-        <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-surface-600 [overflow-wrap:anywhere]">
+        <p className="mt-3 whitespace-pre-wrap wrap-break-word text-sm leading-6 text-surface-600 wrap-anywhere">
           {document.description}
         </p>
       )}
@@ -64,7 +64,7 @@ export function AdminDocumentCard({
         {isPdfDocument(document) && (
           <a
             href={`/admin/documents/${encodeURIComponent(document.id)}/view`}
-            className="rounded-lg bg-surface-900 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-surface-700 focus:outline-none focus:ring-2 focus:ring-surface-900 focus:ring-offset-2"
+            className="rounded-lg bg-surface-900 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-surface-700 focus:outline-hidden focus:ring-2 focus:ring-surface-900 focus:ring-offset-2"
             data-testid={`admin-document-preview-${document.id}`}
           >
             바로 보기
@@ -73,7 +73,7 @@ export function AdminDocumentCard({
         <a
           href={`/api/admin/documents/${encodeURIComponent(document.id)}/download`}
           download={document.fileName}
-          className="rounded-lg border border-surface-200 px-3 py-2 text-xs font-semibold text-surface-900 transition-colors hover:bg-surface-50 focus:outline-none focus:ring-2 focus:ring-surface-900"
+          className="rounded-lg border border-surface-200 px-3 py-2 text-xs font-semibold text-surface-900 transition-colors hover:bg-surface-50 focus:outline-hidden focus:ring-2 focus:ring-surface-900"
           data-testid={`admin-document-download-${document.id}`}
         >
           다운로드

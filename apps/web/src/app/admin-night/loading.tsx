@@ -4,7 +4,7 @@ export default function AdminNightLoading() {
   return (
     <main className="min-h-screen px-4 pb-20 pt-28 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-8">
-        <div className="rounded-[32px] border border-surface-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="rounded-[32px] border border-surface-200 bg-white p-6 shadow-xs sm:p-8">
           <div className="space-y-4">
             <Skeleton className="h-4 w-32 rounded-full" />
             <Skeleton className="h-14 w-full max-w-3xl rounded-3xl" />

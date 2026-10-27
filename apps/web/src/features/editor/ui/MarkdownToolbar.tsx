@@ -120,7 +120,7 @@ export function MarkdownToolbar({ editorRef }: MarkdownToolbarProps) {
   };
 
   const buttonClass =
-    'px-2 py-1 text-xs font-mono rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors border border-transparent hover:border-gray-300 dark:hover:border-gray-500';
+    'px-2 py-1 text-xs font-mono rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors border border-transparent hover:border-gray-300 dark:hover:border-gray-500';
 
   const separatorClass = 'w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1';
 

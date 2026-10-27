@@ -32,7 +32,7 @@ export function TagManagementMobileList({
                     if (event.key === 'Escape') actions.setEditingId(null);
                   }}
                   autoFocus
-                  className="w-full rounded border border-surface-400 bg-white px-2 py-1 text-sm text-surface-900 focus:outline-none focus:ring-2 focus:ring-surface-900/40"
+                  className="w-full rounded-sm border border-surface-400 bg-white px-2 py-1 text-sm text-surface-900 focus:outline-hidden focus:ring-2 focus:ring-surface-900/40"
                 />
               ) : (
                 <span className="inline-flex items-center rounded-full bg-surface-900 px-2.5 py-0.5 text-xs font-medium text-surface-900">

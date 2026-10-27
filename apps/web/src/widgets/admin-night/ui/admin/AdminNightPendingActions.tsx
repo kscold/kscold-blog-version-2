@@ -34,7 +34,7 @@ export function AdminNightPendingActions({
         value={slotValue}
         onChange={event => onSlotChange(request.id, event.target.value)}
         disabled={isPending || slotOptions.length === 0}
-        className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 outline-none transition-colors focus:border-surface-900"
+        className="w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm text-surface-900 outline-hidden transition-colors focus:border-surface-900"
       >
         <option value="" disabled>
           merge 할 일정을 선택해 주세요
@@ -53,7 +53,7 @@ export function AdminNightPendingActions({
           value={reviewNote}
           onChange={event => onReviewNoteChange(request.id, event.target.value)}
           placeholder="실명 확인이 필요하거나, 함께 보고 싶은 배경이 더 필요하면 여기 적어 주세요."
-          className="min-h-28 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 text-surface-900 outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900"
+          className="min-h-28 w-full rounded-2xl border border-surface-200 bg-surface-50 px-4 py-3 text-sm leading-7 text-surface-900 outline-hidden transition-colors placeholder:text-surface-300 focus:border-surface-900"
         />
       </div>
 

@@ -91,9 +91,9 @@ export function ImageUpload({ onUploadSuccess, currentImage, testId }: ImageUplo
           className="relative overflow-hidden rounded-[28px] border border-surface-200 bg-surface-900/5"
           data-testid={testId}
         >
-          <div className="relative aspect-[16/8] sm:aspect-[16/7]">
+          <div className="relative aspect-16/8 sm:aspect-16/7">
           <Image src={preview} alt="Preview" fill sizes="100vw" className="object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-surface-950/75 via-surface-950/10 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-surface-950/75 via-surface-950/10 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-white">
                 <p className="text-sm font-semibold">커버 이미지</p>
@@ -144,14 +144,14 @@ export function ImageUpload({ onUploadSuccess, currentImage, testId }: ImageUplo
           {isUploading ? (
             <button
               type="button"
-              className="inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-semibold text-surface-900 shadow-sm"
+              className="inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-semibold text-surface-900 shadow-xs"
             >
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-surface-300 border-t-surface-900" />
               업로드 중...
             </button>
           ) : (
             <div className="space-y-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-xs">
                 <svg
                   className="w-6 h-6 text-surface-600"
                   fill="none"

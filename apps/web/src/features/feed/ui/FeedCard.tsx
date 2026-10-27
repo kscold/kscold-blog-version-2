@@ -76,7 +76,7 @@ export function FeedCard({
           onClick={() => void reaction.submit(!isLiked)}
           disabled={reaction.isPending}
           aria-busy={reaction.isPending}
-          className="relative z-20 inline-flex min-h-11 items-center gap-2 rounded-xl px-3 font-bold text-surface-700 hover:bg-surface-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-surface-900 disabled:opacity-50"
+          className="relative z-20 inline-flex min-h-11 items-center gap-2 rounded-xl px-3 font-bold text-surface-700 hover:bg-surface-100 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-surface-900 disabled:opacity-50"
         >
           <motion.svg
             className={`w-6 h-6 transition-colors ${isLiked ? 'text-red-500 fill-red-500' : 'text-surface-700'}`}
@@ -165,7 +165,7 @@ export function FeedCard({
           href={`/feed/${feed.id}`}
           prefetch={false}
           aria-label={`${feedTitle} 피드 보기`}
-          className="absolute inset-0 z-10 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-surface-900"
+          className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-surface-900"
         />
       )}
 

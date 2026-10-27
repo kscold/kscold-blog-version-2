@@ -63,7 +63,7 @@ export function StatsSection() {
       className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-surface-50/60"
     >
       <div className="max-w-5xl mx-auto">
-      <div className="rounded-[32px] border border-surface-200 bg-white px-5 sm:px-12 py-10 sm:py-16 space-y-10 sm:space-y-12 shadow-sm">
+      <div className="rounded-[32px] border border-surface-200 bg-white px-5 sm:px-12 py-10 sm:py-16 space-y-10 sm:space-y-12 shadow-xs">
         <motion.div
           className="text-center"
           initial={allowRichEffects ? { opacity: 0, y: 16 } : false}
@@ -90,7 +90,7 @@ export function StatsSection() {
           viewport={allowRichEffects ? { once: true } : undefined}
           transition={allowRichEffects ? { duration: 0.6, delay: 0.4 } : undefined}
         >
-          <Link href="/vault" className={`inline-flex items-center gap-2 px-8 py-3 bg-surface-900 hover:bg-surface-800 text-white rounded-xl transition-colors font-bold text-sm ${isTouchDevice ? 'shadow-sm' : 'shadow-lg'}`}>
+          <Link href="/vault" className={`inline-flex items-center gap-2 px-8 py-3 bg-surface-900 hover:bg-surface-800 text-white rounded-xl transition-colors font-bold text-sm ${isTouchDevice ? 'shadow-xs' : 'shadow-lg'}`}>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>

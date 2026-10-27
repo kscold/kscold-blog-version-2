@@ -19,7 +19,7 @@ export function AdminChatComposer({ value, disabled, onChange, onSend }: Props) 
         onChange={e => onChange(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), onSend())}
         placeholder="메시지 입력..."
-        className="flex-1 rounded-lg border border-surface-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-surface-300"
+        className="flex-1 rounded-lg border border-surface-200 px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-surface-300"
       />
       <button
         onClick={onSend}

@@ -11,7 +11,7 @@ export function AdminNightProcessSection() {
         </p>
       </div>
 
-      <div className="mt-6 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
+      <div className="mt-6 grid gap-4 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
         {ADMIN_NIGHT_STEPS.map((step, index) => (
           <article key={step.id} className="rounded-[24px] border border-surface-200 bg-surface-50 p-5 sm:p-6">
             <div className="flex items-center gap-3">

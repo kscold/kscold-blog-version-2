@@ -30,7 +30,7 @@ export function ImagePreviewGrid({ images, onRemove, testId }: ImagePreviewGridP
           <div
             key={i}
             className={`relative overflow-hidden rounded-[24px] border border-surface-200 bg-surface-100 ${
-              i === 0 && images.length > 2 ? 'aspect-[16/11] sm:col-span-2' : 'aspect-square'
+              i === 0 && images.length > 2 ? 'aspect-16/11 sm:col-span-2' : 'aspect-square'
             }`}
           >
             <Image

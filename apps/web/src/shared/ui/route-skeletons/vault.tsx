@@ -56,7 +56,7 @@ export function VaultNotePageSkeleton() {
               <Skeleton className="h-14 w-3/4" />
               <Skeleton className="h-4 w-32" />
               <SkeletonTextGroup className="pt-4" widths={['w-full', 'w-full', 'w-5/6', 'w-4/6']} />
-              <Skeleton className="h-44 w-full rounded-[2rem]" />
+              <Skeleton className="h-44 w-full rounded-4xl" />
               <SkeletonTextGroup widths={['w-full', 'w-full', 'w-11/12']} />
               <div className="pt-6">
                 <Skeleton className="h-5 w-24" />
@@ -76,7 +76,7 @@ export function VaultNotePageSkeleton() {
 export function GraphPanelSkeleton() {
   return (
     <div className="relative h-full w-full overflow-hidden rounded-xl border border-surface-200 bg-surface-50">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.18),_transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.18),transparent_55%)]" />
       <div className="flex h-full items-center justify-center">
         <div className="grid grid-cols-3 gap-5 opacity-90">
           {Array.from({ length: 6 }).map((_, index) => (

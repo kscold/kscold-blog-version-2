@@ -28,7 +28,7 @@ export function DocumentCategorySelect({
         value={value}
         onChange={event => onChange(event.target.value as AdminDocumentCategory | '')}
         disabled={disabled}
-        className="w-full rounded-lg border border-surface-200 bg-white px-4 py-3 text-sm text-surface-900 focus:outline-none focus:ring-1 focus:ring-surface-900 disabled:opacity-50"
+        className="w-full rounded-lg border border-surface-200 bg-white px-4 py-3 text-sm text-surface-900 focus:outline-hidden focus:ring-1 focus:ring-surface-900 disabled:opacity-50"
       >
         {allowAll && <option value="">전체 문서</option>}
         {DOCUMENT_CATEGORIES.map(category => (

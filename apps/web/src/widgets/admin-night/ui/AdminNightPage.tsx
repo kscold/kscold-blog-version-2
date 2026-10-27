@@ -96,7 +96,7 @@ function UpcomingOfflineSessionCard() {
             </p>
           </div>
         </div>
-        <div className="flex flex-col justify-center gap-3 border-t border-white/10 bg-white/[0.04] p-6 sm:p-8 lg:border-l lg:border-t-0">
+        <div className="flex flex-col justify-center gap-3 border-t border-white/10 bg-white/4 p-6 sm:p-8 lg:border-l lg:border-t-0">
           <div className="flex flex-wrap gap-2">
             {['오프라인 고정', '바이브코딩 활용', '예상 2만~3만 원'].map(label => (
               <span key={label} className="rounded-full border border-white/10 bg-white/10 px-3 py-2 text-xs font-black text-white/75">

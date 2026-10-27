@@ -22,7 +22,7 @@ export function VaultNotePagination({
         <button
           onClick={() => onPageChange(Math.max(0, page - 1))}
           disabled={page === 0}
-          className="rounded bg-surface-200 px-3 py-1.5 text-sm text-surface-700 transition-colors hover:bg-surface-300 disabled:opacity-30"
+          className="rounded-sm bg-surface-200 px-3 py-1.5 text-sm text-surface-700 transition-colors hover:bg-surface-300 disabled:opacity-30"
         >
           이전
         </button>
@@ -32,7 +32,7 @@ export function VaultNotePagination({
         <button
           onClick={() => onPageChange(Math.min(totalPages - 1, page + 1))}
           disabled={page >= totalPages - 1}
-          className="rounded bg-surface-200 px-3 py-1.5 text-sm text-surface-700 transition-colors hover:bg-surface-300 disabled:opacity-30"
+          className="rounded-sm bg-surface-200 px-3 py-1.5 text-sm text-surface-700 transition-colors hover:bg-surface-300 disabled:opacity-30"
         >
           다음
         </button>

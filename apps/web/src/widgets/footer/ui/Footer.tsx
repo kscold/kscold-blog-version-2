@@ -36,7 +36,7 @@ export function Footer() {
                 height={28}
                 className="group-hover:scale-110 transition-transform duration-500 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 will-change-transform"
               />
-              <span className="text-2xl font-sans font-black tracking-[-0.05em] text-surface-900 group-hover:text-surface-600 transition-colors">
+              <span className="text-2xl font-sans font-black tracking-tighter text-surface-900 group-hover:text-surface-600 transition-colors">
                 KSCOLD
               </span>
             </Link>

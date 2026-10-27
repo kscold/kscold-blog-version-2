@@ -30,7 +30,7 @@ export function AdminNightBloomDetailPage() {
                 <p className="text-[11px] font-black uppercase tracking-[0.28em] text-cyan-600">
                   AI Agent Bloom
                 </p>
-                <h1 className="max-w-4xl text-[2.35rem] font-black leading-[1.08] tracking-tight text-surface-950 [word-break:keep-all] sm:text-6xl sm:leading-[1.05]">
+                <h1 className="max-w-4xl text-[2.35rem] font-black leading-[1.08] tracking-tight text-surface-950 break-keep sm:text-6xl sm:leading-[1.05]">
                   <span className="inline-block">AI Agent,</span>{' '}
                   <span className="inline-block">같이 만들고</span>{' '}
                   <span className="inline-block">피워보는 Bloom</span>
@@ -89,7 +89,7 @@ export function AdminNightBloomDetailPage() {
                     className={`rounded-[22px] border p-4 ${
                       phase.state === 'active'
                         ? 'border-cyan-300/60 bg-cyan-300/10'
-                        : 'border-white/10 bg-white/[0.04]'
+                        : 'border-white/10 bg-white/4'
                     }`}
                   >
                     <p className="text-[11px] font-black uppercase tracking-[0.22em] text-white/45">

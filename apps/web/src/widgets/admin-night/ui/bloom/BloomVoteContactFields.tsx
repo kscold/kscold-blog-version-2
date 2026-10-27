@@ -48,7 +48,7 @@ export function BloomVoteContactFields({
           onChange={event => updateForm('requesterName', event.target.value)}
           placeholder="실제 진행 안내에 사용할 본명"
           aria-invalid={Boolean(formErrors.requesterName)}
-          className={`w-full rounded-2xl border bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900 ${
+          className={`w-full rounded-2xl border bg-surface-50 px-4 py-3 text-sm outline-hidden transition-colors placeholder:text-surface-300 focus:border-surface-900 ${
             formErrors.requesterName ? 'border-rose-300' : 'border-surface-200'
           }`}
         />
@@ -70,7 +70,7 @@ export function BloomVoteContactFields({
             placeholder="schedule@example.com"
             autoComplete="email"
             aria-invalid={Boolean(formErrors.contactEmail)}
-            className={`w-full rounded-2xl border bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900 ${
+            className={`w-full rounded-2xl border bg-surface-50 px-4 py-3 text-sm outline-hidden transition-colors placeholder:text-surface-300 focus:border-surface-900 ${
               formErrors.contactEmail ? 'border-rose-300' : 'border-surface-200'
             }`}
           />
@@ -91,7 +91,7 @@ export function BloomVoteContactFields({
             inputMode="numeric"
             autoComplete="tel"
             aria-invalid={Boolean(formErrors.contact)}
-            className={`w-full rounded-2xl border bg-surface-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-surface-300 focus:border-surface-900 ${
+            className={`w-full rounded-2xl border bg-surface-50 px-4 py-3 text-sm outline-hidden transition-colors placeholder:text-surface-300 focus:border-surface-900 ${
               formErrors.contact ? 'border-rose-300' : 'border-surface-200'
             }`}
           />

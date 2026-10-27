@@ -9,7 +9,7 @@ export function SurfaceCard({
   className?: string;
 }) {
   return (
-    <div className={`rounded-[2rem] border border-surface-200 bg-white shadow-sm ${className}`.trim()}>
+    <div className={`rounded-4xl border border-surface-200 bg-white shadow-xs ${className}`.trim()}>
       {children}
     </div>
   );
@@ -34,7 +34,7 @@ export function SkeletonTextGroup({
 export function SkeletonArticleCard() {
   return (
     <SurfaceCard className="overflow-hidden">
-      <Skeleton className="aspect-[4/3] w-full rounded-none sm:aspect-[16/10]" />
+      <Skeleton className="aspect-4/3 w-full rounded-none sm:aspect-16/10" />
       <div className="space-y-4 px-5 py-6">
         <Skeleton className="h-4 w-24 rounded-full" />
         <Skeleton className="h-8 w-4/5" />

@@ -48,7 +48,7 @@ export function PdfPasswordForm({ request }: { request: PdfPasswordRequest }) {
           onChange={event => setPassword(event.target.value)}
           aria-label="PDF 암호"
           data-testid="pdf-viewer-password"
-          className="mt-2 h-11 w-full rounded-lg border border-surface-200 px-3 focus:outline-none focus:ring-2 focus:ring-surface-900"
+          className="mt-2 h-11 w-full rounded-lg border border-surface-200 px-3 focus:outline-hidden focus:ring-2 focus:ring-surface-900"
         />
       </label>
       <Button

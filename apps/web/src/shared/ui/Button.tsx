@@ -23,13 +23,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-surface-900/50 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+      'inline-flex items-center justify-center font-bold tracking-wide transition-all duration-300 rounded-[10px] focus:outline-hidden focus:ring-2 focus:ring-surface-900/50 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variantStyles = {
       primary:
         'bg-surface-900 text-white hover:bg-surface-800 shadow-[0_4px_12px_rgba(15,23,42,0.2)] hover:shadow-[0_8px_20px_rgba(15,23,42,0.3)] hover:-translate-y-1',
       secondary:
-        'bg-surface-100 text-surface-900 hover:bg-surface-200 shadow-sm hover:shadow-md hover:-translate-y-1',
+        'bg-surface-100 text-surface-900 hover:bg-surface-200 shadow-xs hover:shadow-md hover:-translate-y-1',
       ghost:
         'border border-surface-200 hover:bg-surface-50 text-surface-600 hover:text-surface-900',
       minimal: 'hover:bg-surface-50 text-surface-600 hover:text-surface-900',

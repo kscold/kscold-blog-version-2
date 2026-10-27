@@ -59,7 +59,7 @@ export function Sidebar() {
   const asideBaseClass = `fixed top-[88px] left-4 bottom-4 w-56 z-40 overflow-y-auto ${
     useSolidSurface
       ? 'bg-white border border-surface-200 rounded-2xl shadow-md'
-      : 'bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-sm'
+      : 'bg-white/60 backdrop-blur-xl border border-surface-200/50 rounded-2xl shadow-xs'
   }`;
 
   const innerContent = (

@@ -33,7 +33,7 @@ export function LectureFeedbackForm() {
       </fieldset>
       <p className="px-1 pt-2 text-xs leading-6 text-surface-500">응답은 강의 개선을 위해 저장되며 강사만 확인합니다. 이름·연락처·로그인 정보는 응답에 저장하지 않습니다.</p>
       {error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm leading-6 text-red-700">{error}</p>}
-      <button type="submit" disabled={pending} className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-primary-700 px-6 text-base font-bold text-white transition-colors hover:bg-primary-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-700 disabled:cursor-wait disabled:opacity-60">
+      <button type="submit" disabled={pending} className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-primary-700 px-6 text-base font-bold text-white transition-colors hover:bg-primary-800 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-700 disabled:cursor-wait disabled:opacity-60">
         {pending ? '의견을 보내는 중…' : '의견 보내기'}
       </button>
       <p className="text-center text-xs text-surface-500">저장이 완료되면 확인 화면이 나타납니다.</p>

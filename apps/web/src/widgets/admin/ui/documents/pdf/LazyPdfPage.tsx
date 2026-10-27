@@ -45,7 +45,7 @@ export function LazyPdfPage(props: LazyPageProps) {
       ref={pageRef}
       data-testid={`pdf-page-${pageNumber}`}
       data-pdf-page={pageNumber}
-      className="relative shrink-0 overflow-hidden bg-white shadow-sm"
+      className="relative shrink-0 overflow-hidden bg-white shadow-xs"
       style={{ width, minHeight: state.height }}
       aria-label={`${pageNumber}페이지`}
     >

@@ -49,7 +49,7 @@ export function ClientLayout({ children, footer, initialViewer }: ClientLayoutPr
   return (
     <ViewerProvider initialViewer={initialViewer}>
       <div
-        className={`flex flex-col relative z-0 ${isVaultPage ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'}`}
+        className={`flex flex-col relative z-0 ${isVaultPage ? 'h-dvh overflow-hidden' : 'min-h-screen'}`}
       >
         <PageVisitTracker />
         <ScrollProgress />

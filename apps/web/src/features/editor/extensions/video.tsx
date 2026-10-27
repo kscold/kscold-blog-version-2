@@ -21,7 +21,7 @@ function VideoView({ node, deleteNode }: NodeViewProps) {
           src={src}
           controls
           preload="metadata"
-          className="w-full rounded-2xl border border-surface-200 shadow-sm"
+          className="w-full rounded-2xl border border-surface-200 shadow-xs"
         />
         <button
           type="button"

@@ -3,7 +3,7 @@ import { ADMIN_NIGHT_HERO_PARAGRAPHS, ADMIN_NIGHT_HERO_TITLE, ADMIN_NIGHT_KEYWOR
 
 export function AdminNightHeroSection() {
   return (
-    <section className="rounded-[32px] border border-surface-200 bg-white px-6 py-8 shadow-sm sm:px-8 sm:py-10">
+    <section className="rounded-[32px] border border-surface-200 bg-white px-6 py-8 shadow-xs sm:px-8 sm:py-10">
       <div className="max-w-4xl space-y-5">
         <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-surface-400">Admin Night</p>
         <h1 className="text-4xl font-black tracking-tight text-surface-900 sm:text-5xl">{ADMIN_NIGHT_HERO_TITLE}</h1>

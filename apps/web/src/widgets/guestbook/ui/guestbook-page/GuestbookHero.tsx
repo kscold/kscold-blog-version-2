@@ -5,7 +5,7 @@ interface GuestbookHeroProps {
 
 export function GuestbookHero({ isAuthenticated, totalEntries }: GuestbookHeroProps) {
   return (
-    <section className="rounded-[2rem] border border-surface-200 bg-white px-6 py-7 shadow-sm sm:px-8">
+    <section className="rounded-4xl border border-surface-200 bg-white px-6 py-7 shadow-xs sm:px-8">
       <p className="text-xs font-bold uppercase tracking-[0.26em] text-surface-400">
         Guestbook
       </p>

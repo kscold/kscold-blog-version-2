@@ -29,7 +29,7 @@ export function ImagePreviewScroll({ images, onRemove, testId }: ImagePreviewScr
         {images.map((url, i) => (
           <div
             key={i}
-            className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-[22px] border border-surface-200 bg-surface-100 sm:h-32 sm:w-32"
+            className="relative h-28 w-28 shrink-0 overflow-hidden rounded-[22px] border border-surface-200 bg-surface-100 sm:h-32 sm:w-32"
           >
             <Image src={url} alt="" fill sizes="128px" className="object-cover" />
             <button

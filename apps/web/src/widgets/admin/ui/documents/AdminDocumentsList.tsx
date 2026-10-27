@@ -41,7 +41,7 @@ export function AdminDocumentsList(props: AdminDocumentsListProps) {
           role="alert"
           className="space-y-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
-          <p className="break-words">{error}</p>
+          <p className="wrap-break-word">{error}</p>
           <Button
             type="button"
             variant="ghost"

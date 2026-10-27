@@ -94,7 +94,7 @@ export function AgentSuggestions({
                   transition={{ delay: index * 0.04, duration: 0.18 }}
                   className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-surface-200 bg-surface-50 px-3 py-2 text-left text-xs font-bold text-surface-600 transition hover:border-surface-900 hover:bg-white hover:text-surface-900 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <span className="break-words [overflow-wrap:anywhere]">{prompt}</span>
+                  <span className="wrap-break-word wrap-anywhere">{prompt}</span>
                   {isFollowUp && (
                     <svg
                       className="h-3 w-3 shrink-0 text-surface-300 transition-all group-hover:translate-x-0.5 group-hover:text-surface-900"

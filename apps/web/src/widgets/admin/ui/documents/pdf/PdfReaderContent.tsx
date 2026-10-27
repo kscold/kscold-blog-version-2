@@ -19,7 +19,7 @@ export function PdfReaderContent({ state, onRetry }: PdfReaderContentProps) {
       data-testid="pdf-viewer-scroll"
       data-scale={state.scale}
       data-rotation={state.rotation}
-      className="relative min-h-0 min-w-0 flex-1 overflow-auto overscroll-contain focus:outline-none"
+      className="relative min-h-0 min-w-0 flex-1 overflow-auto overscroll-contain focus:outline-hidden"
       style={{ touchAction: 'pan-x pan-y' }}
     >
       {document.passwordRequest && (

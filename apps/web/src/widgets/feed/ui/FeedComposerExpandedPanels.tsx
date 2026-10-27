@@ -96,7 +96,7 @@ export function FeedComposerExpandedPanels({
               aria-describedby={
                 linkError ? 'feed-composer-link-error' : 'feed-composer-link-count'
               }
-              className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 focus:outline-none focus:ring-1 focus:ring-surface-900"
+              className="w-full rounded-2xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-700 placeholder:text-surface-400 focus:outline-hidden focus:ring-1 focus:ring-surface-900"
             />
             <div className="mt-2 flex items-start justify-between gap-3 text-xs">
               {linkError ? (

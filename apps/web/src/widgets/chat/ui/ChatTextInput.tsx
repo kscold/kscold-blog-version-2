@@ -35,7 +35,7 @@ export function ChatTextInput({ label, placeholder, value, maxLength, onChange, 
           event.preventDefault();
           if (canSubmit) event.currentTarget.form?.requestSubmit();
         }}
-        className="block min-h-12 w-full resize-none rounded-xl border border-surface-200 bg-surface-50 px-3 py-3 text-base leading-6 text-surface-900 placeholder:text-surface-400 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 sm:text-sm"
+        className="block min-h-12 w-full resize-none rounded-xl border border-surface-200 bg-surface-50 px-3 py-3 text-base leading-6 text-surface-900 placeholder:text-surface-400 focus:border-primary-600 focus:outline-hidden focus:ring-1 focus:ring-primary-600 sm:text-sm"
       />
       <p id={helpId} className="mt-1 text-[10px] leading-4 text-surface-500">
         <span className="hidden sm:inline">Enter 전송 · Shift+Enter 줄바꿈</span>

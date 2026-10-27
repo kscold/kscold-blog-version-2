@@ -49,10 +49,10 @@ export function Header() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isTouchDevice
           ? isScrolled
-            ? 'bg-white/95 shadow-sm border-b border-surface-100'
+            ? 'bg-white/95 shadow-xs border-b border-surface-100'
             : 'bg-white/92 border-b border-surface-100/80'
           : isScrolled
-            ? 'bg-white/80 backdrop-blur-xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]'
+            ? 'bg-white/80 backdrop-blur-xl shadow-gallery'
             : 'bg-white/50 backdrop-blur-lg'
       }`}
       {...headerMotionProps}
@@ -99,7 +99,7 @@ export function Header() {
                 >
                   <span className="relative z-10">{item.label}</span>
                   <div className="absolute inset-0 bg-surface-100 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-surface-900 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-surface-900 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 </Link>
               ))}
             </nav>

@@ -39,7 +39,7 @@ export function LectureSetupGuide() {
           hidden={platform !== item.key}
           // 안에 누를 것이 없으므로 탭 다음 Tab 키에서 본문으로 바로 들어오게 한다.
           tabIndex={0}
-          className="mt-6 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-surface-900 print:!block"
+          className="mt-6 rounded-lg focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-surface-900 print:block!"
         >
           <h3 className="mb-3 hidden font-bold print:block">{item.label}</h3>
           <ol className="space-y-4">
@@ -110,7 +110,7 @@ function PlatformTabs({
             aria-controls={`setup-panel-${item.key}`}
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(item.key)}
-            className={`min-h-11 min-w-[6.5rem] rounded-full px-5 text-sm font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 ${
+            className={`min-h-11 min-w-26 rounded-full px-5 text-sm font-bold transition-colors focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface-900 ${
               selected ? 'bg-surface-900 text-white' : 'text-surface-600 hover:text-surface-900'
             }`}
           >
