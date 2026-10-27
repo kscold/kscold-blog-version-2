@@ -66,11 +66,15 @@ export function useKakaoPayLiveTest() {
   const code = searchParams.get('code');
   const message = searchParams.get('message');
   const redirectKey = JSON.stringify([isAdmin, paymentId, code, message]);
-  const [previousRedirect, setPreviousRedirect] = useState('');
-  if (previousRedirect !== redirectKey) {
-    setPreviousRedirect(redirectKey);
+  const [previousRedirect, setPreviousRedirect] = useState({ key: '', paymentId: null as string | null });
+  if (previousRedirect.key !== redirectKey) {
+    setPreviousRedirect({
+      key: redirectKey,
+      paymentId: isAdmin && !code && paymentId ? paymentId : previousRedirect.paymentId,
+    });
     if (isAdmin && code) setStatus(message || '결제가 완료되지 않았습니다.');
-    else if (isAdmin && paymentId) {
+    // 같은 결제의 안내 문구 변경은 새 승인 요청이 아니므로 대기를 다시 켜지 않는다.
+    else if (isAdmin && paymentId && previousRedirect.paymentId !== paymentId) {
       setIsProcessing(true);
       setStatus('포트원에서 실결제 승인 결과를 확인하고 있습니다.');
     }
