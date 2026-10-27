@@ -82,7 +82,7 @@ services:
     restart: unless-stopped
 
   mongo:
-    image: mongo:7.0
+    image: mongo:8.0@sha256:8e7d23aa641b0ec6c86418866d5d18d74d5abf89061bc5db7bc4b80929021ef6
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}

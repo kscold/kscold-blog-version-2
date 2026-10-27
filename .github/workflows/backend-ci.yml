@@ -6,12 +6,16 @@ on:
     paths:
       - 'apps/api/**'
       - 'docker/Dockerfile.api'
+      - 'docker/docker-compose.yml'
+      - 'docker/docker-compose.prod.yml'
       - '.dockerignore'
       - '.github/workflows/backend-ci.yml'
   pull_request:
     paths:
       - 'apps/api/**'
       - 'docker/Dockerfile.api'
+      - 'docker/docker-compose.yml'
+      - 'docker/docker-compose.prod.yml'
       - '.dockerignore'
       - '.github/workflows/backend-ci.yml'
   workflow_dispatch:
@@ -29,7 +33,7 @@ jobs:
     timeout-minutes: 20
     services:
       like-test-mongo:
-        image: mongo:7@sha256:b6421fd6d1c5ded6377b397d8983e2f82e2100dc5123332dcfda2065a472be5b
+        image: mongo:8.0@sha256:8e7d23aa641b0ec6c86418866d5d18d74d5abf89061bc5db7bc4b80929021ef6
         ports:
           - 27017:27017
         options: >-
@@ -55,6 +59,19 @@ jobs:
       - name: 테스트, 포맷 및 패키징 검사
         working-directory: apps/api
         run: ./gradlew test spotlessCheck build --no-daemon
+
+      - name: 테스트 실행 및 생략 여부 검사
+        working-directory: apps/api
+        run: |
+          python3 - <<'PYTEST'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          suites = [ET.parse(path).getroot() for path in Path("build/test-results/test").glob("TEST-*.xml")]
+          totals = {key: sum(int(suite.get(key, 0)) for suite in suites)
+                    for key in ("tests", "failures", "errors", "skipped")}
+          print(totals)
+          assert totals["tests"] > 0 and not any(totals[key] for key in ("failures", "errors", "skipped")), totals
+          PYTEST
 
       - name: API 이미지 빌드
         run: docker build --file docker/Dockerfile.api --tag kscold-blog-api:ci .
