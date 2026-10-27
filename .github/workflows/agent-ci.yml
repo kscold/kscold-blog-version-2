@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: 소스 체크아웃
@@ -37,13 +37,11 @@ jobs:
           docker run --rm --env PIP_NO_CACHE_DIR=1 --entrypoint python
           kscold-vault-agent:ci -m pip check
 
-      - name: Python 취약점 검사
+      - name: Agent 런타임 및 실행 권한 검사
         run: |
-          docker run --rm --user root --entrypoint sh kscold-vault-agent:ci -c '
-            python -m venv /tmp/audit &&
-            PIP_DISABLE_PIP_VERSION_CHECK=1 /tmp/audit/bin/pip install --quiet --no-cache-dir pip-audit==2.10.1 &&
-            /tmp/audit/bin/pip-audit --path /usr/local/lib/python3.11/site-packages --progress-spinner off
-          '
+          docker run --rm --entrypoint python kscold-vault-agent:ci -c 'import sys; print(sys.version); assert sys.version_info[:3] == (3, 13, 18)'
+          test "$(docker run --rm --entrypoint id kscold-vault-agent:ci -u)" = 10001
+          test "$(docker image inspect kscold-vault-agent:ci --format '{{if .Config.Healthcheck}}yes{{end}}')" = yes
 
       - name: Python 소스 컴파일 검사
         run: >-
@@ -53,4 +51,51 @@ jobs:
       - name: Agent 단위 테스트
         run: >-
           docker run --rm --volume "$PWD/apps/agent/tests:/tests:ro" --entrypoint python
-          kscold-vault-agent:ci -m unittest discover --start-directory /tests --verbose
+          kscold-vault-agent:ci -c
+          'import unittest, sys; suite = unittest.defaultTestLoader.discover("/tests");
+          result = unittest.TextTestRunner(verbosity=2).run(suite);
+          sys.exit(not result.wasSuccessful() or bool(result.skipped) or result.testsRun == 0)'
+
+      - name: Python 취약점 검사
+        run: |
+          docker run --rm --user root --entrypoint sh kscold-vault-agent:ci -c '
+            python -m venv /tmp/audit &&
+            PIP_DISABLE_PIP_VERSION_CHECK=1 /tmp/audit/bin/pip install --quiet --no-cache-dir pip-audit==2.10.1 &&
+            /tmp/audit/bin/pip-audit --path "$(python -c "import site; print(site.getsitepackages()[0])")" --progress-spinner off
+          '
+
+      - name: Agent 이미지 전체 취약점 수집
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          version: v0.76.1
+          image-ref: kscold-vault-agent:ci
+          scanners: vuln
+          format: json
+          output: agent-security.json
+          exit-code: '0'
+          ignore-unfixed: false
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          cache: false
+
+      - name: 수정 가능한 이미지 취약점 검사
+        run: |
+          python3 - <<'PYAUDIT'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          report = json.loads(Path("agent-security.json").read_text())
+          vulnerabilities = [item for result in report.get("Results", []) for item in result.get("Vulnerabilities", [])]
+          print("전체 취약점:", dict(Counter(item["Severity"] for item in vulnerabilities)))
+          fixable = [item for item in vulnerabilities if item.get("FixedVersion")]
+          for item in fixable:
+              print(item["VulnerabilityID"], item["PkgName"], item["InstalledVersion"], "->", item["FixedVersion"])
+          assert not fixable, f"수정 가능한 취약점 {len(fixable)}건"
+          PYAUDIT
+
+      - name: 이미지 보안 검사 결과 보관
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: agent-security
+          path: agent-security.json
+          retention-days: 7
