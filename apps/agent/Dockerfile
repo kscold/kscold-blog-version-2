@@ -4,7 +4,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
-ARG PIP_VERSION=26.2.1
+ARG PIP_VERSION=26.2.2
 ARG SETUPTOOLS_VERSION=84.1.0
 
 WORKDIR /service
