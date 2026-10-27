@@ -17,7 +17,8 @@ function saveSize(size: Size | null) {
 
 function clampSize(size: Size, panel: HTMLDivElement): Size {
   const style = window.getComputedStyle(panel);
-  const maxWidth = Math.max(1, window.innerWidth - 32);
+  // 스크롤바 예약 공간을 제외한 실제 고정 위치를 기준으로 왼쪽 여백을 지킨다.
+  const maxWidth = Math.max(1, panel.getBoundingClientRect().right - 16);
   const maxHeight = Math.max(1, Math.min(
     window.innerHeight - (parseFloat(style.bottom) || 0) - 8,
     parseFloat(style.maxHeight) || window.innerHeight

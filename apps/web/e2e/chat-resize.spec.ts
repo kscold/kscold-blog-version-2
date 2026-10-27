@@ -74,6 +74,8 @@ test('위쪽과 왼쪽 가장자리, 키보드 및 화면 경계를 지킨다', 
   await expect.poll(async () => Math.round((await bounds(dialog)).width)).toBe(360);
   await dragHandle(page, top, { x: 0, y: 600 });
   await expect.poll(async () => Math.round((await bounds(dialog)).height)).toBe(420);
+  // 스크롤바 예약 공간처럼 오른쪽 기준점이 달라도 왼쪽 여백을 유지해야 한다.
+  await dialog.evaluate(element => { element.style.right = '22px'; });
   await dragHandle(page, dialog.getByRole('button', { name: '채팅 너비와 높이 조절' }), { x: -2000, y: -2000 });
   expect((await bounds(dialog)).x).toBeGreaterThanOrEqual(15);
   expect((await bounds(dialog)).y).toBeGreaterThanOrEqual(7);
