@@ -36,6 +36,17 @@ async function mockCurrentUser(page: Page, user: SessionUser) {
       return;
     }
 
+    // 서버가 권한 없는 세션 쿠키를 지웠다면 목 API도 더 이상 로그인으로 응답하지 않는다.
+    const headers = await route.request().allHeaders();
+    if (!/(?:^|;\s*)auth-token=[^;]+/.test(headers.cookie || '')) {
+      await route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: false, data: null, message: '로그인이 필요합니다.' }),
+      });
+      return;
+    }
+
     await route.fulfill({
       status: 200,
       contentType: 'application/json',

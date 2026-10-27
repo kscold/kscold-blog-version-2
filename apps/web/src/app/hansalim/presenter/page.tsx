@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
-import { isVerifiedAdmin } from '@/shared/lib/server/adminGuard';
+import { notFound } from 'next/navigation';
+import { requireVerifiedAdmin } from '@/shared/lib/server/adminGuard';
 import { HANSALIM_LECTURE, LecturePresenter } from '@/widgets/lecture';
 import { readPresenterData } from '@/widgets/lecture/server/hansalimPresenter';
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 // 강사가 아이패드에서 지금 장·다음 장·대본을 함께 보는 화면이다. 자료 페이지 어디에도 링크하지 않는다.
 // 대본은 공개 저장소에 없고 배포 파일(private/)에만 있으므로, 백엔드에서 관리자임을 확인한 뒤에만 읽는다.
 export default async function HansalimPresenterPage() {
-  if (!(await isVerifiedAdmin())) redirect(`/login?redirect=${encodeURIComponent(PRESENTER_PATH)}`);
+  await requireVerifiedAdmin(PRESENTER_PATH);
   const data = await readPresenterData();
   if (!data) notFound();
   return (

@@ -59,6 +59,10 @@ export function middleware(request: NextRequest) {
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
   const isLoginPage = request.nextUrl.pathname === '/login';
 
+  if (isLoginPage && request.nextUrl.searchParams.get('reauth') === '1') {
+    return clearAuthCookie(NextResponse.next());
+  }
+
   if (isAdminRoute) {
     const jwtToken = token || authHeader?.replace('Bearer ', '');
 

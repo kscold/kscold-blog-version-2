@@ -23,6 +23,9 @@ test.describe('관리자 검색 유입 화면', () => {
     await setAuthCookie(page, createAdminAccessToken());
     await page.goto(PAGE_PATH);
     await expect(page).toHaveURL(/\/login\?redirect=/);
+    expect(new URL(page.url()).origin).toBe(new URL(baseURL).origin);
+    expect((await page.context().cookies()).find(cookie => cookie.name === 'auth-token')).toBeUndefined();
+    await expect(page.getByTestId('search-insights')).toHaveCount(0);
   });
 
   test('관리자는 색인 현황을 보고, 키가 없는 구글 영역은 안내만 본다', async ({ page }) => {

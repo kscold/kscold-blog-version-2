@@ -16,6 +16,7 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
     await mockPrivatePdf(page, { onRequest: () => { requests += 1; } });
     await page.goto('/admin/documents/doc-1/view');
     await expect(page).toHaveURL(/\/login/);
+    expect(new URL(page.url()).origin).toBe(new URL(process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3101').origin);
     expect(requests).toBe(0);
     await expect(page.locator('[data-testid="admin-document-viewer"] canvas')).toHaveCount(0);
   });
@@ -29,6 +30,7 @@ test.describe('비공개 PDF 뷰어 권한과 안전한 오류 처리', () => {
     await mockPrivatePdf(page, { onRequest: () => { requests += 1; } });
     await page.goto('/admin/documents/doc-1/view');
     await expect(page).toHaveURL(/\/login/);
+    expect(new URL(page.url()).origin).toBe(new URL(process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3101').origin);
     expect(requests).toBe(0);
   });
 

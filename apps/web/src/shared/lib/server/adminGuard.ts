@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { resolveInitialViewer } from '@/shared/lib/initialViewer';
 import { fetchViewerApi } from '@/shared/lib/seo/fetch';
 
@@ -21,4 +22,11 @@ export async function isVerifiedAdmin(): Promise<boolean> {
   if (!(await readAdminToken())) return false;
   const viewer = await fetchViewerApi<{ role: string }>('/auth/me');
   return viewer?.role === 'ADMIN';
+}
+
+/** 거부된 쿠키를 로그인 경계에서 지워 관리자 화면으로 되돌아가는 순환을 막는다. */
+export async function requireVerifiedAdmin(returnTo: string): Promise<void> {
+  if (!(await isVerifiedAdmin())) {
+    redirect(`/login?redirect=${encodeURIComponent(returnTo)}&reauth=1`);
+  }
 }

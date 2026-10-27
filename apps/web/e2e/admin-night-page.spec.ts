@@ -97,6 +97,8 @@ test.describe('Admin Night 공개 페이지 시나리오', () => {
     await expect.poll(() => calendarRanges).toContain('2026-08-31|2026-09-06');
 
     await page.clock.runFor(2_100);
+    // 자정 타이머 뒤 React가 예약한 렌더와 브라우저 프레임도 진행시킨다.
+    await page.clock.resume();
 
     await expect(page.locator('[data-testid="admin-night-slot-tonight"]')).toHaveAttribute(
       'data-date',

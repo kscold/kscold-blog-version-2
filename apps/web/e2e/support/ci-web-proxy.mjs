@@ -11,7 +11,16 @@ const server = createServer((request, response) => {
     method: request.method,
     headers: request.headers,
   }, upstreamResponse => {
-    response.writeHead(upstreamResponse.statusCode || 502, upstreamResponse.headers);
+    const headers = { ...upstreamResponse.headers };
+    // Nginx의 proxy_redirect처럼 Next 내부 주소가 브라우저에 노출되지 않게 한다.
+    // 포트가 바뀌면 쿠키·localStorage 출처도 달라져 권한 검사가 우연히 통과할 수 있다.
+    if (headers.location) {
+      const target = new URL(headers.location, 'http://127.0.0.1:3102');
+      if (['127.0.0.1', 'localhost'].includes(target.hostname) && target.port === '3102') {
+        headers.location = `${target.pathname}${target.search}${target.hash}`;
+      }
+    }
+    response.writeHead(upstreamResponse.statusCode || 502, headers);
     upstreamResponse.pipe(response);
     upstreamResponse.on('error', () => response.destroy());
   });
