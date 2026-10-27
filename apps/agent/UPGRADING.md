@@ -1,10 +1,13 @@
 # Agent 런타임 이전
 
-대상은 Python 3.13.18, OpenAI SDK 3.39.0, Qdrant 서버·클라이언트 1.20.0이다.
+대상은 Ubuntu 24.04, Python 3.13.18, OpenAI SDK 3.39.0, Qdrant 서버·클라이언트 1.20.0이다.
 이 문서는 배포 담당자가 적용할 절차이며, 코드 변경만으로 운영 데이터 이전이 수행되지는 않는다.
 
 Python 3.13은 보안 수정 단계이지만 통합 이미지의 지정 버전이므로 최신 보안 패치를 사용한다.
 일반 CPython 빌드를 사용하고 free-threaded 빌드는 사용하지 않는다.
+Ubuntu 24.04에서 공식 소스의 SHA-256을 검증하고 PGO를 적용해 빌드한다.
+`make altinstall`로 `/usr/local/bin/python3.13`에 설치해 Ubuntu 시스템 Python을 덮어쓰지 않는다.
+Agent의 `python` 명령은 이 실행 파일을 가리킨다. 공유 라이브러리는 `ldconfig`로 등록한다.
 설치 도구 pip·ensurepip는 Docker의 `build`/`verification` 단계에만 존재한다.
 실행 이미지에서는 설치 도구 제거 후 의존성 검사와 전체 테스트를 수행한다.
 실행 중인 이미지에 패키지를 설치하지 않고 이미지를 다시 빌드한다.
