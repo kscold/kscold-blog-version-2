@@ -117,7 +117,7 @@ kscold-blog-version-2/
 
 ## 개발 환경
 
-필요한 도구는 Node.js 26.12.1(`.nvmrc` 참고), pnpm 8, JDK 21입니다.
+필요한 도구는 Node.js 26.12.1(`.nvmrc` 참고), pnpm 12.15.0, JDK 21입니다.
 
 ```bash
 pnpm install

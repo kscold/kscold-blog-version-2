@@ -2,15 +2,13 @@
 
 # Base image
 FROM node:26.12.1-alpine AS base
-RUN npm install -g pnpm@8
+RUN npm install -g pnpm@12.15.0
 
 # Dependencies stage
 FROM base AS deps
 WORKDIR /app
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/web/package.json ./apps/web/
-# Copy packages if they have package.json (they may be empty placeholders)
-COPY packages/ ./packages/
 RUN pnpm install --frozen-lockfile --filter=@kscold-blog/web...
 
 # Builder stage
