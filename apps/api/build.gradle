@@ -61,7 +61,7 @@ dependencies {
     implementation 'org.jspecify:jspecify'
 
     // AWS S3 SDK (MinIO S3 호환)
-    implementation 'software.amazon.awssdk:s3:2.54.10'
+    implementation 'software.amazon.awssdk:s3:2.57.4'
 
     // Jsoup (HTML 파싱 / OG 메타데이터 스크래핑)
     implementation 'org.jsoup:jsoup:1.23.2'
