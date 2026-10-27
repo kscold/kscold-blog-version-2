@@ -1,4 +1,4 @@
-FROM python:3.13.18-slim@sha256:8a7c3cd378e4e6dfa5d0ea4f6ca1a11068c951e3de3146ebc484eadf4b05a2be
+FROM python:3.13.18-slim@sha256:8a7c3cd378e4e6dfa5d0ea4f6ca1a11068c951e3de3146ebc484eadf4b05a2be AS build
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
@@ -28,6 +28,19 @@ RUN python -m grpc_tools.protoc \
     --grpc_python_out=./src/agent/grpc \
     ./proto/vault_agent.proto && \
     sed -i 's/^import vault_agent_pb2/from . import vault_agent_pb2/' ./src/agent/grpc/vault_agent_pb2_grpc.py
+
+# 설치 도구는 검증 단계에만 두고 실행 이미지에는 포함하지 않습니다.
+FROM build AS verification
+
+FROM build AS runtime
+
+# pip의 vendored 의존성은 최신 pip에서도 별도 보안 패치를 기다리고 있습니다.
+# pip 제거 후에도 동일한 의존성 검사를 수행하고 임시 검사 도구까지 정리합니다.
+RUN cp -a /usr/local/lib/python3.13/site-packages/pip /tmp/pip && \
+    python -m pip uninstall -y pip && \
+    PYTHONPATH=/tmp python -m pip check && \
+    rm -rf /tmp/pip && \
+    python -c 'import ensurepip, pathlib, shutil; shutil.rmtree(pathlib.Path(ensurepip.__file__).parent)'
 
 ARG AGENT_UID=10001
 ARG AGENT_GID=10001

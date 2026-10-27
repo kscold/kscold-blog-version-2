@@ -30,16 +30,19 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Agent 이미지 빌드
-        run: docker build --file apps/agent/Dockerfile --tag kscold-vault-agent:ci .
+        run: |
+          docker build --target verification --file apps/agent/Dockerfile --tag kscold-vault-agent:verify .
+          docker build --file apps/agent/Dockerfile --tag kscold-vault-agent:ci .
 
       - name: Python 의존성 일관성 검사
         run: >-
           docker run --rm --env PIP_NO_CACHE_DIR=1 --entrypoint python
-          kscold-vault-agent:ci -m pip check
+          kscold-vault-agent:verify -m pip check
 
       - name: Agent 런타임 및 실행 권한 검사
         run: |
           docker run --rm --entrypoint python kscold-vault-agent:ci -c 'import sys; print(sys.version); assert sys.version_info[:3] == (3, 13, 18)'
+          docker run --rm --entrypoint python kscold-vault-agent:ci -c 'import importlib.util; assert importlib.util.find_spec("pip") is None; assert importlib.util.find_spec("ensurepip") is None'
           test "$(docker run --rm --entrypoint id kscold-vault-agent:ci -u)" = 10001
           test "$(docker image inspect kscold-vault-agent:ci --format '{{if .Config.Healthcheck}}yes{{end}}')" = yes
 
@@ -58,7 +61,7 @@ jobs:
 
       - name: Python 취약점 검사
         run: |
-          docker run --rm --user root --entrypoint sh kscold-vault-agent:ci -c '
+          docker run --rm --user root --entrypoint sh kscold-vault-agent:verify -c '
             python -m venv /tmp/audit &&
             PIP_DISABLE_PIP_VERSION_CHECK=1 /tmp/audit/bin/pip install --quiet --no-cache-dir pip-audit==2.10.1 &&
             /tmp/audit/bin/pip-audit --path "$(python -c "import site; print(site.getsitepackages()[0])")" --progress-spinner off
