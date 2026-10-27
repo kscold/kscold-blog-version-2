@@ -10,6 +10,7 @@
 !/scripts/
 /scripts/*
 !/scripts/prepare-pdf-assets.cjs
+!/scripts/start-e2e-web.sh
 !/scripts/sync-hansalim-downloads.mjs
 !/scripts/sync-hansalim-presenter.mjs
 

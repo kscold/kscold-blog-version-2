@@ -65,7 +65,7 @@ if [ "$skip_build" -eq 0 ]; then
   pnpm --dir apps/web build || exit 1
 fi
 
-pnpm --dir apps/web exec next start --hostname 127.0.0.1 -p 3102 &
+bash "$SCRIPT_DIR/start-e2e-web.sh" &
 node apps/web/e2e/support/ci-web-proxy.mjs &
 wait_for http://127.0.0.1:3101/api/health || exit 1
 wait_for http://127.0.0.1:3101/ || exit 1

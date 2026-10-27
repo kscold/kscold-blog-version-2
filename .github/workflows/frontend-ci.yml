@@ -96,7 +96,10 @@ jobs:
         run: |
           node apps/web/e2e/support/build-api-stub.mjs &
           stub_pid=$!
-          pnpm --dir apps/web exec next start --hostname 127.0.0.1 -p 3102 &
+          HANSALIM_PRESENTER_DIR="$PWD/apps/web/e2e/fixtures/hansalim-presenter" \
+          SEARCH_INSIGHTS_DIR="$PWD/apps/web/e2e/fixtures/search-insights/config" \
+          SEARCH_INSIGHTS_STATE_DIR="$PWD/apps/web/e2e/fixtures/search-insights/state" \
+          bash apps/web/scripts/start-e2e-web.sh &
           web_pid=$!
           node apps/web/e2e/support/ci-web-proxy.mjs &
           proxy_pid=$!
