@@ -124,14 +124,10 @@ test('최대화하면 헤더 아래와 사이드바 오른쪽 본문 영역을 �
   if (!header || !sidebar) throw new Error('헤더나 사이드바를 찾지 못했습니다.');
   await expect.poll(async () => Math.round((await bounds(dialog)).x)).toBe(Math.round(sidebar.x + sidebar.width + 16));
   const box = await bounds(dialog);
-  // 고정 위치의 기준은 스크롤바를 뺀 화면이므로 운영체제마다 다른 스크롤바 폭을 제외하고 비교한다.
-  const viewport = await page.evaluate(() => ({
-    width: document.documentElement.clientWidth,
-    height: document.documentElement.clientHeight,
-  }));
+  // 스크롤바 예약 공간은 운영체제마다 달라서, 같은 고정 기준을 쓰는 헤더의 오른쪽 끝과 비교한다.
   expect(box.y).toBeCloseTo(header.y + header.height + 8, 0);
-  expect(box.x + box.width).toBeCloseTo(viewport.width - 16, 0);
-  expect(box.y + box.height).toBeCloseTo(viewport.height - 16, 0);
+  expect(box.x + box.width).toBeCloseTo(header.x + header.width - 16, 0);
+  expect(box.y + box.height).toBeCloseTo(900 - 16, 0);
   await expect(dialog.getByRole('button', { name: /채팅.*조절/ })).toHaveCount(0);
   await expect(dialog.getByRole('textbox')).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('chat-desktop-maximized-1440.png') });
