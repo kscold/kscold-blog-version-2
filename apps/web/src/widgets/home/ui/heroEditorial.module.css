@@ -1,3 +1,5 @@
+@reference '../../../app/globals.css';
+
 .hero {
   container-type: inline-size;
   position: relative;

@@ -1,3 +1,5 @@
+@reference '../../../app/globals.css';
+
 .artwork {
   --hero-art-progress: 0;
   transform: translate3d(0, calc(var(--hero-art-progress) * -24px), 0) rotate(calc(var(--hero-art-progress) * -2deg));

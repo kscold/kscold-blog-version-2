@@ -1,3 +1,5 @@
+@reference '../../../app/globals.css';
+
 .heroScene { --scene-progress: 0; position: relative; }
 .heroScene[data-enhanced='true'] { height: 180svh; }
 .heroScene[data-enhanced='true'] > section { position: sticky; top: 4rem; height: calc(100svh - 4rem); }
