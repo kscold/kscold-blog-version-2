@@ -111,3 +111,29 @@ test('모바일은 저장된 크기와 무관하게 전체 화면으로 열고 �
   await expect(dialog.getByRole('textbox')).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('chat-mobile-390.png') });
 });
+
+test('최대화하면 헤더 아래와 사이드바 오른쪽 본문 영역을 가득 채우고 다시 원래 크기로 돌아온다', async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const dialog = await openChat(page);
+  await dragHandle(page, dialog.getByRole('button', { name: '채팅 너비 조절', exact: true }), { x: -100, y: 0 });
+  await expect.poll(async () => Math.round((await bounds(dialog)).width)).toBe(540);
+
+  await dialog.getByRole('button', { name: '채팅 창 최대화' }).click();
+  const header = await page.locator('[data-chat-maximize-top]').boundingBox();
+  const sidebar = await page.locator('[data-chat-maximize-left]').boundingBox();
+  if (!header || !sidebar) throw new Error('헤더나 사이드바를 찾지 못했습니다.');
+  await expect.poll(async () => Math.round((await bounds(dialog)).x)).toBe(Math.round(sidebar.x + sidebar.width + 16));
+  const box = await bounds(dialog);
+  expect(box.y).toBeCloseTo(header.y + header.height + 8, 0);
+  expect(box.x + box.width).toBeCloseTo(1440 - 16, 0);
+  expect(box.y + box.height).toBeCloseTo(900 - 16, 0);
+  await expect(dialog.getByRole('button', { name: /채팅.*조절/ })).toHaveCount(0);
+  await expect(dialog.getByRole('textbox')).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('chat-desktop-maximized-1440.png') });
+
+  await page.reload();
+  await expect.poll(async () => Math.round((await bounds(page.getByRole('dialog'))).x)).toBe(Math.round(sidebar.x + sidebar.width + 16));
+  await page.getByRole('button', { name: '채팅 창 원래 크기로' }).click();
+  await expect.poll(async () => Math.round((await bounds(dialog)).width)).toBe(540);
+  await expect.poll(async () => Math.round((await bounds(dialog)).height)).toBe(720);
+});

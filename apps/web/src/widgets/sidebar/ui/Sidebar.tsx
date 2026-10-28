@@ -138,7 +138,7 @@ export function Sidebar() {
 
       {/* 데스크톱 사이드바는 Vault 페이지를 제외하고 표시한다. */}
       {!isVaultPage && (
-        <aside className={`${asideBaseClass} hidden lg:block`}>{innerContent}</aside>
+        <aside data-chat-maximize-left className={`${asideBaseClass} hidden lg:block`}>{innerContent}</aside>
       )}
     </>
   );

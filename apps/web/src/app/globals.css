@@ -810,3 +810,17 @@
     display: none;
   }
 }
+
+/* 채팅 창 크기를 끄는 동안 포인터가 손잡이를 벗어나도 같은 커서를 유지하고 본문 선택을 막는다. */
+html[data-chat-resizing] {
+  user-select: none;
+}
+html[data-chat-resizing='top'] * {
+  cursor: ns-resize !important;
+}
+html[data-chat-resizing='left'] * {
+  cursor: ew-resize !important;
+}
+html[data-chat-resizing='corner'] * {
+  cursor: nwse-resize !important;
+}

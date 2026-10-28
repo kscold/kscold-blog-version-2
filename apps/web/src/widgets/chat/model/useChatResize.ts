@@ -3,8 +3,39 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
 
 type Size = { width: number; height: number };
+type Bounds = { top: number; left: number; right: number; bottom: number };
 export type ResizeEdge = 'top' | 'left' | 'corner';
 const STORAGE_KEY = 'kscold-chat-size';
+const MAXIMIZED_KEY = 'kscold-chat-maximized';
+const GAP = 16;
+
+function saveMaximized(maximized: boolean) {
+  try {
+    if (maximized) window.localStorage.setItem(MAXIMIZED_KEY, '1');
+    else window.localStorage.removeItem(MAXIMIZED_KEY);
+  } catch {
+    // 저장소가 차단되어도 현재 창의 최대화는 유지한다.
+  }
+}
+
+function visibleRect(selector: string) {
+  const element = document.querySelector<HTMLElement>(selector);
+  if (!element) return null;
+  const rect = element.getBoundingClientRect();
+  return rect.width > 0 && rect.height > 0 && window.getComputedStyle(element).display !== 'none' ? rect : null;
+}
+
+// 최대화는 사이트 헤더 아래, 데스크톱 사이드바 오른쪽의 본문 영역을 가득 채운다.
+function maximizedBounds(): Bounds {
+  const header = visibleRect('[data-chat-maximize-top]');
+  const sidebar = visibleRect('[data-chat-maximize-left]');
+  return {
+    top: Math.max(GAP / 2, (header?.bottom ?? 0) + GAP / 2),
+    left: sidebar && sidebar.right < window.innerWidth / 2 ? sidebar.right + GAP : GAP,
+    right: GAP,
+    bottom: GAP,
+  };
+}
 
 function saveSize(size: Size | null) {
   try {
@@ -31,6 +62,8 @@ function clampSize(size: Size, panel: HTMLDivElement): Size {
 
 export function useChatResize(isOpen: boolean, panel: RefObject<HTMLDivElement | null>) {
   const [size, setSize] = useState<Size | null>(null);
+  const [maximized, setMaximized] = useState<Bounds | null>(null);
+  const isMaximized = useRef(false);
   const currentSize = useRef<Size | null>(null);
   const drag = useRef<{ edge: ResizeEdge; x: number; y: number; size: Size; pointerId: number } | null>(null);
 
@@ -43,8 +76,17 @@ export function useChatResize(isOpen: boolean, panel: RefObject<HTMLDivElement |
     } catch {
       // 잘못된 저장 값은 기본 크기로 연다.
     }
+    try {
+      isMaximized.current = window.localStorage.getItem(MAXIMIZED_KEY) === '1';
+    } catch {
+      isMaximized.current = false;
+    }
     const update = () => {
-      if (!panel.current || window.innerWidth < 640) return;
+      if (!panel.current || window.innerWidth < 640) {
+        setMaximized(null);
+        return;
+      }
+      setMaximized(isMaximized.current ? maximizedBounds() : null);
       if (currentSize.current) {
         currentSize.current = clampSize(currentSize.current, panel.current);
         setSize(currentSize.current);
@@ -54,6 +96,7 @@ export function useChatResize(isOpen: boolean, panel: RefObject<HTMLDivElement |
     window.addEventListener('resize', update);
     return () => {
       drag.current = null;
+      document.documentElement.removeAttribute('data-chat-resizing');
       window.removeEventListener('resize', update);
     };
   }, [isOpen, panel]);
@@ -69,15 +112,27 @@ export function useChatResize(isOpen: boolean, panel: RefObject<HTMLDivElement |
     currentSize.current = null;
     setSize(null);
     saveSize(null);
+    isMaximized.current = false;
+    setMaximized(null);
+    saveMaximized(false);
+  }
+
+  function toggleMaximize() {
+    if (!panel.current || window.innerWidth < 640) return;
+    isMaximized.current = !isMaximized.current;
+    setMaximized(isMaximized.current ? maximizedBounds() : null);
+    saveMaximized(isMaximized.current);
   }
 
   function onPointerDown(event: PointerEvent<HTMLButtonElement>, edge: ResizeEdge) {
-    if (event.button !== 0 || !panel.current || window.innerWidth < 640) return;
+    if (event.button !== 0 || !panel.current || window.innerWidth < 640 || isMaximized.current) return;
     event.preventDefault();
     event.currentTarget.focus({ preventScroll: true });
     event.currentTarget.setPointerCapture(event.pointerId);
     const { width, height } = panel.current.getBoundingClientRect();
     drag.current = { edge, x: event.clientX, y: event.clientY, size: { width, height }, pointerId: event.pointerId };
+    // 끄는 동안 포인터가 손잡이를 벗어나도 커서와 텍스트 선택 방지를 유지한다.
+    document.documentElement.setAttribute('data-chat-resizing', edge);
   }
 
   function onPointerMove(event: PointerEvent<HTMLButtonElement>) {
@@ -92,6 +147,7 @@ export function useChatResize(isOpen: boolean, panel: RefObject<HTMLDivElement |
   function onPointerEnd(event: PointerEvent<HTMLButtonElement>) {
     if (drag.current?.pointerId !== event.pointerId) return;
     drag.current = null;
+    document.documentElement.removeAttribute('data-chat-resizing');
     saveSize(currentSize.current);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -104,7 +160,7 @@ export function useChatResize(isOpen: boolean, panel: RefObject<HTMLDivElement |
       reset();
       return;
     }
-    if (!panel.current || window.innerWidth < 640) return;
+    if (!panel.current || window.innerWidth < 640 || isMaximized.current) return;
     const step = event.shiftKey ? 48 : 16;
     const dx = edge !== 'top' ? (event.key === 'ArrowLeft' ? step : event.key === 'ArrowRight' ? -step : 0) : 0;
     const dy = edge !== 'left' ? (event.key === 'ArrowUp' ? step : event.key === 'ArrowDown' ? -step : 0) : 0;
@@ -115,6 +171,18 @@ export function useChatResize(isOpen: boolean, panel: RefObject<HTMLDivElement |
     saveSize(currentSize.current);
   }
 
-  const style = size ? { '--chat-width': `${size.width}px`, '--chat-height': `${size.height}px` } as CSSProperties : {};
-  return { style, reset, onPointerDown, onPointerMove, onPointerEnd, onKeyDown };
+  const style = (maximized
+    ? { ...maximized, width: 'auto', height: 'auto', maxWidth: 'none', maxHeight: 'none' }
+    : size ? { '--chat-width': `${size.width}px`, '--chat-height': `${size.height}px` } : {}) as CSSProperties;
+  return {
+    style,
+    isMaximized: !!maximized,
+    isCustomSize: !!size || !!maximized,
+    reset,
+    toggleMaximize,
+    onPointerDown,
+    onPointerMove,
+    onPointerEnd,
+    onKeyDown,
+  };
 }

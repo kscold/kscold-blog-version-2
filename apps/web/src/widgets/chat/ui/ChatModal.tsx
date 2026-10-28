@@ -115,7 +115,9 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
         <>
           {/* 오버레이 */}
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-1300"
+            className={`fixed inset-0 z-1300 transition-colors ${
+              resize.isMaximized ? 'bg-black/20' : 'bg-black/60 backdrop-blur-sm'
+            }`}
             initial={allowRichEffects ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -149,6 +151,9 @@ export default function ChatModal({ isOpen, isElevated = false, onClose, initial
               onNewChat={mode === 'agent' ? startNewChat : undefined}
               canNewChat={canStartNewChat && !isAgentThinking}
               onResetSize={resize.reset}
+              canResetSize={resize.isCustomSize}
+              isMaximized={resize.isMaximized}
+              onToggleMaximize={resize.toggleMaximize}
             />
 
             <ChatModeTabs mode={mode} onChange={setMode} />

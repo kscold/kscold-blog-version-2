@@ -8,6 +8,9 @@ interface Props {
   onNewChat?: () => void;
   canNewChat?: boolean;
   onResetSize?: () => void;
+  canResetSize?: boolean;
+  isMaximized?: boolean;
+  onToggleMaximize?: () => void;
 }
 
 export function ChatModalHeader({
@@ -18,6 +21,9 @@ export function ChatModalHeader({
   onNewChat,
   canNewChat = false,
   onResetSize,
+  canResetSize = false,
+  isMaximized = false,
+  onToggleMaximize,
 }: Props) {
   return (
     <div className="shrink-0 border-b border-surface-200 bg-surface-50 p-3 sm:p-4">
@@ -39,16 +45,30 @@ export function ChatModalHeader({
           </div>
         </div>
         <div className="ml-2 flex shrink-0 items-center gap-1">
-          {onResetSize && (
+          {onResetSize && canResetSize && !isMaximized && (
             <button
               type="button"
               onClick={onResetSize}
               aria-label="채팅 기본 크기로 복원"
               title="기본 크기로 복원"
-              className="hidden h-9 w-9 items-center justify-center rounded-lg text-surface-500 hover:bg-surface-200 sm:flex"
+              className="hidden h-9 w-9 items-center justify-center rounded-lg text-surface-500 transition-colors hover:bg-surface-200 hover:text-surface-900 sm:flex"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                <path d="M4 9V4h5m11 11v5h-5M4 4l6 6m10 10-6-6" />
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5" />
+              </svg>
+            </button>
+          )}
+          {onToggleMaximize && (
+            <button
+              type="button"
+              onClick={onToggleMaximize}
+              aria-label={isMaximized ? '채팅 창 원래 크기로' : '채팅 창 최대화'}
+              aria-pressed={isMaximized}
+              title={isMaximized ? '원래 크기로' : '최대화'}
+              className="hidden h-9 w-9 items-center justify-center rounded-lg text-surface-500 transition-colors hover:bg-surface-200 hover:text-surface-900 sm:flex"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                <path d={isMaximized ? 'M9 4v5H4m11-5v5h5M9 20v-5H4m11 5v-5h5' : 'M4 9V4h5m6 0h5v5M4 15v5h5m6 0h5v-5'} />
               </svg>
             </button>
           )}
