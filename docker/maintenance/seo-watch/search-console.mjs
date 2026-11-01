@@ -12,6 +12,13 @@ const TOP_ROWS = 10;
 // 서치 콘솔 실적은 2~3일 늦게 채워진다.
 const ANALYTICS_LAG_DAYS = 3;
 const ANALYTICS_DAYS = 28;
+// 이름 검색은 노출이 드물어 실적보다 길게 본다.
+const NAME_SEARCH_DAYS = 90;
+const NAME_SEARCH_ROWS = 25;
+// 블로그 주인 이름·핸들이 들어간 검색어. 서치 콘솔 정규식(RE2)이라 (?i)로 대소문자를 무시한다.
+export const NAME_QUERY_PATTERN = '(?i)승찬|kscold';
+// 블로그 글 상세 주소. 태그 목록(/blog/tags/…)은 글이 아니라 뺀다.
+const POST_URL = /^https:\/\/kscold\.com\/blog\/(?!tags\/)[^/]+\/[^/]+$/;
 
 const base64Url = value => Buffer.from(value).toString('base64url');
 
@@ -136,13 +143,11 @@ function dateDaysAgo(now, days) {
   return new Date(now - days * DAY_MS).toISOString().slice(0, 10);
 }
 
-async function loadPerformance(call, encodedProperty, now) {
+async function loadPerformance(query, now) {
   const range = {
     startDate: dateDaysAgo(now, ANALYTICS_LAG_DAYS + ANALYTICS_DAYS - 1),
     endDate: dateDaysAgo(now, ANALYTICS_LAG_DAYS),
   };
-  const query = body =>
-    call('POST', `/webmasters/v3/sites/${encodedProperty}/searchAnalytics/query`, body);
   const [total, pages, queries] = await Promise.all([
     query(range),
     query({ ...range, dimensions: ['page'], rowLimit: TOP_ROWS }),
@@ -165,6 +170,43 @@ async function loadPerformance(call, encodedProperty, now) {
 }
 
 /**
+ * 이름(김승찬·kscold)이 들어간 검색어가 어느 페이지로 몇 위에 나왔는지 읽는다.
+ * 실패해도 나머지 점검은 이어 가도록 사유만 돌려준다.
+ */
+async function loadNameSearch(query, now) {
+  const range = {
+    startDate: dateDaysAgo(now, ANALYTICS_LAG_DAYS + NAME_SEARCH_DAYS - 1),
+    endDate: dateDaysAgo(now, ANALYTICS_LAG_DAYS),
+  };
+  try {
+    const response = await query({
+      ...range,
+      dimensions: ['query', 'page'],
+      rowLimit: NAME_SEARCH_ROWS,
+      dimensionFilterGroups: [
+        {
+          filters: [
+            { dimension: 'query', operator: 'includingRegex', expression: NAME_QUERY_PATTERN },
+          ],
+        },
+      ],
+    });
+    const rows = (response.rows ?? [])
+      .map(row => ({
+        query: row.keys[0],
+        page: row.keys[1],
+        clicks: row.clicks,
+        impressions: row.impressions,
+        position: Math.round(row.position * 10) / 10,
+      }))
+      .sort((left, right) => right.impressions - left.impressions || left.position - right.position);
+    return { ...range, rows };
+  } catch (error) {
+    return { ...range, rows: [], error: error.message };
+  }
+}
+
+/**
  * 서치 콘솔에서 사이트맵 상태·색인 현황·검색 실적을 읽는다.
  * 실제 실행(apply)일 때만 사이트맵을 다시 제출하고 URL 검사를 돌린다. 미리보기는 읽기만 한다.
  */
@@ -181,6 +223,8 @@ export async function checkSearchConsole({
   const token = await createAccessToken({ account, fetcher, now });
   const call = createClient({ token, fetcher });
   const encodedProperty = encodeURIComponent(property);
+  const query = body =>
+    call('POST', `/webmasters/v3/sites/${encodedProperty}/searchAnalytics/query`, body);
   const sitemapPath = `/webmasters/v3/sites/${encodedProperty}/sitemaps/${encodeURIComponent(sitemapUrl)}`;
 
   let sitemap = null;
@@ -210,7 +254,9 @@ export async function checkSearchConsole({
     },
     inspectedToday: Object.keys(inspected).length,
     coverage: summarizeCoverage(urls, nextStatuses),
-    performance: await loadPerformance(call, encodedProperty, now),
+    posts: summarizeCoverage(urls.filter(url => POST_URL.test(url)), nextStatuses),
+    performance: await loadPerformance(query, now),
+    nameSearch: await loadNameSearch(query, now),
     nextStatuses,
   };
 }

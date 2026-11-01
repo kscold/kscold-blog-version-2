@@ -62,6 +62,30 @@ function searchConsoleSection(searchConsole) {
   ];
 }
 
+const toPath = url => decodeURI(url.replace('https://kscold.com', '') || '/');
+
+function nameSearchSection(searchConsole) {
+  if (!searchConsole) return ['- 서비스 계정이 없어 건너뜀'];
+  if (searchConsole.error) return [`- 조회 실패 (${searchConsole.error})`];
+  const { posts, nameSearch } = searchConsole;
+  const lines = [`- 블로그 글 색인: ${posts.indexed}/${posts.total}개 (아직 못 본 글 ${posts.unchecked}개)`];
+  if (nameSearch.error) return [...lines, `- 이름 검색어 조회 실패 (${nameSearch.error})`];
+  if (nameSearch.rows.length === 0) {
+    return [
+      ...lines,
+      `- ${nameSearch.startDate}~${nameSearch.endDate}: 이름(김승찬·kscold)이 들어간 검색어로 노출된 기록이 아직 없음`,
+    ];
+  }
+  return [
+    ...lines,
+    `- ${nameSearch.startDate}~${nameSearch.endDate} 이름이 들어간 검색어`,
+    ...nameSearch.rows.map(
+      row =>
+        `  - "${row.query}" → ${toPath(row.page)} — 노출 ${row.impressions}, 클릭 ${row.clicks}, 평균 ${row.position}위`
+    ),
+  ];
+}
+
 /** 하루치 점검 결과를 사람이 훑어볼 수 있는 마크다운으로 정리한다. */
 export function renderReport(result) {
   return [
@@ -80,6 +104,9 @@ export function renderReport(result) {
     '',
     '## 구글 서치 콘솔',
     ...searchConsoleSection(result.searchConsole),
+    '',
+    '## 이름 검색 (구글)',
+    ...nameSearchSection(result.searchConsole),
     '',
     '## 검색 순위',
     ...rankSection(result.ranks),
@@ -107,7 +134,19 @@ export function toHistoryRecord(result) {
           indexed: result.searchConsole.coverage.indexed,
           clicks: result.searchConsole.performance.clicks,
           impressions: result.searchConsole.performance.impressions,
+          postsIndexed: result.searchConsole.posts.indexed,
+          ...nameSearchHistory(result.searchConsole.nameSearch),
         }
       : {}),
+  };
+}
+
+/** 이름 검색어 추이는 노출 합계와 가장 좋은 순위만 남긴다. */
+function nameSearchHistory(nameSearch) {
+  if (!nameSearch || nameSearch.error) return {};
+  const rows = nameSearch.rows;
+  return {
+    nameImpressions: rows.reduce((sum, row) => sum + row.impressions, 0),
+    nameBestPosition: rows.length ? Math.min(...rows.map(row => row.position)) : null,
   };
 }

@@ -18,7 +18,17 @@ const DEFAULT_GOOGLE_ACCOUNT = '.config/claude-seo/kscold-blog-seo-sa.json';
 const HOSTS = ['kscold.com', 'www.kscold.com'];
 const PAGES = ['/', '/blog', '/feed', '/info', '/notes'];
 const FILES = ['robots.txt', 'sitemap.xml', 'rss.xml', 'ads.txt', 'llms.txt'];
-const RANK_QUERIES = ['김승찬 블로그', '김승찬 개발자', '김승찬', 'kscold'];
+// 순위 API 키가 있을 때 매일 순위를 남길 이름 검색어. 사용자가 노리는 검색어 그대로 둔다.
+const RANK_QUERIES = [
+  '김승찬',
+  '김승찬 블로그',
+  '김승찬의 기술 블로그',
+  '김승찬 개발자',
+  '김승찬 백엔드',
+  '김승찬 프론트엔드',
+  '김승찬 AI Agent',
+  'kscold',
+];
 const RECENT_SAMPLE_SIZE = 8;
 const DAY_MS = 86_400_000;
 const LOG_TAIL_LINES = '60000';

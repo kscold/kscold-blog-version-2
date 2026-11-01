@@ -7,7 +7,7 @@ import { summarizeCrawlers } from './seo-watch/crawlers.mjs';
 import { findFileProblems, findPageProblems } from './seo-watch/health.mjs';
 import { submitIndexNow } from './seo-watch/indexnow.mjs';
 import { checkRanks, findPosition } from './seo-watch/rank.mjs';
-import { renderReport } from './seo-watch/report.mjs';
+import { renderReport, toHistoryRecord } from './seo-watch/report.mjs';
 import {
   createAccessToken,
   pickInspectionBatch,
@@ -267,7 +267,7 @@ const GOOGLE_ACCOUNT = {
 };
 
 /** 토큰 발급과 서치 콘솔 API를 흉내 내고, 나머지 요청은 원래 가짜 웹으로 넘긴다. */
-function withSearchConsole(web, { googleSitemap = null, verdicts = {} } = {}) {
+function withSearchConsole(web, { googleSitemap = null, verdicts = {}, nameSearchFails = false } = {}) {
   const calls = [];
   const json = (status, body) => ({ ok: status < 400, status, json: async () => body });
   const fetcher = async (url, options = {}) => {
@@ -296,6 +296,15 @@ function withSearchConsole(web, { googleSitemap = null, verdicts = {} } = {}) {
     }
     const body = JSON.parse(options.body);
     if (!body.dimensions) return json(200, { rows: [{ clicks: 3, impressions: 40 }] });
+    if (body.dimensionFilterGroups) {
+      if (nameSearchFails) return json(400, {});
+      return json(200, {
+        rows: [
+          { keys: ['kscold', `${SITE}/`], clicks: 0, impressions: 2, position: 3 },
+          { keys: ['김승찬 개발자', `${SITE}/info`], clicks: 1, impressions: 5, position: 6.44 },
+        ],
+      });
+    }
     return json(200, {
       rows: [{ keys: [`${SITE}/blog/dev/a`], clicks: 3, impressions: 40, position: 7.25 }],
     });
@@ -366,6 +375,42 @@ test('실제 실행은 사이트맵을 다시 제출하고 URL을 검사해 색�
   assert.equal(result.nextIndexStatuses[`${SITE}/blog/dev/a`].verdict, 'PASS');
   assert.match(report, /색인: 1\/2개/);
   assert.match(report, /\/blog\/dev\/a — 클릭 3, 노출 40, 평균 7.3위/);
+});
+
+test('이름이 들어간 검색어를 노출 많은 순으로 보여 주고 블로그 글 색인 수를 따로 센다', async () => {
+  const web = withSearchConsole(
+    fakeWeb([
+      ['/blog/dev/a', '2026-10-05'],
+      ['/blog/dev/b', '2026-10-05'],
+      ['/blog/tags/ai', ''],
+      ['/blog', ''],
+    ]),
+    { verdicts: { [`${SITE}/blog/dev/a`]: 'PASS' } }
+  );
+
+  const result = await watch(web, { googleAccount: GOOGLE_ACCOUNT });
+  const report = renderReport(result);
+  const nameCall = web.calls.find(call => call.body?.dimensionFilterGroups);
+
+  assert.deepEqual(nameCall.body.dimensions, ['query', 'page']);
+  assert.equal(nameCall.body.dimensionFilterGroups[0].filters[0].expression, '(?i)승찬|kscold');
+  assert.match(report, /블로그 글 색인: 1\/2개/);
+  assert.match(report, /"김승찬 개발자" → \/info — 노출 5, 클릭 1, 평균 6.4위\n  - "kscold" → \/ — 노출 2/);
+  assert.deepEqual(
+    { postsIndexed: 1, nameImpressions: 7, nameBestPosition: 3 },
+    (({ postsIndexed, nameImpressions, nameBestPosition }) => ({ postsIndexed, nameImpressions, nameBestPosition }))(
+      toHistoryRecord(result)
+    )
+  );
+});
+
+test('이름 검색어 조회가 실패해도 나머지 서치 콘솔 점검은 남긴다', async () => {
+  const web = withSearchConsole(fakeWeb([['/blog/dev/a', '2026-10-05']]), { nameSearchFails: true });
+
+  const report = renderReport(await watch(web, { googleAccount: GOOGLE_ACCOUNT }));
+
+  assert.match(report, /이름 검색어 조회 실패/);
+  assert.match(report, /색인: 0\/1개/);
 });
 
 test('미리보기는 서치 콘솔을 읽기만 하고, 서비스 계정이 없으면 건너뛴다', async () => {
