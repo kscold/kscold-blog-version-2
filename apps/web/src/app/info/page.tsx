@@ -5,12 +5,13 @@ import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 export const metadata = buildPageMetadata({
-  title: '김승찬(kscold) - AI Agent·풀스택 개발자 소개',
+  title: `김승찬(kscold) - ${PROFILE.role}`,
   // 메타 설명은 마크다운 기호(괄호 포함)를 걷어내므로 괄호 없이 쓴다.
-  description: `AI Agent·풀스택 개발자 김승찬 소개. ${PROFILE.bio.join(' ')}`,
+  description: `${PROFILE.role} 김승찬 소개. ${PROFILE.bio.join(' ')}`,
   path: '/info',
   keywords: [
     '김승찬', '김승찬 개발자', '김승찬 소개', '김승찬 포트폴리오',
+    '김승찬 백엔드', '김승찬 프론트엔드', '김승찬 AI Agent',
     'kscold', '콜딩', 'Colding', '프로필', '소개',
     'AI Agent 개발자', 'LangGraph', 'Python', 'MongoDB',
     '풀스택 개발자', '백엔드 개발자', '프론트엔드 개발자',
@@ -36,7 +37,7 @@ const infoJsonLd = {
     name: PROFILE.name,
     ...PROFILE_IDENTITY,
     url: `${SITE_URL}/info`,
-    jobTitle: 'AI Agent·풀스택 개발자',
+    jobTitle: PROFILE.role,
     description: PROFILE.bio[0],
   },
 };

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { PROFILE, PROFILE_FAQ, TEAM_PROFILES } from '@/entities/profile';
+import { PROFILE, PROFILE_FAQ, PROFILE_WORK, TEAM_PROFILES } from '@/entities/profile';
 import type { TeamProfile } from '@/entities/profile';
 import { SkillsSection } from './SkillsSection';
 import { ContactSection } from './ContactSection';
@@ -15,7 +15,7 @@ export function InfoContainer() {
           <div className="w-28 h-28 rounded-full mx-auto mb-6 ring-4 ring-surface-200 overflow-hidden">
             <Image
               src="https://avatars.githubusercontent.com/u/66587554?v=4"
-              alt={PROFILE.name}
+              alt={`${PROFILE.name} 프로필 사진`}
               width={112}
               height={112}
               className="object-cover"
@@ -26,7 +26,8 @@ export function InfoContainer() {
             {PROFILE.name}
           </h1>
           <p className="text-sm font-mono text-surface-600 mb-3">@{PROFILE.handle}</p>
-          <p className="text-lg text-surface-500 font-medium">{PROFILE.title}</p>
+          <p className="text-lg text-surface-500 font-medium">{PROFILE.role}</p>
+          <p className="mt-1 text-sm text-surface-500">{PROFILE.title}</p>
         </div>
 
         {/* 소개 섹션 */}
@@ -35,6 +36,30 @@ export function InfoContainer() {
           <div className="space-y-4">
             {PROFILE.bio.map((paragraph, i) => (
               <p key={i} className="text-surface-600 leading-relaxed">{paragraph}</p>
+            ))}
+          </div>
+        </section>
+
+        {/* 하는 일: 분야별로 맡은 일과 만든 서비스를 문장으로 적어 "김승찬 백엔드" 같은 검색에도 답이 되게 한다. */}
+        <section className="mb-16" aria-labelledby="info-work">
+          <h2 id="info-work" className="text-sm font-bold text-surface-600 uppercase tracking-wider mb-6">Work</h2>
+          <div className="space-y-3">
+            {PROFILE_WORK.map(item => (
+              <article key={item.id} className="bg-white border border-surface-200 rounded-2xl p-5">
+                <h3 className="text-base font-bold text-surface-900 mb-2">{item.heading}</h3>
+                <div className="space-y-2">
+                  {item.body.map((paragraph, i) => (
+                    <p key={i} className="text-sm text-surface-600 leading-relaxed">{paragraph}</p>
+                  ))}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                  {item.links.map(link => (
+                    <Link key={link.href} href={link.href} className="text-surface-700 underline underline-offset-4 hover:text-surface-900">
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              </article>
             ))}
           </div>
         </section>

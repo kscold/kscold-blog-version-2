@@ -3,7 +3,7 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://kscold.c
 export const SITE_URL = 'https://kscold.com';
 export const SITE_NAME = '김승찬 블로그';
 export const SITE_DESCRIPTION =
-  'AI Agent·백엔드·풀스택 개발자 김승찬(kscold)의 기술 블로그. LangGraph·RAG와 Spring Boot·Next.js 기반 서비스의 설계·배포·운영 경험을 기록합니다.';
+  'AI Agent·백엔드·프론트엔드 개발자 김승찬(kscold)의 기술 블로그. LangGraph·RAG 기반 AI Agent, Spring Boot·NestJS 백엔드, Next.js 프론트엔드를 설계·배포·운영한 경험을 기록합니다.';
 export const DEFAULT_OG_IMAGE = '/og-default.png';
 
 /** 피드 상세와 광고 노출에 필요한 최소 본문 길이(글자 수). */

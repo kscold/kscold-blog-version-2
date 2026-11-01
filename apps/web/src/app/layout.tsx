@@ -145,16 +145,16 @@ const siteJsonLd = {
         '@id': `${SITE_URL}/info#profile-page`,
       },
       description:
-        '김승찬(kscold)은 AI Agent 개발을 중심으로 서버·웹 애플리케이션을 만드는 풀스택 개발자입니다. ' +
+        '김승찬(kscold)은 AI Agent 개발을 중심으로 백엔드와 프론트엔드를 함께 만드는 풀스택 개발자입니다. ' +
         'LangGraph·RAG 기반 AI Agent와 Spring Boot·Next.js·TypeScript 기반 서비스의 설계·배포·운영을 수행하며, ' +
         '경험과 기술 기록을 김승찬 블로그 kscold.com에 공개합니다.',
       image: PROFILE_IDENTITY.image,
-      jobTitle: 'AI Agent·풀스택 개발자',
-      hasOccupation: {
+      jobTitle: PROFILE.role,
+      hasOccupation: ['AI Agent 개발자', '백엔드 개발자', '프론트엔드 개발자'].map(name => ({
         '@type': 'Occupation',
-        name: 'AI Agent 개발자 및 풀스택 개발자',
+        name,
         occupationLocation: { '@type': 'Country', name: '대한민국' },
-      },
+      })),
       address: {
         '@type': 'PostalAddress',
         addressCountry: 'KR',

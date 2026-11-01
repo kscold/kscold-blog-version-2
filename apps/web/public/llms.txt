@@ -1,12 +1,12 @@
 # 김승찬 개발자 블로그 (KSCOLD)
 
-> AI Agent 개발을 중심으로 서버와 웹 애플리케이션을 설계·구현·배포·운영하는 개발자 김승찬의 기술 기록입니다.
+> AI Agent·백엔드·프론트엔드 개발자 김승찬(kscold)의 기술 블로그입니다. 김승찬의 기술 블로그 또는 김승찬 블로그라고도 부릅니다.
 
 김승찬(kscold)은 씨에스리 AI기술연구소 연구원으로, Python·LangGraph·RAG·LLM 기반 AI Agent 개발을 주 업무로 수행합니다. Java·Spring Boot 기반 서버와 Next.js·React·TypeScript 기반 웹 제품도 함께 개발하며 MongoDB, PostgreSQL, Redis, Docker, AWS, GCP 환경을 운영합니다.
 
 ## 공식 프로필
 
-- [김승찬 소개](https://kscold.com/info): 경력, 역할, 프로젝트, 기술 스택을 정리한 공식 프로필
+- [김승찬 소개](https://kscold.com/info): 경력, 역할(AI Agent·백엔드·프론트엔드), 만든 서비스, 기술 스택을 정리한 공식 프로필
 - [GitHub 프로필](https://github.com/kscold): 공개 소스 코드와 프로젝트 저장소
 - [이메일](mailto:developerkscold@gmail.com): 업무 및 기술 교류 연락처
 

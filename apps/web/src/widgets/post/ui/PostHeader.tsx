@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { toAuthorDisplayName } from '@/entities/profile';
 import { toPreviewText } from '@/shared/lib/seo/text';
 
 interface PostHeaderProps {
@@ -126,7 +127,7 @@ export function PostHeader({
                 />
               </svg>
               <Link href="/info" rel="author" className="hover:text-surface-900">
-                {author.name}
+                {toAuthorDisplayName(author)}
               </Link>
             </div>
 

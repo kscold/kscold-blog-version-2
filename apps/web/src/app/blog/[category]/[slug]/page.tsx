@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { cache } from 'react';
+import { PROFILE, toAuthorDisplayName } from '@/entities/profile';
 import { PostDetail } from '@/widgets/post';
 import type { Post } from '@/shared/model/types/blog';
 import {
@@ -67,7 +68,7 @@ export async function generateMetadata({
     image: post.coverImage,
     publishedTime: post.publishedAt || post.createdAt,
     modifiedTime: post.updatedAt,
-    authors: [{ name: post.author.name, url: absoluteUrl('/info') }],
+    authors: [{ name: toAuthorDisplayName(post.author), url: absoluteUrl('/info') }],
     noIndex: Boolean(post.restricted),
   });
 }
@@ -108,7 +109,12 @@ export default async function PostPage({
           ...post.tags.map(tag => tag.name),
         ]).join(', '),
         isAccessibleForFree: !post.restricted,
-        author: { '@id': `${absoluteUrl('/')}#person` },
+        author: {
+          '@type': 'Person',
+          '@id': `${absoluteUrl('/')}#person`,
+          name: PROFILE.name,
+          url: absoluteUrl('/info'),
+        },
         publisher: {
           '@type': 'Organization',
           '@id': `${absoluteUrl('/')}#organization`,

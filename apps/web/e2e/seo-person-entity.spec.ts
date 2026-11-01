@@ -1,4 +1,5 @@
 import { expect, test, type APIRequestContext } from '@playwright/test';
+import { toAuthorDisplayName } from '../src/entities/profile/model/profileData';
 
 type JsonLdNode = Record<string, unknown> & { '@type'?: string; '@id'?: string };
 
@@ -21,11 +22,14 @@ test('홈 첫 제목과 사이트 Person은 블로그 주인 이름을 담는다
 
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('김승찬의 기술 블로그');
+  // 검색 결과 제목에는 블로그 이름과 하는 일이 함께 보여야 한다.
+  await expect(page).toHaveTitle('김승찬의 기술 블로그 - AI Agent·백엔드·프론트엔드 개발자');
+  await expect(page.locator('footer').getByRole('link', { name: '김승찬', exact: true })).toHaveAttribute('href', '/info');
 });
 
 test('소개 페이지는 이름이 먼저 오는 제목과 인물 정보를 담은 ProfilePage를 제공한다', async ({ request }) => {
   const { html, nodes } = await jsonLdNodes(request, '/info');
-  expect(html).toMatch(/<title>김승찬\(kscold\) - AI Agent·풀스택 개발자 소개/);
+  expect(html).toMatch(/<title>김승찬\(kscold\) - AI Agent·백엔드·프론트엔드 개발자/);
   const description = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
   expect(description).toContain('김승찬');
   // 괄호가 걷혀 "김승찬 kscold ." 처럼 끊긴 문장이 나오지 않아야 한다.
@@ -38,4 +42,22 @@ test('소개 페이지는 이름이 먼저 오는 제목과 인물 정보를 담
   expect(person?.name).toBe('김승찬');
   expect(person?.image).toBeTruthy();
   expect(person?.sameAs).toEqual(expect.arrayContaining(['https://github.com/kscold']));
+  expect(person?.jobTitle).toBe('AI Agent·백엔드·프론트엔드 개발자');
+});
+
+test('소개 페이지는 분야별로 하는 일을 이름과 함께 보여준다', async ({ page }) => {
+  await page.goto('/info');
+  const work = page.locator('section[aria-labelledby="info-work"]');
+  for (const heading of ['AI Agent 개발', '백엔드 개발', '프론트엔드 개발']) {
+    const card = work.locator('article').filter({ has: page.getByRole('heading', { level: 3, name: heading, exact: true }) });
+    await expect(card).toContainText('김승찬은');
+  }
+  await expect(page.getByRole('heading', { level: 3, name: '김승찬은 어떤 서비스를 만들었나요?' })).toBeVisible();
+});
+
+test('블로그 주인 계정(kscold)이 쓴 글은 작성자를 실명으로 보여준다', () => {
+  expect(toAuthorDisplayName({ name: 'kscold' })).toBe('김승찬');
+  expect(toAuthorDisplayName({ name: 'KSCOLD ' })).toBe('김승찬');
+  expect(toAuthorDisplayName({ name: '피드유저', username: 'kscold' })).toBe('김승찬');
+  expect(toAuthorDisplayName({ name: '작성자' })).toBe('작성자');
 });

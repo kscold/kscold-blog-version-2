@@ -6,6 +6,7 @@ import {
   extractVaultWikiLinkTitles,
   findCurrentVaultSlug,
 } from '@/entities/vault';
+import { PROFILE, toAuthorDisplayName } from '@/entities/profile';
 import type { VaultNote, VaultNoteTitle } from '@/shared/model/types/vault';
 import { VaultNoteLayout } from '@/widgets/vault/note';
 import {
@@ -80,7 +81,7 @@ export async function generateMetadata({
     type: 'article',
     publishedTime: note.createdAt,
     modifiedTime: note.updatedAt,
-    authors: [{ name: note.author.name, url: absoluteUrl('/info') }],
+    authors: [{ name: toAuthorDisplayName(note.author), url: absoluteUrl('/info') }],
     noIndex: isThinNote,
   });
 }
@@ -110,7 +111,12 @@ export default async function VaultNotePage({
         datePublished: toSeoDateTime(note.createdAt),
         dateModified: toSeoDateTime(note.updatedAt),
         keywords: uniqueKeywords([note.title, ...note.tags]).join(', '),
-        author: { '@id': `${absoluteUrl('/')}#person` },
+        author: {
+          '@type': 'Person',
+          '@id': `${absoluteUrl('/')}#person`,
+          name: PROFILE.name,
+          url: absoluteUrl('/info'),
+        },
         mainEntityOfPage: absoluteUrl(canonicalPath),
       },
       buildBreadcrumbJsonLd([

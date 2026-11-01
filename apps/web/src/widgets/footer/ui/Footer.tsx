@@ -49,7 +49,11 @@ export function Footer() {
               <span className="text-surface-700 font-medium">연결을 공유합니다.</span>
             </p>
             <p className="mt-3 text-xs text-surface-500 font-light leading-relaxed max-w-sm">
-              개발자 김승찬이 운영하는 기술 블로그입니다.
+              AI Agent·백엔드·프론트엔드 개발자{' '}
+              <Link href="/info" className="text-surface-600 underline underline-offset-4 hover:text-surface-800">
+                김승찬
+              </Link>
+              이 운영하는 기술 블로그입니다.
             </p>
           </div>
 
