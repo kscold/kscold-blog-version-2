@@ -1,12 +1,13 @@
 import { InfoContainer } from '@/widgets/info';
-import { PROFILE, PROFILE_FAQ } from '@/entities/profile';
+import { PROFILE, PROFILE_FAQ, PROFILE_IDENTITY } from '@/entities/profile';
 import { buildPageMetadata, SITE_URL } from '@/shared/lib/seo';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 export const metadata = buildPageMetadata({
   title: '김승찬(kscold) - AI Agent·풀스택 개발자 소개',
-  description: `개발자 김승찬(kscold). ${PROFILE.bio.join(' ')}`,
+  // 메타 설명은 마크다운 기호(괄호 포함)를 걷어내므로 괄호 없이 쓴다.
+  description: `AI Agent·풀스택 개발자 김승찬 소개. ${PROFILE.bio.join(' ')}`,
   path: '/info',
   keywords: [
     '김승찬', '김승찬 개발자', '김승찬 소개', '김승찬 포트폴리오',
@@ -28,8 +29,15 @@ const infoJsonLd = {
   isPartOf: {
     '@id': `${SITE_URL}/#website`,
   },
+  // 소개 페이지만 읽어도 누구의 프로필인지 알 수 있게 사이트 전체 Person과 같은 @id로 핵심 정보를 함께 싣는다.
   mainEntity: {
+    '@type': 'Person',
     '@id': `${SITE_URL}/#person`,
+    name: PROFILE.name,
+    ...PROFILE_IDENTITY,
+    url: `${SITE_URL}/info`,
+    jobTitle: 'AI Agent·풀스택 개발자',
+    description: PROFILE.bio[0],
   },
 };
 

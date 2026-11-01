@@ -13,6 +13,22 @@ export const PROFILE = {
 };
 
 /**
+ * 검색엔진이 사이트 전체 Person과 소개 페이지의 인물을 같은 사람으로 묶도록 함께 쓰는 이름·사진·외부 프로필.
+ * 영문 이름은 실제로 쓰이는 띄어쓰기·순서 변형만 담는다.
+ */
+export const PROFILE_IDENTITY = {
+  givenName: '승찬',
+  familyName: '김',
+  alternateName: ['kscold', 'KSCOLD', 'Kim Seung Chan', 'KIM SEUNG CHAN', 'Kim Seungchan', 'Seungchan Kim'],
+  image: 'https://avatars.githubusercontent.com/u/66587554?v=4',
+  sameAs: [
+    PROFILE.contacts.github,
+    'https://www.instagram.com/ks_cold',
+    'https://www.threads.net/@kscold_dev',
+  ],
+};
+
+/**
  * 검색·생성형 AI(GEO)가 "김승찬"을 명확한 인물로 인식하도록 하는 FAQ.
  * info 페이지에 화면으로 노출되며 동일 내용이 FAQPage 구조화 데이터로도 제공됨.
  */

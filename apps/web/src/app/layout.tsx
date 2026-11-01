@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Providers } from './providers/providers';
 import { ClientLayout } from './providers/ClientLayout';
-import { PROFILE } from '@/entities/profile';
+import { PROFILE, PROFILE_IDENTITY } from '@/entities/profile';
 import { BUSINESS_INFO } from '@/entities/profile';
 import { Footer } from '@/widgets/footer';
 import { ANONYMOUS_VIEWER } from '@/shared/lib/initialViewer';
@@ -136,8 +136,10 @@ const siteJsonLd = {
       '@type': 'Person',
       '@id': `${SITE_URL}/#person`,
       name: PROFILE.name,
+      givenName: PROFILE_IDENTITY.givenName,
+      familyName: PROFILE_IDENTITY.familyName,
       // 콜딩/Colding 은 사람이 아니라 사업자명이라 별도 Organization 으로 연결한다.
-      alternateName: ['kscold', 'KSCOLD', 'Kim Seung Chan', 'KIM SEUNG CHAN'],
+      alternateName: PROFILE_IDENTITY.alternateName,
       url: `${SITE_URL}/info`,
       mainEntityOfPage: {
         '@id': `${SITE_URL}/info#profile-page`,
@@ -146,7 +148,7 @@ const siteJsonLd = {
         '김승찬(kscold)은 AI Agent 개발을 중심으로 서버·웹 애플리케이션을 만드는 풀스택 개발자입니다. ' +
         'LangGraph·RAG 기반 AI Agent와 Spring Boot·Next.js·TypeScript 기반 서비스의 설계·배포·운영을 수행하며, ' +
         '경험과 기술 기록을 김승찬 블로그 kscold.com에 공개합니다.',
-      image: 'https://avatars.githubusercontent.com/u/66587554?v=4',
+      image: PROFILE_IDENTITY.image,
       jobTitle: 'AI Agent·풀스택 개발자',
       hasOccupation: {
         '@type': 'Occupation',
@@ -166,11 +168,7 @@ const siteJsonLd = {
         'NestJS', 'Docker', 'PostgreSQL', 'CI/CD', 'Harness Engineering', 'Claude API',
         '백엔드 개발', '프론트엔드 개발', '풀스택 개발', 'AI 에이전트',
       ],
-      sameAs: [
-        PROFILE.contacts.github,
-        'https://www.instagram.com/ks_cold',
-        'https://www.threads.net/@kscold_dev',
-      ],
+      sameAs: PROFILE_IDENTITY.sameAs,
       worksFor: {
         '@id': `${SITE_URL}/#current-employer`,
       },
