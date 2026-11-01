@@ -22,10 +22,13 @@ function HeroArtwork() {
 function HeroIntroduction() {
   return (
     <div className={styles.copy}>
-      <p className={styles.eyebrow}><span /> <span><strong>김승찬</strong>의 기술 블로그</span></p>
-      <h1 className={styles.title}>
-        지식을 기록하고,<br />
-        연결을 공유합니다.
+      {/* 이름 검색에 홈이 잡히도록 블로그 주인 이름까지 첫 제목에 담는다. 화면 모양은 그대로 둔다. */}
+      <h1 className={styles.heading}>
+        <span className={styles.eyebrow}><span /> <span><strong>김승찬</strong>의 기술 블로그</span></span>{' '}
+        <span className={styles.title}>
+          지식을 기록하고,<br />
+          연결을 공유합니다.
+        </span>
       </h1>
       <p data-testid="hero-tagline" className={styles.description}>
         러닝커브를 즐기는 개발자{' '}

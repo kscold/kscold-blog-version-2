@@ -5,7 +5,7 @@ import { JsonLd } from '@/shared/ui/JsonLd';
 import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 
 export const metadata = buildPageMetadata({
-  title: '소개 | 개발자 김승찬(kscold)',
+  title: '김승찬(kscold) - AI Agent·풀스택 개발자 소개',
   description: `개발자 김승찬(kscold). ${PROFILE.bio.join(' ')}`,
   path: '/info',
   keywords: [
