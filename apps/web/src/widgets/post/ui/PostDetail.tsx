@@ -1,3 +1,4 @@
+import { AuthorCard, isOwnerAuthor } from '@/entities/profile';
 import { MarkdownContent } from '@/shared/ui/MarkdownContent';
 import { formatPublishedDate } from '@/shared/lib/seo/date';
 import type { Post } from '@/shared/model/types/blog';
@@ -40,6 +41,7 @@ export function PostDetail({ post }: PostDetailProps) {
           />
         </div>
 
+        {isOwnerAuthor(post.author) && <AuthorCard />}
         <PostCommentSection tags={post.tags} />
         {post.status === 'PUBLISHED' && <PostNavigation slug={post.slug} />}
       </article>

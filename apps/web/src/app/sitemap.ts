@@ -92,9 +92,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     note => !!note.slug && isIndexableVaultNote(note.contentLength)
   );
 
+  // 홈은 최신 글 목록을 보여 주므로 가장 최근에 바뀐 공개 글 날짜를 쓴다.
+  const latestPostModifiedAt = latestModifiedAt(
+    ...indexablePosts.map(post => latestModifiedAt(post.updatedAt, post.publishedAt, post.createdAt))
+  );
+
   return [
     {
       url: SITE_URL,
+      lastModified: toSitemapDate(latestPostModifiedAt),
       changeFrequency: 'weekly',
       priority: 1,
     },
@@ -140,6 +146,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${SITE_URL}/info`,
+      lastModified: PROFILE.updatedAt,
       changeFrequency: 'monthly',
       priority: 0.7,
     },

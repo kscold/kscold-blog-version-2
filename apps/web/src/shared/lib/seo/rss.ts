@@ -27,7 +27,15 @@ function toRfc822(value?: string): string | null {
   return timestamp > 0 ? new Date(timestamp).toUTCString() : null;
 }
 
-export function buildRssDocument(posts: PostSummary[]): string {
+interface RssOptions {
+  /** 글마다 실을 작성자 이름. 계정 이름을 실명으로 바꾸는 규칙은 상위 계층이 넘겨준다. */
+  authorName?: (post: PostSummary) => string;
+}
+
+export function buildRssDocument(
+  posts: PostSummary[],
+  { authorName = post => post.author.name }: RssOptions = {}
+): string {
   const publicPosts = posts
     .filter(post => post.status === 'PUBLISHED' && !post.restricted)
     .sort(
@@ -50,6 +58,7 @@ export function buildRssDocument(posts: PostSummary[]): string {
         `      <link>${escapeXml(link)}</link>`,
         `      <guid isPermaLink="true">${escapeXml(link)}</guid>`,
         `      <description>${escapeXml(description)}</description>`,
+        `      <dc:creator>${escapeXml(authorName(post))}</dc:creator>`,
         ...(publishedAt ? [`      <pubDate>${publishedAt}</pubDate>`] : []),
         ...(post.category?.name
           ? [`      <category>${escapeXml(post.category.name)}</category>`]
@@ -61,7 +70,7 @@ export function buildRssDocument(posts: PostSummary[]): string {
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">',
     '  <channel>',
     `    <title>${escapeXml(SITE_NAME)}</title>`,
     `    <link>${escapeXml(SITE_URL)}</link>`,

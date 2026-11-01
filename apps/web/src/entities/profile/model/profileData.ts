@@ -4,6 +4,10 @@ export const PROFILE = {
   title: 'AI Agent · Backend · Full-stack Engineer',
   /** 한국어 검색어(김승찬 백엔드·프론트엔드·AI Agent)와 그대로 맞는 역할 이름. 제목·구조화 데이터·소개 화면이 함께 쓴다. */
   role: 'AI Agent·백엔드·프론트엔드 개발자',
+  /** 글 끝 글쓴이 칸에 쓰는 한 줄 소개. */
+  authorBio: '씨에스리 AI기술연구소에서 AI Agent를 개발하고, 콜딩(Colding)에서 Pawpong·GaDoc·GoLe를 만들어 운영합니다.',
+  /** 소개 내용을 마지막으로 고친 날. 사이트맵 lastmod로 쓰므로 소개를 고치면 같이 바꾼다. */
+  updatedAt: '2026-11-02',
   bio: [
     '안녕하세요, AI Agent 개발을 중심으로 서버·웹 애플리케이션을 만드는 풀스택 개발자 김승찬입니다. 서비스를 설계하고 구현하는 일부터 배포와 운영, 장애 대응까지 직접 연결합니다.',
     'Python·LangGraph·RAG 기반 AI Agent, Spring Boot와 Next.js 기반 제품 개발, 대규모 리팩토링과 운영 자동화 경험을 kscold.com에 기록합니다.',
@@ -34,10 +38,16 @@ export const PROFILE_IDENTITY = {
  * 글·노트 작성자 이름은 계정 이름(kscold)으로 내려온다. 블로그 주인 계정이면 실명으로 보여 줘
  * 모든 글이 "김승찬"이라는 이름과 함께 색인되게 한다.
  */
-export function toAuthorDisplayName(author: { name?: string | null; username?: string | null }) {
+type AuthorLike = { name?: string | null; username?: string | null };
+
+export function isOwnerAuthor(author: AuthorLike) {
   const handle = PROFILE.handle.toLowerCase();
-  const isOwner = [author.name, author.username].some(value => value?.trim().toLowerCase() === handle);
-  return isOwner ? PROFILE.name : author.name?.trim() || PROFILE.name;
+  if (author.name?.trim() === PROFILE.name) return true;
+  return [author.name, author.username].some(value => value?.trim().toLowerCase() === handle);
+}
+
+export function toAuthorDisplayName(author: AuthorLike) {
+  return isOwnerAuthor(author) ? PROFILE.name : author.name?.trim() || PROFILE.name;
 }
 
 /**

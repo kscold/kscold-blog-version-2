@@ -1,3 +1,4 @@
+import { toAuthorDisplayName } from '@/entities/profile';
 import { fetchAllPublicApiPages } from '@/shared/lib/seo';
 import { buildRssDocument } from '@/shared/lib/seo/rss';
 import { isPostSummary } from '@/widgets/blog/archive';
@@ -9,7 +10,7 @@ export async function GET() {
       return unavailableResponse();
     }
 
-    return new Response(buildRssDocument(posts), {
+    return new Response(buildRssDocument(posts, { authorName: post => toAuthorDisplayName(post.author) }), {
       headers: {
         'Content-Type': 'application/rss+xml; charset=utf-8',
         'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
