@@ -2,6 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import { MermaidBlock } from '@/shared/ui/MermaidBlock';
+import { InteractiveBlock } from '@/shared/ui/interactive/InteractiveBlock';
+import { findInteractiveDemoId } from '@/shared/ui/interactive/interactiveDemoIds';
 
 // react-syntax-highlighter는 무겁고(테마 포함) 코드 블록이 있는 글에서만 필요하므로
 // 별도 청크로 분리해 코드 블록이 없는 마크다운 페이지의 번들에서 제외한다.
@@ -97,6 +99,12 @@ export function MarkdownCodeBlock({
 
   if (isMermaidBlock) {
     return <MermaidBlock chart={codeText} theme={isDark ? 'dark' : 'light'} />;
+  }
+
+  // ```interactive 블록은 첫 줄의 데모 이름으로 직접 만져 보는 데모를 그린다. 모르는 이름이면 코드 블록으로 남긴다.
+  const interactiveDemoId = language === 'interactive' ? findInteractiveDemoId(codeText) : null;
+  if (interactiveDemoId) {
+    return <InteractiveBlock demoId={interactiveDemoId} />;
   }
 
   if (!language) {

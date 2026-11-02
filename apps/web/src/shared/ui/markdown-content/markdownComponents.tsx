@@ -4,6 +4,7 @@ import type { Components } from 'react-markdown';
 import { getVideoEmbedConfig } from '@/shared/lib/videoEmbed';
 import { VideoEmbed } from '@/shared/ui/VideoEmbed';
 import { VideoPlayer } from '@/shared/ui/VideoPlayer';
+import { findInteractiveDemoInPre } from './interactivePre';
 import { MarkdownCodeBlock } from './markdownCodeBlock';
 import { MarkdownImage } from './MarkdownImage';
 
@@ -157,6 +158,11 @@ export function createMarkdownComponents(
       );
     },
     strong: ({ children }) => <strong className="markdown-strong">{children}</strong>,
+    pre: ({ children, node, ...rest }) => {
+      // 직접 만져 보는 데모는 코드 블록용 pre 상자(어두운 배경·고정폭 글꼴) 밖에 그린다.
+      if (findInteractiveDemoInPre(node)) return <>{children}</>;
+      return <pre {...rest}>{children}</pre>;
+    },
     code(props) {
       const { className, children } = props;
       return <MarkdownCodeBlock className={className} isDark={isDark}>{children}</MarkdownCodeBlock>;

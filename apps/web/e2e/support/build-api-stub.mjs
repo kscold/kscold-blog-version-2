@@ -67,6 +67,31 @@ const featuredPost = {
 };
 const featuredPostSummary = { ...featuredPost, content: null };
 const koreanSlugPost = { ...featuredPost, id: 'ci-korean-post', title: 'CI 한글 주소 글', slug: '한글-주소-글' };
+// 글 본문의 ```interactive 블록이 데모로 바뀌는지 확인하는 글. 마지막 블록은 없는 데모 이름이다.
+const interactiveDemoPost = {
+  ...featuredPost,
+  id: 'ci-interactive-post',
+  title: 'CI 인터랙티브 블록 글',
+  slug: 'ci-interactive-demo',
+  featured: false,
+  content: [
+    '## 레플리카셋 선거',
+    '',
+    '```interactive',
+    'replica-set-election',
+    '```',
+    '',
+    '## 샤드 키',
+    '',
+    '```interactive',
+    'shard-key-routing',
+    '```',
+    '',
+    '```interactive',
+    'unknown-demo',
+    '```',
+  ].join('\n'),
+};
 const vaultWikiLinkNote = {
   id: 'ci-vault-note',
   title: 'CI Vault 위키링크 검증',
@@ -153,6 +178,12 @@ function getResponseData(requestUrl) {
   }
   if (pathname === '/api/posts/slug/ci-frontend-verification') {
     return featuredPost;
+  }
+  if (pathname === `/api/posts/slug/${interactiveDemoPost.slug}/navigation`) {
+    return { previous: null, next: null };
+  }
+  if (pathname === `/api/posts/slug/${interactiveDemoPost.slug}`) {
+    return interactiveDemoPost;
   }
   if (pathname === '/api/posts') {
     return getBlogArchivePage(featuredPostSummary, searchParams);
