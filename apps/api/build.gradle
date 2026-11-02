@@ -84,6 +84,8 @@ dependencies {
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "com.google.protobuf:protobuf-java:${protobufVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
+    // gRPC가 끌어오는 Guava의 취약점 CVE-2026-102554 (33.7.2에서 수정)
+    implementation 'com.google.guava:guava:33.7.2-jre'
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
