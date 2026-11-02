@@ -31,6 +31,8 @@ import com.kscold.blog.identity.adapter.in.web.JwtAuthenticationFilter;
 import com.kscold.blog.identity.application.port.in.UserQueryPort;
 import com.kscold.blog.identity.domain.port.out.TokenProvider;
 import com.kscold.blog.notification.application.port.in.NotificationUseCase;
+import com.kscold.blog.shared.web.ratelimit.ApiRateLimitFilter;
+import com.kscold.blog.shared.web.ratelimit.ApiRateLimitProperties;
 import com.kscold.blog.support.TestJson;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -242,6 +244,14 @@ class PrivateDocumentSecurityTest {
         CookieCsrfProtectionFilter cookieCsrfProtectionFilter(
                 CorsOriginPolicy policy, ObjectMapper mapper) {
             return new CookieCsrfProtectionFilter(policy, mapper);
+        }
+
+        @Bean
+        ApiRateLimitFilter apiRateLimitFilter(ObjectMapper mapper) {
+            // 이 테스트는 문서 권한만 본다. 요청 제한은 ApiRateLimitFilterTest에서 확인한다.
+            ApiRateLimitProperties properties = new ApiRateLimitProperties();
+            properties.setEnabled(false);
+            return new ApiRateLimitFilter(properties, mapper);
         }
     }
 }

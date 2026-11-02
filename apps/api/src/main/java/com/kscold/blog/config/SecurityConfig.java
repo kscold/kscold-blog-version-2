@@ -4,6 +4,7 @@ import com.kscold.blog.exception.ErrorCode;
 import com.kscold.blog.identity.adapter.in.web.CookieCsrfProtectionFilter;
 import com.kscold.blog.identity.adapter.in.web.JwtAuthenticationFilter;
 import com.kscold.blog.shared.web.ApiResponse;
+import com.kscold.blog.shared.web.ratelimit.ApiRateLimitFilter;
 import jakarta.servlet.DispatcherType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CookieCsrfProtectionFilter cookieCsrfProtectionFilter;
+    private final ApiRateLimitFilter apiRateLimitFilter;
     private final ObjectMapper objectMapper;
     private final CorsOriginPolicy corsOriginPolicy;
 
@@ -153,7 +155,9 @@ public class SecurityConfig {
                                         .authenticated())
                 .addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(cookieCsrfProtectionFilter, JwtAuthenticationFilter.class);
+                .addFilterBefore(cookieCsrfProtectionFilter, JwtAuthenticationFilter.class)
+                // 요청 제한은 로그인 정보를 읽은 뒤에 사용자·관리자를 가려서 센다.
+                .addFilterAfter(apiRateLimitFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }

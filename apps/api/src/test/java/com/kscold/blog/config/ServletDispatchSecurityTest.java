@@ -19,6 +19,8 @@ import com.kscold.blog.notification.application.port.in.NotificationUseCase;
 import com.kscold.blog.notification.domain.model.NotificationMessage;
 import com.kscold.blog.shared.web.FallbackErrorController;
 import com.kscold.blog.shared.web.HealthController;
+import com.kscold.blog.shared.web.ratelimit.ApiRateLimitFilter;
+import com.kscold.blog.shared.web.ratelimit.ApiRateLimitProperties;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -234,6 +236,14 @@ class ServletDispatchSecurityTest {
         CookieCsrfProtectionFilter cookieCsrfProtectionFilter(
                 CorsOriginPolicy policy, ObjectMapper mapper) {
             return new CookieCsrfProtectionFilter(policy, mapper);
+        }
+
+        @Bean
+        ApiRateLimitFilter apiRateLimitFilter(ObjectMapper mapper) {
+            // 이 테스트는 서블릿 재진입만 본다. 요청 제한은 ApiRateLimitFilterTest에서 확인한다.
+            ApiRateLimitProperties properties = new ApiRateLimitProperties();
+            properties.setEnabled(false);
+            return new ApiRateLimitFilter(properties, mapper);
         }
     }
 
