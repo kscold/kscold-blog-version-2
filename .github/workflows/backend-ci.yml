@@ -29,12 +29,12 @@ concurrency:
 
 jobs:
   verify:
-    # MongoDB 8.0 cannot start on the Ubuntu 26.04 kernel (SERVER-136848).
+    # MongoDB 8.0은 리눅스 커널 6.19 이상에서 시작하지 못한다(SERVER-136848). 러너 커널이 올라가 운영과 같은 9.0.4를 쓴다.
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
       like-test-mongo:
-        image: mongo:8.0@sha256:8e7d23aa641b0ec6c86418866d5d18d74d5abf89061bc5db7bc4b80929021ef6
+        image: mongo:9.0.4@sha256:452bdaf2127b8ff851e31410a267809b9829eded219979f2210e7c7efb85a058
         ports:
           - 27017:27017
         options: >-
