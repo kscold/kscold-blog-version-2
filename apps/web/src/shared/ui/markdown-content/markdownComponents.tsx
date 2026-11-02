@@ -6,7 +6,7 @@ import { VideoEmbed } from '@/shared/ui/VideoEmbed';
 import { VideoPlayer } from '@/shared/ui/VideoPlayer';
 import { findInteractiveDemoInPre } from './interactivePre';
 import { MarkdownCodeBlock } from './markdownCodeBlock';
-import { MarkdownImage } from './MarkdownImage';
+import { ZoomableMarkdownImage } from './ZoomableMarkdownImage';
 
 const VIDEO_FILE_PATTERN = /\.(mp4|webm|mov)(\?.*)?$/i;
 
@@ -68,7 +68,7 @@ function ImageGrid({ imgNodes }: { imgNodes: ImgHastNode[] }) {
         const priority = imgNode.properties?.dataPriorityImage === true;
         return (
           <div key={i}>
-            <MarkdownImage
+            <ZoomableMarkdownImage
               src={src}
               alt={alt}
               priority={priority}
@@ -168,7 +168,7 @@ export function createMarkdownComponents(
       return <MarkdownCodeBlock className={className} isDark={isDark}>{children}</MarkdownCodeBlock>;
     },
     img: ({ src, alt, node }) => (
-      <MarkdownImage
+      <ZoomableMarkdownImage
         src={typeof src === 'string' ? src : undefined}
         alt={alt || ''}
         priority={node?.properties?.dataPriorityImage === true}

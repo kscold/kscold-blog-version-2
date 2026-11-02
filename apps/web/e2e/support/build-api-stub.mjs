@@ -92,6 +92,23 @@ const interactiveDemoPost = {
     '```',
   ].join('\n'),
 };
+// 본문 이미지를 눌러 크게 보는 동작을 확인하는 글. 이미지 하나와 두 장짜리 묶음을 함께 둔다.
+const imageLightboxPost = {
+  ...featuredPost,
+  id: 'ci-image-lightbox-post',
+  title: 'CI 이미지 크게 보기 글',
+  slug: 'ci-image-lightbox',
+  featured: false,
+  content: [
+    '## 그림 한 장',
+    '',
+    '![CI 확대 그림](/images/teams/pawpong-logo.png)',
+    '',
+    '## 두 장 묶음',
+    '',
+    '![CI 묶음 첫째](/images/teams/pawpong-logo.png) ![CI 묶음 둘째](/images/teams/pawpong-logo.png)',
+  ].join('\n'),
+};
 const vaultWikiLinkNote = {
   id: 'ci-vault-note',
   title: 'CI Vault 위키링크 검증',
@@ -178,6 +195,12 @@ function getResponseData(requestUrl) {
   }
   if (pathname === '/api/posts/slug/ci-frontend-verification') {
     return featuredPost;
+  }
+  if (pathname === `/api/posts/slug/${imageLightboxPost.slug}/navigation`) {
+    return { previous: null, next: null };
+  }
+  if (pathname === `/api/posts/slug/${imageLightboxPost.slug}`) {
+    return imageLightboxPost;
   }
   if (pathname === `/api/posts/slug/${interactiveDemoPost.slug}/navigation`) {
     return { previous: null, next: null };
