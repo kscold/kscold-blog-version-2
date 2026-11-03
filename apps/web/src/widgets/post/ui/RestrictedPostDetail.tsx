@@ -90,7 +90,7 @@ export function RestrictedPostDetail({ post }: RestrictedPostDetailProps) {
 
   return (
     <div className="min-h-screen bg-surface-50">
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <article className="max-w-4xl mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <PostHeader
           title={resolvedPost.title}
           excerpt={headerExcerpt}

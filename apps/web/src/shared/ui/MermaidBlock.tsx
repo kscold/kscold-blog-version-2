@@ -3,10 +3,11 @@
 import { useHydrated } from '@/shared/lib/useBrowserSnapshot';
 
 import { useEffect, useId, useRef, useState, type RefObject } from 'react';
-import { useMermaidInteraction, type MermaidRenderState } from '@/shared/ui/useMermaidInteraction';
+import type { MermaidRenderState } from '@/shared/ui/mermaid/MermaidDiagram';
 import { ensureMermaidFonts, loadMermaid, processMermaidSvg } from '@/shared/lib/mermaid';
 import { MermaidToolbar } from '@/shared/ui/mermaid/MermaidToolbar';
 import { MermaidDiagram } from '@/shared/ui/mermaid/MermaidDiagram';
+import { MermaidViewer } from '@/shared/ui/mermaid/MermaidViewer';
 
 interface MermaidBlockProps {
   chart: string;
@@ -18,21 +19,11 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
   const diagramId = `mermaid-${blockId}`;
   const [svg, setSvg] = useState('');
   const [renderState, setRenderState] = useState<MermaidRenderState>('loading');
+  const [expandedHeight, setExpandedHeight] = useState<number | null>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const isExpanded = expandedHeight !== null;
   const wrapperRef = useRef<HTMLDivElement>(null);
   const nearViewport = useNearViewport(wrapperRef);
-
-  const {
-    containerRef,
-    contentRef,
-    transform: tf,
-    dragging,
-    containerHeight,
-    isTransformed,
-    reset,
-    onMouseDown,
-    onMouseMove,
-    stopDrag,
-  } = useMermaidInteraction(renderState);
 
   useEffect(() => {
     // 다이어그램 배치 계산은 수백 ms 동안 화면을 붙잡는다. 첫 화면이 그려진 뒤, 다이어그램이 화면 가까이 왔을 때만 그린다.
@@ -75,32 +66,24 @@ export function MermaidBlock({ chart, theme = 'light' }: MermaidBlockProps) {
   return (
     <div
       ref={wrapperRef}
-      className="not-prose relative my-6 overflow-hidden rounded-2xl border shadow-xs"
+      data-mermaid-block
+      className={`not-prose relative my-6 min-w-0 overflow-hidden whitespace-normal rounded-2xl border font-sans shadow-xs ${theme === 'dark' ? 'border-surface-800 bg-surface-950' : 'border-surface-200 bg-white'}`}
     >
-      {/* Header */}
       <MermaidToolbar
         theme={theme}
         chart={chart}
-        isTransformed={isTransformed}
-        scale={tf.s}
-        onReset={reset}
+        canExpand={renderState === 'rendered'}
+        onExpand={() => {
+          setExpandedHeight(previewRef.current?.offsetHeight ?? 0);
+        }}
       />
-
-      {/* Diagram area */}
-      <MermaidDiagram
-        theme={theme}
-        renderState={renderState}
-        svg={svg}
-        chart={chart}
-        containerRef={containerRef}
-        contentRef={contentRef}
-        containerHeight={containerHeight}
-        dragging={dragging}
-        transform={tf}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        stopDrag={stopDrag}
-      />
+      <div ref={previewRef} style={isExpanded ? { height: expandedHeight } : undefined}>
+        {isExpanded ? (
+          <MermaidViewer svg={svg} theme={theme} onClose={() => setExpandedHeight(null)} />
+        ) : (
+          <MermaidDiagram theme={theme} renderState={renderState} svg={svg} chart={chart} />
+        )}
+      </div>
     </div>
   );
 }

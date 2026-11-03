@@ -4,7 +4,6 @@ import type { Components } from 'react-markdown';
 import { getVideoEmbedConfig } from '@/shared/lib/videoEmbed';
 import { VideoEmbed } from '@/shared/ui/VideoEmbed';
 import { VideoPlayer } from '@/shared/ui/VideoPlayer';
-import { findInteractiveDemoInPre } from './interactivePre';
 import { MarkdownCodeBlock } from './markdownCodeBlock';
 import { ZoomableMarkdownImage } from './ZoomableMarkdownImage';
 
@@ -57,11 +56,11 @@ function extractImageNodes(node: unknown): ImgHastNode[] {
 function ImageGrid({ imgNodes }: { imgNodes: ImgHastNode[] }) {
   const sizes =
     imgNodes.length === 2
-      ? '(max-width: 768px) calc((100vw - 44px) / 2), 440px'
-      : '(max-width: 768px) calc((100vw - 56px) / 3), 290px';
+      ? '(max-width: 639px) calc(100vw - 32px), 440px'
+      : '(max-width: 639px) calc(100vw - 32px), 290px';
 
   return (
-    <div className={`my-8 grid gap-3 ${imgNodes.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+    <div className={`my-8 grid grid-cols-1 gap-3 ${imgNodes.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
       {imgNodes.map((imgNode, i) => {
         const src = imgNode.properties?.src;
         const alt = imgNode.properties?.alt ?? '';
@@ -158,11 +157,8 @@ export function createMarkdownComponents(
       );
     },
     strong: ({ children }) => <strong className="markdown-strong">{children}</strong>,
-    pre: ({ children, node, ...rest }) => {
-      // 직접 만져 보는 데모는 코드 블록용 pre 상자(어두운 배경·고정폭 글꼴) 밖에 그린다.
-      if (findInteractiveDemoInPre(node)) return <>{children}</>;
-      return <pre {...rest}>{children}</pre>;
-    },
+    // 코드·도표·데모는 각 컴포넌트가 상자를 그린다. 바깥 pre의 여백·고정폭 글꼴을 물려주지 않는다.
+    pre: ({ children }) => <>{children}</>,
     code(props) {
       const { className, children } = props;
       return <MarkdownCodeBlock className={className} isDark={isDark}>{children}</MarkdownCodeBlock>;
@@ -177,8 +173,8 @@ export function createMarkdownComponents(
       />
     ),
     table: ({ children }) => (
-      <div className={`not-prose my-8 overflow-x-auto rounded-2xl border ${tableSurfaceClass}`}>
-        <table className="m-0 w-full min-w-[720px] border-separate border-spacing-0 text-sm leading-6">
+      <div role="region" aria-label="본문 표" tabIndex={0} className={`not-prose my-8 overflow-x-auto rounded-2xl border focus-visible:outline-2 focus-visible:outline-primary-500 ${tableSurfaceClass}`}>
+        <table className="m-0 w-full border-separate border-spacing-0 text-sm leading-6">
           {children}
         </table>
       </div>
@@ -188,14 +184,14 @@ export function createMarkdownComponents(
     tr: ({ children }) => <tr>{children}</tr>,
     th: ({ children }) => (
       <th
-        className={`whitespace-nowrap border-b border-r px-4 py-3 text-left text-xs font-black uppercase tracking-[0.12em] last:border-r-0 ${tableHeaderClass}`}
+        className={`whitespace-nowrap border-b border-r px-3 py-3 text-left text-sm font-semibold last:border-r-0 sm:px-4 ${tableHeaderClass}`}
       >
         {children}
       </th>
     ),
     td: ({ children }) => (
       <td
-        className={`border-r px-4 py-3 align-top last:border-r-0 ${tableCellClass}`}
+        className={`border-r px-3 py-3 align-top wrap-anywhere last:border-r-0 sm:px-4 ${tableCellClass}`}
       >
         {children}
       </td>

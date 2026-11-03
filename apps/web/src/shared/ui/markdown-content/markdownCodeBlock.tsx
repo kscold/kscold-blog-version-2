@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { MermaidBlock } from '@/shared/ui/MermaidBlock';
 import { InteractiveBlock } from '@/shared/ui/interactive/InteractiveBlock';
 import { findInteractiveDemoId } from '@/shared/ui/interactive/interactiveDemoIds';
+import { useClipboardCopy } from '@/shared/lib/useClipboardCopy';
 
 // react-syntax-highlighter는 무겁고(테마 포함) 코드 블록이 있는 글에서만 필요하므로
 // 별도 청크로 분리해 코드 블록이 없는 마크다운 페이지의 번들에서 제외한다.
@@ -107,27 +108,6 @@ export function MarkdownCodeBlock({
     return <InteractiveBlock demoId={interactiveDemoId} />;
   }
 
-  if (!language) {
-    return (
-      <div className="not-prose group relative my-6">
-        <MarkdownCopyButton codeText={codeText} isDark={isDark} variant="overlay" />
-        <pre
-          className={`my-0 overflow-x-auto rounded-xl border p-5 shadow-xs ${
-            isDark ? 'border-surface-800 bg-[#0f111a]' : 'border-surface-200 bg-surface-50'
-          }`}
-        >
-          <code
-            className={`whitespace-pre text-sm font-mono ${
-              isDark ? 'text-surface-200' : 'text-surface-800'
-            }`}
-          >
-            {codeText}
-          </code>
-        </pre>
-      </div>
-    );
-  }
-
   return (
     <div
       className={`not-prose my-6 overflow-hidden rounded-xl border shadow-xs ${
@@ -135,22 +115,26 @@ export function MarkdownCodeBlock({
       }`}
     >
       <div
-        className={`flex items-center justify-between gap-3 border-b px-4 py-2.5 ${
+        className={`flex items-center justify-between gap-3 border-b px-3 py-1 sm:px-4 ${
           isDark ? 'border-surface-800 bg-surface-900/70' : 'border-surface-200 bg-white/80'
         }`}
       >
         <span
-          data-code-language={rawLanguage.toLowerCase()}
+          data-code-language={rawLanguage.toLowerCase() || 'text'}
           className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
             isDark ? 'bg-surface-800/90 text-surface-300' : 'bg-surface-50 text-surface-500 shadow-xs'
           }`}
         >
-          {formatLanguageLabel(rawLanguage)}
+          {formatLanguageLabel(rawLanguage || 'text')}
         </span>
-        <MarkdownCopyButton codeText={codeText} isDark={isDark} variant="inline" />
+        <MarkdownCopyButton codeText={codeText} isDark={isDark} />
       </div>
-      <div className="overflow-x-auto">
-        <CodeHighlighter codeText={codeText} language={language} isDark={isDark} />
+      <div role="region" aria-label="코드 블록" tabIndex={0} className="overflow-x-auto focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500">
+        {language ? <CodeHighlighter codeText={codeText} language={language} isDark={isDark} /> : (
+          <pre className={`m-0 p-4 sm:p-5 ${isDark ? 'text-surface-200' : 'text-surface-800'}`}>
+            <code className="whitespace-pre text-sm font-mono">{codeText}</code>
+          </pre>
+        )}
       </div>
     </div>
   );
@@ -159,34 +143,23 @@ export function MarkdownCodeBlock({
 function MarkdownCopyButton({
   codeText,
   isDark,
-  variant,
 }: {
   codeText: string;
   isDark: boolean;
-  variant: 'inline' | 'overlay';
 }) {
-  const button = (
+  const { copy, label } = useClipboardCopy(codeText);
+  return (
     <button
-      onClick={() => {
-        navigator.clipboard.writeText(codeText);
-      }}
-      className={`rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors ${
+      type="button"
+      onClick={copy}
+      aria-label="코드 복사"
+      className={`min-h-11 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-primary-500 ${
         isDark
           ? 'border border-surface-700 bg-surface-800 text-surface-100 hover:bg-surface-700 hover:text-white'
           : 'border border-surface-200 bg-surface-100 text-surface-600 hover:bg-surface-200 hover:text-surface-900'
       }`}
     >
-      Copy
+      <span aria-live="polite">{label}</span>
     </button>
-  );
-
-  if (variant === 'inline') {
-    return button;
-  }
-
-  return (
-    <div className="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-hover:opacity-100">
-      {button}
-    </div>
   );
 }

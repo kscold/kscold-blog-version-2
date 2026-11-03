@@ -66,7 +66,7 @@ export function PostHeader({
     <>
       {/* 현재 위치 */}
       <nav
-        className="mb-8 flex items-center gap-2 text-sm text-surface-500"
+        className="mb-6 flex min-w-0 items-center gap-2 text-xs text-surface-500 sm:mb-8 sm:text-sm [&>a]:shrink-0"
       >
         <Link href="/blog" className="hover:text-surface-900 transition-colors">
           Blog
@@ -79,13 +79,13 @@ export function PostHeader({
           {category.name}
         </Link>
         <span className="text-surface-300">/</span>
-        <span className="text-surface-600 truncate max-w-[200px]">{title}</span>
+        <span className="min-w-0 truncate text-surface-600 sm:max-w-80">{title}</span>
       </nav>
 
       {/* 포스트 상단 정보 */}
-      <header className="mb-12">
+      <header className="mb-8 sm:mb-12">
         {/* 카테고리와 발행일 */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="mb-5 flex flex-wrap items-center gap-3 sm:mb-6">
           <Link
             href={`/blog/${category.slug}`}
             className="inline-flex items-center gap-2 px-4 py-1.5 bg-surface-900 text-white rounded-full text-sm font-medium hover:bg-surface-700 transition-colors"
@@ -103,7 +103,7 @@ export function PostHeader({
         </div>
 
         {/* 제목 */}
-        <h1 className="text-4xl sm:text-5xl font-sans font-black tracking-tight text-surface-900 mb-6 leading-[1.1]">
+        <h1 className="mb-6 text-3xl font-sans font-black leading-snug tracking-tight text-surface-900 break-keep wrap-anywhere text-pretty sm:text-5xl sm:leading-tight">
           {title}
         </h1>
 

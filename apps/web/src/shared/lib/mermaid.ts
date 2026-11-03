@@ -123,11 +123,25 @@ export async function ensureMermaidFonts() {
 
 /**
  * Mermaid가 렌더한 SVG를 후처리함.
- * - Mermaid가 주입하는 max-width 제거 (SVG를 자연 크기로 렌더)
  * - 실제 텍스트 크기에 맞춰 노드 박스를 동적으로 키움 (잘림 방지)
+ * - 도표 종류별 고정 크기를 viewBox의 비율로 통일하고 화면 폭은 CSS로 제한함
  */
 export function processMermaidSvg(rawSvg: string): string {
-  // Mermaid가 주입한 max-width를 제거해 SVG가 원래 크기로 렌더되게 함
-  const processed = rawSvg.replace(/max-width\s*:\s*[\d.]+px\s*;?\s*/g, '');
-  return fitNodesToText(processed);
+  const fitted = fitNodesToText(rawSvg);
+  const template = document.createElement('template');
+  template.innerHTML = fitted;
+  const svg = template.content.querySelector('svg');
+  if (!svg) return fitted;
+
+  // xychart의 고정 높이와 flowchart의 백분율 폭을 같은 viewBox 비율로 맞춘다.
+  const { width, height } = svg.viewBox.baseVal;
+  if (width > 0 && height > 0) {
+    svg.setAttribute('width', String(width));
+    svg.setAttribute('height', String(height));
+    svg.style.removeProperty('width');
+    svg.style.removeProperty('height');
+    svg.style.removeProperty('max-width');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  }
+  return template.innerHTML;
 }

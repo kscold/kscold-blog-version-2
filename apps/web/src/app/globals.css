@@ -531,20 +531,21 @@
 
   .mermaid-diagram svg {
     display: block;
-    width: 100%;
+    width: auto;
     height: auto;
-    min-width: 640px;
+    max-width: 100%;
     margin: 0 auto;
+  }
+
+  .mermaid-expanded svg {
+    width: 100%;
+    max-width: none;
   }
 
   /* 노드 라벨이 박스 경계에서 잘리지 않도록 (Mermaid 측정값과 충돌하는
      line-height·white-space 오버라이드는 두지 않는다 — 측정/렌더 불일치로 잘림 유발) */
   .mermaid-diagram svg foreignObject {
     overflow: visible;
-  }
-
-  .mermaid-diagram-wrapper {
-    -webkit-overflow-scrolling: touch;
   }
 
   .custom-scrollbar {
@@ -592,30 +593,26 @@
     text-wrap: pretty;
   }
 
-  .markdown-prose p,
-  .markdown-prose li,
-  .markdown-prose blockquote {
+  .markdown-prose :where(p, li, blockquote):not(:where(.not-prose, .not-prose *)) {
     letter-spacing: -0.012em;
     line-height: 1.92;
     word-break: keep-all;
     overflow-wrap: anywhere;
   }
 
-  .markdown-prose h1,
-  .markdown-prose h2,
-  .markdown-prose h3,
-  .markdown-prose h4 {
+  .markdown-prose :where(h1, h2, h3, h4):not(:where(.not-prose, .not-prose *)) {
     letter-spacing: -0.03em;
-    line-height: 1.25;
+    line-height: 1.4;
     word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
-  /* 본문의 원래 H1을 H2로 렌더해도 기존 Typography 시각 체계를 유지한다. */
+  /* 본문의 원래 H1 위계를 유지하되 작은 화면에서 제목만 과도하게 커지지 않게 한다. */
   .markdown-prose h2.markdown-source-h1 {
     margin-top: 0;
     margin-bottom: 0.8333333em;
-    font-size: 2.6666667em;
-    line-height: 1.25;
+    font-size: clamp(2em, 5vw, 2.6666667em);
+    line-height: 1.4;
   }
 
   .markdown-prose .markdown-strong {
