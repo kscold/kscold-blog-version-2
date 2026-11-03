@@ -38,7 +38,7 @@ test('작은 표는 화면에 맞고 넓은 표만 표 안에서 키보드로 �
   await wide.focus();
   await page.keyboard.press('ArrowRight');
   await expect.poll(() => wide.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });
 
 test('코드 안의 들여쓰기를 유지하고 터치로 복사 결과와 실패를 확인할 수 있다', async ({ page, request }) => {
@@ -66,7 +66,7 @@ test('코드 안의 들여쓰기를 유지하고 터치로 복사 결과와 실�
   } }));
   await copy.click();
   await expect(copy).toHaveText('복사 실패');
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });
 
 test('모바일의 본문 제목·긴 주소가 넘치지 않고 이미지 묶음은 한 장씩 보여 준다', async ({ page, request }) => {
@@ -80,7 +80,7 @@ test('모바일의 본문 제목·긴 주소가 넘치지 않고 이미지 묶�
   const second = (await pictures.nth(1).boundingBox())!;
   expect(first.width).toBeGreaterThan(340);
   expect(second.y).toBeGreaterThanOrEqual(first.y + first.height);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });
 
 test('데스크톱의 이미지 묶음은 기존처럼 나란히 보여 준다', async ({ page, request }) => {

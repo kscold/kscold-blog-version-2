@@ -212,6 +212,17 @@
     cursor: none !important;
   }
 
+  /* DOM 커서는 브라우저 최상위 계층의 dialog 뒤에 가려지므로 기본 포인터를 유지한다. */
+  html.custom-cursor-active dialog:modal,
+  html.custom-cursor-active dialog:modal *,
+  html.custom-cursor-active dialog::backdrop {
+    cursor: auto !important;
+  }
+
+  html.custom-cursor-active dialog:modal :is(button:not(:disabled), a[href]) {
+    cursor: pointer !important;
+  }
+
   /* 선택 영역 스타일 */
   ::selection {
     @apply bg-surface-900 text-white;

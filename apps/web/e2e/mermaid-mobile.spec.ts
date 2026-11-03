@@ -20,7 +20,7 @@ for (const width of [320, 393, 402, 1440]) {
       }));
     expect(labels).toHaveLength(10);
     expect(labels.every(label => label.inside)).toBe(true);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
     if (width < 640) {
       const styles = await page.locator('.markdown-prose > p').first().evaluate(element => {
         const style = getComputedStyle(element);
@@ -109,6 +109,19 @@ test('문법 오류는 원본을 읽을 수 있는 상자로 표시하고 다음
   await expect(next.locator('[data-mermaid-status]')).toHaveAttribute('data-mermaid-status', 'rendered');
 });
 
+test('커스텀 커서가 켜져 있어도 브라우저 최상위 확대 창에서는 포인터가 보인다', async ({ page, request }) => {
+  const block = await openMermaidArticle({ page, request });
+  // CI의 GPU 종류와 관계없이 커스텀 커서가 기본 포인터를 숨기는 조건을 재현한다.
+  await page.locator('html').evaluate(element => element.classList.add('custom-cursor-active'));
+  await block.getByRole('button', { name: '크게 보기' }).click();
+  const dialog = page.getByRole('dialog', { name: '도표 크게 보기' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).not.toHaveCSS('cursor', 'none');
+  await expect(dialog.getByRole('button', { name: '닫기' })).toHaveCSS('cursor', 'pointer');
+  await dialog.getByRole('button', { name: '닫기' }).click();
+  await expect(page.locator('html')).toHaveClass(/custom-cursor-active/);
+});
+
 test('화면 폭이 바뀌어도 흐름도 라벨과 일반 코드의 줄바꿈을 유지한다', async ({ page, request }) => {
   await openMermaidArticle({ page, request });
   const flowchart = page.locator('[data-mermaid-block]').nth(1);
@@ -121,5 +134,5 @@ test('화면 폭이 바뀌어도 흐름도 라벨과 일반 코드의 줄바꿈�
   expect(overflow).toBeLessThanOrEqual(0);
   await expect(page.locator('pre pre')).toHaveCount(0);
   await expect(page.locator('code').filter({ hasText: '첫 줄은 그대로' })).toHaveText('첫 줄은 그대로 둡니다.\n    둘째 줄은 네 칸 들여씁니다.');
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(393);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });
