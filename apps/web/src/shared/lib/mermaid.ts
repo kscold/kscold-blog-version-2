@@ -46,17 +46,24 @@ export function fitNodesToText(rawSvg: string): string {
       const dw = needW + HPAD > foW ? needW + HPAD - foW : 0;
       if (dh === 0 && dw === 0) return;
 
+      // 여백은 상자(rect)에만 더한다. 라벨 칸(foreignObject)까지 여백만큼 키우면
+      // 글자가 늘어난 칸의 왼쪽 위에 붙어 상자 안에서 위·왼쪽으로 쏠려 보인다.
       if (dh > 0) {
-        fo.setAttribute('height', String(foH + dh));
-        fo.setAttribute('y', String(fo.y.baseVal.value - dh / 2));
         rect.setAttribute('height', String(rect.height.baseVal.value + dh));
         rect.setAttribute('y', String(rect.y.baseVal.value - dh / 2));
       }
       if (dw > 0) {
-        fo.setAttribute('width', String(foW + dw));
-        fo.setAttribute('x', String(fo.x.baseVal.value - dw / 2));
         rect.setAttribute('width', String(rect.width.baseVal.value + dw));
         rect.setAttribute('x', String(rect.x.baseVal.value - dw / 2));
+      }
+      // 라벨 칸은 글자가 실제로 넘칠 때만 글자 크기만큼 키우고 가운데를 유지한다
+      if (needH > foH) {
+        fo.setAttribute('height', String(needH));
+        fo.setAttribute('y', String(fo.y.baseVal.value - (needH - foH) / 2));
+      }
+      if (needW > foW) {
+        fo.setAttribute('width', String(needW));
+        fo.setAttribute('x', String(fo.x.baseVal.value - (needW - foW) / 2));
       }
     });
 
