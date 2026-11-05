@@ -13,7 +13,6 @@ export default function robots(): MetadataRoute.Robots {
     'Googlebot-Video',
     'Google-Extended',
     'AdsBot-Google',
-    'Mediapartners-Google',
     'Bingbot',
     'DuckDuckBot',
     'Slurp',
@@ -38,6 +37,13 @@ export default function robots(): MetadataRoute.Robots {
         allow,
         disallow,
       })),
+      // 애드센스 크롤러에만 Vault 노트를 막는다. 짧은 공부 노트가 사이트 심사에서
+      // "가치가 별로 없는 콘텐츠"로 잡히지 않게 하려는 것으로, 검색 크롤러는 그대로 들어온다.
+      {
+        userAgent: 'Mediapartners-Google',
+        allow,
+        disallow: [...disallow, '/vault'],
+      },
       {
         userAgent: '*',
         allow,

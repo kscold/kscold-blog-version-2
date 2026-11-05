@@ -19,7 +19,6 @@ import {
   toSeoDateTime,
   uniqueKeywords,
 } from '@/shared/lib/seo';
-import { AdSenseScript } from '@/shared/ui/AdSenseScript';
 import { JsonLd } from '@/shared/ui/JsonLd';
 import { VaultNotePageSkeleton } from '@/shared/ui/RouteSkeletons';
 
@@ -130,8 +129,8 @@ export default async function VaultNotePage({
   return (
     <>
       <JsonLd id={`vault-${note.id}`} data={jsonLd} />
-      {/* 용어 스텁처럼 분량이 적은 노트는 색인에서 빼는 것과 같은 기준으로 광고도 붙이지 않는다. */}
-      {isIndexableVaultContent(note.content) && <AdSenseScript />}
+      {/* Vault 노트에는 광고를 붙이지 않는다. robots.txt 에서 애드센스 크롤러(Mediapartners-Google)도
+          /vault 를 막아 두었으므로, 광고 코드를 넣어도 빈 자리만 남는다. */}
       <Suspense fallback={<VaultNotePageSkeleton />}>
         <VaultNoteLayout
           slug={note.slug}

@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkGfm from 'remark-gfm';
 import { remarkLooseStrong } from '@/shared/lib/remarkLooseStrong';
 import { rehypeImageGrid } from '@/shared/lib/rehypeImageGrid';
@@ -32,7 +33,9 @@ export function MarkdownContent({
   return (
     <div className={`${proseClasses} min-w-0 break-keep`}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkLooseStrong]}
+        // 한글 바로 앞뒤의 **굵게**(예: `**[[링크]]**으로`)를 CommonMark 가 굵게로 못 읽는 문제를
+        // remark-cjk-friendly 가 고친다. 한 줄 안의 남은 경우는 remarkLooseStrong 이 받는다.
+        remarkPlugins={[remarkGfm, remarkCjkFriendly, remarkLooseStrong]}
         rehypePlugins={[[rehypeImageGrid, { prioritizeFirstImage }]]}
         components={createMarkdownComponents(isDark, demotePrimaryHeading)}
       >
