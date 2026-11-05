@@ -5,6 +5,7 @@ import {
   buildVaultTitleSlugMap,
   extractVaultWikiLinkTitles,
   findCurrentVaultSlug,
+  findMergedVaultNoteTarget,
 } from '@/entities/vault';
 import { PROFILE, toAuthorDisplayName } from '@/entities/profile';
 import type { VaultNote, VaultNoteTitle } from '@/shared/model/types/vault';
@@ -44,6 +45,12 @@ function decodeSlug(slug: string) {
 
 /** 노트를 찾는다. 없으면 예전 주소 체계의 주소인지 확인해 현재 주소로 보내고, 아니면 404로 끝낸다. */
 async function requireVaultNote(slug: string): Promise<VaultNote> {
+  // 정리 노트로 합쳐진 짧은 노트는 정리 노트로 영구 이동시킨다.
+  const mergedTarget = findMergedVaultNoteTarget(decodeSlug(slug));
+  if (mergedTarget) {
+    permanentRedirect(`/vault/${encodeURIComponent(mergedTarget)}`);
+  }
+
   const note = await getVaultNote(slug);
   if (note) {
     return note;
