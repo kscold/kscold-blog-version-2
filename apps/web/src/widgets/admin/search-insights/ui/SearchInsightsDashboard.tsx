@@ -90,7 +90,7 @@ export function SearchInsightsDashboard({ insights }: { insights: SearchInsights
       </div>
 
       {searchConsole.ok && (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid items-start gap-6 lg:grid-cols-2">
           <Card title="많이 노출된 페이지" note="노출 · 클릭 · 평균 순위">
             <RankedList
               rows={searchConsole.data.pages.map(row => ({
@@ -100,15 +100,34 @@ export function SearchInsightsDashboard({ insights }: { insights: SearchInsights
               }))}
             />
           </Card>
-          <Card title="많이 노출된 검색어" note="노출 · 클릭 · 평균 순위">
-            <RankedList
-              empty="검색량이 적으면 구글이 검색어를 숨깁니다"
-              rows={searchConsole.data.queries.map(row => ({
-                label: row.key,
-                value: row.impressions,
-                detail: `${row.impressions} · ${row.clicks} · ${row.position}위`,
-              }))}
-            />
+          <Card
+            title="많이 노출된 검색어"
+            note={
+              searchConsole.data.queries.ok
+                ? `${searchConsole.data.queries.data.startDate} ~ ${searchConsole.data.queries.data.endDate} · 노출 · 클릭 · 평균 순위`
+                : '노출 · 클릭 · 평균 순위'
+            }
+          >
+            {searchConsole.data.queries.ok ? (
+              <>
+                {searchConsole.data.queries.data.startDate !== searchConsole.data.startDate && (
+                  <p className="mb-3 text-xs leading-relaxed text-surface-500">
+                    최근 28일에 공개된 검색어가 없어 최근 180일을 보여 줍니다. 구글이 제공한
+                    검색어를 노출 순으로 정렬했습니다.
+                  </p>
+                )}
+                <RankedList
+                  empty="이 기간에 구글이 제공한 검색어가 없습니다"
+                  rows={searchConsole.data.queries.data.rows.map(row => ({
+                    label: row.key,
+                    value: row.impressions,
+                    detail: `${row.impressions} · ${row.clicks} · ${row.position}위`,
+                  }))}
+                />
+              </>
+            ) : (
+              <SectionError message={searchConsole.data.queries.error} />
+            )}
           </Card>
         </div>
       )}

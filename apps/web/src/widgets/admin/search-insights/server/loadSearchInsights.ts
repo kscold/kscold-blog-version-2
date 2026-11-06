@@ -13,6 +13,7 @@ import {
   SEARCH_INSIGHTS_STATE_DIR,
   type GoogleClient,
 } from './googleApi';
+import { loadSearchQueries, type GscRow } from './searchQueries';
 
 const SITE = 'https://kscold.com/';
 const GSC = 'https://searchconsole.googleapis.com/webmasters/v3';
@@ -22,14 +23,6 @@ const DAYS = 28;
 const GSC_LAG_DAYS = 3;
 const TOP_ROWS = 10;
 const DAY_MS = 86_400_000;
-
-interface GscRow {
-  keys: string[];
-  clicks: number;
-  impressions: number;
-  ctr: number;
-  position: number;
-}
 
 interface Ga4Report {
   rows?: { dimensionValues?: { value: string }[]; metricValues: { value: string }[] }[];
@@ -83,7 +76,10 @@ async function loadSearchConsole(client: GoogleClient): Promise<SearchConsoleIns
     query({}),
     query({ dimensions: ['date'] }),
     query({ dimensions: ['page'], rowLimit: TOP_ROWS }),
-    query({ dimensions: ['query'], rowLimit: TOP_ROWS }),
+    section(async () => {
+      const result = await loadSearchQueries(query, range);
+      return { ...result, rows: result.rows.map(toRanked) };
+    }),
     client
       .get<{
         lastDownloaded?: string;
@@ -109,7 +105,7 @@ async function loadSearchConsole(client: GoogleClient): Promise<SearchConsoleIns
       date => ({ date, clicks: 0, impressions: 0 })
     ),
     pages: (pages.rows ?? []).map(toRanked),
-    queries: (queries.rows ?? []).map(toRanked),
+    queries,
     sitemap: sitemap
       ? {
           submitted: Number(sitemap.contents?.find(item => item.type === 'web')?.submitted ?? 0),
@@ -220,6 +216,6 @@ async function loadUncached(): Promise<SearchInsights> {
 }
 
 /** 구글 API 호출을 아끼려고 30분 동안 같은 결과를 쓴다. 관리자 확인 뒤에만 부른다. */
-export const loadSearchInsights = unstable_cache(loadUncached, ['admin-search-insights'], {
+export const loadSearchInsights = unstable_cache(loadUncached, ['admin-search-insights-v2'], {
   revalidate: 1800,
 });

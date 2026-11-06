@@ -33,7 +33,7 @@ export interface SearchConsoleInsights {
   position: number;
   daily: { date: string; clicks: number; impressions: number }[];
   pages: RankedRow[];
-  queries: RankedRow[];
+  queries: Section<{ startDate: string; endDate: string; rows: RankedRow[] }>;
   sitemap: { submitted: number; lastDownloaded: string | null } | null;
 }
 
