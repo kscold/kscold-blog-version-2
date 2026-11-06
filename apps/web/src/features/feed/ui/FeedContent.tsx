@@ -34,7 +34,7 @@ export function FeedContent({
     const title = toFeedTitle(content, linkPreviewTitle, `${authorName}의 피드`);
 
     return (
-      <div className="px-5 py-6 sm:px-7 sm:py-8 [&_.markdown-source-h1]:mb-8 [&_.markdown-source-h1]:text-[2rem] [&_.markdown-source-h1]:leading-[1.16] [&_.markdown-source-h1]:tracking-[-0.035em] sm:[&_.markdown-source-h1]:mb-10 sm:[&_.markdown-source-h1]:text-[2.5rem] lg:[&_.markdown-source-h1]:text-[2.75rem]">
+      <div className="px-5 py-6 sm:px-7 sm:py-8 [&_.markdown-source-h1]:mb-6 [&_.markdown-source-h1]:text-[1.75rem] [&_.markdown-source-h1]:leading-[1.4] [&_.markdown-source-h1]:tracking-[-0.012em] sm:[&_.markdown-source-h1]:mb-8 sm:[&_.markdown-source-h1]:text-[2.25rem]">
         <h1 className="sr-only">{title}</h1>
         <MarkdownContent content={content} prioritizeFirstImage demotePrimaryHeading />
       </div>
