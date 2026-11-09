@@ -137,9 +137,6 @@ export function ProductSalesPage() {
             <p>
               <span className="font-bold text-surface-500">사업자등록번호</span> 457-49-00942
             </p>
-            <p>
-              <span className="font-bold text-surface-500">대표전화</span> 010-6545-6502
-            </p>
           </div>
           <Link
             href="/privacy"
