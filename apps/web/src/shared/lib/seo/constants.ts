@@ -9,8 +9,8 @@ export const DEFAULT_OG_IMAGE = '/og-default.png';
 /** 피드 상세와 광고 노출에 필요한 최소 본문 길이(글자 수). */
 export const MIN_INDEXABLE_CONTENT_LENGTH = 500;
 
-/** 독립된 지식 문서로 색인할 Vault 노트의 최소 본문 길이(글자 수). */
-export const MIN_INDEXABLE_VAULT_CONTENT_LENGTH = 1500;
+/** 독립된 지식 문서로 색인할 Vault 노트의 최소 본문 길이(글자 수). 짧은 노트가 사이트맵 대부분을 차지해 구글이 글을 늦게 가져가던 문제로 2500 으로 올림. */
+export const MIN_INDEXABLE_VAULT_CONTENT_LENGTH = 2500;
 
 /** 독립된 목록 페이지로 색인할 태그의 최소 공개 포스트 수. */
 export const MIN_INDEXABLE_TAG_POST_COUNT = 3;
